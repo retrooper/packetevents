@@ -71,7 +71,7 @@ public final class SpigotReflectionUtil {
     public static Field ENTITY_PLAYER_PING_FIELD, ENTITY_BOUNDING_BOX_FIELD, BYTE_BUF_IN_PACKET_DATA_SERIALIZER;
 
     //Methods
-    public static Method GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
+    public static Method IS_DEBUGGING, GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
             GET_MOB_EFFECT_LIST_ID_METHOD, GET_MOB_EFFECT_LIST_BY_ID_METHOD, GET_ITEM_ID_METHOD, GET_ITEM_BY_ID_METHOD,
             GET_BUKKIT_ENTITY_METHOD, GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD, GET_ENTITY_BY_ID_METHOD,
             CRAFT_ITEM_STACK_AS_BUKKIT_COPY, CRAFT_ITEM_STACK_AS_NMS_COPY,
@@ -97,6 +97,7 @@ public final class SpigotReflectionUtil {
     }
 
     private static void initMethods() {
+        IS_DEBUGGING = Reflection.getMethod(MINECRAFT_SERVER_CLASS, "isDebugging", 0);
         GET_BUKKIT_ENTITY_METHOD = Reflection.getMethod(NMS_ENTITY_CLASS, CRAFT_ENTITY_CLASS, 0);
         GET_CRAFT_PLAYER_HANDLE_METHOD = Reflection.getMethod(CRAFT_PLAYER_CLASS, "getHandle", 0);
         GET_CRAFT_ENTITY_HANDLE_METHOD = Reflection.getMethod(CRAFT_ENTITY_CLASS, "getHandle", 0);
@@ -210,6 +211,19 @@ public final class SpigotReflectionUtil {
                 return null;
             }
         }
+    }
+
+    public static boolean isMinecraftServerInstanceDebugging() {
+        Object minecraftServerInstance = getMinecraftServerInstance(Bukkit.getServer());
+        if (minecraftServerInstance != null && IS_DEBUGGING != null) {
+            try {
+                return (boolean) IS_DEBUGGING.invoke(minecraftServerInstance);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                IS_DEBUGGING = null;
+                return false;
+            }
+        }
+        return false;
     }
 
     public static Object getMinecraftServerInstance(Server server) {

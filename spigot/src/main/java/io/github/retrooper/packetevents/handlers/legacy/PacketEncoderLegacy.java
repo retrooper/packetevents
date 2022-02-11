@@ -20,9 +20,13 @@ package io.github.retrooper.packetevents.handlers.legacy;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
+import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.github.retrooper.packetevents.handlers.compression.PacketCompressionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
@@ -34,17 +38,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ChannelHandler.Sharable
-public class PacketEncoderLegacy extends MessageToByteEncoder {
+public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
     public volatile Player player;
     public User user;
     private boolean handledCompression;
-    private List<Runnable> promisedTasks = new ArrayList<>();
+    private final List<Runnable> promisedTasks = new ArrayList<>();
 
     public PacketEncoderLegacy(User user) {
         this.user = user;
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf buffer) {
+    public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
         boolean doCompression = handleCompressionOrder(ctx, buffer);
 
         int preProcessIndex = buffer.readerIndex();
@@ -90,8 +94,7 @@ public class PacketEncoderLegacy extends MessageToByteEncoder {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf out) {
-        ByteBuf in = (ByteBuf) o;
+    protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) throws Exception {
         if (in.readableBytes() == 0) return;
         out.writeBytes(in);
         read(ctx, out);
@@ -113,7 +116,13 @@ public class PacketEncoderLegacy extends MessageToByteEncoder {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception{
+        super.exceptionCaught(ctx, cause);
+        //Check if the minecraft server will already print our exception for us.
+        if (ExceptionUtil.isException(cause, PacketProcessException.class)
+                && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
+                && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
+            cause.printStackTrace();
+        }
     }
 }

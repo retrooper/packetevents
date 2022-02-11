@@ -47,12 +47,9 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
         this.player = player;
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf buffer) {
+    public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
         boolean doCompression = handleCompressionOrder(ctx, buffer);
         int firstReaderIndex = buffer.readerIndex();
-        if (doCompression) {
-            System.out.println("Bytes: " + buffer.readableBytes());
-        }
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer);
         int readerIndex = buffer.readerIndex();
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> buffer.readerIndex(readerIndex));
@@ -64,7 +61,6 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
             }
             buffer.readerIndex(firstReaderIndex);
             if (doCompression) {
-                System.out.println("Do compression: " + packetSendEvent.getChannel().pipeline().namesToString());
                 recompress(ctx, buffer);
             }
             if (packetSendEvent.hasPromisedTasks()) {
@@ -76,6 +72,13 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
                 task.run();
             }
         }
+    }
+
+    @Override
+    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
+        if (msg.readableBytes() == 0) return;
+        out.writeBytes(msg);
+        read(ctx, out);
     }
 
     @Override
@@ -111,7 +114,6 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
                 }
                 //Relocate handlers
                 ServerConnectionInitializer.reloadChannel(ctx.channel());
-                System.out.println("Handlers: " + PacketEvents.getAPI().getNettyManager().wrapChannel(ctx.channel()).pipeline().namesToString());
                 handledCompression = true;
                 return true;
             } catch (InvocationTargetException e) {
@@ -135,12 +137,5 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
         finally {
             compressed.release();
         }
-    }
-
-    @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
-        if (msg.readableBytes() == 0) return;
-        out.writeBytes(msg);
-        read(ctx, out);
     }
 }

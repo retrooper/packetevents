@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.event;
 
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
@@ -32,25 +33,28 @@ import java.util.ArrayList;
 public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
     private boolean cloned;
 
-    protected PacketReceiveEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    protected PacketReceiveEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) throws PacketProcessException {
         super(PacketSide.CLIENT, channel, user, player, byteBuf);
     }
 
-    protected PacketReceiveEvent(ConnectionState connectionState, ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    protected PacketReceiveEvent(ConnectionState connectionState, ChannelAbstract channel, User user,
+                                 Object player, ByteBufAbstract byteBuf) throws PacketProcessException{
         super(PacketSide.CLIENT, connectionState, channel, user, player, byteBuf);
     }
 
-    protected PacketReceiveEvent(Object channel, User user, Object player, Object rawByteBuf) {
+    protected PacketReceiveEvent(Object channel, User user, Object player, Object rawByteBuf) throws PacketProcessException{
         super(PacketSide.CLIENT, channel, user, player, rawByteBuf);
     }
 
-    protected PacketReceiveEvent(ConnectionState connectionState, Object channel, User user, Object player, Object rawByteBuf) {
+    protected PacketReceiveEvent(ConnectionState connectionState,
+                                 Object channel, User user, Object player, Object rawByteBuf) throws PacketProcessException{
         super(PacketSide.CLIENT, connectionState, channel, user, player, rawByteBuf);
     }
 
     protected PacketReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
                               ServerVersion serverVersion, InetSocketAddress socketAddress,
-                              ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+                              ChannelAbstract channel, User user, Object player,
+                                 ByteBufAbstract byteBuf) throws PacketProcessException{
         super(packetID, packetType, serverVersion, socketAddress,
                 channel, user, player, byteBuf);
         this.cloned = cloned;
@@ -62,10 +66,15 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public PacketReceiveEvent clone() {
-        return new PacketReceiveEvent(true, getPacketId(),
-                getPacketType(), getServerVersion(),
-                getSocketAddress(), getChannel(),
-                getUser(), getPlayer(), getByteBuf().duplicate());
+        try {
+            return new PacketReceiveEvent(true, getPacketId(),
+                    getPacketType(), getServerVersion(),
+                    getSocketAddress(), getChannel(),
+                    getUser(), getPlayer(), getByteBuf().duplicate());
+        } catch (PacketProcessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

@@ -28,6 +28,7 @@ package com.github.retrooper.packetevents.manager.server;
  * @since 1.6.9
  */
 public enum ServerVersion {
+    //TODO Rename to PlatformVersion or LocalVersion or Version?
     V_1_7_10(5),
     V_1_8(47), V_1_8_3(47), V_1_8_8(47),
     V_1_9(107), V_1_9_2(109), V_1_9_4(110),

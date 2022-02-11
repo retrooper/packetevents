@@ -2,9 +2,14 @@ package io.github.retrooper.packetevents.handlers.legacy;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
+import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.github.retrooper.packetevents.handlers.compression.PacketCompressionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.handler.codec.ByteToMessageDecoder;
@@ -35,7 +40,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
         postTasks.addAll(decoder.postTasks);
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) {
+    public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) throws Exception {
         if (skipDoubleTransform) {
             skipDoubleTransform = false;
             output.add(input.retain());
@@ -74,8 +79,19 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
     }
 
     @Override
-    public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
+    public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
         read(ctx, byteBuf, out);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+        //Check if the minecraft server will already print our exception for us.
+        if (ExceptionUtil.isException(cause, PacketProcessException.class)
+                && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
+                && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
+            cause.printStackTrace();
+        }
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {

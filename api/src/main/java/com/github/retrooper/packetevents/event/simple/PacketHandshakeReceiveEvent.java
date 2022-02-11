@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.event.simple;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
@@ -30,24 +31,35 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import java.net.InetSocketAddress;
 
 public class PacketHandshakeReceiveEvent extends PacketReceiveEvent {
-    public PacketHandshakeReceiveEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    public PacketHandshakeReceiveEvent(ChannelAbstract channel, User user,
+                                       Object player, ByteBufAbstract byteBuf)throws PacketProcessException {
         super(channel, user, player, byteBuf);
     }
 
-    public PacketHandshakeReceiveEvent(ConnectionState connectionState, ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    public PacketHandshakeReceiveEvent(ConnectionState connectionState,
+                                       ChannelAbstract channel, User user,
+                                       Object player, ByteBufAbstract byteBuf)throws PacketProcessException {
         super(connectionState, channel, user, player, byteBuf);
     }
 
-    public PacketHandshakeReceiveEvent(Object channel, User user, Object player, Object rawByteBuf) {
+    public PacketHandshakeReceiveEvent(Object channel, User user,
+                                       Object player, Object rawByteBuf) throws PacketProcessException{
         super(channel, user, player, rawByteBuf);
     }
 
-    public PacketHandshakeReceiveEvent(ConnectionState connectionState, Object channel, User user, Object player, Object rawByteBuf) {
+    public PacketHandshakeReceiveEvent(ConnectionState connectionState,
+                                       Object channel, User user, Object player,
+                                       Object rawByteBuf) throws PacketProcessException {
         super(connectionState, channel, user, player, rawByteBuf);
     }
 
-    public PacketHandshakeReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, InetSocketAddress socketAddress, ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
-        super(cloned, packetID, packetType, serverVersion, socketAddress, channel, user, player, byteBuf);
+    public PacketHandshakeReceiveEvent(boolean cloned, int packetID,
+                                       PacketTypeCommon packetType, ServerVersion serverVersion,
+                                       InetSocketAddress socketAddress, ChannelAbstract channel,
+                                       User user, Object player,
+                                       ByteBufAbstract byteBuf) throws PacketProcessException{
+        super(cloned, packetID, packetType, serverVersion, socketAddress,
+                channel, user, player, byteBuf);
     }
 
     public PacketType.Handshaking.Client getPacketType() {

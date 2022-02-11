@@ -20,8 +20,10 @@ package io.github.retrooper.packetevents.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
+import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -43,7 +45,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
         this.player = decoder.player;
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> output) {
+    public void read(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> output) throws Exception {
         ByteBuf transformed = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
             int firstReaderIndex = transformed.readerIndex();
@@ -70,7 +72,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
         if (byteBuf.readableBytes() != 0) {
             read(ctx, byteBuf, out);
         }

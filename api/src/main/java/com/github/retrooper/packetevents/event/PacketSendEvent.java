@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.event;
 
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
@@ -34,29 +35,29 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     private boolean cloned;
     private List<Runnable> promisedTasks = null;
 
-    protected PacketSendEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    protected PacketSendEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) throws PacketProcessException {
         super(PacketSide.SERVER, channel, user, player, byteBuf);
     }
 
     protected PacketSendEvent(ConnectionState connectionState, ChannelAbstract channel,
-                           User user, Object player,
-                           ByteBufAbstract byteBuf) {
+                              User user, Object player,
+                              ByteBufAbstract byteBuf) throws PacketProcessException {
         super(PacketSide.SERVER, connectionState, channel, user, player, byteBuf);
     }
 
-    protected PacketSendEvent(Object channel, User user, Object player, Object rawByteBuf) {
+    protected PacketSendEvent(Object channel, User user, Object player, Object rawByteBuf) throws PacketProcessException {
         super(PacketSide.SERVER, channel, user, player, rawByteBuf);
     }
 
     protected PacketSendEvent(ConnectionState connectionState, Object channel, User user,
-                           Object player, Object rawByteBuf) {
+                              Object player, Object rawByteBuf) throws PacketProcessException {
         super(PacketSide.SERVER, connectionState, channel, user, player, rawByteBuf);
     }
 
     protected PacketSendEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
-                           ServerVersion serverVersion, InetSocketAddress socketAddress,
-                           ChannelAbstract channel, User user,
-                           Object player, ByteBufAbstract byteBuf) {
+                              ServerVersion serverVersion, InetSocketAddress socketAddress,
+                              ChannelAbstract channel, User user,
+                              Object player, ByteBufAbstract byteBuf) throws PacketProcessException {
         super(packetID, packetType,
                 serverVersion, socketAddress,
                 channel, user, player, byteBuf);
@@ -69,11 +70,16 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public PacketSendEvent clone() {
-        return new PacketSendEvent(true, getPacketId(), getPacketType(),
-                getServerVersion(),
-                getSocketAddress(), getChannel(),
-                getUser(), getPlayer(),
-                getByteBuf().duplicate());
+        try {
+            return new PacketSendEvent(true, getPacketId(), getPacketType(),
+                    getServerVersion(),
+                    getSocketAddress(), getChannel(),
+                    getUser(), getPlayer(),
+                    getByteBuf().duplicate());
+        } catch (PacketProcessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

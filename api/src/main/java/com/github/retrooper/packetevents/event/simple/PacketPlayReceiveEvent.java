@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.event.simple;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
@@ -30,23 +31,29 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import java.net.InetSocketAddress;
 
 public class PacketPlayReceiveEvent extends PacketReceiveEvent {
-    public PacketPlayReceiveEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    public PacketPlayReceiveEvent(ChannelAbstract channel, User user,
+                                  Object player, ByteBufAbstract byteBuf) throws PacketProcessException  {
         super(channel, user, player, byteBuf);
     }
 
-    public PacketPlayReceiveEvent(ConnectionState connectionState, ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    public PacketPlayReceiveEvent(ConnectionState connectionState, ChannelAbstract channel,
+                                  User user, Object player, ByteBufAbstract byteBuf) throws PacketProcessException {
         super(connectionState, channel, user, player, byteBuf);
     }
 
-    public PacketPlayReceiveEvent(Object channel, User user, Object player, Object rawByteBuf) {
+    public PacketPlayReceiveEvent(Object channel, User user,
+                                  Object player, Object rawByteBuf) throws PacketProcessException {
         super(channel, user, player, rawByteBuf);
     }
 
-    public PacketPlayReceiveEvent(ConnectionState connectionState, Object channel, User user, Object player, Object rawByteBuf) {
+    public PacketPlayReceiveEvent(ConnectionState connectionState, Object channel, User user,
+                                  Object player, Object rawByteBuf) throws PacketProcessException {
         super(connectionState, channel, user, player, rawByteBuf);
     }
 
-    public PacketPlayReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, InetSocketAddress socketAddress, ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    public PacketPlayReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
+                                  ServerVersion serverVersion, InetSocketAddress socketAddress,
+                                  ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) throws PacketProcessException {
         super(cloned, packetID, packetType, serverVersion, socketAddress, channel, user, player, byteBuf);
     }
 

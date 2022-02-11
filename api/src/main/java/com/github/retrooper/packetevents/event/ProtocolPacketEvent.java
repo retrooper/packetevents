@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
@@ -48,7 +49,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private PacketWrapper<?> lastUsedWrapper;
     private List<Runnable> postTasks = null;
 
-    public ProtocolPacketEvent(PacketSide packetSide, Object channel, User user, T player, Object rawByteBuf) {
+    public ProtocolPacketEvent(PacketSide packetSide, Object channel, User user, T player, Object rawByteBuf) throws PacketProcessException {
         this(packetSide,
                 PacketEvents.getAPI().getNettyManager().wrapChannel(channel),
                 user,
@@ -57,7 +58,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, Object channel, User user,
-                               T player, Object rawByteBuf) {
+                               T player, Object rawByteBuf) throws PacketProcessException {
         this(packetSide,
                 connectionState,
                 PacketEvents.getAPI().getNettyManager().wrapChannel(channel),
@@ -67,12 +68,12 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
 
-    public ProtocolPacketEvent(PacketSide packetSide, ChannelAbstract channel, User user, T player, ByteBufAbstract byteBuf) {
+    public ProtocolPacketEvent(PacketSide packetSide, ChannelAbstract channel, User user, T player, ByteBufAbstract byteBuf) throws PacketProcessException {
         this(packetSide, user.getConnectionState(), channel, user, player, byteBuf);
     }
 
     public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, ChannelAbstract channel,
-                               User user, T player, ByteBufAbstract byteBuf) {
+                               User user, T player, ByteBufAbstract byteBuf) throws PacketProcessException {
         this.channel = channel;
         this.user = user;
         this.player = player;
@@ -87,16 +88,21 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
                 version = ClientVersion.UNKNOWN;
             }
 
-            if (version != null) {
-                user.setClientVersion(version);
-            }
+            user.setClientVersion(version);
         }
 
 
         this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
 
         this.byteBuf = byteBuf;
-        this.packetID = readVarInt(byteBuf);
+        int size = byteBuf.readableBytes();
+        try {
+            this.packetID = readVarInt(byteBuf);
+        } catch (Exception e) {
+            throw new PacketProcessException(e,
+                    PacketProcessException.PacketProcessExceptionReason.PACKET_ID,
+                    packetSide, size, null);
+        }
         this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
     }
 
@@ -111,17 +117,19 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.packetType = packetType;
     }
 
-    private static int readVarInt(ByteBufAbstract byteBuf) {
-        byte b0;
-        int i = 0;
-        int j = 0;
+    private static int readVarInt(ByteBufAbstract buffer) throws Exception {
+        int value = 0;
+        int length = 0;
+        byte currentByte;
         do {
-            b0 = byteBuf.readByte();
-            i |= (b0 & Byte.MAX_VALUE) << j++ * 7;
-            if (j > 5)
-                throw new RuntimeException("VarInt too big");
-        } while ((b0 & 128) == 128);
-        return i;
+            currentByte = buffer.readByte();
+            value |= (currentByte & 0x7F) << (length * 7);
+            length += 1;
+            if (length > 5) {
+                throw new Exception("VarInt is too big");
+            }
+        } while ((currentByte & 0x80) == 0x80);
+        return value;
     }
 
     public ChannelAbstract getChannel() {
@@ -147,10 +155,12 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     //TODO Possibly put clientversion inside User class and remove here
+    @Deprecated
     public ClientVersion getClientVersion() {
         return user.getClientVersion();
     }
 
+    @Deprecated
     public void setClientVersion(@NotNull ClientVersion clientVersion) {
         user.setClientVersion(clientVersion);
     }

@@ -18,11 +18,11 @@
 
 package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EventManager {
@@ -46,22 +46,17 @@ public class EventManager {
             HashSet<PacketListenerCommon> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerCommon listener : listeners) {
-                    try {
-                        PacketWrapper<?> lastUsedWrapper = null;
-                        boolean isPacketEvent = event instanceof ProtocolPacketEvent;
-                        if (isPacketEvent) {
-                            lastUsedWrapper = ((ProtocolPacketEvent<?>) event).getLastUsedWrapper();
-                        }
-                        event.call(listener);
-                        if (listener.isReadOnly() && isPacketEvent) {
-                            ((ProtocolPacketEvent<?>) event).setLastUsedWrapper(lastUsedWrapper);
-                        }
-                        if (postCallListenerAction != null) {
-                            postCallListenerAction.run();
-                        }
-                    } catch (Exception ex) {
-                        PacketEvents.getAPI().getLogManager().severe("packetevents encountered an exception when calling your listener.");
-                        ex.printStackTrace();
+                    PacketWrapper<?> lastUsedWrapper = null;
+                    boolean isPacketEvent = event instanceof ProtocolPacketEvent;
+                    if (isPacketEvent) {
+                        lastUsedWrapper = ((ProtocolPacketEvent<?>) event).getLastUsedWrapper();
+                    }
+                    event.call(listener);
+                    if (listener.isReadOnly() && isPacketEvent) {
+                        ((ProtocolPacketEvent<?>) event).setLastUsedWrapper(lastUsedWrapper);
+                    }
+                    if (postCallListenerAction != null) {
+                        postCallListenerAction.run();
                     }
                 }
             }
@@ -105,7 +100,7 @@ public class EventManager {
         }
         return listeners;
     }
-    
+
     public void unregisterListener(PacketListenerCommon listener) {
         HashSet<PacketListenerCommon> listenerSet = listenersMap.get(listener.getPriority().getId());
         if (listenerSet == null) return;

@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.event.simple;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
@@ -31,23 +32,28 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 public class PacketLoginSendEvent extends PacketSendEvent {
-    public PacketLoginSendEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    public PacketLoginSendEvent(ChannelAbstract channel, User user,
+                                Object player, ByteBufAbstract byteBuf) throws PacketProcessException {
         super(channel, user, player, byteBuf);
     }
 
-    public PacketLoginSendEvent(ConnectionState connectionState, ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    public PacketLoginSendEvent(ConnectionState connectionState, ChannelAbstract channel, User user,
+                                Object player, ByteBufAbstract byteBuf) throws PacketProcessException{
         super(connectionState, channel, user, player, byteBuf);
     }
 
-    public PacketLoginSendEvent(Object channel, User user, Object player, Object rawByteBuf) {
+    public PacketLoginSendEvent(Object channel, User user, Object player, Object rawByteBuf) throws PacketProcessException {
         super(channel, user, player, rawByteBuf);
     }
 
-    public PacketLoginSendEvent(ConnectionState connectionState, Object channel, User user, Object player, Object rawByteBuf) {
+    public PacketLoginSendEvent(ConnectionState connectionState, Object channel, User user,
+                                Object player, Object rawByteBuf) throws PacketProcessException {
         super(connectionState, channel, user, player, rawByteBuf);
     }
 
-    public PacketLoginSendEvent(boolean cloned, int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, InetSocketAddress socketAddress, ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    public PacketLoginSendEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
+                                ServerVersion serverVersion, InetSocketAddress socketAddress, ChannelAbstract channel,
+                                User user, Object player, ByteBufAbstract byteBuf) throws PacketProcessException {
         super(cloned, packetID, packetType, serverVersion, socketAddress, channel, user, player, byteBuf);
     }
 

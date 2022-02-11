@@ -122,24 +122,6 @@ public class CustomPipelineUtil {
         return output;
     }
 
-    /**
-     * Check if a stack trace contains a certain exception
-     *
-     * @param t The throwable
-     * @param c The exception to look for
-     * @return True if the stack trace contained it as its cause or if t is an instance of c.
-     */
-    public static boolean containsCause(Throwable t, Class<?> c) {
-        while (t != null) {
-            if (c.isAssignableFrom(t.getClass())) {
-                return true;
-            }
-
-            t = t.getCause();
-        }
-        return false;
-    }
-
 
     public static ChannelHandlerContextAbstract getNextContext(String name, ChannelPipelineAbstract pipeline) {
         boolean mark = false;

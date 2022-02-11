@@ -21,10 +21,11 @@ package com.github.retrooper.packetevents.util;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.simple.*;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 public class EventCreationUtil {
-    public static PacketReceiveEvent createReceiveEvent(Object channel, User user, Object player, Object buffer) {
+    public static PacketReceiveEvent createReceiveEvent(Object channel, User user, Object player, Object buffer) throws PacketProcessException {
         switch (user.getConnectionState()) {
             case HANDSHAKING:
                 return new PacketHandshakeReceiveEvent(channel, user, player, buffer);
@@ -39,7 +40,7 @@ public class EventCreationUtil {
         }
     }
 
-    public static PacketSendEvent createSendEvent(Object channel, User user, Object player, Object buffer) {
+    public static PacketSendEvent createSendEvent(Object channel, User user, Object player, Object buffer) throws PacketProcessException{
         switch (user.getConnectionState()) {
             case STATUS:
                 return new PacketStatusSendEvent(channel, user, player, buffer);

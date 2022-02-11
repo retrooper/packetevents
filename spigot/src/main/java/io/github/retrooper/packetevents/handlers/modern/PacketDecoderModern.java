@@ -20,9 +20,13 @@ package io.github.retrooper.packetevents.handlers.modern;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
+import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.github.retrooper.packetevents.handlers.compression.PacketCompressionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -57,7 +61,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         postTasks.addAll(decoder.postTasks);
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) {
+    public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) throws Exception {
         if (skipDoubleTransform) {
             skipDoubleTransform = false;
             output.add(input.retain());
@@ -96,10 +100,11 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     }
 
     @Override
-    public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) {
+    public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
         if (buffer.readableBytes() != 0) {
             read(ctx, buffer, out);
             if (!decoders.isEmpty()) {
+
                 //Call custom decoders
                 try {
                     for (ByteToMessageDecoder decoder : decoders) {
@@ -126,6 +131,17 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+        //Check if the minecraft server will already print our exception for us.
+        if (ExceptionUtil.isException(cause, PacketProcessException.class)
+                && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
+                && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
+            cause.printStackTrace();
         }
     }
 
