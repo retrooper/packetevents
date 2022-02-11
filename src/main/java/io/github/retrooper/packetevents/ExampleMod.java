@@ -10,9 +10,9 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsBuilder;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +42,8 @@ public class ExampleMod implements ModInitializer {
                     int port = handshake.getServerPort();
                     System.out.println("Sent handshaking packet: " + version + " " + address + ":" + port);
                 } else if (event.getConnectionState() == ConnectionState.PLAY) {
-                    Text text = new LiteralText("Packet sent: " + event.getPacketType());
-                    MinecraftClient.getInstance().inGameHud.getChatHud()
+                    Component text = new TextComponent("Packet sent: " + event.getPacketType());
+                    Minecraft.getInstance().gui.getChat()
                             .addMessage(text);
                 }
             }

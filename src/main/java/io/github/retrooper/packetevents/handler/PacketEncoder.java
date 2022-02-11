@@ -9,17 +9,16 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
-import net.minecraft.client.network.ClientPlayerEntity;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.player.LocalPlayer;
 
 public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
-    public final ClientPlayerEntity player;
+    public final LocalPlayer player;
     public User user;
     private final List<Runnable> promisedTasks = new ArrayList<>();
 
-    public PacketEncoder(User user, ClientPlayerEntity player) {
+    public PacketEncoder(User user, LocalPlayer player) {
         this.user = user;
         this.player = player;
     }

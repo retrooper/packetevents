@@ -8,15 +8,14 @@ import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import net.minecraft.client.network.ClientPlayerEntity;
-
 import java.util.List;
+import net.minecraft.client.player.LocalPlayer;
 
 public class PacketDecoder extends ByteToMessageDecoder {
     public User user;
-    public final ClientPlayerEntity player;
+    public final LocalPlayer player;
 
-    public PacketDecoder(User user, ClientPlayerEntity player) {
+    public PacketDecoder(User user, LocalPlayer player) {
         this.user = user;
         this.player = player;
     }
