@@ -53,6 +53,7 @@ public class ExampleMod implements ModInitializer {
                 super.onPacketSend(event);
             }
         });
+
         PacketEvents.getAPI().init();
     }
 }
