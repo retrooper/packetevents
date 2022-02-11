@@ -19,7 +19,14 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.bungee.BungeePacketEventsBuilder;
+import com.github.retrooper.packetevents.event.PacketListenerAbstract;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
+import io.github.retrooper.packetevents.bungee.factory.BungeePacketEventsBuilder;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public final class PacketEventsPlugin extends Plugin {
@@ -36,16 +43,24 @@ public final class PacketEventsPlugin extends Plugin {
         /*PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
-                System.out.println("Receiving: " + event.getPacketType().getName());
+                //System.out.println("Receiving: " + event.getPacketType().getName());
             }
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
+                if (event.getPacketType() == PacketType.Play.Server.PLAYER_INFO) {
+                    WrapperPlayServerPlayerInfo info = new WrapperPlayServerPlayerInfo(event);
+                    System.out.println("Sending: " + event.getPacketType().getName() + " - " + info.getAction());
+                }
+                if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
+                    WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
+                    System.out.println("Sending: " + event.getPacketType().getName() + " - " + joinGame.getWorldName());
+                }
                 if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
                     System.out.println("Sending chunk data: " + event.getPacketType().getName());
+                    WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
+                    System.out.println("Column: " + chunkData.getColumn().getX() + ", " + chunkData.getColumn().getZ());
                 }
-                //System.out.println("Sending: " + event.getPacketType().getName());
-                //Channel channel = (Channel) event.getChannel().rawChannel();
             }
         });*/
         PacketEvents.getAPI().init();
