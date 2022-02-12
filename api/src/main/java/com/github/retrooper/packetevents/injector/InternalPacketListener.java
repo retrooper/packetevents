@@ -78,7 +78,7 @@ public class InternalPacketListener implements PacketListener {
             event.getUser().setWorldNBT(list);
 
             // Update world height
-            NBTCompound worldNBT = event.getUser().getWorldNBT(joinGame.getWorldName()).getCompoundTagOrNull("element");
+            NBTCompound worldNBT = event.getUser().getWorldNBT(joinGame.getDimension().getType().getName()).getCompoundTagOrNull("element");
             event.getUser().setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
             event.getUser().setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
         }
@@ -91,7 +91,7 @@ public class InternalPacketListener implements PacketListener {
 
             WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
 
-            NBTCompound worldNBT = event.getUser().getWorldNBT(respawn.getWorldName().get()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
+            NBTCompound worldNBT = event.getUser().getWorldNBT(respawn.getDimension().getType().getName()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
             event.getUser().setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
             event.getUser().setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
         }
