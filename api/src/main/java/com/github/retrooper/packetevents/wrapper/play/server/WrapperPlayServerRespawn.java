@@ -40,6 +40,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     private Difficulty difficulty;
     private long hashedSeed;
     private GameMode gameMode;
+    @Nullable
     private GameMode previousGameMode;
     private boolean worldDebug;
     private boolean worldFlat;
@@ -52,7 +53,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         super(event);
     }
 
-    public WrapperPlayServerRespawn(Dimension dimension, @Nullable String worldName, Difficulty difficulty, long hashedSeed, GameMode gameMode, GameMode previousGameMode, boolean worldDebug, boolean worldFlat, boolean keepingAllPlayerData) {
+    public WrapperPlayServerRespawn(Dimension dimension, @Nullable String worldName, Difficulty difficulty, long hashedSeed, GameMode gameMode, @Nullable GameMode previousGameMode, boolean worldDebug, boolean worldFlat, boolean keepingAllPlayerData) {
         super(PacketType.Play.Server.RESPAWN);
         this.dimension = dimension;
         setWorldName(worldName);
@@ -78,7 +79,8 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             worldName = Optional.of(readString());
             hashedSeed = readLong();
             gameMode = GameMode.values()[readByte()];
-            previousGameMode = GameMode.values()[readByte()];
+            int previousMode = readByte();
+            previousGameMode = previousMode == -1 ? null : GameMode.values()[previousMode];
             worldDebug = readBoolean();
             worldFlat = readBoolean();
             keepingAllPlayerData = readBoolean();
@@ -89,7 +91,8 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             worldName = Optional.of(readString());
             hashedSeed = readLong();
             gameMode = GameMode.values()[readByte()];
-            previousGameMode = GameMode.values()[readByte()];
+            int previousMode = readByte();
+            previousGameMode = previousMode == -1 ? null : GameMode.values()[previousMode];
             worldDebug = readBoolean();
             worldFlat = readBoolean();
             keepingAllPlayerData = readBoolean();
@@ -100,8 +103,6 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             worldName = Optional.empty();
             hashedSeed = readLong();
             gameMode = GameMode.values()[readByte()];
-            //We just set the previous gamemode to the current one
-            previousGameMode = gameMode;
             levelType = readString(16);
             if (WorldType.FLAT.getName().equals(levelType)) {
                 worldFlat = true;
@@ -130,8 +131,6 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             hashedSeed = 0L;
             //Note: SPECTATOR will not be expected from a 1.7 client.
             gameMode = GameMode.values()[readByte()];
-            //We just set the previous gamemode to the current one
-            previousGameMode = gameMode;
             levelType = readString(16);
             if (WorldType.FLAT.getName().equals(levelType)) {
                 worldFlat = true;
@@ -176,7 +175,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             writeString(worldName.orElse(""));
             writeLong(hashedSeed);
             writeByte(gameMode.ordinal());
-            writeByte(previousGameMode.ordinal());
+            writeByte(previousGameMode == null ? -1 :previousGameMode.ordinal());
             writeBoolean(worldDebug);
             writeBoolean(worldFlat);
             writeBoolean(keepingAllPlayerData);
@@ -186,7 +185,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             writeString(worldName.orElse(""));
             writeLong(hashedSeed);
             writeByte(gameMode.ordinal());
-            writeByte(previousGameMode.ordinal());
+            writeByte(previousGameMode == null ? -1 : previousGameMode.ordinal());
             writeBoolean(worldDebug);
             writeBoolean(worldFlat);
             writeBoolean(keepingAllPlayerData);
@@ -280,11 +279,12 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         this.gameMode = gameMode;
     }
 
+    @Nullable
     public GameMode getPreviousGameMode() {
         return previousGameMode;
     }
 
-    public void setPreviousGameMode(GameMode previousGameMode) {
+    public void setPreviousGameMode(@Nullable GameMode previousGameMode) {
         this.previousGameMode = previousGameMode;
     }
 
