@@ -40,16 +40,16 @@ public class NPCManager {
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.computeIfAbsent(npc, k -> new HashSet<>());
         WrapperPlayServerPlayerInfo playerInfoPacket = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER,
                 npc.getPlayerInfoData());
-        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoPacket);
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoPacket);
 
         //TODO Later if we want entity metadata, its not supported on newer server versions though(confirm if its mandatory on older versions)
         WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getUUID(), npc.getLocation());
-        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, spawnPlayer);
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPlayer);
 
         //Create team
         if (npc.getNameColor() != null || npc.getPrefixName() != null
         || npc.getSuffixName() != null) {
-            PacketEvents.getAPI().getPlayerManager().sendPacket(channel, npc.getTeamData());
+            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, npc.getTeamData());
         }
         targetChannels.add(channel);
     }
@@ -60,7 +60,7 @@ public class NPCManager {
         if (targetChannels != null) {
             //TODO Confirm if we need to destroy the team too
             WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(npc.getId());
-            PacketEvents.getAPI().getPlayerManager().sendPacket(channel, destroyEntities);
+            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
             targetChannels.remove(channel);
             if (targetChannels.isEmpty()) {
                 TARGET_CHANNELS.remove(npc);
@@ -83,7 +83,7 @@ public class NPCManager {
         if (targetChannels != null) {
             for (ChannelAbstract channel : targetChannels) {
                 WrapperPlayServerEntityTeleport entityTeleport = new WrapperPlayServerEntityTeleport(npc.getId(), to, true);
-                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityTeleport);
+                PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityTeleport);
             }
         }
     }
@@ -102,7 +102,7 @@ public class NPCManager {
             for (ChannelAbstract channel : targetChannels) {
                 if (shouldUseEntityTeleport) {
                     WrapperPlayServerEntityTeleport entityTeleport = new WrapperPlayServerEntityTeleport(npc.getId(), to, true);
-                    PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityTeleport);
+                    PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityTeleport);
                 } else {
                     boolean rotationChanged = to.getYaw() != from.getYaw() || to.getPitch() != from.getPitch();
                     boolean positionChanged = to.getPosition().getX() != from.getPosition().getX() ||
@@ -113,19 +113,19 @@ public class NPCManager {
                     double deltaZ = positionChanged ? (to.getPosition().getZ() - from.getPosition().getZ()) : 0;
                     if (positionChanged && rotationChanged) {
                         WrapperPlayServerEntityRelativeMoveAndRotation entityRelativeMoveAndRotation = new WrapperPlayServerEntityRelativeMoveAndRotation(npc.getId(), deltaX, deltaY, deltaZ, (byte) to.getYaw(), (byte) to.getPitch(), true);
-                        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRelativeMoveAndRotation);
+                        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRelativeMoveAndRotation);
 
                         WrapperPlayServerEntityHeadLook headYaw = new WrapperPlayServerEntityHeadLook(npc.getId(), (byte) to.getYaw());
-                        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, headYaw);
+                        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, headYaw);
                     } else if (positionChanged) {
                         WrapperPlayServerEntityRelativeMove entityRelativeMove = new WrapperPlayServerEntityRelativeMove(npc.getId(), deltaX, deltaY, deltaZ, true);
-                        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRelativeMove);
+                        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRelativeMove);
                     } else if (rotationChanged) {
                         WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(npc.getId(), (byte) to.getYaw(), (byte) to.getPitch(), true);
-                        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRotation);
+                        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRotation);
 
                         WrapperPlayServerEntityHeadLook headYaw = new WrapperPlayServerEntityHeadLook(npc.getId(), (byte) to.getYaw());
-                        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, headYaw);
+                        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, headYaw);
                     }
                 }
             }
@@ -139,10 +139,10 @@ public class NPCManager {
         if (targetChannels != null && !targetChannels.isEmpty()) {
             for (ChannelAbstract channel : targetChannels) {
                 WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(npc.getId(), yaw, pitch, true);
-                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRotation);
+                PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRotation);
 
                 WrapperPlayServerEntityHeadLook headYaw = new WrapperPlayServerEntityHeadLook(npc.getId(), yaw);
-                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, headYaw);
+                PacketEvents.getAPI().getProtocolManager().sendPacket(channel, headYaw);
             }
         }
     }
@@ -154,7 +154,7 @@ public class NPCManager {
             for (ChannelAbstract channel : targetChannels) {
                 WrapperPlayServerPlayerInfo playerInfo =
                         new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, npc.getPlayerInfoData());
-                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfo);
+                PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
             }
         }
     }
@@ -164,18 +164,18 @@ public class NPCManager {
         if (targetChannels != null && !targetChannels.isEmpty()) {
             for (ChannelAbstract channel : targetChannels) {
                 WrapperPlayServerPlayerInfo playerInfoRemove = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, npc.getPlayerInfoData());
-                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoRemove);
+                PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoRemove);
 
                 WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(npc.getId());
-                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, destroyEntities);
+                PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
 
                 npc.getProfile().setTextureProperties(skinTextureProperties);
                 npc.getProfile().setUUID(skinUUID);
                 WrapperPlayServerPlayerInfo playerInfoAdd = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, npc.getPlayerInfoData());
-                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoAdd);
+                PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoAdd);
 
                 WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getUUID(), npc.getLocation());
-                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, spawnPlayer);
+                PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPlayer);
             }
         }
     }
@@ -189,11 +189,11 @@ public class NPCManager {
                         new WrapperPlayServerTeams("custom_name_team",
                                 WrapperPlayServerTeams.TeamMode.REMOVE,
                                 Optional.empty());
-                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, removeTeam);
+                PacketEvents.getAPI().getProtocolManager().sendPacket(channel, removeTeam);
 
                 if (npc.getNameColor() != null || npc.getPrefixName() != null
                         || npc.getSuffixName() != null) {
-                    PacketEvents.getAPI().getPlayerManager().sendPacket(channel, npc.getTeamData());
+                    PacketEvents.getAPI().getProtocolManager().sendPacket(channel, npc.getTeamData());
                 }
             }
         }
@@ -247,7 +247,7 @@ public class NPCManager {
                 WrapperPlayServerEntityEquipment equipmentPacket
                         = new WrapperPlayServerEntityEquipment(npc.getId(),
                         equipmentList);
-                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, equipmentPacket);
+                PacketEvents.getAPI().getProtocolManager().sendPacket(channel, equipmentPacket);
             }
         }
     }

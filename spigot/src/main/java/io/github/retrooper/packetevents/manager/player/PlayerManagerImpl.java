@@ -20,8 +20,8 @@ package io.github.retrooper.packetevents.manager.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -30,7 +30,6 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
-import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -53,14 +52,15 @@ public class PlayerManagerImpl implements PlayerManager {
             return ClientVersion.UNKNOWN;
         }
         ChannelAbstract channel = getChannel(p);
-        User user = getUser(channel);
+        User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
         if (user.getClientVersion() == null
                 || !user.getClientVersion().isResolved()) {
+            //Failed to resolve.
             //Asking ViaVersion or ProtocolSupport for the protocol version.
             if (DependencyUtil.isProtocolTranslationDependencyAvailable()) {
                 try {
                     user.setClientVersion(ClientVersion
-                            .getClientVersionByProtocolVersion(DependencyUtil
+                            .getById(DependencyUtil
                                     .getProtocolVersion(p)));
                 } catch (Exception ex) {
                     //Try ask the dependency again the next time, for now it is temporarily unresolved...
@@ -79,76 +79,39 @@ public class PlayerManagerImpl implements PlayerManager {
                     protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
                 }
                 user.setClientVersion(ClientVersion
-                        .getClientVersionByProtocolVersion(protocolVersion));
-            }
-        }
-        return user.getClientVersion();
-    }
-
-
-    @Override
-    public ClientVersion getClientVersion(ChannelAbstract channel) {
-        User user = getUser(channel);
-        if (user.getClientVersion() == null || !user.getClientVersion().isResolved()) {
-            if (!DependencyUtil.isProtocolTranslationDependencyAvailable()) {
-                if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
-                    return user.getClientVersion();
-                } else {
-                    int protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
-                    user.setClientVersion(ClientVersion.getClientVersionByProtocolVersion(protocolVersion));
-                }
+                        .getById(protocolVersion));
             }
         }
         return user.getClientVersion();
     }
 
     @Override
-    public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        if (channel.isOpen()) {
-            if (ProtocolSupportUtil.isAvailable()) {
-                //ProtocolSupport has a MessageToMessageCodec handler named "ps_logic" in the pipeline.
-                //The Netty documentation explicitly mentions that you need to retain buffers before passing them through such handlers.
-                byteBuf.retain();
-            }
-            channel.writeAndFlush(byteBuf);
-        }
-    }
-
-    @Override
-    public void sendPacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        if (channel.isOpen()) {
-            //Only call the encoders after ours in the pipeline
-            channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
-        }
-    }
-
-    @Override
-    public User getUser(@NotNull Object player) {
-        Player p = (Player) player;
-        ChannelAbstract channel = getChannel(p);
-        User user = getUser(channel);
-        if (user == null && channel != null) {
-            //TODO Extract texture properties and pass into user profile(not priority)
-            user = new User(channel, ConnectionState.PLAY,
-                    null, new UserProfile(p.getUniqueId(),
-                    p.getName()));
-            USERS.put(channel, user);
-            PacketEvents.getAPI().getInjector().updateUser(channel, user);
-        }
-        return user;
-    }
-
-    @Override
-    public ChannelAbstract getChannel(@NotNull Object player) {
+    public @NotNull ChannelAbstract getChannel(@NotNull Object player) {
         String username = ((Player) player).getName();
-        ChannelAbstract channel = getChannel(username);
+        ChannelAbstract channel = PacketEvents.getAPI().getProtocolManager().getChannel(username);
         if (channel == null) {
             Object ch = SpigotReflectionUtil.getChannel((Player) player);
             if (ch != null) {
                 channel = PacketEvents.getAPI().getNettyManager().wrapChannel(ch);
-                CHANNELS.put(username, channel);
+                ProtocolManager.CHANNELS.put(username, channel);
             }
         }
         return channel;
+    }
+
+    @Override
+    public @NotNull User getUser(@NotNull Object player) {
+        Player p = (Player) player;
+        ChannelAbstract channel = getChannel(p);
+        User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+        if (user == null) {
+            //TODO Extract texture properties and pass into user profile(not priority)
+            user = new User(channel, ConnectionState.PLAY,
+                    null, new UserProfile(p.getUniqueId(),
+                    p.getName()));
+            ProtocolManager.USERS.put(channel, user);
+            PacketEvents.getAPI().getInjector().updateUser(channel, user);
+        }
+        return user;
     }
 }

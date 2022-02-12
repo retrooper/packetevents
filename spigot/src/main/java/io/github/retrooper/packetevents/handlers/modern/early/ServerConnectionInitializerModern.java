@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.handlers.modern.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -43,7 +44,7 @@ public class ServerConnectionInitializerModern {
         Channel channel = (Channel) ch;
         ChannelAbstract channelAbstract = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
         User user = new User(channelAbstract, connectionState, null, new UserProfile(null, null));
-        PacketEvents.getAPI().getPlayerManager().USERS.put(channelAbstract, user);
+        ProtocolManager.USERS.put(channelAbstract, user);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern(user));
         PacketEncoderModern encoder = new PacketEncoderModern(user);
         ChannelHandler vanillaEncoder = channel.pipeline().get("encoder");

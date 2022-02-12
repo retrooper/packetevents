@@ -93,20 +93,15 @@ public class LateChannelInjectorModern implements LateInjector {
     @Override
     public void ejectPlayer(Object player) {
         ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        if (channel != null) {
-            try {
-                ServerConnectionInitializerModern.postDestroyChannel(channel.rawChannel());
-            } catch (Exception ignored) {
-            }
+        try {
+            ServerConnectionInitializerModern.postDestroyChannel(channel.rawChannel());
+        } catch (Exception ignored) {
         }
     }
 
     @Override
     public boolean hasInjected(Object player) {
         ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        if (channel == null) {
-            return false;
-        }
         PacketDecoderModern decoder = getDecoder(channel);
         PacketEncoderModern encoder = getEncoder(channel);
         return decoder != null && decoder.player != null &&

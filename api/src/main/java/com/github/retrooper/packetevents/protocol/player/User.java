@@ -76,11 +76,11 @@ public class User {
     }
 
     public void sendPacket(ByteBufAbstract buffer) {
-        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, buffer);
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, buffer);
     }
 
     public void sendPacket(PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, wrapper);
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, wrapper);
     }
 
     public void chat(String message) {
@@ -101,7 +101,7 @@ public class User {
 
     public void sendMessage(Component component, ChatPosition position) {
         WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(component, position);
-        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, chatMessage);
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatMessage);
     }
 
     //TODO sendTitle that is cross-version

@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.manager.server;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public interface ServerManager {
@@ -41,43 +40,43 @@ public interface ServerManager {
         return SystemOS.getOS();
     }
 
-    void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
-
-    default void receivePacket(Object player, ByteBufAbstract byteBuf) {
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        receivePacket(channel, byteBuf);
+    @Deprecated
+    default void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        PacketEvents.getAPI().getProtocolManager().receivePacket(channel, byteBuf);
     }
 
-    default void receivePacket(Object player, PacketWrapper<?> wrapper) {
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        receivePacket(channel, wrapper);
-    }
-
+    @Deprecated
     default void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            receivePacket(channel, packet.buffer);
-        }
+        PacketEvents.getAPI().getProtocolManager().receivePacket(channel, wrapper);
     }
 
-    void receivePacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf);
-
-    default void receivePacketSilently(Object player, ByteBufAbstract byteBuf) {
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        receivePacketSilently(channel, byteBuf);
+    @Deprecated
+    default void receivePacket(Object player, ByteBufAbstract byteBuf) {
+        PacketEvents.getAPI().getPlayerManager().receivePacket(player, byteBuf);
     }
 
-    default void receivePacketSilently(Object player, PacketWrapper<?> wrapper) {
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        receivePacketSilently(channel, wrapper);
+    @Deprecated
+    default void receivePacket(Object player, PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getPlayerManager().receivePacket(player, wrapper);
     }
 
+    @Deprecated
+    default void receivePacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(channel, byteBuf);
+    }
+
+    @Deprecated
     default void receivePacketSilently(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            receivePacketSilently(channel, packet.buffer);
-        }
+        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(channel, wrapper);
+    }
+
+    @Deprecated
+    default void receivePacketSilently(Object player, ByteBufAbstract byteBuf) {
+        PacketEvents.getAPI().getPlayerManager().receivePacketSilently(player, byteBuf);
+    }
+
+    @Deprecated
+    default void receivePacketSilently(Object player, PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getPlayerManager().receivePacketSilently(player, wrapper);
     }
 }

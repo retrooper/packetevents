@@ -1,5 +1,5 @@
 /*
- * This file is part of ProtocolLib - https://github.com/retrooper/packetevents
+ * This file is part of ProtocolLib - https://github.com/dmulloy2/ProtocolLib
  * Copyright (C) ProtocolLib
  *
  * This program is free software; you can redistribute it and/or

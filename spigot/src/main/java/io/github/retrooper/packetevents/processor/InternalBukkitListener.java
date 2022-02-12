@@ -65,6 +65,6 @@ public class InternalBukkitListener implements Listener {
         Player player = e.getPlayer();
         ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         //Cleanup user data, maybe make some abstraction method for this in the API module.
-        PacketEvents.getAPI().getPlayerManager().clearUserData(channel, player.getName(), player.getUniqueId());
+        PacketEvents.getAPI().getProtocolManager().clearUserData(channel, player.getName());
     }
 }

@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -54,7 +55,7 @@ public class InternalPacketListener implements PacketListener {
             user.getProfile().setName(profile.getName());
 
             //Map username with channel
-            PacketEvents.getAPI().getPlayerManager().CHANNELS.put(profile.getName(), event.getChannel());
+            ProtocolManager.CHANNELS.put(profile.getName(), event.getChannel());
             PacketEvents.getAPI().getLogManager().debug("Mapped player username with their channel.");
 
             //Update connection state(injectors might do some adjustments when we transition into PLAY state)

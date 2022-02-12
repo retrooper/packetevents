@@ -19,154 +19,120 @@
 package com.github.retrooper.packetevents.manager.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
 public interface PlayerManager {
-    //Job of implementations, clear these maps
-    //Cache game profile independently on late-injections(should only happen on Spigot legacy versions)
-    //
-    Map<String, ChannelAbstract> CHANNELS = new ConcurrentHashMap<>();
-    Map<ChannelAbstract, User> USERS = new ConcurrentHashMap<>();
-    Map<UUID, Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject>> PLAYER_ATTRIBUTES = new ConcurrentHashMap<>();
+    int getPing(@NotNull Object player);
+    @NotNull ClientVersion getClientVersion(@NotNull Object player);
+    @NotNull ChannelAbstract getChannel(@NotNull Object player);
+    @NotNull User getUser(@NotNull Object player);
 
-    default <T extends PlayerAttributeObject> T getAttributeOrDefault(UUID uuid, Class<T> clazz, T defaultReturnValue) {
-        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.get(uuid);
-        if (attributes != null) {
-            return (T) attributes.get(clazz);
-        } else {
-            attributes = new HashMap<>();
-            attributes.put(defaultReturnValue.getClass(), defaultReturnValue);
-            PLAYER_ATTRIBUTES.put(uuid, attributes);
-            return defaultReturnValue;
-        }
-    }
-
-    default <T extends PlayerAttributeObject> T getAttribute(UUID uuid, Class<T> clazz) {
-        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.get(uuid);
-        if (attributes != null) {
-            return (T) attributes.get(clazz);
-        } else {
-            PLAYER_ATTRIBUTES.put(uuid, new HashMap<>());
-            return null;
-        }
-    }
-
-    default <T extends PlayerAttributeObject> void setAttribute(UUID uuid, T attribute) {
-        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.computeIfAbsent(uuid, k -> new HashMap<>());
-        attributes.put(attribute.getClass(), attribute);
+    default void setClientVersion(@NotNull Object player, @NotNull ClientVersion version) {
+        setClientVersion(getChannel(player), version);
     }
 
     default ConnectionState getConnectionState(@NotNull Object player) {
         return getConnectionState(getChannel(player));
     }
 
+    default void sendPacket(@NotNull Object player, @NotNull ByteBufAbstract byteBuf) {
+        sendPacket(getChannel(player), byteBuf);
+    }
+    default void sendPacket(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
+        sendPacket(getChannel(player), wrapper);
+    }
+
+    default void sendPacketSilently(@NotNull Object player, @NotNull ByteBufAbstract byteBuf) {
+        sendPacketSilently(getChannel(player), byteBuf);
+    }
+    default void sendPacketSilently(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
+        sendPacketSilently(getChannel(player), wrapper);
+    }
+    default void receivePacket(Object player, ByteBufAbstract byteBuf) {
+        PacketEvents.getAPI().getProtocolManager().receivePacket(getChannel(player), byteBuf);
+    }
+
+    default void receivePacket(Object player, PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getProtocolManager().receivePacket(getChannel(player), wrapper);
+    }
+    default void receivePacketSilently(Object player, ByteBufAbstract byteBuf) {
+        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(getChannel(player), byteBuf);
+    }
+    default void receivePacketSilently(Object player, PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(getChannel(player), wrapper);
+    }
+
+    @Deprecated
     default ConnectionState getConnectionState(ChannelAbstract channel) {
-        return getUser(channel).getConnectionState();
+        return PacketEvents.getAPI().getProtocolManager().getConnectionState(channel);
     }
 
+    @Deprecated
     default void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
-        getUser(channel).setConnectionState(connectionState);
+        PacketEvents.getAPI().getProtocolManager().changeConnectionState(channel, connectionState);
     }
 
+    @Deprecated
     default void setClientVersion(ChannelAbstract channel, ClientVersion version) {
-        getUser(channel).setClientVersion(version);
+        PacketEvents.getAPI().getProtocolManager().setClientVersion(channel, version);
     }
 
-    default void setClientVersion(@NotNull Object player, ClientVersion version) {
-        setClientVersion(getChannel(player), version);
-    }
-
+    @Deprecated
     default void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            sendPacket(channel, packet.buffer);
-        }
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, wrapper);
     }
 
-    default void sendPacket(@NotNull Object player, ByteBufAbstract byteBuf) {
-        ChannelAbstract channel = getChannel(player);
-        sendPacket(channel, byteBuf);
-    }
-
-    default void sendPacket(@NotNull Object player, PacketWrapper<?> wrapper) {
-        ChannelAbstract channel = getChannel(player);
-        sendPacket(channel, wrapper);
-    }
-
+    @Deprecated
     default void sendPacketSilently(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            sendPacketSilently(channel, packet.buffer);
-        }
+        PacketEvents.getAPI().getProtocolManager().sendPacketSilently(channel, wrapper);
     }
 
-    default void sendPacketSilently(@NotNull Object player, ByteBufAbstract byteBuf) {
-        ChannelAbstract channel = getChannel(player);
-        sendPacketSilently(channel, byteBuf);
-    }
-
-    default void sendPacketSilently(@NotNull Object player, PacketWrapper<?> wrapper) {
-        ChannelAbstract channel = getChannel(player);
-        sendPacketSilently(channel, wrapper);
-    }
-
+    @Deprecated
     default User getUser(ChannelAbstract channel) {
-        return USERS.get(channel);
+        return PacketEvents.getAPI().getProtocolManager().getUser(channel);
     }
 
+    @Deprecated
     default void setUser(ChannelAbstract channel, User user) {
-        USERS.put(channel, user);
-        PacketEvents.getAPI().getInjector().updateUser(channel, user);
+        PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
     }
 
+    @Deprecated
     default ChannelAbstract getChannel(String username) {
-        return CHANNELS.get(username);
+        return PacketEvents.getAPI().getProtocolManager().getChannel(username);
     }
 
+    @Deprecated
     default void setChannel(String username, ChannelAbstract channel) {
-        CHANNELS.put(username, channel);
+        PacketEvents.getAPI().getProtocolManager().setChannel(username, channel);
     }
 
-    default void clearUserData(ChannelAbstract channel, @Nullable String name, @Nullable UUID uuid) {
-        NettyManager.CHANNEL_MAP.remove(channel.rawChannel());
-        USERS.remove(channel);
-        //Name is only accessible if the server sends the LOGIN_SUCCESS packet which contains name and UUID
-        if (name != null) {
-            CHANNELS.remove(name);
-        }
-        if (uuid != null) {
-            PLAYER_ATTRIBUTES.remove(uuid);
-        }
+    @Deprecated
+    default void clearUserData(ChannelAbstract channel, @Nullable String name) {
+        PacketEvents.getAPI().getProtocolManager().clearUserData(channel, name);
     }
 
-    void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
+    @Deprecated
+    default void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, byteBuf);
+    }
 
-    void sendPacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf);
+    @Deprecated
+    default void sendPacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        PacketEvents.getAPI().getProtocolManager().sendPacketSilently(channel, byteBuf);
+    }
 
-    int getPing(@NotNull Object player);
 
-    @NotNull
-    ClientVersion getClientVersion(@NotNull Object player);
+    @Deprecated
+    default ClientVersion getClientVersion(ChannelAbstract channel) {
+        return PacketEvents.getAPI().getProtocolManager().getClientVersion(channel);
+    }
 
-    ClientVersion getClientVersion(ChannelAbstract channel);
-
-    User getUser(@NotNull Object player);
-
-    ChannelAbstract getChannel(@NotNull Object player);
 }

@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.handlers.legacy.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -32,7 +33,7 @@ public class ServerConnectionInitializerLegacy {
         Channel channel = (Channel) ch;
         ChannelAbstract channelAbstract = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
         User user = new User(channelAbstract, connectionState, null, new UserProfile(null, null));
-        PacketEvents.getAPI().getPlayerManager().USERS.put(channelAbstract, user);
+        ProtocolManager.USERS.put(channelAbstract, user);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLegacy(user));
         //No need to account for ViaVersion, as they don't support 1.7.10
         channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderLegacy(user));

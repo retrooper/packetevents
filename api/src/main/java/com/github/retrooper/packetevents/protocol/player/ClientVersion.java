@@ -127,7 +127,7 @@ public enum ClientVersion {
     private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
             340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754, 755, 756, 757};
     private int protocolVersion;
-    private String name;
+    private final String name;
 
     ClientVersion(int protocolVersion) {
         this.protocolVersion = protocolVersion;
@@ -165,7 +165,7 @@ public enum ClientVersion {
      * @return ClientVersion
      */
     @NotNull
-    public static ClientVersion getClientVersionByProtocolVersion(int protocolVersion) {
+    public static ClientVersion getById(int protocolVersion) {
         if (protocolVersion == -1) {
             return ClientVersion.UNRESOLVED;
         } else if (protocolVersion < LOWEST_SUPPORTED_PROTOCOL_VERSION) {

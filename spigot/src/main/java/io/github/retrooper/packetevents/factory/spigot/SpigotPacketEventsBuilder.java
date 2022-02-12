@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.event.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.injector.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -34,6 +35,7 @@ import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.handlers.SpigotChannelInjector;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
+import io.github.retrooper.packetevents.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.processor.InternalBukkitListener;
 import io.github.retrooper.packetevents.utils.BukkitLogManager;
@@ -73,6 +75,7 @@ public class SpigotPacketEventsBuilder {
     public static PacketEventsAPI<Plugin> buildNoCache(Plugin plugin, PacketEventsSettings inSettings) {
         return new PacketEventsAPI<Plugin>() {
             private final PacketEventsSettings settings = inSettings;
+            private final ProtocolManager protocolManager = new ProtocolManagerImpl();
             private final ServerManager serverManager = new ServerManagerImpl();
             private final PlayerManager playerManager = new PlayerManagerImpl();
             private final NettyManager nettyManager = new NettyManagerImpl();
@@ -187,6 +190,11 @@ public class SpigotPacketEventsBuilder {
             @Override
             public Plugin getPlugin() {
                 return plugin;
+            }
+
+            @Override
+            public ProtocolManager getProtocolManager() {
+                return protocolManager;
             }
 
             @Override

@@ -42,6 +42,8 @@ import io.github.retrooper.packetevents.utils.SpigotDataHelper;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
+
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
@@ -98,6 +100,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     if (event.getPlayer() instanceof Player) {
                         Player player = (Player) event.getPlayer();
                         player.sendMessage("Hii " + player.getName());
+                        event.getUser().sendMessage("Hi pt 2");
                     } else {
                         event.getUser().sendMessage("player null, but hey!!!");
                     }

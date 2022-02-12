@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.npc.NPCManager;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -81,6 +82,8 @@ public abstract class PacketEventsAPI<T> {
     public abstract T getPlugin();
 
     public abstract ServerManager getServerManager();
+
+    public abstract ProtocolManager getProtocolManager();
 
     public abstract PlayerManager getPlayerManager();
 

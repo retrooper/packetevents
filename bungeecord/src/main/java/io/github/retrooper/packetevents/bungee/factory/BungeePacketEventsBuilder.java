@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.injector.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
@@ -83,6 +84,7 @@ public class BungeePacketEventsBuilder {
     public static PacketEventsAPI<Plugin> buildNoCache(Plugin plugin, PacketEventsSettings inSettings) {
         return new PacketEventsAPI<Plugin>() {
             private final PacketEventsSettings settings = inSettings;
+            private final ProtocolManager protocolManager = null;
             private final ServerManager serverManager = new ServerManagerImpl() {
                 private ServerVersion version;
                 @Override
@@ -202,6 +204,11 @@ public class BungeePacketEventsBuilder {
             @Override
             public LogManager getLogManager() {
                 return logManager;
+            }
+
+            @Override
+            public ProtocolManager getProtocolManager() {
+                return protocolManager;
             }
 
             @Override

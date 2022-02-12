@@ -33,7 +33,7 @@ public class PotionTypes {
 
     public static PotionType define(String key) {
         if (POTION_TYPES_JSON == null) {
-            POTION_TYPES_JSON = MappingHelper.getJSONObject("item/potion_type_mappings");
+            POTION_TYPES_JSON = MappingHelper.getJSONObject("potion/potion_type_mappings");
         }
         int id = POTION_TYPES_JSON.get(key).getAsInt();
         ResourceLocation identifier = ResourceLocation.minecraft(key);
