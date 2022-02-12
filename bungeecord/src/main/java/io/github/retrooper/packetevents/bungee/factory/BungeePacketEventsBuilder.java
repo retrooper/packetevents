@@ -29,24 +29,21 @@ import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
-import io.github.retrooper.packetevents.handlers.PacketDecoder;
-import io.github.retrooper.packetevents.handlers.PacketEncoder;
+import com.sun.corba.se.impl.activation.ServerManagerImpl;
+import io.github.retrooper.packetevents.impl.manager.netty.NettyManagerImpl;
+import io.github.retrooper.packetevents.impl.manager.player.PlayerManagerAbstract;
+import io.github.retrooper.packetevents.impl.manager.protocol.ProtocolManagerAbstract;
+import io.github.retrooper.packetevents.impl.manager.server.ServerManagerAbstract;
 import io.github.retrooper.packetevents.injector.BungeePipelineInjector;
-import io.github.retrooper.packetevents.manager.netty.NettyManagerImpl;
-import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
-import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.processor.InternalBungeeProcessor;
-import io.netty.channel.Channel;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.protocol.ProtocolConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,9 +81,16 @@ public class BungeePacketEventsBuilder {
     public static PacketEventsAPI<Plugin> buildNoCache(Plugin plugin, PacketEventsSettings inSettings) {
         return new PacketEventsAPI<Plugin>() {
             private final PacketEventsSettings settings = inSettings;
-            private final ProtocolManager protocolManager = null;
-            private final ServerManager serverManager = new ServerManagerImpl() {
+            //TODO Implement platform version
+            private final ProtocolManager protocolManager = new ProtocolManagerAbstract() {
+                @Override
+                public ProtocolVersion getPlatformVersion() {
+                    return ProtocolVersion.UNKNOWN;
+                }
+            };
+            private final ServerManager serverManager = new ServerManagerAbstract() {
                 private ServerVersion version;
+
                 @Override
                 public ServerVersion getVersion() {
                     //TODO Not perfect, as this is on the client! Might be inaccurate by a few patch versions.
@@ -106,7 +110,7 @@ public class BungeePacketEventsBuilder {
                 }
             };
 
-            private final PlayerManagerImpl playerManager = new PlayerManagerImpl() {
+            private final PlayerManagerAbstract playerManager = new PlayerManagerAbstract() {
                 @Override
                 public int getPing(@NotNull Object player) {
                     return ((ProxiedPlayer) player).getPing();
@@ -114,7 +118,7 @@ public class BungeePacketEventsBuilder {
 
                 @Override
                 public ChannelAbstract getChannel(@NotNull Object player) {
-                    return getChannel(((ProxiedPlayer) player).getName());
+                    return PacketEvents.getAPI().getProtocolManager().getChannel(((ProxiedPlayer) player).getName());
                 }
             };
 
