@@ -136,8 +136,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
         int chunkSize = 16;
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            chunkSize = 25;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            chunkSize = user.getTotalWorldHeight() >> 4;
         }
 
         // 1.7 logic is the same
@@ -161,9 +161,9 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         // This applies from 1.14
         //
         // 1.16.2+ send a var int array instead of an int array
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
+        if (hasBiomeData && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
             biomeDataInts = readVarIntArray();
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
+        } else if (hasBiomeData && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
             biomeDataInts = new int[1024];
             for (int i = 0; i < biomeDataInts.length; i++) {
                 biomeDataInts[i] = readInt();

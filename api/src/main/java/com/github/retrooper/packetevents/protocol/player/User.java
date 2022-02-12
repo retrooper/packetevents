@@ -23,16 +23,24 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class User {
     private final ChannelAbstract channel;
     private ConnectionState connectionState;
     private ClientVersion clientVersion;
     private final UserProfile profile;
+    private int minWorldHeight = 0;
+    private int totalWorldHeight = 256;
+    private List<NBTCompound> worldNBT;
 
     public User(ChannelAbstract channel,
                 ConnectionState connectionState, ClientVersion clientVersion,
@@ -97,4 +105,34 @@ public class User {
     }
 
     //TODO sendTitle that is cross-version
+
+    public int getMinWorldHeight() {
+        return minWorldHeight;
+    }
+
+    public void setMinWorldHeight(int minWorldHeight) {
+        this.minWorldHeight = minWorldHeight;
+    }
+
+    public int getTotalWorldHeight() {
+        return totalWorldHeight;
+    }
+
+    public void setTotalWorldHeight(int totalWorldHeight) {
+        this.totalWorldHeight = totalWorldHeight;
+    }
+
+    public void setWorldNBT(NBTList<NBTCompound> worldNBT) {
+        this.worldNBT = worldNBT.getTags();
+    }
+
+    @Nullable
+    public NBTCompound getWorldNBT(String worldName) {
+        for (NBTCompound compound : worldNBT) {
+            if (compound.getStringTagOrNull("name").getValue().equals(worldName)) {
+                return compound;
+            }
+        }
+        return null;
+    }
 }

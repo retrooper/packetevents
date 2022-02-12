@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.wrapper;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
@@ -36,6 +35,7 @@ import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.StringUtil;
@@ -55,6 +55,9 @@ public class PacketWrapper<T extends PacketWrapper> {
     protected ServerVersion serverVersion;
     private int packetID;
     private boolean hasPreparedForSending;
+    // For sending chunk data packets, which need this data
+    @Nullable
+    protected User user;
 
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
@@ -73,6 +76,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     public PacketWrapper(PacketReceiveEvent event, boolean readData) {
         this.clientVersion = event.getClientVersion();
         this.serverVersion = event.getServerVersion();
+        this.user = event.getUser();
         this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
         if (readData) {
@@ -96,6 +100,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.serverVersion = event.getServerVersion();
         this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
+        this.user = event.getUser();
         if (event.isCloned()) {
             int bufferIndex = getBuffer().readerIndex();
             readData();
