@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.mixin;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -28,7 +29,7 @@ public class ExampleMixin {
         ChannelAbstract ch = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
         User user = new User(ch, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
                 new UserProfile(null, null));
-        PacketEvents.getAPI().getPlayerManager().USERS.put(ch, user);
+        ProtocolManager.USERS.put(ch, user);
         LocalPlayer player = Minecraft.getInstance().player;
         PacketDecoder decoder = new PacketDecoder(user, player);
         PacketEncoder encoder = new PacketEncoder(user, player);

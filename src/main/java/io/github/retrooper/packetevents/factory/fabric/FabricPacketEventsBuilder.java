@@ -6,20 +6,23 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.injector.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handler.PacketDecoder;
 import io.github.retrooper.packetevents.handler.PacketEncoder;
-import io.github.retrooper.packetevents.manager.netty.NettyManagerImpl;
-import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
-import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
+import io.github.retrooper.packetevents.impl.manager.netty.NettyManagerImpl;
+import io.github.retrooper.packetevents.impl.manager.player.PlayerManagerAbstract;
+import io.github.retrooper.packetevents.impl.manager.protocol.ProtocolManagerAbstract;
+import io.github.retrooper.packetevents.impl.manager.server.ServerManagerAbstract;
 import io.netty.channel.Channel;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -57,7 +60,14 @@ public class FabricPacketEventsBuilder {
     public static PacketEventsAPI<Minecraft> buildNoCache(String modId, PacketEventsSettings inSettings) {
         return new PacketEventsAPI<>() {
             private final PacketEventsSettings settings = inSettings;
-            private final ServerManager serverManager = new ServerManagerImpl() {
+            //TODO Implement platform version
+            private final ProtocolManager protocolManager = new ProtocolManagerAbstract() {
+                @Override
+                public ProtocolVersion getPlatformVersion() {
+                    return ProtocolVersion.UNKNOWN;
+                }
+            };
+            private final ServerManager serverManager = new ServerManagerAbstract() {
                 private static ServerVersion VERSION;
 
                 @Override
@@ -75,7 +85,7 @@ public class FabricPacketEventsBuilder {
                 }
             };
 
-            private final PlayerManagerImpl playerManager = new PlayerManagerImpl() {
+            private final PlayerManagerAbstract playerManager = new PlayerManagerAbstract() {
                 @Override
                 public int getPing(@NotNull Object player) {
                     return 0;
@@ -142,7 +152,6 @@ public class FabricPacketEventsBuilder {
             private final NettyManager nettyManager = new NettyManagerImpl();
             private boolean loaded;
             private boolean initialized;
-            private boolean lateBind = false;
 
             @Override
             public void load() {
@@ -155,11 +164,7 @@ public class FabricPacketEventsBuilder {
                     PacketEvents.CONNECTION_NAME = "pe-connection-handler-" + id;
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
 
-                    lateBind = !injector.isBound();
-                    //If late-bind is enabled, we will inject a bit later.
-                    if (!lateBind) {
-                        injector.inject();
-                    }
+                    injector.inject();
 
                     loaded = true;
 
@@ -213,6 +218,11 @@ public class FabricPacketEventsBuilder {
             @Override
             public Minecraft getPlugin() {
                 return Minecraft.getInstance();
+            }
+
+            @Override
+            public ProtocolManager getProtocolManager() {
+                return protocolManager;
             }
 
             @Override

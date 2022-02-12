@@ -20,7 +20,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
         this.player = player;
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> output) {
+    public void read(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> output) throws Exception {
         ByteBuf transformed = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
             int firstReaderIndex = transformed.readerIndex();
@@ -48,7 +48,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
         if (byteBuf.readableBytes() != 0) {
             read(ctx, byteBuf, out);
         }
@@ -57,10 +57,5 @@ public class PacketDecoder extends ByteToMessageDecoder {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
     }
 }
