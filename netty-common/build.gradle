@@ -25,6 +25,16 @@ dependencies {
     compileOnly project(':api')
 }
 
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.github.retrooper.packetevents'
+            artifactId = 'netty-common'
+            from(components.java)
+        }
+    }
+}
+
 
 //So that SNAPSHOT is always the latest SNAPSHOT
 configurations.all {
