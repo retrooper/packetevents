@@ -1138,6 +1138,7 @@ public class ItemTypes {
     public static final ItemType INFESTED_COBBLESTONE = builder("infested_cobblestone").setMaxAmount(64).setPlacedType(StateTypes.INFESTED_COBBLESTONE).build();
     public static final ItemType PINK_CONCRETE = builder("pink_concrete").setMaxAmount(64).setPlacedType(StateTypes.PINK_CONCRETE).build();
     public static final ItemType CARROT = builder("carrot").setMaxAmount(64).setAttributes(ItemAttribute.EDIBLE).setPlacedType(StateTypes.CARROTS).build();
+    public static final ItemType MUSIC_DISC_OTHERSIDE = builder("music_disc_otherside").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).build();
 
     public static Collection<ItemType> values() {
         return ITEM_TYPE_MAP.values();
