@@ -15,11 +15,27 @@ shadowJar {
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     compileOnly 'org.jetbrains:annotations:22.0.0'
     compileOnly 'io.netty:netty-all:4.1.72.Final'
-    compileOnly 'com.github.retrooper.packetevents:api:2.0-SNAPSHOT'
+    compileOnly project(':api')
+}
+
+
+//So that SNAPSHOT is always the latest SNAPSHOT
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+}
+
+//So we only produce one jar with shadowJar. No suffixes. Just replace what the original jar would be named.
+tasks.jar.configure {
+    classifier = 'default'
+}
+
+tasks.shadowJar.configure {
+    classifier = null
 }
