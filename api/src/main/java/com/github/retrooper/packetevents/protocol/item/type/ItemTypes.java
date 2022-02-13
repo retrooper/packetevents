@@ -20,9 +20,9 @@ package com.github.retrooper.packetevents.protocol.item.type;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
@@ -1144,9 +1144,7 @@ public class ItemTypes {
     }
 
     private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
-            return ServerVersion.V_1_8;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
             return ServerVersion.V_1_12;
         } else if (serverVersion.isOlderThan(ServerVersion.V_1_13_2)) {
             return ServerVersion.V_1_13;
