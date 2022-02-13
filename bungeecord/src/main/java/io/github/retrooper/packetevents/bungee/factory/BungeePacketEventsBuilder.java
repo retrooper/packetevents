@@ -50,7 +50,7 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public class BungeePacketEventsBuilder {
-
+    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]");
     private static PacketEventsAPI<Plugin> INSTANCE;
 
     public static void clearBuildCache() {
@@ -123,7 +123,6 @@ public class BungeePacketEventsBuilder {
 
             private final ChannelInjector injector = new BungeePipelineInjector();
             private final NettyManager nettyManager = new NettyManagerImpl();
-            private final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]");
             private final LogManager logManager = new LogManager() {
                 @Override
                 protected void log(Level level, @Nullable NamedTextColor color, String message) {
