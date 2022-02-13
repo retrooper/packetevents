@@ -1148,6 +1148,14 @@ public class ItemTypes {
      * @deprecated Fire was removed in 1.8 as an item
      */
     public static final ItemType FIRE = builder("fire").setMaxAmount(64).build();
+    /**
+     * @deprecated Nether portals were removed in 1.8 as an item
+     */
+    public static final ItemType NETHER_PORTAL = builder("nether_portal").setMaxAmount(1).build();
+    /**
+     * @deprecated End portals were removed in 1.8 as an item
+     */
+    public static final ItemType END_PORTAL = builder("end_portal").setMaxAmount(1).build();
 
     public static Collection<ItemType> values() {
         return ITEM_TYPE_MAP.values();
