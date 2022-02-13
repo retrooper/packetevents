@@ -1139,6 +1139,15 @@ public class ItemTypes {
     public static final ItemType PINK_CONCRETE = builder("pink_concrete").setMaxAmount(64).setPlacedType(StateTypes.PINK_CONCRETE).build();
     public static final ItemType CARROT = builder("carrot").setMaxAmount(64).setAttributes(ItemAttribute.EDIBLE).setPlacedType(StateTypes.CARROTS).build();
     public static final ItemType MUSIC_DISC_OTHERSIDE = builder("music_disc_otherside").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).build();
+    /**
+     * @deprecated Burning furnace shows up as a missing texture, removed in 1.9
+     */
+    @Deprecated
+    public static final ItemType BURNING_FURNACE = builder("burning_furnace").setMaxAmount(64).setPlacedType(StateTypes.FURNACE).build();
+    /**
+     * @deprecated Fire was removed in 1.8 as an item
+     */
+    public static final ItemType FIRE = builder("fire").setMaxAmount(64).build();
 
     public static Collection<ItemType> values() {
         return ITEM_TYPE_MAP.values();
