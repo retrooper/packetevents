@@ -6,4 +6,6 @@ softdepend:
   - ProtocolLib
   - ProtocolSupport
   - ViaVersion
+  - ViaBackwards
+  - ViaRewind
   - Geyser-Spigot

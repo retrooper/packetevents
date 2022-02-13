@@ -100,40 +100,20 @@ public class InternalPacketListener implements PacketListener {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
-        switch (event.getConnectionState()) {
-            case HANDSHAKING:
-                if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
-                    User user = event.getUser();
-                    InetSocketAddress address = event.getSocketAddress();
-                    WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
-                    ClientVersion clientVersion = handshake.getClientVersion();
+        if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
+            User user = event.getUser();
+            InetSocketAddress address = event.getSocketAddress();
+            WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
+            ClientVersion clientVersion = handshake.getClientVersion();
 
-                    //Update client version for this event call(and user)
-                    event.setClientVersion(clientVersion);
-                    PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());
-                    event.getPostTasks().add(() -> {
-                        //Transition into the LOGIN OR STATUS connection state
-                        user.setConnectionState(handshake.getNextConnectionState());
-                        PacketEvents.getAPI().getLogManager().debug("Transitioned " + address.getHostString() + ":" + address.getPort() + " into the " + handshake.getNextConnectionState() + " state!");
-                    });
-                }
-                break;
-            case PLAY:
-                /*if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
-                    WrapperPlayClientTabComplete tabComplete = new WrapperPlayClientTabComplete(event);
-                    String text = tabComplete.getText();
-                    GameProfile profile = PacketEvents.getAPI().getPlayerManager().getGameProfile(event.getChannel());
-                    UUID uuid = profile.getId();
-                    TabCompleteAttribute tabCompleteAttribute =
-                            PacketEvents.getAPI().getPlayerManager().getAttributeOrDefault(uuid,
-                                    TabCompleteAttribute.class,
-                                    new TabCompleteAttribute());
-                    tabCompleteAttribute.setInput(text);
-                    Optional<Integer> transactionID = tabComplete.getTransactionId();
-                    transactionID.ifPresent(tabComplete::setTransactionId);
-                    PacketEvents.getAPI().getLogManager().debug("Tab complete received: " + text);
-                }*/
-                break;
+            //Update client version for this event call(and user)
+            user.setClientVersion(clientVersion);
+            PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());
+            event.getPostTasks().add(() -> {
+                //Transition into the LOGIN OR STATUS connection state
+                user.setConnectionState(handshake.getNextConnectionState());
+                PacketEvents.getAPI().getLogManager().debug("Transitioned " + address.getHostString() + ":" + address.getPort() + " into the " + handshake.getNextConnectionState() + " state!");
+            });
         }
     }
 }

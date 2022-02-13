@@ -33,13 +33,14 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
 
 public class ServerConnectionInitializerModern {
-    //TODO Only inject NioSocketChannels(check v1.8 packetevents)
+    //TODO Only inject Epoll & NioSocketChannels(check v1.8 packetevents)
     public static void postInitChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
         ChannelAbstract channelAbstract = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);

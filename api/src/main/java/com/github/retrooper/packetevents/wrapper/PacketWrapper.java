@@ -74,7 +74,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public PacketWrapper(PacketReceiveEvent event, boolean readData) {
-        this.clientVersion = event.getClientVersion();
+        this.clientVersion = event.getUser().getClientVersion();
         this.serverVersion = event.getServerVersion();
         this.user = event.getUser();
         this.buffer = event.getByteBuf();
@@ -96,7 +96,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public PacketWrapper(PacketSendEvent event) {
-        this.clientVersion = event.getClientVersion();
+        this.clientVersion = event.getUser().getClientVersion();
         this.serverVersion = event.getServerVersion();
         this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
