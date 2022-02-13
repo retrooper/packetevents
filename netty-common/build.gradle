@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+
+group 'com.github.packetevents'
+version '2.0.0'
+
+shadowJar {
+    //Just for jitpack to work
+    archiveVersion.set('')
+
+    minimize()
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compileOnly 'org.jetbrains:annotations:22.0.0'
+    compileOnly 'io.netty:netty-all:4.1.72.Final'
+    compileOnly 'com.github.retrooper.packetevents:api:2.0-SNAPSHOT'
+}
