@@ -21,12 +21,10 @@ shadowJar {
 }
 
 dependencies {
-    api project(':api')
-    implementation 'com.github.retrooper:packetevents-netty-impl:master-SNAPSHOT'
-
     compileOnly 'org.jetbrains:annotations:22.0.0'
-
     compileOnly 'net.md-5:bungeecord-api:1.18-R0.1-SNAPSHOT'
+    api project(':api')
+    implementation project(':netty-common')
 }
 
 publishing {

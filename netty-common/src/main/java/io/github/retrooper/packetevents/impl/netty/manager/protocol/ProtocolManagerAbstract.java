@@ -1,0 +1,71 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package io.github.retrooper.packetevents.impl.netty.manager.protocol;
+
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ProtocolVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
+
+public abstract class ProtocolManagerAbstract implements ProtocolManager {
+    @Override
+    public abstract ProtocolVersion getPlatformVersion();
+
+    @Override
+    public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        if (channel.isOpen()) {
+            channel.writeAndFlush(byteBuf);
+        }
+    }
+
+    @Override
+    public void sendPacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        if (channel.isOpen()) {
+            channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
+        }
+    }
+
+    @Override
+    public void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        if (channel.isOpen()) {
+            channel.pipeline().fireChannelRead(byteBuf);
+        }
+    }
+
+    @Override
+    public void receivePacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        if (channel.isOpen()) {
+            channel.pipeline().context(PacketEvents.DECODER_NAME).fireChannelRead(byteBuf);
+        }
+    }
+
+    @Override
+    public ClientVersion getClientVersion(ChannelAbstract channel) {
+        User user = getUser(channel);
+        ClientVersion version = user.getClientVersion();
+        if (version == null || !version.isResolved()) {
+            //TODO Change to getPlatformVersion()
+            version = ClientVersion.getById(PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion());
+        }
+        return version;
+    }
+}
