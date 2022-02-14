@@ -21,13 +21,8 @@ package io.github.retrooper.packetevents.manager.server;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-
-import java.util.List;
 
 public class ServerManagerImpl implements ServerManager {
     private ServerVersion serverVersion;

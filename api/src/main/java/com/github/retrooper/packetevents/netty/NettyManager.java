@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.netty;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHandler;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 
@@ -27,6 +28,9 @@ import java.util.Map;
 
 public interface NettyManager {
     Map<Object, ChannelAbstract> CHANNEL_MAP = new HashMap<>();
+
+    ByteBufHandler getByteBufHandler();
+
     ByteBufAbstract wrappedBuffer(byte[] bytes);
 
     ByteBufAbstract copiedBuffer(byte[] bytes);

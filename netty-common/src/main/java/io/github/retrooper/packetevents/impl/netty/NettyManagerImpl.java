@@ -20,13 +20,22 @@ package io.github.retrooper.packetevents.impl.netty;
 
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHandler;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import io.github.retrooper.packetevents.impl.netty.buffer.ByteBufHandlerImpl;
 import io.github.retrooper.packetevents.impl.netty.buffer.ByteBufImpl;
 import io.github.retrooper.packetevents.impl.netty.channel.ChannelHandlerContextImpl;
 import io.github.retrooper.packetevents.impl.netty.channel.ChannelImpl;
 
 public class NettyManagerImpl implements NettyManager {
+    private static final ByteBufHandler BYTE_BUF_HANDLER = new ByteBufHandlerImpl();
+
+    @Override
+    public ByteBufHandler getByteBufHandler() {
+        return BYTE_BUF_HANDLER;
+    }
+
     @Override
     public ByteBufAbstract wrappedBuffer(byte[] bytes) {
         return ByteBufUtil.wrappedBuffer(bytes);

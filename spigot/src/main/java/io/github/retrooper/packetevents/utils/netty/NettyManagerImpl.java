@@ -20,18 +20,32 @@ package io.github.retrooper.packetevents.utils.netty;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.NettyManager;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHandler;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufLegacy;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufModern;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
+import io.github.retrooper.packetevents.utils.netty.buffer.*;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextLegacy;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextModern;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelLegacy;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelModern;
 
 public class NettyManagerImpl implements NettyManager {
+    private static ByteBufHandler BYTE_BUF_HANDLER;
+
+    @Override
+    public ByteBufHandler getByteBufHandler() {
+        if (BYTE_BUF_HANDLER == null) {
+            if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+                BYTE_BUF_HANDLER = new ByteBufHandlerModernImpl();
+            }
+            else {
+                BYTE_BUF_HANDLER = new ByteBufHandlerLegacyImpl();
+            }
+        }
+        return BYTE_BUF_HANDLER;
+    }
+
     @Override
     public ByteBufAbstract wrappedBuffer(byte[] bytes) {
         return ByteBufUtil.wrappedBuffer(bytes);
