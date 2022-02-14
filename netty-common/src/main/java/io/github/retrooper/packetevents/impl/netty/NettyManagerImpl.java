@@ -20,9 +20,11 @@ package io.github.retrooper.packetevents.impl.netty;
 
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationHandler;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHandler;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import io.github.retrooper.packetevents.impl.netty.buffer.ByteBufAllocationHandlerImpl;
 import io.github.retrooper.packetevents.impl.netty.buffer.ByteBufHandlerImpl;
 import io.github.retrooper.packetevents.impl.netty.buffer.ByteBufImpl;
 import io.github.retrooper.packetevents.impl.netty.channel.ChannelHandlerContextImpl;
@@ -30,10 +32,16 @@ import io.github.retrooper.packetevents.impl.netty.channel.ChannelImpl;
 
 public class NettyManagerImpl implements NettyManager {
     private static final ByteBufHandler BYTE_BUF_HANDLER = new ByteBufHandlerImpl();
+    private static final ByteBufAllocationHandler BYTE_BUF_ALLOCATION_HANDLER = new ByteBufAllocationHandlerImpl();
 
     @Override
     public ByteBufHandler getByteBufHandler() {
         return BYTE_BUF_HANDLER;
+    }
+
+    @Override
+    public ByteBufAllocationHandler getByteBufAllocationHandler() {
+        return BYTE_BUF_ALLOCATION_HANDLER;
     }
 
     @Override

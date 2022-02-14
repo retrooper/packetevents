@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.utils.netty;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.NettyManager;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationHandler;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHandler;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
@@ -32,7 +33,7 @@ import io.github.retrooper.packetevents.utils.netty.channel.ChannelModern;
 
 public class NettyManagerImpl implements NettyManager {
     private static ByteBufHandler BYTE_BUF_HANDLER;
-
+private static ByteBufAllocationHandler BYTE_BUF_ALLOCATION_HANDLER;
     @Override
     public ByteBufHandler getByteBufHandler() {
         if (BYTE_BUF_HANDLER == null) {
@@ -44,6 +45,19 @@ public class NettyManagerImpl implements NettyManager {
             }
         }
         return BYTE_BUF_HANDLER;
+    }
+
+    @Override
+    public ByteBufAllocationHandler getByteBufAllocationHandler() {
+        if (BYTE_BUF_ALLOCATION_HANDLER == null) {
+            if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+                BYTE_BUF_ALLOCATION_HANDLER = new ByteBufAllocationHandlerModernImpl();
+            }
+            else {
+                BYTE_BUF_ALLOCATION_HANDLER = new ByteBufAllocationHandlerLegacyImpl();
+            }
+        }
+        return BYTE_BUF_ALLOCATION_HANDLER;
     }
 
     @Override
