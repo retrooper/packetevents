@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class WrapperPlayServerOpenWindowMerchant extends PacketWrapper<WrapperPlayServerOpenWindowMerchant> {
+public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerTradeList> {
 
-    public WrapperPlayServerOpenWindowMerchant(PacketSendEvent event) {
+    public WrapperPlayServerTradeList(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerOpenWindowMerchant(int containerId, Collection<? extends MerchantRecipeData> merchantRecipeData, int villagerLevel, int villagerXp, boolean showProgress, boolean canRestock) {
+    public WrapperPlayServerTradeList(int containerId, Collection<? extends MerchantRecipeData> merchantRecipeData, int villagerLevel, int villagerXp, boolean showProgress, boolean canRestock) {
         super(PacketType.Play.Server.TRADE_LIST);
         this.containerId = containerId;
         this.merchantRecipeData = new ArrayList<>(merchantRecipeData);
@@ -61,7 +61,7 @@ public class WrapperPlayServerOpenWindowMerchant extends PacketWrapper<WrapperPl
     }
 
     @Override
-    public void readData(WrapperPlayServerOpenWindowMerchant wrapper) {
+    public void readData(WrapperPlayServerTradeList wrapper) {
         containerId = wrapper.containerId;
         merchantRecipeData = wrapper.merchantRecipeData;
         villagerLevel = wrapper.villagerLevel;
