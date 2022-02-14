@@ -2,14 +2,13 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
 // TODO: Test on outdated versions
 public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServerOpenWindow> {
-    public static boolean HANDLE_JSON = true;
 
     private int containerId; // All versions
 
@@ -19,8 +18,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
     private int legacySlots; // 1.13-
     private int horseId; // 1.13-
 
-    private String titleRawJson;
-    private Component titleComponent; // 1.8 and above
+    private Component title;
 
     private boolean useProvidedWindowTitle; // 1.7 only
 
@@ -29,28 +27,29 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
     }
 
     // For 1.14+
-    public WrapperPlayServerOpenWindow(int containerId, int type, String titleRawJson) {
+    public WrapperPlayServerOpenWindow(int containerId, int type, Component title) {
         super(PacketType.Play.Server.OPEN_WINDOW);
         this.containerId = containerId;
         this.type = type;
-        this.titleRawJson = titleRawJson;
+        this.title = title;
     }
 
     // 1.8 through 1.13
-    public WrapperPlayServerOpenWindow(int containerId, String legacyType, int legacySlots, int horseId) {
+    public WrapperPlayServerOpenWindow(int containerId, String legacyType, Component title, int legacySlots, int horseId) {
         super(PacketType.Play.Server.OPEN_WINDOW);
         this.containerId = containerId;
         this.legacyType = legacyType;
         this.legacySlots = legacySlots;
         this.horseId = horseId;
+        this.title = title;
     }
 
     // 1.7
-    public WrapperPlayServerOpenWindow(int containerId, int type, String title, int legacySlots, boolean useProvidedWindowTitle, int horseId) {
+    public WrapperPlayServerOpenWindow(int containerId, int type, Component title, int legacySlots, boolean useProvidedWindowTitle, int horseId) {
         super(PacketType.Play.Server.OPEN_WINDOW);
         this.containerId = containerId;
         this.type = type;
-        this.titleRawJson = title;
+        this.title = title;
         this.legacySlots = legacySlots;
         this.useProvidedWindowTitle = useProvidedWindowTitle;
         this.horseId = horseId;
@@ -58,12 +57,16 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void readData() {
-        this.containerId = readVarInt(); // All versions
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
+            this.containerId = readUnsignedByte();
+        } else {
+            this.containerId = readVarInt();
+        }
 
         // 1.7 has a very different packet format
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             this.type = readUnsignedByte();
-            this.titleRawJson = readString();
+            this.title = AdventureSerializer.asAdventure(readString(32));
             this.legacySlots = readUnsignedByte();
             this.useProvidedWindowTitle = readBoolean();
 
@@ -76,20 +79,15 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         // Known to be 1.8 or above
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             this.type = readVarInt();
+            this.title = readComponent();
         } else {
-            this.legacyType = readString(32);
+            this.legacyType = readString();
+            this.title = readComponent();
             this.legacySlots = readUnsignedByte();
-
             // This is only sent for horses
             if (legacyType.equals("EntityHorse")) {
                 this.horseId = readInt();
             }
-        }
-
-        this.titleRawJson = readString(getMaxMessageLength());
-
-        if (HANDLE_JSON) {
-            titleComponent = AdventureSerializer.parseComponent(this.titleRawJson);
         }
     }
 
@@ -100,19 +98,23 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.legacyType = wrapper.legacyType;
         this.legacySlots = wrapper.legacySlots;
         this.horseId = wrapper.horseId;
-        this.titleRawJson = wrapper.titleRawJson;
-        this.titleComponent = wrapper.titleComponent;
+        this.title = wrapper.title;
         this.useProvidedWindowTitle = wrapper.useProvidedWindowTitle;
     }
 
     @Override
     public void writeData() {
-        writeVarInt(this.containerId);
+
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
+            writeByte(this.containerId);
+        } else {
+            writeVarInt(this.containerId);
+        }
 
         // 1.7 has a very different packet format
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             writeByte(this.type);
-            writeString(this.titleRawJson);
+            writeString(AdventureSerializer.asVanilla(this.title));
             writeByte(this.legacySlots);
             writeBoolean(this.useProvidedWindowTitle);
 
@@ -125,20 +127,16 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         // Known to be 1.8 or above
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             writeVarInt(this.type);
+            writeComponent(this.title);
         } else {
             writeString(this.legacyType);
+            writeComponent(this.title);
             writeByte(this.legacySlots);
-
             // This is only sent for horses
             if (legacyType.equals("EntityHorse")) {
                 writeInt(this.horseId);
             }
         }
-
-        if (HANDLE_JSON) {
-            titleRawJson = AdventureSerializer.toJson(titleComponent);
-        }
-        writeString(titleRawJson, getMaxMessageLength());
     }
 
     public int getContainerId() {
@@ -181,20 +179,12 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.horseId = horseId;
     }
 
-    public String getTitleRawJson() {
-        return titleRawJson;
+    public Component getTitle() {
+        return title;
     }
 
-    public void setTitleRawJson(String titleRawJson) {
-        this.titleRawJson = titleRawJson;
-    }
-
-    public Component getTitleComponent() {
-        return titleComponent;
-    }
-
-    public void setTitleComponent(Component titleComponent) {
-        this.titleComponent = titleComponent;
+    public void setTitle(Component title) {
+        this.title = title;
     }
 
     public boolean isUseProvidedWindowTitle() {
