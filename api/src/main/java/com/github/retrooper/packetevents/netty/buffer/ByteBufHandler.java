@@ -34,7 +34,11 @@ public interface ByteBufHandler {
     int readInt(Object buffer);
     long readUnsignedInt(Object buffer);
     long readLong(Object buffer);
-    //TODO Write these
+
+    void writeByte(Object buffer, int value);
+    void writeShort(Object buffer, int value);
+    void writeInt(Object buffer, int value);
+    void writeLong(Object buffer, long value);
 
     Object copy(Object buffer);
     Object duplicate(Object buffer);
@@ -51,23 +55,41 @@ public interface ByteBufHandler {
         return Float.intBitsToFloat(readInt(buffer));
     }
 
+    default void writeFloat(Object buffer, float value) {
+        writeInt(buffer, Float.floatToIntBits(value));
+    }
+
     default double readDouble(Object buffer) {
         return Double.longBitsToDouble(readLong(buffer));
+    }
+
+    default void writeDouble(Object buffer, double value) {
+        writeLong(buffer, Double.doubleToLongBits(value));
     }
 
     default char readChar(Object buffer) {
         return (char) readShort(buffer);
     }
 
+    default void writeChar(Object buffer, char value) {
+        writeShort(buffer, value);
+    }
+
+    //Use writeShort to write
     default int readUnsignedShort(Object buffer) {
         return readShort(buffer) & '\uffff';
     }
 
+    //Use writeByte to write
     default int readUnsignedByte(Object buffer) {
         return this.readByte(buffer) & 255;
     }
 
     default boolean readBoolean(Object buffer) {
         return readByte(buffer) != 0;
+    }
+
+    default void writeBoolean(Object buffer, boolean value) {
+        writeByte(buffer, value ? 1 : 0);
     }
 }

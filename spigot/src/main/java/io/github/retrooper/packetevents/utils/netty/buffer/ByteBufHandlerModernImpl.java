@@ -82,6 +82,27 @@ public class ByteBufHandlerModernImpl implements ByteBufHandler {
         return ((ByteBuf)buffer).readLong();
     }
 
+
+    @Override
+    public void writeByte(Object buffer, int value) {
+        ((ByteBuf)buffer).writeByte(value);
+    }
+
+    @Override
+    public void writeShort(Object buffer, int value) {
+        ((ByteBuf)buffer).writeShort(value);
+    }
+
+    @Override
+    public void writeInt(Object buffer, int value) {
+        ((ByteBuf)buffer).writeInt(value);
+    }
+
+    @Override
+    public void writeLong(Object buffer, long value) {
+        ((ByteBuf)buffer).writeLong(value);
+    }
+
     @Override
     public Object copy(Object buffer) {
         return ((ByteBuf)buffer).copy();
