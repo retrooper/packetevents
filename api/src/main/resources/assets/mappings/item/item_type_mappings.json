@@ -7403,7 +7403,7 @@
   "V_1_12": {
     "minecraft:air": "0",
     "minecraft:stone": "1",
-    "minecraft:grass": "2",
+    "minecraft:grass_block": "2",
     "minecraft:dirt": "3",
     "minecraft:cobblestone": "4",
     "minecraft:oak_wood": "5",
@@ -7437,7 +7437,7 @@
     "minecraft:red_mushroom": "40",
     "minecraft:gold_block": "41",
     "minecraft:iron_block": "42",
-    "minecraft:stone_slab": "44",
+    "minecraft:smooth_stone_slab": "44",
     "minecraft:bricks": "45",
     "minecraft:tnt": "46",
     "minecraft:bookshelf": "47",
