@@ -176,6 +176,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         worldNames = wrapper.worldNames;
         dimensionCodec = wrapper.dimensionCodec;
         dimension = wrapper.dimension;
+        difficulty = wrapper.difficulty;
         worldName = wrapper.worldName;
         hashedSeed = wrapper.hashedSeed;
         maxPlayers = wrapper.maxPlayers;
