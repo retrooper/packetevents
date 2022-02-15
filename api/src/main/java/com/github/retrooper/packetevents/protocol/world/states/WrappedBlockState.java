@@ -135,6 +135,10 @@ public class WrappedBlockState {
                     dataStrings = line.substring(split[0].length() + split[1].length() + 2 + blockString.length() + 1, line.length() - 1).split(",");
                 }
 
+                if (type == null) {
+                    PacketEvents.getAPI().getLogger().warning("Could not find type for " + blockString);
+                }
+
                 WrappedBlockState state = new WrappedBlockState(type, dataStrings, combinedID);
 
                 BY_STRING.put(fullString, state);
