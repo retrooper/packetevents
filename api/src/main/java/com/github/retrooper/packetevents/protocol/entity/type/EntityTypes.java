@@ -138,14 +138,6 @@ public class EntityTypes {
             public Optional<EntityType> getParent() {
                 return optParent;
             }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof EntityType) {
-                    return getId() == ((EntityType) obj).getId();
-                }
-                return false;
-            }
         };
 
         ENTITY_TYPE_MAP.put(entityType.getName().toString(), entityType);
