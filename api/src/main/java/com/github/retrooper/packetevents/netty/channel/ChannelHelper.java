@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.netty.channel;
 import com.github.retrooper.packetevents.PacketEvents;
 
 import java.net.SocketAddress;
+import java.util.Arrays;
 import java.util.List;
 
 public class ChannelHelper {
@@ -70,5 +71,9 @@ public class ChannelHelper {
 
     public static List<String> pipelineHandlerNames(Object channel) {
         return PacketEvents.getAPI().getNettyManager().getChannelOperator().pipelineHandlerNames(channel);
+    }
+
+    public static String pipelineHandlerNamesAsString(Object channel) {
+        return Arrays.toString(pipelineHandlerNames(channel).toArray(new String[0]));
     }
 }

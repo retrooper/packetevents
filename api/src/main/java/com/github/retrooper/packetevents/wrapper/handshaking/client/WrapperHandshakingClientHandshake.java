@@ -87,7 +87,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
 
     public void setProtocolVersion(int protocolVersion) {
         this.protocolVersion = protocolVersion;
-        setClientVersion(ClientVersion.getById(protocolVersion));
+        this.clientVersion = ClientVersion.getById(protocolVersion);
     }
 
     /**
@@ -102,7 +102,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
 
     public void setClientVersion(ClientVersion clientVersion) {
         this.clientVersion = clientVersion;
-        setProtocolVersion(clientVersion.getProtocolVersion());
+        this.protocolVersion = clientVersion.getProtocolVersion();
     }
 
     /**
