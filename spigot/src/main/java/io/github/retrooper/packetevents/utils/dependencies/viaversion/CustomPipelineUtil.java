@@ -18,8 +18,6 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
-import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
-import com.github.retrooper.packetevents.netty.channel.pipeline.ChannelPipelineAbstract;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -120,30 +118,6 @@ public class CustomPipelineUtil {
             e.printStackTrace();
         }
         return output;
-    }
-
-
-    public static ChannelHandlerContextAbstract getNextContext(String name, ChannelPipelineAbstract pipeline) {
-        boolean mark = false;
-        for (String s : pipeline.names()) {
-            if (mark) {
-                return pipeline.context(pipeline.get(s));
-            }
-            if (s.equals(name))
-                mark = true;
-        }
-        return null;
-    }
-
-    public static ChannelHandlerContextAbstract getPreviousContext(String name, ChannelPipelineAbstract pipeline) {
-        String previous = null;
-        for (String entry : pipeline.toMap().keySet()) {
-            if (entry.equals(name)) {
-                return pipeline.context(previous);
-            }
-            previous = entry;
-        }
-        return null;
     }
 }
 

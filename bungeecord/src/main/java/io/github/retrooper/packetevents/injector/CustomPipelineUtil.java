@@ -18,8 +18,6 @@
 
 package io.github.retrooper.packetevents.injector;
 
-import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
-import com.github.retrooper.packetevents.netty.channel.pipeline.ChannelPipelineAbstract;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -145,7 +143,7 @@ public class CustomPipelineUtil {
         }
         try {
             BUNGEE_PACKET_ENCODE_BYTEBUF.invoke(encoder, ctx, msg, output);
-        } catch (IllegalAccessException e){
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -167,48 +165,6 @@ public class CustomPipelineUtil {
             e.printStackTrace();
         }
         return output;
-    }
-
-    /**
-     * Check if a stack trace contains a certain exception
-     *
-     * @param t The throwable
-     * @param c The exception to look for
-     * @return True if the stack trace contained it as its cause or if t is an instance of c.
-     */
-    public static boolean containsCause(Throwable t, Class<?> c) {
-        while (t != null) {
-            if (c.isAssignableFrom(t.getClass())) {
-                return true;
-            }
-
-            t = t.getCause();
-        }
-        return false;
-    }
-
-
-    public static ChannelHandlerContextAbstract getNextContext(String name, ChannelPipelineAbstract pipeline) {
-        boolean mark = false;
-        for (String s : pipeline.names()) {
-            if (mark) {
-                return pipeline.context(pipeline.get(s));
-            }
-            if (s.equals(name))
-                mark = true;
-        }
-        return null;
-    }
-
-    public static ChannelHandlerContextAbstract getPreviousContext(String name, ChannelPipelineAbstract pipeline) {
-        String previous = null;
-        for (String entry : pipeline.toMap().keySet()) {
-            if (entry.equals(name)) {
-                return pipeline.context(previous);
-            }
-            previous = entry;
-        }
-        return null;
     }
 }
 

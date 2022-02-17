@@ -98,9 +98,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                     if (event.getPlayer() instanceof Player) {
                         Player player = (Player) event.getPlayer();
                         player.sendMessage("Hii " + player.getName());
-                        event.getUser().sendMessage("Hi pt 2");
+                        event.getUser().sendMessage("Hi pt TWOOO");
                     } else {
-                        event.getUser().sendMessage("player null, but hey!!!");
+                        event.getUser().sendMessage("player null, but hi dude!!!");
                     }
                 }
             }

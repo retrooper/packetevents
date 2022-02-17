@@ -19,11 +19,8 @@
 package io.github.retrooper.packetevents.utils.netty;
 
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationOperator;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufOperator;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelOperator;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.*;
