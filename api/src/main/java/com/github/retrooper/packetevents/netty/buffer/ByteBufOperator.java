@@ -18,7 +18,9 @@
 
 package com.github.retrooper.packetevents.netty.buffer;
 
-public interface ByteBufHandler {
+import java.nio.charset.Charset;
+
+public interface ByteBufOperator {
     int readerIndex(Object buffer);
     Object readerIndex(Object buffer, int readerIndex);
 
@@ -40,16 +42,30 @@ public interface ByteBufHandler {
     void writeInt(Object buffer, int value);
     void writeLong(Object buffer, long value);
 
+    short getUnsignedByte(Object buffer, int index);
+
+    boolean isReadable(Object buffer);
     Object copy(Object buffer);
     Object duplicate(Object buffer);
     boolean hasArray(Object buffer);
     byte[] array(Object buffer);
     Object retain(Object buffer);
+    Object readSlice(Object buffer, int length);
+    Object readBytes(Object buffer, byte[] destination, int destinationIndex, int length);
     Object readBytes(Object buffer, int length);
     void readBytes(Object buffer, byte[] bytes);
+
+    Object writeBytes(Object buffer, byte[] bytes);
+    Object writeBytes(Object buffer, byte[] bytes, int offset, int length);
+
     boolean release(Object buffer);
     int refCnt(Object buffer);
     Object skipBytes(Object buffer, int length);
+    String toString(Object buffer, int index, int length, Charset charset);
+    Object markReaderIndex(Object buffer);
+    Object resetReaderIndex(Object buffer);
+    Object markWriterIndex(Object buffer);
+    Object resetWriterIndex(Object buffer);
 
     default float readFloat(Object buffer) {
         return Float.intBitsToFloat(readInt(buffer));
@@ -71,7 +87,7 @@ public interface ByteBufHandler {
         return (char) readShort(buffer);
     }
 
-    default void writeChar(Object buffer, char value) {
+    default void writeChar(Object buffer, int value) {
         writeShort(buffer, value);
     }
 
@@ -81,8 +97,8 @@ public interface ByteBufHandler {
     }
 
     //Use writeByte to write
-    default int readUnsignedByte(Object buffer) {
-        return this.readByte(buffer) & 255;
+    default short readUnsignedByte(Object buffer) {
+        return (short) (this.readByte(buffer) & 255);
     }
 
     default boolean readBoolean(Object buffer) {

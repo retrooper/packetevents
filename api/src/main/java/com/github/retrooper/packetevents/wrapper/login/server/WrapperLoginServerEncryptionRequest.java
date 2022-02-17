@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.login.server;
 
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -61,9 +62,9 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     @Override
     public void readData() {
         this.serverID = readString(20);
-        byte[] publicKeyBytes = readByteArray(buffer.readableBytes());
+        byte[] publicKeyBytes = readByteArray(ByteBufHelper.readableBytes(buffer));
         this.publicKey = encrypt(publicKeyBytes);
-        this.verifyToken = readByteArray(buffer.readableBytes());
+        this.verifyToken = readByteArray(ByteBufHelper.readableBytes(buffer));
     }
 
     @Override

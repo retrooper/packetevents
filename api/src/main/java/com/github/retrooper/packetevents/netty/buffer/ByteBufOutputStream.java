@@ -25,44 +25,44 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class ByteBufAbstractOutputStream extends OutputStream implements DataOutput {
-    private final ByteBufAbstract buffer;
+public class ByteBufOutputStream extends OutputStream implements DataOutput {
+    private final Object buffer;
     private final int startIndex;
     private final DataOutputStream utf8out = new DataOutputStream(this);
 
-    public ByteBufAbstractOutputStream(ByteBufAbstract buffer) {
+    public ByteBufOutputStream(Object buffer) {
         if (buffer == null) {
             throw new NullPointerException("buffer");
         } else {
             this.buffer = buffer;
-            this.startIndex = buffer.writerIndex();
+            this.startIndex = ByteBufHelper.writerIndex(buffer);
         }
     }
 
     public int writtenBytes() {
-        return this.buffer.writerIndex() - this.startIndex;
+        return ByteBufHelper.writerIndex(buffer) - this.startIndex;
     }
 
     public void write(byte[] b, int off, int len) throws IOException {
         if (len != 0) {
-            this.buffer.writeBytes(b, off, len);
+            ByteBufHelper.writeBytes(buffer, b, off, len);
         }
     }
 
     public void write(byte[] b) throws IOException {
-        this.buffer.writeBytes(b);
+        ByteBufHelper.writeBytes(buffer, b);
     }
 
     public void write(int b) throws IOException {
-        this.buffer.writeByte(b);
+        ByteBufHelper.writeByte(buffer, b);
     }
 
     public void writeBoolean(boolean v) throws IOException {
-        this.buffer.writeBoolean(v);
+        ByteBufHelper.writeBoolean(buffer, v);
     }
 
     public void writeByte(int v) throws IOException {
-        this.buffer.writeByte(v);
+        ByteBufHelper.writeByte(buffer, v);
     }
 
     @Deprecated
@@ -71,43 +71,43 @@ public class ByteBufAbstractOutputStream extends OutputStream implements DataOut
     }
 
     public void writeChar(int v) throws IOException {
-        this.buffer.writeChar(v);
+        ByteBufHelper.writeChar(buffer, v);
     }
 
     public void writeChars(String s) throws IOException {
         int len = s.length();
 
         for (int i = 0; i < len; ++i) {
-            this.buffer.writeChar(s.charAt(i));
+            ByteBufHelper.writeChar(buffer, s.charAt(i));
         }
 
     }
 
     public void writeDouble(double v) throws IOException {
-        this.buffer.writeDouble(v);
+        ByteBufHelper.writeDouble(buffer, v);
     }
 
     public void writeFloat(float v) throws IOException {
-        this.buffer.writeFloat(v);
+        ByteBufHelper.writeFloat(buffer, v);
     }
 
     public void writeInt(int v) throws IOException {
-        this.buffer.writeInt(v);
+        ByteBufHelper.writeInt(buffer, v);
     }
 
     public void writeLong(long v) throws IOException {
-        this.buffer.writeLong(v);
+        ByteBufHelper.writeLong(buffer, v);
     }
 
     public void writeShort(int v) throws IOException {
-        this.buffer.writeShort((short) v);
+        ByteBufHelper.writeShort(buffer, v);
     }
 
     public void writeUTF(String s) throws IOException {
         this.utf8out.writeUTF(s);
     }
 
-    public ByteBufAbstract buffer() {
+    public Object buffer() {
         return this.buffer;
     }
 }

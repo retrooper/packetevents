@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.handlers.legacy.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
@@ -31,9 +30,8 @@ import net.minecraft.util.io.netty.channel.Channel;
 public class ServerConnectionInitializerLegacy {
     public static void postInitChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-        ChannelAbstract channelAbstract = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
-        User user = new User(channelAbstract, connectionState, null, new UserProfile(null, null));
-        ProtocolManager.USERS.put(channelAbstract, user);
+        User user = new User(channel, connectionState, null, new UserProfile(null, null));
+        ProtocolManager.USERS.put(channel, user);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLegacy(user));
         //No need to account for ViaVersion, as they don't support 1.7.10
         channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderLegacy(user));

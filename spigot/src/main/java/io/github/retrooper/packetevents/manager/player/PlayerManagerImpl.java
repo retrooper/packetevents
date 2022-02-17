@@ -51,7 +51,7 @@ public class PlayerManagerImpl implements PlayerManager {
         if (p.getAddress() == null) {
             return ClientVersion.UNKNOWN;
         }
-        ChannelAbstract channel = getChannel(p);
+        Object channel = getChannel(p);
         User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
         if (user.getClientVersion() == null
                 || !user.getClientVersion().isResolved()) {
@@ -86,13 +86,12 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public @NotNull ChannelAbstract getChannel(@NotNull Object player) {
+    public Object getChannel(@NotNull Object player) {
         String username = ((Player) player).getName();
-        ChannelAbstract channel = PacketEvents.getAPI().getProtocolManager().getChannel(username);
+        Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(username);
         if (channel == null) {
-            Object ch = SpigotReflectionUtil.getChannel((Player) player);
-            if (ch != null) {
-                channel = PacketEvents.getAPI().getNettyManager().wrapChannel(ch);
+            channel = SpigotReflectionUtil.getChannel((Player) player);
+            if (channel != null) {
                 ProtocolManager.CHANNELS.put(username, channel);
             }
         }
@@ -102,7 +101,7 @@ public class PlayerManagerImpl implements PlayerManager {
     @Override
     public @NotNull User getUser(@NotNull Object player) {
         Player p = (Player) player;
-        ChannelAbstract channel = getChannel(p);
+        Object channel = getChannel(p);
         User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
         if (user == null) {
             //TODO Extract texture properties and pass into user profile(not priority)

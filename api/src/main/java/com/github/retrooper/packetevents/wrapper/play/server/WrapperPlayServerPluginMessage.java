@@ -52,9 +52,9 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
         }
         if (serverVersion == ServerVersion.V_1_7_10) {
             //We ignore this, because it's not needed.
-            int dataSize = readShort();
+            int legacyDataSize = readShort();
         }
-        this.data = readBytes(buffer.readableBytes());
+        this.data = readRemainingBytes();
     }
 
     @Override

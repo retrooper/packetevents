@@ -20,12 +20,11 @@ package io.github.retrooper.packetevents.utils;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.utils.dependencies.google.GuavaUtil;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -298,11 +297,11 @@ public final class SpigotReflectionUtil {
         return null;
     }
 
-    public static Object getCraftPlayer(final Player player) {
+    public static Object getCraftPlayer(Player player) {
         return CRAFT_PLAYER_CLASS.cast(player);
     }
 
-    public static Object getEntityPlayer(final Player player) {
+    public static Object getEntityPlayer(Player player) {
         Object craftPlayer = getCraftPlayer(player);
         try {
             return GET_CRAFT_PLAYER_HANDLE_METHOD.invoke(craftPlayer);
@@ -312,7 +311,7 @@ public final class SpigotReflectionUtil {
         return null;
     }
 
-    public static Object getPlayerConnection(final Player player) {
+    public static Object getPlayerConnection(Player player) {
         Object entityPlayer = getEntityPlayer(player);
         if (entityPlayer == null) {
             return null;
@@ -349,7 +348,7 @@ public final class SpigotReflectionUtil {
         }
     }
 
-    public static Object getChannel(final Player player) {
+    public static Object getChannel(Player player) {
         Object networkManager = getNetworkManager(player);
         if (networkManager == null) {
             return null;
@@ -484,24 +483,23 @@ public final class SpigotReflectionUtil {
     }
 
     public static com.github.retrooper.packetevents.protocol.item.ItemStack decodeBukkitItemStack(ItemStack in) {
-        Object packetDataSerializer = createPacketDataSerializer(ByteBufUtil.buffer().rawByteBuf());
+        Object packetDataSerializer = createPacketDataSerializer(UnpooledByteBufAllocationHelper.buffer());
         Object nmsItemStack = toNMSItemStack(in);
         writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
-        Object rawByteBuf = null;
+        Object byteBuf = null;
         try {
-            rawByteBuf = BYTE_BUF_IN_PACKET_DATA_SERIALIZER.get(packetDataSerializer);
+            byteBuf = BYTE_BUF_IN_PACKET_DATA_SERIALIZER.get(packetDataSerializer);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        ByteBufAbstract bb = PacketEvents.getAPI().getNettyManager().wrapByteBuf(rawByteBuf);
-        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(bb);
+        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(byteBuf);
         return wrapper.readItemStack();
     }
 
     public static ItemStack encodeBukkitItemStack(com.github.retrooper.packetevents.protocol.item.ItemStack in) {
-        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(ByteBufUtil.buffer());
+        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(UnpooledByteBufAllocationHelper.buffer());
         wrapper.writeItemStack(in);
-        Object packetDataSerializer = createPacketDataSerializer(wrapper.getBuffer().rawByteBuf());
+        Object packetDataSerializer = createPacketDataSerializer(wrapper.getBuffer());
         Object nmsItemStack = readNMSItemStackPacketDataSerializer(packetDataSerializer);
         ItemStack itemStack = toBukkitItemStack(nmsItemStack);
         return itemStack;

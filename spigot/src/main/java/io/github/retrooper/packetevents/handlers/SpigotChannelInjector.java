@@ -19,16 +19,15 @@
 package io.github.retrooper.packetevents.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.event.PlayerEjectEvent;
 import com.github.retrooper.packetevents.event.PlayerInjectEvent;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.injector.ChannelInjector;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.handlers.legacy.early.EarlyChannelInjectorLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.late.LateChannelInjectorLegacy;
 import io.github.retrooper.packetevents.handlers.modern.early.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.handlers.modern.late.LateChannelInjectorModern;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -83,7 +82,7 @@ public class SpigotChannelInjector implements ChannelInjector {
     }
 
     @Override
-    public void updateUser(ChannelAbstract channel, User user) {
+    public void updateUser(Object channel, User user) {
         injector.updateUser(channel, user);
     }
 
@@ -112,12 +111,12 @@ public class SpigotChannelInjector implements ChannelInjector {
 
     @Override
     @Nullable
-    public ConnectionState getConnectionState(ChannelAbstract channel) {
+    public ConnectionState getConnectionState(Object channel) {
         return injector.getConnectionState(channel);
     }
 
     @Override
-    public void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
+    public void changeConnectionState(Object channel, ConnectionState connectionState) {
         injector.changeConnectionState(channel, connectionState);
     }
 }

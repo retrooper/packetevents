@@ -18,11 +18,6 @@
 
 package com.github.retrooper.packetevents.manager.server;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-
 public interface ServerManager {
     /**
      * Get the server version.
@@ -38,45 +33,5 @@ public interface ServerManager {
      */
     default SystemOS getOS() {
         return SystemOS.getOS();
-    }
-
-    @Deprecated
-    default void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        PacketEvents.getAPI().getProtocolManager().receivePacket(channel, byteBuf);
-    }
-
-    @Deprecated
-    default void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().receivePacket(channel, wrapper);
-    }
-
-    @Deprecated
-    default void receivePacket(Object player, ByteBufAbstract byteBuf) {
-        PacketEvents.getAPI().getPlayerManager().receivePacket(player, byteBuf);
-    }
-
-    @Deprecated
-    default void receivePacket(Object player, PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getPlayerManager().receivePacket(player, wrapper);
-    }
-
-    @Deprecated
-    default void receivePacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(channel, byteBuf);
-    }
-
-    @Deprecated
-    default void receivePacketSilently(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(channel, wrapper);
-    }
-
-    @Deprecated
-    default void receivePacketSilently(Object player, ByteBufAbstract byteBuf) {
-        PacketEvents.getAPI().getPlayerManager().receivePacketSilently(player, byteBuf);
-    }
-
-    @Deprecated
-    default void receivePacketSilently(Object player, PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getPlayerManager().receivePacketSilently(player, wrapper);
     }
 }

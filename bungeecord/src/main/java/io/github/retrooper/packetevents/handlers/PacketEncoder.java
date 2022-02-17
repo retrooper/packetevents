@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
@@ -55,7 +56,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> buffer.readerIndex(readerIndex));
         if (!packetSendEvent.isCancelled()) {
             if (packetSendEvent.getLastUsedWrapper() != null) {
-                packetSendEvent.getByteBuf().clear();
+                ByteBufHelper.clear(packetSendEvent.getByteBuf());
                 packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
                 packetSendEvent.getLastUsedWrapper().writeData();
             }

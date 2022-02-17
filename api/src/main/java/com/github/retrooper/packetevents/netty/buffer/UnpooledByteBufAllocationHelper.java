@@ -22,22 +22,22 @@ import com.github.retrooper.packetevents.PacketEvents;
 
 public class UnpooledByteBufAllocationHelper {
     public static Object wrappedBuffer(byte[] bytes) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationHandler().wrappedBuffer(bytes);
+        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationOperator().wrappedBuffer(bytes);
     }
 
     public static Object copiedBuffer(byte[] bytes) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationHandler().copiedBuffer(bytes);
+        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationOperator().copiedBuffer(bytes);
     }
 
     public static Object buffer() {
-        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationHandler().buffer();
+        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationOperator().buffer();
     }
 
     public static Object directBuffer() {
-        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationHandler().directBuffer();
+        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationOperator().directBuffer();
     }
 
     public static Object compositeBuffer() {
-        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationHandler().compositeBuffer();
+        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationOperator().compositeBuffer();
     }
 }

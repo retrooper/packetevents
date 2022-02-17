@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.processor;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PostPlayerInjectEvent;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.handlers.SpigotChannelInjector;
@@ -29,30 +28,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class InternalBukkitListener implements Listener {
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onLogin(PlayerLoginEvent e) {
-        Player player = e.getPlayer();
-        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-        if (injector.shouldInjectEarly()) {
-            PacketEvents.getAPI().getInjector().injectPlayer(player, null);
-        }
-    }
-
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
         SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-        boolean injectEarly = injector.shouldInjectEarly();
-        boolean shouldInject = !injectEarly || !injector.hasInjected(e.getPlayer());
         //By accessing user with the player object, we ensure that a valid user is cached.
         User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
 
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
-        if (shouldInject) {
+        if (!injector.hasInjected(e.getPlayer())) {
             //Late injection
             injector.injectPlayer(player, ConnectionState.PLAY);
         }
@@ -63,7 +50,7 @@ public class InternalBukkitListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         //Cleanup user data, maybe make some abstraction method for this in the API module.
         PacketEvents.getAPI().getProtocolManager().clearUserData(channel, player.getName());
     }

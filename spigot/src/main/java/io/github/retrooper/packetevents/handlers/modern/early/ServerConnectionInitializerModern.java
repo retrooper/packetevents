@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.handlers.modern.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
@@ -33,7 +32,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -43,17 +41,15 @@ public class ServerConnectionInitializerModern {
     //TODO Only inject Epoll & NioSocketChannels(check v1.8 packetevents)
     public static void postInitChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-        ChannelAbstract channelAbstract = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
-        User user = new User(channelAbstract, connectionState, null, new UserProfile(null, null));
-        ProtocolManager.USERS.put(channelAbstract, user);
+        User user = new User(channel, connectionState, null, new UserProfile(null, null));
+        ProtocolManager.USERS.put(channel, user);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern(user));
         PacketEncoderModern encoder = new PacketEncoderModern(user);
         ChannelHandler vanillaEncoder = channel.pipeline().get("encoder");
         if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitEncodeHandlerClass().isInstance(vanillaEncoder)) {
             //Read the minecraft encoder stored in ViaVersion's encoder.
             encoder.mcEncoder = new ReflectionObject(vanillaEncoder).read(0, MessageToByteEncoder.class);
-        }
-        else {
+        } else {
             //Read the minecraft encoder exposed in the pipeline
             encoder.mcEncoder = (MessageToByteEncoder<?>) vanillaEncoder;
         }

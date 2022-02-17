@@ -19,13 +19,12 @@
 package io.github.retrooper.packetevents.handlers.modern.late;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.handlers.LateInjector;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.github.retrooper.packetevents.handlers.modern.early.ServerConnectionInitializerModern;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import org.bukkit.entity.Player;
@@ -43,7 +42,7 @@ public class LateChannelInjectorModern implements LateInjector {
     }
 
     @Override
-    public void updateUser(ChannelAbstract channel, User user) {
+    public void updateUser(Object channel, User user) {
         PacketEncoderModern encoder = getEncoder(channel);
         if (encoder != null) {
             encoder.user = user;
@@ -57,20 +56,20 @@ public class LateChannelInjectorModern implements LateInjector {
 
     @Override
     public void injectPlayer(Object player, @Nullable ConnectionState connectionState) {
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         if (connectionState == null) {
             connectionState = ConnectionState.PLAY;
         }
-        ServerConnectionInitializerModern.postInitChannel(channel.rawChannel(), connectionState);
+        ServerConnectionInitializerModern.postInitChannel(channel, connectionState);
         PacketDecoderModern decoder = getDecoder(channel);
         if (decoder != null) {
-            decoder.user.getProfile().setName(((Player)player).getName());
-            decoder.user.getProfile().setUUID(((Player)player).getUniqueId());
+            decoder.user.getProfile().setName(((Player) player).getName());
+            decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
         }
     }
 
-    private PacketDecoderModern getDecoder(ChannelAbstract ch) {
-        Channel channel = (Channel) ch.rawChannel();
+    private PacketDecoderModern getDecoder(Object ch) {
+        Channel channel = (Channel) ch;
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
@@ -79,8 +78,8 @@ public class LateChannelInjectorModern implements LateInjector {
         }
     }
 
-    private PacketEncoderModern getEncoder(ChannelAbstract ch) {
-        Channel channel = (Channel) ch.rawChannel();
+    private PacketEncoderModern getEncoder(Object ch) {
+        Channel channel = (Channel) ch;
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
         if (decoder instanceof PacketEncoderModern) {
             return (PacketEncoderModern) decoder;
@@ -92,16 +91,16 @@ public class LateChannelInjectorModern implements LateInjector {
 
     @Override
     public void ejectPlayer(Object player) {
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         try {
-            ServerConnectionInitializerModern.postDestroyChannel(channel.rawChannel());
+            ServerConnectionInitializerModern.postDestroyChannel(channel);
         } catch (Exception ignored) {
         }
     }
 
     @Override
     public boolean hasInjected(Object player) {
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         PacketDecoderModern decoder = getDecoder(channel);
         PacketEncoderModern encoder = getEncoder(channel);
         return decoder != null && decoder.player != null &&
@@ -109,7 +108,7 @@ public class LateChannelInjectorModern implements LateInjector {
     }
 
     @Override
-    public ConnectionState getConnectionState(ChannelAbstract channel) {
+    public ConnectionState getConnectionState(Object channel) {
         PacketEncoderModern encoder = getEncoder(channel);
         if (encoder != null) {
             return encoder.user.getConnectionState();
@@ -118,7 +117,7 @@ public class LateChannelInjectorModern implements LateInjector {
     }
 
     @Override
-    public void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
+    public void changeConnectionState(Object channel, ConnectionState connectionState) {
         PacketEncoderModern encoder = getEncoder(channel);
         if (encoder != null) {
             encoder.user.setConnectionState(connectionState);

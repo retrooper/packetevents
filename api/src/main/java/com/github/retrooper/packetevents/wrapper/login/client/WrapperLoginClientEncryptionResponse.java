@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.login.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.MinecraftEncryptionUtil;
@@ -45,8 +46,8 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
 
     @Override
     public void readData() {
-        this.encryptedSharedSecret = readByteArray(buffer.readableBytes());
-        this.encryptedVerifyToken = readByteArray(buffer.readableBytes());
+        this.encryptedSharedSecret = readByteArray(ByteBufHelper.readableBytes(buffer));
+        this.encryptedVerifyToken = readByteArray(ByteBufHelper.readableBytes(buffer));
     }
 
     @Override

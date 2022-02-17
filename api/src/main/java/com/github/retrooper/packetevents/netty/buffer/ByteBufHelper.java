@@ -20,148 +20,221 @@ package com.github.retrooper.packetevents.netty.buffer;
 
 import com.github.retrooper.packetevents.PacketEvents;
 
+import java.nio.charset.Charset;
+
 public class ByteBufHelper {
     public static int readerIndex(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readerIndex(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readerIndex(buffer);
     }
 
     public static Object readerIndex(Object buffer, int readerIndex) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readerIndex(buffer, readerIndex);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readerIndex(buffer, readerIndex);
     }
 
     public static int writerIndex(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().writerIndex(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().writerIndex(buffer);
     }
 
     public static Object writerIndex(Object buffer, int writerIndex) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().writerIndex(buffer, writerIndex);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().writerIndex(buffer, writerIndex);
     }
 
     public static int readableBytes(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readableBytes(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readableBytes(buffer);
     }
 
     public static int writableBytes(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().writableBytes(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().writableBytes(buffer);
     }
 
     public static Object clear(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().clear(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().clear(buffer);
+    }
+
+    public static String toString(Object buffer, int index, int length, Charset charset) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().toString(buffer, index, length, charset);
     }
 
     public static byte readByte(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readByte(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readByte(buffer);
     }
 
     public static void writeByte(Object buffer, int value) {
-        PacketEvents.getAPI().getNettyManager().getByteBufHandler().writeByte(buffer, value);
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeByte(buffer, value);
     }
 
     public static boolean readBoolean(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readBoolean(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readBoolean(buffer);
     }
 
     public static void writeBoolean(Object buffer, boolean value) {
-        PacketEvents.getAPI().getNettyManager().getByteBufHandler().writeBoolean(buffer, value);
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeBoolean(buffer, value);
     }
 
-    public static int readUnsignedByte(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readUnsignedByte(buffer);
+    public static short readUnsignedByte(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readUnsignedByte(buffer);
     }
 
     public static char readChar(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readChar(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readChar(buffer);
     }
 
-    public static void writeChar(Object buffer, char value) {
-        PacketEvents.getAPI().getNettyManager().getByteBufHandler().writeChar(buffer, value);
+    public static void writeChar(Object buffer, int value) {
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeChar(buffer, value);
     }
 
     public static short readShort(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readShort(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readShort(buffer);
     }
 
     public static int readUnsignedShort(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readUnsignedShort(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readUnsignedShort(buffer);
     }
 
     public static void writeShort(Object buffer, int value) {
-        PacketEvents.getAPI().getNettyManager().getByteBufHandler().writeShort(buffer, value);
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeShort(buffer, value);
     }
 
     public static int readInt(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readInt(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readInt(buffer);
     }
 
     public static void writeInt(Object buffer, int value) {
-        PacketEvents.getAPI().getNettyManager().getByteBufHandler().writeInt(buffer, value);
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeInt(buffer, value);
     }
 
     public static long readUnsignedInt(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readUnsignedInt(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readUnsignedInt(buffer);
     }
 
     public static long readLong(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readLong(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readLong(buffer);
     }
 
     public static void writeLong(Object buffer, long value) {
-        PacketEvents.getAPI().getNettyManager().getByteBufHandler().writeLong(buffer, value);
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeLong(buffer, value);
     }
 
     public static float readFloat(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readFloat(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readFloat(buffer);
     }
 
     public static void writeFloat(Object buffer, float value) {
-        PacketEvents.getAPI().getNettyManager().getByteBufHandler().writeFloat(buffer, value);
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeFloat(buffer, value);
     }
 
     public static double readDouble(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readDouble(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readDouble(buffer);
     }
 
     public static void writeDouble(Object buffer, double value) {
-        PacketEvents.getAPI().getNettyManager().getByteBufHandler().writeDouble(buffer, value);
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeDouble(buffer, value);
+    }
+
+    public static short getUnsignedByte(Object buffer, int index) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().getUnsignedByte(buffer, index);
+    }
+
+    public static boolean isReadable(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().isReadable(buffer);
     }
 
     public static Object copy(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().copy(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().copy(buffer);
     }
 
     public static Object duplicate(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().duplicate(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().duplicate(buffer);
     }
 
     public static boolean hasArray(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().hasArray(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().hasArray(buffer);
     }
 
     public static byte[] array(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().array(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().array(buffer);
     }
 
     public static Object retain(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().retain(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().retain(buffer);
+    }
+
+    public static Object readSlice(Object buffer, int length) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readSlice(buffer, length);
+    }
+
+    public static Object readBytes(Object buffer, byte[] destination, int destinationIndex, int length) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readBytes(buffer, destination, destinationIndex, length);
     }
 
     public static Object readBytes(Object buffer, int length) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().readBytes(buffer, length);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readBytes(buffer, length);
     }
 
     public static void readBytes(Object buffer, byte[] bytes) {
-        PacketEvents.getAPI().getNettyManager().getByteBufHandler().readBytes(buffer, bytes);
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().readBytes(buffer, bytes);
+    }
+
+    public static void writeBytes(Object buffer, byte[] bytes) {
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeBytes(buffer, bytes);
+    }
+
+    public static void writeBytes(Object buffer, byte[] bytes, int offset, int length) {
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeBytes(buffer, bytes, offset, length);
     }
 
     public static boolean release(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().release(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().release(buffer);
     }
 
     public static int refCnt(Object buffer) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().refCnt(buffer);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().refCnt(buffer);
     }
 
     public static Object skipBytes(Object buffer, int length) {
-        return PacketEvents.getAPI().getNettyManager().getByteBufHandler().skipBytes(buffer, length);
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().skipBytes(buffer, length);
     }
+
+    public static Object markReaderIndex(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().markReaderIndex(buffer);
+    }
+
+    public static Object resetReaderIndex(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().resetReaderIndex(buffer);
+    }
+
+    public static Object markWriterIndex(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().markWriterIndex(buffer);
+    }
+
+    public static Object resetWriterIndex(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().resetWriterIndex(buffer);
+    }
+
+    public static int readVarInt(Object buffer) {
+        int value = 0;
+        int length = 0;
+        byte currentByte;
+        do {
+            currentByte = readByte(buffer);
+            value |= (currentByte & 0x7F) << (length * 7);
+            length++;
+            if (length > 5) {
+                throw new RuntimeException("VarInt is too large. Must be smaller than 5 bytes.");
+            }
+        } while ((currentByte & 0x80) == 0x80);
+        return value;
+    }
+
+    public static void writeVarInt(Object buffer, int value) {
+        while (true) {
+            if ((value & ~0x7F) == 0) {
+                writeByte(buffer, value);
+                return;
+            }
+            writeByte(buffer, (value & 0x7F) | 0x80);
+            value >>>= 7;
+        }
+    }
+
 }

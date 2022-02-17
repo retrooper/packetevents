@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
@@ -34,8 +33,7 @@ public class ServerConnectionInitializer {
     }
 
     public static void initChannel(Channel channel, ConnectionState state) {
-        ChannelAbstract ch = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
-        User user = new User(ch, state, null, new UserProfile(null, null));
+        User user = new User(channel, state, null, new UserProfile(null, null));
         PacketDecoder decoder = new PacketDecoder(user, null);
         PacketEncoder encoder = new PacketEncoder(user, null);
         initChannel(channel, decoder, encoder);

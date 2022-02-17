@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.impl.netty.manager.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,7 @@ public abstract class PlayerManagerAbstract implements PlayerManager {
     public abstract int getPing(@NotNull Object player);
 
     @Override
-    public abstract ChannelAbstract getChannel(@NotNull Object player);
+    public abstract Object getChannel(@NotNull Object player);
 
     @Override
     public @NotNull ClientVersion getClientVersion(@NotNull Object player) {
@@ -38,8 +37,8 @@ public abstract class PlayerManagerAbstract implements PlayerManager {
     }
 
     @Override
-    public User getUser(@NotNull Object player) {
-        ChannelAbstract channel = getChannel(player);
+    public @NotNull User getUser(@NotNull Object player) {
+        Object channel = getChannel(player);
         return PacketEvents.getAPI().getProtocolManager().getUser(channel);
     }
 }

@@ -21,53 +21,53 @@ package com.github.retrooper.packetevents.netty.buffer;
 import java.io.*;
 
 //TODO Give netty credit, also credit for our other abstract interfaces defining netty functions
-public class ByteBufAbstractInputStream extends InputStream implements DataInput {
-    private final ByteBufAbstract buffer;
+public class ByteBufInputStream extends InputStream implements DataInput {
+    private final Object buffer;
     private final int startIndex;
     private final int endIndex;
     private final boolean releaseOnClose;
     private final StringBuilder lineBuf;
     private boolean closed;
 
-    public ByteBufAbstractInputStream(ByteBufAbstract buffer) {
-        this(buffer, buffer.readableBytes());
+    public ByteBufInputStream(Object buffer) {
+        this(buffer, ByteBufHelper.readableBytes(buffer));
     }
 
-    public ByteBufAbstractInputStream(ByteBufAbstract buffer, int length) {
+    public ByteBufInputStream(Object buffer, int length) {
         this(buffer, length, false);
     }
 
-    public ByteBufAbstractInputStream(ByteBufAbstract buffer, boolean releaseOnClose) {
-        this(buffer, buffer.readableBytes(), releaseOnClose);
+    public ByteBufInputStream(Object buffer, boolean releaseOnClose) {
+        this(buffer, ByteBufHelper.readableBytes(buffer), releaseOnClose);
     }
 
-    public ByteBufAbstractInputStream(ByteBufAbstract buffer, int length, boolean releaseOnClose) {
+    public ByteBufInputStream(Object buffer, int length, boolean releaseOnClose) {
         this.lineBuf = new StringBuilder();
         if (buffer == null) {
             throw new NullPointerException("buffer");
         } else if (length < 0) {
             if (releaseOnClose) {
-                buffer.release();
+                ByteBufHelper.release(buffer);
             }
 
             throw new IllegalArgumentException("length: " + length);
-        } else if (length > buffer.readableBytes()) {
+        } else if (length > ByteBufHelper.readableBytes(buffer)) {
             if (releaseOnClose) {
-                buffer.release();
+                ByteBufHelper.release(buffer);
             }
 
-            throw new IndexOutOfBoundsException("Too many bytes to be read - Needs " + length + ", maximum is " + buffer.readableBytes());
+            throw new IndexOutOfBoundsException("Too many bytes to be read - Needs " + length + ", maximum is " + ByteBufHelper.readableBytes(buffer));
         } else {
             this.releaseOnClose = releaseOnClose;
             this.buffer = buffer;
-            this.startIndex = buffer.readerIndex();
+            this.startIndex = ByteBufHelper.readerIndex(buffer);
             this.endIndex = this.startIndex + length;
-            buffer.markReaderIndex();
+            ByteBufHelper.markReaderIndex(buffer);
         }
     }
 
     public int readBytes() {
-        return this.buffer.readerIndex() - this.startIndex;
+        return ByteBufHelper.readerIndex(buffer) - this.startIndex;
     }
 
     public void close() throws IOException {
@@ -76,7 +76,7 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
         } finally {
             if (this.releaseOnClose && !this.closed) {
                 this.closed = true;
-                this.buffer.release();
+                ByteBufHelper.release(buffer);
             }
 
         }
@@ -84,11 +84,11 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
     }
 
     public int available() throws IOException {
-        return this.endIndex - this.buffer.readerIndex();
+        return this.endIndex - ByteBufHelper.readerIndex(buffer);
     }
 
     public void mark(int readlimit) {
-        this.buffer.markReaderIndex();
+        ByteBufHelper.markReaderIndex(buffer);
     }
 
     public boolean markSupported() {
@@ -96,7 +96,7 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
     }
 
     public int read() throws IOException {
-        return !this.buffer.isReadable() ? -1 : this.buffer.readByte() & 255;
+        return !(ByteBufHelper.isReadable(buffer)) ? -1 : ByteBufHelper.readByte(buffer) & 255;
     }
 
 
@@ -106,13 +106,13 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
             return -1;
         } else {
             len = Math.min(available, len);
-            this.buffer.readBytes(b, off, len);
+            ByteBufHelper.readBytes(buffer, b, off, len);
             return len;
         }
     }
 
     public void reset() throws IOException {
-        this.buffer.resetReaderIndex();
+        ByteBufHelper.resetReaderIndex(buffer);
     }
 
     public long skip(long n) throws IOException {
@@ -126,15 +126,15 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
 
     public byte[] readBytes(int len) {
         byte[] bytes = new byte[len];
-        buffer.readBytes(bytes);
+        ByteBufHelper.readBytes(buffer, bytes);
         return bytes;
     }
 
     public byte readByte() throws IOException {
-        if (!this.buffer.isReadable()) {
+        if (!(ByteBufHelper.isReadable(buffer))) {
             throw new EOFException();
         } else {
-            return this.buffer.readByte();
+            return ByteBufHelper.readByte(buffer);
         }
     }
 
@@ -156,23 +156,24 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
 
     public void readFully(byte[] b, int off, int len) throws IOException {
         this.checkAvailable(len);
-        this.buffer.readBytes(b, off, len);
+        ByteBufHelper.readBytes(buffer, b, off, len);
     }
 
     public int readInt() throws IOException {
         this.checkAvailable(4);
-        return this.buffer.readInt();
+        return ByteBufHelper.readInt(buffer);
     }
 
     public String readLine() throws IOException {
         this.lineBuf.setLength(0);
 
-        while (this.buffer.isReadable()) {
-            int c = this.buffer.readUnsignedByte();
+        while (ByteBufHelper.isReadable(buffer)) {
+            int c = ByteBufHelper.readUnsignedByte(buffer);
             switch (c) {
                 case 13:
-                    if (this.buffer.isReadable() && (char) this.buffer.getUnsignedByte(this.buffer.readerIndex()) == '\n') {
-                        this.buffer.skipBytes(1);
+                    if (ByteBufHelper.isReadable(buffer)
+                            && (char) ByteBufHelper.getUnsignedByte(buffer, ByteBufHelper.readerIndex(buffer)) == '\n') {
+                        ByteBufHelper.skipBytes(buffer, 1);
                     }
                 case 10:
                     return this.lineBuf.toString();
@@ -186,7 +187,7 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
 
     public long readLong() throws IOException {
         this.checkAvailable(8);
-        return this.buffer.readLong();
+        return ByteBufHelper.readLong(buffer);
     }
 
     public long[] readLongs(int size) throws IOException {
@@ -200,7 +201,7 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
 
     public short readShort() throws IOException {
         this.checkAvailable(2);
-        return this.buffer.readShort();
+        return ByteBufHelper.readShort(buffer);
     }
 
     public String readUTF() throws IOException {
@@ -217,7 +218,7 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
 
     public int skipBytes(int n) throws IOException {
         int nBytes = Math.min(this.available(), n);
-        this.buffer.skipBytes(nBytes);
+        ByteBufHelper.skipBytes(buffer, nBytes);
         return nBytes;
     }
 

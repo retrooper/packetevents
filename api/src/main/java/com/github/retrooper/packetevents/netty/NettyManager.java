@@ -19,59 +19,14 @@
 package com.github.retrooper.packetevents.netty;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationHandler;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHandler;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationOperator;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufOperator;
+import com.github.retrooper.packetevents.netty.channel.ChannelOperator;
 
 public interface NettyManager {
-    Map<Object, ChannelAbstract> CHANNEL_MAP = new HashMap<>();
+    ChannelOperator getChannelOperator();
 
-    ByteBufHandler getByteBufHandler();
+    ByteBufOperator getByteBufOperator();
 
-    ByteBufAllocationHandler getByteBufAllocationHandler();
-
-    ByteBufAbstract wrappedBuffer(byte[] bytes);
-
-    ByteBufAbstract copiedBuffer(byte[] bytes);
-
-    ByteBufAbstract buffer();
-
-    ByteBufAbstract buffer(int initialCapacity);
-
-    ByteBufAbstract buffer(int initialCapacity, int maxCapacity);
-
-    ByteBufAbstract directBuffer();
-
-    ByteBufAbstract directBuffer(int initialCapacity);
-
-    ByteBufAbstract directBuffer(int initialCapacity, int maxCapacity);
-
-    ByteBufAbstract compositeBuffer();
-
-    ByteBufAbstract compositeBuffer(int maxNumComponents);
-
-    ByteBufAbstract wrapByteBuf(Object byteBuf);
-
-    default ChannelAbstract wrapChannel(Object channel) {
-        ChannelAbstract result = CHANNEL_MAP.get(channel);
-        if (result == null) {
-            result = wrapChannel0(channel);
-            CHANNEL_MAP.put(channel, result);
-        }
-        return result;
-    }
-    ChannelAbstract wrapChannel0(Object channel);
-
-    ChannelHandlerContextAbstract wrapChannelHandlerContext(Object ctx);
-
-    default byte[] asByteArray(ByteBufAbstract byteBuf) {
-        int len = byteBuf.readableBytes();
-        byte[] bytes = new byte[len];
-        byteBuf.getBytes(byteBuf.readerIndex(), bytes);
-        return bytes;
-    }
+    ByteBufAllocationOperator getByteBufAllocationOperator();
 }

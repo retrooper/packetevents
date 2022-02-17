@@ -20,8 +20,7 @@ package io.github.retrooper.packetevents.impl.netty.manager.protocol;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -31,35 +30,35 @@ public abstract class ProtocolManagerAbstract implements ProtocolManager {
     public abstract ProtocolVersion getPlatformVersion();
 
     @Override
-    public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        if (channel.isOpen()) {
-            channel.writeAndFlush(byteBuf);
+    public void sendPacket(Object channel, Object byteBuf) {
+        if (ChannelHelper.isOpen(channel)) {
+            ChannelHelper.writeAndFlush(channel, byteBuf);
         }
     }
 
     @Override
-    public void sendPacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        if (channel.isOpen()) {
-            channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
+    public void sendPacketSilently(Object channel, Object byteBuf) {
+        if (ChannelHelper.isOpen(channel)) {
+            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
         }
     }
 
     @Override
-    public void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        if (channel.isOpen()) {
-            channel.pipeline().fireChannelRead(byteBuf);
+    public void receivePacket(Object channel, Object byteBuf) {
+        if (ChannelHelper.isOpen(channel)) {
+            ChannelHelper.fireChannelRead(channel, byteBuf);
         }
     }
 
     @Override
-    public void receivePacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        if (channel.isOpen()) {
-            channel.pipeline().context(PacketEvents.DECODER_NAME).fireChannelRead(byteBuf);
+    public void receivePacketSilently(Object channel, Object byteBuf) {
+        if (ChannelHelper.isOpen(channel)) {
+            ChannelHelper.fireChannelReadInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
         }
     }
 
     @Override
-    public ClientVersion getClientVersion(ChannelAbstract channel) {
+    public ClientVersion getClientVersion(Object channel) {
         User user = getUser(channel);
         ClientVersion version = user.getClientVersion();
         if (version == null || !version.isResolved()) {

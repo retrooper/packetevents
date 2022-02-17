@@ -19,10 +19,10 @@
 package io.github.retrooper.packetevents.handlers.legacy;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import io.github.retrooper.packetevents.handlers.compression.PacketCompressionManager;
 import io.github.retrooper.packetevents.handlers.compression.PacketCompressionUtil;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
-import io.github.retrooper.packetevents.utils.netty.RawNettyUtil;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
@@ -43,7 +43,7 @@ public class PacketCompressionLegacy implements PacketCompressionManager {
             output.writeBytes(buffer);
             return;
         }
-        int dataLength = RawNettyUtil.readVarInt(buffer);
+        int dataLength = ByteBufHelper.readVarInt(buffer);
         if (dataLength == 0) {
             output.writeBytes(buffer.readBytes(buffer.readableBytes()));
         } else {
@@ -83,12 +83,12 @@ public class PacketCompressionLegacy implements PacketCompressionManager {
         }
         int dataLength = buffer.readableBytes();
         if (dataLength < PacketCompressionUtil.THRESHOLD) {
-            RawNettyUtil.writeVarInt(output, 0);
+            ByteBufHelper.writeVarInt(output, 0);
             output.writeBytes(buffer);
         } else {
             byte[] decompressedData = new byte[dataLength];
             buffer.readBytes(decompressedData);
-            RawNettyUtil.writeVarInt(output, decompressedData.length);
+            ByteBufHelper.writeVarInt(output, decompressedData.length);
             PacketCompressionUtil.DEFLATER.setInput(decompressedData, 0, decompressedData.length);
             PacketCompressionUtil.DEFLATER.finish();
 

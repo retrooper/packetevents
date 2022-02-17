@@ -19,7 +19,6 @@ package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
@@ -56,15 +55,15 @@ public class BungeePipelineInjector implements ChannelInjector {
     private final List<Channel> injectedChannels = new ArrayList<>();
 
     @Override
-    public @Nullable ConnectionState getConnectionState(ChannelAbstract ch) {
-        Channel channel = (Channel) ch.rawChannel();
+    public @Nullable ConnectionState getConnectionState(Object ch) {
+        Channel channel = (Channel) ch;
         PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
         return decoder.user.getConnectionState();
     }
 
     @Override
-    public void changeConnectionState(ChannelAbstract ch, @Nullable ConnectionState packetState) {
-        Channel channel = (Channel) ch.rawChannel();
+    public void changeConnectionState(Object ch, @Nullable ConnectionState packetState) {
+        Channel channel = (Channel) ch;
         PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
         decoder.user.setConnectionState(packetState);
     }
@@ -125,7 +124,7 @@ public class BungeePipelineInjector implements ChannelInjector {
     @Override
     public void injectPlayer(Object p, @Nullable ConnectionState connectionState) {
         ProxiedPlayer player = (ProxiedPlayer) p;
-        Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player).rawChannel();
+        Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player);
         PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
         decoder.player = player;
         decoder.user.getProfile().setUUID(player.getUniqueId());
@@ -138,8 +137,8 @@ public class BungeePipelineInjector implements ChannelInjector {
     }
 
     @Override
-    public void updateUser(ChannelAbstract ch, User user) {
-        Channel channel = (Channel) ch.rawChannel();
+    public void updateUser(Object ch, User user) {
+        Channel channel = (Channel) ch;
         PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
         decoder.user = user;
         PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
@@ -148,15 +147,13 @@ public class BungeePipelineInjector implements ChannelInjector {
 
     @Override
     public void ejectPlayer(Object player) {
-        Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player).rawChannel();
-        if (channel != null) {
-            ServerConnectionInitializer.destroyChannel(channel);
-        }
+        Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        ServerConnectionInitializer.destroyChannel(channel);
     }
 
     @Override
     public boolean hasInjected(Object player) {
-        Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player).rawChannel();
+        Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player);
         PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
         PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
         return decoder != null && encoder != null

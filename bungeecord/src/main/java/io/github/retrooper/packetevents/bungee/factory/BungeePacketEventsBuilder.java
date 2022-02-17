@@ -28,7 +28,6 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -116,7 +115,7 @@ public class BungeePacketEventsBuilder {
                 }
 
                 @Override
-                public ChannelAbstract getChannel(@NotNull Object player) {
+                public Object getChannel(@NotNull Object player) {
                     return PacketEvents.getAPI().getProtocolManager().getChannel(((ProxiedPlayer) player).getName());
                 }
             };

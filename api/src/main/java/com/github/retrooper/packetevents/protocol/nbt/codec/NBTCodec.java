@@ -19,9 +19,9 @@
 package com.github.retrooper.packetevents.protocol.nbt.codec;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstractInputStream;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstractOutputStream;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufInputStream;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufOutputStream;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTEnd;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
@@ -33,21 +33,24 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class NBTCodec {
-    public static NBTCompound readNBT(ByteBufAbstract byteBuf, ServerVersion serverVersion) {
+    public static NBTCompound readNBT(Object byteBuf, ServerVersion serverVersion) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try {
-                return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(new ByteBufAbstractInputStream(byteBuf));
+                return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(
+                        new ByteBufInputStream(byteBuf));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         else {
             try {
-                final short length = byteBuf.readShort();
+                final short length = ByteBufHelper.readShort(byteBuf);
                 if (length < 0) {
                     return null;
                 }
-                try (DataInputStream stream = new DataInputStream(new GZIPInputStream(new ByteBufAbstractInputStream(byteBuf.readSlice(length))))) {
+                Object slicedBuffer = ByteBufHelper.readSlice(byteBuf, length);
+                try (DataInputStream stream = new DataInputStream(
+                        new GZIPInputStream(new ByteBufInputStream(slicedBuffer)))) {
                     return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(stream);
                 }
             }
@@ -58,9 +61,9 @@ public class NBTCodec {
         return null;
     }
 
-    public static void writeNBT(ByteBufAbstract byteBuf, ServerVersion serverVersion, NBTCompound tag) {
+    public static void writeNBT(Object byteBuf, ServerVersion serverVersion, NBTCompound tag) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            try (ByteBufAbstractOutputStream outputStream = new ByteBufAbstractOutputStream(byteBuf)) {
+            try (ByteBufOutputStream outputStream = new ByteBufOutputStream(byteBuf)) {
                 if (tag != null) {
                     DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, tag);
                 } else {
@@ -72,20 +75,20 @@ public class NBTCodec {
         }
         else {
             if (tag == null) {
-                byteBuf.writeShort(-1);
+                ByteBufHelper.writeShort(byteBuf, -1);
             } else {
-                int lengthWriterIndex = byteBuf.writerIndex();
-                byteBuf.writeShort(0);
-                int writerIndexDataStart = byteBuf.writerIndex();
-                try (DataOutputStream outputstream = new DataOutputStream(new GZIPOutputStream(new ByteBufAbstractOutputStream(byteBuf)))) {
+                int lengthWriterIndex = ByteBufHelper.writerIndex(byteBuf);
+                ByteBufHelper.writeShort(byteBuf, 0);
+                int writerIndexDataStart = ByteBufHelper.writerIndex(byteBuf);
+                try (DataOutputStream outputstream = new DataOutputStream(new GZIPOutputStream(new ByteBufOutputStream(byteBuf)))) {
                     DefaultNBTSerializer.INSTANCE.serializeTag(outputstream, tag);
                 } catch (Exception e) {
                     throw new IllegalStateException(e);
                 }
-                int writerIndexDataEnd = byteBuf.writerIndex();
-                byteBuf.writerIndex(lengthWriterIndex);
-                byteBuf.writeShort(writerIndexDataEnd - writerIndexDataStart);
-                byteBuf.writerIndex(writerIndexDataEnd);
+                int writerIndexDataEnd = ByteBufHelper.writerIndex(byteBuf);
+                ByteBufHelper.writerIndex(byteBuf, lengthWriterIndex);
+                ByteBufHelper.writeShort(byteBuf, writerIndexDataEnd - writerIndexDataStart);
+                ByteBufHelper.writerIndex(byteBuf, writerIndexDataEnd);
             }
         }
     }

@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.login.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -44,7 +45,7 @@ public class WrapperLoginClientPluginResponse extends PacketWrapper<WrapperLogin
         this.messageID = readVarInt();
         this.successful = readBoolean();
         if (this.successful) {
-            this.data = readByteArray(buffer.readableBytes());
+            this.data = readByteArray(ByteBufHelper.readableBytes(buffer));
         } else {
             this.data = new byte[0];
         }

@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.manager.npc;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
@@ -34,10 +33,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NPCManager {
     public static int ENTITY_TELEPORT_THRESHOLD = 8;
     //A map that has an NPC as key with all channels that can see this NPC as values
-    private static final Map<NPC, Set<ChannelAbstract>> TARGET_CHANNELS = new ConcurrentHashMap<>();
+    private static final Map<NPC, Set<Object>> TARGET_CHANNELS = new ConcurrentHashMap<>();
 
-    public void spawn(ChannelAbstract channel, NPC npc) {
-        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.computeIfAbsent(npc, k -> new HashSet<>());
+    public void spawn(Object channel, NPC npc) {
+        Set<Object> targetChannels = TARGET_CHANNELS.computeIfAbsent(npc, k -> new HashSet<>());
         WrapperPlayServerPlayerInfo playerInfoPacket = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER,
                 npc.getPlayerInfoData());
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoPacket);
@@ -55,8 +54,8 @@ public class NPCManager {
     }
 
 
-    public void despawn(ChannelAbstract channel, NPC npc) {
-        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+    public void despawn(Object channel, NPC npc) {
+        Set<Object> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null) {
             //TODO Confirm if we need to destroy the team too
             WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(npc.getId());
@@ -72,16 +71,16 @@ public class NPCManager {
         return TARGET_CHANNELS.containsKey(npc);
     }
 
-    public boolean isUsedFor(ChannelAbstract channel, NPC npc) {
-        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+    public boolean isUsedFor(Object channel, NPC npc) {
+        Set<Object> targetChannels = TARGET_CHANNELS.get(npc);
         return targetChannels != null && targetChannels.contains(channel);
     }
 
     public void teleportNPC(NPC npc, Location to) {
         npc.setLocation(to);
-        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        Set<Object> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null) {
-            for (ChannelAbstract channel : targetChannels) {
+            for (Object channel : targetChannels) {
                 WrapperPlayServerEntityTeleport entityTeleport = new WrapperPlayServerEntityTeleport(npc.getId(), to, true);
                 PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityTeleport);
             }
@@ -91,7 +90,7 @@ public class NPCManager {
     public void updateNPCLocation(NPC npc, Location to) {
         Location from = npc.getLocation();
         npc.setLocation(to);
-        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        Set<Object> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
             double distXAbs = Math.abs(to.getPosition().getX() - from.getPosition().getX());
             double distYAbs = Math.abs(to.getPosition().getY() - from.getPosition().getY());
@@ -99,7 +98,7 @@ public class NPCManager {
             boolean shouldUseEntityTeleport = distXAbs > ENTITY_TELEPORT_THRESHOLD ||
                     distYAbs > ENTITY_TELEPORT_THRESHOLD ||
                     distZAbs > ENTITY_TELEPORT_THRESHOLD;
-            for (ChannelAbstract channel : targetChannels) {
+            for (Object channel : targetChannels) {
                 if (shouldUseEntityTeleport) {
                     WrapperPlayServerEntityTeleport entityTeleport = new WrapperPlayServerEntityTeleport(npc.getId(), to, true);
                     PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityTeleport);
@@ -135,9 +134,9 @@ public class NPCManager {
     public void updateNPCRotation(NPC npc, byte yaw, byte pitch) {
         npc.getLocation().setYaw(yaw);
         npc.getLocation().setPitch(pitch);
-        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        Set<Object> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
-            for (ChannelAbstract channel : targetChannels) {
+            for (Object channel : targetChannels) {
                 WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(npc.getId(), yaw, pitch, true);
                 PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRotation);
 
@@ -149,9 +148,9 @@ public class NPCManager {
 
     public void updateNPCTabPing(NPC npc, int ping) {
         npc.setDisplayPing(ping);
-        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        Set<Object> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
-            for (ChannelAbstract channel : targetChannels) {
+            for (Object channel : targetChannels) {
                 WrapperPlayServerPlayerInfo playerInfo =
                         new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, npc.getPlayerInfoData());
                 PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
@@ -160,9 +159,9 @@ public class NPCManager {
     }
 
     public void changeNPCSkin(NPC npc, UUID skinUUID, List<TextureProperty> skinTextureProperties) {
-        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        Set<Object> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
-            for (ChannelAbstract channel : targetChannels) {
+            for (Object channel : targetChannels) {
                 WrapperPlayServerPlayerInfo playerInfoRemove = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, npc.getPlayerInfoData());
                 PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoRemove);
 
@@ -181,9 +180,9 @@ public class NPCManager {
     }
 
     public void updateNPCNameTag(NPC npc) {
-        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        Set<Object> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
-            for (ChannelAbstract channel : targetChannels) {
+            for (Object channel : targetChannels) {
                 //Destroy team
                 WrapperPlayServerTeams removeTeam =
                         new WrapperPlayServerTeams("custom_name_team",
@@ -200,9 +199,9 @@ public class NPCManager {
     }
 
     public void updateEquipment(NPC npc) {
-        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        Set<Object> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
-            for (ChannelAbstract channel : targetChannels) {
+            for (Object channel : targetChannels) {
                 List<Equipment> equipmentList = new ArrayList<>();
                 ItemStack handItem = npc.getMainHand();
                 if (handItem == null) {

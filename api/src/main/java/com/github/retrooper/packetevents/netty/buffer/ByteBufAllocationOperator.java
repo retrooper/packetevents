@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.netty.buffer;
 
-public interface ByteBufAllocationHandler {
+public interface ByteBufAllocationOperator {
     Object wrappedBuffer(byte[] bytes);
 
     Object copiedBuffer(byte[] bytes);

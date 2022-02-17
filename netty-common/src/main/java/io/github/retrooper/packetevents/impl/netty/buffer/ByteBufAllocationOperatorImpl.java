@@ -16,16 +16,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.netty;
+package io.github.retrooper.packetevents.impl.netty.buffer;
 
-import io.netty.buffer.ByteBuf;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationOperator;
+import io.netty.buffer.Unpooled;
 
-public class RawNettyUtilModern {
-    public static byte readByte(Object buffer) {
-        return ((ByteBuf) buffer).readByte();
+public class ByteBufAllocationOperatorImpl implements ByteBufAllocationOperator {
+    @Override
+    public Object wrappedBuffer(byte[] bytes) {
+        return Unpooled.wrappedBuffer(bytes);
     }
 
-    public static void writeByte(Object buffer, int value) {
-        ((ByteBuf) buffer).writeByte(value);
+    @Override
+    public Object copiedBuffer(byte[] bytes) {
+        return Unpooled.copiedBuffer(bytes);
+    }
+
+    @Override
+    public Object buffer() {
+        return Unpooled.buffer();
+    }
+
+    @Override
+    public Object directBuffer() {
+        return Unpooled.directBuffer();
+    }
+
+    @Override
+    public Object compositeBuffer() {
+        return Unpooled.compositeBuffer();
     }
 }

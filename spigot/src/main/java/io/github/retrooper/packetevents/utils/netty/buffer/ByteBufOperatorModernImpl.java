@@ -18,10 +18,12 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHandler;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufOperator;
 import io.netty.buffer.ByteBuf;
 
-public class ByteBufHandlerModernImpl implements ByteBufHandler {
+import java.nio.charset.Charset;
+
+public class ByteBufOperatorModernImpl implements ByteBufOperator {
     @Override
     public int readerIndex(Object buffer) {
         return ((ByteBuf)buffer).readerIndex();
@@ -104,6 +106,16 @@ public class ByteBufHandlerModernImpl implements ByteBufHandler {
     }
 
     @Override
+    public short getUnsignedByte(Object buffer, int index) {
+        return ((ByteBuf)buffer).getUnsignedByte(index);
+    }
+
+    @Override
+    public boolean isReadable(Object buffer) {
+        return ((ByteBuf)buffer).isReadable();
+    }
+
+    @Override
     public Object copy(Object buffer) {
         return ((ByteBuf)buffer).copy();
     }
@@ -129,9 +141,30 @@ public class ByteBufHandlerModernImpl implements ByteBufHandler {
     }
 
     @Override
+    public Object readSlice(Object buffer, int length) {
+        return ((ByteBuf)buffer).readSlice(length);
+    }
+
+    @Override
+    public Object readBytes(Object buffer, byte[] destination, int destinationIndex, int length) {
+        return ((ByteBuf)buffer).readBytes(destination, destinationIndex, length);
+    }
+
+    @Override
     public Object readBytes(Object buffer, int length) {
         return ((ByteBuf)buffer).readBytes(length);
     }
+
+    @Override
+    public Object writeBytes(Object buffer, byte[] bytes) {
+        return ((ByteBuf)buffer).writeBytes(bytes);
+    }
+
+    @Override
+    public Object writeBytes(Object buffer, byte[] bytes, int offset, int length) {
+        return ((ByteBuf)buffer).writeBytes(bytes, offset, length);
+    }
+
 
     @Override
     public void readBytes(Object buffer, byte[] bytes) {
@@ -151,5 +184,30 @@ public class ByteBufHandlerModernImpl implements ByteBufHandler {
     @Override
     public Object skipBytes(Object buffer, int length) {
         return ((ByteBuf)buffer).skipBytes(length);
+    }
+
+    @Override
+    public String toString(Object buffer, int index, int length, Charset charset) {
+        return ((ByteBuf)buffer).toString(index, length, charset);
+    }
+
+    @Override
+    public Object markReaderIndex(Object buffer) {
+        return ((ByteBuf)buffer).markReaderIndex();
+    }
+
+    @Override
+    public Object resetReaderIndex(Object buffer) {
+        return ((ByteBuf)buffer).resetReaderIndex();
+    }
+
+    @Override
+    public Object markWriterIndex(Object buffer) {
+        return ((ByteBuf)buffer).markWriterIndex();
+    }
+
+    @Override
+    public Object resetWriterIndex(Object buffer) {
+        return ((ByteBuf)buffer).resetWriterIndex();
     }
 }

@@ -24,7 +24,6 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
@@ -40,11 +39,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRe
 import java.net.InetSocketAddress;
 
 public class InternalPacketListener implements PacketListener {
-    //Make this specific event be at MONITOR priority
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
-            ChannelAbstract channel = event.getChannel();
+            Object channel = event.getChannel();
             User user = event.getUser();
             //Process outgoing login success packet
             WrapperLoginServerLoginSuccess loginSuccess = new WrapperLoginServerLoginSuccess(event);
@@ -55,7 +53,7 @@ public class InternalPacketListener implements PacketListener {
             user.getProfile().setName(profile.getName());
 
             //Map username with channel
-            ProtocolManager.CHANNELS.put(profile.getName(), event.getChannel());
+            ProtocolManager.CHANNELS.put(profile.getName(), channel);
             PacketEvents.getAPI().getLogManager().debug("Mapped player username with their channel.");
 
             //Update connection state(injectors might do some adjustments when we transition into PLAY state)

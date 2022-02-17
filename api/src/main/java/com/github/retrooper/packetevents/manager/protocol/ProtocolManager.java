@@ -20,8 +20,6 @@ package com.github.retrooper.packetevents.manager.protocol;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -34,25 +32,25 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface ProtocolManager {
-    Map<String, ChannelAbstract> CHANNELS = new ConcurrentHashMap<>();
-    Map<ChannelAbstract, User> USERS = new ConcurrentHashMap<>();
+    Map<String, Object> CHANNELS = new ConcurrentHashMap<>();
+    Map<Object, User> USERS = new ConcurrentHashMap<>();
 
     //Methods to implement
     ProtocolVersion getPlatformVersion();
 
-    void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
+    void sendPacket(Object channel, Object byteBuf);
 
-    void sendPacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf);
+    void sendPacketSilently(Object channel, Object byteBuf);
 
-    void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
+    void receivePacket(Object channel, Object byteBuf);
 
-    void receivePacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf);
+    void receivePacketSilently(Object channel, Object byteBuf);
 
-    ClientVersion getClientVersion(ChannelAbstract channel);
+    ClientVersion getClientVersion(Object channel);
 
 
     //Methods below don't need to be implemented. A lot of these functions depend on each other.
-    default ConnectionState getConnectionState(ChannelAbstract channel) {
+    default ConnectionState getConnectionState(Object channel) {
         return getUser(channel).getConnectionState();
     }
 
@@ -60,15 +58,15 @@ public interface ProtocolManager {
     //Sometimes you should use getInjector().changeConnectionState because that can allow the injector to make adjustments.
     //This is very important, especially on Spigot.
     //As soon as we switch to the play state on spigot, our injector makes some adjustments.
-    default void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
+    default void changeConnectionState(Object channel, ConnectionState connectionState) {
         getUser(channel).setConnectionState(connectionState);
     }
 
-    default void setClientVersion(ChannelAbstract channel, ClientVersion version) {
+    default void setClientVersion(Object channel, ClientVersion version) {
         getUser(channel).setClientVersion(version);
     }
 
-    default void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
+    default void sendPacket(Object channel, PacketWrapper<?> wrapper) {
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
         for (PacketWrapper<?> packet : wrappers) {
             packet.prepareForSend();
@@ -76,7 +74,7 @@ public interface ProtocolManager {
         }
     }
 
-    default void sendPacketSilently(ChannelAbstract channel, PacketWrapper<?> wrapper) {
+    default void sendPacketSilently(Object channel, PacketWrapper<?> wrapper) {
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
         for (PacketWrapper<?> packet : wrappers) {
             packet.prepareForSend();
@@ -84,7 +82,7 @@ public interface ProtocolManager {
         }
     }
 
-    default void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
+    default void receivePacket(Object channel, PacketWrapper<?> wrapper) {
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
         for (PacketWrapper<?> packet : wrappers) {
             packet.prepareForSend();
@@ -92,7 +90,7 @@ public interface ProtocolManager {
         }
     }
 
-    default void receivePacketSilently(ChannelAbstract channel, PacketWrapper<?> wrapper) {
+    default void receivePacketSilently(Object channel, PacketWrapper<?> wrapper) {
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
         for (PacketWrapper<?> packet : wrappers) {
             packet.prepareForSend();
@@ -100,25 +98,20 @@ public interface ProtocolManager {
         }
     }
 
-    default User getUser(ChannelAbstract channel) {
+    default User getUser(Object channel) {
         return USERS.get(channel);
     }
 
-    default void setUser(ChannelAbstract channel, User user) {
+    default void setUser(Object channel, User user) {
         USERS.put(channel, user);
         PacketEvents.getAPI().getInjector().updateUser(channel, user);
     }
 
-    default ChannelAbstract getChannel(String username) {
+    default Object getChannel(String username) {
         return CHANNELS.get(username);
     }
 
-    default void setChannel(String username, ChannelAbstract channel) {
-        CHANNELS.put(username, channel);
-    }
-
-    default void clearUserData(ChannelAbstract channel, @Nullable String name) {
-        NettyManager.CHANNEL_MAP.remove(channel.rawChannel());
+    default void clearUserData(Object channel, @Nullable String name) {
         USERS.remove(channel);
         //Name is only accessible if the server sends the LOGIN_SUCCESS packet which contains name and UUID
         if (name != null) {

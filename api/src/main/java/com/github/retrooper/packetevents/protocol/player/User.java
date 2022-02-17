@@ -19,8 +19,6 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
@@ -34,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class User {
-    private final ChannelAbstract channel;
+    private final Object channel;
     private ConnectionState connectionState;
     private ClientVersion clientVersion;
     private final UserProfile profile;
@@ -42,7 +40,7 @@ public class User {
     private int totalWorldHeight = 256;
     private List<NBTCompound> worldNBT;
 
-    public User(ChannelAbstract channel,
+    public User(Object channel,
                 ConnectionState connectionState, ClientVersion clientVersion,
                 UserProfile profile) {
         this.channel = channel;
@@ -51,7 +49,7 @@ public class User {
         this.profile = profile;
     }
 
-    public ChannelAbstract getChannel() {
+    public Object getChannel() {
         return channel;
     }
 
@@ -75,7 +73,7 @@ public class User {
         return profile;
     }
 
-    public void sendPacket(ByteBufAbstract buffer) {
+    public void sendPacket(Object buffer) {
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, buffer);
     }
 
@@ -86,7 +84,7 @@ public class User {
     public void chat(String message) {
         //Fake an incoming chat packet
         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(message);
-        PacketEvents.getAPI().getServerManager().receivePacket(channel, chatMessage);
+        PacketEvents.getAPI().getProtocolManager().receivePacket(channel, chatMessage);
     }
 
     //TODO Support colors

@@ -19,93 +19,30 @@
 package io.github.retrooper.packetevents.impl.netty;
 
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationHandler;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHandler;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
-import io.github.retrooper.packetevents.impl.netty.buffer.ByteBufAllocationHandlerImpl;
-import io.github.retrooper.packetevents.impl.netty.buffer.ByteBufHandlerImpl;
-import io.github.retrooper.packetevents.impl.netty.buffer.ByteBufImpl;
-import io.github.retrooper.packetevents.impl.netty.channel.ChannelHandlerContextImpl;
-import io.github.retrooper.packetevents.impl.netty.channel.ChannelImpl;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationOperator;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufOperator;
+import com.github.retrooper.packetevents.netty.channel.ChannelOperator;
+import io.github.retrooper.packetevents.impl.netty.buffer.ByteBufAllocationOperatorImpl;
+import io.github.retrooper.packetevents.impl.netty.buffer.ByteBufOperatorImpl;
+import io.github.retrooper.packetevents.impl.netty.channel.ChannelOperatorImpl;
 
 public class NettyManagerImpl implements NettyManager {
-    private static final ByteBufHandler BYTE_BUF_HANDLER = new ByteBufHandlerImpl();
-    private static final ByteBufAllocationHandler BYTE_BUF_ALLOCATION_HANDLER = new ByteBufAllocationHandlerImpl();
+    private static final ByteBufOperator BYTE_BUF_OPERATOR = new ByteBufOperatorImpl();
+    private static final ByteBufAllocationOperator BYTE_BUF_ALLOCATION_OPERATOR = new ByteBufAllocationOperatorImpl();
+    private static final ChannelOperator CHANNEL_OPERATOR = new ChannelOperatorImpl();
 
     @Override
-    public ByteBufHandler getByteBufHandler() {
-        return BYTE_BUF_HANDLER;
+    public ChannelOperator getChannelOperator() {
+        return CHANNEL_OPERATOR;
     }
 
     @Override
-    public ByteBufAllocationHandler getByteBufAllocationHandler() {
-        return BYTE_BUF_ALLOCATION_HANDLER;
+    public ByteBufOperator getByteBufOperator() {
+        return BYTE_BUF_OPERATOR;
     }
 
     @Override
-    public ByteBufAbstract wrappedBuffer(byte[] bytes) {
-        return ByteBufUtil.wrappedBuffer(bytes);
-    }
-
-    @Override
-    public ByteBufAbstract copiedBuffer(byte[] bytes) {
-        return ByteBufUtil.copiedBuffer(bytes);
-    }
-
-    @Override
-    public ByteBufAbstract buffer() {
-        return ByteBufUtil.buffer();
-    }
-
-    @Override
-    public ByteBufAbstract buffer(int initialCapacity) {
-        return ByteBufUtil.buffer(initialCapacity);
-    }
-
-    @Override
-    public ByteBufAbstract buffer(int initialCapacity, int maxCapacity) {
-        return ByteBufUtil.buffer(initialCapacity, maxCapacity);
-    }
-
-    @Override
-    public ByteBufAbstract directBuffer() {
-        return ByteBufUtil.directBuffer();
-    }
-
-    @Override
-    public ByteBufAbstract directBuffer(int initialCapacity) {
-        return ByteBufUtil.directBuffer(initialCapacity);
-    }
-
-    @Override
-    public ByteBufAbstract directBuffer(int initialCapacity, int maxCapacity) {
-        return ByteBufUtil.directBuffer(initialCapacity, maxCapacity);
-    }
-
-    @Override
-    public ByteBufAbstract compositeBuffer() {
-        return ByteBufUtil.compositeBuffer();
-    }
-
-    @Override
-    public ByteBufAbstract compositeBuffer(int maxNumComponents) {
-        return ByteBufUtil.compositeBuffer(maxNumComponents);
-    }
-
-    @Override
-    public ByteBufAbstract wrapByteBuf(Object byteBuf) {
-        return new ByteBufImpl(byteBuf);
-    }
-
-    @Override
-    public ChannelAbstract wrapChannel0(Object channel) {
-        return new ChannelImpl(channel);
-    }
-
-    @Override
-    public ChannelHandlerContextAbstract wrapChannelHandlerContext(Object ctx) {
-        return new ChannelHandlerContextImpl(ctx);
+    public ByteBufAllocationOperator getByteBufAllocationOperator() {
+        return BYTE_BUF_ALLOCATION_OPERATOR;
     }
 }

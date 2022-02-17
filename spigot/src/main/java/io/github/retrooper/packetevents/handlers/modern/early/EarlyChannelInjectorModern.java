@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.handlers.modern.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ListWrapper;
@@ -36,12 +35,14 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EarlyChannelInjectorModern implements EarlyInjector {
     private final List<ChannelFuture> injectedFutures = new ArrayList<>();
@@ -148,11 +149,9 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         }
         if (pipeline.get("SpigotNettyServerChannelHandler#0") != null) {
             pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.CONNECTION_NAME, new ServerChannelHandlerModern());
-        }
-        else if (pipeline.get("floodgate-init") != null) {
+        } else if (pipeline.get("floodgate-init") != null) {
             pipeline.addAfter("floodgate-init", PacketEvents.CONNECTION_NAME, new ServerChannelHandlerModern());
-        }
-        else {
+        } else {
             pipeline.addFirst(PacketEvents.CONNECTION_NAME, new ServerChannelHandlerModern());
         }
         List<Object> networkManagers = SpigotReflectionUtil.getNetworkManagers();
@@ -200,7 +199,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     }
 
     @Override
-    public void updateUser(ChannelAbstract channel, User user) {
+    public void updateUser(Object channel, User user) {
         PacketEncoderModern encoder = getEncoder(channel);
         if (encoder != null) {
             encoder.user = user;
@@ -214,47 +213,42 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void injectPlayer(Object player, @Nullable ConnectionState connectionState) {
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        if (channel != null) {
-            updatePlayerObject(channel, player, connectionState);
-        }
+        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        updatePlayerObject(channel, player, connectionState);
     }
 
     @Override
     public void ejectPlayer(Object player) {
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        if (channel != null) {
-            ServerConnectionInitializerModern.postDestroyChannel(channel.rawChannel());
-        }
+        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        ServerConnectionInitializerModern.postDestroyChannel(channel);
     }
 
     @Override
     public boolean hasInjected(Object player) {
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        if (channel == null) {
+        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        if (channel != null) {
+            PacketDecoderModern decoder = getDecoder(channel);
+            PacketEncoderModern encoder = getEncoder(channel);
+            return decoder != null && decoder.player != null
+                    && encoder != null && encoder.player != null;
+        } else {
             return false;
         }
-        PacketDecoderModern decoder = getDecoder(channel);
-        PacketEncoderModern encoder = getEncoder(channel);
-        return decoder != null && decoder.player != null
-                && encoder != null && encoder.player != null;
     }
 
-    private PacketDecoderModern getDecoder(ChannelAbstract ch) {
-        Channel channel = (Channel) ch.rawChannel();
+    private PacketDecoderModern getDecoder(Object ch) {
+        Channel channel = (Channel) ch;
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
-        }
-        else if (ViaVersionUtil.isAvailable()) {
+        } else if (ViaVersionUtil.isAvailable()) {
             ChannelHandler mcDecoder = channel.pipeline().get("decoder");
             if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(mcDecoder)) {
                 ReflectionObject reflectMCDecoder = new ReflectionObject(mcDecoder);
                 ByteToMessageDecoder injectedDecoder = reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
                 if (injectedDecoder instanceof PacketDecoderModern) {
                     return (PacketDecoderModern) injectedDecoder;
-                }
-                else {
+                } else {
                     ReflectionObject reflectInjectedDecoder = new ReflectionObject(injectedDecoder);
                     List<Object> decoders = reflectInjectedDecoder.readList(0);
                     for (Object customDecoder : decoders) {
@@ -268,8 +262,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         return null;
     }
 
-    private PacketEncoderModern getEncoder(ChannelAbstract ch) {
-        Channel channel = (Channel) ch.rawChannel();
+    private PacketEncoderModern getEncoder(Object ch) {
+        Channel channel = (Channel) ch;
         ChannelHandler encoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
         if (encoder instanceof PacketEncoderModern) {
             return (PacketEncoderModern) encoder;
@@ -278,24 +272,21 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     }
 
     @Override
-    public void updatePlayerObject(ChannelAbstract ch, Object player, @Nullable ConnectionState newConnectionState) {
-        Channel channel = (Channel) ch.rawChannel();
+    public void updatePlayerObject(Object ch, Object player, @Nullable ConnectionState newConnectionState) {
+        Channel channel = (Channel) ch;
         PacketDecoderModern decoder = getDecoder(ch);
         if (decoder != null) {
             decoder.player = (Player) player;
             decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
             decoder.user.getProfile().setName(((Player) player).getName());
-            //TODO Perhaps client-version?
             if (newConnectionState == ConnectionState.PLAY) {
-                //decoder.handledCompression = true;
                 if (ViaVersionUtil.isAvailable()) {
                     ChannelHandler handler = channel.pipeline().get(PacketEvents.DECODER_NAME);
                     if (handler != null) {
                         channel.pipeline().remove(PacketEvents.DECODER_NAME);
                         addCustomViaDecoder(channel, new PacketDecoderModern(decoder));
                     }
-                }
-                else if (ProtocolSupportUtil.isAvailable()) {
+                } else if (ProtocolSupportUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);
                     channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, new PacketDecoderModern(decoder));
                 }
@@ -314,12 +305,12 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     }
 
     @Override
-    public ConnectionState getConnectionState(ChannelAbstract channel) {
-       PacketEncoderModern encoder = getEncoder(channel);
-       if (encoder != null) {
-           return encoder.user.getConnectionState();
-       }
-       return null;
+    public ConnectionState getConnectionState(Object channel) {
+        PacketEncoderModern encoder = getEncoder(channel);
+        if (encoder != null) {
+            return encoder.user.getConnectionState();
+        }
+        return null;
     }
 
     private void addCustomViaDecoder(Object ch, PacketDecoderModern decoder) {
@@ -333,8 +324,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             List<Object> decoders = reflectPacketDecoderModern.readList(0);
             decoders.add(decoder);
             reflectPacketDecoderModern.writeList(0, decoders);
-        }
-        else {
+        } else {
             //We are the first decoder to inject into ViaVersion's decoder
             decoder.mcDecoder = mcDecoder;
             reflectionObject.write(ByteToMessageDecoder.class, 0, decoder);
@@ -342,8 +332,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     }
 
     @Override
-    public void changeConnectionState(ChannelAbstract ch, ConnectionState connectionState) {
-        Channel channel = (Channel) ch.rawChannel();
+    public void changeConnectionState(Object ch, ConnectionState connectionState) {
+        Channel channel = (Channel) ch;
         PacketDecoderModern decoder = getDecoder(ch);
         if (decoder != null) {
             //Change connection state in decoder

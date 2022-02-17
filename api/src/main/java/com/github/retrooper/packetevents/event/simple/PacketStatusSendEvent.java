@@ -20,40 +20,12 @@ package com.github.retrooper.packetevents.event.simple;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 
-import java.net.InetSocketAddress;
-import java.util.List;
-
 public class PacketStatusSendEvent extends PacketSendEvent {
-    public PacketStatusSendEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) throws PacketProcessException  {
-        super(channel, user, player, byteBuf);
-    }
-
-    public PacketStatusSendEvent(ConnectionState connectionState, ChannelAbstract channel,
-                                 User user, Object player, ByteBufAbstract byteBuf) throws PacketProcessException {
-        super(connectionState, channel, user, player, byteBuf);
-    }
-
-    public PacketStatusSendEvent(Object channel, User user, Object player, Object rawByteBuf) throws PacketProcessException{
+    public PacketStatusSendEvent(Object channel, User user, Object player, Object rawByteBuf) throws PacketProcessException {
         super(channel, user, player, rawByteBuf);
-    }
-
-    public PacketStatusSendEvent(ConnectionState connectionState, Object channel,
-                                 User user, Object player, Object rawByteBuf) throws PacketProcessException{
-        super(connectionState, channel, user, player, rawByteBuf);
-    }
-
-    public PacketStatusSendEvent(boolean cloned, int packetID, PacketTypeCommon packetType, ServerVersion serverVersion,
-                                 InetSocketAddress socketAddress, ChannelAbstract channel, User user, Object player,
-                                 ByteBufAbstract byteBuf) throws PacketProcessException{
-        super(cloned, packetID, packetType, serverVersion, socketAddress, channel, user, player, byteBuf);
     }
 
     public PacketType.Status.Server getPacketType() {

@@ -19,7 +19,7 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +36,7 @@ import java.net.InetSocketAddress;
  */
 public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent<Object> {
     private final Object player;
-    private final ChannelAbstract channel;
+    private final Object channel;
     private boolean cancelled;
 
     public PlayerInjectEvent(Object player) {
@@ -61,13 +61,13 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
     }
 
     @Nullable
-    public ChannelAbstract getChannel() {
+    public Object getChannel() {
         return channel;
     }
 
     @NotNull
     public InetSocketAddress getSocketAddress() {
-        return (InetSocketAddress) channel.remoteAddress();
+        return (InetSocketAddress) ChannelHelper.remoteAddress(channel);
     }
 
     @Override

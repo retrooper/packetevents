@@ -20,18 +20,12 @@ package io.github.retrooper.packetevents.manager.protocol;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -73,60 +67,60 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        if (channel.isOpen()) {
+    public void sendPacket(Object channel, Object byteBuf) {
+        if (ChannelHelper.isOpen(channel)) {
             if (ProtocolSupportUtil.isAvailable()) {
                 //ProtocolSupport has a MessageToMessageCodec handler named "ps_logic" in the pipeline.
                 //The Netty documentation explicitly mentions that you need to retain buffers before passing them through such handlers.
-                byteBuf.retain();
+                ByteBufHelper.retain(byteBuf);
             }
-            channel.writeAndFlush(byteBuf);
+            ChannelHelper.writeAndFlush(channel, byteBuf);
         }
     }
 
     @Override
-    public void sendPacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        if (channel.isOpen()) {
+    public void sendPacketSilently(Object channel, Object byteBuf) {
+        if (ChannelHelper.isOpen(channel)) {
             //Only call the encoders after ours in the pipeline
-            channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
+            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
         }
     }
 
     @Override
-    public void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        if (channel.isOpen()) {
+    public void receivePacket(Object channel, Object byteBuf) {
+        if (ChannelHelper.isOpen(channel)) {
             //TODO Have we given ViaVersion a thought?
-            List<String> handlerNames = channel.pipeline().names();
+            List<String> handlerNames = ChannelHelper.pipelineHandlerNames(channel);
             if (handlerNames.contains("ps_decoder_transformer")) {
                 //We want to skip ProtocolSupport's translation handlers,
                 //because the buffer is fit for the current server-version
-                channel.pipeline().context("ps_decoder_transformer").fireChannelRead(byteBuf);
+                ChannelHelper.fireChannelReadInContext(channel, "ps_decoder_transformer", byteBuf);
             } else if (handlerNames.contains("decompress")) {
                 //We will have to just skip through the minecraft server's decompression handler
-                channel.pipeline().context("decompress").fireChannelRead(byteBuf);
+                ChannelHelper.fireChannelReadInContext(channel, "decompress", byteBuf);
             } else {
                 if (handlerNames.contains("decrypt")) {
                     //We will have to just skip through the minecraft server's decryption handler
                     //We don't have to deal with decompressing, as that handler isn't currently in the pipeline
-                    channel.pipeline().context("decrypt").fireChannelRead(byteBuf);
+                    ChannelHelper.fireChannelReadInContext(channel, "decrypt", byteBuf);
                 } else {
                     //No decompressing nor decrypting handlers are present
                     //You cannot fill this buffer up with chunks of packets,
                     //since we skip the packet-splitter handler.
-                    channel.pipeline().context("splitter").fireChannelRead(byteBuf);
+                    ChannelHelper.fireChannelReadInContext(channel, "splitter", byteBuf);
                 }
             }
         }
     }
 
     @Override
-    public void receivePacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+    public void receivePacketSilently(Object channel, Object byteBuf) {
         //Receive the packet for all handlers after our decoder
-        channel.pipeline().context(PacketEvents.DECODER_NAME).fireChannelRead(byteBuf);
+        ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
     }
 
     @Override
-    public ClientVersion getClientVersion(ChannelAbstract channel) {
+    public ClientVersion getClientVersion(Object channel) {
         User user = getUser(channel);
         if (user.getClientVersion() == null) {
             return ClientVersion.UNKNOWN;

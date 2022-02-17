@@ -16,12 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.impl.netty.buffer;
+package io.github.retrooper.packetevents.utils.netty.buffer;
 
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationHandler;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationOperator;
 import io.netty.buffer.Unpooled;
 
-public class ByteBufAllocationHandlerImpl implements ByteBufAllocationHandler {
+public class ByteBufAllocationOperatorModernImpl implements ByteBufAllocationOperator {
     @Override
     public Object wrappedBuffer(byte[] bytes) {
         return Unpooled.wrappedBuffer(bytes);

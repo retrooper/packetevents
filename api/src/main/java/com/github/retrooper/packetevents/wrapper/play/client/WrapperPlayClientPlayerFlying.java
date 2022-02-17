@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.world.Location;
@@ -39,9 +40,9 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
         rotationChanged = event.getPacketType() == PacketType.Play.Client.PLAYER_ROTATION ||
                 event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION;
         if (event.isCloned()) {
-            int bufferIndex = getBuffer().readerIndex();
+            int bufferIndex = ByteBufHelper.readerIndex(getBuffer());
             readData();
-            getBuffer().readerIndex(bufferIndex);
+            ByteBufHelper.readerIndex(getBuffer(), bufferIndex);
         } else {
             if (event.getLastUsedWrapper() == null) {
                 event.setLastUsedWrapper(this);

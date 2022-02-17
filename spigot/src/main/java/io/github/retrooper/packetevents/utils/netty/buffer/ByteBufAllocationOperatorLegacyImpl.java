@@ -18,10 +18,10 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationHandler;
-import io.netty.buffer.Unpooled;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationOperator;
+import net.minecraft.util.io.netty.buffer.Unpooled;
 
-public class ByteBufAllocationHandlerModernImpl implements ByteBufAllocationHandler {
+public class ByteBufAllocationOperatorLegacyImpl implements ByteBufAllocationOperator {
     @Override
     public Object wrappedBuffer(byte[] bytes) {
         return Unpooled.wrappedBuffer(bytes);

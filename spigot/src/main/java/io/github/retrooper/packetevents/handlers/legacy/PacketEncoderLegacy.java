@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.handlers.legacy;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
@@ -59,7 +60,7 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
         });
         if (!packetSendEvent.isCancelled()) {
             if (packetSendEvent.getLastUsedWrapper() != null) {
-                packetSendEvent.getByteBuf().clear();
+                ByteBufHelper.clear(packetSendEvent.getByteBuf());
                 packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
                 packetSendEvent.getLastUsedWrapper().writeData();
             }

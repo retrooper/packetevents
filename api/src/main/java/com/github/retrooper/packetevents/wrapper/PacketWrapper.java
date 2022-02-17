@@ -23,6 +23,8 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -50,7 +52,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class PacketWrapper<T extends PacketWrapper> {
-    public final ByteBufAbstract buffer;
+    public final Object buffer;
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
     private int packetID;
@@ -62,7 +64,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
 
-    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, ByteBufAbstract buffer, int packetID) {
+    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, Object buffer, int packetID) {
         this.clientVersion = clientVersion;
         this.serverVersion = serverVersion;
         this.buffer = buffer;
@@ -81,9 +83,9 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.packetID = event.getPacketId();
         if (readData) {
             if (event.isCloned()) {
-                int bufferIndex = getBuffer().readerIndex();
+                int bufferIndex = ByteBufHelper.readerIndex(getBuffer());
                 readData();
-                getBuffer().readerIndex(bufferIndex);
+                ByteBufHelper.readerIndex(getBuffer(), bufferIndex);
             } else {
                 if (event.getLastUsedWrapper() == null) {
                     event.setLastUsedWrapper(this);
@@ -102,9 +104,9 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.packetID = event.getPacketId();
         this.user = event.getUser();
         if (event.isCloned()) {
-            int bufferIndex = getBuffer().readerIndex();
+            int bufferIndex = ByteBufHelper.readerIndex(getBuffer());
             readData();
-            getBuffer().readerIndex(bufferIndex);
+            ByteBufHelper.readerIndex(getBuffer(), bufferIndex);
         } else {
             if (event.getLastUsedWrapper() == null) {
                 event.setLastUsedWrapper(this);
@@ -117,20 +119,20 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public PacketWrapper(int packetID, ClientVersion clientVersion) {
         this(clientVersion, PacketEvents.getAPI().getServerManager().getVersion(),
-                PacketEvents.getAPI().getNettyManager().buffer(), packetID);
+                UnpooledByteBufAllocationHelper.buffer(), packetID);
     }
 
     public PacketWrapper(int packetID) {
         this(ClientVersion.UNKNOWN,
                 PacketEvents.getAPI().getServerManager().getVersion(),
-                PacketEvents.getAPI().getNettyManager().buffer(), packetID);
+                UnpooledByteBufAllocationHelper.buffer(), packetID);
     }
 
     public PacketWrapper(PacketTypeCommon packetType) {
         this(packetType.getId());
     }
 
-    public static PacketWrapper<?> createUniversalPacketWrapper(ByteBufAbstract byteBuf) {
+    public static PacketWrapper<?> createUniversalPacketWrapper(Object byteBuf) {
         return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), byteBuf, -1);
     }
 
@@ -178,7 +180,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.serverVersion = serverVersion;
     }
 
-    public ByteBufAbstract getBuffer() {
+    public Object getBuffer() {
         return buffer;
     }
 
@@ -195,20 +197,20 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void resetByteBuf() {
-        buffer.clear();
+        ByteBufHelper.clear(buffer);
         writeVarInt(packetID);
     }
 
     public byte readByte() {
-        return buffer.readByte();
+        return ByteBufHelper.readByte(buffer);
     }
 
     public void writeByte(int value) {
-        buffer.writeByte(value);
+        ByteBufHelper.writeByte(buffer, value);
     }
 
     public short readUnsignedByte() {
-        return (short) (readByte() & 255);
+        return ByteBufHelper.readUnsignedByte(buffer);
     }
 
     public boolean readBoolean() {
@@ -220,11 +222,11 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public int readInt() {
-        return buffer.readInt();
+        return ByteBufHelper.readInt(buffer);
     }
 
     public void writeInt(int value) {
-        buffer.writeInt(value);
+        ByteBufHelper.writeInt(buffer, value);
     }
 
     public int readVarInt() {
@@ -232,7 +234,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         int length = 0;
         byte currentByte;
         do {
-            currentByte = buffer.readByte();
+            currentByte = readByte();
             value |= (currentByte & 0x7F) << (length * 7);
             length++;
             if (length > 5) {
@@ -245,10 +247,10 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void writeVarInt(int value) {
         while (true) {
             if ((value & ~0x7F) == 0) {
-                buffer.writeByte(value);
+                writeByte(value);
                 return;
             }
-            buffer.writeByte((value & 0x7F) | 0x80);
+            writeByte((value & 0x7F) | 0x80);
             value >>>= 7;
         }
     }
@@ -367,8 +369,8 @@ public class PacketWrapper<T extends PacketWrapper> {
         } else if (j < 0) {
             throw new RuntimeException("The received encoded string buffer length is less than zero! Weird string!");
         } else {
-            String s = buffer.toString(buffer.readerIndex(), j, StandardCharsets.UTF_8);
-            buffer.readerIndex(buffer.readerIndex() + j);
+            String s = ByteBufHelper.toString(buffer, ByteBufHelper.readerIndex(buffer), j, StandardCharsets.UTF_8);
+            ByteBufHelper.readerIndex(buffer, ByteBufHelper.readerIndex(buffer) + j);
             if (s.length() > maxLen) {
                 throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + maxLen + ")");
             } else {
@@ -394,7 +396,7 @@ public class PacketWrapper<T extends PacketWrapper> {
             throw new IllegalStateException("String too big (was " + bytes.length + " bytes encoded, max " + maxLen + ")");
         } else {
             writeVarInt(bytes.length);
-            buffer.writeBytes(bytes);
+            ByteBufHelper.writeBytes(buffer, bytes);
         }
     }
 
@@ -423,23 +425,23 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public int readUnsignedShort() {
-        return buffer.readUnsignedShort();
+        return ByteBufHelper.readUnsignedShort(buffer);
     }
 
     public short readShort() {
-        return buffer.readShort();
+        return ByteBufHelper.readShort(buffer);
     }
 
     public void writeShort(int value) {
-        buffer.writeShort(value);
+        ByteBufHelper.writeShort(buffer, value);
     }
 
     public int readVarShort() {
-        int low = buffer.readUnsignedShort();
+        int low = readUnsignedShort();
         int high = 0;
         if ((low & 0x8000) != 0) {
             low = low & 0x7FFF;
-            high = buffer.readUnsignedByte();
+            high = readUnsignedByte();
         }
         return ((high & 0xFF) << 15) | low;
     }
@@ -450,28 +452,28 @@ public class PacketWrapper<T extends PacketWrapper> {
         if (high != 0) {
             low = low | 0x8000;
         }
-        buffer.writeShort(low);
+        writeShort(low);
         if (high != 0) {
-            buffer.writeByte(high);
+            writeByte(high);
         }
     }
 
     public long readLong() {
-        return buffer.readLong();
+        return ByteBufHelper.readLong(buffer);
+    }
+
+    public void writeLong(long value) {
+        ByteBufHelper.writeLong(buffer, value);
     }
 
     public long readVarLong() {
         long value = 0;
         int size = 0;
         int b;
-        while (((b = this.readByte()) & 0x80) == 0x80) {
+        while (((b = readByte()) & 0x80) == 0x80) {
             value |= (long) (b & 0x7F) << (size++ * 7);
         }
         return value | ((long) (b & 0x7F) << (size * 7));
-    }
-
-    public void writeLong(long value) {
-        buffer.writeLong(value);
     }
 
     public void writeVarLong(long l) {
@@ -484,29 +486,33 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public float readFloat() {
-        return buffer.readFloat();
+        return ByteBufHelper.readFloat(buffer);
     }
 
     public void writeFloat(float value) {
-        buffer.writeFloat(value);
+        ByteBufHelper.writeFloat(buffer, value);
     }
 
     public double readDouble() {
-        return buffer.readDouble();
+        return ByteBufHelper.readDouble(buffer);
     }
 
     public void writeDouble(double value) {
-        buffer.writeDouble(value);
+        ByteBufHelper.writeDouble(buffer, value);
+    }
+
+    public byte[] readRemainingBytes() {
+        return readBytes(ByteBufHelper.readableBytes(buffer));
     }
 
     public byte[] readBytes(int size) {
         byte[] bytes = new byte[size];
-        buffer.readBytes(bytes);
+        ByteBufHelper.readBytes(buffer, bytes);
         return bytes;
     }
 
     public void writeBytes(byte[] array) {
-        buffer.writeBytes(array);
+        ByteBufHelper.writeBytes(buffer, array);
     }
 
     public byte[] readByteArray(int maxLength) {
@@ -528,7 +534,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public int[] readVarIntArray() {
-        int readableBytes = buffer.readableBytes();
+        int readableBytes = ByteBufHelper.readableBytes(buffer);
         int size = readVarInt();
         if (size > readableBytes) {
             throw new IllegalStateException("VarIntArray with size " + size + " is bigger than allowed " + readableBytes);
@@ -559,12 +565,12 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public byte[] readByteArrayOfSize(int size) {
         byte[] array = new byte[size];
-        buffer.readBytes(array);
+        ByteBufHelper.readBytes(buffer, array);
         return array;
     }
 
     public void writeByteArrayOfSize(byte[] array) {
-        buffer.writeBytes(array);
+        ByteBufHelper.writeBytes(buffer, array);
     }
 
     public int[] readVarIntArrayOfSize(int size) {
@@ -582,7 +588,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public long[] readLongArray() {
-        int readableBytes = buffer.readableBytes() / 8;
+        int readableBytes = ByteBufHelper.readableBytes(buffer) / 8;
         int size = readVarInt();
         if (size > readableBytes) {
             throw new IllegalStateException("LongArray with size " + size + " is bigger than allowed " + readableBytes);

@@ -19,7 +19,7 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +34,7 @@ import java.net.InetSocketAddress;
  */
 public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent<Object> {
     private final Object player;
-    private final ChannelAbstract channel;
+    private final Object channel;
 
     public PostPlayerInjectEvent(Object player) {
         this.player = player;
@@ -48,13 +48,13 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent<Ob
     }
 
     @NotNull
-    public ChannelAbstract getChannel() {
+    public Object getChannel() {
         return channel;
     }
 
     @NotNull
     public InetSocketAddress getSocketAddress() {
-        return (InetSocketAddress) channel.remoteAddress();
+        return (InetSocketAddress) ChannelHelper.remoteAddress(channel);
     }
 
     /**

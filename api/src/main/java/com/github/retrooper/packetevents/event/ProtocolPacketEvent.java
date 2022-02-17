@@ -21,8 +21,8 @@ package com.github.retrooper.packetevents.event;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -38,10 +38,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ProtocolPacketEvent<T> extends PacketEvent implements PlayerEvent<T>, CancellableEvent {
-    private final ChannelAbstract channel;
+    private final Object channel;
     private final User user;
     private final T player;
-    private ByteBufAbstract byteBuf;
+    private Object byteBuf;
     private final int packetID;
     private final PacketTypeCommon packetType;
     private ServerVersion serverVersion;
@@ -49,31 +49,8 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private PacketWrapper<?> lastUsedWrapper;
     private List<Runnable> postTasks = null;
 
-    public ProtocolPacketEvent(PacketSide packetSide, Object channel, User user, T player, Object rawByteBuf) throws PacketProcessException {
-        this(packetSide,
-                PacketEvents.getAPI().getNettyManager().wrapChannel(channel),
-                user,
-                player,
-                PacketEvents.getAPI().getNettyManager().wrapByteBuf(rawByteBuf));
-    }
-
-    public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, Object channel, User user,
-                               T player, Object rawByteBuf) throws PacketProcessException {
-        this(packetSide,
-                connectionState,
-                PacketEvents.getAPI().getNettyManager().wrapChannel(channel),
-                user,
-                player,
-                PacketEvents.getAPI().getNettyManager().wrapByteBuf(rawByteBuf));
-    }
-
-
-    public ProtocolPacketEvent(PacketSide packetSide, ChannelAbstract channel, User user, T player, ByteBufAbstract byteBuf) throws PacketProcessException {
-        this(packetSide, user.getConnectionState(), channel, user, player, byteBuf);
-    }
-
-    public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, ChannelAbstract channel,
-                               User user, T player, ByteBufAbstract byteBuf) throws PacketProcessException {
+    public ProtocolPacketEvent(PacketSide packetSide, Object channel,
+                               User user, T player, Object byteBuf) throws PacketProcessException {
         this.channel = channel;
         this.user = user;
         this.player = player;
@@ -95,7 +72,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
 
         this.byteBuf = byteBuf;
-        int size = byteBuf.readableBytes();
+        int size = ByteBufHelper.readableBytes(byteBuf);
         try {
             this.packetID = readVarInt(byteBuf);
         } catch (Exception e) {
@@ -103,11 +80,11 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
                     PacketProcessException.PacketProcessExceptionReason.PACKET_ID,
                     packetSide, size, null);
         }
-        this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
+        this.packetType = PacketType.getById(packetSide, user.getConnectionState(), this.serverVersion, packetID);
     }
 
-    public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, InetSocketAddress socketAddress, ChannelAbstract channel,
-                               User user, T player, ByteBufAbstract byteBuf) {
+    public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, Object channel,
+                               User user, T player, Object byteBuf) {
         this.channel = channel;
         this.user = user;
         this.player = player;
@@ -117,12 +94,12 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.packetType = packetType;
     }
 
-    private static int readVarInt(ByteBufAbstract buffer) throws Exception {
+    private static int readVarInt(Object buffer) throws Exception {
         int value = 0;
         int length = 0;
         byte currentByte;
         do {
-            currentByte = buffer.readByte();
+            currentByte = ByteBufHelper.readByte(buffer);
             value |= (currentByte & 0x7F) << (length * 7);
             length += 1;
             if (length > 5) {
@@ -132,12 +109,12 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         return value;
     }
 
-    public ChannelAbstract getChannel() {
+    public Object getChannel() {
         return channel;
     }
 
     public InetSocketAddress getSocketAddress() {
-        return ((InetSocketAddress) channel.remoteAddress());
+        return (InetSocketAddress) ChannelHelper.remoteAddress(channel);
     }
 
     @NotNull
@@ -173,11 +150,11 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.serverVersion = serverVersion;
     }
 
-    public ByteBufAbstract getByteBuf() {
+    public Object getByteBuf() {
         return byteBuf;
     }
 
-    public void setByteBuf(ByteBufAbstract byteBuf) {
+    public void setByteBuf(Object byteBuf) {
         this.byteBuf = byteBuf;
     }
 

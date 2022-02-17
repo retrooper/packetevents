@@ -52,10 +52,10 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
         }
         if (serverVersion == ServerVersion.V_1_7_10) {
             //It is ignored, because we don't need it
-            int dataSize = readShort();
+            int legacyDataSize = readShort();
         }
         //We just read the remaining bytes
-        this.data = readBytes(buffer.readableBytes());
+        this.data = readRemainingBytes();
     }
 
     @Override

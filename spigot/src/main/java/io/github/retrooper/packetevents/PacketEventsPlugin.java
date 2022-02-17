@@ -42,8 +42,6 @@ import io.github.retrooper.packetevents.utils.SpigotDataHelper;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
-
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
@@ -54,8 +52,8 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.getAPI().init();
         PacketEvents.getAPI().getSettings().debug(true).bStats(true);
+        PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract() {
             @Override
             public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
@@ -108,7 +106,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             }
         };
         //net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles w1;
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
