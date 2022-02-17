@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.handlers.legacy.early;
 
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.handlers.legacy.ServerConnectionInitializerLegacy;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
 

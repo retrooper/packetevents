@@ -20,8 +20,11 @@ package com.github.retrooper.packetevents.netty.channel;
 
 import java.net.SocketAddress;
 import java.util.List;
+import java.util.Set;
 
 public interface ChannelOperator {
+    Set<Class<? extends Throwable>> getIgnoredHandlerExceptions();
+
     SocketAddress remoteAddress(Object channel);
     SocketAddress localAddress(Object channel);
     boolean isOpen(Object channel);

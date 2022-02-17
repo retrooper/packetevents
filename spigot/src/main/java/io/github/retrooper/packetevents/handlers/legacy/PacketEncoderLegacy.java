@@ -118,7 +118,9 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception{
-        super.exceptionCaught(ctx, cause);
+        if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
+            super.exceptionCaught(ctx, cause);
+        }
         //Check if the minecraft server will already print our exception for us.
         if (ExceptionUtil.isException(cause, PacketProcessException.class)
                 && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()

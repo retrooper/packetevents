@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.handlers.modern.early;
 
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.handlers.modern.ServerConnectionInitializerModern;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;

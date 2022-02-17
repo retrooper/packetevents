@@ -20,11 +20,31 @@ package io.github.retrooper.packetevents.impl.netty.channel;
 
 import com.github.retrooper.packetevents.netty.channel.ChannelOperator;
 import io.netty.channel.Channel;
+import io.netty.channel.unix.Errors;
+import io.netty.handler.timeout.ReadTimeoutException;
 
+import java.io.IOException;
 import java.net.SocketAddress;
+import java.nio.channels.ClosedChannelException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ChannelOperatorImpl implements ChannelOperator {
+    private static Set<Class<? extends Throwable>> IGNORED_HANDLER_EXCEPTIONS = null;
+
+    @Override
+    public Set<Class<? extends Throwable>> getIgnoredHandlerExceptions() {
+        if (IGNORED_HANDLER_EXCEPTIONS == null) {
+            IGNORED_HANDLER_EXCEPTIONS = new HashSet<>();
+            IGNORED_HANDLER_EXCEPTIONS.add(ClosedChannelException.class);
+            IGNORED_HANDLER_EXCEPTIONS.add(ReadTimeoutException.class);
+            IGNORED_HANDLER_EXCEPTIONS.add(IOException.class);
+            IGNORED_HANDLER_EXCEPTIONS.add(Errors.NativeIoException.class);
+        }
+        return IGNORED_HANDLER_EXCEPTIONS;
+    }
+
     @Override
     public SocketAddress remoteAddress(Object channel) {
         return ((Channel)channel).remoteAddress();

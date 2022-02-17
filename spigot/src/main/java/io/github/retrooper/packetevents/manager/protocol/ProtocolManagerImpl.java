@@ -68,8 +68,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void sendPacket(Object channel, Object byteBuf) {
+        boolean protocolSupportPresent = ProtocolSupportUtil.isAvailable();
         if (ChannelHelper.isOpen(channel)) {
-            if (ProtocolSupportUtil.isAvailable()) {
+            if (protocolSupportPresent) {
                 //ProtocolSupport has a MessageToMessageCodec handler named "ps_logic" in the pipeline.
                 //The Netty documentation explicitly mentions that you need to retain buffers before passing them through such handlers.
                 ByteBufHelper.retain(byteBuf);

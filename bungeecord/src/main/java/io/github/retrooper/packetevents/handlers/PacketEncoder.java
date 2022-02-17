@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
+import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
 import io.github.retrooper.packetevents.injector.ServerConnectionInitializer;
 import io.netty.buffer.ByteBuf;
@@ -80,6 +81,13 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
         if (msg.readableBytes() == 0) return;
         out.writeBytes(msg);
         read(ctx, out);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
+            super.exceptionCaught(ctx, cause);
+        }
     }
 
     @Override
