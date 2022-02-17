@@ -52,7 +52,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.getAPI().getSettings().debug(true).bStats(true);
+        PacketEvents.getAPI().getSettings().debug(false).bStats(true);
         PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract() {
             @Override

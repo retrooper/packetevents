@@ -64,7 +64,7 @@ public class SpigotChannelInjector implements ChannelInjector {
         } catch (Exception ex) {
             //Failed to inject! Let us revert to the compatibility injector and re-inject.
             if (injector instanceof EarlyInjector) {
-                injectEarly = false;
+                setShouldInjectEarly(false);
                 load();
                 injector.inject();
                 PacketEvents.getAPI().getLogger().warning("[packetevents] Failed to inject with the Early Injector. Reverting to the Compatibility/Late Injector... This is just a warning, but please report this!");
