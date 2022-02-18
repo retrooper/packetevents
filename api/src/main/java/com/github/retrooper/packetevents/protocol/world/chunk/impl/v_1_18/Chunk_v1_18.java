@@ -60,4 +60,20 @@ public class Chunk_v1_18 implements BaseChunk {
     public boolean isEmpty() {
         return this.blockCount == 0;
     }
+
+    public int getBlockCount() {
+        return blockCount;
+    }
+
+    public void setBlockCount(int blockCount) {
+        this.blockCount = blockCount;
+    }
+
+    public @NotNull DataPalette getChunkData() {
+        return chunkData;
+    }
+
+    public @NotNull DataPalette getBiomeData() {
+        return biomeData;
+    }
 }
