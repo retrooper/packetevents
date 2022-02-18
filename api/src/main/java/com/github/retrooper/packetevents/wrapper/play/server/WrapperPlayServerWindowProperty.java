@@ -1,6 +1,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -10,7 +10,7 @@ public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlaySe
     private int id;
     private int value;
 
-    public WrapperPlayServerWindowProperty(PacketReceiveEvent event) {
+    public WrapperPlayServerWindowProperty(PacketSendEvent event) {
         super(event);
     }
 
