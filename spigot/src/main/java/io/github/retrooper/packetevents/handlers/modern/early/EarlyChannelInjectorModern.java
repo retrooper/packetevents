@@ -130,16 +130,14 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         //This only happens when you join extremely early on older versions of minecraft.
         List<Object> networkManagers = SpigotReflectionUtil.getNetworkManagers();
         //TODO We are synchronizing a local variable, lets optimize this
-        synchronized (networkManagers) {
-            for (Object networkManager : networkManagers) {
-                ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
-                Channel channel = networkManagerWrapper.readObject(0, Channel.class);
-                //TODO Check for NioSocketChannel or EpollSocketChannel
-                if (channel == null) {
-                    continue;
-                }
-                ServerConnectionInitializerModern.postInitChannel(channel, ConnectionState.PLAY);
+        for (Object networkManager : networkManagers) {
+            ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
+            Channel channel = networkManagerWrapper.readObject(0, Channel.class);
+            //TODO Check for NioSocketChannel or EpollSocketChannel
+            if (channel == null) {
+                continue;
             }
+            ServerConnectionInitializerModern.postInitChannel(channel, ConnectionState.PLAY);
         }
     }
 

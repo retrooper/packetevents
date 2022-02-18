@@ -41,6 +41,7 @@ public class PreChannelInitializerModern_v1_12 extends ChannelInboundHandlerAdap
                 pipeline.remove(this);
             }
         }
+
         ctx.pipeline().fireChannelRegistered();
     }
 

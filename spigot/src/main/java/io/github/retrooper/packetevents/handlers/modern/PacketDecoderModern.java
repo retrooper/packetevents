@@ -69,7 +69,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         }
         ByteBuf transformed = ctx.alloc().buffer().writeBytes(input);
         try {
-            boolean doCompression =
+            boolean doRecompression =
                     handleCompressionOrder(ctx, transformed);
             int preProcessIndex = transformed.readerIndex();
             PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player, transformed);
@@ -84,7 +84,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
                     packetReceiveEvent.getLastUsedWrapper().writeData();
                 }
                 transformed.readerIndex(preProcessIndex);
-                if (doCompression) {
+                if (doRecompression) {
                     PacketCompressionUtil.recompress(ctx, transformed);
                     skipDoubleTransform = true;
                 }
