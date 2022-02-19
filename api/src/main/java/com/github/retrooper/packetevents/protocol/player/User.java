@@ -81,6 +81,10 @@ public class User {
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, wrapper);
     }
 
+    public void writePacket(PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getProtocolManager().writePacket(channel, wrapper);
+    }
+
     public void chat(String message) {
         //Fake an incoming chat packet
         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(message);

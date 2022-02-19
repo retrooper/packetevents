@@ -44,6 +44,20 @@ public abstract class ProtocolManagerAbstract implements ProtocolManager {
     }
 
     @Override
+    public void writePacket(Object channel, Object byteBuf) {
+        if (ChannelHelper.isOpen(channel)) {
+            ChannelHelper.write(channel, byteBuf);
+        }
+    }
+
+    @Override
+    public void writePacketSilently(Object channel, Object byteBuf) {
+        if (ChannelHelper.isOpen(channel)) {
+            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+        }
+    }
+
+    @Override
     public void receivePacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
             ChannelHelper.fireChannelRead(channel, byteBuf);
