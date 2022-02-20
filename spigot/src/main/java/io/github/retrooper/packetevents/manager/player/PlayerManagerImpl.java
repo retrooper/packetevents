@@ -58,11 +58,7 @@ public class PlayerManagerImpl implements PlayerManager {
             if (DependencyUtil.isProtocolTranslationDependencyAvailable()) {
                 try {
                     ClientVersion version = ClientVersion.getById(DependencyUtil.getProtocolVersion(p));
-                    if (user.getClientVersion() == null) {
-                        PacketEvents.getAPI().getLogManager().debug("Requested user version with protocol hacks. User version is null, setting to " + version.getReleaseName());
-                    } else {
-                        PacketEvents.getAPI().getLogManager().debug("Requested user version with protocol hacks. User version is " + user.getClientVersion().getReleaseName() + ", setting to " + version.getReleaseName());
-                    }
+                    PacketEvents.getAPI().getLogManager().debug("Requested user version with protocol hacks. Set user version to " + version.getReleaseName());
                     user.setClientVersion(version);
                 } catch (Exception ex) {
                     //Try ask the dependency again the next time, for now it is temporarily unresolved...
@@ -81,7 +77,7 @@ public class PlayerManagerImpl implements PlayerManager {
                     protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
                 }
                 ClientVersion version = ClientVersion.getById(protocolVersion);
-                PacketEvents.getAPI().getLogManager().debug("Requested user version. User version is null, setting to " + version.getReleaseName());
+                PacketEvents.getAPI().getLogManager().debug("Requested user version. Setting to " + version.getReleaseName());
                 user.setClientVersion(version);
             }
         }
