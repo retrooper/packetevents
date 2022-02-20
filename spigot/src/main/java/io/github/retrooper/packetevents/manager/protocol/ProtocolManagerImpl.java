@@ -96,6 +96,27 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
+    public void writePacket(Object channel, Object byteBuf) {
+        boolean protocolSupportPresent = ProtocolSupportUtil.isAvailable();
+        if (ChannelHelper.isOpen(channel)) {
+            if (protocolSupportPresent) {
+                //ProtocolSupport has a MessageToMessageCodec handler named "ps_logic" in the pipeline.
+                //The Netty documentation explicitly mentions that you need to retain buffers before passing them through such handlers.
+                ByteBufHelper.retain(byteBuf);
+            }
+            ChannelHelper.write(channel, byteBuf);
+        }
+    }
+
+    @Override
+    public void writePacketSilently(Object channel, Object byteBuf) {
+        if (ChannelHelper.isOpen(channel)) {
+            //Only call the encoders after ours in the pipeline
+            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+        }
+    }
+
+    @Override
     public void receivePacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
             //TODO Have we given ViaVersion a thought?

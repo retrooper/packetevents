@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.manager.protocol;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -42,12 +41,15 @@ public interface ProtocolManager {
 
     void sendPacketSilently(Object channel, Object byteBuf);
 
+    void writePacket(Object channel, Object byteBuf);
+
+    void writePacketSilently(Object channel, Object byteBuf);
+
     void receivePacket(Object channel, Object byteBuf);
 
     void receivePacketSilently(Object channel, Object byteBuf);
 
     ClientVersion getClientVersion(Object channel);
-
 
     //Methods below don't need to be implemented. A lot of these functions depend on each other.
     default ConnectionState getConnectionState(Object channel) {
@@ -79,6 +81,22 @@ public interface ProtocolManager {
         for (PacketWrapper<?> packet : wrappers) {
             packet.prepareForSend();
             sendPacketSilently(channel, packet.buffer);
+        }
+    }
+
+    default void writePacket(Object channel, PacketWrapper<?> wrapper) {
+        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
+        for (PacketWrapper<?> packet : wrappers) {
+            packet.prepareForSend();
+            writePacket(channel, packet.buffer);
+        }
+    }
+
+    default void writePacketSilently(Object channel, PacketWrapper<?> wrapper) {
+        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
+        for (PacketWrapper<?> packet : wrappers) {
+            packet.prepareForSend();
+            writePacketSilently(channel, packet.buffer);
         }
     }
 

@@ -52,15 +52,14 @@ public class PlayerManagerImpl implements PlayerManager {
         }
         Object channel = getChannel(p);
         User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
-        if (user.getClientVersion() == null
-                || !user.getClientVersion().isResolved()) {
+        if (user.getClientVersion() == null || !user.getClientVersion().isResolved()) {
             //Failed to resolve.
             //Asking ViaVersion or ProtocolSupport for the protocol version.
             if (DependencyUtil.isProtocolTranslationDependencyAvailable()) {
                 try {
-                    user.setClientVersion(ClientVersion
-                            .getById(DependencyUtil
-                                    .getProtocolVersion(p)));
+                    ClientVersion version = ClientVersion.getById(DependencyUtil.getProtocolVersion(p));
+                    PacketEvents.getAPI().getLogManager().debug("Requested user version with protocol hacks. Set user version to " + version.getReleaseName());
+                    user.setClientVersion(version);
                 } catch (Exception ex) {
                     //Try ask the dependency again the next time, for now it is temporarily unresolved...
                     //Temporary unresolved means there is still hope, an exception was thrown on the dependency's end.
@@ -77,8 +76,9 @@ public class PlayerManagerImpl implements PlayerManager {
                     //If you aren't using ViaVersion or ProtocolSupport, how are you supporting multiple protocol versions?
                     protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
                 }
-                user.setClientVersion(ClientVersion
-                        .getById(protocolVersion));
+                ClientVersion version = ClientVersion.getById(protocolVersion);
+                PacketEvents.getAPI().getLogManager().debug("Requested user version. Setting to " + version.getReleaseName());
+                user.setClientVersion(version);
             }
         }
         return user.getClientVersion();

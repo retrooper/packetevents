@@ -54,6 +54,22 @@ public interface PlayerManager {
         PacketEvents.getAPI().getProtocolManager().sendPacketSilently(getChannel(player), wrapper);
     }
 
+    default void writePacket(@NotNull Object player, @NotNull Object byteBuf) {
+        PacketEvents.getAPI().getProtocolManager().writePacket(getChannel(player), byteBuf);
+    }
+
+    default void writePacket(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getProtocolManager().writePacket(getChannel(player), wrapper);
+    }
+
+    default void writePacketSilently(@NotNull Object player, @NotNull Object byteBuf) {
+        PacketEvents.getAPI().getProtocolManager().writePacketSilently(getChannel(player), byteBuf);
+    }
+
+    default void writePacketSilently(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getProtocolManager().writePacketSilently(getChannel(player), wrapper);
+    }
+
     default void receivePacket(Object player, Object byteBuf) {
         PacketEvents.getAPI().getProtocolManager().receivePacket(getChannel(player), byteBuf);
     }
