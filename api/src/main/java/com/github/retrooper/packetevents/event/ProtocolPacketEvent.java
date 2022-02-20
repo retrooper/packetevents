@@ -65,6 +65,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
                 version = ClientVersion.UNKNOWN;
             }
 
+            PacketEvents.getAPI().getLogManager().debug("Client version is null, setting to " + version.getReleaseName());
             user.setClientVersion(version);
         }
 
@@ -139,6 +140,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
 
     @Deprecated
     public void setClientVersion(@NotNull ClientVersion clientVersion) {
+        PacketEvents.getAPI().getLogManager().debug("Setting client version with deprecated method " + clientVersion.getReleaseName());
         user.setClientVersion(clientVersion);
     }
 
