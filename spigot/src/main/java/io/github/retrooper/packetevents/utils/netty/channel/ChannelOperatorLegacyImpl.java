@@ -103,4 +103,14 @@ public class ChannelOperatorLegacyImpl implements ChannelOperator {
     public List<String> pipelineHandlerNames(Object channel) {
         return ((Channel) channel).pipeline().names();
     }
+
+    @Override
+    public Object getPipelineHandler(Object channel, String name) {
+        return ((Channel)channel).pipeline().get(name);
+    }
+
+    @Override
+    public Object getPipelineContext(Object channel, String name) {
+        return ((Channel)channel).pipeline().context(name);
+    }
 }

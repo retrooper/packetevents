@@ -55,6 +55,7 @@ public interface ByteBufOperator {
     Object readBytes(Object buffer, int length);
     void readBytes(Object buffer, byte[] bytes);
 
+    Object writeBytes(Object buffer, Object src);
     Object writeBytes(Object buffer, byte[] bytes);
     Object writeBytes(Object buffer, byte[] bytes, int offset, int length);
 

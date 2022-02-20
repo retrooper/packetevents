@@ -36,6 +36,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -129,7 +130,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         //Player channels might have been registered already. Let us add our handlers. We are a little late though.
         //This only happens when you join extremely early on older versions of minecraft.
         List<Object> networkManagers = SpigotReflectionUtil.getNetworkManagers();
-        //TODO We are synchronizing a local variable, lets optimize this
         for (Object networkManager : networkManagers) {
             ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
             Channel channel = networkManagerWrapper.readObject(0, Channel.class);
@@ -269,7 +269,22 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (encoder instanceof PacketEncoderModern) {
             return (PacketEncoderModern) encoder;
         }
-        return null;
+        else {
+            ReflectionObject reflectEncoder = new ReflectionObject(encoder);
+            MessageToByteEncoder<?> wrappedSuperEncoder = reflectEncoder.read(0, MessageToByteEncoder.class);
+            if (wrappedSuperEncoder instanceof PacketEncoderModern) {
+                return (PacketEncoderModern) wrappedSuperEncoder;
+            }
+            else {
+                List<MessageToByteEncoder<?>> encoders = reflectEncoder.readList(0);
+                for (MessageToByteEncoder<?> customEncoder : encoders) {
+                    if (customEncoder instanceof PacketEncoderModern) {
+                        return (PacketEncoderModern) customEncoder;
+                    }
+                }
+                return null;
+            }
+        }
     }
 
     @Override
@@ -296,12 +311,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 decoder.user.setConnectionState(newConnectionState);
             }
         }
+
         PacketEncoderModern encoder = getEncoder(ch);
         if (encoder != null) {
             encoder.player = (Player) player;
-            if (newConnectionState == ConnectionState.PLAY) {
-                encoder.handledCompression = true;
-            }
         }
     }
 

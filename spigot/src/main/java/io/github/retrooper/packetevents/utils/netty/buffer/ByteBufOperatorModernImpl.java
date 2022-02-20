@@ -156,6 +156,11 @@ public class ByteBufOperatorModernImpl implements ByteBufOperator {
     }
 
     @Override
+    public Object writeBytes(Object buffer, Object src) {
+        return ((ByteBuf)buffer).writeBytes((ByteBuf) src);
+    }
+
+    @Override
     public Object writeBytes(Object buffer, byte[] bytes) {
         return ((ByteBuf)buffer).writeBytes(bytes);
     }

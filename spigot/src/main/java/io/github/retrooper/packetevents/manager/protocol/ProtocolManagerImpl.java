@@ -21,12 +21,15 @@ package io.github.retrooper.packetevents.manager.protocol;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class ProtocolManagerImpl implements ProtocolManager {
@@ -68,14 +71,19 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void sendPacket(Object channel, Object byteBuf) {
-        boolean protocolSupportPresent = ProtocolSupportUtil.isAvailable();
         if (ChannelHelper.isOpen(channel)) {
-            if (protocolSupportPresent) {
-                //ProtocolSupport has a MessageToMessageCodec handler named "ps_logic" in the pipeline.
-                //The Netty documentation explicitly mentions that you need to retain buffers before passing them through such handlers.
-                ByteBufHelper.retain(byteBuf);
+            //ChannelHelper.writeAndFlush(channel, byteBuf);
+            Object encoder = ChannelHelper.getPipelineHandler(channel, PacketEvents.ENCODER_NAME);
+            Object ctx = ChannelHelper.getPipelineContext(channel, PacketEvents.ENCODER_NAME);
+            Object inputBuffer = UnpooledByteBufAllocationHelper.buffer();
+            ByteBufHelper.writeBytes(inputBuffer, byteBuf);
+            ByteBufHelper.clear(byteBuf);
+            try {
+                CustomPipelineUtil.callEncode(encoder, ctx, inputBuffer, byteBuf);
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
             }
-            ChannelHelper.writeAndFlush(channel, byteBuf);
+            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
         }
     }
 
@@ -117,6 +125,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void receivePacketSilently(Object channel, Object byteBuf) {
         //Receive the packet for all handlers after our decoder
+        //TODO Consider viaversion when we are in play state
         ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
     }
 

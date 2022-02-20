@@ -43,15 +43,23 @@ public class ServerConnectionInitializerModern {
         ProtocolManager.USERS.put(channel, user);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern(user));
         PacketEncoderModern encoder = new PacketEncoderModern(user);
-        ChannelHandler vanillaEncoder = channel.pipeline().get("encoder");
-        if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitEncodeHandlerClass().isInstance(vanillaEncoder)) {
+        ChannelHandler vanillaEncoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
+        encoder.wrappedEncoder = (MessageToByteEncoder<?>) vanillaEncoder;
+        //TODO Test new encoder stuff on multiple packetevents instances, and add same code to legacy initializer
+        if (ViaVersionUtil.isAvailable()
+                && ViaVersionUtil.getBukkitEncodeHandlerClass().equals(vanillaEncoder.getClass())) {
             //Read the minecraft encoder stored in ViaVersion's encoder.
-            encoder.mcEncoder = new ReflectionObject(vanillaEncoder).read(0, MessageToByteEncoder.class);
+            encoder.vanillaEncoder = new ReflectionObject(encoder.wrappedEncoder)
+                    .read(0, MessageToByteEncoder.class);
+        } else if (ClassUtil.getClassSimpleName(encoder.wrappedEncoder.getClass()).equals("PacketEncoderModern")) {
+            ReflectionObject reflectEncoder = new ReflectionObject(encoder.wrappedEncoder);
+            List<MessageToByteEncoder<?>> encoders = reflectEncoder.readList(0);
+            encoders.add(encoder);
         } else {
-            //Read the minecraft encoder exposed in the pipeline
-            encoder.mcEncoder = (MessageToByteEncoder<?>) vanillaEncoder;
+            encoder.vanillaEncoder = encoder.wrappedEncoder;
         }
-        channel.pipeline().addAfter("encoder", PacketEvents.ENCODER_NAME, encoder);
+        //Replace "encoder" with "encoder"
+        channel.pipeline().replace(PacketEvents.ENCODER_NAME, PacketEvents.ENCODER_NAME, encoder);
     }
 
     public static void postDestroyChannel(Object ch) {
@@ -114,6 +122,16 @@ public class ServerConnectionInitializerModern {
             channel.pipeline().remove(PacketEvents.DECODER_NAME);
         }
 
-        channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+
+        ChannelHandler encoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
+        if (encoder instanceof PacketEncoderModern) {
+            PacketEncoderModern encoderModern = (PacketEncoderModern) encoder;
+            channel.pipeline().replace(PacketEvents.ENCODER_NAME, PacketEvents.ENCODER_NAME, encoderModern.wrappedEncoder);
+        } else if (ClassUtil.getClassSimpleName(encoder.getClass()).equals("PacketEncoderModern")) {
+            //Possibly another packetevents instance
+            ReflectionObject reflectEncoder = new ReflectionObject(encoder);
+            List<Object> encoders = reflectEncoder.readList(0);
+            encoders.removeIf(e -> e instanceof PacketEncoderModern);
+        }
     }
 }

@@ -104,20 +104,12 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
         if (buffer.readableBytes() != 0) {
             read(ctx, buffer, out);
-            if (!decoders.isEmpty()) {
-
-                //Call custom decoders
-                try {
-                    for (ByteToMessageDecoder decoder : decoders) {
-                        //Only support one output object
-                        if (!out.isEmpty()) {
-                            Object input = out.get(0);
-                            out.clear();
-                            out.addAll(CustomPipelineUtil.callDecode(decoder, ctx, input));
-                        }
-                    }
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+            for (ByteToMessageDecoder decoder : decoders) {
+                //Only support one output object
+                if (!out.isEmpty()) {
+                    Object input = out.get(0);
+                    out.clear();
+                    out.addAll(CustomPipelineUtil.callDecode(decoder, ctx, input));
                 }
             }
             if (mcDecoder != null) {

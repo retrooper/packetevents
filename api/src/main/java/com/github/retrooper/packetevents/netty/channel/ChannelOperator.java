@@ -38,4 +38,6 @@ public interface ChannelOperator {
     Object writeAndFlushInContext(Object channel, String ctx, Object buffer);
     Object fireChannelReadInContext(Object channel, String ctx, Object buffer);
     List<String> pipelineHandlerNames(Object channel);
+    Object getPipelineHandler(Object channel, String name);
+    Object getPipelineContext(Object channel, String name);
 }

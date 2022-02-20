@@ -74,7 +74,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.byteBuf = byteBuf;
         int size = ByteBufHelper.readableBytes(byteBuf);
         try {
-            this.packetID = readVarInt(byteBuf);
+            this.packetID = ByteBufHelper.readVarInt(byteBuf);
         } catch (Exception e) {
             throw new PacketProcessException(e,
                     PacketProcessException.PacketProcessExceptionReason.PACKET_ID,
@@ -92,21 +92,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.byteBuf = byteBuf;
         this.packetID = packetID;
         this.packetType = packetType;
-    }
-
-    private static int readVarInt(Object buffer) throws Exception {
-        int value = 0;
-        int length = 0;
-        byte currentByte;
-        do {
-            currentByte = ByteBufHelper.readByte(buffer);
-            value |= (currentByte & 0x7F) << (length * 7);
-            length += 1;
-            if (length > 5) {
-                throw new Exception("VarInt is too big");
-            }
-        } while ((currentByte & 0x80) == 0x80);
-        return value;
     }
 
     public Object getChannel() {

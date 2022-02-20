@@ -91,7 +91,7 @@ public class SpigotPacketEventsBuilder {
                 if (!loaded) {
                     //Resolve server version and cache
                     PacketEvents.IDENTIFIER = "pe-" + plugin.getName().toLowerCase();
-                    PacketEvents.ENCODER_NAME = "pe-encoder-" + plugin.getName().toLowerCase();
+                    PacketEvents.ENCODER_NAME = "encoder";
                     PacketEvents.DECODER_NAME = "pe-decoder-" + plugin.getName().toLowerCase();
                     PacketEvents.CONNECTION_NAME = "pe-connection-handler-" + plugin.getName().toLowerCase();
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + plugin.getName().toLowerCase();

@@ -171,6 +171,10 @@ public class ByteBufHelper {
         return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readBytes(buffer, length);
     }
 
+    public static Object writeBytes(Object buffer, Object src) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeBytes(buffer, src);
+    }
+
     public static void readBytes(Object buffer, byte[] bytes) {
         PacketEvents.getAPI().getNettyManager().getByteBufOperator().readBytes(buffer, bytes);
     }

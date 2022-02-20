@@ -76,4 +76,12 @@ public class ChannelHelper {
     public static String pipelineHandlerNamesAsString(Object channel) {
         return Arrays.toString(pipelineHandlerNames(channel).toArray(new String[0]));
     }
+
+    public static Object getPipelineHandler(Object channel, String name) {
+        return PacketEvents.getAPI().getNettyManager().getChannelOperator().getPipelineHandler(channel, name);
+    }
+
+    public static Object getPipelineContext(Object channel, String handlerName) {
+        return PacketEvents.getAPI().getNettyManager().getChannelOperator().getPipelineContext(channel, handlerName);
+    }
 }

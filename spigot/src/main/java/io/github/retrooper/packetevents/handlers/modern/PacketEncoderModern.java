@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
@@ -34,9 +35,9 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +45,9 @@ import java.util.List;
 public class PacketEncoderModern extends MessageToByteEncoder<Object> {
     public User user;
     public volatile Player player;
-    public boolean handledCompression;
-    public MessageToByteEncoder<?> mcEncoder;
+    public MessageToByteEncoder<?> wrappedEncoder;
+    public MessageToByteEncoder<?> vanillaEncoder;
+    public List<MessageToByteEncoder<Object>> encoders = new ArrayList<>();
     private final List<Runnable> promisedTasks = new ArrayList<>();
 
     public PacketEncoderModern(User user) {
@@ -53,8 +55,6 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
-        boolean doCompression = handleCompressionOrder(ctx, buffer);
-
         int preProcessIndex = buffer.readerIndex();
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer);
         int processIndex = buffer.readerIndex();
@@ -68,9 +68,6 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
                 packetSendEvent.getLastUsedWrapper().writeData();
             }
             buffer.readerIndex(preProcessIndex);
-            if (doCompression) {
-                PacketCompressionUtil.recompress(ctx, buffer);
-            }
             promisedTasks.addAll(packetSendEvent.getPromisedTasks());
         } else {
             //Make the buffer unreadable for the next handlers
@@ -100,40 +97,35 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf out) throws Exception {
         if (!(o instanceof ByteBuf)) {
-            //Call mc encoder
-            if (mcEncoder == null) return;
-            try {
-                CustomPipelineUtil.callEncode(mcEncoder, ctx, o, out);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            //Convert NMS object to bytes, so we can process it right away.
+            if (vanillaEncoder == null) return;
+            CustomPipelineUtil.callEncode(vanillaEncoder, ctx, o, out);
         } else {
             ByteBuf in = (ByteBuf) o;
             if (in.readableBytes() == 0) return;
             out.writeBytes(in);
         }
         read(ctx, out);
-    }
-
-    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {
-        if (handledCompression) return false;
-        int encoderIndex = ctx.pipeline().names().indexOf("compress");
-        if (encoderIndex == -1) return false;
-        handledCompression = true;
-        if (encoderIndex > ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME)) {
-            // Need to decompress this packet due to bad order
-            ByteBuf decompressed = ctx.alloc().buffer();
-            PacketCompressionUtil.decompress(ctx.pipeline(), buffer, decompressed);
-            PacketCompressionUtil.relocateHandlers(ctx.pipeline(), buffer, decompressed);
-            return true;
+        ByteBuf input = ctx.alloc().buffer().writeBytes(out);
+        out.clear();
+        for (MessageToByteEncoder<Object> encoder : encoders) {
+            CustomPipelineUtil.callEncode(encoder, ctx, input, out);
+            input.clear().writeBytes(out);
+            out.clear();
         }
-        return false;
+
+        if (wrappedEncoder != vanillaEncoder) {
+            CustomPipelineUtil.callEncode(wrappedEncoder, ctx, input, out);
+        }
+        else {
+            out.writeBytes(input);
+        }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
-            super.exceptionCaught(ctx, cause);
+        super.exceptionCaught(ctx, cause);
         //}
         //Check if the minecraft server will already print our exception for us.
         if (ExceptionUtil.isException(cause, PacketProcessException.class)
