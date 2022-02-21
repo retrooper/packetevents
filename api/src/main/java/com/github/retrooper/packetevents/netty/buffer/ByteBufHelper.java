@@ -131,6 +131,10 @@ public class ByteBufHelper {
         PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeDouble(buffer, value);
     }
 
+    public static Object getBytes(Object buffer, int index, byte[] destination) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().getBytes(buffer, index, destination);
+    }
+
     public static short getUnsignedByte(Object buffer, int index) {
         return PacketEvents.getAPI().getNettyManager().getByteBufOperator().getUnsignedByte(buffer, index);
     }
@@ -241,4 +245,9 @@ public class ByteBufHelper {
         }
     }
 
+    public static byte[] copyBytes(Object buffer) {
+        byte[] bytes = new byte[readableBytes(buffer)];
+        getBytes(buffer, readerIndex(buffer), bytes);
+        return bytes;
+    }
 }

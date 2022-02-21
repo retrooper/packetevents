@@ -60,6 +60,11 @@ public class ChannelOperatorLegacyImpl implements ChannelOperator {
     }
 
     @Override
+    public Object close(Object channel) {
+        return ((Channel) channel).close();
+    }
+
+    @Override
     public Object write(Object channel, Object buffer) {
         return ((Channel) channel).write(buffer);
     }

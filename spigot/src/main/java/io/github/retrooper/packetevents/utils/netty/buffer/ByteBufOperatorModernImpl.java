@@ -106,6 +106,11 @@ public class ByteBufOperatorModernImpl implements ByteBufOperator {
     }
 
     @Override
+    public Object getBytes(Object buffer, int index, byte[] destination) {
+        return ((ByteBuf)buffer).getBytes(index, destination);
+    }
+
+    @Override
     public short getUnsignedByte(Object buffer, int index) {
         return ((ByteBuf)buffer).getUnsignedByte(index);
     }
@@ -169,7 +174,6 @@ public class ByteBufOperatorModernImpl implements ByteBufOperator {
     public Object writeBytes(Object buffer, byte[] bytes, int offset, int length) {
         return ((ByteBuf)buffer).writeBytes(bytes, offset, length);
     }
-
 
     @Override
     public void readBytes(Object buffer, byte[] bytes) {

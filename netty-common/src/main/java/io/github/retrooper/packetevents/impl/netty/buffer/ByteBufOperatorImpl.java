@@ -105,6 +105,11 @@ public class ByteBufOperatorImpl implements ByteBufOperator {
     }
 
     @Override
+    public Object getBytes(Object buffer, int index, byte[] destination) {
+        return ((ByteBuf)buffer).getBytes(index, destination);
+    }
+
+    @Override
     public short getUnsignedByte(Object buffer, int index) {
         return ((ByteBuf)buffer).getUnsignedByte(index);
     }

@@ -42,6 +42,7 @@ public interface ByteBufOperator {
     void writeInt(Object buffer, int value);
     void writeLong(Object buffer, long value);
 
+    Object getBytes(Object buffer, int index, byte[] destination);
     short getUnsignedByte(Object buffer, int index);
 
     boolean isReadable(Object buffer);

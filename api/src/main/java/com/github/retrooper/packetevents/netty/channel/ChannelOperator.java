@@ -28,6 +28,7 @@ public interface ChannelOperator {
     SocketAddress remoteAddress(Object channel);
     SocketAddress localAddress(Object channel);
     boolean isOpen(Object channel);
+    Object close(Object channel);
     Object write(Object channel, Object buffer);
     Object flush(Object channel);
     Object writeAndFlush(Object channel, Object buffer);

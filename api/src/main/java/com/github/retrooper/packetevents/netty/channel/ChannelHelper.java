@@ -37,6 +37,10 @@ public class ChannelHelper {
         return PacketEvents.getAPI().getNettyManager().getChannelOperator().isOpen(channel);
     }
 
+    public static Object close(Object channel) {
+        return PacketEvents.getAPI().getNettyManager().getChannelOperator().close(channel);
+    }
+
     public static Object write(Object channel, Object buffer) {
         return PacketEvents.getAPI().getNettyManager().getChannelOperator().write(channel, buffer);
     }
