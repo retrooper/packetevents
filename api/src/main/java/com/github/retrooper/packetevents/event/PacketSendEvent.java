@@ -25,12 +25,8 @@ import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     private boolean cloned;
-    private List<Runnable> promisedTasks = null;
 
     protected PacketSendEvent(Object channel, User user, Object player, Object rawByteBuf) throws PacketProcessException {
         super(PacketSide.SERVER, channel, user, player, rawByteBuf);
@@ -67,17 +63,5 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     @Override
     public void call(PacketListenerCommon listener) {
         listener.onPacketSend(this);
-    }
-
-    //TODO Remove this, and find out what the difference is.
-    public boolean hasPromisedTasks() {
-        return promisedTasks != null && !promisedTasks.isEmpty();
-    }
-
-    public List<Runnable> getPromisedTasks() {
-        if (promisedTasks == null) {
-            promisedTasks = new ArrayList<>();
-        }
-        return promisedTasks;
     }
 }

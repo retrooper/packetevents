@@ -31,7 +31,6 @@ import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipe
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 
@@ -45,14 +44,13 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
     public MessageToByteEncoder<?> wrappedEncoder;
     public MessageToByteEncoder<?> vanillaEncoder;
     public List<MessageToByteEncoder<Object>> encoders = new ArrayList<>();
-    private final List<Runnable> promisedTasks = new ArrayList<>();
 
     public PacketEncoderModern(User user) {
         this.user = user;
     }
 
     public void writeMessage(Object ctx, Object msg) throws Exception {
-        write((ChannelHandlerContext) ctx, msg, ((ChannelHandlerContext)ctx).newPromise());
+        write((ChannelHandlerContext) ctx, msg, ((ChannelHandlerContext) ctx).newPromise());
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
@@ -69,7 +67,6 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
                 packetSendEvent.getLastUsedWrapper().writeData();
             }
             buffer.readerIndex(preProcessIndex);
-            promisedTasks.addAll(packetSendEvent.getPromisedTasks());
         } else {
             //Make the buffer unreadable for the next handlers
             buffer.clear();
@@ -79,20 +76,6 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
                 task.run();
             }
         }
-    }
-
-    @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (!this.promisedTasks.isEmpty()) {
-            List<Runnable> clonedPostTasks = new ArrayList<>(this.promisedTasks);
-            this.promisedTasks.clear();
-            promise.addListener(f -> {
-                for (Runnable task : clonedPostTasks) {
-                    task.run();
-                }
-            });
-        }
-        super.write(ctx, msg, promise);
     }
 
     @Override

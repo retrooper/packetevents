@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
@@ -83,6 +84,10 @@ public class User {
 
     public void writePacket(PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().writePacket(channel, wrapper);
+    }
+
+    public void flushPackets() {
+        ChannelHelper.flush(channel);
     }
 
     public void chat(String message) {

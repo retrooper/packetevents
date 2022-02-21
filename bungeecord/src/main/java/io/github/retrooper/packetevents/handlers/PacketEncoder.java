@@ -23,25 +23,21 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
-import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
 import io.github.retrooper.packetevents.injector.ServerConnectionInitializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
+
 //Thanks to ViaVersion for the compression method.
 @ChannelHandler.Sharable
 public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     public ProxiedPlayer player;
     public User user;
-    private final List<Runnable> promisedTasks = new ArrayList<>();
     public boolean handledCompression;
 
     public PacketEncoder(User user, ProxiedPlayer player) {
@@ -65,9 +61,6 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
             if (doCompression) {
                 recompress(ctx, buffer);
             }
-            if (packetSendEvent.hasPromisedTasks()) {
-                promisedTasks.addAll(packetSendEvent.getPromisedTasks());
-            }
         }
         if (packetSendEvent.hasPostTasks()) {
             for (Runnable task : packetSendEvent.getPostTasks()) {
@@ -86,22 +79,8 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
-            super.exceptionCaught(ctx, cause);
+        super.exceptionCaught(ctx, cause);
         //}
-    }
-
-    @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (!promisedTasks.isEmpty()) {
-            List<Runnable> postTasks = new ArrayList<>(this.promisedTasks);
-            this.promisedTasks.clear();
-            promise.addListener(f -> {
-                for (Runnable task : postTasks) {
-                    task.run();
-                }
-            });
-        }
-        super.write(ctx, msg, promise);
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {
@@ -116,8 +95,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
                 if (buffer != decompressed) {
                     try {
                         buffer.clear().writeBytes(decompressed);
-                    }
-                    finally {
+                    } finally {
                         decompressed.release();
                     }
                 }
@@ -142,8 +120,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
         }
         try {
             buffer.clear().writeBytes(compressed);
-        }
-        finally {
+        } finally {
             compressed.release();
         }
     }

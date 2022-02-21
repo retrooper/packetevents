@@ -31,19 +31,14 @@ import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
-import net.minecraft.util.io.netty.channel.ChannelPromise;
 import net.minecraft.util.io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
     public volatile Player player;
     public User user;
     private boolean handledCompression;
-    private final List<Runnable> promisedTasks = new ArrayList<>();
 
     public PacketEncoderLegacy(User user) {
         this.user = user;
@@ -51,7 +46,7 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
 
 
     public void writeMessage(Object ctx, Object msg) throws Exception {
-        write((ChannelHandlerContext) ctx, msg, ((ChannelHandlerContext)ctx).newPromise());
+        write((ChannelHandlerContext) ctx, msg, ((ChannelHandlerContext) ctx).newPromise());
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
@@ -73,7 +68,6 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
             if (doCompression) {
                 PacketCompressionUtil.recompress(ctx, buffer);
             }
-            promisedTasks.addAll(packetSendEvent.getPromisedTasks());
         } else {
             //Make the buffer unreadable for the next handlers
             buffer.clear();
@@ -83,20 +77,6 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
                 task.run();
             }
         }
-    }
-
-    @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (!promisedTasks.isEmpty()) {
-            List<Runnable> postTasks = new ArrayList<>(this.promisedTasks);
-            this.promisedTasks.clear();
-            promise.addListener(f -> {
-                for (Runnable task : postTasks) {
-                    task.run();
-                }
-            });
-        }
-        super.write(ctx, msg, promise);
     }
 
     @Override
@@ -122,9 +102,9 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception{
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
-            super.exceptionCaught(ctx, cause);
+        super.exceptionCaught(ctx, cause);
         //}
         //Check if the minecraft server will already print our exception for us.
         if (ExceptionUtil.isException(cause, PacketProcessException.class)
