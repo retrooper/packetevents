@@ -22,12 +22,10 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
-import io.github.retrooper.packetevents.handlers.compression.PacketCompressionUtil;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
@@ -35,7 +33,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -52,6 +49,10 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
 
     public PacketEncoderModern(User user) {
         this.user = user;
+    }
+
+    public void writeMessage(Object ctx, Object msg) throws Exception {
+        write((ChannelHandlerContext) ctx, msg, ((ChannelHandlerContext)ctx).newPromise());
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
@@ -116,8 +117,7 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
 
         if (wrappedEncoder != vanillaEncoder) {
             CustomPipelineUtil.callEncode(wrappedEncoder, ctx, input, out);
-        }
-        else {
+        } else {
             out.writeBytes(input);
         }
     }

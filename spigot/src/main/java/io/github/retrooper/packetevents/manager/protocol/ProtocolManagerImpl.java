@@ -26,15 +26,19 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
+import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class ProtocolManagerImpl implements ProtocolManager {
+    private static Method WRITE_MESSAGE_METHOD;
     private ProtocolVersion platformVersion;
 
+    //TODO Implement
     private ProtocolVersion resolveVersionNoCache() {
        /* for (final ServerVersion val : ServerVersion.reversedValues()) {
             //For example "V_1_18" -> "1.18"
@@ -72,7 +76,6 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void sendPacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            //ChannelHelper.writeAndFlush(channel, byteBuf);
             Object encoder = ChannelHelper.getPipelineHandler(channel, PacketEvents.ENCODER_NAME);
             Object ctx = ChannelHelper.getPipelineContext(channel, PacketEvents.ENCODER_NAME);
             Object inputBuffer = UnpooledByteBufAllocationHelper.buffer();
@@ -97,14 +100,23 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void writePacket(Object channel, Object byteBuf) {
-        boolean protocolSupportPresent = ProtocolSupportUtil.isAvailable();
         if (ChannelHelper.isOpen(channel)) {
-            if (protocolSupportPresent) {
-                //ProtocolSupport has a MessageToMessageCodec handler named "ps_logic" in the pipeline.
-                //The Netty documentation explicitly mentions that you need to retain buffers before passing them through such handlers.
-                ByteBufHelper.retain(byteBuf);
+            Object encoder = ChannelHelper.getPipelineHandler(channel, PacketEvents.ENCODER_NAME);
+            Object ctx = ChannelHelper.getPipelineContext(channel, PacketEvents.ENCODER_NAME);
+            if (WRITE_MESSAGE_METHOD == null) {
+                try {
+                    WRITE_MESSAGE_METHOD = encoder.getClass().getMethod("writeMessage", Object.class, Object.class);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
             }
-            ChannelHelper.write(channel, byteBuf);
+            try {
+                //Call writeMessage in our encoder, which redirects to write in netty encoders.
+                //This should be passed on to the next encoders.
+                WRITE_MESSAGE_METHOD.invoke(encoder, ctx, byteBuf);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
     }
 

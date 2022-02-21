@@ -49,6 +49,11 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
         this.user = user;
     }
 
+
+    public void writeMessage(Object ctx, Object msg) throws Exception {
+        write((ChannelHandlerContext) ctx, msg, ((ChannelHandlerContext)ctx).newPromise());
+    }
+
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
         boolean doCompression = handleCompressionOrder(ctx, buffer);
 
