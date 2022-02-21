@@ -3,6 +3,7 @@ package io.github.retrooper.packetevents.handler;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.netty.buffer.ByteBuf;
@@ -29,7 +30,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
             PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> transformed.readerIndex(readerIndex));
             if (!packetSendEvent.isCancelled()) {
                 if (packetSendEvent.getLastUsedWrapper() != null) {
-                    packetSendEvent.getByteBuf().clear();
+                    ByteBufHelper.clear(packetSendEvent.getByteBuf());
                     packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
                     packetSendEvent.getLastUsedWrapper().writeData();
                 }
@@ -41,7 +42,6 @@ public class PacketDecoder extends ByteToMessageDecoder {
                     task.run();
                 }
             }
-            //TODO hasPromisedTasks maybe
         } finally {
             transformed.release();
         }

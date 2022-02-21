@@ -2,7 +2,7 @@ package io.github.retrooper.packetevents.mixin;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -26,17 +26,16 @@ public class ExampleMixin {
     private void channelActive(ChannelHandlerContext ctx, CallbackInfo info) throws Exception {
         ExampleMod.LOGGER.info("Connected!");
         Channel channel = ctx.channel();
-        ChannelAbstract ch = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
-        User user = new User(ch, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
+        User user = new User(channel, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
                 new UserProfile(null, null));
-        ProtocolManager.USERS.put(ch, user);
+        ProtocolManager.USERS.put(channel, user);
         LocalPlayer player = Minecraft.getInstance().player;
         PacketDecoder decoder = new PacketDecoder(user, player);
         PacketEncoder encoder = new PacketEncoder(user, player);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, encoder);
         //TODO Handle compression
-        ExampleMod.LOGGER.info("Pipeline: " + ch.pipeline().namesToString());
+        ExampleMod.LOGGER.info("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
     }
 
     @Inject(method = "channelInactive", at = @At("HEAD"))

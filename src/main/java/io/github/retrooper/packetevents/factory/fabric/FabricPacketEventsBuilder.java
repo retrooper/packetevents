@@ -10,7 +10,6 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -19,10 +18,10 @@ import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handler.PacketDecoder;
 import io.github.retrooper.packetevents.handler.PacketEncoder;
-import io.github.retrooper.packetevents.impl.manager.netty.NettyManagerImpl;
-import io.github.retrooper.packetevents.impl.manager.player.PlayerManagerAbstract;
-import io.github.retrooper.packetevents.impl.manager.protocol.ProtocolManagerAbstract;
-import io.github.retrooper.packetevents.impl.manager.server.ServerManagerAbstract;
+import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
+import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
+import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
+import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import io.netty.channel.Channel;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -92,25 +91,24 @@ public class FabricPacketEventsBuilder {
                 }
 
                 @Override
-                public ChannelAbstract getChannel(@NotNull Object player) {
+                public Object getChannel(@NotNull Object player) {
                     Connection connection = ((LocalPlayer) player).connection.getConnection();
                     ReflectionObject reflectConnection = new ReflectionObject(connection);
-                    Channel channel = reflectConnection.readObject(0, Channel.class);
-                    return PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
+                    return reflectConnection.readObject(0, Channel.class);
                 }
             };
 
             private final ChannelInjector injector = new ChannelInjector() {
                 @Override
-                public @Nullable ConnectionState getConnectionState(ChannelAbstract ch) {
-                    Channel channel = (Channel) ch.rawChannel();
+                public @Nullable ConnectionState getConnectionState(Object ch) {
+                    Channel channel = (Channel) ch;
                     PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
                     return decoder.user.getConnectionState();
                 }
 
                 @Override
-                public void changeConnectionState(ChannelAbstract ch, @Nullable ConnectionState packetState) {
-                    Channel channel = (Channel) ch.rawChannel();
+                public void changeConnectionState(Object ch, @Nullable ConnectionState packetState) {
+                    Channel channel = (Channel) ch;
                     PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
                     decoder.user.setConnectionState(packetState);
                 }
@@ -131,8 +129,8 @@ public class FabricPacketEventsBuilder {
                 }
 
                 @Override
-                public void updateUser(ChannelAbstract ch, User user) {
-                    Channel channel = (Channel) ch.rawChannel();
+                public void updateUser(Object ch, User user) {
+                    Channel channel = (Channel) ch;
                     PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
                     decoder.user = user;
                     PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
