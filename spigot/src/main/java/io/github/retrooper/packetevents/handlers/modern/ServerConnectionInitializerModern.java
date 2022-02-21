@@ -65,7 +65,7 @@ public class ServerConnectionInitializerModern {
     public static void postDestroyChannel(Object ch) {
         Channel channel = (Channel) ch;
         ChannelHandler viaDecoder = channel.pipeline().get("decoder");
-        if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(viaDecoder)) {
+        if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitDecodeHandlerClass().equals(viaDecoder.getClass())) {
             ReflectionObject reflectViaDecoder = new ReflectionObject(viaDecoder);
             ByteToMessageDecoder decoder = reflectViaDecoder.readObject(0, ByteToMessageDecoder.class);
             if (decoder instanceof PacketDecoderModern) {

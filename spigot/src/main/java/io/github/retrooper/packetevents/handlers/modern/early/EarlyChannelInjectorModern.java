@@ -243,13 +243,16 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
         } else if (ViaVersionUtil.isAvailable()) {
-            ChannelHandler mcDecoder = channel.pipeline().get("decoder");
-            if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(mcDecoder)) {
-                ReflectionObject reflectMCDecoder = new ReflectionObject(mcDecoder);
+            decoder = channel.pipeline().get("decoder");
+            if (ViaVersionUtil.getBukkitDecodeHandlerClass().equals(decoder.getClass())) {
+                ReflectionObject reflectMCDecoder = new ReflectionObject(decoder);
                 ByteToMessageDecoder injectedDecoder = reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
+                //We are the father decoder
                 if (injectedDecoder instanceof PacketDecoderModern) {
                     return (PacketDecoderModern) injectedDecoder;
-                } else {
+                }
+                else if (ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoderModern")) {
+                    //Some other packetevents instance already injected. Let us find our child decoder somewhere in here.
                     ReflectionObject reflectInjectedDecoder = new ReflectionObject(injectedDecoder);
                     List<Object> decoders = reflectInjectedDecoder.readList(0);
                     for (Object customDecoder : decoders) {
@@ -257,6 +260,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                             return (PacketDecoderModern) customDecoder;
                         }
                     }
+                }
+                else {
+                    //We honestly have no idea
+                    return null;
                 }
             }
         }
