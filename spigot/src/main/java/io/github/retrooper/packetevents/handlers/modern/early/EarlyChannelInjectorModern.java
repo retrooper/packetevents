@@ -156,14 +156,14 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             pipeline.addFirst(PacketEvents.CONNECTION_NAME, new ServerChannelHandlerModern());
         }
         List<Object> networkManagers = SpigotReflectionUtil.getNetworkManagers();
-        synchronized (networkManagers) {
-            for (Object networkManager : networkManagers) {
-                ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
-                Channel channel = networkManagerWrapper.readObject(0, Channel.class);
-                if (channel.isOpen()) {
-                    if (channel.localAddress().equals(future.channel().localAddress())) {
-                        channel.close();
-                    }
+        //TODO Instead of accessing it with reflection each time, maybe keep a reference once if that works?
+        //TODO But then we'd have to synchronize it i believe.(also do this in legacy early injector)
+        for (Object networkManager : networkManagers) {
+            ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
+            Channel channel = networkManagerWrapper.readObject(0, Channel.class);
+            if (channel.isOpen()) {
+                if (channel.localAddress().equals(future.channel().localAddress())) {
+                    channel.close();
                 }
             }
         }
@@ -250,8 +250,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 //We are the father decoder
                 if (injectedDecoder instanceof PacketDecoderModern) {
                     return (PacketDecoderModern) injectedDecoder;
-                }
-                else if (ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoderModern")) {
+                } else if (ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoderModern")) {
                     //Some other packetevents instance already injected. Let us find our child decoder somewhere in here.
                     ReflectionObject reflectInjectedDecoder = new ReflectionObject(injectedDecoder);
                     List<Object> decoders = reflectInjectedDecoder.readList(0);
@@ -260,8 +259,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                             return (PacketDecoderModern) customDecoder;
                         }
                     }
-                }
-                else {
+                } else {
                     //We honestly have no idea
                     return null;
                 }
@@ -275,14 +273,12 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         ChannelHandler encoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
         if (encoder instanceof PacketEncoderModern) {
             return (PacketEncoderModern) encoder;
-        }
-        else {
+        } else {
             ReflectionObject reflectEncoder = new ReflectionObject(encoder);
             MessageToByteEncoder<?> wrappedSuperEncoder = reflectEncoder.read(0, MessageToByteEncoder.class);
             if (wrappedSuperEncoder instanceof PacketEncoderModern) {
                 return (PacketEncoderModern) wrappedSuperEncoder;
-            }
-            else {
+            } else {
                 List<MessageToByteEncoder<?>> encoders = reflectEncoder.readList(0);
                 for (MessageToByteEncoder<?> customEncoder : encoders) {
                     if (customEncoder instanceof PacketEncoderModern) {

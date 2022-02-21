@@ -126,15 +126,13 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         //Player channels might have been registered already. Let us add our handlers. We are a little late though.
         //This only happens when you join extremely early on older versions of minecraft.
         List<Object> networkManagers = SpigotReflectionUtil.getNetworkManagers();
-        synchronized (networkManagers) {
-            for (Object networkManager : networkManagers) {
-                ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
-                Channel channel = networkManagerWrapper.readObject(0, Channel.class);
-                if (channel == null) {
-                    continue;
-                }
-                ServerConnectionInitializerLegacy.postInitChannel(channel, ConnectionState.PLAY);
+        for (Object networkManager : networkManagers) {
+            ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
+            Channel channel = networkManagerWrapper.readObject(0, Channel.class);
+            if (channel == null) {
+                continue;
             }
+            ServerConnectionInitializerLegacy.postInitChannel(channel, ConnectionState.PLAY);
         }
     }
 
@@ -152,14 +150,12 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         }
 
         List<Object> networkManagers = SpigotReflectionUtil.getNetworkManagers();
-        synchronized (networkManagers) {
-            for (Object networkManager : networkManagers) {
-                ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
-                Channel channel = networkManagerWrapper.readObject(0, Channel.class);
-                if (channel.isOpen()) {
-                    if (channel.localAddress().equals(future.channel().localAddress())) {
-                        channel.close();
-                    }
+        for (Object networkManager : networkManagers) {
+            ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
+            Channel channel = networkManagerWrapper.readObject(0, Channel.class);
+            if (channel.isOpen()) {
+                if (channel.localAddress().equals(future.channel().localAddress())) {
+                    channel.close();
                 }
             }
         }
