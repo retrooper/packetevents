@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.IdentityHashMap;
@@ -100,10 +101,6 @@ public enum ClientVersion {
      */
     ANY_PRE_RELEASE_VERSION(0, true),
 
-    TEMP_UNRESOLVED(-1, true),
-
-    UNRESOLVED(-1, true),
-
     UNKNOWN(-1, true);
 
     private static final ClientVersion[] REVERSED_VALUES;
@@ -126,7 +123,7 @@ public enum ClientVersion {
     private static final Map<Integer, ClientVersion> CLIENT_VERSION_CACHE = new IdentityHashMap<>();
     private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
             340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754, 755, 756, 757};
-    private int protocolVersion;
+    private final int protocolVersion;
     private final String name;
 
     ClientVersion(int protocolVersion) {
@@ -138,8 +135,7 @@ public enum ClientVersion {
         this.protocolVersion = protocolVersion;
         if (isNotRelease) {
             this.name = name();
-        }
-        else {
+        } else {
             this.name = name().substring(2).replace("_", ".");
         }
     }
@@ -148,6 +144,7 @@ public enum ClientVersion {
     /**
      * Get the release name of this client version.
      * For example, for the V_1_18 enum constant, it would return "1.18".
+     *
      * @return Release name
      */
     public String getReleaseName() {
@@ -166,28 +163,25 @@ public enum ClientVersion {
      */
     @NotNull
     public static ClientVersion getById(int protocolVersion) {
-        if (protocolVersion == -1) {
-            return ClientVersion.UNRESOLVED;
-        } else if (protocolVersion < LOWEST_SUPPORTED_PROTOCOL_VERSION) {
+        if (protocolVersion < LOWEST_SUPPORTED_PROTOCOL_VERSION) {
             return LOWER_THAN_SUPPORTED_VERSIONS;
         } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
         } else {
             ClientVersion cached = CLIENT_VERSION_CACHE.get(protocolVersion);
-            if (cached == null) {
-                for (ClientVersion version : values()) {
-                    if (version.protocolVersion > protocolVersion) {
-                        break;
-                    } else if (version.protocolVersion == protocolVersion) {
-                        //Cache for next time
-                        CLIENT_VERSION_CACHE.put(protocolVersion, version);
-                        return version;
-                    }
-                }
-                cached = UNKNOWN;
-                cached.protocolVersion = protocolVersion;
+            if (cached != null) {
+                return cached;
             }
-            return cached;
+            for (ClientVersion version : values()) {
+                if (version.protocolVersion > protocolVersion) {
+                    break;
+                } else if (version.protocolVersion == protocolVersion) {
+                    //Cache for next time
+                    CLIENT_VERSION_CACHE.put(protocolVersion, version);
+                    return version;
+                }
+            }
+            return UNKNOWN;
         }
     }
 
@@ -217,8 +211,7 @@ public enum ClientVersion {
      * @return Is this client version newer than the compared client version.
      */
     public boolean isNewerThan(ClientVersion target) {
-        return protocolVersion > target.protocolVersion &&
-                (target != UNRESOLVED && this != UNRESOLVED && target != TEMP_UNRESOLVED && this != TEMP_UNRESOLVED);
+        return protocolVersion > target.protocolVersion;
     }
 
     /**
@@ -242,8 +235,7 @@ public enum ClientVersion {
      * @return Is this client version older than the compared client version.
      */
     public boolean isOlderThan(ClientVersion target) {
-        return protocolVersion < target.protocolVersion &&
-                (target != UNRESOLVED && this != UNRESOLVED && target != TEMP_UNRESOLVED && this != TEMP_UNRESOLVED);
+        return protocolVersion < target.protocolVersion;
     }
 
     /**
@@ -271,15 +263,5 @@ public enum ClientVersion {
             return Arrays.binarySearch(CLIENT_VERSIONS, protocolVersion) < 0;
         }
         return true;
-    }
-
-    /**
-     * Is this client version resolved?
-     * This method checks if the version is not equal to TEMP_UNRESOLVED or UNRESOLVED.
-     *
-     * @return Is resolved
-     */
-    public boolean isResolved() {
-        return this != TEMP_UNRESOLVED && this != UNRESOLVED;
     }
 }

@@ -22,6 +22,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import protocolsupport.api.ProtocolSupportAPI;
 
+import java.net.SocketAddress;
+
 public class ProtocolSupportUtil {
     private static byte available = -1;
 
@@ -31,6 +33,10 @@ public class ProtocolSupportUtil {
             available = (byte) (present ? 1 : 0);
         }
         return available == 1;
+    }
+
+    public static int getProtocolVersion(SocketAddress address) {
+        return ProtocolSupportAPI.getProtocolVersion(address).getId();
     }
 
     public static int getProtocolVersion(Player player) {

@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.processor;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.handlers.SpigotChannelInjector;
 import org.bukkit.entity.Player;
@@ -37,6 +38,10 @@ public class InternalBukkitListener implements Listener {
         SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
         //By accessing user with the player object, we ensure that a valid user is cached.
         User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+        //By accessing the client version with the player object, we should ensure the client version is valid.
+        //TODO With Via we might have to run this a tick AFTER join event (atleast when via & viabackwards & rewind are present)
+        //TODO Confirm this.
+        ClientVersion version = PacketEvents.getAPI().getPlayerManager().getClientVersion(player);
 
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
         if (!injector.hasInjected(e.getPlayer())) {

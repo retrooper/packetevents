@@ -30,6 +30,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCh
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.List;
 
 public class User {
@@ -52,6 +54,10 @@ public class User {
 
     public Object getChannel() {
         return channel;
+    }
+
+    public InetSocketAddress getAddress() {
+        return (InetSocketAddress) ChannelHelper.remoteAddress(channel);
     }
 
     public ConnectionState getConnectionState() {
@@ -97,6 +103,7 @@ public class User {
     }
 
     //TODO Support colors
+    @Deprecated
     public void sendMessage(String message) {
         Component component = Component.text(message);
         sendMessage(component);

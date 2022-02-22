@@ -55,21 +55,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.user = user;
         this.player = player;
 
-        if (user.getClientVersion() == null || !user.getClientVersion().isResolved()) {
-            ClientVersion version = null;
-            if (player != null) {
-                //Possibly ask a soft-dependency(for example, ViaVersion) for the client version.
-                version = PacketEvents.getAPI().getPlayerManager().getClientVersion(player);
-            }
-            if (version == null) {
-                version = ClientVersion.UNKNOWN;
-            }
-
-            PacketEvents.getAPI().getLogManager().debug("Client version is null or invalid, setting to " + version.getReleaseName());
-            user.setClientVersion(version);
-        }
-
-
         this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
 
         this.byteBuf = byteBuf;

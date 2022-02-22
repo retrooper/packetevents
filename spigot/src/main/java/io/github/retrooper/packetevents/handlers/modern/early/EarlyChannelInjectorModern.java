@@ -293,11 +293,23 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     @Override
     public void updatePlayerObject(Object ch, Object player, @Nullable ConnectionState newConnectionState) {
         Channel channel = (Channel) ch;
+
+        PacketEncoderModern encoder = getEncoder(ch);
+        if (encoder != null) {
+            encoder.player = (Player) player;
+            if (newConnectionState != null) {
+                encoder.user.setConnectionState(newConnectionState);
+            }
+        }
+
         PacketDecoderModern decoder = getDecoder(ch);
         if (decoder != null) {
             decoder.player = (Player) player;
             decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
             decoder.user.getProfile().setName(((Player) player).getName());
+            if (newConnectionState != null) {
+                decoder.user.setConnectionState(newConnectionState);
+            }
             if (newConnectionState == ConnectionState.PLAY) {
                 if (ViaVersionUtil.isAvailable()) {
                     ChannelHandler handler = channel.pipeline().get(PacketEvents.DECODER_NAME);
@@ -310,14 +322,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, new PacketDecoderModern(decoder));
                 }
             }
-            if (newConnectionState != null) {
-                decoder.user.setConnectionState(newConnectionState);
-            }
-        }
-
-        PacketEncoderModern encoder = getEncoder(ch);
-        if (encoder != null) {
-            encoder.player = (Player) player;
         }
     }
 

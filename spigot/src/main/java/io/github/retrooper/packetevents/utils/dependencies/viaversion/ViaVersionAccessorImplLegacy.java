@@ -30,8 +30,6 @@ import java.lang.reflect.Method;
 
 public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     private Class<?> viaClass;
-    private Class<?> viaManagerClass;
-    private Class<?> protocolInfoClass;
     private Class<?> bukkitDecodeHandlerClass;
     private Class<?> bukkitEncodeHandlerClass;
     private Class<?> cancelCodecExceptionClass;
@@ -56,10 +54,10 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
             try {
                 viaClass = Class.forName("us.myles.ViaVersion.api.Via");
 
-                viaManagerClass = Class.forName("us.myles.ViaVersion.ViaManager");
+                Class<?> viaManagerClass = Class.forName("us.myles.ViaVersion.ViaManager");
                 viaManagerField = viaClass.getDeclaredField("manager");
 
-                protocolInfoClass = Class.forName("us.myles.ViaVersion.protocols.base.ProtocolInfo");
+                Class<?> protocolInfoClass = Class.forName("us.myles.ViaVersion.protocols.base.ProtocolInfo");
 
                 protocolStateClass = (Class<? extends Enum<?>>) Class.forName("us.myles.ViaVersion.packets.State");
 

@@ -28,7 +28,8 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
-import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -45,41 +46,30 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public @NotNull ClientVersion getClientVersion(@NotNull Object player) {
-        Player p = (Player) player;
-        if (p.getAddress() == null) {
-            return ClientVersion.UNKNOWN;
-        }
-        Object channel = getChannel(p);
-        User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
-        if (user.getClientVersion() == null || !user.getClientVersion().isResolved()) {
-            //Failed to resolve.
-            //Asking ViaVersion or ProtocolSupport for the protocol version.
-            if (DependencyUtil.isProtocolTranslationDependencyAvailable()) {
-                try {
-                    ClientVersion version = ClientVersion.getById(DependencyUtil.getProtocolVersion(p));
-                    PacketEvents.getAPI().getLogManager().debug("Requested user version with protocol hacks. Set user version to " + version.getReleaseName());
-                    user.setClientVersion(version);
-                } catch (Exception ex) {
-                    //Try ask the dependency again the next time, for now it is temporarily unresolved...
-                    //Temporary unresolved means there is still hope, an exception was thrown on the dependency's end.
-                    return ClientVersion.TEMP_UNRESOLVED;
-                }
+    public @NotNull ClientVersion getClientVersion(@NotNull Object p) {
+        Player player = (Player) p;
+        User user = getUser(player);
+        if (user.getClientVersion() == null) {
+            int protocolVersion;
+            if (ProtocolSupportUtil.isAvailable()) {
+                protocolVersion = ProtocolSupportUtil.getProtocolVersion(user.getAddress());
+                PacketEvents.getAPI().getLogManager().debug("Requested ProtocolSupport for user " + user.getAddress().getHostName() + "'s protocol version. Protocol version: " + protocolVersion);
+            } else if (ViaVersionUtil.isAvailable()) {
+                protocolVersion = ViaVersionUtil.getProtocolVersion(player);
+                PacketEvents.getAPI().getLogManager().debug("Requested ViaVersion for " + player.getName() + "'s protocol version. Protocol version: " + protocolVersion);
+
             } else {
-                int protocolVersion;
-                //Luckily 1.7.10 provides a method for us to access a player's protocol version(because 1.7.10 servers support 1.8 clients too)
                 if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
-                    protocolVersion = SpigotVersionLookup_1_7.getProtocolVersion(p);
+                    protocolVersion = SpigotVersionLookup_1_7.getProtocolVersion(player);
+                    PacketEvents.getAPI().getLogManager().debug("Requested Spigot 1.7.10 for " + player.getName() + "'s protocol version. Protocol version: " + protocolVersion);
                 } else {
-                    //No dependency available, couldn't snatch the version from the packet AND server version is not 1.7.10
-                    //We are pretty safe to assume the version is the same as the server, as ViaVersion AND ProtocolSupport could not be found.
-                    //If you aren't using ViaVersion or ProtocolSupport, how are you supporting multiple protocol versions?
+                    //No protocol translation plugins available, the client must be the same version as the server.
                     protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
+                    PacketEvents.getAPI().getLogManager().debug("No protocol translation plugins are available. We will assume " + user.getAddress().getHostName() + "'s protocol version is the same as the server version's protocol version. Protocol version: " + protocolVersion);
                 }
-                ClientVersion version = ClientVersion.getById(protocolVersion);
-                PacketEvents.getAPI().getLogManager().debug("Requested user version. Setting to " + version.getReleaseName());
-                user.setClientVersion(version);
             }
+            ClientVersion version = ClientVersion.getById(protocolVersion);
+            user.setClientVersion(version);
         }
         return user.getClientVersion();
     }
