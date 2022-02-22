@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
@@ -32,15 +33,17 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import com.github.retrooper.packetevents.wrapper.play.client.*;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.utils.SpigotDataHelper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.nio.charset.StandardCharsets;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -90,14 +93,25 @@ public class PacketEventsPlugin extends JavaPlugin {
                         Vector3i bp = blockPlacement.getBlockPosition();
                         user.sendMessage("Face: " + face + ", bp: " + bp);
                         break;
+                    case PLUGIN_MESSAGE:
+                        WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
+                        String channel = pluginMessage.getChannelName();
+                        byte[] data = pluginMessage.getData();
+                        String brandData = new String(data, StandardCharsets.UTF_8);
+                        Component component = Component.text("The channel name: " + channel)
+                                .color(NamedTextColor.RED)
+                                .append(Component.text(" Data: " + brandData)
+                                        .color(NamedTextColor.GOLD));
+                        WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(component, ChatPosition.CHAT);
+                        user.writePacket(cm);
                 }
             }
 
             @Override
             public void onPacketPlaySend(PacketPlaySendEvent event) {
+                Player player = (Player) event.getPlayer();
                 if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
-                    if (event.getPlayer() instanceof Player) {
-                        Player player = (Player) event.getPlayer();
+                    if (player != null) {
                         player.sendMessage("Hii " + player.getName());
                         event.getUser().sendMessage("Hi pt TWOOO");
                     } else {
