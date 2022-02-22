@@ -174,7 +174,7 @@ public final class SpigotReflectionUtil {
         V_1_12_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_12);
         USE_MODERN_NETTY_PACKAGE = VERSION.isNewerThan(ServerVersion.V_1_7_10);
 
-        SpigotReflectionUtil.ENTITY_ID_CACHE = GuavaUtil.makeMap(SpigotReflectionUtil.VERSION);
+        SpigotReflectionUtil.ENTITY_ID_CACHE = GuavaUtil.makeMap(VERSION);
         try {
             //Check if the selected netty location is valid
             getNettyClass("channel.Channel");

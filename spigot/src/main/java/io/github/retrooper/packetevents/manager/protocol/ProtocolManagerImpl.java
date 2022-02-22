@@ -26,8 +26,6 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
-import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -101,6 +99,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void writePacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
+            //TODO Why can we not listen to our own written packets when protocollib is present
             Object encoder = ChannelHelper.getPipelineHandler(channel, PacketEvents.ENCODER_NAME);
             Object ctx = ChannelHelper.getPipelineContext(channel, PacketEvents.ENCODER_NAME);
             if (WRITE_MESSAGE_METHOD == null) {
