@@ -75,7 +75,6 @@ public class ServerConnectionInitializerModern {
 
     public static void postDestroyChannel(Object ch) {
         Channel channel = (Channel) ch;
-        //TODO Confirm this decoder part still works, as the encoder part works.
         ChannelHandler viaDecoder = channel.pipeline().get("decoder");
         if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitDecodeHandlerClass().equals(viaDecoder.getClass())) {
             ReflectionObject reflectViaDecoder = new ReflectionObject(viaDecoder);
@@ -125,7 +124,7 @@ public class ServerConnectionInitializerModern {
             PacketEncoderModern encoderModern = (PacketEncoderModern) encoder;
             ChannelHandler wrappedHandler = encoderModern.wrappedEncoder;
             //ViaVersion's encoder handler is not sharable, so we need to create a new instance with identical data.
-            if (ViaVersionUtil.getBukkitEncodeHandlerClass().equals(wrappedHandler.getClass())) {
+            if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitEncodeHandlerClass().equals(wrappedHandler.getClass())) {
                 ReflectionObject reflectViaEncoder = new ReflectionObject(wrappedHandler);
                 Object userConnection = reflectViaEncoder.readObject(0, ViaVersionUtil.getUserConnectionClass());
                 MessageToByteEncoder<?> viaMinecraftEncoder = reflectViaEncoder.readObject(0, MessageToByteEncoder.class);

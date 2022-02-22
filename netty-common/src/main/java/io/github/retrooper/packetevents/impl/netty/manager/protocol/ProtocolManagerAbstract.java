@@ -75,8 +75,9 @@ public abstract class ProtocolManagerAbstract implements ProtocolManager {
     public ClientVersion getClientVersion(Object channel) {
         User user = getUser(channel);
         ClientVersion version = user.getClientVersion();
-        if (version == null || !version.isResolved()) {
+        if (version == null) {
             //TODO Change to getPlatformVersion()
+            //Assume client version is same as the server version
             version = ClientVersion.getById(PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion());
         }
         return version;
