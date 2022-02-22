@@ -59,8 +59,8 @@ public final class SpigotReflectionUtil {
     public static Class<?> MINECRAFT_SERVER_CLASS, NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS,
             NMS_IMATERIAL_CLASS, NMS_ENTITY_CLASS, ENTITY_PLAYER_CLASS, BOUNDING_BOX_CLASS,
             ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS,
-            MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, WORLD_SERVER_CLASS, GAME_PROFILE_CLASS,
-            CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS,
+            MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, WORLD_SERVER_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
+            GAME_PROFILE_CLASS, CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS,
             LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS;
 
     //Netty classes
@@ -144,6 +144,7 @@ public final class SpigotReflectionUtil {
         NMS_ITEM_CLASS = getServerClass("world.item.Item", "Item");
         DEDICATED_SERVER_CLASS = getServerClass("server.dedicated.DedicatedServer", "DedicatedServer");
         WORLD_SERVER_CLASS = getServerClass("server.level.WorldServer", "WorldServer");
+        ENUM_PROTOCOL_DIRECTION_CLASS = getServerClass("network.protocol.EnumProtocolDirection", "EnumProtocolDirection");
         if (V_1_17_OR_HIGHER) {
             LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
             PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");

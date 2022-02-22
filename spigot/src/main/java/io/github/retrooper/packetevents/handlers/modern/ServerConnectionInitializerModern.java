@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -41,6 +42,7 @@ import java.util.NoSuchElementException;
 
 public class ServerConnectionInitializerModern {
     private static Constructor<?> BUKKIT_ENCODE_HANDLER_CONSTRUCTOR;
+    private static Constructor<?> VANILLA_ENCODE_HANDLER_CONSTRUCTOR;
 
     //TODO Only inject Epoll & NioSocketChannels(check v1.8 packetevents)
     public static void postInitChannel(Object ch, ConnectionState connectionState) {
@@ -143,7 +145,27 @@ public class ServerConnectionInitializerModern {
                     e.printStackTrace();
                 }
             }
-            //Unwrap the encoder our encoder wrapped. Act like nothing happened :)
+            //Likely vanilla's encoder handler. It is unfortunately also not sharable. Create a new identical instance.
+            else if (ClassUtil.getClassSimpleName(wrappedHandler.getClass()).equals("PacketEncoder")) {
+                ReflectionObject reflectVanillaEncoder = new ReflectionObject(wrappedHandler);
+                Object nmsProtocolDirection = reflectVanillaEncoder.readObject(0, SpigotReflectionUtil.ENUM_PROTOCOL_DIRECTION_CLASS);
+                if (VANILLA_ENCODE_HANDLER_CONSTRUCTOR == null) {
+                    try {
+                        VANILLA_ENCODE_HANDLER_CONSTRUCTOR = wrappedHandler.getClass()
+                                .getConstructor(nmsProtocolDirection.getClass());
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    wrappedHandler = (ChannelHandler) VANILLA_ENCODE_HANDLER_CONSTRUCTOR.newInstance(nmsProtocolDirection);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+            //Otherwise, assume the original encoder is sharable.
+
+            //Unwrap the original encoder. Just like nothing ever happened...
             channel.pipeline().replace(PacketEvents.ENCODER_NAME, PacketEvents.ENCODER_NAME, wrappedHandler);
         } else if (ClassUtil.getClassSimpleName(encoder.getClass()).equals("PacketEncoderModern")) {
             //Possibly another packetevents instance. Unwrapping (cleanup) will be their responsibility.
