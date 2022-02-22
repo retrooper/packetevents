@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
 	implementation 'com.github.retrooper.packetevents:netty-common:2.0-SNAPSHOT'
-	include('com.github.retrooper.packetevents:netty-impl:2.0-SNAPSHOT')
+	include('com.github.retrooper.packetevents:netty-common:2.0-SNAPSHOT')
 
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
