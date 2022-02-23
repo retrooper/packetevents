@@ -29,7 +29,7 @@ public class PreChannelInitializerModern_v1_8 extends ChannelInitializer<Channel
         channel.pipeline().addLast(new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel channel) {
-                ServerConnectionInitializerModern.postInitChannel(channel, ConnectionState.HANDSHAKING);
+                ServerConnectionInitializerModern.initChannel(channel, ConnectionState.HANDSHAKING);
             }
         });
     }

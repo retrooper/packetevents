@@ -133,11 +133,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         for (Object networkManager : networkManagers) {
             ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
             Channel channel = networkManagerWrapper.readObject(0, Channel.class);
-            //TODO Check for NioSocketChannel or EpollSocketChannel
             if (channel == null) {
                 continue;
             }
-            ServerConnectionInitializerModern.postInitChannel(channel, ConnectionState.PLAY);
+            ServerConnectionInitializerModern.initChannel(channel, ConnectionState.PLAY);
         }
     }
 
@@ -221,7 +220,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     @Override
     public void ejectPlayer(Object player) {
         Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        ServerConnectionInitializerModern.postDestroyChannel(channel);
+        ServerConnectionInitializerModern.destroyChannel(channel);
     }
 
     @Override

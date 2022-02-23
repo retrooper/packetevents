@@ -24,21 +24,22 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
-import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
 import net.minecraft.util.io.netty.channel.Channel;
+import net.minecraft.util.io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.util.NoSuchElementException;
 
 public class ServerConnectionInitializerLegacy {
     public static void postInitChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
+         if (!(channel instanceof NioSocketChannel)) {
+            return;
+        }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
         ProtocolManager.USERS.put(channel, user);
         try {
             channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLegacy(user));
-        }
-        catch (NoSuchElementException ex) {
+        } catch (NoSuchElementException ex) {
             String handlers = ChannelHelper.pipelineHandlerNamesAsString(channel);
             throw new IllegalStateException("PacketEvents failed to add a decoder to the netty pipeline. Pipeline handlers: " + handlers, ex);
         }
@@ -48,6 +49,9 @@ public class ServerConnectionInitializerLegacy {
 
     public static void postDestroyChannel(Object ch) {
         Channel channel = (Channel) ch;
+        if (!(channel instanceof NioSocketChannel)) {
+            return;
+        }
         channel.pipeline().remove(PacketEvents.DECODER_NAME);
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
     }

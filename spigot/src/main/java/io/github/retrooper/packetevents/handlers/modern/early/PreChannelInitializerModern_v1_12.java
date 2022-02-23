@@ -32,7 +32,7 @@ public class PreChannelInitializerModern_v1_12 extends ChannelInboundHandlerAdap
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) {
         try {
-            ServerConnectionInitializerModern.postInitChannel(ctx.channel(), ConnectionState.HANDSHAKING);
+            ServerConnectionInitializerModern.initChannel(ctx.channel(), ConnectionState.HANDSHAKING);
         } catch (Throwable t) {
             exceptionCaught(ctx, t);
         } finally {

@@ -60,7 +60,7 @@ public class LateChannelInjectorModern implements LateInjector {
         if (connectionState == null) {
             connectionState = ConnectionState.PLAY;
         }
-        ServerConnectionInitializerModern.postInitChannel(channel, connectionState);
+        ServerConnectionInitializerModern.initChannel(channel, connectionState);
         PacketDecoderModern decoder = getDecoder(channel);
         if (decoder != null) {
             decoder.user.getProfile().setName(((Player) player).getName());
@@ -93,7 +93,7 @@ public class LateChannelInjectorModern implements LateInjector {
     public void ejectPlayer(Object player) {
         Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         try {
-            ServerConnectionInitializerModern.postDestroyChannel(channel);
+            ServerConnectionInitializerModern.destroyChannel(channel);
         } catch (Exception ignored) {
         }
     }

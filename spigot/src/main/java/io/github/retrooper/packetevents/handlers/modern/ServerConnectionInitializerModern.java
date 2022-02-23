@@ -30,6 +30,8 @@ import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.epoll.EpollSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
@@ -44,9 +46,12 @@ public class ServerConnectionInitializerModern {
     private static Constructor<?> BUKKIT_ENCODE_HANDLER_CONSTRUCTOR;
     private static Constructor<?> VANILLA_ENCODE_HANDLER_CONSTRUCTOR;
 
-    //TODO Only inject Epoll & NioSocketChannels(check v1.8 packetevents)
-    public static void postInitChannel(Object ch, ConnectionState connectionState) {
+    public static void initChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
+        if (!(channel instanceof EpollSocketChannel) &&
+                !(channel instanceof NioSocketChannel)) {
+            return;
+        }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
         ProtocolManager.USERS.put(channel, user);
         try {
@@ -75,8 +80,12 @@ public class ServerConnectionInitializerModern {
         channel.pipeline().replace(PacketEvents.ENCODER_NAME, PacketEvents.ENCODER_NAME, encoder);
     }
 
-    public static void postDestroyChannel(Object ch) {
+    public static void destroyChannel(Object ch) {
         Channel channel = (Channel) ch;
+        if (!(channel instanceof EpollSocketChannel) &&
+                !(channel instanceof NioSocketChannel)) {
+            return;
+        }
         ChannelHandler viaDecoder = channel.pipeline().get("decoder");
         if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitDecodeHandlerClass().equals(viaDecoder.getClass())) {
             ReflectionObject reflectViaDecoder = new ReflectionObject(viaDecoder);
