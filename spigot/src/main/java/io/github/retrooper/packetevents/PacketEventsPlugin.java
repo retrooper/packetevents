@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
@@ -98,6 +99,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         String channel = pluginMessage.getChannelName();
                         byte[] data = pluginMessage.getData();
                         String brandData = new String(data, StandardCharsets.UTF_8);
+                        System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                         Component component = Component.text("The channel name: " + channel)
                                 .color(NamedTextColor.RED)
                                 .append(Component.text(" Data: " + brandData)
@@ -118,10 +120,14 @@ public class PacketEventsPlugin extends JavaPlugin {
                         event.getUser().sendMessage("player null, but hi dude!!!");
                     }
                 }
+                else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                    WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
+                    System.out.println("Sent " + chatMessage.getChatComponentJson());
+                }
             }
         };
         //net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles w1;
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override

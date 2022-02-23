@@ -100,8 +100,10 @@ public class InternalPacketListener implements PacketListener {
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
             User user = event.getUser();
+            Object channel = event.getChannel();
             InetSocketAddress address = event.getSocketAddress();
             WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
+            ConnectionState nextState = handshake.getNextConnectionState();
             ClientVersion clientVersion = handshake.getClientVersion();
 
             //Update client version for this event call(and user)
@@ -109,8 +111,8 @@ public class InternalPacketListener implements PacketListener {
             PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());
             event.getPostTasks().add(() -> {
                 //Transition into the LOGIN OR STATUS connection state
-                user.setConnectionState(handshake.getNextConnectionState());
-                PacketEvents.getAPI().getLogManager().debug("Transitioned " + address.getHostString() + ":" + address.getPort() + " into the " + handshake.getNextConnectionState() + " state!");
+                PacketEvents.getAPI().getInjector().changeConnectionState(channel, nextState);
+                PacketEvents.getAPI().getLogManager().debug("Transitioned " + address.getHostString() + ":" + address.getPort() + " into the " + nextState + " state!");
             });
         }
     }

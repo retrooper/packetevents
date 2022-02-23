@@ -355,6 +355,12 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     @Override
     public void changeConnectionState(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
+        PacketEncoderModern encoder = getEncoder(ch);
+        if (encoder != null) {
+            //Change connection state in encoder
+            encoder.user.setConnectionState(connectionState);
+        }
+
         PacketDecoderModern decoder = getDecoder(ch);
         if (decoder != null) {
             //Change connection state in decoder
