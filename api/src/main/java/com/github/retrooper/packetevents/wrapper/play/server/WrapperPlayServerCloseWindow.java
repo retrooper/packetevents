@@ -11,13 +11,13 @@ public class WrapperPlayServerCloseWindow extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    public WrapperPlayServerCloseWindow(byte id) {
+    public WrapperPlayServerCloseWindow(int id) {
         super(PacketType.Play.Server.CLOSE_WINDOW);
         this.windowId = id;
     }
 
     public WrapperPlayServerCloseWindow() {
-        this((byte)0);
+        this(0);
     }
 
     @Override

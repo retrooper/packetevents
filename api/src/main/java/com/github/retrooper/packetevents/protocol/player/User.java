@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,6 +101,11 @@ public class User {
         //Fake an incoming chat packet
         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(message);
         PacketEvents.getAPI().getProtocolManager().receivePacket(channel, chatMessage);
+    }
+
+    public void closeInventory() {
+        WrapperPlayServerCloseWindow closeWindow = new WrapperPlayServerCloseWindow(0);
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, closeWindow);
     }
 
     public void sendMessage(String legacyMessage) {

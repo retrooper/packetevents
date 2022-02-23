@@ -109,15 +109,7 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
             }
 
             if (wrappedEncoder != vanillaEncoder) {
-                try {
-                    CustomPipelineUtil.callEncode(wrappedEncoder, ctx, transformed, out);
-                }
-                catch (Exception ex) {
-                    //ViaVersion wants to cancel this packet.
-                    if (ViaVersionUtil.getCancelCodecExceptionClass().isInstance(ex)) {
-                        out.clear();
-                    }
-                }
+                CustomPipelineUtil.callEncode(wrappedEncoder, ctx, transformed, out);
             } else {
                 out.writeBytes(transformed);
             }
@@ -129,6 +121,10 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (ViaVersionUtil.isAvailable()
+                && ExceptionUtil.isException(cause, ViaVersionUtil.getCancelCodecExceptionClass())) {
+            return;
+        }
         //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
         super.exceptionCaught(ctx, cause);
         //}
