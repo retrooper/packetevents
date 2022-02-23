@@ -9,6 +9,10 @@ version = '2.0.0'
 
 repositories {
     mavenCentral()
+    maven {
+        name = "sonatype-oss-snapshots"
+        url = "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
 }
 
 shadowJar {
@@ -20,10 +24,10 @@ shadowJar {
 
 dependencies {
     compileOnly 'org.jetbrains:annotations:22.0.0'
-    api 'net.kyori:adventure-api:4.9.3'
-    api 'net.kyori:adventure-text-serializer-gson:4.9.3'
-    api 'net.kyori:adventure-text-serializer-legacy:4.9.3'
-    api 'com.google.code.gson:gson:2.8.9'
+    api 'net.kyori:adventure-api:4.10.0-SNAPSHOT'
+    api 'net.kyori:adventure-text-serializer-gson:4.10.0-SNAPSHOT'
+    api 'net.kyori:adventure-text-serializer-legacy:4.10.0-SNAPSHOT'
+    api 'com.google.code.gson:gson:2.9.0'
 }
 
 publishing {
