@@ -37,6 +37,7 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowConfirmation;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.utils.SpigotDataHelper;
 import net.kyori.adventure.text.Component;
@@ -107,6 +108,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                                         .color(NamedTextColor.GOLD));
                         WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(component, ChatPosition.CHAT);
                         user.writePacket(cm);
+                        WrapperPlayServerWindowConfirmation transaction = new WrapperPlayServerWindowConfirmation(0, (short)10000, false);
+                        user.writePacket(transaction);
                 }
             }
 

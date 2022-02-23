@@ -38,7 +38,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientWi
  * @see WrapperPlayClientWindowConfirmation
  */
 public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPlayServerWindowConfirmation> {
-    byte windowId;
+    int windowId;
     short actionId;
     boolean accepted;
 
@@ -54,7 +54,7 @@ public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPl
      *                 Using non-positive numbers is recommended to avoid conflicting with vanilla transactions
      * @param accepted Whether the action was accepted. Use false to get a response from the client.
      */
-    public WrapperPlayServerWindowConfirmation(byte windowId, short actionId, boolean accepted) {
+    public WrapperPlayServerWindowConfirmation(int windowId, short actionId, boolean accepted) {
         super(PacketType.Play.Server.WINDOW_CONFIRMATION);
         this.windowId = windowId;
         this.actionId = actionId;
@@ -82,11 +82,11 @@ public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPl
         this.accepted = wrapper.isAccepted();
     }
 
-    public byte getWindowId() {
+    public int getWindowId() {
         return windowId;
     }
 
-    public void setWindowId(byte windowID) {
+    public void setWindowId(int windowID) {
         this.windowId = windowID;
     }
 

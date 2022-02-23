@@ -35,6 +35,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,12 +123,10 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (ViaVersionUtil.isAvailable()
-                && ExceptionUtil.isException(cause, ViaVersionUtil.getCancelCodecExceptionClass())) {
-            return;
+                && ExceptionUtil.isException(cause, InvocationTargetException.class)) {
+          return;
         }
-        //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
         super.exceptionCaught(ctx, cause);
-        //}
         //Check if the minecraft server will already print our exception for us.
         if (ExceptionUtil.isException(cause, PacketProcessException.class)
                 && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
