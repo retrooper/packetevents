@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -108,7 +109,15 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
             }
 
             if (wrappedEncoder != vanillaEncoder) {
-                CustomPipelineUtil.callEncode(wrappedEncoder, ctx, transformed, out);
+                try {
+                    CustomPipelineUtil.callEncode(wrappedEncoder, ctx, transformed, out);
+                }
+                catch (Exception ex) {
+                    //ViaVersion wants to cancel this packet.
+                    if (ViaVersionUtil.getCancelCodecExceptionClass().isInstance(ex)) {
+                        out.clear();
+                    }
+                }
             } else {
                 out.writeBytes(transformed);
             }
