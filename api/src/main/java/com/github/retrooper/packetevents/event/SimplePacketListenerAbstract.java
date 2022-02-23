@@ -45,41 +45,32 @@ public abstract class SimplePacketListenerAbstract extends PacketListenerCommon 
         super();
     }
 
-    //TODO Rename PacketListenerAbstract not accessible, make its onPacketReceive and send private and make a packetlistenerabstract that implements them making them public,
-
-
     @Override
     void onPacketReceive(PacketReceiveEvent event) {
-        switch (event.getConnectionState()) {
-            case HANDSHAKING:
-                onPacketHandshakeReceive((PacketHandshakeReceiveEvent) event);
-                break;
-            case STATUS:
-                onPacketStatusReceive((PacketStatusReceiveEvent) event);
-                break;
-            case LOGIN:
-                onPacketLoginReceive((PacketLoginReceiveEvent) event);
-                break;
-            case PLAY:
-                onPacketPlayReceive((PacketPlayReceiveEvent) event);
-                break;
+        if (event instanceof PacketHandshakeReceiveEvent) {
+            onPacketHandshakeReceive((PacketHandshakeReceiveEvent) event);
+        }
+        else if (event instanceof PacketStatusReceiveEvent) {
+            onPacketStatusReceive((PacketStatusReceiveEvent) event);
+        }
+        else if (event instanceof PacketLoginReceiveEvent) {
+            onPacketLoginReceive((PacketLoginReceiveEvent) event);
+        }
+        else if (event instanceof PacketPlayReceiveEvent) {
+            onPacketPlayReceive((PacketPlayReceiveEvent) event);
         }
     }
 
     @Override
     void onPacketSend(PacketSendEvent event) {
-        switch (event.getConnectionState()) {
-            case HANDSHAKING:
-                break;
-            case STATUS:
-                onPacketStatusSend((PacketStatusSendEvent) event);
-                break;
-            case LOGIN:
-                onPacketLoginSend((PacketLoginSendEvent) event);
-                break;
-            case PLAY:
-                onPacketPlaySend((PacketPlaySendEvent) event);
-                break;
+        if (event instanceof PacketStatusSendEvent) {
+            onPacketStatusSend((PacketStatusSendEvent) event);
+        }
+        else if (event instanceof PacketLoginSendEvent) {
+            onPacketLoginSend((PacketLoginSendEvent) event);
+        }
+        else if (event instanceof PacketPlaySendEvent) {
+            onPacketPlaySend((PacketPlaySendEvent) event);
         }
     }
 

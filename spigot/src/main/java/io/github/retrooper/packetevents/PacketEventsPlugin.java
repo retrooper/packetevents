@@ -41,6 +41,7 @@ import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import io.github.retrooper.packetevents.utils.SpigotDataHelper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -92,7 +93,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         WrapperPlayClientPlayerBlockPlacement blockPlacement = new WrapperPlayClientPlayerBlockPlacement(event);
                         BlockFace face = blockPlacement.getFace();
                         Vector3i bp = blockPlacement.getBlockPosition();
-                        user.sendMessage("Face: " + face + ", bp: " + bp);
+                        user.sendMessage(ChatColor.GOLD + "Face: " + face + ", bp: " + bp);
                         break;
                     case PLUGIN_MESSAGE:
                         WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
@@ -115,9 +116,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                 if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
                     if (player != null) {
                         player.sendMessage("Hii " + player.getName());
-                        event.getUser().sendMessage("Hi pt TWOOO");
+                        event.getUser().sendMessage(ChatColor.GREEN + "Hi pt TWOOO");
                     } else {
-                        event.getUser().sendMessage("player null, but hi dude!!!");
+                        event.getUser().sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
                 }
                 else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {

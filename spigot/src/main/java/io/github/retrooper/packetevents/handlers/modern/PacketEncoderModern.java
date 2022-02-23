@@ -80,38 +80,41 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf out) throws Exception {
-        if (!(o instanceof ByteBuf)) {
-            //Convert NMS object to bytes, so we can process it right away.
-            if (vanillaEncoder == null) return;
-            CustomPipelineUtil.callEncode(vanillaEncoder, ctx, o, out);
-        } else {
-            ByteBuf in = (ByteBuf) o;
-            if (in.readableBytes() == 0) return;
-            out.writeBytes(in);
-        }
-        read(ctx, out);
-        //Our packetevents unfortunately cancelled this packet, so we won't pass it on.
-        if (!out.isReadable()) {
-            return;
-        }
-        ByteBuf input = ctx.alloc().buffer().writeBytes(out);
-        out.clear();
-        for (MessageToByteEncoder<Object> encoder : encoders) {
-            CustomPipelineUtil.callEncode(encoder, ctx, input, out);
-            if (out.isReadable()) {
-                input.clear().writeBytes(out);
-                out.clear();
+        ByteBuf transformed = ctx.alloc().buffer();
+        try {
+            if (!(o instanceof ByteBuf)) {
+                //Convert NMS object to bytes, so we can process it right away.
+                if (vanillaEncoder == null) return;
+                CustomPipelineUtil.callEncode(vanillaEncoder, ctx, o, transformed);
+            } else {
+                ByteBuf in = (ByteBuf) o;
+                if (in.readableBytes() == 0) return;
+                transformed.writeBytes(in);
             }
-            else {
-                //This encoder decided to discard this packet.
-                break;
+            read(ctx, transformed);
+            //Our packetevents unfortunately cancelled this packet, so we won't pass it on.
+            if (!transformed.isReadable()) {
+                return;
             }
-        }
+            for (MessageToByteEncoder<Object> encoder : encoders) {
+                CustomPipelineUtil.callEncode(encoder, ctx, transformed, out);
+                if (out.isReadable()) {
+                    transformed.clear().writeBytes(out);
+                    out.clear();
+                } else {
+                    //This encoder decided to discard this packet.
+                    break;
+                }
+            }
 
-        if (wrappedEncoder != vanillaEncoder) {
-            CustomPipelineUtil.callEncode(wrappedEncoder, ctx, input, out);
-        } else {
-            out.writeBytes(input);
+            if (wrappedEncoder != vanillaEncoder) {
+                CustomPipelineUtil.callEncode(wrappedEncoder, ctx, transformed, out);
+            } else {
+                out.writeBytes(transformed);
+            }
+        } finally {
+            //Release to prevent memory leaks
+            transformed.release();
         }
     }
 
