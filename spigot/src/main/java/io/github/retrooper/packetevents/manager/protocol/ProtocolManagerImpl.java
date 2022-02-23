@@ -91,7 +91,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void sendPacketSilently(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            //Only call the encoders after ours in the pipeline
+            //Only call the encoders after ours in the pipeline.
+            //TODO Downside is Via won't process the packet either(yet)
             ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
         }
     }

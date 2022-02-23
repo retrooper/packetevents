@@ -90,12 +90,22 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
             out.writeBytes(in);
         }
         read(ctx, out);
+        //Our packetevents unfortunately cancelled this packet, so we won't pass it on.
+        if (!out.isReadable()) {
+            return;
+        }
         ByteBuf input = ctx.alloc().buffer().writeBytes(out);
         out.clear();
         for (MessageToByteEncoder<Object> encoder : encoders) {
             CustomPipelineUtil.callEncode(encoder, ctx, input, out);
-            input.clear().writeBytes(out);
-            out.clear();
+            if (out.isReadable()) {
+                input.clear().writeBytes(out);
+                out.clear();
+            }
+            else {
+                //This encoder decided to discard this packet.
+                break;
+            }
         }
 
         if (wrappedEncoder != vanillaEncoder) {

@@ -122,7 +122,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
                 else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
-                    System.out.println("Sent " + chatMessage.getChatComponentJson());
+                    event.setCancelled(true);
+                    WrapperPlayServerChatMessage clone = new WrapperPlayServerChatMessage((Component) null, null);
+                    clone.readData(chatMessage);
+                    PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), clone);
+                    System.out.println("Delayed " + chatMessage.getChatComponentJson());
                 }
             }
         };
