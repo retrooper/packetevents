@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
@@ -31,7 +32,6 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.List;
 
 public class User {
@@ -102,10 +102,8 @@ public class User {
         PacketEvents.getAPI().getProtocolManager().receivePacket(channel, chatMessage);
     }
 
-    //TODO Support colors
-    @Deprecated
-    public void sendMessage(String message) {
-        Component component = Component.text(message);
+    public void sendMessage(String legacyMessage) {
+        Component component = AdventureSerializer.asAdventure(legacyMessage);
         sendMessage(component);
     }
 
