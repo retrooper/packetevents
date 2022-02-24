@@ -163,6 +163,10 @@ public class ByteBufHelper {
         return PacketEvents.getAPI().getNettyManager().getByteBufOperator().retain(buffer);
     }
 
+    public static Object retainedDuplicate(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().retainedDuplicate(buffer);
+    }
+
     public static Object readSlice(Object buffer, int length) {
         return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readSlice(buffer, length);
     }

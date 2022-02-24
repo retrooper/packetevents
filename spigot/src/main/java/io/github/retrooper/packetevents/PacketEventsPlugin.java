@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
@@ -60,12 +61,14 @@ public class PacketEventsPlugin extends JavaPlugin {
         //Register your listeners
         PacketEvents.getAPI().getSettings().debug(false).bStats(true);
         PacketEvents.getAPI().init();
-        SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract() {
+        SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH,
+                true, false) {
             @Override
             public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
                 User user = event.getUser();
                 switch (event.getPacketType()) {
                     case CHAT_MESSAGE:
+                        System.out.println("Running 10 seconds later");
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                         if (chatMessage.getMessage().equalsIgnoreCase("mrmcyeet")) {
                             Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
@@ -76,7 +79,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     = new WrapperPlayServerParticle(particle, true, position,
                                     new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
                             user.sendPacket(particlePacket);
-                            event.setCancelled(true);
                         }
                         break;
                     case PLAYER_FLYING:
@@ -108,8 +110,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                                         .color(NamedTextColor.GOLD));
                         WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(component, ChatPosition.CHAT);
                         user.writePacket(cm);
-                        WrapperPlayServerWindowConfirmation transaction = new WrapperPlayServerWindowConfirmation(0, (short)10000, false);
+                        WrapperPlayServerWindowConfirmation transaction = new WrapperPlayServerWindowConfirmation(0, (short) 10000, false);
                         user.writePacket(transaction);
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -124,14 +129,14 @@ public class PacketEventsPlugin extends JavaPlugin {
                         event.getUser().sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
                 }
-                else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
                     event.setCancelled(true);
                     WrapperPlayServerChatMessage clone = new WrapperPlayServerChatMessage((Component) null, null);
                     clone.readData(chatMessage);
                     PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), clone);
                     System.out.println("Delayed " + chatMessage.getChatComponentJson());
-                }
+                }*/
             }
         };
         //net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles w1;

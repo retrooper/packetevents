@@ -81,7 +81,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
         if (readData) {
-            if (event.isCloned()) {
+            if (event.isClone()) {
                 int bufferIndex = ByteBufHelper.readerIndex(getBuffer());
                 readData();
                 ByteBufHelper.readerIndex(getBuffer(), bufferIndex);
@@ -102,7 +102,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
         this.user = event.getUser();
-        if (event.isCloned()) {
+        if (event.isClone()) {
             int bufferIndex = ByteBufHelper.readerIndex(getBuffer());
             readData();
             ByteBufHelper.readerIndex(getBuffer(), bufferIndex);

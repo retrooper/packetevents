@@ -27,16 +27,16 @@ public abstract class PacketListenerAbstract extends PacketListenerCommon {
         super(priority);
     }
 
-    public PacketListenerAbstract(PacketListenerPriority priority, boolean readOnly) {
-        super(priority, readOnly);
+    public PacketListenerAbstract(PacketListenerPriority priority, boolean readOnly, boolean threadSafe) {
+        super(priority, readOnly, threadSafe);
     }
 
     public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
         super(priority, methods);
     }
 
-    public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly) {
-        super(priority, methods, readOnly);
+    public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly, boolean threadSafe) {
+        super(priority, methods, readOnly, threadSafe);
     }
 
     public PacketListenerAbstract() {

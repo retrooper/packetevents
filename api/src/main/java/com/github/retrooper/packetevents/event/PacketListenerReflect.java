@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public interface PacketListenerReflect {
-    default PacketListenerAbstract asAbstract(PacketListenerPriority priority, boolean readOnly) {
+    default PacketListenerAbstract asAbstract(PacketListenerPriority priority, boolean readOnly, boolean threadSafe) {
         Map<Byte, List<Method>> methods = new HashMap<>();
         for (byte i = 0; i < 6; i++) {
             methods.put(i, new ArrayList<>());
@@ -66,7 +66,7 @@ public interface PacketListenerReflect {
                 }
             }
         }
-        return new PacketListenerAbstract(priority, methods, readOnly) {
+        return new PacketListenerAbstract(priority, methods, readOnly, threadSafe) {
             private void callEventByIndex(byte index, PacketEvent event) {
                 if (methods != null) {
                     List<Method> targets = methods.get(index);

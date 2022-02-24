@@ -39,6 +39,7 @@ import java.util.List;
 
 public abstract class ProtocolPacketEvent<T> extends PacketEvent implements PlayerEvent<T>, CancellableEvent {
     private final Object channel;
+    private final ConnectionState connectionState;
     private final User user;
     private final T player;
     private Object byteBuf;
@@ -48,6 +49,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private boolean cancel;
     private PacketWrapper<?> lastUsedWrapper;
     private List<Runnable> postTasks = null;
+    private boolean cloned;
 
     public ProtocolPacketEvent(PacketSide packetSide, Object channel,
                                User user, T player, Object byteBuf) throws PacketProcessException {
@@ -67,6 +69,8 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
                     packetSide, size, null);
         }
         this.packetType = PacketType.getById(packetSide, user.getConnectionState(), this.serverVersion, packetID);
+
+        this.connectionState = user.getConnectionState();
     }
 
     public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, Object channel,
@@ -78,6 +82,12 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.byteBuf = byteBuf;
         this.packetID = packetID;
         this.packetType = packetType;
+        this.connectionState = user.getConnectionState();
+        cloned = true;
+    }
+
+    public boolean isClone() {
+        return cloned;
     }
 
     public Object getChannel() {
@@ -99,7 +109,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     public ConnectionState getConnectionState() {
-        return user.getConnectionState();
+        return connectionState;
     }
 
     //TODO Possibly put clientversion inside User class and remove here
@@ -172,5 +182,17 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
 
     public boolean hasPostTasks() {
         return postTasks != null && !postTasks.isEmpty();
+    }
+
+    @Override
+    public ProtocolPacketEvent<?> clone() {
+        return this instanceof PacketReceiveEvent ? ((PacketReceiveEvent) this).clone()
+                : ((PacketSendEvent) this).clone();
+    }
+
+    public void cleanUp() {
+        if (isClone()) {
+            ByteBufHelper.release(byteBuf);
+        }
     }
 }

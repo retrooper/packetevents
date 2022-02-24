@@ -39,7 +39,7 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
                 event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION;
         rotationChanged = event.getPacketType() == PacketType.Play.Client.PLAYER_ROTATION ||
                 event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION;
-        if (event.isCloned()) {
+        if (event.isClone()) {
             int bufferIndex = ByteBufHelper.readerIndex(getBuffer());
             readData();
             ByteBufHelper.readerIndex(getBuffer(), bufferIndex);

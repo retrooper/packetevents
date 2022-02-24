@@ -145,6 +145,11 @@ public class ByteBufOperatorImpl implements ByteBufOperator {
     }
 
     @Override
+    public Object retainedDuplicate(Object buffer) {
+        return ((ByteBuf)buffer).retainedDuplicate();
+    }
+
+    @Override
     public Object readSlice(Object buffer, int length) {
         return ((ByteBuf)buffer).readSlice(length);
     }

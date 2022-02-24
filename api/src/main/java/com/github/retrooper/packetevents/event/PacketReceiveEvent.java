@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.event;
 
+import com.github.retrooper.packetevents.event.simple.*;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
@@ -26,40 +27,39 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
-    private boolean cloned;
-
     protected PacketReceiveEvent(Object channel, User user, Object player, Object rawByteBuf) throws PacketProcessException {
         super(PacketSide.CLIENT, channel, user, player, rawByteBuf);
     }
 
-    protected PacketReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
+    protected PacketReceiveEvent(int packetID, PacketTypeCommon packetType,
                                  ServerVersion serverVersion,
                                  Object channel, User user, Object player,
                                  Object byteBuf) throws PacketProcessException {
         super(packetID, packetType, serverVersion,
                 channel, user, player, byteBuf);
-        this.cloned = cloned;
-    }
-
-    public boolean isCloned() {
-        return cloned;
-    }
-
-    @Override
-    public PacketReceiveEvent clone() {
-        try {
-            return new PacketReceiveEvent(true, getPacketId(),
-                    getPacketType(), getServerVersion(),
-                    getChannel(),
-                    getUser(), getPlayer(), ByteBufHelper.duplicate(getByteBuf()));
-        } catch (PacketProcessException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Override
     public void call(PacketListenerCommon listener) {
         listener.onPacketReceive(this);
+    }
+
+    @Override
+    public PacketReceiveEvent clone() {
+        if (this instanceof PacketHandshakeReceiveEvent) {
+            return ((PacketHandshakeReceiveEvent)this).clone();
+        }
+        else if (this instanceof PacketStatusReceiveEvent) {
+            return ((PacketStatusReceiveEvent)this).clone();
+        }
+        else if (this instanceof PacketLoginReceiveEvent) {
+            return ((PacketLoginReceiveEvent)this).clone();
+        }
+        else if (this instanceof PacketPlayReceiveEvent) {
+            return ((PacketPlayReceiveEvent)this).clone();
+        }
+        else {
+            return null;
+        }
     }
 }

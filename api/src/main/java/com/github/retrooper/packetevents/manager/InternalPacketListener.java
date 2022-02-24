@@ -16,12 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.injector;
+package com.github.retrooper.packetevents.manager;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListener;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.*;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -38,7 +36,16 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRe
 
 import java.net.InetSocketAddress;
 
-public class InternalPacketListener implements PacketListener {
+public class InternalPacketListener extends PacketListenerAbstract {
+
+    public InternalPacketListener() {
+        this(PacketListenerPriority.LOWEST);
+    }
+
+    public InternalPacketListener(PacketListenerPriority priority) {
+        super(priority, true, false);
+    }
+
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {

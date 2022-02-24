@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,9 +55,14 @@ public class EventManager {
                         lastUsedWrapper = ((ProtocolPacketEvent<?>) event).getLastUsedWrapper();
                     }
                     try {
-                        event.call(listener);
-                    }
-                    catch (Throwable t) {
+                        if (isPacketEvent && listener.isThreadSafe()) {
+                            //Pass a "cloned" event to this listener.
+                            ((ProtocolPacketEvent<?>)event).clone().call(listener);
+                        }
+                        else {
+                            event.call(listener);
+                        }
+                    } catch (Throwable t) {
                         PacketEvents.getAPI().getLogger().log(Level.WARNING, "PacketEvents caught an unhandled exception while calling your listener.", t);
                     }
                     if (listener.isReadOnly() && isPacketEvent) {
@@ -70,13 +76,13 @@ public class EventManager {
         }
     }
 
-    public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly) {
-        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly);
+    public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly, boolean threadSafe) {
+        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly, threadSafe);
         return registerListener(packetListenerAbstract);
     }
 
-    public PacketListenerCommon registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly) {
-        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly);
+    public PacketListenerCommon registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly, boolean threadSafe) {
+        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly, threadSafe);
         return registerListener(packetListenerAbstract);
     }
 
