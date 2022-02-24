@@ -26,7 +26,9 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -82,7 +84,10 @@ public class ProtocolManagerImpl implements ProtocolManager {
             try {
                 CustomPipelineUtil.callEncode(encoder, ctx, inputBuffer, byteBuf);
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                // TODO: This is a hack until ProtocolLib + ViaVersion incompatibility is fixed
+                if (!ViaVersionUtil.isAvailable() || !ExceptionUtil.isException(e, InvocationTargetException.class)) {
+                    e.printStackTrace();
+                }
             }
             ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
         }
