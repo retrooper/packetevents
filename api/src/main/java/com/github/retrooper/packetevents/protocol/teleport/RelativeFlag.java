@@ -1,7 +1,5 @@
 package com.github.retrooper.packetevents.protocol.teleport;
 
-import com.github.retrooper.packetevents.protocol.player.SkinSection;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,7 +21,7 @@ public enum RelativeFlag {
     }
 
     public boolean isSet(byte mask) {
-        return (mask & (1 << bit)) != 0;
+        return (mask & bit) != 0;
     }
 
     public byte set(byte mask, boolean relative) {
