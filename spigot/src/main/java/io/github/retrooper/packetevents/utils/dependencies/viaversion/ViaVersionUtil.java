@@ -42,7 +42,7 @@ public class ViaVersionUtil {
 
     public static boolean isAvailable() {
         if (available == -1) {
-            boolean present = Bukkit.getPluginManager().getPlugin("ViaVersion") != null;
+            boolean present = Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
             available = (byte) (present ? 1 : 0);
         }
         return available == 1;
