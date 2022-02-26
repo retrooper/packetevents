@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
@@ -36,16 +37,12 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketEncoderModern extends MessageToByteEncoder<Object> {
     public User user;
     public volatile Player player;
-    public MessageToByteEncoder<?> wrappedEncoder;
     public MessageToByteEncoder<?> vanillaEncoder;
-    public List<MessageToByteEncoder<Object>> encoders = new ArrayList<>();
 
     public PacketEncoderModern(User user) {
         this.user = user;
@@ -82,49 +79,24 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf out) throws Exception {
-        ByteBuf transformed = ctx.alloc().buffer();
-        try {
-            if (!(o instanceof ByteBuf)) {
-                //Convert NMS object to bytes, so we can process it right away.
-                if (vanillaEncoder == null) return;
-                CustomPipelineUtil.callEncode(vanillaEncoder, ctx, o, transformed);
-            } else {
-                ByteBuf in = (ByteBuf) o;
-                if (in.readableBytes() == 0) return;
-                transformed.writeBytes(in);
-            }
-            read(ctx, transformed);
-            //Our packetevents unfortunately cancelled this packet, so we won't pass it on.
-            if (!transformed.isReadable()) {
-                return;
-            }
-            for (MessageToByteEncoder<Object> encoder : encoders) {
-                CustomPipelineUtil.callEncode(encoder, ctx, transformed, out);
-                if (out.isReadable()) {
-                    transformed.clear().writeBytes(out);
-                    out.clear();
-                } else {
-                    //This encoder decided to discard this packet.
-                    break;
-                }
-            }
-
-            if (wrappedEncoder != vanillaEncoder) {
-                CustomPipelineUtil.callEncode(wrappedEncoder, ctx, transformed, out);
-            } else {
-                out.writeBytes(transformed);
-            }
-        } finally {
-            //Release to prevent memory leaks
-            transformed.release();
+        System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
+        if (!(o instanceof ByteBuf)) {
+            //Convert NMS object to bytes, so we can process it right away.
+            if (vanillaEncoder == null) return;
+            CustomPipelineUtil.callEncode(vanillaEncoder, ctx, o, out);
+        } else {
+            ByteBuf in = (ByteBuf) o;
+            if (in.readableBytes() == 0) return;
+            out.writeBytes(in);
         }
+        read(ctx, out);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (ViaVersionUtil.isAvailable()
                 && ExceptionUtil.isException(cause, InvocationTargetException.class)) {
-          return;
+            return;
         }
         super.exceptionCaught(ctx, cause);
         //Check if the minecraft server will already print our exception for us.

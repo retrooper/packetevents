@@ -122,9 +122,6 @@ public class User {
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatMessage);
     }
 
-    //public void sendTitle(String title) {
-    //}
-
     //TODO sendTitle that is cross-version
 
     public int getMinWorldHeight() {

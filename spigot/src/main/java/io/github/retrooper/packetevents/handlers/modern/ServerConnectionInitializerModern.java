@@ -26,7 +26,6 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
-import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -37,7 +36,6 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -60,24 +58,19 @@ public class ServerConnectionInitializerModern {
             String handlers = ChannelHelper.pipelineHandlerNamesAsString(channel);
             throw new IllegalStateException("PacketEvents failed to add a decoder to the netty pipeline. Pipeline handlers: " + handlers, ex);
         }
+        String handlers = ChannelHelper.pipelineHandlerNamesAsString(channel);
+        System.out.println("pipe: " + handlers);
         PacketEncoderModern encoder = new PacketEncoderModern(user);
-        ChannelHandler vanillaEncoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
-        encoder.wrappedEncoder = (MessageToByteEncoder<?>) vanillaEncoder;
-        //TODO Test new encoder stuff on multiple packetevents instances, and add same code to legacy initializer
+        ChannelHandler vanillaEncoder = channel.pipeline().get("encoder");
         if (ViaVersionUtil.isAvailable()
                 && ViaVersionUtil.getBukkitEncodeHandlerClass().equals(vanillaEncoder.getClass())) {
             //Read the minecraft encoder stored in ViaVersion's encoder.
-            encoder.vanillaEncoder = new ReflectionObject(encoder.wrappedEncoder)
+            encoder.vanillaEncoder = new ReflectionObject(vanillaEncoder)
                     .read(0, MessageToByteEncoder.class);
-        } else if (ClassUtil.getClassSimpleName(encoder.wrappedEncoder.getClass()).equals("PacketEncoderModern")) {
-            ReflectionObject reflectEncoder = new ReflectionObject(encoder.wrappedEncoder);
-            List<MessageToByteEncoder<?>> encoders = reflectEncoder.readList(0);
-            encoders.add(encoder);
         } else {
-            encoder.vanillaEncoder = encoder.wrappedEncoder;
+            encoder.vanillaEncoder = (MessageToByteEncoder<?>) vanillaEncoder;
         }
-        //Replace "encoder" with "encoder"
-        channel.pipeline().replace(PacketEvents.ENCODER_NAME, PacketEvents.ENCODER_NAME, encoder);
+        channel.pipeline().addAfter("encoder", PacketEvents.ENCODER_NAME, encoder);
     }
 
     public static void destroyChannel(Object ch) {
@@ -128,59 +121,7 @@ public class ServerConnectionInitializerModern {
             channel.pipeline().remove(PacketEvents.DECODER_NAME);
         }
 
-
-        ChannelHandler encoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
-        //We are the father encoder.
-        if (encoder instanceof PacketEncoderModern) {
-            PacketEncoderModern encoderModern = (PacketEncoderModern) encoder;
-            ChannelHandler wrappedHandler = encoderModern.wrappedEncoder;
-            //ViaVersion's encoder handler is not sharable, so we need to create a new instance with identical data.
-            if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitEncodeHandlerClass().equals(wrappedHandler.getClass())) {
-                ReflectionObject reflectViaEncoder = new ReflectionObject(wrappedHandler);
-                Object userConnection = reflectViaEncoder.readObject(0, ViaVersionUtil.getUserConnectionClass());
-                MessageToByteEncoder<?> viaMinecraftEncoder = reflectViaEncoder.readObject(0, MessageToByteEncoder.class);
-                if (BUKKIT_ENCODE_HANDLER_CONSTRUCTOR == null) {
-                    try {
-                        BUKKIT_ENCODE_HANDLER_CONSTRUCTOR = wrappedHandler.getClass()
-                                .getConstructor(ViaVersionUtil.getUserConnectionClass(),
-                                        MessageToByteEncoder.class);
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    }
-                }
-                try {
-                    wrappedHandler = (ChannelHandler) BUKKIT_ENCODE_HANDLER_CONSTRUCTOR.newInstance(userConnection, viaMinecraftEncoder);
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            }
-            //Likely vanilla's encoder handler. It is unfortunately also not sharable. Create a new identical instance.
-            else if (ClassUtil.getClassSimpleName(wrappedHandler.getClass()).equals("PacketEncoder")) {
-                ReflectionObject reflectVanillaEncoder = new ReflectionObject(wrappedHandler);
-                Object nmsProtocolDirection = reflectVanillaEncoder.readObject(0, SpigotReflectionUtil.ENUM_PROTOCOL_DIRECTION_CLASS);
-                if (VANILLA_ENCODE_HANDLER_CONSTRUCTOR == null) {
-                    try {
-                        VANILLA_ENCODE_HANDLER_CONSTRUCTOR = wrappedHandler.getClass()
-                                .getConstructor(nmsProtocolDirection.getClass());
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    }
-                }
-                try {
-                    wrappedHandler = (ChannelHandler) VANILLA_ENCODE_HANDLER_CONSTRUCTOR.newInstance(nmsProtocolDirection);
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            }
-            //Otherwise, assume the original encoder is sharable.
-
-            //Unwrap the original encoder. Just like nothing ever happened...
-            channel.pipeline().replace(PacketEvents.ENCODER_NAME, PacketEvents.ENCODER_NAME, wrappedHandler);
-        } else if (ClassUtil.getClassSimpleName(encoder.getClass()).equals("PacketEncoderModern")) {
-            //Possibly another packetevents instance. Unwrapping (cleanup) will be their responsibility.
-            ReflectionObject reflectEncoder = new ReflectionObject(encoder);
-            List<Object> encoders = reflectEncoder.readList(0);
-            encoders.removeIf(e -> e instanceof PacketEncoderModern);
-        }
+        //Easily cleanup the encoder
+        channel.pipeline().remove(PacketEvents.ENCODER_NAME);
     }
 }

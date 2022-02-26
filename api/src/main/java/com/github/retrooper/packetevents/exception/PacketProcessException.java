@@ -70,7 +70,7 @@ public class PacketProcessException extends Exception {
 
     @Override
     public String getMessage() {
-        String message = "PacketEvents failed to process a" + (side != null ? side.name().toLowerCase() : "") + " packet.\n";
+        String message = "PacketEvents failed to process a " + (side != null ? side.name().toLowerCase() : "") + " packet.\n";
         switch (reason) {
             case PACKET_ID:
                 message += "The packet ID could not be found in the buffer.\n";
