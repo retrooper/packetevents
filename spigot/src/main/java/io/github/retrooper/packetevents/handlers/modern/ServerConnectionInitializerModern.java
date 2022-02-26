@@ -58,8 +58,6 @@ public class ServerConnectionInitializerModern {
             String handlers = ChannelHelper.pipelineHandlerNamesAsString(channel);
             throw new IllegalStateException("PacketEvents failed to add a decoder to the netty pipeline. Pipeline handlers: " + handlers, ex);
         }
-        String handlers = ChannelHelper.pipelineHandlerNamesAsString(channel);
-        System.out.println("pipe: " + handlers);
         PacketEncoderModern encoder = new PacketEncoderModern(user);
         ChannelHandler vanillaEncoder = channel.pipeline().get("encoder");
         if (ViaVersionUtil.isAvailable()
