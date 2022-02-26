@@ -79,7 +79,6 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf out) throws Exception {
-        System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
         if (!(o instanceof ByteBuf)) {
             //Convert NMS object to bytes, so we can process it right away.
             if (vanillaEncoder == null) return;
