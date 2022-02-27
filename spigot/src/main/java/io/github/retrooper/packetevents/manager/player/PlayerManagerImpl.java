@@ -26,11 +26,11 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
-import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
-import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
-import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
+import io.github.retrooper.packetevents.util.PlayerPingAccessorModern;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
+import io.github.retrooper.packetevents.util.SpigotVersionLookup_1_7;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -65,7 +65,7 @@ public class PlayerManagerImpl implements PlayerManager {
                 } else {
                     //No protocol translation plugins available, the client must be the same version as the server.
                     protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
-                    PacketEvents.getAPI().getLogManager().debug("No protocol translation plugins are available. We will assume " + user.getAddress().getHostName() + "'s protocol version is the same as the server version's protocol version. Protocol version: " + protocolVersion);
+                    PacketEvents.getAPI().getLogManager().debug("No protocol translation plugins are available. We will assume " + user.getAddress().getHostName() + "'s protocol version is the same as the server's protocol version. Protocol version: " + protocolVersion);
                 }
             }
             ClientVersion version = ClientVersion.getById(protocolVersion);
@@ -93,7 +93,7 @@ public class PlayerManagerImpl implements PlayerManager {
         Object channel = getChannel(p);
         User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
         if (user == null) {
-            //TODO Extract texture properties and pass into user profile(not priority)
+            //TODO Extract texture properties from NMS entity player and pass into user profile(not priority)
             user = new User(channel, ConnectionState.PLAY,
                     null, new UserProfile(p.getUniqueId(),
                     p.getName()));

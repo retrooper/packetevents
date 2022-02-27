@@ -27,6 +27,7 @@ public class InternalBungeeProcessor implements Listener {
     //Called right after LoginSuccess is sent to the user.
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
-        PacketEvents.getAPI().getInjector().injectPlayer(event.getPlayer(), null);
+        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(event.getPlayer());
+        PacketEvents.getAPI().getInjector().setPlayer(channel, event.getPlayer());
     }
 }

@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
@@ -40,7 +41,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCh
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowConfirmation;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
-import io.github.retrooper.packetevents.utils.SpigotDataHelper;
+import io.github.retrooper.packetevents.util.SpigotDataHelper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
@@ -69,17 +70,26 @@ public class PacketEventsPlugin extends JavaPlugin {
                 switch (event.getPacketType()) {
                     case CHAT_MESSAGE:
                         System.out.println("Running 10 seconds later");
-                        WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
-                        if (chatMessage.getMessage().equalsIgnoreCase("mrmcyeet")) {
-                            Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
-                            Vector3d position = SpigotDataHelper
-                                    .fromBukkitLocation(((Player) event.getPlayer()).getLocation())
-                                    .getPosition().add(0, 2, 0);
-                            WrapperPlayServerParticle particlePacket
-                                    = new WrapperPlayServerParticle(particle, true, position,
-                                    new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
-                            user.writePacket(particlePacket);
-                        }
+                        final PacketPlayReceiveEvent finalEvent = event.clone();
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(10000L);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(finalEvent);
+                            if (chatMessage.getMessage().equalsIgnoreCase("mrmcyeet")) {
+                                Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
+                                Vector3d position = SpigotDataHelper
+                                        .fromBukkitLocation(((Player) finalEvent.getPlayer()).getLocation())
+                                        .getPosition().add(0, 2, 0);
+                                WrapperPlayServerParticle particlePacket
+                                        = new WrapperPlayServerParticle(particle, true, position,
+                                        new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
+                                user.writePacket(particlePacket);
+                            }
+                            event.cleanUp();
+                        }).start();
                         break;
                     case PLAYER_FLYING:
                     case PLAYER_POSITION:
@@ -103,7 +113,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                         String channel = pluginMessage.getChannelName();
                         byte[] data = pluginMessage.getData();
                         String brandData = new String(data, StandardCharsets.UTF_8);
-                        System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                         Component component = Component.text("The channel name: " + channel)
                                 .color(NamedTextColor.RED)
                                 .append(Component.text(" Data: " + brandData)
@@ -129,14 +138,14 @@ public class PacketEventsPlugin extends JavaPlugin {
                         event.getUser().sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
                 }
-                /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
                     event.setCancelled(true);
                     WrapperPlayServerChatMessage clone = new WrapperPlayServerChatMessage((Component) null, null);
                     clone.readData(chatMessage);
                     PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), clone);
                     System.out.println("Delayed " + chatMessage.getChatComponentJson());
-                }*/
+                }
             }
         };
         //net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles w1;

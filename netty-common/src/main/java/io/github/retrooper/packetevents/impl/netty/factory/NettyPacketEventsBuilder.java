@@ -88,7 +88,7 @@ public class NettyPacketEventsBuilder {
                     PacketEvents.IDENTIFIER = "pe-" + data.getName().toLowerCase();
                     PacketEvents.ENCODER_NAME = "pe-encoder-" + data.getName().toLowerCase();
                     PacketEvents.DECODER_NAME = "pe-decoder-" + data.getName().toLowerCase();
-                    PacketEvents.CONNECTION_NAME = "pe-connection-handler-" + data.getName().toLowerCase();
+                    PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + data.getName().toLowerCase();
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + data.getName().toLowerCase();
                     injector.inject();
 
@@ -132,8 +132,8 @@ public class NettyPacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    //Eject the injector if needed(depends on the injector implementation)
-                    injector.eject();
+                    //Uninject the injector if needed(depends on the injector implementation)
+                    injector.uninject();
                     //Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;

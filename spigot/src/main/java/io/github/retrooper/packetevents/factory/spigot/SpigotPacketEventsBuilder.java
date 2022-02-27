@@ -27,20 +27,19 @@ import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
-import io.github.retrooper.packetevents.handlers.SpigotChannelInjector;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
-import io.github.retrooper.packetevents.processor.InternalBukkitListener;
-import io.github.retrooper.packetevents.utils.BukkitLogManager;
-import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
-import io.github.retrooper.packetevents.utils.netty.NettyManagerImpl;
+import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
+import io.github.retrooper.packetevents.util.BukkitLogManager;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
+import io.github.retrooper.packetevents.netty.NettyManagerImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -78,7 +77,7 @@ public class SpigotPacketEventsBuilder {
             private final ServerManager serverManager = new ServerManagerImpl();
             private final PlayerManager playerManager = new PlayerManagerImpl();
             private final NettyManager nettyManager = new NettyManagerImpl();
-            private final SpigotChannelInjector injector = new SpigotChannelInjector();
+            private SpigotChannelInjector injector;
             private final InternalBukkitListener internalBukkitListener = new InternalBukkitListener();
             private final LogManager logManager = new BukkitLogManager();
             private boolean loaded;
@@ -92,7 +91,7 @@ public class SpigotPacketEventsBuilder {
                     PacketEvents.IDENTIFIER = "pe-" + plugin.getName().toLowerCase();
                     PacketEvents.ENCODER_NAME = "pe-encoder-" + plugin.getName().toLowerCase();
                     PacketEvents.DECODER_NAME = "pe-decoder-" + plugin.getName().toLowerCase();
-                    PacketEvents.CONNECTION_NAME = "pe-connection-handler-" + plugin.getName().toLowerCase();
+                    PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + plugin.getName().toLowerCase();
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + plugin.getName().toLowerCase();
                     try {
                         SpigotReflectionUtil.init();
@@ -101,8 +100,9 @@ public class SpigotPacketEventsBuilder {
                         throw new IllegalStateException(ex);
                     }
 
-                    injector.load();
-                    lateBind = !injector.isBound();
+                    injector = new SpigotChannelInjector();
+                    //Server hasn't bound to the port yet.
+                    lateBind = !injector.isServerBound();
                     //If late-bind is enabled, we will inject a bit later.
                     if (!lateBind) {
                         injector.inject();
@@ -145,7 +145,7 @@ public class SpigotPacketEventsBuilder {
                         Bukkit.getPluginManager().registerEvents(internalBukkitListener, plugin);
                         for (final Player p : Bukkit.getOnlinePlayers()) {
                             try {
-                                injector.injectPlayer(p, ConnectionState.PLAY);
+                                injector.updatePlayer(p);
                                 getEventManager().callEvent(new PostPlayerInjectEvent(p));
                             } catch (Exception ex) {
                                 p.kickPlayer("Failed to inject... Please rejoin!");
@@ -155,8 +155,13 @@ public class SpigotPacketEventsBuilder {
 
                     if (lateBind) {
                         //If late-bind is enabled, we still need to inject (after all plugins enabled).
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, injector::inject);
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, postInjectTask);
+                        Runnable lateBindTask = () -> {
+                            if (injector.isServerBound()) {
+                                injector.inject();
+                                postInjectTask.run();
+                            }
+                        };
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, lateBindTask);
                     } else {
                         postInjectTask.run();
                     }
@@ -173,12 +178,8 @@ public class SpigotPacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    //Eject all players
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        injector.ejectPlayer(p);
-                    }
-                    //Eject the injector if needed(depends on the injector implementation)
-                    injector.eject();
+                    //Uninject the injector if needed(depends on the injector implementation)
+                    injector.uninject();
                     //Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;

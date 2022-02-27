@@ -22,7 +22,7 @@ public final class PacketEvents {
     private static PacketEventsAPI<?> API;
 
     //Put these variable names anywhere else, they are really only for the injectors
-    public static String IDENTIFIER, ENCODER_NAME, DECODER_NAME, CONNECTION_NAME, SERVER_CHANNEL_HANDLER_NAME;
+    public static String IDENTIFIER, ENCODER_NAME, DECODER_NAME, CONNECTION_HANDLER_NAME, SERVER_CHANNEL_HANDLER_NAME;
 
     public static PacketEventsAPI<?> getAPI() {
         return API;

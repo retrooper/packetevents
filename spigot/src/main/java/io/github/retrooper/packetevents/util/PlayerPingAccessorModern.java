@@ -16,28 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.injector;
+package io.github.retrooper.packetevents.util;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.player.User;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.entity.Player;
 
-public interface ChannelInjector {
-    default boolean isServerBound() {
-        return true;
+public class PlayerPingAccessorModern {
+    public static int getPing(Player player) {
+        return player.getPing();
     }
-
-    void inject();
-
-    void uninject();
-
-    User getUser(Object channel);
-
-    void changeConnectionState(Object channel, @Nullable ConnectionState connectionState);
-
-    void updateUser(Object channel, User user);
-
-    void setPlayer(Object channel, Object player);
-
-    boolean hasPlayer(Object player);
 }

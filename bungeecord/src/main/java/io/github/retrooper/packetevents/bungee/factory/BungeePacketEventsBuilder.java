@@ -141,7 +141,7 @@ public class BungeePacketEventsBuilder {
                     PacketEvents.IDENTIFIER = "pe-" + id;
                     PacketEvents.ENCODER_NAME = "pe-encoder-" + id;
                     PacketEvents.DECODER_NAME = "pe-decoder-" + id;
-                    PacketEvents.CONNECTION_NAME = "pe-connection-handler-" + id;
+                    PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
 
                     injector.inject();
@@ -187,8 +187,8 @@ public class BungeePacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    //Eject the injector if needed(depends on the injector implementation)
-                    injector.eject();
+                    //Uninject the injector if needed(depends on the injector implementation)
+                    injector.uninject();
                     //Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;

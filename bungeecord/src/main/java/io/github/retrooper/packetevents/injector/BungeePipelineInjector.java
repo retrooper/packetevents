@@ -53,24 +53,21 @@ public class BungeePipelineInjector implements ChannelInjector {
         CHANNEL_WRAPPER_CLASS = Reflection.getClassByNameWithoutException("net.md_5.bungee.netty.ChannelWrapper");
     }
 
-    private final List<Channel> injectedChannels = new ArrayList<>();
+    private final List<Channel> connectionChannels = new ArrayList<>();
 
     @Override
-    public @Nullable ConnectionState getConnectionState(Object ch) {
-        Channel channel = (Channel) ch;
-        PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-        return decoder.user.getConnectionState();
+    public User getUser(Object channel) {
+        return ((PacketDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME)).user;
     }
 
     @Override
-    public void changeConnectionState(Object ch, @Nullable ConnectionState packetState) {
-        Channel channel = (Channel) ch;
-        PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-        decoder.user.setConnectionState(packetState);
+    public void changeConnectionState(Object channel, @Nullable ConnectionState connectionState) {
+        //No adjustments to the pipeline necessary on bungee.
+        getUser(channel).setConnectionState(connectionState);
     }
 
     public void injectChannel(Channel channel) {
-        channel.pipeline().addFirst(PacketEvents.CONNECTION_NAME,
+        channel.pipeline().addFirst(PacketEvents.CONNECTION_HANDLER_NAME,
                 new ChannelInboundHandlerAdapter() {
                     @Override
                     public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
@@ -95,7 +92,7 @@ public class BungeePipelineInjector implements ChannelInjector {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        injectedChannels.add(channel);
+        connectionChannels.add(channel);
     }
 
     @Override
@@ -114,23 +111,22 @@ public class BungeePipelineInjector implements ChannelInjector {
     }
 
     @Override
-    public void eject() {
-        for (Channel channel : injectedChannels) {
-            channel.pipeline().remove(PacketEvents.CONNECTION_NAME);
+    public void uninject() {
+        for (Channel channel : connectionChannels) {
+            channel.pipeline().remove(PacketEvents.CONNECTION_HANDLER_NAME);
         }
+        //Set<Channel> listeners = (Set<Channel>) LISTENERS_FIELD.get(ProxyServer.getInstance());
+        //TODO Unwrap the listeners
     }
 
     @Override
-    public void injectPlayer(Object p, @Nullable ConnectionState connectionState) {
+    public void setPlayer(Object ch, Object p) {
+        Channel channel = (Channel) ch;
         ProxiedPlayer player = (ProxiedPlayer) p;
-        Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player);
         PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
         decoder.player = player;
         decoder.user.getProfile().setUUID(player.getUniqueId());
         decoder.user.getProfile().setName(player.getName());
-        if (connectionState != null) {
-            decoder.user.setConnectionState(connectionState);
-        }
         PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
         encoder.player = player;
     }
@@ -144,18 +140,12 @@ public class BungeePipelineInjector implements ChannelInjector {
         encoder.user = user;
     }
 
-    @Override
-    public void ejectPlayer(Object player) {
-        Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        ServerConnectionInitializer.destroyChannel(channel);
-    }
 
     @Override
-    public boolean hasInjected(Object player) {
+    public boolean hasPlayer(Object player) {
         Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player);
         PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-        PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
-        return decoder != null && encoder != null
-                && decoder.player != null && encoder.player != null;
+        return decoder != null
+                && decoder.player != null;
     }
 }

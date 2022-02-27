@@ -16,28 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.injector;
+package io.github.retrooper.packetevents.util.google;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.player.User;
-import org.jetbrains.annotations.Nullable;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 
-public interface ChannelInjector {
-    default boolean isServerBound() {
-        return true;
+import java.util.concurrent.ConcurrentMap;
+
+public class GuavaUtil {
+    public static <T, K> ConcurrentMap<T, K> makeMap(ServerVersion serverVersion) {
+        if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
+            return GuavaUtils_8.makeMap();
+        } else {
+            return GuavaUtils_7.makeMap();
+        }
     }
-
-    void inject();
-
-    void uninject();
-
-    User getUser(Object channel);
-
-    void changeConnectionState(Object channel, @Nullable ConnectionState connectionState);
-
-    void updateUser(Object channel, User user);
-
-    void setPlayer(Object channel, Object player);
-
-    boolean hasPlayer(Object player);
 }

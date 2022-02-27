@@ -16,28 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.injector;
+package io.github.retrooper.packetevents.injector;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.player.User;
-import org.jetbrains.annotations.Nullable;
-
-public interface ChannelInjector {
-    default boolean isServerBound() {
-        return true;
-    }
-
-    void inject();
-
-    void uninject();
-
-    User getUser(Object channel);
-
-    void changeConnectionState(Object channel, @Nullable ConnectionState connectionState);
-
-    void updateUser(Object channel, User user);
-
-    void setPlayer(Object channel, Object player);
-
-    boolean hasPlayer(Object player);
+public interface WritablePacketEncoder {
+    void writePacket(Object ctx, Object msg) throws Exception;
 }

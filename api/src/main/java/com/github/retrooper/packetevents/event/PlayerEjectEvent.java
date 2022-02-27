@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
  * @author retrooper
  * @since 1.6.9
  */
+//TODO Remove as its never called
 public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent<Object> {
     private final Object player;
     private boolean cancelled;

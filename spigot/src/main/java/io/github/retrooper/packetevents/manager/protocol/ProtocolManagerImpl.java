@@ -20,19 +20,12 @@ package io.github.retrooper.packetevents.manager.protocol;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.ExceptionUtil;
-import io.github.retrooper.packetevents.handlers.PacketEncoder;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
+import io.github.retrooper.packetevents.injector.WritablePacketEncoder;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 
 public class ProtocolManagerImpl implements ProtocolManager {
@@ -93,9 +86,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
         if (ChannelHelper.isOpen(channel)) {
             Object encoder = ChannelHelper.getPipelineHandler(channel, PacketEvents.ENCODER_NAME);
             Object ctx = ChannelHelper.getPipelineContext(channel, PacketEvents.ENCODER_NAME);
-            if (encoder instanceof PacketEncoder) {
+            if (encoder instanceof WritablePacketEncoder) {
                 try {
-                    ((PacketEncoder) encoder).writePacket(ctx, packet);
+                    ((WritablePacketEncoder) encoder).writePacket(ctx, packet);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

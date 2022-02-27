@@ -18,9 +18,9 @@
 
 package io.github.retrooper.packetevents.handlers.compression;
 
-import io.github.retrooper.packetevents.handlers.legacy.PacketCompressionLegacy;
-import io.github.retrooper.packetevents.handlers.modern.PacketCompressionModern;
-import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.injector.legacy.compression.PacketCompressionLegacy;
+import io.github.retrooper.packetevents.injector.latest.compression.PacketCompressionLatest;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -39,7 +39,7 @@ public class PacketCompressionUtil {
     private static void loadManager() {
         if (COMPRESSION_MANAGER == null) {
             if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
-                COMPRESSION_MANAGER = new PacketCompressionModern();
+                COMPRESSION_MANAGER = new PacketCompressionLatest();
             }
             else {
                 COMPRESSION_MANAGER = new PacketCompressionLegacy();

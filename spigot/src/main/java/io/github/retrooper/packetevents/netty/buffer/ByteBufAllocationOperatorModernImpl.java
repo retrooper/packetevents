@@ -16,28 +16,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.injector;
+package io.github.retrooper.packetevents.netty.buffer;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.player.User;
-import org.jetbrains.annotations.Nullable;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationOperator;
+import io.netty.buffer.Unpooled;
 
-public interface ChannelInjector {
-    default boolean isServerBound() {
-        return true;
+public class ByteBufAllocationOperatorModernImpl implements ByteBufAllocationOperator {
+    @Override
+    public Object wrappedBuffer(byte[] bytes) {
+        return Unpooled.wrappedBuffer(bytes);
     }
 
-    void inject();
+    @Override
+    public Object copiedBuffer(byte[] bytes) {
+        return Unpooled.copiedBuffer(bytes);
+    }
 
-    void uninject();
+    @Override
+    public Object buffer() {
+        return Unpooled.buffer();
+    }
 
-    User getUser(Object channel);
+    @Override
+    public Object directBuffer() {
+        return Unpooled.directBuffer();
+    }
 
-    void changeConnectionState(Object channel, @Nullable ConnectionState connectionState);
-
-    void updateUser(Object channel, User user);
-
-    void setPlayer(Object channel, Object player);
-
-    boolean hasPlayer(Object player);
+    @Override
+    public Object compositeBuffer() {
+        return Unpooled.compositeBuffer();
+    }
 }

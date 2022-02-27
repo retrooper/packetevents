@@ -16,28 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.injector;
+package io.github.retrooper.packetevents.injector.latest.connection;
 
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.player.User;
-import org.jetbrains.annotations.Nullable;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
 
-public interface ChannelInjector {
-    default boolean isServerBound() {
-        return true;
+public class PreChannelInitializerLatest_v1_8 extends ChannelInitializer<Channel> {
+    @Override
+    protected void initChannel(Channel channel) {
+        channel.pipeline().addLast(new ChannelInitializer<Channel>() {
+            @Override
+            protected void initChannel(Channel channel) {
+                ServerConnectionInitializerLatest.initChannel(channel, ConnectionState.HANDSHAKING);
+            }
+        });
     }
-
-    void inject();
-
-    void uninject();
-
-    User getUser(Object channel);
-
-    void changeConnectionState(Object channel, @Nullable ConnectionState connectionState);
-
-    void updateUser(Object channel, User user);
-
-    void setPlayer(Object channel, Object player);
-
-    boolean hasPlayer(Object player);
 }

@@ -26,8 +26,9 @@ import org.jetbrains.annotations.Nullable;
 import java.net.InetSocketAddress;
 
 /**
- * The {@code PlayerInjectEvent} event is fired whenever a player is injected.
- * A player is injected by PacketEvents whenever they join the server.
+ * The {@code PlayerInjectEvent} event is fired whenever a player is mapped with their channel.
+ * This event is usually fired by PlayerJoinEvent.
+ * It can also be called on reloads.
  * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
  *
  * @author retrooper
