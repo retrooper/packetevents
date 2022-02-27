@@ -97,6 +97,10 @@ public class User {
         ChannelHelper.flush(channel);
     }
 
+    public void closeConnection() {
+        ChannelHelper.close(channel);
+    }
+
     public void chat(String message) {
         //Fake an incoming chat packet
         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(message);
