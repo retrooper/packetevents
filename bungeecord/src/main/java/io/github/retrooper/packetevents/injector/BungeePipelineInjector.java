@@ -30,6 +30,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -72,7 +73,7 @@ public class BungeePipelineInjector implements ChannelInjector {
         channel.pipeline().addFirst(PacketEvents.CONNECTION_NAME,
                 new ChannelInboundHandlerAdapter() {
                     @Override
-                    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                    public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
                         Channel channel = (Channel) msg;
                         channel.pipeline().addLast(PacketEvents.SERVER_CHANNEL_HANDLER_NAME, new PreChannelInitializer());
                         super.channelRead(ctx, msg);
@@ -101,9 +102,7 @@ public class BungeePipelineInjector implements ChannelInjector {
     public void inject() {
         try {
             Set<Channel> listeners = (Set<Channel>) LISTENERS_FIELD.get(ProxyServer.getInstance());
-            Set<Channel> wrapper = new SetWrapper<>(listeners, channel -> {
-                injectChannel(channel);
-            });
+            Set<Channel> wrapper = new SetWrapper<>(listeners, this::injectChannel);
             LISTENERS_FIELD.set(ProxyServer.getInstance(), wrapper);
 
             for (Channel channel : listeners) {

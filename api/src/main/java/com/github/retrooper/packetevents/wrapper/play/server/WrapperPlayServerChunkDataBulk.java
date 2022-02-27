@@ -73,7 +73,7 @@ public class WrapperPlayServerChunkDataBulk extends PacketWrapper<WrapperPlaySer
             byte[] dat = new byte[length];
             data[column] = new NetworkChunkData(mask, true, skylight, dat);
         }
-
+        //TODO Fix ChunkDataBulk for 1.8
         for (int column = 0; column < columns; column++) {
             data[column].setData(readBytes(data[column].getData().length));
             BitSet mask = BitSet.valueOf(new long[]{data[column].getMask()});

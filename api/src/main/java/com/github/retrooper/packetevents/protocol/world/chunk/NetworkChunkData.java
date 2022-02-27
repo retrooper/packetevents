@@ -1,13 +1,13 @@
 package com.github.retrooper.packetevents.protocol.world.chunk;
 
 public class NetworkChunkData {
-    private int mask;
+    private final int mask;
     private int extendedChunkMask; // 1.7 only
-    private boolean fullChunk;
-    private boolean sky;
-    private byte data[];
+    private final boolean fullChunk;
+    private final boolean sky;
+    private byte[] data;
 
-    public NetworkChunkData(int mask, boolean fullChunk, boolean sky, byte data[]) {
+    public NetworkChunkData(int mask, boolean fullChunk, boolean sky, byte[] data) {
         this.mask = mask;
         this.fullChunk = fullChunk;
         this.sky = sky;
