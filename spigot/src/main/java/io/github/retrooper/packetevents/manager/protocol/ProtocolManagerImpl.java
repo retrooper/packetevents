@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
+import io.github.retrooper.packetevents.handlers.PacketEncoder;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 
@@ -35,7 +36,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public class ProtocolManagerImpl implements ProtocolManager {
-    private static Method WRITE_MESSAGE_METHOD;
     private ProtocolVersion platformVersion;
 
     //TODO Implement
@@ -74,48 +74,40 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public void sendPacket(Object channel, Object byteBuf) {
+    public void sendPacket(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.writeAndFlush(channel, byteBuf);
+            ChannelHelper.writeAndFlush(channel, packet);
         }
     }
 
     @Override
-    public void sendPacketSilently(Object channel, Object byteBuf) {
+    public void sendPacketSilently(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
             //Only call the encoders after ours in the pipeline.
-            //TODO Downside is Via won't process the packet either(yet)
-            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, packet);
         }
     }
 
     @Override
-    public void writePacket(Object channel, Object byteBuf) {
+    public void writePacket(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
             Object encoder = ChannelHelper.getPipelineHandler(channel, PacketEvents.ENCODER_NAME);
             Object ctx = ChannelHelper.getPipelineContext(channel, PacketEvents.ENCODER_NAME);
-            if (WRITE_MESSAGE_METHOD == null) {
+            if (encoder instanceof PacketEncoder) {
                 try {
-                    WRITE_MESSAGE_METHOD = encoder.getClass().getMethod("writeMessage", Object.class, Object.class);
-                } catch (NoSuchMethodException e) {
+                    ((PacketEncoder) encoder).writePacket(ctx, packet);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
-            try {
-                //Call writeMessage in our encoder, which redirects to write in netty encoders.
-                //This should be passed on to the next encoders.
-                WRITE_MESSAGE_METHOD.invoke(encoder, ctx, byteBuf);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
             }
         }
     }
 
     @Override
-    public void writePacketSilently(Object channel, Object byteBuf) {
+    public void writePacketSilently(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
             //Only call the encoders after ours in the pipeline
-            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, packet);
         }
     }
 

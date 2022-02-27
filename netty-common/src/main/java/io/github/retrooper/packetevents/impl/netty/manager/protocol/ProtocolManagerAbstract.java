@@ -30,44 +30,44 @@ public abstract class ProtocolManagerAbstract implements ProtocolManager {
     public abstract ProtocolVersion getPlatformVersion();
 
     @Override
-    public void sendPacket(Object channel, Object byteBuf) {
+    public void sendPacket(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.writeAndFlush(channel, byteBuf);
+            ChannelHelper.writeAndFlush(channel, packet);
         }
     }
 
     @Override
-    public void sendPacketSilently(Object channel, Object byteBuf) {
+    public void sendPacketSilently(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, packet);
         }
     }
 
     @Override
-    public void writePacket(Object channel, Object byteBuf) {
+    public void writePacket(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.write(channel, byteBuf);
+            ChannelHelper.write(channel, packet);
         }
     }
 
     @Override
-    public void writePacketSilently(Object channel, Object byteBuf) {
+    public void writePacketSilently(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, packet);
         }
     }
 
     @Override
-    public void receivePacket(Object channel, Object byteBuf) {
+    public void receivePacket(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.fireChannelRead(channel, byteBuf);
+            ChannelHelper.fireChannelRead(channel, packet);
         }
     }
 
     @Override
-    public void receivePacketSilently(Object channel, Object byteBuf) {
+    public void receivePacketSilently(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.fireChannelReadInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+            ChannelHelper.fireChannelReadInContext(channel, PacketEvents.ENCODER_NAME, packet);
         }
     }
 

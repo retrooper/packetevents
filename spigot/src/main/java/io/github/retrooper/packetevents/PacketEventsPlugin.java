@@ -78,7 +78,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                             WrapperPlayServerParticle particlePacket
                                     = new WrapperPlayServerParticle(particle, true, position,
                                     new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
-                            user.sendPacket(particlePacket);
+                            user.writePacket(particlePacket);
                         }
                         break;
                     case PLAYER_FLYING:

@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
+import io.github.retrooper.packetevents.handlers.PacketEncoder;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
@@ -39,7 +40,7 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.InvocationTargetException;
 
 @ChannelHandler.Sharable
-public class PacketEncoderModern extends MessageToByteEncoder<Object> {
+public class PacketEncoderModern extends MessageToByteEncoder<Object> implements PacketEncoder {
     public User user;
     public volatile Player player;
     public MessageToByteEncoder<?> vanillaEncoder;
@@ -48,7 +49,8 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
         this.user = user;
     }
 
-    public void writeMessage(Object ctx, Object msg) throws Exception {
+    @Override
+    public void writePacket(Object ctx, Object msg) throws Exception {
         write((ChannelHandlerContext) ctx, msg, ((ChannelHandlerContext) ctx).newPromise());
     }
 
@@ -83,6 +85,7 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
             //Convert NMS object to bytes, so we can process it right away.
             if (vanillaEncoder == null) return;
             CustomPipelineUtil.callEncode(vanillaEncoder, ctx, o, out);
+            if (out.readableBytes() == 0) return;
         } else {
             ByteBuf in = (ByteBuf) o;
             if (in.readableBytes() == 0) return;

@@ -37,17 +37,17 @@ public interface ProtocolManager {
     //Methods to implement
     ProtocolVersion getPlatformVersion();
 
-    void sendPacket(Object channel, Object byteBuf);
+    void sendPacket(Object channel, Object packet);
 
-    void sendPacketSilently(Object channel, Object byteBuf);
+    void sendPacketSilently(Object channel, Object packet);
 
-    void writePacket(Object channel, Object byteBuf);
+    void writePacket(Object channel, Object packet);
 
-    void writePacketSilently(Object channel, Object byteBuf);
+    void writePacketSilently(Object channel, Object packet);
 
-    void receivePacket(Object channel, Object byteBuf);
+    void receivePacket(Object channel, Object packet);
 
-    void receivePacketSilently(Object channel, Object byteBuf);
+    void receivePacketSilently(Object channel, Object packet);
 
     ClientVersion getClientVersion(Object channel);
 
