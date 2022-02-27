@@ -39,6 +39,7 @@ public final class PacketEventsPlugin extends Plugin {
 
     @Override
     public void onEnable() {
+
         //Register your listeners
         /*PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
