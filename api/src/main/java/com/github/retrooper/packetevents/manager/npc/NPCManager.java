@@ -131,16 +131,18 @@ public class NPCManager {
         }
     }
 
-    public void updateNPCRotation(NPC npc, byte yaw, byte pitch) {
+    public void updateNPCRotation(NPC npc, float yaw, float pitch) {
         npc.getLocation().setYaw(yaw);
         npc.getLocation().setPitch(pitch);
         Set<Object> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
             for (Object channel : targetChannels) {
-                WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(npc.getId(), yaw, pitch, true);
+                WrapperPlayServerEntityRotation entityRotation =
+                        new WrapperPlayServerEntityRotation(npc.getId(), yaw, pitch, true);
                 PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRotation);
 
-                WrapperPlayServerEntityHeadLook headYaw = new WrapperPlayServerEntityHeadLook(npc.getId(), yaw);
+                WrapperPlayServerEntityHeadLook headYaw =
+                        new WrapperPlayServerEntityHeadLook(npc.getId(), yaw);
                 PacketEvents.getAPI().getProtocolManager().sendPacket(channel, headYaw);
             }
         }
