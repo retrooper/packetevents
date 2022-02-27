@@ -502,8 +502,7 @@ public final class SpigotReflectionUtil {
         wrapper.writeItemStack(in);
         Object packetDataSerializer = createPacketDataSerializer(wrapper.getBuffer());
         Object nmsItemStack = readNMSItemStackPacketDataSerializer(packetDataSerializer);
-        ItemStack itemStack = toBukkitItemStack(nmsItemStack);
-        return itemStack;
+        return toBukkitItemStack(nmsItemStack);
     }
 
 

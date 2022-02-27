@@ -18,6 +18,9 @@
 
 package com.github.retrooper.packetevents.event;
 
+import com.github.retrooper.packetevents.event.simple.PacketLoginSendEvent;
+import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.event.simple.PacketStatusSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
@@ -26,42 +29,37 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 public class PacketSendEvent extends ProtocolPacketEvent<Object> {
-    private boolean cloned;
-
     protected PacketSendEvent(Object channel, User user, Object player, Object rawByteBuf) throws PacketProcessException {
         super(PacketSide.SERVER, channel, user, player, rawByteBuf);
     }
 
-    protected PacketSendEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
+    protected PacketSendEvent(int packetID, PacketTypeCommon packetType,
                               ServerVersion serverVersion,
                               Object channel, User user,
                               Object player, Object byteBuf) throws PacketProcessException {
         super(packetID, packetType,
                 serverVersion,
                 channel, user, player, byteBuf);
-        this.cloned = cloned;
-    }
-
-    public boolean isCloned() {
-        return cloned;
-    }
-
-    @Override
-    public PacketSendEvent clone() {
-        try {
-            return new PacketSendEvent(true, getPacketId(), getPacketType(),
-                    getServerVersion(),
-                    getChannel(),
-                    getUser(), getPlayer(),
-                    ByteBufHelper.duplicate(getByteBuf()));
-        } catch (PacketProcessException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Override
     public void call(PacketListenerCommon listener) {
         listener.onPacketSend(this);
+    }
+
+    @Override
+    public PacketSendEvent clone() {
+        if (this instanceof PacketStatusSendEvent) {
+            return ((PacketStatusSendEvent)this).clone();
+        }
+        else if (this instanceof PacketLoginSendEvent) {
+            return ((PacketLoginSendEvent)this).clone();
+        }
+        else if (this instanceof PacketPlaySendEvent) {
+            return ((PacketPlaySendEvent)this).clone();
+        }
+        else {
+            return null;
+        }
     }
 }

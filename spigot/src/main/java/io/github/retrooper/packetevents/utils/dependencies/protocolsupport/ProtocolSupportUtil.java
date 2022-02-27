@@ -29,7 +29,7 @@ public class ProtocolSupportUtil {
 
     public static boolean isAvailable() {
         if (available == -1) {
-            boolean present = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
+            boolean present = Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
             available = (byte) (present ? 1 : 0);
         }
         return available == 1;

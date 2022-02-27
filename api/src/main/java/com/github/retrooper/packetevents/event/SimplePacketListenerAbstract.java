@@ -29,71 +29,62 @@ public abstract class SimplePacketListenerAbstract extends PacketListenerCommon 
         super(priority);
     }
 
-    public SimplePacketListenerAbstract(PacketListenerPriority priority, boolean readOnly) {
-        super(priority, readOnly);
+    public SimplePacketListenerAbstract(PacketListenerPriority priority, boolean readOnly, boolean threadSafe) {
+        super(priority, readOnly, threadSafe);
     }
 
-    public SimplePacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
-        super(priority, methods);
-    }
-
-    public SimplePacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly) {
-        super(priority, methods, readOnly);
+    public SimplePacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods,
+                                        boolean readOnly,
+                                        boolean threadSafe) {
+        super(priority, methods, readOnly, threadSafe);
     }
 
     public SimplePacketListenerAbstract() {
         super();
     }
 
-    //TODO Rename PacketListenerAbstract not accessible, make its onPacketReceive and send private and make a packetlistenerabstract that implements them making them public,
-
-
     @Override
     void onPacketReceive(PacketReceiveEvent event) {
-        switch (event.getConnectionState()) {
-            case HANDSHAKING:
-                onPacketHandshakeReceive((PacketHandshakeReceiveEvent) event);
-                break;
-            case STATUS:
-                onPacketStatusReceive((PacketStatusReceiveEvent) event);
-                break;
-            case LOGIN:
-                onPacketLoginReceive((PacketLoginReceiveEvent) event);
-                break;
-            case PLAY:
-                onPacketPlayReceive((PacketPlayReceiveEvent) event);
-                break;
+        if (event instanceof PacketHandshakeReceiveEvent) {
+            onPacketHandshakeReceive((PacketHandshakeReceiveEvent) event);
+        } else if (event instanceof PacketStatusReceiveEvent) {
+            onPacketStatusReceive((PacketStatusReceiveEvent) event);
+        } else if (event instanceof PacketLoginReceiveEvent) {
+            onPacketLoginReceive((PacketLoginReceiveEvent) event);
+        } else if (event instanceof PacketPlayReceiveEvent) {
+            onPacketPlayReceive((PacketPlayReceiveEvent) event);
         }
     }
 
     @Override
     void onPacketSend(PacketSendEvent event) {
-        switch (event.getConnectionState()) {
-            case HANDSHAKING:
-                break;
-            case STATUS:
-                onPacketStatusSend((PacketStatusSendEvent) event);
-                break;
-            case LOGIN:
-                onPacketLoginSend((PacketLoginSendEvent) event);
-                break;
-            case PLAY:
-                onPacketPlaySend((PacketPlaySendEvent) event);
-                break;
+        if (event instanceof PacketStatusSendEvent) {
+            onPacketStatusSend((PacketStatusSendEvent) event);
+        } else if (event instanceof PacketLoginSendEvent) {
+            onPacketLoginSend((PacketLoginSendEvent) event);
+        } else if (event instanceof PacketPlaySendEvent) {
+            onPacketPlaySend((PacketPlaySendEvent) event);
         }
     }
 
-    public void onPacketHandshakeReceive(PacketHandshakeReceiveEvent event) {}
+    public void onPacketHandshakeReceive(PacketHandshakeReceiveEvent event) {
+    }
 
-    public void onPacketStatusReceive(PacketStatusReceiveEvent event) {}
+    public void onPacketStatusReceive(PacketStatusReceiveEvent event) {
+    }
 
-    public void onPacketStatusSend(PacketStatusSendEvent event) {}
+    public void onPacketStatusSend(PacketStatusSendEvent event) {
+    }
 
-    public void onPacketLoginReceive(PacketLoginReceiveEvent event) {}
+    public void onPacketLoginReceive(PacketLoginReceiveEvent event) {
+    }
 
-    public void onPacketLoginSend(PacketLoginSendEvent event) {}
+    public void onPacketLoginSend(PacketLoginSendEvent event) {
+    }
 
-    public void onPacketPlayReceive(PacketPlayReceiveEvent event) {}
+    public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+    }
 
-    public void onPacketPlaySend(PacketPlaySendEvent event) {}
+    public void onPacketPlaySend(PacketPlaySendEvent event) {
+    }
 }

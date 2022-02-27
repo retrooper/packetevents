@@ -51,6 +51,7 @@ public interface ByteBufOperator {
     boolean hasArray(Object buffer);
     byte[] array(Object buffer);
     Object retain(Object buffer);
+    Object retainedDuplicate(Object buffer);
     Object readSlice(Object buffer, int length);
     Object readBytes(Object buffer, byte[] destination, int destinationIndex, int length);
     Object readBytes(Object buffer, int length);
