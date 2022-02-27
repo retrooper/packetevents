@@ -44,11 +44,16 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
 
     @Override
     public void readData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             action = DiggingAction.getById(readVarInt());
+        }
+        else {
+            action = DiggingAction.getById(readByte());
+        }
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             blockPosition = readBlockPosition();
         } else {
-            action = DiggingAction.getById(readByte());
             int x = readInt();
             int y = readUnsignedByte();
             int z = readInt();
