@@ -1,6 +1,6 @@
 /*
- * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2021 ViaVersion and contributors
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,21 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.handlers.modern;
+package io.github.retrooper.packetevents.injector.latest.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
-import io.github.retrooper.packetevents.handlers.PacketEncoder;
-import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
+import io.github.retrooper.packetevents.injector.WritablePacketEncoder;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -40,12 +39,12 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.InvocationTargetException;
 
 @ChannelHandler.Sharable
-public class PacketEncoderModern extends MessageToByteEncoder<Object> implements PacketEncoder {
+public class PacketEncoderLatest extends MessageToByteEncoder<Object> implements WritablePacketEncoder {
     public User user;
     public volatile Player player;
     public MessageToByteEncoder<?> vanillaEncoder;
 
-    public PacketEncoderModern(User user) {
+    public PacketEncoderLatest(User user) {
         this.user = user;
     }
 
