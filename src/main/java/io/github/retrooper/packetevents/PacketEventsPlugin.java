@@ -37,22 +37,6 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        /*PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
-            @Override
-            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-               if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
-                   event.getPlayer().sendMessage("Are you a geyser player: " + GeyserUtils.isGeyserPlayer(event.getPlayer().getUniqueId()));
-               }
-            }
-
-            @Override
-            public void onPacketPlaySend(PacketPlaySendEvent event) {
-                if (event.getPacketId() == PacketType.Play.Server.ENTITY_DESTROY) {
-                    WrappedPacketOutEntityDestroy destroy = new WrappedPacketOutEntityDestroy(event.getNMSPacket());
-                    System.out.println("Destroyed: " + Arrays.toString(destroy.getEntityIds()));
-                }
-            }
-        });*/
         PacketEvents.get().init();
     }
 

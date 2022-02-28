@@ -29,7 +29,7 @@ import org.bukkit.entity.Entity;
 import java.lang.reflect.Constructor;
 
 public class WrappedPacketOutRemoveEntityEffect extends WrappedPacketEntityAbstraction implements SendableWrapper {
-    private static boolean v_1_8_x, v_1_17;
+    private static boolean v_1_8_x, v_1_17, v_1_18_2;
     private static Constructor<?> packetConstructor;
     private int effectID;
 
@@ -52,6 +52,7 @@ public class WrappedPacketOutRemoveEntityEffect extends WrappedPacketEntityAbstr
     protected void load() {
         v_1_8_x = version.isOlderThan(ServerVersion.v_1_9);
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
+        v_1_18_2 = version.isNewerThanOrEquals(ServerVersion.v_1_18_2);
         try {
             if (v_1_17) {
                 packetConstructor = PacketTypeClasses.Play.Server.REMOVE_ENTITY_EFFECT.getConstructor(int.class, NMSUtils.mobEffectListClass);
@@ -66,9 +67,12 @@ public class WrappedPacketOutRemoveEntityEffect extends WrappedPacketEntityAbstr
 
     public int getEffectId() {
         if (packet != null) {
+            //1.7 and 1.8
             if (v_1_8_x) {
                 return readInt(1);
-            } else {
+            }
+            //1.9+
+            else {
                 Object nmsMobEffectList = readObject(0, NMSUtils.mobEffectListClass);
                 return NMSUtils.getEffectId(nmsMobEffectList);
             }
@@ -80,9 +84,12 @@ public class WrappedPacketOutRemoveEntityEffect extends WrappedPacketEntityAbstr
 
     public void setEffectId(int effectID) {
         if (packet != null) {
+            //1.7 and 1.8
             if (v_1_8_x) {
                 writeInt(1, effectID);
-            } else {
+            }
+            //1.9+
+            else {
                 Object nmsMobEffectList = NMSUtils.getMobEffectListById(effectID);
                 write(NMSUtils.mobEffectListClass, 0, nmsMobEffectList);
             }
