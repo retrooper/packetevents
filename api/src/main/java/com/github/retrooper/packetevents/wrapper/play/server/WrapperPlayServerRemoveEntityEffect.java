@@ -1,41 +1,59 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerRemoveEntityEffect extends PacketWrapper<WrapperPlayServerRemoveEntityEffect> {
-    int entityId;
-    int effectId;
+    private int entityId;
+    private PotionType potionType;
 
     public WrapperPlayServerRemoveEntityEffect(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerRemoveEntityEffect(int entityId, int effectId) {
+    public WrapperPlayServerRemoveEntityEffect(int entityId, PotionType potionType) {
         super(PacketType.Play.Server.REMOVE_ENTITY_EFFECT);
         this.entityId = entityId;
-        this.effectId = effectId;
+        this.potionType = potionType;
+    }
+
+    @Deprecated
+    public WrapperPlayServerRemoveEntityEffect(int entityId, int effectId) {
+        this(entityId, PotionTypes.getById(effectId));
     }
 
     @Override
     public void readData() {
         this.entityId = readVarInt();
-        this.effectId = readByte();
+        int effectId;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18_2)) {
+            effectId = readVarInt();
+        }
+        else {
+            effectId = readByte();
+        }
+        this.potionType = PotionTypes.getById(effectId);
     }
 
     @Override
     public void writeData() {
         writeVarInt(entityId);
-        writeByte(effectId);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18_2)) {
+            writeVarInt(potionType.getId());
+        }
+        else {
+            writeByte(potionType.getId());
+        }
     }
 
     @Override
     public void readData(WrapperPlayServerRemoveEntityEffect wrapper) {
         entityId = wrapper.entityId;
-        effectId = wrapper.effectId;
+        potionType = wrapper.potionType;
     }
 
     public int getEntityId() {
@@ -46,19 +64,21 @@ public class WrapperPlayServerRemoveEntityEffect extends PacketWrapper<WrapperPl
         this.entityId = entityId;
     }
 
+    @Deprecated
     public int getEffectId() {
-        return effectId;
+        return potionType.getId();
     }
 
+    @Deprecated
     public void setEffectId(int effectId) {
-        this.effectId = effectId;
+        this.potionType = PotionTypes.getById(effectId);
     }
 
     public PotionType getPotionType() {
-        return PotionTypes.getById(effectId);
+        return potionType;
     }
 
     public void setPotionType(PotionType potionType) {
-        this.effectId = potionType.getId();
+        this.potionType = potionType;
     }
 }
