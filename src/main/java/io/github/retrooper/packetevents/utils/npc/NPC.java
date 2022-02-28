@@ -196,7 +196,7 @@ public class NPC {
         if (dist > 8) {
             sentPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
         } else {
-            sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook(entityID, distX, distY, distZ, (byte) yaw, (byte) pitch, onGround);
+            sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook(entityID, distX, distY, distZ, yaw, pitch, onGround);
         }
         if (hasSpawned(player)) {
             PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
@@ -256,7 +256,7 @@ public class NPC {
         if (dist > 8) {
             sentPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
         } else {
-            sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook(entityID, distX, distY, distZ, (byte) yaw, (byte) pitch, onGround);
+            sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook(entityID, distX, distY, distZ, yaw, pitch, onGround);
         }
         for (Player player : players) {
             if (hasSpawned(player)) {
@@ -290,7 +290,7 @@ public class NPC {
     }
 
     @Deprecated
-    public void moveDeltaAndRotate(List<Player> players, Vector3d deltaPosition, byte yaw, byte pitch) {
+    public void moveDeltaAndRotate(List<Player> players, Vector3d deltaPosition, float yaw, float pitch) {
         this.position = this.position.add(deltaPosition);
         this.yaw = yaw;
         this.pitch = pitch;

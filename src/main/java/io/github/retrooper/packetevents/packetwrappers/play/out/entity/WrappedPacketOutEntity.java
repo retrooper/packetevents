@@ -35,11 +35,12 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
     //Byte = 1.7.10->1.8.8, Int = 1.9->1.15.x, Short = 1.16.x
     private static byte mode; //byte = 0, int = 1, short = 2
     private static double dXYZDivisor;
+    private static final float ROTATION_FACTOR = 256.0F / 360.0F;
     private static int yawByteIndex = 0;
     private static int pitchByteIndex = 1;
     private static Constructor<?> entityPacketConstructor, entityRelMovePacketConstructor, entityLookConstructor, entityRelMoveLookConstructor;
     private double deltaX, deltaY, deltaZ;
-    private byte pitch, yaw;
+    private float pitch, yaw;
     private boolean onGround, rotating, moving;
 
     public WrappedPacketOutEntity(NMSPacket packet) {
@@ -48,7 +49,7 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
     }
 
     public WrappedPacketOutEntity(int entityID, double deltaX, double deltaY, double deltaZ,
-                                  byte yaw, byte pitch, boolean onGround, boolean rotating, boolean moving) {
+                                  float yaw, float pitch, boolean onGround, boolean rotating, boolean moving) {
         this.entityID = entityID;
         this.deltaX = deltaX;
         this.deltaY = deltaY;
@@ -61,22 +62,22 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
     }
 
     public WrappedPacketOutEntity(int entityID, double deltaX, double deltaY, double deltaZ,
-                                  byte yaw, byte pitch, boolean onGround, boolean rotating) {
+                                  float yaw, float pitch, boolean onGround, boolean rotating) {
         this(entityID, deltaX, deltaY, deltaZ, yaw, pitch, onGround, rotating, false);
     }
 
     public WrappedPacketOutEntity(int entityID, double deltaX, double deltaY, double deltaZ,
-                                  byte yaw, byte pitch, boolean onGround) {
+                                  float yaw, float pitch, boolean onGround) {
         this(entityID, deltaX, deltaY, deltaZ, yaw, pitch, onGround, false, false);
     }
 
     public WrappedPacketOutEntity(Entity entity, double deltaX, double deltaY, double deltaZ,
-                                  byte yaw, byte pitch, boolean onGround, boolean isLook) {
+                                  float yaw, float pitch, boolean onGround, boolean isLook) {
         this(entity.getEntityId(), deltaX, deltaY, deltaZ, yaw, pitch, onGround, isLook);
     }
 
     public WrappedPacketOutEntity(Entity entity, double deltaX, double deltaY, double deltaZ,
-                                  byte yaw, byte pitch, boolean onGround) {
+                                  float yaw, float pitch, boolean onGround) {
         this(entity.getEntityId(), deltaX, deltaY, deltaZ, yaw, pitch, onGround, false);
     }
 
@@ -116,33 +117,33 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
 
     }
 
-    public byte getPitch() {
+    public float getPitch() {
         if (packet != null) {
-            return readByte(pitchByteIndex);
+            return readByte(pitchByteIndex) / ROTATION_FACTOR;
         } else {
             return pitch;
         }
     }
 
-    public void setPitch(byte pitch) {
+    public void setPitch(float pitch) {
         if (packet != null) {
-            writeByte(pitchByteIndex, pitch);
+            writeByte(pitchByteIndex, (byte) (pitch * ROTATION_FACTOR));
         } else {
             this.pitch = pitch;
         }
     }
 
-    public byte getYaw() {
+    public float getYaw() {
         if (packet != null) {
-            return readByte(yawByteIndex);
+            return readByte(yawByteIndex) / ROTATION_FACTOR;
         } else {
             return yaw;
         }
     }
 
-    public void setYaw(byte yaw) {
+    public void setYaw(float yaw) {
         if (packet != null) {
-            writeByte(yawByteIndex, yaw);
+            writeByte(yawByteIndex, (byte) (yaw * ROTATION_FACTOR));
         }
     }
 
@@ -315,10 +316,12 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
     @Override
     public Object asNMSPacket() throws Exception {
         if (v_1_17) {
+            byte angleYaw = (byte) (getYaw() * ROTATION_FACTOR);
+            byte anglePitch = (byte) (getPitch() * ROTATION_FACTOR);
             return entityPacketConstructor.newInstance(getEntityId(),
                     (short) (getDeltaX() * dXYZDivisor), (short) (getDeltaY() * dXYZDivisor),
                     (short) (getDeltaZ() * dXYZDivisor),
-                    getYaw(), getPitch(), isOnGround(), isRotating().get(), isMoving().get());
+                    angleYaw, anglePitch, isOnGround(), isRotating().get(), isMoving().get());
         } else {
             Object packetInstance = entityPacketConstructor.newInstance(getEntityId());
             WrappedPacketOutEntity wrapper = new WrappedPacketOutEntity(new NMSPacket(packetInstance));
@@ -343,7 +346,7 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
             super(packet);
         }
 
-        public WrappedPacketOutEntityLook(int entityID, byte yaw, byte pitch, boolean onGround) {
+        public WrappedPacketOutEntityLook(int entityID, float yaw, float pitch, boolean onGround) {
             super(entityID, 0, 0, 0, yaw, pitch, onGround, true);
         }
 
@@ -366,7 +369,9 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         public Object asNMSPacket() throws Exception {
             Object packetInstance;
             if (v_1_17) {
-                packetInstance = entityLookConstructor.newInstance(getEntityId(), getYaw(), getPitch(), isOnGround());
+                byte angleYaw = (byte) (getYaw() * ROTATION_FACTOR);
+                byte anglePitch = (byte) (getPitch() * ROTATION_FACTOR);
+                packetInstance = entityLookConstructor.newInstance(getEntityId(), angleYaw, anglePitch, isOnGround());
             }
             else {
                 packetInstance = entityLookConstructor.newInstance();
@@ -389,7 +394,7 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
 
         public WrappedPacketOutRelEntityMove(int entityID, double deltaX, double deltaY, double deltaZ, boolean onGround) {
-            super(entityID, deltaX, deltaY, deltaZ, (byte) 0, (byte) 0, onGround, false);
+            super(entityID, deltaX, deltaY, deltaZ, 0, 0, onGround, false);
         }
 
         @Override
@@ -438,7 +443,8 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
             super(packet);
         }
 
-        public WrappedPacketOutRelEntityMoveLook(int entityID, double deltaX, double deltaY, double deltaZ, byte yaw, byte pitch, boolean onGround) {
+        public WrappedPacketOutRelEntityMoveLook(int entityID, double deltaX, double deltaY, double deltaZ,
+                                                 float yaw, float pitch, boolean onGround) {
             super(entityID, deltaX, deltaY, deltaZ, yaw, pitch, onGround, false);
         }
 
@@ -464,7 +470,9 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
                 short dx = (short) (getDeltaX() * dXYZDivisor);
                 short dy = (short) (getDeltaY() * dXYZDivisor);
                 short dz = (short) (getDeltaZ() * dXYZDivisor);
-                packetInstance = entityRelMoveLookConstructor.newInstance(getEntityId(), dx, dy, dz, getYaw(), getPitch(), isOnGround());
+                byte angleYaw = (byte) (getYaw() * ROTATION_FACTOR);
+                byte anglePitch = (byte) (getPitch() * ROTATION_FACTOR);
+                packetInstance = entityRelMoveLookConstructor.newInstance(getEntityId(), dx, dy, dz, angleYaw, anglePitch, isOnGround());
             }
             else {
                 packetInstance = entityRelMoveLookConstructor.newInstance();

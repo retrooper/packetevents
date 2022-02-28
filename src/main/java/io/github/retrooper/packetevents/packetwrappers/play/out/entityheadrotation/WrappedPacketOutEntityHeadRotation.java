@@ -32,18 +32,19 @@ import java.lang.reflect.Constructor;
 public class WrappedPacketOutEntityHeadRotation extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static boolean v_1_17;
     private static Constructor<?> packetConstructor;
-    private byte yaw;
+    private static final float ROTATION_FACTOR = 256.0F / 360.0F;
+    private float yaw;
 
     public WrappedPacketOutEntityHeadRotation(NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedPacketOutEntityHeadRotation(int entityID, byte yaw) {
+    public WrappedPacketOutEntityHeadRotation(int entityID, float yaw) {
         this.entityID = entityID;
         this.yaw = yaw;
     }
 
-    public WrappedPacketOutEntityHeadRotation(Entity entity, byte yaw) {
+    public WrappedPacketOutEntityHeadRotation(Entity entity, float yaw) {
         this.entityID = entity.getEntityId();
         this.entity = entity;
         this.yaw = yaw;
@@ -64,17 +65,17 @@ public class WrappedPacketOutEntityHeadRotation extends WrappedPacketEntityAbstr
         }
     }
 
-    public byte getYaw() {
+    public float getYaw() {
         if (packet != null) {
-            return readByte(0);
+            return readByte(0) / ROTATION_FACTOR;
         } else {
             return yaw;
         }
     }
 
-    public void setYaw(byte yaw) {
+    public void setYaw(float yaw) {
         if (packet != null) {
-            writeByte(0, yaw);
+            writeByte(0, (byte) (yaw * ROTATION_FACTOR));
         } else {
             this.yaw = yaw;
         }
