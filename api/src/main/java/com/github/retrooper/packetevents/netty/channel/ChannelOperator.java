@@ -41,4 +41,5 @@ public interface ChannelOperator {
     List<String> pipelineHandlerNames(Object channel);
     Object getPipelineHandler(Object channel, String name);
     Object getPipelineContext(Object channel, String name);
+    void runInEventLoop(Object channel, Runnable runnable);
 }

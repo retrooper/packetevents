@@ -119,4 +119,9 @@ public class ChannelOperatorImpl implements ChannelOperator {
     public Object getPipelineContext(Object channel, String name) {
         return ((Channel)channel).pipeline().context(name);
     }
+
+    @Override
+    public void runInEventLoop(Object channel, Runnable runnable) {
+        ((Channel)channel).eventLoop().execute(runnable);
+    }
 }

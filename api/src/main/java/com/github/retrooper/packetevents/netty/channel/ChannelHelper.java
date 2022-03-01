@@ -88,4 +88,8 @@ public class ChannelHelper {
     public static Object getPipelineContext(Object channel, String handlerName) {
         return PacketEvents.getAPI().getNettyManager().getChannelOperator().getPipelineContext(channel, handlerName);
     }
+
+    public static void runInEventLoop(Object channel, Runnable runnable) {
+        PacketEvents.getAPI().getNettyManager().getChannelOperator().runInEventLoop(channel, runnable);
+    }
 }
