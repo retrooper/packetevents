@@ -1,4 +1,6 @@
 plugins {
+    id 'java-library'
+    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
@@ -15,14 +17,13 @@ repositories {
 }
 
 shadowJar {
-    relocate("net.kyori", "com.github.retrooper.packetevents.libs.net.kyori")
-    relocate("com.google.gson", "com.github.retrooper.packetevents.libs.com.google.gson")
     archiveVersion.set('')
     minimize()
 }
 
 dependencies {
     api project(':api')
+    compileOnly 'org.jetbrains:annotations:22.0.0'
 
     compileOnly 'org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT'
     compileOnly 'com.viaversion:viaversion:4.0.1'

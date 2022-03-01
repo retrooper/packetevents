@@ -1,8 +1,10 @@
 plugins {
+    id 'java-library'
+    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
-group 'com.github.retrooper'
+group 'com.github.packetevents'
 version '2.0.0'
 
 shadowJar {
@@ -19,6 +21,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly 'org.jetbrains:annotations:22.0.0'
     compileOnly 'io.netty:netty-all:4.1.72.Final'
     api project(':api')
 }

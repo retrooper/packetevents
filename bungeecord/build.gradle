@@ -1,4 +1,6 @@
 plugins {
+    id 'java-library'
+    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
@@ -13,17 +15,15 @@ repositories {
 }
 
 shadowJar {
-    dependencies {
-        exclude(dependency("com.google.code.gson:gson:2.8.0"))
-    }
-    relocate("net.kyori", "com.github.retrooper.packetevents.libs.net.kyori")
     //Just for jitpack to work
     archiveVersion.set('')
     minimize()
 }
 
 dependencies {
+    compileOnly 'org.jetbrains:annotations:22.0.0'
     compileOnly 'net.md-5:bungeecord-api:1.18-R0.1-SNAPSHOT'
+    api project(':api')
     implementation project(':netty-common')
 }
 

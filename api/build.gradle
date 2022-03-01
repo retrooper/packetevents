@@ -1,4 +1,6 @@
 plugins {
+    id 'java-library'
+    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
@@ -6,7 +8,6 @@ group = 'com.github.retrooper'
 version = '2.0.0'
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
@@ -18,6 +19,11 @@ shadowJar {
 }
 
 dependencies {
+    compileOnly 'org.jetbrains:annotations:22.0.0'
+    api 'net.kyori:adventure-api:4.10.0'
+    api 'net.kyori:adventure-text-serializer-gson:4.10.0'
+    api 'net.kyori:adventure-text-serializer-legacy:4.10.0'
+    api 'com.google.code.gson:gson:2.9.0'
 }
 
 publishing {
