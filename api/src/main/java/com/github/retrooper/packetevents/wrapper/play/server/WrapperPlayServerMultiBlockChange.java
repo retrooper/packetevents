@@ -26,20 +26,32 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
 
     @Override
     public void readData() {
-        long encodedPosition = readLong();
-
-        int sectionX = (int) (encodedPosition >> 42);
-        int sectionY = (int) (encodedPosition << 44 >> 44);
-        int sectionZ = (int) (encodedPosition << 22 >> 42);
-        chunkPosition = new Vector3i(sectionX, sectionY, sectionZ);
-
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            trustEdges = readBoolean();
-        }
+            long encodedPosition = readLong();
 
-        blockData = new EncodedBlock[readVarInt()];
-        for (int i = 0; i < blockData.length; i++) {
-            blockData[i] = new EncodedBlock(chunkPosition, readVarLong());
+            int sectionX = (int) (encodedPosition >> 42);
+            int sectionY = (int) (encodedPosition << 44 >> 44);
+            int sectionZ = (int) (encodedPosition << 22 >> 42);
+            chunkPosition = new Vector3i(sectionX, sectionY, sectionZ);
+
+            trustEdges = readBoolean();
+
+            blockData = new EncodedBlock[readVarInt()];
+            for (int i = 0; i < blockData.length; i++) {
+                blockData[i] = new EncodedBlock(chunkPosition, readVarLong());
+            }
+        } else { // Copied from MCProtocolLib
+            int chunkX = readInt();
+            int chunkZ = readInt();
+
+            blockData = new EncodedBlock[readVarInt()];
+            for (int i = 0; i < blockData.length; i++) {
+                short pos = readShort();
+                int x = (chunkX << 4) + (pos >> 12 & 15);
+                int y = pos & 255;
+                int z = (chunkZ << 4) + (pos >> 8 & 15);
+                this.blockData[i] = new EncodedBlock(readVarInt(), x, y, z);
+            }
         }
     }
 
@@ -52,18 +64,28 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
 
     @Override
     public void writeData() {
-        long encodedPos = 0;
-        encodedPos |= (chunkPosition.getX() & 0x3FFFFFL) << 42;
-        encodedPos |= (chunkPosition.getZ() & 0x3FFFFFL) << 20;
-        writeLong(encodedPos | (chunkPosition.getY() & 0xFFFFFL));
-
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            writeBoolean(trustEdges);
-        }
+            long encodedPos = 0;
+            encodedPos |= (chunkPosition.getX() & 0x3FFFFFL) << 42;
+            encodedPos |= (chunkPosition.getZ() & 0x3FFFFFL) << 20;
+            writeLong(encodedPos | (chunkPosition.getY() & 0xFFFFFL));
 
-        writeVarInt(blockData.length);
-        for (EncodedBlock blockDatum : blockData) {
-            writeVarLong(blockDatum.toLong());
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+                writeBoolean(trustEdges);
+            }
+
+            writeVarInt(blockData.length);
+            for (EncodedBlock blockDatum : blockData) {
+                writeVarLong(blockDatum.toLong());
+            }
+        } else { // Copied from MCProtocolLib
+            writeInt(chunkPosition.getX());
+            writeInt(chunkPosition.getZ());
+            writeVarInt(this.blockData.length);
+            for (EncodedBlock record : blockData) {
+                writeShort((record.getX() - (chunkPosition.getX() << 4)) << 12 | (record.getZ() - (chunkPosition.getZ() << 4)) << 8 | record.getY());
+                writeVarInt(record.getBlockID());
+            }
         }
     }
 
@@ -131,28 +153,46 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
             blockID = blockState.getGlobalId();
         }
 
+        /**
+         * @return Global X position of block
+         */
         public int getX() {
             return x;
         }
 
+        /**
+         * @return Global Y position of block
+         */
         public int getY() {
             return y;
         }
 
+        /**
+         * @return Global Z position of block
+         */
         public int getZ() {
             return z;
         }
 
-        public int setX(int x) {
-            return this.x = x;
+        /**
+         * @param x Global X position of block
+         */
+        public void setX(int x) {
+            this.x = x;
         }
 
-        public int setY(int y) {
-            return this.y = y;
+        /**
+         * @param y Global Y position of block
+         */
+        public void setY(int y) {
+            this.y = y;
         }
 
-        public int setZ(int z) {
-            return this.z = z;
+        /**
+         * @param z Global Z position of block
+         */
+        public void setZ(int z) {
+            this.z = z;
         }
     }
 }
