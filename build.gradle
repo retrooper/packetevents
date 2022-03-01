@@ -8,6 +8,30 @@ version = '2.0.0'
 description = 'packetevents'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
+allprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        //Add adventure to every module except itself and this father module.
+        if (project.name != "packetevents") {
+            compileOnly 'org.jetbrains:annotations:22.0.0'
+            if (project.name != "adventure" && project.name != "gson") {
+                compileOnly project(':adventure')
+            }
+            if (project.name != "gson" && project.name != "adventure") {
+                compileOnly project(':gson')
+            }
+        }
+
+        //api 'com.google.code.gson:gson:2.9.0'
+    }
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
