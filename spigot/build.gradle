@@ -15,9 +15,9 @@ repositories {
 }
 
 shadowJar {
-    archiveVersion.set('')
     relocate("net.kyori", "com.github.retrooper.packetevents.libs.net.kyori")
     relocate("com.google.gson", "com.github.retrooper.packetevents.libs.com.google.gson")
+    archiveVersion.set('')
     minimize()
 }
 

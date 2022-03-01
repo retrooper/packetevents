@@ -14,9 +14,9 @@ repositories {
 
 shadowJar {
     dependencies {
-        //We DON'T want gson here, but we keep adventure.
         exclude(dependency("com.google.code.gson:gson:2.8.0"))
     }
+    relocate("net.kyori", "com.github.retrooper.packetevents.libs.net.kyori")
     //Just for jitpack to work
     archiveVersion.set('')
     minimize()

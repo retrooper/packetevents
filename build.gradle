@@ -8,6 +8,15 @@ version = '2.0.0'
 description = 'packetevents'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
+def containsString(String[] arr, String value) {
+    for (String s : arr) {
+        if (s == value) {
+            return true
+        }
+    }
+    return false
+}
+
 allprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
@@ -26,15 +35,12 @@ allprojects {
                 //If we aren't building standalone jars, just using it as a library, we shade nothing.
                 adventureShadingModules = []
             }
-            boolean shaded = false
-            for (String s : adventureShadingModules) {
-                if (project.name == s) {
-                    api project(':adventure')
-                    shaded = true
-                    break
-                }
+            boolean shaded = containsString(adventureShadingModules, project.name)
+            if (shaded) {
+                api project(':adventure')
             }
-            if (!shaded && project.name != "adventure") {
+
+            else if (project.name != "adventure") {
                 compileOnly project(':adventure')
             }
         }
