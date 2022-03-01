@@ -1,6 +1,4 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
@@ -18,6 +16,8 @@ repositories {
 
 shadowJar {
     archiveVersion.set('')
+    relocate("net.kyori", "com.github.retrooper.packetevents.libs.net.kyori")
+    relocate("com.google.gson", "com.github.retrooper.packetevents.libs.com.google.gson")
     minimize()
 }
 

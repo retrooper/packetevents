@@ -9,26 +9,35 @@ description = 'packetevents'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 allprojects {
-    apply plugin: 'java'
-
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
     repositories {
         mavenLocal()
         mavenCentral()
     }
 
     dependencies {
-        //Add adventure to every module except itself and this father module.
         if (project.name != "packetevents") {
             compileOnly 'org.jetbrains:annotations:22.0.0'
-            if (project.name != "adventure" && project.name != "gson") {
+
+            String[] adventureShadingModules = ["spigot", "bungeecord"]
+            boolean isExporting = !project.hasProperty("library");
+            if (!isExporting) {
+                //If we aren't building standalone jars, just using it as a library, we shade nothing.
+                adventureShadingModules = []
+            }
+            boolean shaded = false
+            for (String s : adventureShadingModules) {
+                if (project.name == s) {
+                    api project(':adventure')
+                    shaded = true
+                    break
+                }
+            }
+            if (!shaded && project.name != "adventure") {
                 compileOnly project(':adventure')
             }
-            if (project.name != "gson" && project.name != "adventure") {
-                compileOnly project(':gson')
-            }
         }
-
-        //api 'com.google.code.gson:gson:2.9.0'
     }
 }
 

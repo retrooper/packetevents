@@ -1,6 +1,4 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
@@ -15,6 +13,10 @@ repositories {
 }
 
 shadowJar {
+    dependencies {
+        //We DON'T want gson here, but we keep adventure.
+        exclude(dependency("com.google.code.gson:gson:2.8.0"))
+    }
     //Just for jitpack to work
     archiveVersion.set('')
     minimize()
@@ -22,7 +24,6 @@ shadowJar {
 
 dependencies {
     compileOnly 'net.md-5:bungeecord-api:1.18-R0.1-SNAPSHOT'
-    //api project(':api')
     implementation project(':netty-common')
 }
 

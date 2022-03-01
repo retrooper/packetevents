@@ -103,10 +103,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                         String channel = pluginMessage.getChannelName();
                         byte[] data = pluginMessage.getData();
                         String brandData = new String(data, StandardCharsets.UTF_8);
-                        System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
-                        Component component = Component.text("The channel name: " + channel)
+                        Component component = Component.text("Channel name: " + channel)
                                 .color(NamedTextColor.RED)
-                                .append(Component.text(" Data: " + brandData)
+                                .append(Component.text(" Brand: " + brandData)
                                         .color(NamedTextColor.GOLD));
                         WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(component, ChatPosition.CHAT);
                         user.writePacket(cm);
