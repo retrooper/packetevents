@@ -113,7 +113,7 @@ public class NPC {
         }
     }
 
-    public void updateNPCLocation(Location to) {
+    public void updateLocation(Location to) {
         Location from = getLocation();
         setLocation(to);
         double distXAbs = Math.abs(to.getPosition().getX() - from.getPosition().getX());
@@ -164,7 +164,7 @@ public class NPC {
         }
     }
 
-    public void updateNPCRotation(float yaw, float pitch) {
+    public void updateRotation(float yaw, float pitch) {
         getLocation().setYaw(yaw);
         getLocation().setPitch(pitch);
         for (Object channel : channels) {
@@ -178,7 +178,7 @@ public class NPC {
         }
     }
 
-    public void updateNPCTabPing(int ping) {
+    public void updateTabPing(int ping) {
         setDisplayPing(ping);
         for (Object channel : channels) {
             WrapperPlayServerPlayerInfo playerInfo =
@@ -187,7 +187,7 @@ public class NPC {
         }
     }
 
-    public void changeNPCSkin(UUID skinUUID, List<TextureProperty> skinTextureProperties) {
+    public void changeSkin(UUID skinUUID, List<TextureProperty> skinTextureProperties) {
         for (Object channel : channels) {
             WrapperPlayServerPlayerInfo playerInfoRemove =
                     new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getPlayerInfoData());
@@ -209,7 +209,7 @@ public class NPC {
         }
     }
 
-    public void updateNPCNameTag(NPC npc) {
+    public void updateNameTag(NPC npc) {
         for (Object channel : channels) {
             //Destroy team
             WrapperPlayServerTeams removeTeam =
