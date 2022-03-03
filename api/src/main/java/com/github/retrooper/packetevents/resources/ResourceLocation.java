@@ -30,7 +30,7 @@ public class ResourceLocation {
     public ResourceLocation(String location) {
         String[] array = new String[]{"minecraft", location};
         int index = location.indexOf(":");
-        if (index >= 0) {
+        if (index != -1) {
             array[1] = location.substring(index + 1);
             if (index >= 1) {
                 array[0] = location.substring(0, index);
