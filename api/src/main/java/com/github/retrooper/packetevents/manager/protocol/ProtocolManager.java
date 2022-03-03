@@ -28,12 +28,22 @@ import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface ProtocolManager {
     Map<String, Object> CHANNELS = new ConcurrentHashMap<>();
     Map<Object, User> USERS = new ConcurrentHashMap<>();
+
+    default Collection<User> getUsers() {
+        return USERS.values();
+    }
+
+    default Collection<Object> getChannels() {
+        return CHANNELS.values();
+    }
 
     //Methods to implement
     ProtocolVersion getPlatformVersion();

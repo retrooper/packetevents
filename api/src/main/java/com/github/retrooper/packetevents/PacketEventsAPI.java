@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.npc.NPCManager;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
@@ -33,18 +32,13 @@ import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 import java.util.logging.Logger;
 
 public abstract class PacketEventsAPI<T> {
-    private static final NPCManager NPC_MANAGER = new NPCManager();
     private static final EventManager EVENT_MANAGER = new EventManager();
     private static final PacketEventsSettings SETTINGS = new PacketEventsSettings();
     private static final UpdateChecker UPDATE_CHECKER = new UpdateChecker();
     private final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
     private static final LogManager LOG_MANAGER = new LogManager();
     private static final PEVersion VERSION = new PEVersion(2, 0, 0);
-
-    public NPCManager getNPCManager() {
-        return NPC_MANAGER;
-    }
-
+    
     public EventManager getEventManager() {
         return EVENT_MANAGER;
     }
