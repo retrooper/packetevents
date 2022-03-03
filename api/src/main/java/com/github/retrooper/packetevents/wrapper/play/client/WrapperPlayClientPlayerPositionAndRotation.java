@@ -25,98 +25,40 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayClientPlayerPositionAndRotation extends PacketWrapper<WrapperPlayClientPlayerPositionAndRotation> {
-    private Vector3d position;
-    private float yaw;
-    private float pitch;
-    private boolean onGround;
-
+public class WrapperPlayClientPlayerPositionAndRotation extends WrapperPlayClientPlayerFlying {
     public WrapperPlayClientPlayerPositionAndRotation(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperPlayClientPlayerPositionAndRotation(Vector3d position, float yaw, float pitch, boolean onGround) {
-        super(PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION);
-        this.position = position;
-        this.yaw = yaw;
-        this.pitch = pitch;
-        this.onGround = onGround;
+        super(true, true, onGround, new Location(position, yaw, pitch));
     }
 
     public WrapperPlayClientPlayerPositionAndRotation(Location location, boolean onGround) {
-        super(PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION);
-        this.position = location.getPosition();
-        this.yaw = location.getYaw();
-        this.pitch = location.getPitch();
-        this.onGround = onGround;
-    }
-
-    @Override
-    public void readData() {
-        double x = readDouble();
-        double y = readDouble();
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            //headY = (y + 1.62), this is kind of constant
-            double headY = readDouble();
-        }
-        double z = readDouble();
-        position = new Vector3d(x, y, z);
-        yaw = readFloat();
-        pitch = readFloat();
-        onGround = readBoolean();
-    }
-
-    @Override
-    public void readData(WrapperPlayClientPlayerPositionAndRotation wrapper) {
-        position = wrapper.position;
-        yaw = wrapper.yaw;
-        pitch = wrapper.pitch;
-        onGround = wrapper.onGround;
-    }
-
-    @Override
-    public void writeData() {
-        writeDouble(position.x);
-        writeDouble(position.y);
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            //Writing head Y
-            writeDouble(position.y + 1.62);
-        }
-        writeDouble(position.z);
-        writeFloat(yaw);
-        writeFloat(pitch);
-        writeBoolean(onGround);
+        super(true, true, onGround, location);
     }
 
     public Vector3d getPosition() {
-        return position;
+        return getLocation().getPosition();
     }
 
     public void setPosition(Vector3d position) {
-        this.position = position;
+        getLocation().setPosition(position);
     }
 
     public float getYaw() {
-        return yaw;
+        return getLocation().getYaw();
     }
 
     public void setYaw(float yaw) {
-        this.yaw = yaw;
+        getLocation().setYaw(yaw);
     }
 
     public float getPitch() {
-        return pitch;
+        return getLocation().getPitch();
     }
 
     public void setPitch(float pitch) {
-        this.pitch = pitch;
-    }
-
-    public boolean isOnGround() {
-        return onGround;
-    }
-
-    public void setOnGround(boolean onGround) {
-        this.onGround = onGround;
+        getLocation().setPitch(pitch);
     }
 }

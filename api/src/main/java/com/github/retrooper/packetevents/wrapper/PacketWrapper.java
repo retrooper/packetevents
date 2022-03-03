@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
@@ -81,38 +82,22 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
         if (readData) {
-            if (event.isClone()) {
-                int bufferIndex = ByteBufHelper.readerIndex(getBuffer());
-                readData();
-                ByteBufHelper.readerIndex(getBuffer(), bufferIndex);
-            } else {
-                if (event.getLastUsedWrapper() == null) {
-                    event.setLastUsedWrapper(this);
-                    readData();
-                } else {
-                    readData((T) event.getLastUsedWrapper());
-                }
-            }
+            readEvent(event);
         }
     }
 
     public PacketWrapper(PacketSendEvent event) {
+        this(event, true);
+    }
+
+    public PacketWrapper(PacketSendEvent event, boolean readData) {
         this.clientVersion = event.getUser().getClientVersion();
         this.serverVersion = event.getServerVersion();
         this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
         this.user = event.getUser();
-        if (event.isClone()) {
-            int bufferIndex = ByteBufHelper.readerIndex(getBuffer());
-            readData();
-            ByteBufHelper.readerIndex(getBuffer(), bufferIndex);
-        } else {
-            if (event.getLastUsedWrapper() == null) {
-                event.setLastUsedWrapper(this);
-                readData();
-            } else {
-                readData((T) event.getLastUsedWrapper());
-            }
+        if (readData) {
+            readEvent(event);
         }
     }
 
@@ -153,6 +138,17 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeData() {
 
+    }
+
+    public final void readEvent(ProtocolPacketEvent<?> event) {
+        PacketWrapper<?> last = event.getLastUsedWrapper();
+        if (last != null) {
+            readData((T) last);
+        }
+        else {
+            event.setLastUsedWrapper(this);
+            readData();
+        }
     }
 
     public boolean hasPreparedForSending() {

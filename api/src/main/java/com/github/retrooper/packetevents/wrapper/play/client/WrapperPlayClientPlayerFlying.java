@@ -39,18 +39,7 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
                 event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION;
         rotationChanged = event.getPacketType() == PacketType.Play.Client.PLAYER_ROTATION ||
                 event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION;
-        if (event.isClone()) {
-            int bufferIndex = ByteBufHelper.readerIndex(getBuffer());
-            readData();
-            ByteBufHelper.readerIndex(getBuffer(), bufferIndex);
-        } else {
-            if (event.getLastUsedWrapper() == null) {
-                event.setLastUsedWrapper(this);
-                readData();
-            } else {
-                readData((WrapperPlayClientPlayerFlying) event.getLastUsedWrapper());
-            }
-        }
+        readEvent(event);
     }
 
     public WrapperPlayClientPlayerFlying(boolean positionChanged, boolean rotationChanged, boolean onGround, Location location) {
@@ -63,7 +52,6 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
         this.location = location;
     }
 
-    //TODO Rethink, should this be somewhere else?
     public static boolean isFlying(PacketTypeCommon type) {
         return type == PacketType.Play.Client.PLAYER_FLYING
                 || type == PacketType.Play.Client.PLAYER_POSITION
@@ -98,7 +86,6 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
 
     @Override
     public void readData(WrapperPlayClientPlayerFlying wrapper) {
-        setPacketId(wrapper.getPacketId());
         positionChanged = wrapper.positionChanged;
         rotationChanged = wrapper.rotationChanged;
         location = wrapper.location;

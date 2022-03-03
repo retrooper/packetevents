@@ -19,69 +19,23 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayClientPlayerPosition extends PacketWrapper<WrapperPlayClientPlayerPosition> {
-    private Vector3d position;
-    private boolean onGround;
-
+public class WrapperPlayClientPlayerPosition extends WrapperPlayClientPlayerFlying {
     public WrapperPlayClientPlayerPosition(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperPlayClientPlayerPosition(Vector3d position, boolean onGround) {
-        super(PacketType.Play.Client.PLAYER_POSITION);
-        this.position = position;
-        this.onGround = onGround;
-    }
-
-    @Override
-    public void readData() {
-        double x = readDouble();
-        double y = readDouble();
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            //headY = (y + 1.62), this is kind of constant
-            double headY = readDouble();
-        }
-        double z = readDouble();
-        position = new Vector3d(x, y, z);
-        onGround = readBoolean();
-    }
-
-    @Override
-    public void readData(WrapperPlayClientPlayerPosition wrapper) {
-        position = wrapper.position;
-        onGround = wrapper.onGround;
-    }
-
-    @Override
-    public void writeData() {
-        writeDouble(position.x);
-        writeDouble(position.y);
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            //Writing head Y
-            writeDouble(position.y + 1.62);
-        }
-        writeDouble(position.z);
-        writeBoolean(onGround);
+        super(true, false, onGround, new Location(position, 0, 0));
     }
 
     public Vector3d getPosition() {
-        return position;
+        return getLocation().getPosition();
     }
 
     public void setPosition(Vector3d position) {
-        this.position = position;
-    }
-
-    public boolean isOnGround() {
-        return onGround;
-    }
-
-    public void setOnGround(boolean onGround) {
-        this.onGround = onGround;
+        getLocation().setPosition(position);
     }
 }
