@@ -15,6 +15,9 @@ repositories {
 }
 
 shadowJar {
+    dependencies {
+        exclude(dependency("com.google.code.gson:gson:2.8.0"))
+    }
     //Just for jitpack to work
     archiveVersion.set('')
     minimize()
@@ -25,6 +28,10 @@ dependencies {
     compileOnly 'net.md-5:bungeecord-api:1.18-R0.1-SNAPSHOT'
     api project(':api')
     implementation project(':netty-common')
+    api 'net.kyori:adventure-api:4.10.0'
+    api 'net.kyori:adventure-text-serializer-gson:4.10.0'
+    api 'net.kyori:adventure-text-serializer-legacy:4.10.0'
+    //no gson as its on bungee already
 }
 
 publishing {
