@@ -36,6 +36,14 @@ public class EntityTypes {
     private static JsonObject MAPPINGS;
     private static JsonObject LEGACY_MAPPINGS;
 
+    static {
+        //Mappings have been used, we can clear them.
+        //TODO Test this to see if it works.
+        /*
+        MAPPINGS = null;
+        LEGACY_MAPPINGS = null;*/
+    }
+
     @NotNull
     private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
         if (serverVersion.isOlderThan(ServerVersion.V_1_11)) {
@@ -152,13 +160,13 @@ public class EntityTypes {
             }
             if (type.getParent().isPresent()) {
                 type = type.getParent().get();
-            }
-            else {
+            } else {
                 return false;
             }
         }
         return false;
     }
+
     //with minecraft:key
     public static EntityType getByName(String name) {
         return ENTITY_TYPE_MAP.get(name);
