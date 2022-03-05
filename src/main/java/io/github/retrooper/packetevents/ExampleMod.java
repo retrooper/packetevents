@@ -50,10 +50,9 @@ public class ExampleMod implements ModInitializer {
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
-                super.onPacketSend(event);
+
             }
         });
-
         PacketEvents.getAPI().init();
     }
 }

@@ -4,7 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.injector.InternalPacketListener;
+import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
@@ -15,6 +15,7 @@ import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handler.PacketDecoder;
 import io.github.retrooper.packetevents.handler.PacketEncoder;
@@ -23,6 +24,7 @@ import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerA
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import io.netty.channel.Channel;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -30,7 +32,11 @@ import net.minecraft.network.Connection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.logging.Level;
+import java.util.regex.Pattern;
+
 public class FabricPacketEventsBuilder {
+    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]");
     private static PacketEventsAPI<Minecraft> INSTANCE;
 
     public static void clearBuildCache() {
@@ -87,7 +93,13 @@ public class FabricPacketEventsBuilder {
             private final PlayerManagerAbstract playerManager = new PlayerManagerAbstract() {
                 @Override
                 public int getPing(@NotNull Object player) {
-                    return 0;
+                    try {
+                        return ((LocalPlayer) player).connection.getPlayerInfo(String.valueOf(((LocalPlayer) player).getName())).getLatency();
+                    }
+                    catch (Exception ex) {
+                        PacketEvents.getAPI().getLogManager().debug("Failed to get ping for player " + ((LocalPlayer)player).getName());
+                        return -1;
+                    }
                 }
 
                 @Override
@@ -148,6 +160,15 @@ public class FabricPacketEventsBuilder {
                 }
             };
             private final NettyManager nettyManager = new NettyManagerImpl();
+            private final LogManager logManager = new LogManager() {
+                @Override
+                protected void log(Level level, @Nullable NamedTextColor color, String message) {
+                    //First we must strip away the color codes that might be in this message
+                    message = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
+                    System.out.println(message);
+                    //TODO This doesn't work in bungee console PacketEvents.getAPI().getLogger().log(level, color != null ? (color.toString()) : "" + message);
+                }
+            };
             private boolean loaded;
             private boolean initialized;
 
@@ -168,8 +189,7 @@ public class FabricPacketEventsBuilder {
 
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListener(new InternalPacketListener(),
-                            PacketListenerPriority.LOWEST, true);
+                    getEventManager().registerListener(new InternalPacketListener());
                 }
             }
 
@@ -226,6 +246,11 @@ public class FabricPacketEventsBuilder {
             @Override
             public ServerManager getServerManager() {
                 return serverManager;
+            }
+
+            @Override
+            public LogManager getLogManager() {
+                return logManager;
             }
 
             @Override
