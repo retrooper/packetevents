@@ -4,32 +4,36 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
-group = 'com.github.retrooper'
-version = '2.0.0'
+group 'com.github.retrooper'
+version '2.0.0'
 
 repositories {
     mavenCentral()
+    mavenLocal()
+    maven { url 'https://jitpack.io' }
+    maven { url = 'https://oss.sonatype.org/content/groups/public/' }
 }
 
 shadowJar {
     //Just for jitpack to work
     archiveVersion.set('')
-
+    dependencies {
+        exclude(dependency('com.google.code.gson:gson:2.8.0'))
+    }
     minimize()
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:22.0.0'
-    compileOnly 'net.kyori:adventure-api:4.10.0'
-    compileOnly 'net.kyori:adventure-text-serializer-gson:4.10.0'
-    compileOnly 'net.kyori:adventure-text-serializer-legacy:4.10.0'
+    api 'net.kyori:adventure-api:4.10.0'
+    api 'net.kyori:adventure-text-serializer-gson:4.10.0'
+    api 'net.kyori:adventure-text-serializer-legacy:4.10.0'
 }
 
 publishing {
     publications {
         maven(MavenPublication) {
             groupId = 'com.github.retrooper.packetevents'
-            artifactId = 'api'
+            artifactId = 'adventure'
             from(components.java)
         }
     }
@@ -37,6 +41,12 @@ publishing {
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+}
+
+
+//So that SNAPSHOT is always the latest SNAPSHOT
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
 }
 
 //So we only produce one jar with shadowJar. No suffixes. Just replace what the original jar would be named.
