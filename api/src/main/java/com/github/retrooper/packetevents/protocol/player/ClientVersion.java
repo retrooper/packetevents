@@ -95,6 +95,7 @@ public enum ClientVersion {
     V_1_18_2(758),
 
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
+    //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
     HIGHER_THAN_SUPPORTED_VERSIONS(V_1_18_2.protocolVersion + 1, true),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
@@ -122,6 +123,7 @@ public enum ClientVersion {
     private static final int HIGHEST_SUPPORTED_PROTOCOL_VERSION = HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1;
 
     private static final Map<Integer, ClientVersion> CLIENT_VERSION_CACHE = new IdentityHashMap<>();
+    //TODO UPDATE Add version protocol version
     private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
             340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754, 755, 756, 757, 758};
     private final int protocolVersion;

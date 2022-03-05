@@ -337,6 +337,8 @@ public final class PacketType {
                 loadPacketIds(ClientVersion.V_1_17, ServerboundPacketType_1_17.values());
                 loadPacketIds(ClientVersion.V_1_17_1, ServerboundPacketType_1_17.values());
                 loadPacketIds(ClientVersion.V_1_18, ServerboundPacketType_1_17.values());
+                loadPacketIds(ClientVersion.V_1_18_2, ServerboundPacketType_1_17.values());
+                //TODO UPDATE Map client version
             }
 
             public int getId() {
