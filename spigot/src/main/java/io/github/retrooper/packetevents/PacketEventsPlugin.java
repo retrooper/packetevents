@@ -108,10 +108,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                                 .color(NamedTextColor.RED)
                                 .append(Component.text(" Data: " + brandData)
                                         .color(NamedTextColor.GOLD));
-                        WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(component, ChatPosition.CHAT);
-                        user.writePacket(cm);
-                        WrapperPlayServerWindowConfirmation transaction = new WrapperPlayServerWindowConfirmation(0, (short) 10000, false);
-                        user.writePacket(transaction);
                         break;
                     default:
                         break;
@@ -121,14 +117,14 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketPlaySend(PacketPlaySendEvent event) {
                 Player player = (Player) event.getPlayer();
-                if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
+                /*if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
                     if (player != null) {
                         player.sendMessage("Hii " + player.getName());
                         event.getUser().sendMessage(ChatColor.GREEN + "Hi pt TWOOO");
                     } else {
                         event.getUser().sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
-                }
+                }*/
                 /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
                     event.setCancelled(true);
