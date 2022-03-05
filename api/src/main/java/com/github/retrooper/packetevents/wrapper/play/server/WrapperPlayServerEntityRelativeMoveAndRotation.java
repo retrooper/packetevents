@@ -24,20 +24,22 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrapper<WrapperPlayServerEntityRelativeMoveAndRotation> {
-    private static double MODERN_DELTA_DIVISOR = 4096.0;
-    private static double LEGACY_DELTA_DIVISOR = 32.0;
+    private static final float ROTATION_FACTOR = 256.0F / 360.0F;
+    private static final double MODERN_DELTA_DIVISOR = 4096.0;
+    private static final double LEGACY_DELTA_DIVISOR = 32.0;
     private int entityID;
     private double deltaX;
     private double deltaY;
     private double deltaZ;
-    private byte yaw;
-    private byte pitch;
+    private float yaw;
+    private float pitch;
     private boolean onGround;
     public WrapperPlayServerEntityRelativeMoveAndRotation(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityRelativeMoveAndRotation(int entityID, double deltaX, double deltaY, double deltaZ, byte yaw, byte pitch, boolean onGround) {
+    public WrapperPlayServerEntityRelativeMoveAndRotation(int entityID, double deltaX, double deltaY, double deltaZ,
+                                                          float yaw, float pitch, boolean onGround) {
         super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION);
         this.entityID = entityID;
         this.deltaX = deltaX;
@@ -61,8 +63,8 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
             deltaY = readByte() / LEGACY_DELTA_DIVISOR;
             deltaZ = readByte() / LEGACY_DELTA_DIVISOR;
         }
-        yaw = readByte();
-        pitch = readByte();
+        yaw = readByte() / ROTATION_FACTOR;
+        pitch = readByte() / ROTATION_FACTOR;
         onGround = readBoolean();
     }
 
@@ -90,8 +92,8 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
             writeByte((byte) (deltaY * LEGACY_DELTA_DIVISOR));
             writeByte((byte) (deltaZ * LEGACY_DELTA_DIVISOR));
         }
-        writeByte(yaw);
-        writeByte(pitch);
+        writeByte((int)(yaw * ROTATION_FACTOR));
+        writeByte((int)(pitch * ROTATION_FACTOR));
         writeBoolean(onGround);
     }
 
@@ -127,19 +129,19 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
         this.deltaZ = deltaZ;
     }
 
-    public byte getYaw() {
+    public float getYaw() {
         return yaw;
     }
 
-    public void setYaw(byte yaw) {
+    public void setYaw(float yaw) {
         this.yaw = yaw;
     }
 
-    public byte getPitch() {
+    public float getPitch() {
         return pitch;
     }
 
-    public void setPitch(byte pitch) {
+    public void setPitch(float pitch) {
         this.pitch = pitch;
     }
 

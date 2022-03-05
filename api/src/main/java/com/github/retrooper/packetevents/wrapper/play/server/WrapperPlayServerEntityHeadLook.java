@@ -23,14 +23,15 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEntityHeadLook extends PacketWrapper<WrapperPlayServerEntityHeadLook> {
+    private static final float ROTATION_FACTOR = 256.0F / 360.0F;
     private int entityID;
-    private byte headYaw;
+    private float headYaw;
 
     public WrapperPlayServerEntityHeadLook(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityHeadLook(int entityID, byte headYaw) {
+    public WrapperPlayServerEntityHeadLook(int entityID, float headYaw) {
         super(PacketType.Play.Server.ENTITY_HEAD_LOOK);
         this.entityID = entityID;
         this.headYaw = headYaw;
@@ -39,7 +40,7 @@ public class WrapperPlayServerEntityHeadLook extends PacketWrapper<WrapperPlaySe
     @Override
     public void readData() {
         entityID = readVarInt();
-        headYaw = readByte();
+        headYaw = readByte() / ROTATION_FACTOR;
     }
 
     @Override
@@ -51,7 +52,7 @@ public class WrapperPlayServerEntityHeadLook extends PacketWrapper<WrapperPlaySe
     @Override
     public void writeData() {
         writeVarInt(entityID);
-        writeByte(headYaw);
+        writeByte((int) (headYaw * ROTATION_FACTOR));
     }
 
     public int getEntityId() {
@@ -62,11 +63,11 @@ public class WrapperPlayServerEntityHeadLook extends PacketWrapper<WrapperPlaySe
         this.entityID = entityID;
     }
 
-    public byte getHeadYaw() {
+    public float getHeadYaw() {
         return headYaw;
     }
 
-    public void setHeadYaw(byte headYaw) {
+    public void setHeadYaw(float headYaw) {
         this.headYaw = headYaw;
     }
 }

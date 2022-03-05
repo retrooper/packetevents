@@ -23,15 +23,16 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlayServerEntityRotation> {
+    private static final float ROTATION_FACTOR = 256.0F / 360.0F;
     private int entityID;
-    private byte yaw;
-    private byte pitch;
+    private float yaw;
+    private float pitch;
     private boolean onGround;
     public WrapperPlayServerEntityRotation(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityRotation(int entityID, byte yaw, byte pitch, boolean onGround) {
+    public WrapperPlayServerEntityRotation(int entityID, float yaw, float pitch, boolean onGround) {
         super(PacketType.Play.Server.ENTITY_ROTATION);
         this.entityID = entityID;
         this.yaw = yaw;
@@ -42,8 +43,8 @@ public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlaySe
     @Override
     public void readData() {
         entityID = readVarInt();
-        yaw = readByte();
-        pitch = readByte();
+        yaw = readByte()/ ROTATION_FACTOR;
+        pitch = readByte() / ROTATION_FACTOR;
         onGround = readBoolean();
     }
 
@@ -58,8 +59,8 @@ public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlaySe
     @Override
     public void writeData() {
         writeVarInt(entityID);
-        writeByte(yaw);
-        writeByte(pitch);
+        writeByte((int) (yaw * ROTATION_FACTOR));
+        writeByte((int) (pitch * ROTATION_FACTOR));
         writeBoolean(onGround);
     }
 
@@ -71,19 +72,19 @@ public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlaySe
         this.entityID = entityID;
     }
 
-    public byte getYaw() {
+    public float getYaw() {
         return yaw;
     }
 
-    public void setYaw(byte yaw) {
+    public void setYaw(float yaw) {
         this.yaw = yaw;
     }
 
-    public byte getPitch() {
+    public float getPitch() {
         return pitch;
     }
 
-    public void setPitch(byte pitch) {
+    public void setPitch(float pitch) {
         this.pitch = pitch;
     }
 

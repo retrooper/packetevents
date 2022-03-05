@@ -27,9 +27,7 @@ package com.github.retrooper.packetevents.manager.server;
 public enum SystemOS {
 
     WINDOWS, MACOS, LINUX, OTHER;
-
-    private static final SystemOS[] VALUES = values();
-    private static SystemOS value;
+    private static SystemOS CACHE;
 
     /**
      * Get the server's operating system.
@@ -39,7 +37,7 @@ public enum SystemOS {
      */
     public static SystemOS getOSNoCache() {
         final String os = System.getProperty("os.name").toLowerCase();
-        for (SystemOS sysos : VALUES) {
+        for (SystemOS sysos : values()) {
             if (os.contains(sysos.name().toLowerCase())) {
                 return sysos;
             }
@@ -54,10 +52,10 @@ public enum SystemOS {
      * @return Operating System.
      */
     public static SystemOS getOS() {
-        if (value == null) {
-            value = getOSNoCache();
+        if (CACHE == null) {
+            CACHE = getOSNoCache();
         }
-        return value;
+        return CACHE;
     }
 
 }

@@ -19,66 +19,31 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.util.Vector3d;
 
-public class WrapperPlayClientPlayerRotation extends PacketWrapper<WrapperPlayClientPlayerRotation> {
-    private float yaw;
-    private float pitch;
-    private boolean onGround;
+public class WrapperPlayClientPlayerRotation extends WrapperPlayClientPlayerFlying {
     public WrapperPlayClientPlayerRotation(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperPlayClientPlayerRotation(float yaw, float pitch, boolean onGround) {
-        super(PacketType.Play.Client.PLAYER_ROTATION);
-        this.yaw = yaw;
-        this.pitch = pitch;
-        this.onGround = onGround;
-    }
-
-    @Override
-    public void readData() {
-        yaw = readFloat();
-        pitch = readFloat();
-        onGround = readBoolean();
-    }
-
-    @Override
-    public void readData(WrapperPlayClientPlayerRotation wrapper) {
-        yaw = wrapper.yaw;
-        pitch = wrapper.pitch;
-        onGround = wrapper.onGround;
-    }
-
-    @Override
-    public void writeData() {
-        writeFloat(yaw);
-        writeFloat(pitch);
-        writeBoolean(onGround);
+        super(false, true, onGround, new Location(new Vector3d(), yaw, pitch));
     }
 
     public float getYaw() {
-        return yaw;
+        return getLocation().getYaw();
     }
 
     public void setYaw(float yaw) {
-        this.yaw = yaw;
+        getLocation().setYaw(yaw);
     }
 
     public float getPitch() {
-        return pitch;
+        return getLocation().getPitch();
     }
 
     public void setPitch(float pitch) {
-        this.pitch = pitch;
-    }
-
-    public boolean isOnGround() {
-        return onGround;
-    }
-
-    public void setOnGround(boolean onGround) {
-        this.onGround = onGround;
+        getLocation().setPitch(pitch);
     }
 }
