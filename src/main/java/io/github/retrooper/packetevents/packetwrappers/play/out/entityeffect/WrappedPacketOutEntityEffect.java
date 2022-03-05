@@ -166,7 +166,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
             }
             //1.18.2+
             else if (v_1_18_2) {
-                return readInt(6);
+                return readInt(5);
             }
             //1.17 - 1.8
             else {
@@ -189,7 +189,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
                 writeShort(0, (short) duration);
             }
             else if (v_1_18_2) {
-                writeInt(6, duration);
+                writeInt(5, duration);
             }
             else {
                 writeInt(v_1_17 ? 4 : 1, duration);
@@ -200,7 +200,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
     }
 
     private Optional<Byte> getByteMask() {
-        if (version.isOlderThan(ServerVersion.v_1_8)) {
+        if (v_1_7_10) {
             return Optional.empty();
         }
         if (packet != null && !byteMaskInitialized) {
@@ -211,7 +211,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
     }
 
     private void setByteMask(byte byteMask) {
-        if (version.isNewerThan(ServerVersion.v_1_7_10)) {
+        if (!v_1_7_10) {
             this.byteMask = byteMask;
             if (packet != null) {
                 writeByte(v_1_18_2 ? 1 : 2, byteMask);

@@ -29,7 +29,7 @@ import org.bukkit.entity.Entity;
 import java.lang.reflect.Constructor;
 
 public class WrappedPacketOutRemoveEntityEffect extends WrappedPacketEntityAbstraction implements SendableWrapper {
-    private static boolean v_1_8_x, v_1_17, v_1_18_2;
+    private static boolean v_1_8_x, v_1_17;
     private static Constructor<?> packetConstructor;
     private int effectID;
 
@@ -52,7 +52,6 @@ public class WrappedPacketOutRemoveEntityEffect extends WrappedPacketEntityAbstr
     protected void load() {
         v_1_8_x = version.isOlderThan(ServerVersion.v_1_9);
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
-        v_1_18_2 = version.isNewerThanOrEquals(ServerVersion.v_1_18_2);
         try {
             if (v_1_17) {
                 packetConstructor = PacketTypeClasses.Play.Server.REMOVE_ENTITY_EFFECT.getConstructor(int.class, NMSUtils.mobEffectListClass);
