@@ -30,18 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MappingHelper {
-    public static final Map<String, JsonObject> MAPPING_JSON_OBJECTS = new HashMap<>();
-
     public static JsonObject getJSONObject(String id) {
-        JsonObject result = MAPPING_JSON_OBJECTS.get(id);
-        if (result == null) {
-            result = searchJSONObject(id);
-            MAPPING_JSON_OBJECTS.put(id, result);
-        }
-        return result;
-    }
-
-    public static JsonObject searchJSONObject(String id) {
         StringBuilder sb = new StringBuilder();
         try (InputStream inputStream = ItemTypes.class.getClassLoader().getResourceAsStream("assets/mappings/" + id + ".json");
              InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
