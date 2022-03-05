@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.handlers.compression;
+package io.github.retrooper.packetevents.injector;
 
 import io.github.retrooper.packetevents.injector.legacy.compression.PacketCompressionLegacy;
 import io.github.retrooper.packetevents.injector.latest.compression.PacketCompressionLatest;

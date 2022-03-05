@@ -20,8 +20,8 @@ package io.github.retrooper.packetevents.injector.legacy.compression;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import io.github.retrooper.packetevents.handlers.compression.PacketCompressionManager;
-import io.github.retrooper.packetevents.handlers.compression.PacketCompressionUtil;
+import io.github.retrooper.packetevents.injector.PacketCompressionManager;
+import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
 import io.github.retrooper.packetevents.injector.legacy.handlers.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
