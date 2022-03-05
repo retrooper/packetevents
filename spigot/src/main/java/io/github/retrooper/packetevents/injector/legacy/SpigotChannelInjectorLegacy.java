@@ -135,9 +135,9 @@ public class SpigotChannelInjectorLegacy implements ChannelInjector {
         else if (pipeline.get("floodgate-init") != null) {
             pipeline.addAfter("floodgate-init", PacketEvents.CONNECTION_HANDLER_NAME, new ServerChannelHandlerLegacy());
         }
-        //Otherwise, we just don't care and make sure we are first.
+        //Otherwise, we just don't care and make sure we are last.
         else {
-            pipeline.addFirst(PacketEvents.CONNECTION_HANDLER_NAME, new ServerChannelHandlerLegacy());
+            pipeline.addLast(PacketEvents.CONNECTION_HANDLER_NAME, new ServerChannelHandlerLegacy());
         }
 
         if (networkManagers == null) {
