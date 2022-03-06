@@ -14,16 +14,16 @@
   },
 
   "license": "GPLv3",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/packetevents/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "io.github.retrooper.packetevents.ExampleMod"
+      "io.github.retrooper.packetevents.PacketEventsMod"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "packetevents.mixins.json"
   ],
 
   "depends": {

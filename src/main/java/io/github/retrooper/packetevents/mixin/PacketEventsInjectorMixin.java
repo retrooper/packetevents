@@ -7,7 +7,7 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import io.github.retrooper.packetevents.ExampleMod;
+import io.github.retrooper.packetevents.PacketEventsMod;
 import io.github.retrooper.packetevents.handler.PacketDecoder;
 import io.github.retrooper.packetevents.handler.PacketEncoder;
 import io.netty.channel.Channel;
@@ -21,10 +21,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
 @Mixin(net.minecraft.network.Connection.class)
-public class ExampleMixin {
+public class PacketEventsInjectorMixin {
     @Inject(method = "channelActive", at = @At("HEAD"))
     private void channelActive(ChannelHandlerContext ctx, CallbackInfo info) throws Exception {
-        ExampleMod.LOGGER.info("Connected!");
+        PacketEventsMod.LOGGER.info("Connected!");
         Channel channel = ctx.channel();
         User user = new User(channel, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
                 new UserProfile(null, null));
@@ -35,11 +35,11 @@ public class ExampleMixin {
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, encoder);
         //TODO Handle compression
-        ExampleMod.LOGGER.info("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
+        PacketEventsMod.LOGGER.info("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
     }
 
     @Inject(method = "channelInactive", at = @At("HEAD"))
     private void channelInactive(ChannelHandlerContext ctx, CallbackInfo info) {
-        ExampleMod.LOGGER.info("Disconnected!");
+        PacketEventsMod.LOGGER.info("Disconnected!");
     }
 }
