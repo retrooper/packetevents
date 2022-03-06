@@ -18,54 +18,110 @@
 
 package io.github.retrooper.packetevents.injector;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.reflection.Reflection;
+import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
+import io.github.retrooper.packetevents.handlers.PacketDecoder;
+import io.github.retrooper.packetevents.handlers.PacketEncoder;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.function.Supplier;
+
 public class VelocityPipelineInjector implements ChannelInjector {
+    private static Class<?> CONNECTION_MANAGER_CLASS, SERVER_INITIALIZER_HOLDER_CLASS, BACKEND_INITIALIZER_HOLDER_CLASS;
+    private static Method SET_SERVER_INTIIALIZER, SET_BACKEND_INITIALIZER;
+    private final ProxyServer server;
+
+    public VelocityPipelineInjector(ProxyServer server) {
+        this.server = server;
+    }
+
     @Override
-    public boolean isBound() {
+    public boolean isServerBound() {
         return true;
     }
 
     @Override
-    public @Nullable ConnectionState getConnectionState(Object channel) {
-        return null;
-    }
-
-    @Override
-    public void changeConnectionState(Object channel, @Nullable ConnectionState packetState) {
-
-    }
-
-    @Override
     public void inject() {
+        if (CONNECTION_MANAGER_CLASS == null) {
+            CONNECTION_MANAGER_CLASS = Reflection.getClassByNameWithoutException("com.velocitypowered.proxy.network.ConnectionManager");
+            SERVER_INITIALIZER_HOLDER_CLASS = Reflection.getClassByNameWithoutException("com.velocitypowered.proxy.network.ServerChannelInitializerHolder");
+            BACKEND_INITIALIZER_HOLDER_CLASS = Reflection.getClassByNameWithoutException("com.velocitypowered.proxy.network.BackendChannelInitializerHolder");
+            SET_SERVER_INTIIALIZER = Reflection.getMethod(SERVER_INITIALIZER_HOLDER_CLASS, 0, ChannelInitializer.class);
+            SET_BACKEND_INITIALIZER = Reflection.getMethod(BACKEND_INITIALIZER_HOLDER_CLASS, 0, ChannelInitializer.class);
+        }
+        ReflectionObject reflectServer = new ReflectionObject(server);
+        Object connectionManager = reflectServer.readObject(0, CONNECTION_MANAGER_CLASS);
+        ReflectionObject reflectConnectionManager = new ReflectionObject(connectionManager);
+        Object proxyInitializerHolder = reflectConnectionManager.readObject(0, SERVER_INITIALIZER_HOLDER_CLASS);
+        ChannelInitializer<Channel> wrappedProxyInitializer = ((Supplier<ChannelInitializer<Channel>>) proxyInitializerHolder).get();
+        VelocityChannelInitializer initializer = new VelocityChannelInitializer(wrappedProxyInitializer);
+        try {
+            SET_SERVER_INTIIALIZER.invoke(proxyInitializerHolder, initializer);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        //TODO Do we also register in backend initializer?
+       /* Object backendInitializerHolder = reflectConnectionManager.readObject(0, BACKEND_INITIALIZER_HOLDER_CLASS);
+        ChannelInitializer<Channel> wrappedBackendInitializer = ((Supplier<ChannelInitializer<Channel>>) backendInitializerHolder).get();
+        try {
+            SET_BACKEND_INITIALIZER.invoke(backendInitializerHolder, new VelocityChannelInitializer(wrappedBackendInitializer));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }*/
+    }
+
+    @Override
+    public void uninject() {
 
     }
 
     @Override
-    public void eject() {
-
+    public User getUser(Object channel) {
+        PacketDecoder decoder = (PacketDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME);
+        return decoder.user;
     }
 
     @Override
-    public void injectPlayer(Object player, @Nullable ConnectionState connectionState) {
-
+    public void changeConnectionState(Object channel, @Nullable ConnectionState connectionState) {
+        getUser(channel).setConnectionState(connectionState);
     }
 
     @Override
     public void updateUser(Object channel, User user) {
+        PacketDecoder decoder = (PacketDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME);
+        decoder.user = user;
 
+        PacketEncoder encoder = (PacketEncoder) ((Channel) channel).pipeline().get(PacketEvents.ENCODER_NAME);
+        encoder.user = user;
     }
 
     @Override
-    public void ejectPlayer(Object player) {
-
+    public void setPlayer(Object ch, Object p) {
+        Channel channel = (Channel) ch;
+        Player player = (Player) p;
+        PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+        decoder.player = player;
+        decoder.user.getProfile().setUUID(player.getUniqueId());
+        decoder.user.getProfile().setName(player.getUsername());
+        PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
+        encoder.player = player;
     }
 
     @Override
-    public boolean hasInjected(Object player) {
-        return false;
+    public boolean hasPlayer(Object player) {
+        Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+        return decoder != null
+                && decoder.player != null;
     }
 }

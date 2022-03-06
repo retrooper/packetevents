@@ -28,8 +28,8 @@ import io.netty.channel.Channel;
 
 public class ServerConnectionInitializer {
     public static void initChannel(Channel channel, PacketDecoder decoder, PacketEncoder encoder) {
-        channel.pipeline().addBefore("packet-decoder", PacketEvents.DECODER_NAME, decoder);
-        channel.pipeline().addBefore("packet-encoder", PacketEvents.ENCODER_NAME, encoder);
+        channel.pipeline().addBefore("minecraft-decoder", PacketEvents.DECODER_NAME, decoder);
+        channel.pipeline().addBefore("minecraft-encoder", PacketEvents.ENCODER_NAME, encoder);
     }
 
     public static void initChannel(Channel channel, ConnectionState state) {

@@ -30,16 +30,24 @@ import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import com.github.retrooper.packetevents.util.LogManager;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import io.github.retrooper.packetevents.PacketEventsPlugin;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import io.github.retrooper.packetevents.injector.VelocityPipelineInjector;
+import io.github.retrooper.packetevents.manager.PlayerManagerImpl;
+import io.netty.channel.Channel;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.logging.Level;
 
 public class VelocityPacketEventsBuilder {
     private static PacketEventsAPI<PluginContainer> INSTANCE;
@@ -84,38 +92,30 @@ public class VelocityPacketEventsBuilder {
 
                 @Override
                 public ServerVersion getVersion() {
-                    //TODO Not perfect, as this is on the client! Might be inaccurate by a few patch versions.
                     if (version == null) {
-                        String velocityVersion =
-                                server.getVersion().getName();
-                        System.out.println("Velocity version: " + velocityVersion);
-                        for (final ServerVersion val : ServerVersion.reversedValues()) {
+                        String velocityVersion = com.velocitypowered.api.network.ProtocolVersion
+                                .MAXIMUM_VERSION.getName();
+                        for (final ServerVersion val : ServerVersion.values()) {
                             if (velocityVersion.contains(val.getReleaseName())) {
                                 return version = val;
                             }
                         }
-                        if (version == null) {
-                            version = PacketEvents.getAPI().getSettings().getFallbackServerVersion();
-                        }
+                        return version = PacketEvents.getAPI().getSettings().getFallbackServerVersion();
                     }
                     return version;
                 }
             };
 
-            private final PlayerManagerAbstract playerManager = new PlayerManagerAbstract() {
-                @Override
-                public int getPing(@NotNull Object player) {
-                    return (int) ((Player) player).getPing();
-                }
+            private final PlayerManagerAbstract playerManager = new PlayerManagerImpl();
 
+            private final ChannelInjector injector = new VelocityPipelineInjector(server);
+            private final NettyManager nettyManager = new NettyManagerImpl();
+            private final LogManager logManager = new LogManager() {
                 @Override
-                public Object getChannel(@NotNull Object player) {
-                    return PacketEvents.getAPI().getProtocolManager().getChannel(((Player) player).getUsername());
+                protected void log(Level level, @Nullable NamedTextColor color, String message) {
+                    System.out.println(message);
                 }
             };
-
-            private final ChannelInjector injector = new VelocityPipelineInjector();
-            private final NettyManager nettyManager = new NettyManagerImpl();
             private boolean loaded;
             private boolean initialized;
 
@@ -127,7 +127,7 @@ public class VelocityPacketEventsBuilder {
                     PacketEvents.IDENTIFIER = "pe-" + id;
                     PacketEvents.ENCODER_NAME = "pe-encoder-" + id;
                     PacketEvents.DECODER_NAME = "pe-decoder-" + id;
-                    PacketEvents.CONNECTION_NAME = "pe-connection-handler-" + id;
+                    PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
 
                     injector.inject();
@@ -151,7 +151,9 @@ public class VelocityPacketEventsBuilder {
                 load();
                 if (!initialized) {
                     server.getEventManager().register(plugin.getInstance().orElse(null), PostLoginEvent.class, (event) -> {
-                        PacketEvents.getAPI().getInjector().injectPlayer(event.getPlayer(), null);
+                        Player player = event.getPlayer();
+                        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+                        PacketEvents.getAPI().getInjector().setPlayer(channel, player);
                     });
                     if (settings.shouldCheckForUpdates()) {
                         getUpdateChecker().handleUpdateCheck();
@@ -176,11 +178,16 @@ public class VelocityPacketEventsBuilder {
             public void terminate() {
                 if (initialized) {
                     //Eject the injector if needed(depends on the injector implementation)
-                    injector.eject();
+                    injector.uninject();
                     //Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;
                 }
+            }
+
+            @Override
+            public LogManager getLogManager() {
+                return logManager;
             }
 
             @Override

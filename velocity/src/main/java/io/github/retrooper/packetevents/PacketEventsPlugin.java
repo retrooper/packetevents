@@ -19,6 +19,10 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerAbstract;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -33,6 +37,7 @@ import java.util.logging.Logger;
 public class PacketEventsPlugin {
     private final ProxyServer server;
     private final Logger logger;
+    @Inject
     public PacketEventsPlugin(ProxyServer server, Logger logger) {
         this.server = server;
         this.logger = logger;
@@ -46,6 +51,17 @@ public class PacketEventsPlugin {
         PacketEvents.setAPI(VelocityPacketEventsBuilder.build(server, plugin));
         PacketEvents.getAPI().load();
         PacketEvents.getAPI().getSettings().debug(true);
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketReceive(PacketReceiveEvent event) {
+                System.out.println("Incoming: " + event.getPacketType().getName());
+            }
+
+            @Override
+            public void onPacketSend(PacketSendEvent event) {
+                System.out.println("Outgoing: " + event.getPacketType().getName());
+            }
+        });
         PacketEvents.getAPI().init();
     }
 

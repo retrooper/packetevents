@@ -1,6 +1,6 @@
 /*
- * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2021 ViaVersion and contributors
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,29 +23,20 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
-import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
-import io.github.retrooper.packetevents.injector.ServerConnectionInitializer;
+import com.velocitypowered.api.proxy.Player;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.lang.reflect.InvocationTargetException;
-
-//Thanks to ViaVersion for the compression method.
-@ChannelHandler.Sharable
 public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
-    public ProxiedPlayer player;
+    public Player player;
     public User user;
-    public boolean handledCompression;
 
     public PacketEncoder(User user) {
         this.user = user;
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
-        boolean doCompression = handleCompressionOrder(ctx, buffer);
         int firstReaderIndex = buffer.readerIndex();
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer);
         int readerIndex = buffer.readerIndex();
@@ -57,9 +48,6 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
                 packetSendEvent.getLastUsedWrapper().writeData();
             }
             buffer.readerIndex(firstReaderIndex);
-            if (doCompression) {
-                recompress(ctx, buffer);
-            }
         }
         if (packetSendEvent.hasPostTasks()) {
             for (Runnable task : packetSendEvent.getPostTasks()) {
@@ -81,46 +69,5 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
         super.exceptionCaught(ctx, cause);
         //}
     }
-
-    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {
-        if (handledCompression) return false;
-        int encoderIndex = ctx.pipeline().names().indexOf("compress");
-        if (encoderIndex == -1) return false;
-        if (encoderIndex > ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME)) {
-            // Need to decompress this packet due to bad order
-            ChannelHandler decompressor = ctx.pipeline().get("decompress");
-            try {
-                ByteBuf decompressed = (ByteBuf) CustomPipelineUtil.callPacketDecodeByteBuf(decompressor, ctx, buffer).get(0);
-                if (buffer != decompressed) {
-                    try {
-                        buffer.clear().writeBytes(decompressed);
-                    } finally {
-                        decompressed.release();
-                    }
-                }
-                //Relocate handlers
-                ServerConnectionInitializer.reloadChannel(ctx.channel());
-                handledCompression = true;
-                return true;
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
-    }
-
-    private void recompress(ChannelHandlerContext ctx, ByteBuf buffer) {
-        ChannelHandler compressor = ctx.pipeline().get("compress");
-        ByteBuf compressed = ctx.alloc().buffer();
-        try {
-            CustomPipelineUtil.callPacketEncodeByteBuf(compressor, ctx, buffer, compressed);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        try {
-            buffer.clear().writeBytes(compressed);
-        } finally {
-            compressed.release();
-        }
-    }
 }
+

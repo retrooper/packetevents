@@ -20,24 +20,21 @@ package io.github.retrooper.packetevents.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
-import com.github.retrooper.packetevents.util.ExceptionUtil;
+import com.velocitypowered.api.proxy.Player;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.List;
+
 @ChannelHandler.Sharable
 public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
     public User user;
-    public ProxiedPlayer player;
-
+    public Player player;
     public PacketDecoder(User user) {
         this.user = user;
     }
@@ -78,7 +75,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
-            super.exceptionCaught(ctx, cause);
+        super.exceptionCaught(ctx, cause);
         //}
     }
 }
