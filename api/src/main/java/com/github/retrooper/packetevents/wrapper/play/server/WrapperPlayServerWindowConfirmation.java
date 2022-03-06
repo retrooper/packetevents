@@ -63,7 +63,7 @@ public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPl
 
     @Override
     public void readData() {
-        this.windowId = readByte();
+        this.windowId = readUnsignedByte();
         this.actionId = readShort();
         this.accepted = readBoolean();
     }

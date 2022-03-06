@@ -5,7 +5,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayServerOpenHorseWindow> {
-    byte windowId;
+    int windowId;
     int slotCount;
     int entityId;
 
@@ -13,7 +13,7 @@ public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayS
         super(event);
     }
 
-    public WrapperPlayServerOpenHorseWindow(byte windowId, int slotCount, int entityId) {
+    public WrapperPlayServerOpenHorseWindow(int windowId, int slotCount, int entityId) {
         super(PacketType.Play.Server.OPEN_HORSE_WINDOW);
         this.windowId = windowId;
         this.slotCount = slotCount;
@@ -22,7 +22,7 @@ public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayS
 
     @Override
     public void readData() {
-        this.windowId = (byte) readUnsignedByte();
+        this.windowId = readUnsignedByte();
         this.slotCount = readVarInt();
         this.entityId = readInt();
     }
@@ -41,11 +41,11 @@ public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayS
         writeInt(entityId);
     }
 
-    public byte getWindowId() {
+    public int getWindowId() {
         return windowId;
     }
 
-    public void setWindowId(byte windowId) {
+    public void setWindowId(int windowId) {
         this.windowId = windowId;
     }
 
