@@ -103,7 +103,8 @@ public class ServerConnectionInitializerLatest {
                     //Force via to now wrap this new father decoder.
                     reflectViaDecoder.write(ByteToMessageDecoder.class, 0, newDecoderModern);
                 }
-            } else if (ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketDecoderModern")) {
+            } else if (ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketDecoderLatest")
+            || ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketDecoderModern")) {
                 //Possibly another instance of packetevents has already injected into ViaVersion.
                 //Let us try to remove our own decoder without breaking the other instance.
                 ReflectionObject reflectDecoder = new ReflectionObject(decoder);
