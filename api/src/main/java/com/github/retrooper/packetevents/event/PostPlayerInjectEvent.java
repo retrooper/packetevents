@@ -65,7 +65,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent<Ob
      */
     @NotNull
     public ClientVersion getClientVersion() {
-        return PacketEvents.getAPI().getPlayerManager().getClientVersion(channel);
+        return PacketEvents.getAPI().getPlayerManager().getClientVersion(player);
     }
 
     @Override
