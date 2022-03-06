@@ -55,8 +55,8 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        if (msg.readableBytes() != 0) {
-            boolean recompress = handleCompression(ctx, msg);
+        if (msg.isReadable()) {
+            boolean recompress = handleCompression(ctx, msg) && msg.isReadable();
             read(ctx, msg);
             if (recompress) {
                 recompress(ctx, msg);
