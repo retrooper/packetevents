@@ -16,15 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.processor;
+package io.github.retrooper.packetevents.bukkit;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import io.github.retrooper.packetevents.handlers.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
