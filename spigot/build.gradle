@@ -25,6 +25,12 @@ dependencies {
     api project(':api')
     compileOnly 'org.jetbrains:annotations:22.0.0'
 
+    api 'net.kyori:adventure-api:4.10.0'
+    //includes gson
+    api 'net.kyori:adventure-text-serializer-gson:4.10.0'
+
+    api 'net.kyori:adventure-text-serializer-legacy:4.10.0'
+
     compileOnly 'org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT'
     compileOnly 'com.viaversion:viaversion:4.0.1'
     compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
