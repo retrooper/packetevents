@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "packetevents-fabric",
+  "id": "packetevents",
   "version": "${version}",
 
   "name": "PacketEvents Fabric",

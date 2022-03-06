@@ -20,9 +20,9 @@ repositories {
 }
 
 dependencies {
-	implementation 'com.github.retrooper.packetevents:netty-common:2.0-SNAPSHOT'
+	modImplementation 'com.github.retrooper.packetevents:netty-common:2.0-SNAPSHOT'
 	include('com.github.retrooper.packetevents:netty-common:2.0-SNAPSHOT')
-	implementation 'com.github.retrooper.packetevents:adventure:2.0-SNAPSHOT'
+	modImplementation 'com.github.retrooper.packetevents:adventure:2.0-SNAPSHOT'
 	include('com.github.retrooper.packetevents:adventure:2.0-SNAPSHOT')
 
 	// To change the versions see the gradle.properties file

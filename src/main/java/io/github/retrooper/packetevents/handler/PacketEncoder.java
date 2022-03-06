@@ -21,18 +21,20 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
         this.player = player;
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
-        int firstReaderIndex = byteBuf.readerIndex();
-        PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player, byteBuf);
-        int readerIndex = byteBuf.readerIndex();
-        PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> byteBuf.readerIndex(readerIndex));
+    public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
+        int firstReaderIndex = buffer.readerIndex();
+        PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player, buffer);
+        int readerIndex = buffer.readerIndex();
+        PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> buffer.readerIndex(readerIndex));
         if (!packetReceiveEvent.isCancelled()) {
             if (packetReceiveEvent.getLastUsedWrapper() != null) {
                 ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
                 packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
                 packetReceiveEvent.getLastUsedWrapper().writeData();
             }
-            byteBuf.readerIndex(firstReaderIndex);
+            buffer.readerIndex(firstReaderIndex);
+        } else {
+            buffer.clear();
         }
         if (packetReceiveEvent.hasPostTasks()) {
             for (Runnable task : packetReceiveEvent.getPostTasks()) {
