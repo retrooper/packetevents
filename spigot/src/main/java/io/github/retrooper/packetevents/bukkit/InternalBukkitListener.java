@@ -16,12 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.bukkit;
+package io.github.retrooper.packetevents.processor;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PostPlayerInjectEvent;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
+import io.github.retrooper.packetevents.handlers.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,7 +54,8 @@ public class InternalBukkitListener implements Listener {
     public void onQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
         Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        //Cleanup user data, maybe make some abstraction method for this in the API module.
-        PacketEvents.getAPI().getProtocolManager().clearUserData(channel, player.getName());
+        //When we receive LOGIN_SUCCESS, we cache username with their channel.
+        //Here we clean that up.
+        ProtocolManager.CHANNELS.remove(player.getName());
     }
 }

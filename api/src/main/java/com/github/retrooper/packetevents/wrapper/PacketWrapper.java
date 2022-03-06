@@ -140,6 +140,9 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     }
 
+    //TODO public void transform(int protocolVersion) {}
+    //Current idea change server version, but still think more
+
     public final void readEvent(ProtocolPacketEvent<?> event) {
         PacketWrapper<?> last = event.getLastUsedWrapper();
         if (last != null) {

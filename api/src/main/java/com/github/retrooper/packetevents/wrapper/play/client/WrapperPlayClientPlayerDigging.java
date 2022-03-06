@@ -59,7 +59,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
             int z = readInt();
             blockPosition = new Vector3i(x, y, z);
         }
-        byte face = readByte();
+        short face = readUnsignedByte();
         blockFace = BlockFace.getBlockFaceByValue(face);
     }
 

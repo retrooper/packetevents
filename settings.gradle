@@ -4,4 +4,5 @@ include ':adventure'
 include ':netty-common'
 include ':spigot'
 include ':bungeecord'
+include 'velocity'
 

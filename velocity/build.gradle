@@ -1,0 +1,56 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+
+group = 'com.github.retrooper'
+version = '2.0.0'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url = 'https://oss.sonatype.org/content/groups/public/' }
+    maven {
+        url 'https://repo.velocitypowered.com/snapshots/'
+    }
+}
+
+shadowJar {
+    //Just for jitpack to work
+    archiveVersion.set('')
+    minimize()
+}
+
+dependencies {
+    compileOnly 'org.jetbrains:annotations:22.0.0'
+    compileOnly 'com.velocitypowered:velocity-api:1.0.0-SNAPSHOT'
+    api project(':api')
+    implementation project(':netty-common')
+    implementation project(':adventure')
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.github.retrooper.packetevents'
+            artifactId = 'velocity'
+            from(components.java)
+        }
+    }
+}
+
+//So that SNAPSHOT is always the latest SNAPSHOT
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+}
+
+//So we only produce one jar with shadowJar. No suffixes. Just replace what the original jar would be named.
+tasks.jar.configure {
+    classifier = 'default'
+}
+
+tasks.shadowJar.configure {
+    classifier = null
+}
