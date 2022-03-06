@@ -8,13 +8,11 @@ import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToMessageEncoder;
+import io.netty.handler.codec.MessageToByteEncoder;
 import net.minecraft.client.player.LocalPlayer;
 
-import java.util.List;
-
 @ChannelHandler.Sharable
-public class PacketEncoder extends MessageToMessageEncoder<ByteBuf> {
+public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     public final LocalPlayer player;
     public User user;
 
@@ -46,11 +44,11 @@ public class PacketEncoder extends MessageToMessageEncoder<ByteBuf> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
         if (msg.isReadable()) {
             read(ctx, msg);
             if (msg.isReadable()) {
-                out.add(msg.retain());
+                out.writeBytes(msg);
             }
         }
     }
