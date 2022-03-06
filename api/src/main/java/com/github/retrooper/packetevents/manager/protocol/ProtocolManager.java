@@ -206,12 +206,4 @@ public interface ProtocolManager {
     default Object getChannel(String username) {
         return CHANNELS.get(username);
     }
-
-    default void clearUserData(Object channel, @Nullable String name) {
-        USERS.remove(channel);
-        //Name is only accessible if the server sends the LOGIN_SUCCESS packet which contains name and UUID
-        if (name != null) {
-            CHANNELS.remove(name);
-        }
-    }
 }
