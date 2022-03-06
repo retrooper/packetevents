@@ -56,5 +56,6 @@ public class ServerConnectionInitializerLegacy {
         }
         channel.pipeline().remove(PacketEvents.DECODER_NAME);
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+        ProtocolManager.USERS.remove(channel);
     }
 }

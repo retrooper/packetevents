@@ -119,5 +119,7 @@ public class ServerConnectionInitializerLatest {
 
         //Easily cleanup the encoder
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+
+        ProtocolManager.USERS.remove(channel);
     }
 }
