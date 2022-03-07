@@ -66,7 +66,7 @@ dependencies {
 }
 
 group = 'io.github.retrooper'
-version = '1.8-pre-19'
+version = '1.8'
 description = 'packetevents'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 

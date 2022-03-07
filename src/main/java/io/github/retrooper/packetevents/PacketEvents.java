@@ -57,7 +57,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class PacketEvents implements Listener, EventManager {
     private static PacketEvents instance;
     private static Plugin plugin;
-    private final PEVersion version = new PEVersion(1, 7, 9, 19);
+    private final PEVersion version = new PEVersion(1, 8);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
@@ -191,6 +191,10 @@ public final class PacketEvents implements Listener, EventManager {
 
             if (settings.isbStatsEnabled()) {
                 Metrics metrics = new Metrics((JavaPlugin) getPlugin(), 11327);
+                //Just to have an idea what versions of packetevents people use
+                metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
+                    return "1.8";
+                }));
             }
 
             //We must wait for the injector to initialize.
