@@ -18,7 +18,7 @@
 
   "environment": "*",
   "entrypoints": {
-    "main": [
+    "preLaunch": [
       "io.github.retrooper.packetevents.PacketEventsMod"
     ]
   },
