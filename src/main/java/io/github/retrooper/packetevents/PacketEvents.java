@@ -193,7 +193,7 @@ public final class PacketEvents implements Listener, EventManager {
                 Metrics metrics = new Metrics((JavaPlugin) getPlugin(), 11327);
                 //Just to have an idea what versions of packetevents people use
                 metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
-                    return "1.8";
+                    return getVersion().toString();
                 }));
             }
 
