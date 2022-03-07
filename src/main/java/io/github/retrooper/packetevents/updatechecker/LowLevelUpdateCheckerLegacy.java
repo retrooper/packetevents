@@ -38,7 +38,7 @@ public class LowLevelUpdateCheckerLegacy implements LowLevelUpdateChecker {
         JsonObject jsonObject = parser.parse(jsonResponse).getAsJsonObject();
         String versionName = null;
         if (jsonObject != null) {
-            versionName = jsonObject.get("tag_name").getAsString();
+            versionName = jsonObject.get("name").getAsString();
         }
         return versionName;
     }
