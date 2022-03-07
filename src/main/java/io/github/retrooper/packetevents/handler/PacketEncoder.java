@@ -6,9 +6,13 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.util.ReferenceCountUtil;
 import net.minecraft.client.player.LocalPlayer;
 
 @ChannelHandler.Sharable
@@ -34,6 +38,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
             }
             buffer.readerIndex(firstReaderIndex);
         } else {
+            //Clear the buffer, our custom write method will discard the packet for us.
             buffer.clear();
         }
         if (packetReceiveEvent.hasPostTasks()) {
@@ -44,12 +49,44 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     }
 
     @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        ByteBuf buf = null;
+        try {
+            if (acceptOutboundMessage(msg)) {
+                ByteBuf in = (ByteBuf) msg;
+                buf = allocateBuffer(ctx, in, true);
+                try {
+                    encode(ctx, in, buf);
+                } finally {
+                    ReferenceCountUtil.release(in);
+                }
+                if (buf.isReadable()) {
+                    ctx.write(buf, promise);
+                } else {
+                    buf.release();
+                    //We cancelled this packet, do not pass it on to the next handler.
+                    //ctx.write(Unpooled.EMPTY_BUFFER, promise);
+                }
+                buf = null;
+            } else {
+                ctx.write(msg, promise);
+            }
+        } catch (EncoderException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new EncoderException(e);
+        } finally {
+            if (buf != null) {
+                buf.release();
+            }
+        }
+    }
+
+    @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
         if (msg.isReadable()) {
             read(ctx, msg);
-            if (msg.isReadable()) {
-                out.writeBytes(msg);
-            }
+            out.writeBytes(msg);
         }
     }
 }

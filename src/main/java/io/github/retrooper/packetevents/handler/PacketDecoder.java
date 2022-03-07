@@ -99,14 +99,6 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
                 PacketDecoder decoder = (PacketDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
                 ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
                 PacketEncoder encoder = (PacketEncoder) ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
-
-                //Replace vanilla compression handler as it doesn't let us discard outgoing packets.
-                CompressionEncoder compressionEncoder = (CompressionEncoder) ctx.pipeline().get("compress");
-                ReflectionObject reflectCompressionEncoder = new ReflectionObject(compressionEncoder);
-                int threshold = reflectCompressionEncoder.readInt(0);
-                BetterPacketCompressionEncoder compressionHandler = new BetterPacketCompressionEncoder(threshold);
-                ctx.pipeline().replace("compress", "compress", compressionHandler);
-
                 ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
                 checkedCompression = true;
                 return true;
