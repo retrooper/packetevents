@@ -1,5 +1,5 @@
 name: packetevents
-version: 1.8
+version: 1.8.0
 main: io.github.retrooper.packetevents.PacketEventsPlugin
 author: retrooper
 softdepend:
