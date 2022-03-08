@@ -131,7 +131,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }*/
             }
         };
-        //net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles w1;
         //PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 

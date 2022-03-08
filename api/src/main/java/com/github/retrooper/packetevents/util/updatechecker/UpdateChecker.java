@@ -46,7 +46,7 @@ public class UpdateChecker {
             String jsonResponse = reader.readLine();
             reader.close();
             JsonObject jsonObject = AdventureSerializer.GSON.serializer().fromJson(jsonResponse, JsonObject.class);
-            return jsonObject.get("tag_name").getAsString();
+            return jsonObject.get("name").getAsString();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to parse packetevents version!", e);
         }
@@ -134,16 +134,15 @@ public class UpdateChecker {
          */
         OUTDATED,
         /**
-         * You are on a dev or pre-released build. Not on the latest release.
+         * You are on a dev or pre-released build. Not on the latest stable release(not necessarily bad).
          */
         PRE_RELEASE,
         /**
-         * Your build is up-to-date.
+         * Your build is up-to-date. Latest stable release.
          */
         UP_TO_DATE,
         /**
-         * Failed to check for an update. There might be an issue with your connection, if your connection seems to be fine make sure to contact me.
-         * It could have been a mistake from my end when naming a release.
+         * Failed to check for an update. There might be an issue with your connection.
          */
         FAILED
     }
