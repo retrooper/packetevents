@@ -46,7 +46,7 @@ public class UpdateChecker {
             String jsonResponse = reader.readLine();
             reader.close();
             JsonObject jsonObject = AdventureSerializer.GSON.serializer().fromJson(jsonResponse, JsonObject.class);
-            return jsonObject.get("tag_name").getAsString();
+            return jsonObject.get("name").getAsString();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to parse packetevents version!", e);
         }
