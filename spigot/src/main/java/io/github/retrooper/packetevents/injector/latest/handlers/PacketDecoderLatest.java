@@ -99,7 +99,7 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
 
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
-        if (buffer.readableBytes() != 0) {
+        if (buffer.isReadable()) {
             read(ctx, buffer, out);
             for (ByteToMessageDecoder decoder : decoders) {
                 //Only support one output object

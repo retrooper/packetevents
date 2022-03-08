@@ -20,8 +20,6 @@ package io.github.retrooper.packetevents.manager;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import com.velocitypowered.api.proxy.Player;
@@ -43,8 +41,8 @@ public class PlayerManagerImpl extends PlayerManagerAbstract {
             if (CONNECTED_PLAYER == null) {
                 CONNECTED_PLAYER = Reflection
                         .getClassByNameWithoutException("com.velocitypowered.proxy.connection.client.ConnectedPlayer");
-                 MINECRAFT_CONNECTION_CLASS = Reflection
-                         .getClassByNameWithoutException("com.velocitypowered.proxy.connection.MinecraftConnection");
+                MINECRAFT_CONNECTION_CLASS = Reflection
+                        .getClassByNameWithoutException("com.velocitypowered.proxy.connection.MinecraftConnection");
 
             }
             Object connectedPlayer = CONNECTED_PLAYER.cast(player);
@@ -52,7 +50,7 @@ public class PlayerManagerImpl extends PlayerManagerAbstract {
             Object minecraftConnection = reflectConnectedPlayer.readObject(0, MINECRAFT_CONNECTION_CLASS);
             ReflectionObject reflectConnection = new ReflectionObject(minecraftConnection);
             channel = reflectConnection.readObject(0, Channel.class);
-            ProtocolManager.CHANNELS.put(((Player)player).getUsername(), channel);
+            ProtocolManager.CHANNELS.put(((Player) player).getUsername(), channel);
         }
         return channel;
     }

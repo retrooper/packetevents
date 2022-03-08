@@ -70,7 +70,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
-        if (byteBuf.readableBytes() != 0) {
+        if (byteBuf.isReadable()) {
             read(ctx, byteBuf, out);
         }
     }

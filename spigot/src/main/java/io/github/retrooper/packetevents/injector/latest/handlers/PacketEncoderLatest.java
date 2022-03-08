@@ -84,10 +84,10 @@ public class PacketEncoderLatest extends MessageToByteEncoder<Object> implements
             //Convert NMS object to bytes, so we can process it right away.
             if (vanillaEncoder == null) return;
             CustomPipelineUtil.callEncode(vanillaEncoder, ctx, o, out);
-            if (out.readableBytes() == 0) return;
+            if (!out.isReadable()) return;
         } else {
             ByteBuf in = (ByteBuf) o;
-            if (in.readableBytes() == 0) return;
+            if (!in.isReadable()) return;
             out.writeBytes(in);
         }
         read(ctx, out);

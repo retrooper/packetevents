@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
@@ -34,6 +35,7 @@ import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.util.SpigotDataHelper;
@@ -55,7 +57,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.getAPI().getSettings().debug(false).bStats(true);
+        PacketEvents.getAPI().getSettings().debug(true).bStats(true);
         PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH,
                 true, false) {
@@ -113,22 +115,21 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketPlaySend(PacketPlaySendEvent event) {
                 Player player = (Player) event.getPlayer();
-                /*if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
+                if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
                     if (player != null) {
                         player.sendMessage("Hii " + player.getName());
                         event.getUser().sendMessage(ChatColor.GREEN + "Hi pt TWOOO");
                     } else {
                         event.getUser().sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
-                }*/
-                /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
                     event.setCancelled(true);
                     WrapperPlayServerChatMessage clone = new WrapperPlayServerChatMessage((Component) null, null);
                     clone.readData(chatMessage);
                     PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), clone);
                     System.out.println("Delayed " + chatMessage.getChatComponentJson());
-                }*/
+                }
             }
         };
         //PacketEvents.getAPI().getEventManager().registerListener(listener);

@@ -58,7 +58,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
-        if (msg.readableBytes() == 0) return;
+        if (!msg.isReadable()) return;
         read(ctx, msg);
         out.writeBytes(msg);
     }

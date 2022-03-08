@@ -83,9 +83,9 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> implement
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) throws Exception {
-        if (in.readableBytes() == 0) return;
+        if (!in.isReadable()) return;
+        read(ctx, in);
         out.writeBytes(in);
-        read(ctx, out);
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {

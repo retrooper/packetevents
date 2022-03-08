@@ -81,7 +81,7 @@ public class SpigotChannelInjectorLegacy implements ChannelInjector {
                 //This is automatically also ran for the elements already added before we wrapped the list.
                 Channel channel = future.channel();
                 //Inject into the server connection channel.
-                injectConnectionChannel(channel);
+                injectServerChannel(channel);
                 //Make sure to store it, so we can uninject later on.
                 injectedConnectionChannels.add(channel);
             });
@@ -105,7 +105,7 @@ public class SpigotChannelInjectorLegacy implements ChannelInjector {
     public void uninject() {
         //Uninject our connection handler from these connection channels.
         for (Channel connectionChannel : injectedConnectionChannels) {
-            uninjectConnectionChannel(connectionChannel);
+            uninjectServerChannel(connectionChannel);
         }
         injectedConnectionChannels.clear();
         Object serverConnection = SpigotReflectionUtil.getMinecraftServerConnectionInstance();
@@ -120,8 +120,8 @@ public class SpigotChannelInjectorLegacy implements ChannelInjector {
         }
     }
 
-    private void injectConnectionChannel(Channel connectionChannel) {
-        ChannelPipeline pipeline = connectionChannel.pipeline();
+    private void injectServerChannel(Channel serverChannel) {
+        ChannelPipeline pipeline = serverChannel.pipeline();
         ChannelHandler connectionHandler = pipeline.get(PacketEvents.CONNECTION_HANDLER_NAME);
         if (connectionHandler != null) {
             //Why does it already exist?
@@ -137,7 +137,7 @@ public class SpigotChannelInjectorLegacy implements ChannelInjector {
         }
         //Otherwise, we just don't care and make sure we are last.
         else {
-            pipeline.addLast(PacketEvents.CONNECTION_HANDLER_NAME, new ServerChannelHandlerLegacy());
+            pipeline.addFirst(PacketEvents.CONNECTION_HANDLER_NAME, new ServerChannelHandlerLegacy());
         }
 
         if (networkManagers == null) {
@@ -149,7 +149,7 @@ public class SpigotChannelInjectorLegacy implements ChannelInjector {
                 ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
                 Channel channel = networkManagerWrapper.readObject(0, Channel.class);
                 if (channel.isOpen()) {
-                    if (channel.localAddress().equals(connectionChannel.localAddress())) {
+                    if (channel.localAddress().equals(serverChannel.localAddress())) {
                         channel.close();
                     }
                 }
@@ -157,8 +157,8 @@ public class SpigotChannelInjectorLegacy implements ChannelInjector {
         }
     }
 
-    private void uninjectConnectionChannel(Channel connectionChannel) {
-        connectionChannel.pipeline().remove(PacketEvents.CONNECTION_HANDLER_NAME);
+    private void uninjectServerChannel(Channel serverChannel) {
+        serverChannel.pipeline().remove(PacketEvents.CONNECTION_HANDLER_NAME);
     }
 
 

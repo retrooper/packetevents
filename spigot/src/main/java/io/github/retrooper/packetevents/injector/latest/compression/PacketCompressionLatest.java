@@ -36,7 +36,7 @@ public class PacketCompressionLatest implements PacketCompressionManager {
     public void decompress(Object rawPipeline, Object rawBuffer, Object rawOutput) {
         ChannelPipeline pipeline = (ChannelPipeline) rawPipeline;
         ByteBuf buffer = (ByteBuf) rawBuffer;
-        if (buffer.readableBytes() == 0) return;
+        if (!buffer.isReadable()) return;
         ByteBuf output = (ByteBuf) rawOutput;
         ChannelHandler decompressionHandler = pipeline.get("decompress");
         if (!SpigotReflectionUtil.BYTE_TO_MESSAGE_DECODER.isInstance(decompressionHandler)) {
@@ -74,7 +74,7 @@ public class PacketCompressionLatest implements PacketCompressionManager {
     public void compress(Object rawPipeline, Object rawBuffer, Object rawOutput) {
         ChannelPipeline pipeline = (ChannelPipeline) rawPipeline;
         ByteBuf buffer = (ByteBuf) rawBuffer;
-        if (buffer.readableBytes() == 0) return;
+        if (!buffer.isReadable()) return;
         ByteBuf output = (ByteBuf) rawOutput;
         ChannelHandler compressionHandler = pipeline.get("compress");
         if (!SpigotReflectionUtil.MESSAGE_TO_BYTE_ENCODER.isInstance(compressionHandler)) {
