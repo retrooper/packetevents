@@ -39,12 +39,12 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
 
     public static void postInitChannel(Channel channel) {
         if (channel.getClass().equals(NioSocketChannel.class)
-        || channel.getClass().equals(EpollSocketChannel.class)) {
+                || channel.getClass().equals(EpollSocketChannel.class)) {
             PlayerChannelHandlerModern channelHandler = new PlayerChannelHandlerModern();
             if (channel.pipeline().get("packet_handler") != null) {
                 String handlerName = PacketEvents.get().getHandlerName();
                 if (channel.pipeline().get(handlerName) != null) {
-                    PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a channel twice!");
+                    //PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a channel twice!");
                 } else {
                     channel.pipeline().addBefore("packet_handler", handlerName, channelHandler);
                 }
