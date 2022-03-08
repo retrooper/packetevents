@@ -44,6 +44,7 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
             if (channel.pipeline().get("packet_handler") != null) {
                 String handlerName = PacketEvents.get().getHandlerName();
                 if (channel.pipeline().get(handlerName) != null) {
+                    //Just ignore this to support latest ProtocolLib snapshots.
                     //PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a channel twice!");
                 } else {
                     channel.pipeline().addBefore("packet_handler", handlerName, channelHandler);
