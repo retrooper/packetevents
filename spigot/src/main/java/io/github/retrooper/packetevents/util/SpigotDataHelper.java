@@ -60,7 +60,7 @@ public class SpigotDataHelper {
         return stack.getType();
     }
 
-    //This is a lazy appraoch, but likely works.
+    //This is a lazy approach, but likely works.
     public static org.bukkit.Material toBukkitItemMaterial(ItemType itemType) {
         ItemStack stack = ItemStack.builder().type(itemType).build();
         org.bukkit.inventory.ItemStack bukkitStack = toBukkitItemStack(stack);

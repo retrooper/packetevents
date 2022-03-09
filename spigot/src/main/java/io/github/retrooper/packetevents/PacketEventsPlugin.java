@@ -87,17 +87,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                             Vector3i bp = SpigotDataHelper.fromBukkitLocation(((Player) event.getPlayer()).getLocation())
                                     .getPosition().toVector3i();
                             bp.setY(bp.getY() - 1);
-                            StateType type = StateTypes.OAK_DOOR;
+                            StateType type = StateTypes.GRASS_BLOCK;
                             WrappedBlockState blockState = type.createBlockState();
-                            blockState.setHalf(Half.BOTTOM);
                             WrapperPlayServerBlockChange blockChange = new WrapperPlayServerBlockChange(bp,
                                     blockState.getGlobalId());
                             user.writePacket(blockChange);
-                            bp.setY(bp.getY() + 1);
-                            blockState.setHalf(Half.TOP);
-                            blockChange = new WrapperPlayServerBlockChange(bp,
-                                    blockState.getGlobalId());
-                            user.sendPacket(blockChange);
                         }
                         break;
                     case PLAYER_FLYING:
