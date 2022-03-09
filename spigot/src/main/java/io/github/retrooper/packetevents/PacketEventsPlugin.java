@@ -31,10 +31,15 @@ import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Half;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
@@ -57,7 +62,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.getAPI().getSettings().debug(false).bStats(true);
+        PacketEvents.getAPI().getSettings().debug(true).bStats(true);
         PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH,
                 true, false) {
@@ -76,7 +81,23 @@ public class PacketEventsPlugin extends JavaPlugin {
                             WrapperPlayServerParticle particlePacket
                                     = new WrapperPlayServerParticle(particle, true, position,
                                     new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
-                            user.sendPacket(particlePacket);
+                            user.writePacket(particlePacket);
+
+
+                            Vector3i bp = SpigotDataHelper.fromBukkitLocation(((Player) event.getPlayer()).getLocation())
+                                    .getPosition().toVector3i();
+                            bp.setY(bp.getY() - 1);
+                            StateType type = StateTypes.OAK_DOOR;
+                            WrappedBlockState blockState = type.createBlockState();
+                            blockState.setHalf(Half.BOTTOM);
+                            WrapperPlayServerBlockChange blockChange = new WrapperPlayServerBlockChange(bp,
+                                    blockState.getGlobalId());
+                            user.writePacket(blockChange);
+                            bp.setY(bp.getY() + 1);
+                            blockState.setHalf(Half.TOP);
+                            blockChange = new WrapperPlayServerBlockChange(bp,
+                                    blockState.getGlobalId());
+                            user.sendPacket(blockChange);
                         }
                         break;
                     case PLAYER_FLYING:

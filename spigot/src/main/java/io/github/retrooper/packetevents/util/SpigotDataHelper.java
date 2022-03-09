@@ -18,7 +18,11 @@
 
 package io.github.retrooper.packetevents.util;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
@@ -49,7 +53,27 @@ public class SpigotDataHelper {
         return org.bukkit.GameMode.getByValue(gameMode.getId());
     }
 
-    //TODO Material conversions
+    //TODO Finish Material conversions
+    @Deprecated
+    public static ItemType fromBukkitItemMaterial(org.bukkit.Material material) {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            return ItemTypes.getByName(material.getKey().toString());
+        }
+        else {
+            return ItemTypes.getById(material.getId());
+        }
+    }
+
+    @Deprecated
+    public static org.bukkit.Material toBukkitItemMaterial(ItemType itemType) {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            return org.bukkit.Material.matchMaterial(itemType.getName().toString());
+        }
+        else {
+            //TODO complete?
+            return org.bukkit.Material.AIR;
+        }
+    }
 
     public static ItemStack fromBukkitItemStack(org.bukkit.inventory.ItemStack itemStack) {
         return SpigotReflectionUtil.decodeBukkitItemStack(itemStack);

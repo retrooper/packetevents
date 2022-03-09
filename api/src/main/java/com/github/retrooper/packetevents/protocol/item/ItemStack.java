@@ -55,8 +55,8 @@ public class ItemStack {
 
     public boolean isDamageableItem() {
         if (!this.cachedIsEmpty && this.getType().getMaxDurability() > 0) {
-            NBTCompound compoundtag = this.getNBT();
-            return compoundtag == null || !compoundtag.getBoolean("Unbreakable");
+            NBTCompound tag = this.getNBT();
+            return tag == null || !tag.getBoolean("Unbreakable");
         } else {
             return false;
         }
