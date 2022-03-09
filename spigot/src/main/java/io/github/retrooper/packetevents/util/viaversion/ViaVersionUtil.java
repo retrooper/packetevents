@@ -18,7 +18,6 @@
 
 package io.github.retrooper.packetevents.util.viaversion;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -57,42 +56,6 @@ public class ViaVersionUtil {
         return getViaVersionAccessor().getProtocolVersion(player);
     }
 
-    public static boolean isDebug() {
-        return getViaVersionAccessor().isDebug();
-    }
-
-    public static Exception throwCancelDecoderException(Throwable throwable) {
-        return getViaVersionAccessor().throwCancelDecoderException(throwable);
-    }
-
-    public static Exception throwCancelEncoderException(Throwable throwable) {
-        return getViaVersionAccessor().throwCancelEncoderException(throwable);
-    }
-
-    public static void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) throws Exception {
-        getViaVersionAccessor().transformPacket(userConnectionObj, byteBufObj, clientSide);
-    }
-
-    public static void setUserConnectionActive(Object userConnectionObj, boolean active) {
-        getViaVersionAccessor().setUserConnectionActive(userConnectionObj, active);
-    }
-
-    public static boolean isUserConnectionActive(Object userConnectionObj) {
-        return getViaVersionAccessor().isUserConnectionActive(userConnectionObj);
-    }
-
-    public static boolean checkServerboundPacketUserConnection(Object userConnectionObj) {
-        return getViaVersionAccessor().checkServerboundPacketUserConnection(userConnectionObj);
-    }
-
-    public static boolean checkClientboundPacketUserConnection(Object userConnectionObj) {
-        return getViaVersionAccessor().checkClientboundPacketUserConnection(userConnectionObj);
-    }
-
-    public static ConnectionState getUserConnectionProtocolState(Object userConnectionObj) {
-        return getViaVersionAccessor().getUserConnectionProtocolState(userConnectionObj);
-    }
-
     public static Class<?> getUserConnectionClass() {
         return getViaVersionAccessor().getUserConnectionClass();
     }
@@ -103,13 +66,5 @@ public class ViaVersionUtil {
 
     public static Class<?> getBukkitEncodeHandlerClass() {
         return getViaVersionAccessor().getBukkitEncodeHandlerClass();
-    }
-
-    public static Class<?> getCancelCodecExceptionClass() {
-        return getViaVersionAccessor().getCancelCodecExceptionClass();
-    }
-
-    public static Class<?> getInformativeExceptionClass() {
-        return getViaVersionAccessor().getInformativeExceptionClass();
     }
 }

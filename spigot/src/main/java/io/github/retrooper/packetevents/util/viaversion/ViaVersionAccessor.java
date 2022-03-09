@@ -18,37 +18,14 @@
 
 package io.github.retrooper.packetevents.util.viaversion;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import org.bukkit.entity.Player;
 
 public interface ViaVersionAccessor {
     int getProtocolVersion(Player player);
-
-    boolean isDebug();
-
-    Exception throwCancelDecoderException(Throwable throwable);
-
-    Exception throwCancelEncoderException(Throwable throwable);
-
-    void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) throws Exception;
-
-    void setUserConnectionActive(Object userConnectionObj, boolean active);
-
-    boolean isUserConnectionActive(Object userConnectionObj);
-
-    boolean checkServerboundPacketUserConnection(Object userConnectionObj);
-
-    boolean checkClientboundPacketUserConnection(Object userConnectionObj);
-
-    ConnectionState getUserConnectionProtocolState(Object userConnectionObj);
 
     Class<?> getUserConnectionClass();
 
     Class<?> getBukkitDecodeHandlerClass();
 
     Class<?> getBukkitEncodeHandlerClass();
-
-    Class<?> getCancelCodecExceptionClass();
-
-    Class<?> getInformativeExceptionClass();
 }
