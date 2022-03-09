@@ -53,26 +53,18 @@ public class SpigotDataHelper {
         return org.bukkit.GameMode.getByValue(gameMode.getId());
     }
 
-    //TODO Finish Material conversions
-    @Deprecated
+    //This is sort of a lazy approach, but likely works.
     public static ItemType fromBukkitItemMaterial(org.bukkit.Material material) {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            return ItemTypes.getByName(material.getKey().toString());
-        }
-        else {
-            return ItemTypes.getById(material.getId());
-        }
+        org.bukkit.inventory.ItemStack bukkitStack = new org.bukkit.inventory.ItemStack(material);
+        ItemStack stack = fromBukkitItemStack(bukkitStack);
+        return stack.getType();
     }
 
-    @Deprecated
+    //This is a lazy appraoch, but likely works.
     public static org.bukkit.Material toBukkitItemMaterial(ItemType itemType) {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            return org.bukkit.Material.matchMaterial(itemType.getName().toString());
-        }
-        else {
-            //TODO complete?
-            return org.bukkit.Material.AIR;
-        }
+        ItemStack stack = ItemStack.builder().type(itemType).build();
+        org.bukkit.inventory.ItemStack bukkitStack = toBukkitItemStack(stack);
+        return bukkitStack.getType();
     }
 
     public static ItemStack fromBukkitItemStack(org.bukkit.inventory.ItemStack itemStack) {
