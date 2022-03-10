@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:22.0.0'
+    compileOnly 'org.jetbrains:annotations:23.0.0'
     compileOnly 'io.netty:netty-all:4.1.72.Final'
     api project(':api')
 }
