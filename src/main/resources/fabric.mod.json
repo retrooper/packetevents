@@ -20,6 +20,9 @@
   "entrypoints": {
     "preLaunch": [
       "io.github.retrooper.packetevents.PacketEventsMod"
+    ],
+    "main": [
+      "io.github.retrooper.packetevents.PacketEventsMod"
     ]
   },
   "mixins": [
@@ -33,6 +36,5 @@
     "java": ">=17"
   },
   "suggests": {
-    "another-mod": "*"
   }
 }

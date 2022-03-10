@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -17,12 +16,11 @@ import net.minecraft.client.player.LocalPlayer;
 
 @ChannelHandler.Sharable
 public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
-    public final LocalPlayer player;
     public User user;
+    public LocalPlayer player;
 
-    public PacketEncoder(User user, LocalPlayer player) {
+    public PacketEncoder(User user) {
         this.user = user;
-        this.player = player;
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {

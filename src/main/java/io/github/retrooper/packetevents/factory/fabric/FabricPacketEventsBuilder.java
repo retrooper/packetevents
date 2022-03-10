@@ -2,7 +2,8 @@ package io.github.retrooper.packetevents.factory.fabric;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
-import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
+import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
@@ -93,11 +94,11 @@ public class FabricPacketEventsBuilder {
             private final PlayerManagerAbstract playerManager = new PlayerManagerAbstract() {
                 @Override
                 public int getPing(@NotNull Object player) {
+                    String name = ((LocalPlayer) player).getGameProfile().getName();
                     try {
-                        return ((LocalPlayer) player).connection.getPlayerInfo(String.valueOf(((LocalPlayer) player).getName())).getLatency();
-                    }
-                    catch (Exception ex) {
-                        PacketEvents.getAPI().getLogManager().debug("Failed to get ping for player " + ((LocalPlayer)player).getName());
+                        return ((LocalPlayer) player).connection.getPlayerInfo(name).getLatency();
+                    } catch (Exception ex) {
+                        PacketEvents.getAPI().getLogManager().debug("Failed to get ping for player " + name);
                         return -1;
                     }
                 }
@@ -112,17 +113,8 @@ public class FabricPacketEventsBuilder {
 
             private final ChannelInjector injector = new ChannelInjector() {
                 @Override
-                public @Nullable ConnectionState getConnectionState(Object ch) {
-                    Channel channel = (Channel) ch;
-                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-                    return decoder.user.getConnectionState();
-                }
-
-                @Override
-                public void changeConnectionState(Object ch, @Nullable ConnectionState packetState) {
-                    Channel channel = (Channel) ch;
-                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-                    decoder.user.setConnectionState(packetState);
+                public boolean isServerBound() {
+                    return true;
                 }
 
                 @Override
@@ -131,13 +123,22 @@ public class FabricPacketEventsBuilder {
                 }
 
                 @Override
-                public void eject() {
+                public void uninject() {
 
                 }
 
                 @Override
-                public void injectPlayer(Object player, @Nullable ConnectionState connectionState) {
+                public User getUser(Object ch) {
+                    Channel channel = (Channel) ch;
+                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+                    return decoder.user;
+                }
 
+                @Override
+                public void changeConnectionState(Object ch, @Nullable ConnectionState packetState) {
+                    Channel channel = (Channel) ch;
+                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+                    decoder.user.setConnectionState(packetState);
                 }
 
                 @Override
@@ -150,13 +151,19 @@ public class FabricPacketEventsBuilder {
                 }
 
                 @Override
-                public void ejectPlayer(Object player) {
+                public void setPlayer(Object ch, Object player) {
+                    Channel channel = (Channel) ch;
+                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+                    decoder.player = (LocalPlayer) player;
 
+                    PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
+                    encoder.player = (LocalPlayer) player;
                 }
 
                 @Override
-                public boolean hasInjected(Object player) {
-                    return false;
+                public boolean hasPlayer(Object ch) {
+                    PacketDecoder decoder = (PacketDecoder) ((Channel) ch).pipeline().get(PacketEvents.DECODER_NAME);
+                    return decoder != null && decoder.player != null;
                 }
             };
             private final NettyManager nettyManager = new NettyManagerImpl();
@@ -166,7 +173,6 @@ public class FabricPacketEventsBuilder {
                     //First we must strip away the color codes that might be in this message
                     message = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
                     System.out.println(message);
-                    //TODO This doesn't work in bungee console PacketEvents.getAPI().getLogger().log(level, color != null ? (color.toString()) : "" + message);
                 }
             };
             private boolean loaded;
@@ -180,7 +186,7 @@ public class FabricPacketEventsBuilder {
                     PacketEvents.IDENTIFIER = "pe-" + id;
                     PacketEvents.ENCODER_NAME = "pe-encoder-" + id;
                     PacketEvents.DECODER_NAME = "pe-decoder-" + id;
-                    PacketEvents.CONNECTION_NAME = "pe-connection-handler-" + id;
+                    PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
 
                     injector.inject();
@@ -190,6 +196,16 @@ public class FabricPacketEventsBuilder {
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalPacketListener());
+                    getEventManager().registerListener(new SimplePacketListenerAbstract() {
+                        @Override
+                        public void onPacketPlaySend(PacketPlaySendEvent event) {
+                            if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
+                                System.out.println("Is player null? " + (Minecraft.getInstance().player != null));
+                                PacketEvents.getAPI().getInjector().setPlayer(event.getChannel(),
+                                        Minecraft.getInstance().player);
+                            }
+                        }
+                    });
                 }
             }
 
@@ -226,7 +242,7 @@ public class FabricPacketEventsBuilder {
             public void terminate() {
                 if (initialized) {
                     //Eject the injector if needed(depends on the injector implementation)
-                    injector.eject();
+                    injector.uninject();
                     //Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;

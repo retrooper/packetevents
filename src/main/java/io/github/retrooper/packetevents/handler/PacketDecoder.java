@@ -3,17 +3,13 @@ package io.github.retrooper.packetevents.handler;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
-import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.CompressionDecoder;
-import net.minecraft.network.CompressionEncoder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,12 +20,11 @@ import java.util.List;
 public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
     private static Method DECOMPRESSOR_METHOD, COMPRESSOR_METHOD;
     public User user;
-    public final LocalPlayer player;
+    public LocalPlayer player;
     public boolean checkedCompression;
 
-    public PacketDecoder(User user, LocalPlayer player) {
+    public PacketDecoder(User user) {
         this.user = user;
-        this.player = player;
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {

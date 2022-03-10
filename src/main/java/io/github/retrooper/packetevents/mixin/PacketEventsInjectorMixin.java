@@ -29,9 +29,8 @@ public class PacketEventsInjectorMixin {
         User user = new User(channel, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
                 new UserProfile(null, null));
         ProtocolManager.USERS.put(channel, user);
-        LocalPlayer player = Minecraft.getInstance().player;
-        PacketDecoder decoder = new PacketDecoder(user, player);
-        PacketEncoder encoder = new PacketEncoder(user, player);
+        PacketDecoder decoder = new PacketDecoder(user);
+        PacketEncoder encoder = new PacketEncoder(user);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, encoder);
         //TODO Handle compression
