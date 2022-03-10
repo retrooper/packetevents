@@ -26,7 +26,6 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
-import io.github.retrooper.packetevents.injector.WritablePacketEncoder;
 import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
@@ -36,19 +35,13 @@ import net.minecraft.util.io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 
 @ChannelHandler.Sharable
-public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> implements WritablePacketEncoder {
+public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
     public volatile Player player;
     public User user;
     private boolean handledCompression;
 
     public PacketEncoderLegacy(User user) {
         this.user = user;
-    }
-
-
-    @Override
-    public void writePacket(Object ctx, Object msg) throws Exception {
-        write((ChannelHandlerContext) ctx, msg, ((ChannelHandlerContext) ctx).newPromise());
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {

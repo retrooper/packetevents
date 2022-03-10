@@ -26,7 +26,6 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
-import io.github.retrooper.packetevents.injector.WritablePacketEncoder;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
@@ -39,18 +38,13 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.InvocationTargetException;
 
 @ChannelHandler.Sharable
-public class PacketEncoderLatest extends MessageToByteEncoder<Object> implements WritablePacketEncoder {
+public class PacketEncoderLatest extends MessageToByteEncoder<Object> {
     public User user;
     public volatile Player player;
     public MessageToByteEncoder<?> vanillaEncoder;
 
     public PacketEncoderLatest(User user) {
         this.user = user;
-    }
-
-    @Override
-    public void writePacket(Object ctx, Object msg) throws Exception {
-        write((ChannelHandlerContext) ctx, msg, ((ChannelHandlerContext) ctx).newPromise());
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {

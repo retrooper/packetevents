@@ -24,7 +24,6 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import io.github.retrooper.packetevents.injector.WritablePacketEncoder;
 
 import java.util.List;
 
@@ -84,15 +83,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void writePacket(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
-            Object encoder = ChannelHelper.getPipelineHandler(channel, PacketEvents.ENCODER_NAME);
-            Object ctx = ChannelHelper.getPipelineContext(channel, PacketEvents.ENCODER_NAME);
-            if (encoder instanceof WritablePacketEncoder) {
-                try {
-                    ((WritablePacketEncoder) encoder).writePacket(ctx, packet);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            //Call write to all encoders.
+            ChannelHelper.write(channel, packet);
         }
     }
 
