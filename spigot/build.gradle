@@ -1,6 +1,4 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
@@ -8,8 +6,6 @@ group = 'com.github.retrooper'
 version = '2.0.0'
 
 repositories {
-    mavenLocal()
-    mavenCentral()
     maven { url 'https://jitpack.io' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url 'https://nexus.funkemunky.cc/content/repositories/releases/' }

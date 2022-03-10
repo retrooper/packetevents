@@ -18,7 +18,6 @@
 
 package io.github.retrooper.packetevents.util;
 
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -30,6 +29,7 @@ import java.util.function.Consumer;
 public class InjectedList<E> implements List<E> {
     private final List<E> originalList;
     private final Consumer<E> pushBackAction;
+
     public InjectedList(List<E> originalList, Consumer<E> pushBackAction) {
         for (E key : originalList) {
             pushBackAction.accept(key);
@@ -106,6 +106,7 @@ public class InjectedList<E> implements List<E> {
     public synchronized <T> T[] toArray(@NotNull T[] a) {
         return originalList.toArray(a);
     }
+
     @Override
     public synchronized boolean remove(Object o) {
         return originalList.remove(o);

@@ -1,6 +1,4 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
@@ -8,10 +6,6 @@ group = 'com.github.retrooper'
 version = '2.0.0'
 
 repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url 'https://jitpack.io' }
-    maven { url = 'https://oss.sonatype.org/content/groups/public/' }
     maven {
         url 'https://repo.velocitypowered.com/snapshots/'
     }
