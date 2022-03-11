@@ -2,9 +2,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
-group = 'com.github.retrooper'
-version = '2.0.0'
-
 shadowJar {
     //Just for jitpack to work
     archiveVersion.set('')
@@ -13,7 +10,6 @@ shadowJar {
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:23.0.0'
     compileOnly 'net.kyori:adventure-api:4.10.1'
     compileOnly 'net.kyori:adventure-text-serializer-gson:4.10.1'
     compileOnly 'net.kyori:adventure-text-serializer-gson-legacy-impl:4.10.1'

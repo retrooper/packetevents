@@ -2,9 +2,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
-group = 'com.github.retrooper'
-version = '2.0.0'
-
 repositories {
     maven { url 'https://jitpack.io' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
@@ -19,7 +16,6 @@ shadowJar {
 
 dependencies {
     api project(':api')
-    compileOnly 'org.jetbrains:annotations:23.0.0'
 
     api 'net.kyori:adventure-api:4.10.1'
     //includes gson

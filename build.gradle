@@ -21,9 +21,16 @@ allprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
 
+    group = 'com.github.retrooper'
+    version = '2.0.0'
+
     repositories {
         mavenLocal()
         mavenCentral()
         maven { url = 'https://oss.sonatype.org/content/groups/public/' }
+    }
+
+    dependencies {
+        compileOnly 'org.jetbrains:annotations:23.0.0'
     }
 }
