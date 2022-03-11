@@ -15,16 +15,6 @@ dependencies {
     implementation project(':adventure')
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.github.retrooper.packetevents'
-            artifactId = 'bungeecord'
-            from(components.java)
-        }
-    }
-}
-
 //So that SNAPSHOT is always the latest SNAPSHOT
 configurations.all {
     resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'

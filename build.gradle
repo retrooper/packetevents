@@ -24,6 +24,18 @@ allprojects {
     group = 'com.github.retrooper'
     version = '2.0.0'
 
+    if (project.name != 'packetevents') {
+        publishing {
+            publications {
+                maven(MavenPublication) {
+                    groupId = 'com.github.retrooper.packetevents'
+                    artifactId = project.name
+                    from(components.java)
+                }
+            }
+        }
+    }
+
     repositories {
         mavenLocal()
         mavenCentral()

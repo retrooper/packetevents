@@ -14,16 +14,6 @@ dependencies {
     api project(':api')
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.github.retrooper.packetevents'
-            artifactId = 'netty-common'
-            from(components.java)
-        }
-    }
-}
-
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }

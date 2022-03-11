@@ -54,16 +54,6 @@ dependencies {
     compileOnly 'org.github.spigot:1.7.10:1.7.10'
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.github.retrooper.packetevents'
-            artifactId = 'spigot'
-            from(components.java)
-        }
-    }
-}
-
 //So that SNAPSHOT is always the latest SNAPSHOT
 configurations.all {
     resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'

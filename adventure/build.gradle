@@ -27,16 +27,6 @@ dependencies {
     api 'net.kyori:adventure-text-serializer-legacy:4.10.1'
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.github.retrooper.packetevents'
-            artifactId = 'adventure'
-            from(components.java)
-        }
-    }
-}
-
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
