@@ -24,6 +24,7 @@ allprojects {
     apply plugin: 'com.github.johnrengelman.shadow'
 
     group = 'com.github.retrooper'
+    description = project.name
     version = '2.0.0'
 
     if (project.name != 'packetevents') {
@@ -48,8 +49,7 @@ allprojects {
         }
 
         shadowJar {
-            //Just for jitpack to work
-            archiveVersion.set('')
+            archiveFileName.set("packetevents-${project.name}-${project.version}.jar")
             minimize()
         }
 
