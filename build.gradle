@@ -1,6 +1,7 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.0' apply(false)
 }
 
 group = 'com.github.retrooper'
@@ -20,6 +21,7 @@ wrapper {
 allprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
+    apply plugin: 'com.github.johnrengelman.shadow'
 
     group = 'com.github.retrooper'
     version = '2.0.0'
