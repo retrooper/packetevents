@@ -21,28 +21,34 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Build with Gradle
-        run: gradle :clean :build api:clean api:shadowJar spigot:clean spigot:build spigot:shadowJar netty-common:clean netty-common:shadowJar bungeecord:clean bungeecord:shadowJar
+        run: gradle :clean :build api:clean api:shadowJar spigot:clean spigot:build spigot:shadowJar netty-common:clean netty-common:shadowJar bungeecord:clean bungeecord:shadowJar velocity:clean velocity:shadowJar
 
       - name: Upload build artifacts api
         uses: actions/upload-artifact@v1
         with:
-          name: packetevents-api-2.0-build.jar
+          name: api-build.zip
           path: api/build/libs
 
       - name: Upload build artifacts spigot
         uses: actions/upload-artifact@v1
         with:
-          name: packetevents-spigot-2.0-build.jar
+          name: spigot-build.zip
           path: spigot/build/libs
 
       - name: Upload build artifacts netty-common
         uses: actions/upload-artifact@v1
         with:
-          name: packetevents-netty-common-2.0-build.jar
+          name: netty-common-build.zip
           path: netty-common/build/libs
 
       - name: Upload build artifacts bungeecord
         uses: actions/upload-artifact@v1
         with:
-          name: packetevents-bungeecord-2.0-build.jar
+          name: bungeecord-build.zip
           path: bungeecord/build/libs
+
+      - name: Upload build artifacts velocity
+        uses: actions/upload-artifact@v1
+        with:
+          name: velocity-build.zip
+          path: velocity/build/libs
