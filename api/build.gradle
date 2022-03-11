@@ -1,26 +1,6 @@
-shadowJar {
-    //Just for jitpack to work
-    archiveVersion.set('')
-
-    minimize()
-}
-
 dependencies {
     compileOnly 'net.kyori:adventure-api:4.10.1'
     compileOnly 'net.kyori:adventure-text-serializer-gson:4.10.1'
     compileOnly 'net.kyori:adventure-text-serializer-gson-legacy-impl:4.10.1'
     compileOnly 'net.kyori:adventure-text-serializer-legacy:4.10.1'
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
-
-//So we only produce one jar with shadowJar. No suffixes. Just replace what the original jar would be named.
-tasks.jar.configure {
-    classifier = 'default'
-}
-
-tasks.shadowJar.configure {
-    classifier = null
 }

@@ -47,4 +47,27 @@ allprojects {
     dependencies {
         compileOnly 'org.jetbrains:annotations:23.0.0'
     }
+
+    shadowJar {
+        //Just for jitpack to work
+        archiveVersion.set('')
+        minimize()
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    //So that SNAPSHOT is always the latest SNAPSHOT
+    configurations.all {
+        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+    }
+
+    tasks.jar.configure {
+        classifier = 'default'
+    }
+
+    tasks.shadowJar.configure {
+        classifier = null
+    }
 }

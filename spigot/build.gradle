@@ -5,11 +5,6 @@ repositories {
     maven { url 'https://repo.viaversion.com/' }
 }
 
-shadowJar {
-    archiveVersion.set('')
-    minimize()
-}
-
 dependencies {
     api project(':api')
 
@@ -48,22 +43,4 @@ dependencies {
     compileOnly 'org.github.spigot:1.9:1.9'
     compileOnly 'org.github.spigot:1.8.8:1.8.8'
     compileOnly 'org.github.spigot:1.7.10:1.7.10'
-}
-
-//So that SNAPSHOT is always the latest SNAPSHOT
-configurations.all {
-    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
-
-//So we only produce one jar with shadowJar. No suffixes. Just replace what the original jar would be named.
-tasks.jar.configure {
-    classifier = 'default'
-}
-
-tasks.shadowJar.configure {
-    classifier = null
 }

@@ -4,12 +4,6 @@ repositories {
     }
 }
 
-shadowJar {
-    //Just for jitpack to work
-    archiveVersion.set('')
-    minimize()
-}
-
 dependencies {
     compileOnly 'io.netty:netty-all:4.1.72.Final'
     compileOnly 'com.velocitypowered:velocity-api:1.0.0-SNAPSHOT'
@@ -18,18 +12,4 @@ dependencies {
     implementation project(':netty-common')
     //Velocity ships with adventure & gson
     compileOnly project(':adventure')
-}
-
-//So that SNAPSHOT is always the latest SNAPSHOT
-configurations.all {
-    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
-}
-
-//So we only produce one jar with shadowJar. No suffixes. Just replace what the original jar would be named.
-tasks.jar.configure {
-    classifier = 'default'
-}
-
-tasks.shadowJar.configure {
-    classifier = null
 }
