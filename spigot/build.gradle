@@ -8,7 +8,7 @@ repositories {
 dependencies {
     api project(':api')
 
-    api 'net.kyori:adventure-api:4.10.1'
+    api 'net.kyori:adventure-api:4.10.0'
     //includes gson
     api 'net.kyori:adventure-text-serializer-gson:4.10.1'
     api 'net.kyori:adventure-text-serializer-gson-legacy-impl:4.10.1'
