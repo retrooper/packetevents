@@ -38,17 +38,17 @@ jobs:
       - name: Upload build artifacts netty-common
         uses: actions/upload-artifact@v1
         with:
-          name: netty-common-build.zip
+          name: netty-common-build
           path: netty-common/build/libs
 
       - name: Upload build artifacts bungeecord
         uses: actions/upload-artifact@v1
         with:
-          name: bungeecord-build.zip
+          name: bungeecord-build
           path: bungeecord/build/libs
 
       - name: Upload build artifacts velocity
         uses: actions/upload-artifact@v1
         with:
-          name: velocity-build.zip
+          name: velocity-build
           path: velocity/build/libs
