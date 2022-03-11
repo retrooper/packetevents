@@ -43,7 +43,7 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             this.channelName = readString(32767);
         }
@@ -58,13 +58,13 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
     }
 
     @Override
-    public void readData(WrapperPlayServerPluginMessage wrapper) {
+    public void copy(WrapperPlayServerPluginMessage wrapper) {
         this.channelName = wrapper.channelName;
         this.data = wrapper.data;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             writeString(this.channelName, 32767);
         }

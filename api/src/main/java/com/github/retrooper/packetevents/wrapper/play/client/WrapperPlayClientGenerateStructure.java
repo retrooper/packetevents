@@ -43,21 +43,21 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.blockPosition = new Vector3i(readLong());
         this.levels = readVarInt();
         this.keepJigsaws = readBoolean();
     }
 
     @Override
-    public void readData(WrapperPlayClientGenerateStructure wrapper) {
+    public void copy(WrapperPlayClientGenerateStructure wrapper) {
         this.blockPosition = wrapper.blockPosition;
         this.levels = wrapper.levels;
         this.keepJigsaws = wrapper.keepJigsaws;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeLong(this.blockPosition.getSerializedPosition());
         writeVarInt(this.levels);
         writeBoolean(this.keepJigsaws);

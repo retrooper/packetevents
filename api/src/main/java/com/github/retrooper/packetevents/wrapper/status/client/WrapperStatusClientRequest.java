@@ -32,14 +32,14 @@ public class WrapperStatusClientRequest extends PacketWrapper<WrapperStatusClien
     }
 
     @Override
-    public void readData() {
+    public void read() {
     }
 
     @Override
-    public void readData(WrapperStatusClientRequest wrapper) {
+    public void copy(WrapperStatusClientRequest wrapper) {
     }
 
     @Override
-    public void writeData() {
+    public void write() {
     }
 }

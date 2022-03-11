@@ -41,7 +41,7 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion == ServerVersion.V_1_17) {
             entityIDs = new int[] {readVarInt()};
         }
@@ -64,12 +64,12 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void readData(WrapperPlayServerDestroyEntities wrapper) {
+    public void copy(WrapperPlayServerDestroyEntities wrapper) {
         entityIDs = wrapper.entityIDs;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion == ServerVersion.V_1_17) {
             writeVarInt(entityIDs[0]);
         }

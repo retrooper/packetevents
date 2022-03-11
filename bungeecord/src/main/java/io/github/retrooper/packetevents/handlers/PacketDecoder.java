@@ -20,15 +20,12 @@ package io.github.retrooper.packetevents.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
-import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -53,7 +50,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
                 if (packetReceiveEvent.getLastUsedWrapper() != null) {
                     ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
                     packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
-                    packetReceiveEvent.getLastUsedWrapper().writeData();
+                    packetReceiveEvent.getLastUsedWrapper().write();
                 }
                 transformed.readerIndex(firstReaderIndex);
                 output.add(transformed.retain());

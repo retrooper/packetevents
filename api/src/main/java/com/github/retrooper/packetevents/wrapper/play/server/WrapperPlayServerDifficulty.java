@@ -40,7 +40,7 @@ public class WrapperPlayServerDifficulty extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void readData() {
+    public void read() {
         difficulty = Difficulty.getById(readByte());
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             locked = readBoolean();
@@ -49,13 +49,13 @@ public class WrapperPlayServerDifficulty extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void readData(WrapperPlayServerDifficulty wrapper) {
+    public void copy(WrapperPlayServerDifficulty wrapper) {
         difficulty = wrapper.difficulty;
         locked = wrapper.locked;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeByte(difficulty.getId());
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             writeBoolean(locked);

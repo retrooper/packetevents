@@ -34,17 +34,17 @@ public class WrapperPlayServerUpdateSimulationDistance extends PacketWrapper<Wra
     }
 
     @Override
-    public void readData() {
+    public void read() {
         simulationDistance = readVarInt();
     }
 
     @Override
-    public void readData(WrapperPlayServerUpdateSimulationDistance wrapper) {
+    public void copy(WrapperPlayServerUpdateSimulationDistance wrapper) {
         simulationDistance = wrapper.simulationDistance;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(simulationDistance);
     }
 

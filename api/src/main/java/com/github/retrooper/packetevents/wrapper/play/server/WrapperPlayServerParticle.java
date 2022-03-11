@@ -57,7 +57,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     }
 
     @Override
-    public void readData() {
+    public void read() {
         int particleTypeId = 0;
         ParticleType particleType;
         if (serverVersion == ServerVersion.V_1_7_10) {
@@ -104,7 +104,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     }
 
     @Override
-    public void readData(WrapperPlayServerParticle wrapper) {
+    public void copy(WrapperPlayServerParticle wrapper) {
         particle = wrapper.particle;
         longDistance = wrapper.longDistance;
         position = wrapper.position;
@@ -115,7 +115,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         //TODO on 1.7 we get particle type by 64 len string
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeString(particle.getType().getName().getKey(), 64);

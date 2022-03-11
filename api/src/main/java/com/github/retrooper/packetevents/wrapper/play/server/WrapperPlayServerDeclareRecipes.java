@@ -27,7 +27,7 @@ public class WrapperPlayServerDeclareRecipes extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.recipes = new Recipe[readVarInt()];
         for (int i = 0; i < this.recipes.length; i++) {
             RecipeType type = RecipeType.valueOf(readString().replace("minecraft:", "").toUpperCase(Locale.ROOT));
@@ -113,12 +113,12 @@ public class WrapperPlayServerDeclareRecipes extends PacketWrapper<WrapperPlaySe
         }
     }
 
-    public void readData(WrapperPlayServerDeclareRecipes wrapper) {
+    public void copy(WrapperPlayServerDeclareRecipes wrapper) {
         this.recipes = wrapper.recipes;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(this.recipes.length);
         for (Recipe recipe : this.recipes) {
             writeString("minecraft:" + recipe.getType().toString().toLowerCase(Locale.ROOT));

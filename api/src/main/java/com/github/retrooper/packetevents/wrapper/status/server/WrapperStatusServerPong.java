@@ -35,17 +35,17 @@ public class WrapperStatusServerPong extends PacketWrapper<WrapperStatusServerPo
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.time = readLong();
     }
 
     @Override
-    public void readData(WrapperStatusServerPong wrapper) {
+    public void copy(WrapperStatusServerPong wrapper) {
         this.time = wrapper.time;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeLong(time);
     }
 

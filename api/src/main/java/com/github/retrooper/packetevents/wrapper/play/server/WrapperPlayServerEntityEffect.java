@@ -43,7 +43,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.entityID = readVarInt();
         int effectId;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18_2)) {
@@ -60,7 +60,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(entityID);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18_2)) {
             writeVarInt(potionType.getId());
@@ -75,7 +75,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     }
 
     @Override
-    public void readData(WrapperPlayServerEntityEffect wrapper) {
+    public void copy(WrapperPlayServerEntityEffect wrapper) {
         entityID = wrapper.entityID;
         potionType = wrapper.potionType;
         effectAmplifier = wrapper.effectAmplifier;

@@ -56,7 +56,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
             this.containerId = readUnsignedByte();
         } else {
@@ -92,7 +92,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void readData(WrapperPlayServerOpenWindow wrapper) {
+    public void copy(WrapperPlayServerOpenWindow wrapper) {
         this.containerId = wrapper.containerId;
         this.type = wrapper.type;
         this.legacyType = wrapper.legacyType;
@@ -103,7 +103,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void writeData() {
+    public void write() {
 
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
             writeByte(this.containerId);

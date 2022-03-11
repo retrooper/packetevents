@@ -40,21 +40,21 @@ public class WrapperLoginServerPluginRequest extends PacketWrapper<WrapperLoginS
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.messageID = readVarInt();
         this.channelName = readString();
         this.data = readByteArray(ByteBufHelper.readableBytes(buffer));
     }
 
     @Override
-    public void readData(WrapperLoginServerPluginRequest wrapper) {
+    public void copy(WrapperLoginServerPluginRequest wrapper) {
         this.messageID = wrapper.messageID;
         this.channelName = wrapper.channelName;
         this.data = wrapper.data;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(messageID);
         writeString(channelName);
         writeByteArray(data);

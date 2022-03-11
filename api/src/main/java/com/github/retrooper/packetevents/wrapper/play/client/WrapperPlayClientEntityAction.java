@@ -40,7 +40,7 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
     }
 
     @Override
-    public void readData() {
+    public void read() {
         entityID = readVarInt();
         action = Action.VALUES[readVarInt()];
         if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
@@ -52,14 +52,14 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
     }
 
     @Override
-    public void readData(WrapperPlayClientEntityAction wrapper) {
+    public void copy(WrapperPlayClientEntityAction wrapper) {
         entityID = wrapper.entityID;
         action = wrapper.action;
         jumpBoost = wrapper.jumpBoost;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(entityID);
         int actionIndex = action.ordinal();
         if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {

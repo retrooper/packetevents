@@ -40,19 +40,19 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
         this.entityMetadata = entityMetadata;
     }
     @Override
-    public void readData() {
+    public void read() {
         entityID = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) ? readVarInt() : readInt();
         entityMetadata = readEntityMetadata();
     }
 
     @Override
-    public void readData(WrapperPlayServerEntityMetadata wrapper) {
+    public void copy(WrapperPlayServerEntityMetadata wrapper) {
         entityID = wrapper.entityID;
         entityMetadata = wrapper.entityMetadata;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             writeVarInt(entityID);
         } else {

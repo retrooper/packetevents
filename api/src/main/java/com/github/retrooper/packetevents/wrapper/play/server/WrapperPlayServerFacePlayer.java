@@ -42,7 +42,7 @@ public class WrapperPlayServerFacePlayer extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void readData() {
+    public void read() {
         aimUnit = EntitySection.getById(readVarInt());
         targetPosition = new Vector3d(readDouble(), readDouble(), readDouble());
         if (readBoolean()) {
@@ -53,14 +53,14 @@ public class WrapperPlayServerFacePlayer extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void readData(WrapperPlayServerFacePlayer wrapper) {
+    public void copy(WrapperPlayServerFacePlayer wrapper) {
         aimUnit = wrapper.aimUnit;
         targetPosition = wrapper.targetPosition;
         targetEntity = wrapper.targetEntity;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(aimUnit.getId());
         writeDouble(targetPosition.getX());
         writeDouble(targetPosition.getY());

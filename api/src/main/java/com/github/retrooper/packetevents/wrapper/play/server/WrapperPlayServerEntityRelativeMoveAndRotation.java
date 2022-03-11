@@ -51,7 +51,7 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         entityID = readVarInt();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             deltaX = readShort() / MODERN_DELTA_DIVISOR;
@@ -69,7 +69,7 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
     }
 
     @Override
-    public void readData(WrapperPlayServerEntityRelativeMoveAndRotation wrapper) {
+    public void copy(WrapperPlayServerEntityRelativeMoveAndRotation wrapper) {
         entityID = wrapper.entityID;
         deltaX = wrapper.deltaX;
         deltaY = wrapper.deltaY;
@@ -80,7 +80,7 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(entityID);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeShort((short) (deltaX * MODERN_DELTA_DIVISOR));

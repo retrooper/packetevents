@@ -35,17 +35,17 @@ public class WrapperLoginServerSetCompression extends PacketWrapper<WrapperLogin
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.threshold = readVarInt();
     }
 
     @Override
-    public void readData(WrapperLoginServerSetCompression wrapper) {
+    public void copy(WrapperLoginServerSetCompression wrapper) {
         this.threshold = wrapper.threshold;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(threshold);
     }
 

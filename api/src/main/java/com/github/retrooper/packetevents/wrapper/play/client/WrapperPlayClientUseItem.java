@@ -18,17 +18,17 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
     }
 
     @Override
-    public void readData() {
+    public void read() {
         hand = InteractionHand.getById(readVarInt());
     }
 
     @Override
-    public void readData(WrapperPlayClientUseItem packet) {
+    public void copy(WrapperPlayClientUseItem packet) {
         this.hand = packet.hand;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(hand.getId());
     }
 

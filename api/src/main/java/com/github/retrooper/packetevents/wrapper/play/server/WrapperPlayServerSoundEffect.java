@@ -45,7 +45,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         soundID = readVarInt();
         soundCategory = SoundCategory.values()[readVarInt()];
         effectPosition = new Vector3i(readInt(), readInt(), readInt());
@@ -54,7 +54,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData(WrapperPlayServerSoundEffect wrapper) {
+    public void copy(WrapperPlayServerSoundEffect wrapper) {
         soundID = wrapper.soundID;
         soundCategory = wrapper.soundCategory;
         effectPosition = wrapper.effectPosition;
@@ -63,7 +63,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(soundID);
         writeVarInt(soundCategory.ordinal());
         writeInt(effectPosition.x);

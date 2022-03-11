@@ -89,7 +89,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     }
 
     @Override
-    public void readData() {
+    public void read() {
         entityID = readInt();
         boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
@@ -168,7 +168,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     }
 
     @Override
-    public void readData(WrapperPlayServerJoinGame wrapper) {
+    public void copy(WrapperPlayServerJoinGame wrapper) {
         entityID = wrapper.entityID;
         hardcore = wrapper.hardcore;
         gameMode = wrapper.gameMode;
@@ -189,7 +189,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeInt(entityID);
         boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);

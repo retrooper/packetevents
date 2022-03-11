@@ -21,21 +21,21 @@ public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.windowId = readUnsignedByte();
         this.slotCount = readVarInt();
         this.entityId = readInt();
     }
 
     @Override
-    public void readData(WrapperPlayServerOpenHorseWindow other) {
+    public void copy(WrapperPlayServerOpenHorseWindow other) {
         this.windowId = other.windowId;
         this.slotCount = other.slotCount;
         this.entityId = other.entityId;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeByte(windowId);
         writeVarInt(slotCount);
         writeInt(entityId);

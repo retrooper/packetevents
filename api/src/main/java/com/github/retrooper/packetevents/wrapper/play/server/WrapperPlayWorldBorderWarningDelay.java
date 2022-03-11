@@ -17,17 +17,17 @@ public class WrapperPlayWorldBorderWarningDelay extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void readData() {
+    public void read() {
         delay = readVarLong();
     }
 
     @Override
-    public void readData(WrapperPlayWorldBorderWarningDelay packet) {
+    public void copy(WrapperPlayWorldBorderWarningDelay packet) {
         delay = packet.delay;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarLong(delay);
     }
 }

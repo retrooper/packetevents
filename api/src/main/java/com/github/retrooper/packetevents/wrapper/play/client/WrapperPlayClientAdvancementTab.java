@@ -39,7 +39,7 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
     }
 
     @Override
-    public void readData() {
+    public void read() {
         action = Action.VALUES[readVarInt()];
         if (action == Action.OPENED_TAB) {
             String key = readString();
@@ -50,13 +50,13 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
     }
 
     @Override
-    public void readData(WrapperPlayClientAdvancementTab wrapper) {
+    public void copy(WrapperPlayClientAdvancementTab wrapper) {
         action = wrapper.action;
         tabID = wrapper.tabID;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(action.ordinal());
         if (action == Action.OPENED_TAB) {
             writeString(tabID.get());

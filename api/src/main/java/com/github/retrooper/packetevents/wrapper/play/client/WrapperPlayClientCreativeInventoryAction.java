@@ -38,19 +38,19 @@ public class WrapperPlayClientCreativeInventoryAction extends PacketWrapper<Wrap
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.slot = readShort();
         this.itemStack = readItemStack();
     }
 
     @Override
-    public void readData(WrapperPlayClientCreativeInventoryAction wrapper) {
+    public void copy(WrapperPlayClientCreativeInventoryAction wrapper) {
         this.slot = wrapper.slot;
         this.itemStack = wrapper.itemStack;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeShort(slot);
         writeItemStack(itemStack);
     }

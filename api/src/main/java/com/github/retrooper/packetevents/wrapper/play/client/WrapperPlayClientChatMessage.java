@@ -40,18 +40,18 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
     }
 
     @Override
-    public void readData() {
+    public void read() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
         this.message = readString(maxMessageLength);
     }
 
     @Override
-    public void readData(WrapperPlayClientChatMessage wrapper) {
+    public void copy(WrapperPlayClientChatMessage wrapper) {
         this.message = wrapper.message;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
         writeString(this.message, maxMessageLength);
     }

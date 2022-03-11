@@ -58,7 +58,7 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
     }
 
     @Override
-    public void readData() {
+    public void read() {
         boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
         this.windowID = readUnsignedByte();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
@@ -86,7 +86,7 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
     }
 
     @Override
-    public void readData(WrapperPlayClientClickWindow wrapper) {
+    public void copy(WrapperPlayClientClickWindow wrapper) {
         this.windowID = wrapper.windowID;
         this.stateID = wrapper.stateID;
         this.slot = wrapper.slot;
@@ -98,7 +98,7 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
         writeByte(windowID);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {

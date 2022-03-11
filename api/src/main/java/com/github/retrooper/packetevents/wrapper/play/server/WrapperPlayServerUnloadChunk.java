@@ -36,19 +36,19 @@ public class WrapperPlayServerUnloadChunk extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.chunkX = readInt();
         this.chunkZ = readInt();
     }
 
     @Override
-    public void readData(WrapperPlayServerUnloadChunk wrapper) {
+    public void copy(WrapperPlayServerUnloadChunk wrapper) {
         this.chunkX = wrapper.chunkX;
         this.chunkZ = wrapper.chunkZ;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeInt(chunkX);
         writeInt(chunkZ);
     }

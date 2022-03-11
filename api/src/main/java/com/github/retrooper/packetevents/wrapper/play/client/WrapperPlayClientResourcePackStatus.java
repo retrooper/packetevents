@@ -44,7 +44,7 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion.isOlderThan(ServerVersion.V_1_10)) {
             //For now ignore hash, maybe make optional
             this.hash = readString(40);
@@ -57,13 +57,13 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
     }
 
     @Override
-    public void readData(WrapperPlayClientResourcePackStatus wrapper) {
+    public void copy(WrapperPlayClientResourcePackStatus wrapper) {
         this.hash = wrapper.hash;
         this.result = wrapper.result;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion.isOlderThan(ServerVersion.V_1_10)) {
             writeString(hash, 40);
         }

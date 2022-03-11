@@ -48,7 +48,7 @@ public class WrapperPlayServerChunkDataBulk extends PacketWrapper<WrapperPlaySer
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             read_1_8();
         } else {
@@ -146,7 +146,7 @@ public class WrapperPlayServerChunkDataBulk extends PacketWrapper<WrapperPlaySer
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             write_1_8();
         } else {

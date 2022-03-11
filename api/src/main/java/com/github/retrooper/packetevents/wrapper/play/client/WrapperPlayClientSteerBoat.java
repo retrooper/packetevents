@@ -46,19 +46,19 @@ public class WrapperPlayClientSteerBoat extends PacketWrapper<WrapperPlayClientS
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.leftPaddleTurning = readBoolean();
         this.rightPaddleTurning = readBoolean();
     }
 
     @Override
-    public void readData(WrapperPlayClientSteerBoat wrapper) {
+    public void copy(WrapperPlayClientSteerBoat wrapper) {
         this.leftPaddleTurning = wrapper.leftPaddleTurning;
         this.rightPaddleTurning = wrapper.rightPaddleTurning;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeBoolean(leftPaddleTurning);
         writeBoolean(rightPaddleTurning);
     }

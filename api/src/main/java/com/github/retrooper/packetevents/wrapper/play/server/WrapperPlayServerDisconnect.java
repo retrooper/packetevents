@@ -47,7 +47,7 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void readData() {
+    public void read() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         reasonJson = readString(maxMessageLength);
         if (HANDLE_JSON) {
@@ -56,13 +56,13 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void readData(WrapperPlayServerDisconnect wrapper) {
+    public void copy(WrapperPlayServerDisconnect wrapper) {
         reasonJson = wrapper.reasonJson;
         reasonComponent = wrapper.reasonComponent;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
             reasonJson = AdventureSerializer.toJson(reasonComponent);

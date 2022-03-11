@@ -21,17 +21,17 @@ public class WrapperPlayServerCloseWindow extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.windowId = readUnsignedByte();
     }
 
     @Override
-    public void readData(WrapperPlayServerCloseWindow wrapper) {
+    public void copy(WrapperPlayServerCloseWindow wrapper) {
         this.windowId = wrapper.windowId;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeByte(windowId);
     }
 

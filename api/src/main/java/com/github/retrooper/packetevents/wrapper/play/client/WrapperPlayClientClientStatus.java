@@ -37,7 +37,7 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
     }
 
     @Override
-    public void readData() {
+    public void read() {
         int index;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             index = readVarInt();
@@ -48,12 +48,12 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
     }
 
     @Override
-    public void readData(WrapperPlayClientClientStatus wrapper) {
+    public void copy(WrapperPlayClientClientStatus wrapper) {
         this.action = wrapper.action;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             int index = action.ordinal();
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {

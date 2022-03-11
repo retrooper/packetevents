@@ -64,7 +64,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.chatComponentJson = readString(getMaxMessageLength());
 
         //Parse JSON message
@@ -89,7 +89,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData(WrapperPlayServerChatMessage wrapper) {
+    public void copy(WrapperPlayServerChatMessage wrapper) {
         this.chatComponentJson = wrapper.chatComponentJson;
         this.chatComponent = wrapper.chatComponent;
         this.position = wrapper.position;
@@ -97,7 +97,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (HANDLE_JSON) {
             chatComponentJson = AdventureSerializer.toJson(chatComponent);
         }

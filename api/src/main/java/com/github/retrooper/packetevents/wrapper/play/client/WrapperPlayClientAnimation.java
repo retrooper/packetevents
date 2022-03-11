@@ -41,7 +41,7 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             this.interactionHand = InteractionHand.getById(readVarInt());
         } else {
@@ -50,12 +50,12 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
     }
 
     @Override
-    public void readData(WrapperPlayClientAnimation wrapper) {
+    public void copy(WrapperPlayClientAnimation wrapper) {
         this.interactionHand = wrapper.interactionHand;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeVarInt(interactionHand.getId());
         }

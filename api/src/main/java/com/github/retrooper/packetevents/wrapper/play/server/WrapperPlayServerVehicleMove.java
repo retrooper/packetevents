@@ -40,21 +40,21 @@ public class WrapperPlayServerVehicleMove extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         position = new Vector3d(readDouble(), readDouble(), readDouble());
         yaw = readFloat();
         pitch = readFloat();
     }
 
     @Override
-    public void readData(WrapperPlayServerVehicleMove wrapper) {
+    public void copy(WrapperPlayServerVehicleMove wrapper) {
         position = wrapper.position;
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeDouble(position.x);
         writeDouble(position.y);
         writeDouble(position.z);

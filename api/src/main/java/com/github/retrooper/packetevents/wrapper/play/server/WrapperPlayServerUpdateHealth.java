@@ -40,7 +40,7 @@ public class WrapperPlayServerUpdateHealth extends PacketWrapper<WrapperPlayServ
     }
 
     @Override
-    public void readData() {
+    public void read() {
         health = readFloat();
         if (serverVersion == ServerVersion.V_1_7_10) {
             food = readShort();
@@ -52,14 +52,14 @@ public class WrapperPlayServerUpdateHealth extends PacketWrapper<WrapperPlayServ
     }
 
     @Override
-    public void readData(WrapperPlayServerUpdateHealth wrapper) {
+    public void copy(WrapperPlayServerUpdateHealth wrapper) {
         health = wrapper.health;
         food = wrapper.food;
         foodSaturation = wrapper.foodSaturation;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeFloat(health);
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeShort(food);

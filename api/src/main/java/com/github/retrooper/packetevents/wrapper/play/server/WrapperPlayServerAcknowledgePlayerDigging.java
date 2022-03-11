@@ -42,7 +42,7 @@ public class WrapperPlayServerAcknowledgePlayerDigging extends PacketWrapper<Wra
     }
 
     @Override
-    public void readData() {
+    public void read() {
         blockPosition = readBlockPosition();
         blockID = readVarInt();
         action = DiggingAction.getById(readVarInt());
@@ -50,7 +50,7 @@ public class WrapperPlayServerAcknowledgePlayerDigging extends PacketWrapper<Wra
     }
 
     @Override
-    public void readData(WrapperPlayServerAcknowledgePlayerDigging wrapper) {
+    public void copy(WrapperPlayServerAcknowledgePlayerDigging wrapper) {
         action = wrapper.action;
         successful = wrapper.successful;
         blockPosition = wrapper.blockPosition;
@@ -58,7 +58,7 @@ public class WrapperPlayServerAcknowledgePlayerDigging extends PacketWrapper<Wra
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeBlockPosition(blockPosition);
         writeVarInt(blockID);
         writeVarInt(action.getId());

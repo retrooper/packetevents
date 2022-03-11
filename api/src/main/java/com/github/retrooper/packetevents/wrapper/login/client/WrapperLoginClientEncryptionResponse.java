@@ -45,19 +45,19 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.encryptedSharedSecret = readByteArray(ByteBufHelper.readableBytes(buffer));
         this.encryptedVerifyToken = readByteArray(ByteBufHelper.readableBytes(buffer));
     }
 
     @Override
-    public void readData(WrapperLoginClientEncryptionResponse wrapper) {
+    public void copy(WrapperLoginClientEncryptionResponse wrapper) {
         this.encryptedSharedSecret = wrapper.encryptedSharedSecret;
         this.encryptedVerifyToken = wrapper.encryptedVerifyToken;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeByteArray(encryptedSharedSecret);
         writeByteArray(encryptedVerifyToken);
     }

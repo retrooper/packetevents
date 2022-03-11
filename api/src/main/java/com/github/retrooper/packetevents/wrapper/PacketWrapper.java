@@ -123,20 +123,20 @@ public class PacketWrapper<T extends PacketWrapper> {
     public final void prepareForSend() {
         if (!hasPreparedForSending) {
             writeVarInt(packetID);
-            writeData();
+            write();
             hasPreparedForSending = true;
         }
     }
 
-    public void readData() {
+    public void read() {
 
     }
 
-    public void readData(T wrapper) {
+    public void copy(T wrapper) {
 
     }
 
-    public void writeData() {
+    public void write() {
 
     }
 
@@ -146,11 +146,11 @@ public class PacketWrapper<T extends PacketWrapper> {
     public final void readEvent(ProtocolPacketEvent<?> event) {
         PacketWrapper<?> last = event.getLastUsedWrapper();
         if (last != null) {
-            readData((T) last);
+            copy((T) last);
         }
         else {
             event.setLastUsedWrapper(this);
-            readData();
+            read();
         }
     }
 

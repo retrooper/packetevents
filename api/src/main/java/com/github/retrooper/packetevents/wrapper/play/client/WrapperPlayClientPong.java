@@ -43,17 +43,17 @@ public class WrapperPlayClientPong extends PacketWrapper<WrapperPlayClientPong> 
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.id = readInt();
     }
 
     @Override
-    public void readData(WrapperPlayClientPong wrapper) {
+    public void copy(WrapperPlayClientPong wrapper) {
         this.id = wrapper.id;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeInt(id);
     }
 

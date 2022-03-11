@@ -19,19 +19,19 @@ public class WrapperPlayServerWorldBorderCenter extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.x = readDouble();
         this.z = readDouble();
     }
 
     @Override
-    public void readData(WrapperPlayServerWorldBorderCenter wrapper) {
+    public void copy(WrapperPlayServerWorldBorderCenter wrapper) {
         this.x = wrapper.x;
         this.z = wrapper.z;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeDouble(this.x);
         writeDouble(this.z);
     }

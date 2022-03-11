@@ -56,7 +56,7 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion == ServerVersion.V_1_7_10)
             entityID = readInt();
         else
@@ -77,7 +77,7 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void readData(WrapperPlayServerEntityTeleport wrapper) {
+    public void copy(WrapperPlayServerEntityTeleport wrapper) {
         entityID = wrapper.entityID;
         position = wrapper.position;
         yaw = wrapper.yaw;
@@ -86,7 +86,7 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion == ServerVersion.V_1_7_10)
             writeInt(entityID);
         else

@@ -48,7 +48,7 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             entityId = readInt();
         }
@@ -78,13 +78,13 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void readData(WrapperPlayServerEntityEquipment wrapper) {
+    public void copy(WrapperPlayServerEntityEquipment wrapper) {
         entityId = wrapper.entityId;
         equipment = wrapper.equipment;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeInt(entityId);
         }

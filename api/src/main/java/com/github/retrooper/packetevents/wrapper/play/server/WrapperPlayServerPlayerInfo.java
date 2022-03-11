@@ -76,7 +76,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             playerDataList = new ArrayList<>(1);
             //Only one player data
@@ -144,13 +144,13 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void readData(WrapperPlayServerPlayerInfo wrapper) {
+    public void copy(WrapperPlayServerPlayerInfo wrapper) {
         action = wrapper.action;
         playerDataList = wrapper.playerDataList;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             //Only one player data can be sent
             PlayerData data = playerDataList.get(0);

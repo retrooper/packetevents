@@ -42,18 +42,18 @@ public class WrapperLoginServerDisconnect extends PacketWrapper<WrapperLoginServ
     }
 
     @Override
-    public void readData() {
+    public void read() {
         int reasonLength = clientVersion.isNewerThanOrEquals(ClientVersion.V_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
         this.reason = readString(reasonLength);
     }
 
     @Override
-    public void readData(WrapperLoginServerDisconnect wrapper) {
+    public void copy(WrapperLoginServerDisconnect wrapper) {
         this.reason = wrapper.reason;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         int reasonLength = clientVersion.isNewerThanOrEquals(ClientVersion.V_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
         writeString(reason, reasonLength);
     }

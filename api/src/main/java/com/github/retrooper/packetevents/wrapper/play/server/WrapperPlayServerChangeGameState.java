@@ -60,19 +60,19 @@ public class WrapperPlayServerChangeGameState extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void readData() {
+    public void read() {
         reason = Reason.VALUES[readByte()];
         value = readFloat();
     }
 
     @Override
-    public void readData(WrapperPlayServerChangeGameState wrapper) {
+    public void copy(WrapperPlayServerChangeGameState wrapper) {
         reason = wrapper.reason;
         value = wrapper.value;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeByte(reason.ordinal());
         writeFloat(value);
     }

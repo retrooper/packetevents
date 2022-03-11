@@ -41,7 +41,7 @@ public class WrapperLoginClientPluginResponse extends PacketWrapper<WrapperLogin
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.messageID = readVarInt();
         this.successful = readBoolean();
         if (this.successful) {
@@ -52,14 +52,14 @@ public class WrapperLoginClientPluginResponse extends PacketWrapper<WrapperLogin
     }
 
     @Override
-    public void readData(WrapperLoginClientPluginResponse wrapper) {
+    public void copy(WrapperLoginClientPluginResponse wrapper) {
         this.messageID = wrapper.messageID;
         this.successful = wrapper.successful;
         this.data = wrapper.data;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(messageID);
         writeBoolean(successful);
         if (successful) {

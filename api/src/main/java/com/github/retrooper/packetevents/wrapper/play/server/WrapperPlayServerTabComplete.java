@@ -60,7 +60,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
     }*/
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             transactionID = Optional.of(readVarInt());
             int begin = readVarInt();
@@ -94,14 +94,14 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData(WrapperPlayServerTabComplete wrapper) {
+    public void copy(WrapperPlayServerTabComplete wrapper) {
         transactionID = wrapper.transactionID;
         commandRange = wrapper.commandRange;
         commandMatches = wrapper.commandMatches;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             writeVarInt(transactionID.orElse(-1));
             CommandRange commandRange = this.commandRange.get();

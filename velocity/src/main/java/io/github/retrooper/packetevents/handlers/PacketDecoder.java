@@ -50,7 +50,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
                 if (packetReceiveEvent.getLastUsedWrapper() != null) {
                     ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
                     packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
-                    packetReceiveEvent.getLastUsedWrapper().writeData();
+                    packetReceiveEvent.getLastUsedWrapper().write();
                 }
                 transformed.readerIndex(firstReaderIndex);
                 output.add(transformed.retain());

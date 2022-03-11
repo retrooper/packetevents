@@ -12,17 +12,17 @@ public class WrapperPlayWorldBorderWarningReach extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void readData() {
+    public void read() {
         warningBlocks = readVarInt();
     }
 
     @Override
-    public void readData(WrapperPlayWorldBorderWarningReach packet) {
+    public void copy(WrapperPlayWorldBorderWarningReach packet) {
         warningBlocks = packet.warningBlocks;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(warningBlocks);
     }
 

@@ -25,7 +25,7 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             long encodedPosition = readLong();
 
@@ -56,14 +56,14 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
     }
 
     @Override
-    public void readData(WrapperPlayServerMultiBlockChange wrapper) {
+    public void copy(WrapperPlayServerMultiBlockChange wrapper) {
         chunkPosition = wrapper.chunkPosition;
         trustEdges = wrapper.trustEdges;
         blockData = wrapper.blockData;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             long encodedPos = 0;
             encodedPos |= (chunkPosition.getX() & 0x3FFFFFL) << 42;

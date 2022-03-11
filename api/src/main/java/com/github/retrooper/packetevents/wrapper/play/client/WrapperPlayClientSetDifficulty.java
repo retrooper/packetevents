@@ -36,17 +36,17 @@ public class WrapperPlayClientSetDifficulty extends PacketWrapper<WrapperPlayCli
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.difficulty = Difficulty.getById(readByte());
     }
 
     @Override
-    public void readData(WrapperPlayClientSetDifficulty wrapper) {
+    public void copy(WrapperPlayClientSetDifficulty wrapper) {
         this.difficulty = wrapper.difficulty;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeByte(difficulty.getId());
     }
 

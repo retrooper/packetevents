@@ -36,17 +36,17 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.username = readString(16);
     }
 
     @Override
-    public void readData(WrapperLoginClientLoginStart wrapper) {
+    public void copy(WrapperLoginClientLoginStart wrapper) {
         this.username = wrapper.username;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeString(username, 16);
     }
 

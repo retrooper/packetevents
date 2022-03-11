@@ -108,7 +108,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     }
 
     @Override
-    public void readData() {
+    public void read() {
         int chunkX = readInt();
         int chunkZ = readInt();
 
@@ -291,7 +291,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     }
 
     @Override
-    public void readData(WrapperPlayServerChunkData wrapper) {
+    public void copy(WrapperPlayServerChunkData wrapper) {
         this.column = wrapper.column;
         this.ignoreOldData = wrapper.ignoreOldData;
         this.trustEdges = wrapper.trustEdges;
@@ -306,7 +306,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeInt(column.getX());
         writeInt(column.getZ());
 

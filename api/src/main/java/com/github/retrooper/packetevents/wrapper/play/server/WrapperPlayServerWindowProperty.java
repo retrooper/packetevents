@@ -22,21 +22,21 @@ public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.containerId = (byte) readUnsignedByte();
         this.id = readShort();
         this.value = readShort();
     }
 
     @Override
-    public void readData(WrapperPlayServerWindowProperty wrapper) {
+    public void copy(WrapperPlayServerWindowProperty wrapper) {
         this.containerId = wrapper.containerId;
         this.id = wrapper.id;
         this.value = wrapper.value;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeByte(this.containerId);
         writeShort(this.id);
         writeShort(this.value);

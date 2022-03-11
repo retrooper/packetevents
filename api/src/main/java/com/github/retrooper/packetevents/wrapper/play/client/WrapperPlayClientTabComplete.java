@@ -45,7 +45,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
     }
 
     @Override
-    public void readData() {
+    public void read() {
         boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13);
         int textLength;
         if (v1_13) {
@@ -80,14 +80,14 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
     }
 
     @Override
-    public void readData(WrapperPlayClientTabComplete wrapper) {
+    public void copy(WrapperPlayClientTabComplete wrapper) {
         text = wrapper.text;
         transactionID = wrapper.transactionID;
         blockPosition = wrapper.blockPosition;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13);
         int textLength;
         if (v1_13) {

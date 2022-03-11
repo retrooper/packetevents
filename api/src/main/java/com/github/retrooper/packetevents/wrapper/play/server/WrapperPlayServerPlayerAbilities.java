@@ -45,7 +45,7 @@ public class WrapperPlayServerPlayerAbilities extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void readData() {
+    public void read() {
         byte mask = readByte();
         godMode = (mask & 0x01) != 0;
         flying = (mask & 0x02) != 0;
@@ -56,7 +56,7 @@ public class WrapperPlayServerPlayerAbilities extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void readData(WrapperPlayServerPlayerAbilities wrapper) {
+    public void copy(WrapperPlayServerPlayerAbilities wrapper) {
         godMode = wrapper.godMode;
         flying = wrapper.flying;
         flightAllowed = wrapper.flightAllowed;
@@ -66,7 +66,7 @@ public class WrapperPlayServerPlayerAbilities extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         byte mask = 0x00;
         if (godMode) {
             mask |= 0x01;

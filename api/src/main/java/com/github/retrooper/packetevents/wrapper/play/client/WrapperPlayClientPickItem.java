@@ -35,17 +35,17 @@ public class WrapperPlayClientPickItem extends PacketWrapper<WrapperPlayClientPi
     }
 
     @Override
-    public void readData() {
+    public void read() {
         slot = readVarInt();
     }
 
     @Override
-    public void readData(WrapperPlayClientPickItem wrapper) {
+    public void copy(WrapperPlayClientPickItem wrapper) {
         slot = wrapper.slot;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(slot);
     }
 

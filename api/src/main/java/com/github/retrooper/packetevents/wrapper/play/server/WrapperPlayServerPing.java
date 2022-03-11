@@ -43,17 +43,17 @@ public class WrapperPlayServerPing extends PacketWrapper<WrapperPlayServerPing> 
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.id = readInt();
     }
 
     @Override
-    public void readData(WrapperPlayServerPing wrapper) {
+    public void copy(WrapperPlayServerPing wrapper) {
         this.id = wrapper.id;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeInt(id);
     }
 

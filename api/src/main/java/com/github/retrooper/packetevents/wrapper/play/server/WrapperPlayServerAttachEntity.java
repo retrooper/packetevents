@@ -22,7 +22,7 @@ public class WrapperPlayServerAttachEntity extends PacketWrapper<WrapperPlayServ
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.attachedId = readInt();
         this.holdingId = readInt();
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
@@ -32,7 +32,7 @@ public class WrapperPlayServerAttachEntity extends PacketWrapper<WrapperPlayServ
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeInt(attachedId);
         writeInt(holdingId);
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
@@ -41,7 +41,7 @@ public class WrapperPlayServerAttachEntity extends PacketWrapper<WrapperPlayServ
     }
 
     @Override
-    public void readData(WrapperPlayServerAttachEntity wrapper) {
+    public void copy(WrapperPlayServerAttachEntity wrapper) {
         this.attachedId = wrapper.attachedId;
         this.holdingId = wrapper.holdingId;
         this.leash = wrapper.leash;

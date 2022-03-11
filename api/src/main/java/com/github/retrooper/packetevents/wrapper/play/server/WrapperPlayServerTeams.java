@@ -147,7 +147,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     }
 
     @Override
-    public void readData() {
+    public void read() {
         teamName = readString();
         teamMode = TeamMode.values()[readByte()];
         ScoreBoardTeamInfo info = null;
@@ -197,7 +197,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     }
 
     @Override
-    public void readData(WrapperPlayServerTeams wrapper) {
+    public void copy(WrapperPlayServerTeams wrapper) {
         teamName = wrapper.teamName;
         teamMode = wrapper.teamMode;
         players = wrapper.players;
@@ -205,7 +205,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeString(teamName);
         writeByte(teamMode.ordinal());
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {

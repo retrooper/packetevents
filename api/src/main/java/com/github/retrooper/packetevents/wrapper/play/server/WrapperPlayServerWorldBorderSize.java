@@ -17,17 +17,17 @@ public class WrapperPlayServerWorldBorderSize extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void readData() {
+    public void read() {
         diameter = readDouble();
     }
 
     @Override
-    public void readData(WrapperPlayServerWorldBorderSize packet) {
+    public void copy(WrapperPlayServerWorldBorderSize packet) {
         diameter = packet.diameter;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeDouble(diameter);
     }
 }

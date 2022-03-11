@@ -41,7 +41,7 @@ public class WrapperPlayServerBlockBreakAnimation extends PacketWrapper<WrapperP
     }
 
     @Override
-    public void readData() {
+    public void read() {
         entityID = readVarInt();
         if (serverVersion == ServerVersion.V_1_7_10) {
             int x = readInt();
@@ -56,14 +56,14 @@ public class WrapperPlayServerBlockBreakAnimation extends PacketWrapper<WrapperP
     }
 
     @Override
-    public void readData(WrapperPlayServerBlockBreakAnimation wrapper) {
+    public void copy(WrapperPlayServerBlockBreakAnimation wrapper) {
         entityID = wrapper.entityID;
         blockPosition = wrapper.blockPosition;
         destroyStage = wrapper.destroyStage;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(entityID);
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeInt(blockPosition.x);

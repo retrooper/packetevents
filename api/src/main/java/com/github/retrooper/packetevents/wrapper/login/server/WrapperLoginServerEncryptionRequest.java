@@ -60,7 +60,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.serverID = readString(20);
         byte[] publicKeyBytes = readByteArray(ByteBufHelper.readableBytes(buffer));
         this.publicKey = encrypt(publicKeyBytes);
@@ -68,14 +68,14 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     }
 
     @Override
-    public void readData(WrapperLoginServerEncryptionRequest wrapper) {
+    public void copy(WrapperLoginServerEncryptionRequest wrapper) {
         this.serverID = wrapper.serverID;
         this.publicKey = wrapper.publicKey;
         this.verifyToken = wrapper.verifyToken;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeString(serverID, 20);
         byte[] encoded = publicKey.getEncoded();
         writeByteArray(encoded);

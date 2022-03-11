@@ -51,7 +51,7 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
     }
 
     @Override
-    public void readData() {
+    public void read() {
         name = readString();
         mode = ObjectiveMode.values()[readByte()];
         displayName = Optional.ofNullable(readString());
@@ -59,7 +59,7 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
     }
 
     @Override
-    public void readData(WrapperPlayServerScoreboardObjective wrapper) {
+    public void copy(WrapperPlayServerScoreboardObjective wrapper) {
         name = wrapper.name;
         mode = wrapper.mode;
         displayName = wrapper.displayName;
@@ -67,7 +67,7 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeString(name);
         writeByte((byte) mode.ordinal());
         if (mode == ObjectiveMode.CREATE || mode == ObjectiveMode.UPDATE) {

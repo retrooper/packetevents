@@ -35,17 +35,17 @@ public class WrapperPlayClientLockDifficulty extends PacketWrapper<WrapperPlayCl
     }
 
     @Override
-    public void readData() {
+    public void read() {
         locked = readBoolean();
     }
 
     @Override
-    public void readData(WrapperPlayClientLockDifficulty wrapper) {
+    public void copy(WrapperPlayClientLockDifficulty wrapper) {
         locked = wrapper.locked;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeBoolean(locked);
     }
 

@@ -108,7 +108,7 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.action = WorldBorderAction.values()[this.readVarInt()];
         if (this.action == WorldBorderAction.SET_SIZE) {
             this.radius = readDouble();
@@ -136,7 +136,7 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData(WrapperPlayServerWorldBorder wrapper) {
+    public void copy(WrapperPlayServerWorldBorder wrapper) {
         this.action = wrapper.action;
         this.radius = wrapper.radius;
         this.oldRadius = wrapper.oldRadius;
@@ -150,7 +150,7 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(this.action.ordinal());
         if (this.action == WorldBorderAction.SET_SIZE) {
             writeDouble(this.radius);

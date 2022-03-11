@@ -31,7 +31,7 @@ public class WrapperPlayServerInitializeWorldBorder extends PacketWrapper<Wrappe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.x = readDouble();
         this.z = readDouble();
         this.oldDiameter = readDouble();
@@ -43,7 +43,7 @@ public class WrapperPlayServerInitializeWorldBorder extends PacketWrapper<Wrappe
     }
 
     @Override
-    public void readData(WrapperPlayServerInitializeWorldBorder wrapper) {
+    public void copy(WrapperPlayServerInitializeWorldBorder wrapper) {
         this.x = wrapper.x;
         this.z = wrapper.z;
         this.oldDiameter = wrapper.oldDiameter;
@@ -55,7 +55,7 @@ public class WrapperPlayServerInitializeWorldBorder extends PacketWrapper<Wrappe
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeDouble(x);
         writeDouble(z);
         writeDouble(oldDiameter);

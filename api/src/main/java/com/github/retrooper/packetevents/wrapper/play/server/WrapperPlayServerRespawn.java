@@ -67,7 +67,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     }
 
     @Override
-    public void readData() {
+    public void read() {
         boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         boolean v1_15_0 = v1_14 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
         boolean v1_16_0 = v1_15_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
@@ -148,7 +148,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     }
 
     @Override
-    public void readData(WrapperPlayServerRespawn wrapper) {
+    public void copy(WrapperPlayServerRespawn wrapper) {
         dimension = wrapper.dimension;
         worldName = wrapper.worldName;
         difficulty = wrapper.difficulty;
@@ -161,7 +161,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         boolean v1_15_0 = v1_14 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
         boolean v1_16_0 = v1_15_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);

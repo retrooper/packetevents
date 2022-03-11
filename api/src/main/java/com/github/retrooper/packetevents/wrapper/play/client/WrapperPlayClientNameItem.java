@@ -35,17 +35,17 @@ public class WrapperPlayClientNameItem extends PacketWrapper<WrapperPlayClientNa
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.itemName = readString();
     }
 
     @Override
-    public void readData(WrapperPlayClientNameItem wrapper) {
+    public void copy(WrapperPlayClientNameItem wrapper) {
         this.itemName = wrapper.itemName;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeString(itemName);
     }
 

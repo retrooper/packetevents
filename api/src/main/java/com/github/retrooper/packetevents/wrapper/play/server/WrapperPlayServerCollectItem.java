@@ -63,7 +63,7 @@ public class WrapperPlayServerCollectItem extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             collectedEntityId = readInt();
             collectorEntityId = readInt();
@@ -78,14 +78,14 @@ public class WrapperPlayServerCollectItem extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData(WrapperPlayServerCollectItem wrapper) {
+    public void copy(WrapperPlayServerCollectItem wrapper) {
         collectedEntityId = wrapper.collectedEntityId;
         collectorEntityId = wrapper.collectorEntityId;
         pickupItemCount = wrapper.pickupItemCount;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeInt(collectedEntityId);
             writeInt(collectorEntityId);

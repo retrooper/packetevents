@@ -47,19 +47,19 @@ public class WrapperPlayServerEntityAnimation extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void readData() {
+    public void read() {
         entityID = readVarInt();
         type = EntityAnimationType.VALUES[readByte()];
     }
 
     @Override
-    public void readData(WrapperPlayServerEntityAnimation wrapper) {
+    public void copy(WrapperPlayServerEntityAnimation wrapper) {
         entityID = wrapper.entityID;
         type = wrapper.type;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(entityID);
         writeByte(type.ordinal());
     }

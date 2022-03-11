@@ -16,7 +16,7 @@ public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> 
     }
 
     @Override
-    public void readData() {
+    public void read() {
         int count = readVarInt(); // Number of resource tags sent
         tags = new HashMap<>(count);
 
@@ -43,12 +43,12 @@ public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> 
     }
 
     @Override
-    public void readData(WrapperPlayServerTags wrapper) {
+    public void copy(WrapperPlayServerTags wrapper) {
         this.tags = wrapper.tags;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(tags.size());
 
         for (Map.Entry<String, List<Tag>> entry : tags.entrySet()) {

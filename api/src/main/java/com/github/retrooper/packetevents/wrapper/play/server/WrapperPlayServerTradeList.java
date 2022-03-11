@@ -34,7 +34,7 @@ public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerT
     private boolean canRestock;
 
     @Override
-    public void readData() {
+    public void read() {
         containerId = readVarInt();
         int size = readByte() & 0xFF;
         merchantRecipeData = new ArrayList<>(size);
@@ -61,7 +61,7 @@ public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerT
     }
 
     @Override
-    public void readData(WrapperPlayServerTradeList wrapper) {
+    public void copy(WrapperPlayServerTradeList wrapper) {
         containerId = wrapper.containerId;
         merchantRecipeData = wrapper.merchantRecipeData;
         villagerLevel = wrapper.villagerLevel;
@@ -71,7 +71,7 @@ public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerT
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(containerId);
         writeByte(this.merchantRecipeData.size() & 0xFF);
         for (MerchantRecipeData data : this.merchantRecipeData) {

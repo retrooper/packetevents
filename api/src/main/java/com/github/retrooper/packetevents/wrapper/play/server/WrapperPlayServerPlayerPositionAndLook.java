@@ -38,7 +38,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.x = readDouble();
         this.y = readDouble();
         this.z = readDouble();
@@ -54,7 +54,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeDouble(x);
         writeDouble(y);
         writeDouble(z);
@@ -70,7 +70,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
     }
 
     @Override
-    public void readData(WrapperPlayServerPlayerPositionAndLook wrapper) {
+    public void copy(WrapperPlayServerPlayerPositionAndLook wrapper) {
         this.x = wrapper.x;
         this.y = wrapper.y;
         this.z = wrapper.z;

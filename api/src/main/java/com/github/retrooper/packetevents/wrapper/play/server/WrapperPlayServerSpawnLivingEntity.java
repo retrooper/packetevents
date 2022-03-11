@@ -64,7 +64,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.entityID = readVarInt();
         if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
             this.entityUUID = new UUID(0L, 0L);
@@ -98,7 +98,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void readData(WrapperPlayServerSpawnLivingEntity wrapper) {
+    public void copy(WrapperPlayServerSpawnLivingEntity wrapper) {
         this.entityID = wrapper.entityID;
         this.entityUUID = wrapper.entityUUID;
         this.entityType = wrapper.entityType;
@@ -112,7 +112,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
 
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(entityID);
         if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
             writeByte(entityType.getId() & 255);

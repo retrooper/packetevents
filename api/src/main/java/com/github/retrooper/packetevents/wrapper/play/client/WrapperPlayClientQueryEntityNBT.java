@@ -36,19 +36,19 @@ public class WrapperPlayClientQueryEntityNBT extends PacketWrapper<WrapperPlayCl
     }
 
     @Override
-    public void readData() {
+    public void read() {
         transactionID = readVarInt();
         entityID = readVarInt();
     }
 
     @Override
-    public void readData(WrapperPlayClientQueryEntityNBT wrapper) {
+    public void copy(WrapperPlayClientQueryEntityNBT wrapper) {
         transactionID = wrapper.transactionID;
         entityID = wrapper.entityID;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(transactionID);
         writeVarInt(entityID);
     }

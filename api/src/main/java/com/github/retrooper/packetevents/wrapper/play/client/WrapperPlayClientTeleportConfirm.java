@@ -35,17 +35,17 @@ public class WrapperPlayClientTeleportConfirm extends PacketWrapper<WrapperPlayC
     }
 
     @Override
-    public void readData() {
+    public void read() {
         teleportID = readVarInt();
     }
 
     @Override
-    public void readData(WrapperPlayClientTeleportConfirm wrapper) {
+    public void copy(WrapperPlayClientTeleportConfirm wrapper) {
         teleportID = wrapper.teleportID;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(teleportID);
     }
 

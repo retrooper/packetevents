@@ -62,21 +62,21 @@ public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPl
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.windowId = readUnsignedByte();
         this.actionId = readShort();
         this.accepted = readBoolean();
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeByte(windowId);
         writeShort(actionId);
         writeBoolean(accepted);
     }
 
     @Override
-    public void readData(WrapperPlayServerWindowConfirmation wrapper) {
+    public void copy(WrapperPlayServerWindowConfirmation wrapper) {
         this.windowId = wrapper.getWindowId();
         this.actionId = wrapper.getActionId();
         this.accepted = wrapper.isAccepted();

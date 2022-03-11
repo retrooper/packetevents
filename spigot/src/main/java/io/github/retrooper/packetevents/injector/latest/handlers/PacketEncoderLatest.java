@@ -58,7 +58,7 @@ public class PacketEncoderLatest extends MessageToByteEncoder<Object> {
             if (packetSendEvent.getLastUsedWrapper() != null) {
                 ByteBufHelper.clear(packetSendEvent.getByteBuf());
                 packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
-                packetSendEvent.getLastUsedWrapper().writeData();
+                packetSendEvent.getLastUsedWrapper().write();
             }
             buffer.readerIndex(preProcessIndex);
         } else {

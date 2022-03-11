@@ -36,17 +36,17 @@ public class WrapperStatusClientPing extends PacketWrapper<WrapperStatusClientPi
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.time = readLong();
     }
 
     @Override
-    public void readData(WrapperStatusClientPing wrapper) {
+    public void copy(WrapperStatusClientPing wrapper) {
         this.time = wrapper.time;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeLong(time);
     }
 

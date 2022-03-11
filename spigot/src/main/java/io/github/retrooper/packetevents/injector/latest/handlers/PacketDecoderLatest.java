@@ -78,7 +78,7 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
                 if (packetReceiveEvent.getLastUsedWrapper() != null) {
                     ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
                     packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
-                    packetReceiveEvent.getLastUsedWrapper().writeData();
+                    packetReceiveEvent.getLastUsedWrapper().write();
                 }
                 transformed.readerIndex(preProcessIndex);
                 if (doRecompression) {

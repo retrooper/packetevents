@@ -35,17 +35,17 @@ public class WrapperPlayServerHeldItemChange extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.slot = readByte();
     }
 
     @Override
-    public void readData(WrapperPlayServerHeldItemChange wrapper) {
+    public void copy(WrapperPlayServerHeldItemChange wrapper) {
         this.slot = wrapper.slot;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeByte(slot);
     }
 

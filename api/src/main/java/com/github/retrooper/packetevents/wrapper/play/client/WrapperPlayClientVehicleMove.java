@@ -40,7 +40,7 @@ public class WrapperPlayClientVehicleMove extends PacketWrapper<WrapperPlayClien
     }
 
     @Override
-    public void readData() {
+    public void read() {
         double x = readDouble();
         double y = readDouble();
         double z = readDouble();
@@ -50,14 +50,14 @@ public class WrapperPlayClientVehicleMove extends PacketWrapper<WrapperPlayClien
     }
 
     @Override
-    public void readData(WrapperPlayClientVehicleMove wrapper) {
+    public void copy(WrapperPlayClientVehicleMove wrapper) {
         this.position = wrapper.position;
         this.yaw = wrapper.yaw;
         this.pitch = wrapper.pitch;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeDouble(position.x);
         writeDouble(position.y);
         writeDouble(position.z);

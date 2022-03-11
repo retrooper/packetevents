@@ -54,7 +54,7 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
     }
 
     @Override
-    public void readData() {
+    public void read() {
         byte mask = readByte();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             flying = (mask & 0x02) != 0;
@@ -75,7 +75,7 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
     }
 
     @Override
-    public void readData(WrapperPlayClientPlayerAbilities wrapper) {
+    public void copy(WrapperPlayClientPlayerAbilities wrapper) {
         godMode = wrapper.godMode;
         flying = wrapper.flying;
         flightAllowed = wrapper.flightAllowed;
@@ -85,7 +85,7 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             byte mask = (byte) (flying ? 0x02 : 0x00);
             writeByte(mask);

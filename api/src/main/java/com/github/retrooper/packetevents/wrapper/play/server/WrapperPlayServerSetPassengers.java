@@ -19,19 +19,19 @@ public class WrapperPlayServerSetPassengers extends PacketWrapper<WrapperPlaySer
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.entityId = readVarInt();
         this.passengers = readVarIntArray();
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(entityId);
         writeVarIntArray(passengers);
     }
 
     @Override
-    public void readData(WrapperPlayServerSetPassengers wrapper) {
+    public void copy(WrapperPlayServerSetPassengers wrapper) {
         entityId = wrapper.entityId;
         passengers = wrapper.passengers;
     }

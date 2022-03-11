@@ -65,7 +65,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         int localeLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12) ? 16 : 7;
         locale = readString(localeLength);
         viewDistance = readByte();
@@ -108,7 +108,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
     }
 
     @Override
-    public void readData(WrapperPlayClientSettings wrapper) {
+    public void copy(WrapperPlayClientSettings wrapper) {
         locale = wrapper.locale;
         viewDistance = wrapper.viewDistance;
         visibility = wrapper.visibility;
@@ -119,7 +119,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         int localeLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12) ? 16 : 7;
         writeString(locale, localeLength);
         writeByte(viewDistance);

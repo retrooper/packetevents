@@ -140,7 +140,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
                     event.setCancelled(true);
                     WrapperPlayServerChatMessage clone = new WrapperPlayServerChatMessage((Component) null, null);
-                    clone.readData(chatMessage);
+                    clone.copy(chatMessage);
                     PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), clone);
                     System.out.println("Delayed " + chatMessage.getChatComponentJson());
                 }

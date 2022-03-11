@@ -40,19 +40,19 @@ public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.windowID = readByte();
         this.buttonID = readByte();
     }
 
     @Override
-    public void readData(WrapperPlayClientClickWindowButton wrapper) {
+    public void copy(WrapperPlayClientClickWindowButton wrapper) {
         this.windowID = wrapper.windowID;
         this.buttonID = wrapper.buttonID;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeByte(this.windowID);
         writeByte(this.buttonID);
     }

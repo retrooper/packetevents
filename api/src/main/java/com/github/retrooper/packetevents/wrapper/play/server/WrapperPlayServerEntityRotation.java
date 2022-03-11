@@ -41,7 +41,7 @@ public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         entityID = readVarInt();
         yaw = readByte()/ ROTATION_FACTOR;
         pitch = readByte() / ROTATION_FACTOR;
@@ -49,7 +49,7 @@ public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void readData(WrapperPlayServerEntityRotation wrapper) {
+    public void copy(WrapperPlayServerEntityRotation wrapper) {
         entityID = wrapper.entityID;
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
@@ -57,7 +57,7 @@ public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(entityID);
         writeByte((int) (yaw * ROTATION_FACTOR));
         writeByte((int) (pitch * ROTATION_FACTOR));

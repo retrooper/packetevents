@@ -40,17 +40,17 @@ public class WrapperPlayClientSpectate extends PacketWrapper<WrapperPlayClientSp
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.targetUUID = readUUID();
     }
 
     @Override
-    public void readData(WrapperPlayClientSpectate wrapper) {
+    public void copy(WrapperPlayClientSpectate wrapper) {
         this.targetUUID = wrapper.targetUUID;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeUUID(targetUUID);
     }
 

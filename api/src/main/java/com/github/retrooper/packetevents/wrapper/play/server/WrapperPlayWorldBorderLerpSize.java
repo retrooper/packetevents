@@ -21,21 +21,21 @@ public class WrapperPlayWorldBorderLerpSize extends PacketWrapper<WrapperPlayWor
     }
 
     @Override
-    public void readData() {
+    public void read() {
         oldDiameter = readDouble();
         newDiameter = readDouble();
         speed = readVarLong();
     }
 
     @Override
-    public void readData(WrapperPlayWorldBorderLerpSize packet) {
+    public void copy(WrapperPlayWorldBorderLerpSize packet) {
         this.oldDiameter = packet.oldDiameter;
         this.newDiameter = packet.newDiameter;
         this.speed = packet.speed;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeDouble(oldDiameter);
         writeDouble(newDiameter);
         writeVarLong(speed);

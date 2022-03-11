@@ -35,17 +35,17 @@ public class WrapperPlayClientCloseWindow extends PacketWrapper<WrapperPlayClien
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.windowID = readUnsignedByte();
     }
 
     @Override
-    public void readData(WrapperPlayClientCloseWindow wrapper) {
+    public void copy(WrapperPlayClientCloseWindow wrapper) {
         this.windowID = wrapper.windowID;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeByte(this.windowID);
     }
 

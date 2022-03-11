@@ -52,7 +52,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             interactionHand = InteractionHand.getById(readVarInt());
             blockPosition = readBlockPosition();
@@ -86,7 +86,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
     }
 
     @Override
-    public void readData(WrapperPlayClientPlayerBlockPlacement wrapper) {
+    public void copy(WrapperPlayClientPlayerBlockPlacement wrapper) {
         interactionHand = wrapper.interactionHand;
         blockPosition = wrapper.blockPosition;
         face = wrapper.face;
@@ -95,7 +95,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             writeVarInt(interactionHand.getId());
             writeBlockPosition(blockPosition);

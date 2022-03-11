@@ -34,17 +34,17 @@ public class WrapperPlayServerUpdateViewDistance extends PacketWrapper<WrapperPl
     }
 
     @Override
-    public void readData() {
+    public void read() {
         viewDistance = readVarInt();
     }
 
     @Override
-    public void readData(WrapperPlayServerUpdateViewDistance wrapper) {
+    public void copy(WrapperPlayServerUpdateViewDistance wrapper) {
         viewDistance = wrapper.viewDistance;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(viewDistance);
     }
 

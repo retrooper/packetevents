@@ -36,19 +36,19 @@ public class WrapperPlayServerEntityStatus extends PacketWrapper<WrapperPlayServ
     }
 
     @Override
-    public void readData() {
+    public void read() {
         entityID = readInt();
         status = readByte();
     }
 
     @Override
-    public void readData(WrapperPlayServerEntityStatus wrapper) {
+    public void copy(WrapperPlayServerEntityStatus wrapper) {
         entityID = wrapper.entityID;
         status = wrapper.status;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeInt(entityID);
         writeByte(status);
     }

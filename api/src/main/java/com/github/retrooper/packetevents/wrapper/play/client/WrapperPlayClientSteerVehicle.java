@@ -29,21 +29,21 @@ public class WrapperPlayClientSteerVehicle extends PacketWrapper<WrapperPlayClie
     }
 
     @Override
-    public void readData() {
+    public void read() {
         this.sideways = readFloat();
         this.forward = readFloat();
         this.flags = readByte();
     }
 
     @Override
-    public void readData(WrapperPlayClientSteerVehicle wrapper) {
+    public void copy(WrapperPlayClientSteerVehicle wrapper) {
         this.sideways = wrapper.sideways;
         this.forward = wrapper.forward;
         this.flags = wrapper.flags;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeFloat(sideways);
         writeFloat(forward);
         writeByte(flags);

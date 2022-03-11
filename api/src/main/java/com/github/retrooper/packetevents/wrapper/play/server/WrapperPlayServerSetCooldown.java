@@ -21,19 +21,19 @@ public class WrapperPlayServerSetCooldown extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         item = ItemTypes.getById(readVarInt());
         cooldownTicks = readVarInt();
     }
 
     @Override
-    public void readData(WrapperPlayServerSetCooldown wrapper) {
+    public void copy(WrapperPlayServerSetCooldown wrapper) {
         item = wrapper.item;
         cooldownTicks = wrapper.cooldownTicks;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(item.getId());
         writeVarInt(cooldownTicks);
     }

@@ -48,7 +48,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     }
 
     @Override
-    public void readData() {
+    public void read() {
         float x = readFloat();
         float y = readFloat();
         float z = readFloat();
@@ -75,7 +75,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     }
 
     @Override
-    public void readData(WrapperPlayServerExplosion wrapper) {
+    public void copy(WrapperPlayServerExplosion wrapper) {
         position = wrapper.position;
         strength = wrapper.strength;
         records = wrapper.records;
@@ -83,7 +83,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeFloat(position.x);
         writeFloat(position.y);
         writeFloat(position.z);

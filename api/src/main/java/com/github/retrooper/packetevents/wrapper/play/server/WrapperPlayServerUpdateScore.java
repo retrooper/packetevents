@@ -51,7 +51,7 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             entityName = readString(16);
             action = Action.VALUES[readByte()];
@@ -79,7 +79,7 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData(WrapperPlayServerUpdateScore wrapper) {
+    public void copy(WrapperPlayServerUpdateScore wrapper) {
         entityName = wrapper.entityName;
         action = wrapper.action;
         objectiveName = wrapper.objectiveName;
@@ -87,7 +87,7 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeString(entityName, 16);
             writeByte(action.ordinal());

@@ -41,7 +41,7 @@ public class WrapperPlayClientKeepAlive extends PacketWrapper<WrapperPlayClientK
     }
 
     @Override
-    public void readData() {
+    public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
             this.id = readLong();
         } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
@@ -52,12 +52,12 @@ public class WrapperPlayClientKeepAlive extends PacketWrapper<WrapperPlayClientK
     }
 
     @Override
-    public void readData(WrapperPlayClientKeepAlive wrapper) {
+    public void copy(WrapperPlayClientKeepAlive wrapper) {
         this.id = wrapper.id;
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
             writeLong(id);
         } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {

@@ -58,7 +58,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData() {
+    public void read() {
         entityID = readVarInt();
         boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
         if (v1_9) {
@@ -107,7 +107,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData(WrapperPlayServerSpawnEntity wrapper) {
+    public void copy(WrapperPlayServerSpawnEntity wrapper) {
         entityID = wrapper.entityID;
         uuid = wrapper.uuid;
         entityType = wrapper.entityType;
@@ -129,7 +129,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         writeVarInt(entityID);
         boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
         if (v1_9) {

@@ -60,7 +60,7 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
     }
 
     @Override
-    public void readData() {
+    public void read() {
         Vector3d position = new Vector3d();
         float yaw = 0.0f;
         float pitch = 0.0f;
@@ -85,7 +85,7 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
     }
 
     @Override
-    public void readData(WrapperPlayClientPlayerFlying wrapper) {
+    public void copy(WrapperPlayClientPlayerFlying wrapper) {
         positionChanged = wrapper.positionChanged;
         rotationChanged = wrapper.rotationChanged;
         location = wrapper.location;
@@ -93,7 +93,7 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
     }
 
     @Override
-    public void writeData() {
+    public void write() {
         if (positionChanged) {
             writeDouble(location.getPosition().getX());
             if (serverVersion == ServerVersion.V_1_7_10) {
