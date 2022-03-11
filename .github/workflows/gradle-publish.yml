@@ -21,18 +21,18 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Build with Gradle
-        run: gradle :clean :build api:clean api:shadowJar spigot:clean spigot:build spigot:shadowJar netty-common:clean netty-common:shadowJar bungeecord:clean bungeecord:shadowJar velocity:clean velocity:shadowJar
+        run: gradle shadowJar
 
       - name: Upload build artifacts api
         uses: actions/upload-artifact@v1
         with:
-          name: api-build.zip
+          name: api-build
           path: api/build/libs
 
       - name: Upload build artifacts spigot
         uses: actions/upload-artifact@v1
         with:
-          name: spigot-build.zip
+          name: spigot-build
           path: spigot/build/libs
 
       - name: Upload build artifacts netty-common
