@@ -3,15 +3,7 @@ plugins {
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.0' apply(false)
 }
-
-group = 'com.github.retrooper'
-version = '2.0.0'
-description = 'packetevents'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
 
 wrapper {
     gradleVersion = "7.3.1"
