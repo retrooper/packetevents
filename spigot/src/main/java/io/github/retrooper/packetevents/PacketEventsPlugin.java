@@ -138,11 +138,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                     System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                 } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
-                    /*event.setCancelled(true);
+                    event.setCancelled(true);
                     WrapperPlayServerChatMessage clone = new WrapperPlayServerChatMessage((Component) null, null);
                     clone.readData(chatMessage);
                     PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), clone);
-                    System.out.println("Delayed " + chatMessage.getChatComponentJson());*/
+                    System.out.println("Delayed " + chatMessage.getChatComponentJson());
                 }
             }
         };

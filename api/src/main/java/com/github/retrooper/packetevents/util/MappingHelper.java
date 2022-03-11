@@ -44,6 +44,6 @@ public class MappingHelper {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return AdventureSerializer.GSON.serializer().fromJson(sb.toString(), JsonObject.class);
+        return AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
     }
 }

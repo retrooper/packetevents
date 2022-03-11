@@ -47,7 +47,7 @@ public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServ
     public void readData() {
         componentJson = readString();
         if (HANDLE_JSON) {
-            component = AdventureSerializer.GSON.serializer().fromJson(componentJson, JsonObject.class);
+            component = AdventureSerializer.getGsonSerializer().serializer().fromJson(componentJson, JsonObject.class);
         }
     }
 

@@ -28,18 +28,8 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class AdventureSerializer {
 
-    public static final GsonComponentSerializer GSON;
-    public static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
-
-    static {
-        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
-        GsonComponentSerializer.Builder builder = GsonComponentSerializer.builder()
-                .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get());
-        if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            builder.downsampleColors();
-        }
-        GSON = builder.build();
-    }
+    private static GsonComponentSerializer GSON;
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
     public static String asVanilla(Component component) {
         return LEGACY.serialize(component);
@@ -49,20 +39,37 @@ public class AdventureSerializer {
         return LEGACY.deserialize(vanilla);
     }
 
+    public static GsonComponentSerializer getGsonSerializer() {
+        if (GSON == null) {
+            ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+            GsonComponentSerializer.Builder builder = GsonComponentSerializer.builder()
+                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get());
+            if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+                builder.downsampleColors();
+            }
+            GSON = builder.build();
+        }
+        return GSON;
+    }
+
+    public static LegacyComponentSerializer getLegacyGsonSerializer() {
+        return LEGACY;
+    }
+
     public static Component parseComponent(String json) {
-        return GSON.deserialize(json);
+        return getGsonSerializer().deserialize(json);
     }
 
     public static Component parseJsonTree(JsonElement json) {
-        return GSON.deserializeFromTree(json);
+        return getGsonSerializer().deserializeFromTree(json);
     }
 
     public static String toJson(Component component) {
-        return GSON.serialize(component);
+        return getGsonSerializer().serialize(component);
     }
 
     public static JsonElement toJsonTree(Component component) {
-        return GSON.serializeToTree(component);
+        return getGsonSerializer().serializeToTree(component);
     }
 
 }

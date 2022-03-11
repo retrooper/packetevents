@@ -25,7 +25,6 @@ dependencies {
     //includes gson
     api 'net.kyori:adventure-text-serializer-gson:4.10.1'
     api 'net.kyori:adventure-text-serializer-gson-legacy-impl:4.10.1'
-
     api 'net.kyori:adventure-text-serializer-legacy:4.10.1'
 
     compileOnly 'org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT'

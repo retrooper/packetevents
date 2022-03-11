@@ -55,7 +55,7 @@ public class MojangAPIUtil {
                 sb.append(inputLine);
             }
             in.close();
-            JsonObject responseObject = AdventureSerializer.GSON.serializer().fromJson(sb.toString(), JsonObject.class);
+            JsonObject responseObject = AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
             JsonArray jsonProperties = responseObject.get("properties").getAsJsonArray();
             for (JsonElement element : jsonProperties) {
                 JsonObject property = element.getAsJsonObject();
@@ -97,7 +97,7 @@ public class MojangAPIUtil {
                 sb.append(inputLine);
             }
             in.close();
-            JsonObject responseObject = AdventureSerializer.GSON.serializer().fromJson(sb.toString(), JsonObject.class);
+            JsonObject responseObject = AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
             return responseObject.get("name").getAsString();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -124,7 +124,7 @@ public class MojangAPIUtil {
                 sb.append(inputLine);
             }
             in.close();
-            JsonObject responseObject = AdventureSerializer.GSON.serializer().fromJson(sb.toString(), JsonObject.class);
+            JsonObject responseObject = AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
             String uuidStr = responseObject.get("id").getAsString();
             //Now we must add the "-"s to the UUID
             return UUIDUtil.fromStringWithoutDashes(uuidStr);
