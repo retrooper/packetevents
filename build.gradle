@@ -39,6 +39,10 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
+configurations.all {
+	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 processResources {
 	inputs.property "version", project.version
 
