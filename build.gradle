@@ -36,38 +36,38 @@ allprojects {
                 }
             }
         }
-    }
 
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url = 'https://oss.sonatype.org/content/groups/public/' }
-    }
+        repositories {
+            mavenLocal()
+            mavenCentral()
+            maven { url = 'https://oss.sonatype.org/content/groups/public/' }
+        }
 
-    dependencies {
-        compileOnly 'org.jetbrains:annotations:23.0.0'
-    }
+        dependencies {
+            compileOnly 'org.jetbrains:annotations:23.0.0'
+        }
 
-    shadowJar {
-        //Just for jitpack to work
-        archiveVersion.set('')
-        minimize()
-    }
+        shadowJar {
+            //Just for jitpack to work
+            archiveVersion.set('')
+            minimize()
+        }
 
-    tasks.withType(JavaCompile) {
-        options.encoding = 'UTF-8'
-    }
+        tasks.withType(JavaCompile) {
+            options.encoding = 'UTF-8'
+        }
 
-    //So that SNAPSHOT is always the latest SNAPSHOT
-    configurations.all {
-        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
-    }
+        //So that SNAPSHOT is always the latest SNAPSHOT
+        configurations.all {
+            resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+        }
 
-    tasks.jar.configure {
-        classifier = 'default'
-    }
+        tasks.jar.configure {
+            classifier = 'default'
+        }
 
-    tasks.shadowJar.configure {
-        classifier = null
+        tasks.shadowJar.configure {
+            classifier = null
+        }
     }
 }
