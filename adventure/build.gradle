@@ -4,10 +4,11 @@ dependencies {
     api 'net.kyori:adventure-text-serializer-gson-legacy-impl:4.10.1'
     api 'net.kyori:adventure-text-serializer-legacy:4.10.1'
 }
-
-shadowJar {
-    dependencies {
-        exclude(dependency('com.google.code.gson:gson:2.8.0'))
+tasks {
+    shadowJar {
+        //relocate 'net.kyori', 'com.github.retrooper.packetevents.libs.kyori'
+        dependencies {
+            exclude(dependency('com.google.code.gson:gson:2.8.0'))
+        }
     }
-    relocate 'net.kyori', 'com.github.retrooper.packetevents.libs.kyori'
 }

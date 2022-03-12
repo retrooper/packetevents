@@ -1,4 +1,5 @@
 plugins {
+    id 'java'
     id 'java-library'
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.0' apply(false)
@@ -10,7 +11,8 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
-allprojects {
+subprojects {
+    apply plugin: 'java'
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'com.github.johnrengelman.shadow'
@@ -19,47 +21,76 @@ allprojects {
     description = project.name
     version = '2.0.0'
 
-    if (project.name != 'packetevents') {
-        publishing {
-            publications {
-                maven(MavenPublication) {
-                    groupId = 'com.github.retrooper.packetevents'
-                    artifactId = project.name
-                    from(components.java)
-                }
-            }
-        }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url = 'https://oss.sonatype.org/content/groups/public/' }
+    }
 
-        repositories {
-            mavenLocal()
-            mavenCentral()
-            maven { url = 'https://oss.sonatype.org/content/groups/public/' }
-        }
+    dependencies {
+        compileOnly 'org.jetbrains:annotations:23.0.0'
+    }
 
-        dependencies {
-            compileOnly 'org.jetbrains:annotations:23.0.0'
-        }
-
+    tasks {
         shadowJar {
             archiveFileName.set("packetevents-${project.name}-${project.version}.jar")
             minimize()
         }
 
-        tasks.withType(JavaCompile) {
+        build {
+            dependsOn(shadowJar)
+        }
+
+        /*task unpackShadow(type: Copy) {
+            dependsOn shadowJar
+            from zipTree("$buildDir/libs/${shadowJar.archiveFileName.get()}")
+            into "$buildDir/unpacked-shadow"
+        }
+        tasks.getByName('shadowJar').finalizedBy(unpackShadow)*/
+
+        task sourceJar(type: Jar) {
+            from sourceSets.main.allJava
+        }
+
+        withType(JavaCompile) {
             options.encoding = 'UTF-8'
         }
 
-        //So that SNAPSHOT is always the latest SNAPSHOT
-        configurations.all {
-            resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
-        }
-
-        tasks.jar.configure {
+        jar.configure {
             classifier = 'default'
         }
 
-        tasks.shadowJar.configure {
+        shadowJar.configure {
             classifier = null
         }
     }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId = 'com.github.retrooper.packetevents'
+                artifactId = project.name
+                version = project.version
+                from components.java
+            }
+        }
+    }
+    //So that SNAPSHOT is always the latest SNAPSHOT
+    configurations.all {
+        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+    }
+
+    /*
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+
+    tasks.jar.configure {
+        classifier = 'default'
+    }
+
+    tasks.shadowJar.configure {
+        classifier = null
+    }*/
 }

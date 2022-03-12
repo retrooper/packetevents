@@ -7,7 +7,7 @@ repositories {
 
 dependencies {
     api project(':api')
-    api project(':adventure')
+    api project(':adventure-gson')
 
 
     compileOnly 'org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT'
@@ -39,4 +39,8 @@ dependencies {
     compileOnly 'org.github.spigot:1.9:1.9'
     compileOnly 'org.github.spigot:1.8.8:1.8.8'
     compileOnly 'org.github.spigot:1.7.10:1.7.10'
+}
+
+shadowJar {
+    relocate 'net.kyori', 'com.github.retrooper.packetevents.libs.kyori'
 }

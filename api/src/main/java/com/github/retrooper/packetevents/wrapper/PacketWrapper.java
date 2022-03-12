@@ -129,7 +129,6 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void read() {
-
     }
 
     public void copy(T wrapper) {

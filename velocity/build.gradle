@@ -13,3 +13,7 @@ dependencies {
     //Velocity ships with adventure & gson
     compileOnly project(':adventure')
 }
+
+shadowJar {
+    relocate 'net.kyori', 'com.github.retrooper.packetevents.libs.kyori'
+}

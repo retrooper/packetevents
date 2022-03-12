@@ -4,3 +4,7 @@ dependencies {
     implementation project(':netty-common')
     implementation project(':adventure')
 }
+
+shadowJar {
+    relocate 'net.kyori', 'com.github.retrooper.packetevents.libs.kyori'
+}
