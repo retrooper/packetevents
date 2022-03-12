@@ -48,9 +48,9 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
     public void read() {
         url = readString();
         hash = readString();
-        required = readBoolean();
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+            required = readBoolean();
             hasPrompt = readBoolean();
 
             if (hasPrompt) {
@@ -77,9 +77,9 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
     public void write() {
         writeString(url);
         writeString(hash);
-        writeBoolean(required);
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+            writeBoolean(required);
             writeBoolean(hasPrompt);
             writeComponent(prompt);
         }
