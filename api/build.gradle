@@ -1,3 +1,3 @@
 dependencies {
-    compileOnly project(':adventure-gson')
+    compileOnly(adventureDependencies)
 }

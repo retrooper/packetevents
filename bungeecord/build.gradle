@@ -1,10 +1,14 @@
 dependencies {
     compileOnly 'net.md-5:bungeecord-api:1.18-R0.1-SNAPSHOT'
     api project(':api')
-    implementation project(':netty-common')
-    implementation project(':adventure')
+    api project(':netty-common')
+    api(adventureDependencies)
 }
 
 shadowJar {
-    relocate 'net.kyori', 'com.github.retrooper.packetevents.libs.kyori'
+    shadowJar {
+        dependencies {
+            exclude(dependency('com.google.code.gson:gson:2.8.0'))
+        }
+    }
 }

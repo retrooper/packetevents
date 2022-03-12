@@ -11,9 +11,5 @@ dependencies {
     api project(':api')
     implementation project(':netty-common')
     //Velocity ships with adventure & gson
-    compileOnly project(':adventure')
-}
-
-shadowJar {
-    relocate 'net.kyori', 'com.github.retrooper.packetevents.libs.kyori'
+    compileOnly(adventureDependencies)
 }

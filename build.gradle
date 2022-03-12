@@ -11,6 +11,7 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'java-library'
@@ -20,6 +21,9 @@ subprojects {
     group = 'com.github.retrooper'
     description = project.name
     version = '2.0.0'
+
+    project.ext.adventureVersion = '4.10.0'
+    project.ext.adventureDependencies=["net.kyori:adventure-api:${adventureVersion}", "net.kyori:adventure-text-serializer-gson:${adventureVersion}", "net.kyori:adventure-text-serializer-legacy:${adventureVersion}", "net.kyori:adventure-text-serializer-gson-legacy-impl:${adventureVersion}"]
 
     repositories {
         mavenLocal()
@@ -32,6 +36,8 @@ subprojects {
     }
 
     tasks {
+
+
         shadowJar {
             archiveFileName.set("packetevents-${project.name}-${project.version}.jar")
             minimize()
@@ -40,13 +46,6 @@ subprojects {
         build {
             dependsOn(shadowJar)
         }
-
-        /*task unpackShadow(type: Copy) {
-            dependsOn shadowJar
-            from zipTree("$buildDir/libs/${shadowJar.archiveFileName.get()}")
-            into "$buildDir/unpacked-shadow"
-        }
-        tasks.getByName('shadowJar').finalizedBy(unpackShadow)*/
 
         task sourceJar(type: Jar) {
             from sourceSets.main.allJava
