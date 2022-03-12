@@ -22,7 +22,7 @@ subprojects {
     description = project.name
     version = '2.0.0'
 
-    project.ext.adventureVersion = '4.10.0'
+    project.ext.adventureVersion = '4.10.1'
     project.ext.adventureDependencies=["net.kyori:adventure-api:${adventureVersion}", "net.kyori:adventure-text-serializer-gson:${adventureVersion}", "net.kyori:adventure-text-serializer-legacy:${adventureVersion}", "net.kyori:adventure-text-serializer-gson-legacy-impl:${adventureVersion}"]
 
     repositories {
