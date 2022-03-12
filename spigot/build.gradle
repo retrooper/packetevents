@@ -12,7 +12,7 @@ shadowJar {
 
 dependencies {
     api project(':api')
-    api(adventureDependencies)
+    implementation(adventureDependencies)
     //api project(':adventure-gson')
 
 
