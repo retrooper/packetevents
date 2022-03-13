@@ -23,25 +23,30 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlayServerResourcePackSend> {
     private String url;
     private String hash;
     private boolean required;
-    private boolean hasPrompt;
     private Component prompt;
 
     public WrapperPlayServerResourcePackSend(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerResourcePackSend(String url, String hash, boolean required, boolean hasPrompt, Component prompt) {
+    public WrapperPlayServerResourcePackSend(String url, String hash, boolean required, @Nullable Component prompt) {
         super(PacketType.Play.Server.RESOURCE_PACK_SEND);
         this.url = url;
         this.hash = hash;
         this.required = required;
-        this.hasPrompt = hasPrompt;
         this.prompt = prompt;
+    }
+
+    @Deprecated
+    public WrapperPlayServerResourcePackSend(String url, String hash, boolean required, boolean hasPrompt, @Nullable Component prompt) {
+        //hasPrompt is redundant
+        this(url, hash, required, prompt);
     }
 
     @Override
@@ -51,7 +56,7 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             required = readBoolean();
-            hasPrompt = readBoolean();
+            boolean hasPrompt = readBoolean();
 
             if (hasPrompt) {
                 prompt = readComponent();
@@ -59,7 +64,6 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
                 prompt = null;
             }
         } else {
-            hasPrompt = false;
             prompt = null;
         }
     }
@@ -69,7 +73,6 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
         url = wrapper.url;
         hash = wrapper.hash;
         required = wrapper.required;
-        hasPrompt = wrapper.hasPrompt;
         prompt = wrapper.prompt;
     }
 
@@ -80,8 +83,10 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             writeBoolean(required);
-            writeBoolean(hasPrompt);
-            writeComponent(prompt);
+            writeBoolean(prompt != null);
+            if (prompt != null) {
+                writeComponent(prompt);
+            }
         }
     }
 
@@ -97,8 +102,9 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
         return required;
     }
 
+    @Deprecated
     public boolean getHasPrompt() {
-        return hasPrompt;
+        return prompt != null;
     }
 
     public Component getPrompt() {
