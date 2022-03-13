@@ -1,4 +1,4 @@
 dependencies {
-    compileOnly 'io.netty:netty-all:4.1.72.Final'
+    compileOnly "io.netty:netty-all:${nettyVersion}"
     api project(':api')
 }
