@@ -20,9 +20,10 @@ package io.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
-import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
@@ -51,6 +52,27 @@ public class SpigotDataHelper {
 
     public static org.bukkit.GameMode toBukkitGameMode(GameMode gameMode) {
         return org.bukkit.GameMode.getByValue(gameMode.getId());
+    }
+
+    public static EntityType fromBukkitEntityType(org.bukkit.entity.EntityType entityType) {
+        if (PacketEvents.getAPI().getServerManager().getVersion()
+                .isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            return EntityTypes.getByName(entityType.getName());
+        } else {
+            if (entityType.getTypeId() == -1) {
+                return null;
+            }
+            return EntityTypes.getById(entityType.getTypeId());
+        }
+    }
+
+    public static org.bukkit.entity.EntityType toBukkitEntityType(EntityType entityType) {
+        if (PacketEvents.getAPI().getServerManager().getVersion()
+                .isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            return org.bukkit.entity.EntityType.fromName(entityType.getName().getKey());
+        } else {
+            return org.bukkit.entity.EntityType.fromId(entityType.getId());
+        }
     }
 
     //This is sort of a lazy approach, but likely works.

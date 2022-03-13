@@ -326,4 +326,15 @@ public class EntityTypes {
     public static final EntityType ZOMBIFIED_PIGLIN = define("zombified_piglin", ZOMBIE);
     public static final EntityType PLAYER = define("player", LIVINGENTITY);
     public static final EntityType FISHING_BOBBER = define("fishing_bobber", ENTITY);
+    public static final EntityType ENDER_SIGNAL = define("ender_signal", ENTITY);
+    public static final EntityType THROWN_EXP_BOTTLE = define("thrown_exp_bottle", PROJECTILE_ABSTRACT);
+    public static final EntityType PRIMED_TNT = define("primed_tnt", ENTITY);
+    public static final EntityType FIREWORK = define("firework", ENTITY);
+    public static final EntityType MINECART_COMMAND = define("minecart_command", MINECART_ABSTRACT);
+    public static final EntityType MINECART_RIDEABLE = define("minecart_rideable", MINECART_ABSTRACT);
+    public static final EntityType MINECART_CHEST = define("minecart_chest", MINECART_ABSTRACT);
+    public static final EntityType MINECART_FURNACE = define("minecart_furnace", MINECART_ABSTRACT);
+    public static final EntityType MINECART_TNT = define("minecart_tnt", MINECART_ABSTRACT);
+    public static final EntityType MINECART_HOPPER = define("minecart_hopper", MINECART_ABSTRACT);
+    public static final EntityType MINECART_MOB_SPAWNER = define("minecart_mob_spawner", MINECART_ABSTRACT);
 }

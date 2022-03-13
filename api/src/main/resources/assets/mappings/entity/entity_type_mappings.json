@@ -798,6 +798,8 @@
   "V_1_10": {
     "item": 1,
     "experience_orb": 2,
+    "leash_knot": 8,
+    "painting": 9,
     "arrow": 10,
     "snowball": 11,
     "fireball": 12,

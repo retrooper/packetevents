@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
@@ -91,6 +92,24 @@ public class PacketEventsPlugin extends JavaPlugin {
                             WrapperPlayServerBlockChange blockChange = new WrapperPlayServerBlockChange(bp,
                                     blockState.getGlobalId());
                             user.writePacket(blockChange);
+                        }
+                        else if (chatMessage.getMessage().equalsIgnoreCase("test0")) {
+                            for (org.bukkit.entity.EntityType type : org.bukkit.entity.EntityType.values()) {
+                                EntityType entityType = SpigotDataHelper.fromBukkitEntityType(type);
+                                if (entityType != null) {
+                                    System.out.println("EntityType: " + entityType.getName() + ", Bukkit type: " + type.getName());
+                                }
+                            }
+                        }
+                        else if (chatMessage.getMessage().equalsIgnoreCase("test1")) {
+                            for (org.bukkit.entity.EntityType type : org.bukkit.entity.EntityType.values()) {
+                                if (type.getTypeId() != -1) {
+                                    EntityType entityType = SpigotDataHelper.fromBukkitEntityType(type);
+                                    if (entityType == null) {
+                                        System.out.println("Bukkit type not found in packetevents: " + type.getName() + ", id: " + type.getTypeId());
+                                    }
+                                }
+                            }
                         }
                         break;
                     case PLAYER_FLYING:
