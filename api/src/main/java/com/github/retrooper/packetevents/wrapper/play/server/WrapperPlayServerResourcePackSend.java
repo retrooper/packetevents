@@ -43,16 +43,10 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
         this.prompt = prompt;
     }
 
-    @Deprecated
-    public WrapperPlayServerResourcePackSend(String url, String hash, boolean required, boolean hasPrompt, @Nullable Component prompt) {
-        //hasPrompt is redundant
-        this(url, hash, required, prompt);
-    }
-
     @Override
     public void read() {
         url = readString();
-        hash = readString();
+        hash = readString(40);
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             required = readBoolean();
@@ -60,11 +54,7 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
 
             if (hasPrompt) {
                 prompt = readComponent();
-            } else {
-                prompt = null;
             }
-        } else {
-            prompt = null;
         }
     }
 
@@ -98,13 +88,8 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
         return hash;
     }
 
-    public boolean getRequired() {
+    public boolean isRequired() {
         return required;
-    }
-
-    @Deprecated
-    public boolean getHasPrompt() {
-        return prompt != null;
     }
 
     public Component getPrompt() {
