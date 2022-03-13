@@ -10,6 +10,9 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
+project.ext.adventureVersion = '4.10.1'
+project.ext.adventureDependencies=["net.kyori:adventure-api:${adventureVersion}", "net.kyori:adventure-text-serializer-gson:${adventureVersion}", "net.kyori:adventure-text-serializer-legacy:${adventureVersion}", "net.kyori:adventure-text-serializer-gson-legacy-impl:${adventureVersion}"]
+
 repositories {
 	mavenCentral()
 	maven { url 'https://jitpack.io/' }
@@ -22,8 +25,8 @@ repositories {
 dependencies {
 	modImplementation 'com.github.retrooper.packetevents:netty-common:2.0-SNAPSHOT'
 	include('com.github.retrooper.packetevents:netty-common:2.0-SNAPSHOT')
-	modImplementation 'com.github.retrooper.packetevents:adventure:2.0-SNAPSHOT'
-	include('com.github.retrooper.packetevents:adventure:2.0-SNAPSHOT')
+	modImplementation(adventureDependencies)
+	include(adventureDependencies)
 
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
