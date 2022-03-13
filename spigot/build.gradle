@@ -7,14 +7,13 @@ repositories {
 
 
 shadowJar {
-    relocate 'net.kyori', 'com.github.retrooper.packetevents.libs.kyori'
+    relocate 'net.kyori.adventure.text.serializer', 'io.github.retrooper.packetevents.adventure.serializer'
+    relocate 'net.kyori.adventure.util.Codec', 'io.github.retrooper.packetevents.adventure.util.Codec'
 }
 
 dependencies {
     api project(':api')
-    implementation(adventureDependencies)
-    //api project(':adventure-gson')
-
+    api(adventureDependencies)
 
     compileOnly 'org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT'
     compileOnly 'com.viaversion:viaversion:4.0.1'
