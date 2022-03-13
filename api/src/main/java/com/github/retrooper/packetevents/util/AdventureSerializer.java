@@ -29,7 +29,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 public class AdventureSerializer {
 
     private static GsonComponentSerializer GSON;
-    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder().build();
 
     public static String asVanilla(Component component) {
         return LEGACY.serialize(component);
