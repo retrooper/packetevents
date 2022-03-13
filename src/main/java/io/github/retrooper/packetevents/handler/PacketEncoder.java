@@ -32,7 +32,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
             if (packetReceiveEvent.getLastUsedWrapper() != null) {
                 ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
                 packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
-                packetReceiveEvent.getLastUsedWrapper().writeData();
+                packetReceiveEvent.getLastUsedWrapper().write();
             }
             buffer.readerIndex(firstReaderIndex);
         } else {
