@@ -191,8 +191,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 for (int i = 0; i < biomeDataBytes.length; i++) {
                     biomeDataBytes[i] = dataIn.readByte();
                 }
-            } else {
-                biomeDataBytes = Arrays.copyOfRange(data, data.length - 256, data.length); // let's hope the server knows the right data length
+            } else if (data.length >= 256) { // some MCM jars don't send biome data always, unlike vanilla
+                biomeDataBytes = Arrays.copyOfRange(data, data.length - 256, data.length);
             }
         }
 
