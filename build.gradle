@@ -78,18 +78,4 @@ subprojects {
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
     }
-
-    /*
-    tasks.withType(JavaCompile) {
-        options.encoding = 'UTF-8'
-    }
-
-
-    tasks.jar.configure {
-        classifier = 'default'
-    }
-
-    tasks.shadowJar.configure {
-        classifier = null
-    }*/
 }
