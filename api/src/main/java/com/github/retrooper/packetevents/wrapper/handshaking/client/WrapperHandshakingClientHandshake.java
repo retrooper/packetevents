@@ -55,7 +55,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
         this.serverAddress = readString();
         this.serverPort = readUnsignedShort();
         int nextStateIndex = readVarInt();
-        this.nextConnectionState = ConnectionState.VALUES[nextStateIndex];
+        this.nextConnectionState = ConnectionState.getById(nextStateIndex);
     }
 
     @Override

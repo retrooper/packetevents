@@ -19,7 +19,10 @@
 package com.github.retrooper.packetevents.manager;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.*;
+import com.github.retrooper.packetevents.event.PacketListenerAbstract;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -109,7 +112,15 @@ public class InternalPacketListener extends PacketListenerAbstract {
             User user = event.getUser();
             Object channel = event.getChannel();
             InetSocketAddress address = event.getSocketAddress();
-            WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
+            WrapperHandshakingClientHandshake handshake;
+            try {
+                handshake = new WrapperHandshakingClientHandshake(event);
+            }
+            catch (ArrayIndexOutOfBoundsException exception) {
+                event.getUser().closeConnection();
+                PacketEvents.getAPI().getLogManager().debug("Disconnected " + address.getHostString() + ":" + address.getPort() + " for sending an invalid handshaking packet. They might be on an outdated client.");
+                return;
+            }
             ConnectionState nextState = handshake.getNextConnectionState();
             ClientVersion clientVersion = handshake.getClientVersion();
 

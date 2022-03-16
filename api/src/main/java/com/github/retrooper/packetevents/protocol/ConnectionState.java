@@ -25,5 +25,7 @@ package com.github.retrooper.packetevents.protocol;
 public enum ConnectionState {
     HANDSHAKING, STATUS, LOGIN, PLAY;
 
-    public static final ConnectionState[] VALUES = values();
+    public static ConnectionState getById(int id) {
+        return values()[id];
+    }
 }
