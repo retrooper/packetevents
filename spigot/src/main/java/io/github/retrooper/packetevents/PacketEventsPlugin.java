@@ -95,8 +95,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                             WrapperPlayServerBlockChange blockChange = new WrapperPlayServerBlockChange(bp,
                                     blockState.getGlobalId());
                             user.writePacket(blockChange);
-                        }
-                        else if (chatMessage.getMessage().equalsIgnoreCase("test3")) {
+                        } else if (chatMessage.getMessage().equalsIgnoreCase("test3")) {
                             Material ironDoor = Material.IRON_DOOR;
                             WrappedBlockState state = SpigotDataHelper.fromBukkitBlockData(new MaterialData(ironDoor, (byte) 0));
                             StateType type = state.getType();
@@ -104,8 +103,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                             MaterialData backToDoorData = SpigotDataHelper.toBukkitBlockData(state.clone());
                             if (backToDoorData != null) {
                                 user.sendMessage("Back to Bukkit block type: " + backToDoorData.getItemType().name() + ", type: " + backToDoorData.getClass().getSimpleName());
-                            }
-                            else {
+                            } else {
                                 user.sendMessage("No back way");
                             }
                             org.bukkit.inventory.ItemStack bukkitStack = new org.bukkit.inventory.ItemStack(Material.EMERALD, 10);
@@ -114,8 +112,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                             org.bukkit.inventory.ItemStack backToBukkitStack = SpigotDataHelper.toBukkitItemStack(stack);
                             user.sendMessage("Back to Bukkit itemstack type: " + backToBukkitStack.getType().name() + ", type: " + backToBukkitStack.getClass().getSimpleName());
 
-                        }
-                        else if (chatMessage.getMessage().equalsIgnoreCase("test0")) {
+                        } else if (chatMessage.getMessage().equalsIgnoreCase("test0")) {
                             for (org.bukkit.entity.EntityType type : org.bukkit.entity.EntityType.values()) {
                                 EntityType entityType = SpigotDataHelper.fromBukkitEntityType(type);
                                 if (entityType != null) {
@@ -168,6 +165,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketPlaySend(PacketPlaySendEvent event) {
                 Player player = (Player) event.getPlayer();
+                User user = event.getUser();
                 if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
                     if (player != null) {
                         player.sendMessage("Hii " + player.getName());

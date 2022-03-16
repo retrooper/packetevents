@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
+import io.github.retrooper.packetevents.injector.latest.connection.ServerConnectionInitializerLatest;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
@@ -135,6 +136,12 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
                 && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();
         }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        ServerConnectionInitializerLatest.destroyChannel(ctx.channel());
+        super.channelInactive(ctx);
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {

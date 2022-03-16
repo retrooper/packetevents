@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
+import io.github.retrooper.packetevents.injector.legacy.connection.ServerConnectionInitializerLegacy;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.minecraft.util.io.netty.handler.codec.MessageToMessageDecoder;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
@@ -111,6 +112,12 @@ public class PacketDecoderLegacy extends MessageToMessageDecoder<ByteBuf> {
                 && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();
         }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        ServerConnectionInitializerLegacy.destroyChannel(ctx.channel());
+        super.channelInactive(ctx);
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {

@@ -40,6 +40,7 @@ public class User {
     private ConnectionState connectionState;
     private ClientVersion clientVersion;
     private final UserProfile profile;
+    private int entityId = -1;
     private int minWorldHeight = 0;
     private int totalWorldHeight = 256;
     private List<NBTCompound> worldNBT;
@@ -79,6 +80,14 @@ public class User {
 
     public UserProfile getProfile() {
         return profile;
+    }
+
+    public int getEntityId() {
+        return entityId;
+    }
+
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
     }
 
     public void sendPacket(Object buffer) {

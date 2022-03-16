@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
@@ -36,7 +37,7 @@ public class PacketTransformationUtil {
                     int entityId = destroyEntities.getEntityIds()[i];
                     output[i] = new WrapperPlayServerDestroyEntities(entityId);
                 }
-                //TODO Potentially free the previous buffer
+                ByteBufHelper.release(destroyEntities.getBuffer());
                 return output;
             }
         } else if (wrapper instanceof WrapperPlayServerEntityEquipment) {
@@ -49,7 +50,8 @@ public class PacketTransformationUtil {
                     Equipment equipment = entityEquipment.getEquipment().get(i);
                     output[i] = new WrapperPlayServerEntityEquipment(entityEquipment.getEntityId(), equipment);
                 }
-                //TODO Potentially free the previous buffer
+
+                ByteBufHelper.release(entityEquipment.getBuffer());
                 return output;
             }
         }
