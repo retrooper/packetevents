@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
@@ -47,8 +48,12 @@ import io.github.retrooper.packetevents.util.SpigotDataHelper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
+import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.java.JavaPlugin;
+import sun.security.provider.ConfigFile;
 
 import java.nio.charset.StandardCharsets;
 
@@ -93,6 +98,25 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     blockState.getGlobalId());
                             user.writePacket(blockChange);
                         }
+                        else if (chatMessage.getMessage().equalsIgnoreCase("test3")) {
+                            Material ironDoor = Material.IRON_DOOR;
+                            WrappedBlockState state = SpigotDataHelper.fromBukkitBlockData(new MaterialData(ironDoor, (byte) 0));
+                            StateType type = state.getType();
+                            user.sendMessage("Bukkit block type: " + ironDoor.name() + ", packetevents type: " + type.getName());
+                            MaterialData backToDoorData = SpigotDataHelper.toBukkitBlockData(state.clone());
+                            if (backToDoorData != null) {
+                                user.sendMessage("Back to Bukkit block type: " + backToDoorData.getItemType().name() + ", type: " + backToDoorData.getClass().getSimpleName());
+                            }
+                            else {
+                                user.sendMessage("No back way");
+                            }
+                            org.bukkit.inventory.ItemStack bukkitStack = new org.bukkit.inventory.ItemStack(Material.EMERALD, 10);
+                            ItemStack stack = SpigotDataHelper.fromBukkitItemStack(bukkitStack);
+                            user.sendMessage("Bukkit itemstack type: " + bukkitStack.getType().name() + ", packetevents type: " + stack.getType().getName());
+                            org.bukkit.inventory.ItemStack backToBukkitStack = SpigotDataHelper.toBukkitItemStack(stack);
+                            user.sendMessage("Back to Bukkit itemstack type: " + backToBukkitStack.getType().name() + ", type: " + backToBukkitStack.getClass().getSimpleName());
+
+                        }
                         else if (chatMessage.getMessage().equalsIgnoreCase("test0")) {
                             for (org.bukkit.entity.EntityType type : org.bukkit.entity.EntityType.values()) {
                                 EntityType entityType = SpigotDataHelper.fromBukkitEntityType(type);
@@ -100,8 +124,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     System.out.println("EntityType: " + entityType.getName() + ", Bukkit type: " + type.getName());
                                 }
                             }
-                        }
-                        else if (chatMessage.getMessage().equalsIgnoreCase("test1")) {
+                        } else if (chatMessage.getMessage().equalsIgnoreCase("test1")) {
                             for (org.bukkit.entity.EntityType type : org.bukkit.entity.EntityType.values()) {
                                 if (type.getTypeId() != -1) {
                                     EntityType entityType = SpigotDataHelper.fromBukkitEntityType(type);

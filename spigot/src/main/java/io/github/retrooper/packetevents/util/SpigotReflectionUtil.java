@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
@@ -31,6 +32,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
@@ -61,7 +63,8 @@ public final class SpigotReflectionUtil {
             ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS,
             MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, WORLD_SERVER_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
             GAME_PROFILE_CLASS, CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS,
-            LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS;
+            LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
+            BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS;
 
     //Netty classes
     public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS, BYTE_TO_MESSAGE_DECODER, MESSAGE_TO_BYTE_ENCODER;
@@ -74,7 +77,9 @@ public final class SpigotReflectionUtil {
             GET_MOB_EFFECT_LIST_ID_METHOD, GET_MOB_EFFECT_LIST_BY_ID_METHOD, GET_ITEM_ID_METHOD, GET_ITEM_BY_ID_METHOD,
             GET_BUKKIT_ENTITY_METHOD, GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD, GET_ENTITY_BY_ID_METHOD,
             CRAFT_ITEM_STACK_AS_BUKKIT_COPY, CRAFT_ITEM_STACK_AS_NMS_COPY,
-            READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD, WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD;
+            READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD,
+            WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD, GET_COMBINED_ID,
+            GET_BY_COMBINED_ID, GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA;
 
     //Constructors
     private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR;
@@ -117,9 +122,13 @@ public final class SpigotReflectionUtil {
 
         CRAFT_ITEM_STACK_AS_BUKKIT_COPY = Reflection.getMethod(CRAFT_ITEM_STACK_CLASS, "asBukkitCopy", 0);
         CRAFT_ITEM_STACK_AS_NMS_COPY = Reflection.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", 0);
-
         READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS, 0);
         WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, 0, NMS_ITEM_STACK_CLASS);
+        GET_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, "getCombinedId", int.class, IBLOCK_DATA_CLASS);
+        GET_BY_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, "getByCombinedId", IBLOCK_DATA_CLASS, int.class);
+        if (CRAFT_BLOCK_DATA_CLASS != null) {
+            GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA = Reflection.getMethod(CRAFT_BLOCK_DATA_CLASS, "fromData", CRAFT_BLOCK_DATA_CLASS, IBLOCK_DATA_CLASS);
+        }
     }
 
     private static void initFields() {
@@ -149,6 +158,12 @@ public final class SpigotReflectionUtil {
             LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
             PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
         }
+
+        CRAFT_MAGIC_NUMBERS_CLASS = getOBCClass("util.CraftMagicNumbers");
+        //IBlockData does not exist on 1.7.10
+        IBLOCK_DATA_CLASS = getServerClass("world.level.block.state.IBlockData", "IBlockData");
+        BLOCK_CLASS = getServerClass("world.level.block.Block", "Block");
+        CRAFT_BLOCK_DATA_CLASS = getOBCClass("block.data.CraftBlockData");
 
         if (USE_MODERN_NETTY_PACKAGE) {
             GAME_PROFILE_CLASS = Reflection.getClassByNameWithoutException("com.mojang.authlib.GameProfile");
@@ -199,17 +214,9 @@ public final class SpigotReflectionUtil {
     @Nullable
     public static Class<?> getServerClass(String modern, String legacy) {
         if (V_1_17_OR_HIGHER) {
-            try {
-                return Class.forName("net.minecraft." + modern);
-            } catch (ClassNotFoundException ex) {
-                return null;
-            }
+            return Reflection.getClassByNameWithoutException("net.minecraft." + modern);
         } else {
-            try {
-                return Class.forName(LEGACY_NMS_PACKAGE + legacy);
-            } catch (ClassNotFoundException ex) {
-                return null;
-            }
+            return Reflection.getClassByNameWithoutException(LEGACY_NMS_PACKAGE + legacy);
         }
     }
 
@@ -487,27 +494,72 @@ public final class SpigotReflectionUtil {
     }
 
     public static com.github.retrooper.packetevents.protocol.item.ItemStack decodeBukkitItemStack(ItemStack in) {
-        Object packetDataSerializer = createPacketDataSerializer(UnpooledByteBufAllocationHelper.buffer());
+        Object buffer = UnpooledByteBufAllocationHelper.buffer();
+        Object packetDataSerializer = createPacketDataSerializer(buffer);
         Object nmsItemStack = toNMSItemStack(in);
         writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
-        Object byteBuf = null;
-        try {
-            byteBuf = BYTE_BUF_IN_PACKET_DATA_SERIALIZER.get(packetDataSerializer);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(byteBuf);
-        return wrapper.readItemStack();
+        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
+        com.github.retrooper.packetevents.protocol.item.ItemStack stack = wrapper.readItemStack();
+        ByteBufHelper.release(buffer);
+        return stack;
     }
 
     public static ItemStack encodeBukkitItemStack(com.github.retrooper.packetevents.protocol.item.ItemStack in) {
-        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(UnpooledByteBufAllocationHelper.buffer());
+        Object buffer = UnpooledByteBufAllocationHelper.buffer();
+        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
         wrapper.writeItemStack(in);
         Object packetDataSerializer = createPacketDataSerializer(wrapper.getBuffer());
         Object nmsItemStack = readNMSItemStackPacketDataSerializer(packetDataSerializer);
-        return toBukkitItemStack(nmsItemStack);
+        ItemStack stack = toBukkitItemStack(nmsItemStack);
+        ByteBufHelper.release(buffer);
+        return stack;
     }
 
+    public static int getBlockDataCombinedId(MaterialData materialData) {
+        if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
+            //TODO Finish for 1.7.10
+            throw new IllegalStateException("This operation is not supported yet on 1.7.10!");
+        }
+        int combinedID;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            combinedID = -1;
+        }
+        else {
+            combinedID = materialData.getItemType().getId() << 4 | materialData.getData();
+            //System.out.println("id: " + combinedID + ", material: " + materialData.getItemType().name());
+        }
+        return combinedID;
+        /*
+        Object iBlockDataObj = new ReflectionObject(blockData).readObject(0, IBLOCK_DATA_CLASS);
+        int combinedID = 0;
+        try {
+            combinedID = (int) GET_COMBINED_ID.invoke(null, iBlockDataObj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return combinedID;*/
+    }
+
+    public static MaterialData getBlockDataByCombinedId(int combinedID) {
+        if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
+            //TODO Finish for 1.7.10
+            throw new IllegalStateException("This operation is not supported yet on 1.7.10!");
+        }
+        /*Object iBlockDataObj = null;
+        try {
+            iBlockDataObj = GET_BY_COMBINED_ID.invoke(null, combinedID);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }*/
+        /*
+        try {
+            return (BlockData) GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA.invoke(null, iBlockDataObj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }*/
+
+        return null;
+    }
 
     public static Object createNMSItemStack(int itemID, int count) {
         try {

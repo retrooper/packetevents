@@ -29,7 +29,7 @@ public enum EquipmentSlot {
     CHESTPLATE(3),
     HELMET(4);
 
-    private byte legacyId;
+    private final byte legacyId;
 
     EquipmentSlot(int legacyId) {
         this.legacyId =(byte) legacyId;

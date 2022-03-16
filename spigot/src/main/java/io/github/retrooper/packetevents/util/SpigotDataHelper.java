@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
 public class SpigotDataHelper {
     public static Location fromBukkitLocation(org.bukkit.Location location) {
@@ -87,6 +88,15 @@ public class SpigotDataHelper {
         ItemStack stack = ItemStack.builder().type(itemType).build();
         org.bukkit.inventory.ItemStack bukkitStack = toBukkitItemStack(stack);
         return bukkitStack.getType();
+    }
+
+    public static WrappedBlockState fromBukkitBlockData(org.bukkit.material.MaterialData materialData) {
+        int combinedID = SpigotReflectionUtil.getBlockDataCombinedId(materialData);
+        return WrappedBlockState.getByGlobalId(combinedID);
+    }
+
+    public static org.bukkit.material.MaterialData toBukkitBlockData(WrappedBlockState state) {
+        return SpigotReflectionUtil.getBlockDataByCombinedId(state.getGlobalId());
     }
 
     public static ItemStack fromBukkitItemStack(org.bukkit.inventory.ItemStack itemStack) {

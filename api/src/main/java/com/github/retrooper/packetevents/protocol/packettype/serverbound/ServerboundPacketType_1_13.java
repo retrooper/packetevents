@@ -30,6 +30,7 @@ public enum ServerboundPacketType_1_13 {
     CLICK_WINDOW,
     CLOSE_WINDOW,
     PLUGIN_MESSAGE,
+    //This packet was added
     EDIT_BOOK,
     QUERY_ENTITY_NBT,
     INTERACT_ENTITY,
