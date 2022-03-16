@@ -495,9 +495,11 @@ public final class SpigotReflectionUtil {
 
     public static com.github.retrooper.packetevents.protocol.item.ItemStack decodeBukkitItemStack(ItemStack in) {
         Object buffer = UnpooledByteBufAllocationHelper.buffer();
+        //3 reflection calls
         Object packetDataSerializer = createPacketDataSerializer(buffer);
         Object nmsItemStack = toNMSItemStack(in);
         writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
+        //No more reflection from here on.
         PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
         com.github.retrooper.packetevents.protocol.item.ItemStack stack = wrapper.readItemStack();
         ByteBufHelper.release(buffer);
@@ -508,6 +510,7 @@ public final class SpigotReflectionUtil {
         Object buffer = UnpooledByteBufAllocationHelper.buffer();
         PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
         wrapper.writeItemStack(in);
+        //3 reflection calls
         Object packetDataSerializer = createPacketDataSerializer(wrapper.getBuffer());
         Object nmsItemStack = readNMSItemStackPacketDataSerializer(packetDataSerializer);
         ItemStack stack = toBukkitItemStack(nmsItemStack);
