@@ -16,6 +16,7 @@ project.ext.adventureDependencies=["net.kyori:adventure-api:${adventureVersion}"
 								   "net.kyori:adventure-text-serializer-legacy:${adventureVersion}",
 								   "net.kyori:adventure-text-serializer-gson-legacy-impl:${adventureVersion}",
 		                           "net.kyori:adventure-key:${adventureVersion}",
+		                           "net.kyori:adventure-nbt:${adventureVersion}",
                                    "net.kyori:examination-api:1.3.0",
                                    "net.kyori:examination-string:1.3.0"]
 
