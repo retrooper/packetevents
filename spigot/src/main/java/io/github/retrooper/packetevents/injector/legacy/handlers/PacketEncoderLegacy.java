@@ -20,17 +20,21 @@ package io.github.retrooper.packetevents.injector.legacy.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
+import net.minecraft.util.io.netty.channel.ChannelPromise;
 import net.minecraft.util.io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 
@@ -60,17 +64,18 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
                 packetSendEvent.getLastUsedWrapper().write();
             }
             buffer.readerIndex(preProcessIndex);
-            if (doCompression) {
-                PacketCompressionUtil.recompress(ctx, buffer);
-            }
         } else {
             //Make the buffer unreadable for the next handlers
             buffer.clear();
+            doCompression = false;
         }
         if (packetSendEvent.hasPostTasks()) {
             for (Runnable task : packetSendEvent.getPostTasks()) {
                 task.run();
             }
+        }
+        if (doCompression) {
+            PacketCompressionUtil.recompress(ctx, buffer);
         }
     }
 
@@ -97,8 +102,13 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
     }
 
     @Override
+    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        PacketEventsImplHelper.handleDisconnection(ctx.channel(), null);
+        super.close(ctx, promise);
+    }
+
+    @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
         super.exceptionCaught(ctx, cause);
         //}
         //Check if the minecraft server will already print our exception for us.

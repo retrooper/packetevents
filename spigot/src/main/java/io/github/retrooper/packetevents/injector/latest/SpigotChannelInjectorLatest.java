@@ -138,7 +138,7 @@ public class SpigotChannelInjectorLatest implements ChannelInjector {
         else if (pipeline.get("floodgate-init") != null) {
             pipeline.addAfter("floodgate-init", PacketEvents.CONNECTION_HANDLER_NAME, new ServerChannelHandlerLatest());
         }
-        //Otherwise, we just don't care and make sure we are last.
+        //Otherwise, make sure we are first.
         else {
             pipeline.addFirst(PacketEvents.CONNECTION_HANDLER_NAME, new ServerChannelHandlerLatest());
         }

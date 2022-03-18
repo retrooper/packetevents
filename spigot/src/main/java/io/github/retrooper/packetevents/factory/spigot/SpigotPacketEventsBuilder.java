@@ -88,11 +88,13 @@ public class SpigotPacketEventsBuilder {
             public void load() {
                 if (!loaded) {
                     //Resolve server version and cache
-                    PacketEvents.IDENTIFIER = "pe-" + plugin.getName().toLowerCase();
-                    PacketEvents.ENCODER_NAME = "pe-encoder-" + plugin.getName().toLowerCase();
-                    PacketEvents.DECODER_NAME = "pe-decoder-" + plugin.getName().toLowerCase();
-                    PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + plugin.getName().toLowerCase();
-                    PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + plugin.getName().toLowerCase();
+                    String id = plugin.getName().toLowerCase();
+                    PacketEvents.IDENTIFIER = "pe-" + id;
+                    PacketEvents.ENCODER_NAME = "pe-encoder-" + id;
+                    PacketEvents.DECODER_NAME = "pe-decoder-" + id;
+                    PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
+                    PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
+                    PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
                     try {
                         SpigotReflectionUtil.init();
                         CustomPipelineUtil.init();

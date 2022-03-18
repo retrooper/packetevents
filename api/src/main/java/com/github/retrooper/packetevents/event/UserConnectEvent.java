@@ -18,22 +18,19 @@
 
 package com.github.retrooper.packetevents.event;
 
-import org.jetbrains.annotations.NotNull;
+import com.github.retrooper.packetevents.protocol.player.User;
 
-/**
- * The {@code PlayerEjectEvent} event is fired whenever a player is ejected.
- * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
- *
- * @author retrooper
- * @since 1.6.9
- */
-//TODO Remove as its never called
-public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent<Object> {
-    private final Object player;
+public class UserConnectEvent extends PacketEvent implements CancellableEvent, UserEvent{
+    private final User user;
     private boolean cancelled;
 
-    public PlayerEjectEvent(Object player) {
-        this.player = player;
+    public UserConnectEvent(User user) {
+        this.user = user;
+    }
+
+    @Override
+    public User getUser() {
+        return user;
     }
 
     @Override
@@ -42,25 +39,13 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
     }
 
     @Override
-    public void setCancelled(boolean value) {
-        cancelled = value;
-    }
-
-    /**
-     * This method returns the bukkit player object of the player being ejected.
-     * The player object is guaranteed to NOT be null.
-     *
-     * @return Ejected player.
-     */
-    @NotNull
-    @Override
-    public Object getPlayer() {
-        return player;
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     @Override
     public void call(PacketListenerCommon listener) {
-        listener.onPlayerEject(this);
+        listener.onUserConnect(this);
     }
 
     @Override

@@ -24,10 +24,12 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.velocitypowered.api.proxy.Player;
+import io.github.retrooper.packetevents.injector.ServerConnectionInitializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -77,5 +79,11 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
         super.exceptionCaught(ctx, cause);
         //}
+    }
+
+    @Override
+    public void channelInactive(@NotNull ChannelHandlerContext ctx) throws Exception {
+        ServerConnectionInitializer.destroyChannel(ctx.channel());
+        super.channelInactive(ctx);
     }
 }

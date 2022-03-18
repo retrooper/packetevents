@@ -19,6 +19,8 @@
 package io.github.retrooper.packetevents.injector.legacy.connection;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.UserConnectEvent;
+import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -34,10 +36,17 @@ import java.util.NoSuchElementException;
 public class ServerConnectionInitializerLegacy {
     public static void initChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-         if (!(channel instanceof NioSocketChannel)) {
+        //1.7 has no EpollSocketChannel
+        if (!(channel instanceof NioSocketChannel)) {
             return;
         }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
+        UserConnectEvent connectEvent = new UserConnectEvent(user);
+        PacketEvents.getAPI().getEventManager().callEvent(connectEvent);
+        if (connectEvent.isCancelled()) {
+            channel.unsafe().closeForcibly();
+            return;
+        }
         ProtocolManager.USERS.put(channel, user);
         try {
             channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLegacy(user));
@@ -51,9 +60,13 @@ public class ServerConnectionInitializerLegacy {
 
     public static void destroyChannel(Object ch) {
         Channel channel = (Channel) ch;
+        //1.7 has no EpollSocketChannel
         if (!(channel instanceof NioSocketChannel)) {
             return;
         }
+        User user = ProtocolManager.USERS.get(channel);
+        UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
+        PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
         channel.pipeline().remove(PacketEvents.DECODER_NAME);
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
         ProtocolManager.USERS.remove(channel);

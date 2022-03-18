@@ -19,6 +19,8 @@
 package io.github.retrooper.packetevents.injector.latest.connection;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.UserConnectEvent;
+import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -49,6 +51,12 @@ public class ServerConnectionInitializerLatest {
             return;
         }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
+        UserConnectEvent connectEvent = new UserConnectEvent(user);
+        PacketEvents.getAPI().getEventManager().callEvent(connectEvent);
+        if (connectEvent.isCancelled()) {
+            channel.unsafe().closeForcibly();
+            return;
+        }
         ProtocolManager.USERS.put(channel, user);
         try {
             channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLatest(user));
@@ -75,6 +83,12 @@ public class ServerConnectionInitializerLatest {
                 !(channel instanceof NioSocketChannel)) {
             return;
         }
+        User user = ProtocolManager.USERS.get(channel);
+        if (user == null) {
+            return;
+        }
+        UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
+        PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
         ChannelHandler viaDecoder = channel.pipeline().get("decoder");
         if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitDecodeHandlerClass().equals(viaDecoder.getClass())) {
             ReflectionObject reflectViaDecoder = new ReflectionObject(viaDecoder);
@@ -104,7 +118,7 @@ public class ServerConnectionInitializerLatest {
                     reflectViaDecoder.write(ByteToMessageDecoder.class, 0, newDecoderModern);
                 }
             } else if (ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketDecoderLatest")
-            || ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketDecoderModern")) {
+                    || ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketDecoderModern")) {
                 //Possibly another instance of packetevents has already injected into ViaVersion.
                 //Let us try to remove our own decoder without breaking the other instance.
                 ReflectionObject reflectDecoder = new ReflectionObject(decoder);

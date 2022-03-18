@@ -18,24 +18,19 @@
 
 package io.github.retrooper.packetevents.injector.latest.handlers;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
-import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
-
-import java.lang.reflect.InvocationTargetException;
 
 @ChannelHandler.Sharable
 public class PacketEncoderLatest extends MessageToByteEncoder<Object> {
@@ -47,52 +42,31 @@ public class PacketEncoderLatest extends MessageToByteEncoder<Object> {
         this.user = user;
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
-        int preProcessIndex = buffer.readerIndex();
-        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer);
-        int processIndex = buffer.readerIndex();
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
-            buffer.readerIndex(processIndex);
-        });
-        if (!packetSendEvent.isCancelled()) {
-            if (packetSendEvent.getLastUsedWrapper() != null) {
-                ByteBufHelper.clear(packetSendEvent.getByteBuf());
-                packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
-                packetSendEvent.getLastUsedWrapper().write();
-            }
-            buffer.readerIndex(preProcessIndex);
-        } else {
-            //Make the buffer unreadable for the next handlers
-            buffer.clear();
-        }
-        if (packetSendEvent.hasPostTasks()) {
-            for (Runnable task : packetSendEvent.getPostTasks()) {
-                task.run();
-            }
-        }
-    }
-
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf out) throws Exception {
         if (!(o instanceof ByteBuf)) {
             //Convert NMS object to bytes, so we can process it right away.
             if (vanillaEncoder == null) return;
             CustomPipelineUtil.callEncode(vanillaEncoder, ctx, o, out);
+            //Failed to translate it into ByteBuf form (which we can process)
             if (!out.isReadable()) return;
         } else {
             ByteBuf in = (ByteBuf) o;
+            //Empty packets?
             if (!in.isReadable()) return;
             out.writeBytes(in);
         }
-        read(ctx, out);
+        PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out);
+    }
+
+    @Override
+    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        PacketEventsImplHelper.handleDisconnection(ctx.channel(), null);
+        super.close(ctx, promise);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (ViaVersionUtil.isAvailable()
-                && ExceptionUtil.isException(cause, InvocationTargetException.class)) {
-            return;
-        }
         super.exceptionCaught(ctx, cause);
         //Check if the minecraft server will already print our exception for us.
         if (ExceptionUtil.isException(cause, PacketProcessException.class)

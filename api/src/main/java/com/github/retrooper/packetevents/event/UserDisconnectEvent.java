@@ -18,38 +18,22 @@
 
 package com.github.retrooper.packetevents.event;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
+import com.github.retrooper.packetevents.protocol.player.User;
 
-public abstract class PacketListenerAbstract extends PacketListenerCommon {
-    public PacketListenerAbstract(PacketListenerPriority priority) {
-        super(priority);
-    }
+public class UserDisconnectEvent extends PacketEvent implements UserEvent {
+    private final User user;
 
-    public PacketListenerAbstract(PacketListenerPriority priority, boolean readOnly) {
-        super(priority, readOnly);
-    }
-
-    public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
-        super(priority, methods);
-    }
-
-    public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly) {
-        super(priority, methods, readOnly);
-    }
-
-    public PacketListenerAbstract() {
-        super();
+    public UserDisconnectEvent(User user) {
+        this.user = user;
     }
 
     @Override
-    public void onPacketReceive(PacketReceiveEvent event) {
-
+    public User getUser() {
+        return user;
     }
 
     @Override
-    public void onPacketSend(PacketSendEvent event) {
-
+    public void call(PacketListenerCommon listener) {
+        listener.onUserDisconnect(this);
     }
 }

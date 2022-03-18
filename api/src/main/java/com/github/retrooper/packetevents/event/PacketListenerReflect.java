@@ -21,9 +21,9 @@ package com.github.retrooper.packetevents.event;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-
+@Deprecated
 public interface PacketListenerReflect {
-    default PacketListenerAbstract asAbstract(PacketListenerPriority priority, boolean readOnly, boolean threadSafe) {
+    default PacketListenerAbstract asAbstract(PacketListenerPriority priority, boolean readOnly) {
         Map<Byte, List<Method>> methods = new HashMap<>();
         for (byte i = 0; i < 6; i++) {
             methods.put(i, new ArrayList<>());
@@ -40,33 +40,40 @@ public interface PacketListenerReflect {
                     List<Method> eventMethods = methods.get((byte) 1);
                     eventMethods.add(method);
                     methods.put((byte) 1, eventMethods);
-                } else if (parameterType.equals(PlayerEjectEvent.class)) {
+                }
+                else if (parameterType.equals(UserConnectEvent.class)) {
                     List<Method> eventMethods = methods.get((byte) 2);
                     eventMethods.add(method);
                     methods.put((byte) 2, eventMethods);
-                } else if (parameterType.equals(PacketReceiveEvent.class)) {
+                }
+                else if (parameterType.equals(UserDisconnectEvent.class)) {
                     List<Method> eventMethods = methods.get((byte) 3);
                     eventMethods.add(method);
                     methods.put((byte) 3, eventMethods);
-                } else if (parameterType.equals(PacketSendEvent.class)) {
+                }
+                else if (parameterType.equals(PacketReceiveEvent.class)) {
                     List<Method> eventMethods = methods.get((byte) 4);
                     eventMethods.add(method);
                     methods.put((byte) 4, eventMethods);
+                } else if (parameterType.equals(PacketSendEvent.class)) {
+                    List<Method> eventMethods = methods.get((byte) 5);
+                    eventMethods.add(method);
+                    methods.put((byte) 5, eventMethods);
                 } else if (parameterType.equals(PacketEvent.class)) {
                     //Add to all
-                    for (byte i = 0; i < 6; i++) {
+                    for (byte i = 0; i < 7; i++) {
                         List<Method> eventMethods = methods.get(i);
                         eventMethods.add(method);
                         methods.put(i, eventMethods);
                     }
                 } else {
-                    List<Method> eventMethods = methods.get((byte) 5);
+                    List<Method> eventMethods = methods.get((byte) 6);
                     eventMethods.add(method);
-                    methods.put((byte) 5, eventMethods);
+                    methods.put((byte) 6, eventMethods);
                 }
             }
         }
-        return new PacketListenerAbstract(priority, methods, readOnly, threadSafe) {
+        return new PacketListenerAbstract(priority, methods, readOnly) {
             private void callEventByIndex(byte index, PacketEvent event) {
                 if (methods != null) {
                     List<Method> targets = methods.get(index);
@@ -91,23 +98,28 @@ public interface PacketListenerReflect {
             }
 
             @Override
-            public void onPlayerEject(PlayerEjectEvent event) {
-                callEventByIndex((byte) 2, event);
+            public void onUserConnect(UserConnectEvent event) {
+                callEventByIndex((byte)2, event);
+            }
+
+            @Override
+            public void onUserDisconnect(UserDisconnectEvent event) {
+                callEventByIndex((byte)3, event);
             }
 
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
-                callEventByIndex((byte) 3, event);
-            }
-
-            @Override
-            public void onPacketSend(PacketSendEvent event) {
                 callEventByIndex((byte) 4, event);
             }
 
             @Override
-            public void onPacketEventExternal(PacketEvent event) {
+            public void onPacketSend(PacketSendEvent event) {
                 callEventByIndex((byte) 5, event);
+            }
+
+            @Override
+            public void onPacketEventExternal(PacketEvent event) {
+                callEventByIndex((byte) 6, event);
             }
         };
     }

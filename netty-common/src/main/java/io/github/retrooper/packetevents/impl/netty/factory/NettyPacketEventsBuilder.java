@@ -90,6 +90,7 @@ public class NettyPacketEventsBuilder {
                     PacketEvents.DECODER_NAME = "pe-decoder-" + data.getName().toLowerCase();
                     PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + data.getName().toLowerCase();
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + data.getName().toLowerCase();
+                    PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + data.getName().toLowerCase();
                     injector.inject();
 
                     loaded = true;

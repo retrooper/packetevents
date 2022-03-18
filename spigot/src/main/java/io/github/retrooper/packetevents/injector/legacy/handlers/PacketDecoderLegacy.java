@@ -114,12 +114,6 @@ public class PacketDecoderLegacy extends MessageToMessageDecoder<ByteBuf> {
         }
     }
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ServerConnectionInitializerLegacy.destroyChannel(ctx.channel());
-        super.channelInactive(ctx);
-    }
-
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {
         if (handledCompression) return false;
         int decoderIndex = ctx.pipeline().names().indexOf("decompress");

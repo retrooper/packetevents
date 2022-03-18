@@ -31,17 +31,16 @@ import java.util.Map;
 public abstract class PacketListenerCommon {
     protected final Map<Byte, List<Method>> methods;
     private final PacketListenerPriority priority;
-    private boolean readOnly, threadSafe;
+    private boolean readOnly;
     public PacketListenerCommon(PacketListenerPriority priority) {
         this.priority = priority;
         this.methods = null;
     }
 
-    public PacketListenerCommon(PacketListenerPriority priority, boolean readOnly, boolean threadSafe) {
+    public PacketListenerCommon(PacketListenerPriority priority, boolean readOnly) {
         this.priority = priority;
         this.methods = null;
         this.readOnly = readOnly;
-        this.threadSafe = threadSafe;
     }
 
     public PacketListenerCommon(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
@@ -49,11 +48,10 @@ public abstract class PacketListenerCommon {
         this.methods = methods;
     }
 
-    public PacketListenerCommon(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly, boolean threadSafe) {
+    public PacketListenerCommon(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly) {
         this.priority = priority;
         this.methods = methods;
         this.readOnly = readOnly;
-        this.threadSafe = threadSafe;
     }
 
     public PacketListenerCommon() {
@@ -73,21 +71,16 @@ public abstract class PacketListenerCommon {
         this.readOnly = readOnly;
     }
 
-    public boolean isThreadSafe() {
-        return threadSafe;
-    }
-
-    public void setThreadSafe(boolean threadSafe) {
-        this.threadSafe = threadSafe;
-    }
-
     public void onPlayerInject(PlayerInjectEvent event) {
     }
 
     public void onPostPlayerInject(PostPlayerInjectEvent event) {
     }
 
-    public void onPlayerEject(PlayerEjectEvent event) {
+    public void onUserConnect(UserConnectEvent event) {
+    }
+
+    public void onUserDisconnect(UserDisconnectEvent event) {
     }
 
     void onPacketReceive(PacketReceiveEvent event) {

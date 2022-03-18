@@ -19,8 +19,8 @@
 package com.github.retrooper.packetevents.event;
 
 public interface PacketListener {
-    default PacketListenerAbstract asAbstract(PacketListenerPriority priority, boolean readOnly, boolean threadSafe) {
-        return new PacketListenerAbstract(priority, readOnly, threadSafe) {
+    default PacketListenerAbstract asAbstract(PacketListenerPriority priority, boolean readOnly) {
+        return new PacketListenerAbstract(priority, readOnly) {
             @Override
             public void onPlayerInject(PlayerInjectEvent event) {
                 PacketListener.this.onPlayerInject(event);
@@ -32,8 +32,13 @@ public interface PacketListener {
             }
 
             @Override
-            public void onPlayerEject(PlayerEjectEvent event) {
-                PacketListener.this.onPlayerEject(event);
+            public void onUserConnect(UserConnectEvent event) {
+                PacketListener.this.onUserConnect(event);
+            }
+
+            @Override
+            public void onUserDisconnect(UserDisconnectEvent event) {
+                PacketListener.this.onUserDisconnect(event);
             }
 
             @Override
@@ -59,9 +64,11 @@ public interface PacketListener {
     default void onPostPlayerInject(PostPlayerInjectEvent event) {
     }
 
-    default void onPlayerEject(PlayerEjectEvent event) {
+    default void onUserConnect(UserConnectEvent event) {
     }
 
+    default void onUserDisconnect(UserDisconnectEvent event) {
+    }
 
     default void onPacketReceive(PacketReceiveEvent event) {
     }

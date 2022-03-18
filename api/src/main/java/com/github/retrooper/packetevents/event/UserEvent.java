@@ -16,20 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents;
+package com.github.retrooper.packetevents.event;
 
-public final class PacketEvents {
-    private static PacketEventsAPI<?> API;
+import com.github.retrooper.packetevents.protocol.player.User;
 
-    //Put these variable names anywhere else, they are really only for the injectors
-    public static String IDENTIFIER, ENCODER_NAME, DECODER_NAME, CONNECTION_HANDLER_NAME, SERVER_CHANNEL_HANDLER_NAME,
-    TIMEOUT_HANDLER_NAME;
-
-    public static PacketEventsAPI<?> getAPI() {
-        return API;
-    }
-
-    public static void setAPI(PacketEventsAPI<?> api) {
-        API = api;
-    }
+/**
+ * Event that involves users.
+ *
+ * @author retrooper
+ * @since 2.0.0
+ */
+public interface UserEvent {
+    User getUser();
 }

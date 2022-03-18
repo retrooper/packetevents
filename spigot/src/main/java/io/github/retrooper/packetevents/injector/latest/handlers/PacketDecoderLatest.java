@@ -19,15 +19,12 @@
 package io.github.retrooper.packetevents.injector.latest.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
-import io.github.retrooper.packetevents.injector.latest.connection.ServerConnectionInitializerLatest;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
@@ -60,40 +57,29 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
         skipDoubleTransform = decoder.skipDoubleTransform;
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) throws Exception {
-        if (skipDoubleTransform) {
-            skipDoubleTransform = false;
-            output.add(input.retain());
-        }
+    public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
         ByteBuf transformed = ctx.alloc().buffer().writeBytes(input);
         try {
+            if (skipDoubleTransform) {
+                skipDoubleTransform = false;
+                out.add(transformed.retain());
+            }
             boolean doRecompression =
                     handleCompressionOrder(ctx, transformed);
-            int preProcessIndex = transformed.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player, transformed);
-            int processIndex = transformed.readerIndex();
-            PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
-                transformed.readerIndex(processIndex);
-            });
-            if (!packetReceiveEvent.isCancelled()) {
-                if (packetReceiveEvent.getLastUsedWrapper() != null) {
-                    ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
-                    packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
-                    packetReceiveEvent.getLastUsedWrapper().write();
-                }
-                transformed.readerIndex(preProcessIndex);
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, transformed);
+            if (transformed.isReadable()) {
                 if (doRecompression) {
                     PacketCompressionUtil.recompress(ctx, transformed);
                     skipDoubleTransform = true;
                 }
-                output.add(transformed.retain());
+                out.add(transformed.retain());
             }
-            if (packetReceiveEvent.hasPostTasks()) {
-                for (Runnable task : packetReceiveEvent.getPostTasks()) {
-                    task.run();
-                }
+            if (doRecompression && transformed.isReadable()) {
+                PacketCompressionUtil.recompress(ctx, transformed);
+                skipDoubleTransform = true;
             }
-        } finally {
+        }
+        finally {
             transformed.release();
         }
     }
@@ -136,12 +122,6 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
                 && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();
         }
-    }
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ServerConnectionInitializerLatest.destroyChannel(ctx.channel());
-        super.channelInactive(ctx);
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {

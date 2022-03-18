@@ -55,13 +55,7 @@ public class EventManager {
                         lastUsedWrapper = ((ProtocolPacketEvent<?>) event).getLastUsedWrapper();
                     }
                     try {
-                        if (isPacketEvent && listener.isThreadSafe()) {
-                            //Pass a "cloned" event to this listener.
-                            ((ProtocolPacketEvent<?>)event).clone().call(listener);
-                        }
-                        else {
-                            event.call(listener);
-                        }
+                        event.call(listener);
                     } catch (Throwable t) {
                         PacketEvents.getAPI().getLogger().log(Level.WARNING, "PacketEvents caught an unhandled exception while calling your listener.", t);
                     }
@@ -76,13 +70,13 @@ public class EventManager {
         }
     }
 
-    public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly, boolean threadSafe) {
-        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly, threadSafe);
+    public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly) {
+        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly);
         return registerListener(packetListenerAbstract);
     }
 
-    public PacketListenerCommon registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly, boolean threadSafe) {
-        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly, threadSafe);
+    public PacketListenerCommon registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly) {
+        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly);
         return registerListener(packetListenerAbstract);
     }
 

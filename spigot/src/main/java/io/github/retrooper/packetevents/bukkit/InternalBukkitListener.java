@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,10 +38,13 @@ public class InternalBukkitListener implements Listener {
         Player player = e.getPlayer();
         SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
         //By accessing user with the player object, we ensure that a valid user is cached.
+        //In the spigot PlayerManager impl, if there was no user cached,
+        //we will create one with help of the Player object.
         User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
         //By accessing the client version with the player object, we should ensure the client version is valid.
+        //In the spigot PlayerManager impl, we ask protocol translation dependencies for the version
+        //if we failed to catch it.(shouldn't ever happen really)
         //TODO With Via we might have to run this a tick AFTER join event (atleast when via & viabackwards & rewind are present)
-        //TODO Confirm this.
         ClientVersion version = PacketEvents.getAPI().getPlayerManager().getClientVersion(player);
 
         injector.updatePlayer(player);
@@ -54,6 +58,6 @@ public class InternalBukkitListener implements Listener {
         Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         //When we receive LOGIN_SUCCESS, we cache username with their channel.
         //Here we clean that up.
-        ProtocolManager.CHANNELS.remove(player.getName());
+        PacketEventsImplHelper.handleDisconnection(channel, player.getName());
     }
 }

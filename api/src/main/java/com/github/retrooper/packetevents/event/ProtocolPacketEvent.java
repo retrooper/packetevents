@@ -37,7 +37,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ProtocolPacketEvent<T> extends PacketEvent implements PlayerEvent<T>, CancellableEvent {
+public abstract class ProtocolPacketEvent<T> extends PacketEvent implements PlayerEvent<T>, CancellableEvent, UserEvent {
     private final Object channel;
     private final ConnectionState connectionState;
     private final User user;
@@ -98,7 +98,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         return (InetSocketAddress) ChannelHelper.remoteAddress(channel);
     }
 
-    @NotNull
+    @Override
     public User getUser() {
         return user;
     }

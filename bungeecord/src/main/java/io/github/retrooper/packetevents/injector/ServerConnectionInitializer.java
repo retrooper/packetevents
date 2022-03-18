@@ -19,6 +19,9 @@
 package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.UserConnectEvent;
+import com.github.retrooper.packetevents.event.UserDisconnectEvent;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
@@ -27,19 +30,30 @@ import io.github.retrooper.packetevents.handlers.PacketEncoder;
 import io.netty.channel.Channel;
 
 public class ServerConnectionInitializer {
-    public static void initChannel(Channel channel, PacketDecoder decoder, PacketEncoder encoder) {
+    //This can be called on connection refactors. Not specifically on channel initialization,
+    public static void prepareChannel(Channel channel, PacketDecoder decoder, PacketEncoder encoder) {
         channel.pipeline().addBefore("packet-decoder", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addBefore("packet-encoder", PacketEvents.ENCODER_NAME, encoder);
     }
 
+    //This is ONLY called whenever the connection starts.
     public static void initChannel(Channel channel, ConnectionState state) {
         User user = new User(channel, state, null, new UserProfile(null, null));
+        UserConnectEvent connectEvent = new UserConnectEvent(user);
+        PacketEvents.getAPI().getEventManager().callEvent(connectEvent);
+        if (connectEvent.isCancelled()) {
+            channel.unsafe().closeForcibly();
+            return;
+        }
         PacketDecoder decoder = new PacketDecoder(user);
         PacketEncoder encoder = new PacketEncoder(user);
-        initChannel(channel, decoder, encoder);
+        prepareChannel(channel, decoder, encoder);
     }
 
     public static void destroyChannel(Channel channel) {
+        User user = ProtocolManager.USERS.get(channel);
+        UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
+        PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
         channel.pipeline().remove(PacketEvents.DECODER_NAME);
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
     }
@@ -47,6 +61,6 @@ public class ServerConnectionInitializer {
     public static void reloadChannel(Channel channel) {
         PacketDecoder decoder = (PacketDecoder) channel.pipeline().remove(PacketEvents.DECODER_NAME);
         PacketEncoder encoder = (PacketEncoder) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-        initChannel(channel, decoder, encoder);
+        prepareChannel(channel, decoder, encoder);
     }
 }

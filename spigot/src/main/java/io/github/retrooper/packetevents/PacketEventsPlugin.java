@@ -21,6 +21,8 @@ package io.github.retrooper.packetevents;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
+import com.github.retrooper.packetevents.event.UserConnectEvent;
+import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
@@ -68,7 +70,7 @@ public class PacketEventsPlugin extends JavaPlugin {
         PacketEvents.getAPI().getSettings().debug(false).bStats(true).checkForUpdates(false);
         PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH,
-                true, false) {
+                true) {
             @Override
             public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
                 User user = event.getUser();
@@ -77,6 +79,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         System.out.println("Running 10 seconds later");
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                         if (chatMessage.getMessage().equalsIgnoreCase("mrmcyeet")) {
+                            event.setCancelled(true);
                             Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
                             Vector3d position = SpigotDataHelper
                                     .fromBukkitLocation(((Player) event.getPlayer()).getLocation())
@@ -182,6 +185,16 @@ public class PacketEventsPlugin extends JavaPlugin {
                     PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), clone);
                     System.out.println("Delayed " + chatMessage.getChatComponentJson());
                 }
+            }
+
+            @Override
+            public void onUserConnect(UserConnectEvent event) {
+                System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " connected...");
+            }
+
+            @Override
+            public void onUserDisconnect(UserDisconnectEvent event) {
+                System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
         //PacketEvents.getAPI().getEventManager().registerListener(listener);
