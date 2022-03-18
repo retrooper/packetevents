@@ -51,30 +51,8 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
         boolean doCompression = handleCompressionOrder(ctx, buffer);
 
-        int preProcessIndex = buffer.readerIndex();
-        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer);
-        int processIndex = buffer.readerIndex();
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
-            buffer.readerIndex(processIndex);
-        });
-        if (!packetSendEvent.isCancelled()) {
-            if (packetSendEvent.getLastUsedWrapper() != null) {
-                ByteBufHelper.clear(packetSendEvent.getByteBuf());
-                packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
-                packetSendEvent.getLastUsedWrapper().write();
-            }
-            buffer.readerIndex(preProcessIndex);
-        } else {
-            //Make the buffer unreadable for the next handlers
-            buffer.clear();
-            doCompression = false;
-        }
-        if (packetSendEvent.hasPostTasks()) {
-            for (Runnable task : packetSendEvent.getPostTasks()) {
-                task.run();
-            }
-        }
-        if (doCompression) {
+        PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, buffer);
+        if (doCompression && buffer.isReadable()) {
             PacketCompressionUtil.recompress(ctx, buffer);
         }
     }

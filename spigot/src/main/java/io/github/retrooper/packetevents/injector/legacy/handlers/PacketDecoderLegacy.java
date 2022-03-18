@@ -19,20 +19,17 @@
 package io.github.retrooper.packetevents.injector.legacy.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
-import io.github.retrooper.packetevents.injector.legacy.connection.ServerConnectionInitializerLegacy;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
-import net.minecraft.util.io.netty.handler.codec.MessageToMessageDecoder;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
+import net.minecraft.util.io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -59,40 +56,25 @@ public class PacketDecoderLegacy extends MessageToMessageDecoder<ByteBuf> {
         postTasks.addAll(decoder.postTasks);
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) throws Exception {
+    public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
         if (skipDoubleTransform) {
             skipDoubleTransform = false;
-            output.add(input.retain());
+            out.add(input.retain());
         }
-        ByteBuf transformed = ctx.alloc().buffer().writeBytes(input);
+        ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(input);
         try {
-            boolean doCompression = handleCompressionOrder(ctx, transformed);
-            int preProcessIndex = transformed.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player, transformed);
-            int processIndex = transformed.readerIndex();
-            PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
-                transformed.readerIndex(processIndex);
-            });
-            if (!packetReceiveEvent.isCancelled()) {
-                if (packetReceiveEvent.getLastUsedWrapper() != null) {
-                    ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
-                    packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
-                    packetReceiveEvent.getLastUsedWrapper().write();
-                }
-                transformed.readerIndex(preProcessIndex);
-                if (doCompression) {
-                    PacketCompressionUtil.recompress(ctx, transformed);
+            boolean doRecompression =
+                    handleCompressionOrder(ctx, outputBuffer);
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer);
+            if (outputBuffer.isReadable()) {
+                if (doRecompression) {
+                    PacketCompressionUtil.recompress(ctx, outputBuffer);
                     skipDoubleTransform = true;
                 }
-                output.add(transformed.retain());
-            }
-            if (packetReceiveEvent.hasPostTasks()) {
-                for (Runnable task : packetReceiveEvent.getPostTasks()) {
-                    task.run();
-                }
+                out.add(outputBuffer.retain());
             }
         } finally {
-            transformed.release();
+            outputBuffer.release();
         }
     }
 

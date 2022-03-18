@@ -58,29 +58,25 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
-        ByteBuf transformed = ctx.alloc().buffer().writeBytes(input);
+        if (skipDoubleTransform) {
+            skipDoubleTransform = false;
+            out.add(input.retain());
+        }
+        ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(input);
         try {
-            if (skipDoubleTransform) {
-                skipDoubleTransform = false;
-                out.add(transformed.retain());
-            }
             boolean doRecompression =
-                    handleCompressionOrder(ctx, transformed);
-            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, transformed);
-            if (transformed.isReadable()) {
+                    handleCompressionOrder(ctx, outputBuffer);
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer);
+            if (outputBuffer.isReadable()) {
                 if (doRecompression) {
-                    PacketCompressionUtil.recompress(ctx, transformed);
+                    PacketCompressionUtil.recompress(ctx, outputBuffer);
                     skipDoubleTransform = true;
                 }
-                out.add(transformed.retain());
-            }
-            if (doRecompression && transformed.isReadable()) {
-                PacketCompressionUtil.recompress(ctx, transformed);
-                skipDoubleTransform = true;
+                out.add(outputBuffer.retain());
             }
         }
         finally {
-            transformed.release();
+            outputBuffer.release();
         }
     }
 

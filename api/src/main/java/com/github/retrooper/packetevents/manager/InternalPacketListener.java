@@ -46,7 +46,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
     }
 
     public InternalPacketListener(PacketListenerPriority priority) {
-        super(priority, true);
+        super(priority);
     }
 
     @Override

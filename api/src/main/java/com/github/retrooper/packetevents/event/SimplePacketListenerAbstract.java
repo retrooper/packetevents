@@ -29,15 +29,6 @@ public abstract class SimplePacketListenerAbstract extends PacketListenerCommon 
         super(priority);
     }
 
-    public SimplePacketListenerAbstract(PacketListenerPriority priority, boolean readOnly) {
-        super(priority, readOnly);
-    }
-
-    public SimplePacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods,
-                                        boolean readOnly) {
-        super(priority, methods, readOnly);
-    }
-
     public SimplePacketListenerAbstract() {
         super();
     }

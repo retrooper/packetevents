@@ -54,7 +54,9 @@ public class PacketEventsImplHelper {
         }
     }
 
-    public static void handleServerBoundPacket(Object channel, User user, Object player, Object buffer) throws PacketProcessException {
+    public static void handleServerBoundPacket(Object channel, User user,
+                                               Object player,
+                                               Object buffer) throws PacketProcessException {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer);
         int processIndex = ByteBufHelper.readerIndex(buffer);
@@ -62,15 +64,21 @@ public class PacketEventsImplHelper {
             ByteBufHelper.readerIndex(buffer, processIndex);
         });
         if (!packetReceiveEvent.isCancelled()) {
+            //Did they ever use a wrapper?
             if (packetReceiveEvent.getLastUsedWrapper() != null) {
-                ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
+                //Rewrite the buffer
+                ByteBufHelper.clear(buffer);
                 packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
                 packetReceiveEvent.getLastUsedWrapper().write();
             }
+            //If no wrappers were used, just pass on the original buffer.
+
+            //Correct the reader index, basically what the next handler is expecting.
             ByteBufHelper.readerIndex(buffer, preProcessIndex);
-        } else {
-            //Make the buffer unreadable for the next handlers
-            ByteBufHelper.clear(buffer);
+        }
+        else {
+            //Cancelling the packet, lets clear the buffer
+             ByteBufHelper.clear(buffer);
         }
         if (packetReceiveEvent.hasPostTasks()) {
             for (Runnable task : packetReceiveEvent.getPostTasks()) {

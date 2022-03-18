@@ -28,7 +28,11 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
  * @since 1.5.8
  */
 public class PacketEventsSettings {
+
+
     private ServerVersion fallbackServerVersion = ServerVersion.V_1_7_10;
+
+    private boolean readOnlyListeners = false;
 
     /**
      * This boolean stores if PacketEvents should check for updates,
@@ -57,6 +61,16 @@ public class PacketEventsSettings {
      */
     public PacketEventsSettings fallbackServerVersion(ServerVersion version) {
         this.fallbackServerVersion = version;
+        return this;
+    }
+
+    /**
+     * Are the packet listeners all read only?
+     * @param readOnlyListeners Value
+     * @return Settings instance
+     */
+    public PacketEventsSettings readOnlyListeners(boolean readOnlyListeners) {
+        this.readOnlyListeners = readOnlyListeners;
         return this;
     }
 
@@ -101,6 +115,14 @@ public class PacketEventsSettings {
 
     public ServerVersion getFallbackServerVersion() {
         return fallbackServerVersion;
+    }
+
+    /**
+     * Should the packet listeners be read only?
+     * @return Getter for {@link #readOnlyListeners}
+     */
+    public boolean shouldListenersReadOnly() {
+        return readOnlyListeners;
     }
 
     /**

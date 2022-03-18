@@ -49,18 +49,10 @@ public class EventManager {
             HashSet<PacketListenerCommon> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerCommon listener : listeners) {
-                    PacketWrapper<?> lastUsedWrapper = null;
-                    boolean isPacketEvent = event instanceof ProtocolPacketEvent;
-                    if (isPacketEvent) {
-                        lastUsedWrapper = ((ProtocolPacketEvent<?>) event).getLastUsedWrapper();
-                    }
                     try {
                         event.call(listener);
                     } catch (Throwable t) {
                         PacketEvents.getAPI().getLogger().log(Level.WARNING, "PacketEvents caught an unhandled exception while calling your listener.", t);
-                    }
-                    if (listener.isReadOnly() && isPacketEvent) {
-                        ((ProtocolPacketEvent<?>) event).setLastUsedWrapper(lastUsedWrapper);
                     }
                     if (postCallListenerAction != null) {
                         postCallListenerAction.run();
@@ -68,15 +60,19 @@ public class EventManager {
                 }
             }
         }
+        if (event instanceof ProtocolPacketEvent && PacketEvents.getAPI().getSettings().shouldListenersReadOnly()) {
+            ((ProtocolPacketEvent<?>) event).setLastUsedWrapper(null);
+        }
+
     }
 
-    public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly) {
-        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly);
+    public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority) {
+        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority);
         return registerListener(packetListenerAbstract);
     }
 
-    public PacketListenerCommon registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly) {
-        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly);
+    public PacketListenerCommon registerListener(PacketListenerReflect listener, PacketListenerPriority priority) {
+        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority);
         return registerListener(packetListenerAbstract);
     }
 

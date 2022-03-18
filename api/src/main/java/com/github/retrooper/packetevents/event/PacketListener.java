@@ -19,8 +19,8 @@
 package com.github.retrooper.packetevents.event;
 
 public interface PacketListener {
-    default PacketListenerAbstract asAbstract(PacketListenerPriority priority, boolean readOnly) {
-        return new PacketListenerAbstract(priority, readOnly) {
+    default PacketListenerAbstract asAbstract(PacketListenerPriority priority) {
+        return new PacketListenerAbstract(priority) {
             @Override
             public void onPlayerInject(PlayerInjectEvent event) {
                 PacketListener.this.onPlayerInject(event);

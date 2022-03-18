@@ -67,10 +67,10 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.getAPI().getSettings().debug(false).bStats(true).checkForUpdates(false);
+        PacketEvents.getAPI().getSettings().debug(false).bStats(true)
+                .checkForUpdates(false).readOnlyListeners(false);
         PacketEvents.getAPI().init();
-        SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH,
-                true) {
+        SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
             @Override
             public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
                 User user = event.getUser();
