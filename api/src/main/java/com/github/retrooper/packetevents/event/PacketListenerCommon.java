@@ -53,10 +53,10 @@ public abstract class PacketListenerCommon {
     public void onPlayerInject(PlayerInjectEvent event) {
     }
 
-    public void onPostPlayerInject(PostPlayerInjectEvent event) {
+    public void onUserConnect(UserConnectEvent event) {
     }
 
-    public void onUserConnect(UserConnectEvent event) {
+    public void onUserLogin(UserLoginEvent event) {
     }
 
     public void onUserDisconnect(UserDisconnectEvent event) {

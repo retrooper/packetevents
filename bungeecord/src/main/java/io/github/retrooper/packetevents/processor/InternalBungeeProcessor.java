@@ -19,6 +19,9 @@
 package io.github.retrooper.packetevents.processor;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.UserLoginEvent;
+import com.github.retrooper.packetevents.protocol.player.User;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -27,7 +30,11 @@ public class InternalBungeeProcessor implements Listener {
     //Called right after LoginSuccess is sent to the user.
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
-        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(event.getPlayer());
-        PacketEvents.getAPI().getInjector().setPlayer(channel, event.getPlayer());
+        ProxiedPlayer player = event.getPlayer();
+        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        PacketEvents.getAPI().getInjector().setPlayer(channel, player);
+        User user = PacketEvents.getAPI().getPlayerManager().getUser(event.getPlayer());
+        UserLoginEvent loginEvent = new UserLoginEvent(user, player);
+        PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
     }
 }

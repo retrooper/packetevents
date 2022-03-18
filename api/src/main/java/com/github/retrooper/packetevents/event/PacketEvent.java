@@ -50,8 +50,4 @@ public abstract class PacketEvent implements CallableEvent {
     public void callPacketEventExternal(PacketListenerCommon listener) {
         listener.onPacketEventExternal(this);
     }
-
-    public boolean isInbuilt() {
-        return false;
-    }
 }

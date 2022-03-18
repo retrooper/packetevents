@@ -19,8 +19,7 @@
 package io.github.retrooper.packetevents.bukkit;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PostPlayerInjectEvent;
-import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
+import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
@@ -49,7 +48,7 @@ public class InternalBukkitListener implements Listener {
 
         injector.updatePlayer(player);
 
-        PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+        PacketEvents.getAPI().getEventManager().callEvent(new UserLoginEvent(user, e.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.factory.spigot;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
-import com.github.retrooper.packetevents.event.PostPlayerInjectEvent;
+import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
@@ -142,13 +143,14 @@ public class SpigotPacketEventsBuilder {
 
                     PacketType.Play.Client.load();
                     PacketType.Play.Server.load();
-
+                    //TODO Test reloads
                     Runnable postInjectTask = () -> {
                         Bukkit.getPluginManager().registerEvents(internalBukkitListener, plugin);
                         for (final Player p : Bukkit.getOnlinePlayers()) {
                             try {
                                 injector.updatePlayer(p);
-                                getEventManager().callEvent(new PostPlayerInjectEvent(p));
+                                User user = PacketEvents.getAPI().getPlayerManager().getUser(p);
+                                getEventManager().callEvent(new UserLoginEvent(user, p));
                             } catch (Exception ex) {
                                 p.kickPlayer("Failed to inject... Please rejoin!");
                             }

@@ -27,13 +27,13 @@ public interface PacketListener {
             }
 
             @Override
-            public void onPostPlayerInject(PostPlayerInjectEvent event) {
-                PacketListener.this.onPostPlayerInject(event);
+            public void onUserConnect(UserConnectEvent event) {
+                PacketListener.this.onUserConnect(event);
             }
 
             @Override
-            public void onUserConnect(UserConnectEvent event) {
-                PacketListener.this.onUserConnect(event);
+            public void onUserLogin(UserLoginEvent event) {
+                PacketListener.this.onUserLogin(event);
             }
 
             @Override
@@ -61,10 +61,10 @@ public interface PacketListener {
     default void onPlayerInject(PlayerInjectEvent event) {
     }
 
-    default void onPostPlayerInject(PostPlayerInjectEvent event) {
+    default void onUserConnect(UserConnectEvent event) {
     }
 
-    default void onUserConnect(UserConnectEvent event) {
+    default void onUserLogin(UserLoginEvent event) {
     }
 
     default void onUserDisconnect(UserDisconnectEvent event) {

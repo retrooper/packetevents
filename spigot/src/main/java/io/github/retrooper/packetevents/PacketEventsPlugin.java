@@ -19,10 +19,7 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListenerPriority;
-import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
-import com.github.retrooper.packetevents.event.UserConnectEvent;
-import com.github.retrooper.packetevents.event.UserDisconnectEvent;
+import com.github.retrooper.packetevents.event.*;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
@@ -190,6 +187,12 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onUserConnect(UserConnectEvent event) {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " connected...");
+            }
+
+            @Override
+            public void onUserLogin(UserLoginEvent event) {
+                Player player = (Player) event.getPlayer();
+                player.sendMessage("You logged in! User name: " + event.getUser().getProfile().getName());
             }
 
             @Override

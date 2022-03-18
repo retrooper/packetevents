@@ -75,9 +75,4 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
     public void call(PacketListenerCommon listener) {
         listener.onPlayerInject(this);
     }
-
-    @Override
-    public boolean isInbuilt() {
-        return true;
-    }
 }

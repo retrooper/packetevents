@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.velocity.factory;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
+import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
@@ -29,6 +30,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
@@ -154,6 +156,9 @@ public class VelocityPacketEventsBuilder {
                         Player player = event.getPlayer();
                         Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
                         PacketEvents.getAPI().getInjector().setPlayer(channel, player);
+                        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+                        UserLoginEvent loginEvent = new UserLoginEvent(user, player);
+                        PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
                     });
                     if (settings.shouldCheckForUpdates()) {
                         getUpdateChecker().handleUpdateCheck();

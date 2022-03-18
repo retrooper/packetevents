@@ -20,12 +20,13 @@ package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.protocol.player.User;
 
-public class UserConnectEvent extends PacketEvent implements CancellableEvent, UserEvent{
+public class UserLoginEvent extends PacketEvent implements CallableEvent, UserEvent, PlayerEvent<Object> {
     private final User user;
-    private boolean cancelled;
+    private final Object player;
 
-    public UserConnectEvent(User user) {
+    public UserLoginEvent(User user, Object player) {
         this.user = user;
+        this.player = player;
     }
 
     @Override
@@ -34,17 +35,12 @@ public class UserConnectEvent extends PacketEvent implements CancellableEvent, U
     }
 
     @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
+    public Object getPlayer() {
+        return player;
     }
 
     @Override
     public void call(PacketListenerCommon listener) {
-        listener.onUserConnect(this);
+        listener.onUserLogin(this);
     }
 }

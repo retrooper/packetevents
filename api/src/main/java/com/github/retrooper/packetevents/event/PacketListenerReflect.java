@@ -39,27 +39,21 @@ public interface PacketListenerReflect {
                 if (parameterType.equals(PlayerInjectEvent.class)) {
                     List<Method> eventMethods = methods.get((byte) 0);
                     eventMethods.add(method);
-                    methods.put((byte) 0, eventMethods);
-                } else if (parameterType.equals(PostPlayerInjectEvent.class)) {
+                } else if (parameterType.equals(UserConnectEvent.class)) {
                     List<Method> eventMethods = methods.get((byte) 1);
                     eventMethods.add(method);
-                    methods.put((byte) 1, eventMethods);
-                } else if (parameterType.equals(UserConnectEvent.class)) {
+                } else if (parameterType.equals(UserLoginEvent.class)) {
                     List<Method> eventMethods = methods.get((byte) 2);
                     eventMethods.add(method);
-                    methods.put((byte) 2, eventMethods);
                 } else if (parameterType.equals(UserDisconnectEvent.class)) {
                     List<Method> eventMethods = methods.get((byte) 3);
                     eventMethods.add(method);
-                    methods.put((byte) 3, eventMethods);
                 } else if (parameterType.equals(PacketReceiveEvent.class)) {
                     List<Method> eventMethods = methods.get((byte) 4);
                     eventMethods.add(method);
-                    methods.put((byte) 4, eventMethods);
                 } else if (parameterType.equals(PacketSendEvent.class)) {
                     List<Method> eventMethods = methods.get((byte) 5);
                     eventMethods.add(method);
-                    methods.put((byte) 5, eventMethods);
                 } else if (parameterType.equals(PacketEvent.class)) {
                     //Add to all
                     for (byte i = 0; i < 7; i++) {
@@ -70,7 +64,6 @@ public interface PacketListenerReflect {
                 } else {
                     List<Method> eventMethods = methods.get((byte) 6);
                     eventMethods.add(method);
-                    methods.put((byte) 6, eventMethods);
                 }
             }
         }
@@ -94,12 +87,12 @@ public interface PacketListenerReflect {
             }
 
             @Override
-            public void onPostPlayerInject(PostPlayerInjectEvent event) {
+            public void onUserConnect(UserConnectEvent event) {
                 callEventByIndex((byte) 1, event);
             }
 
             @Override
-            public void onUserConnect(UserConnectEvent event) {
+            public void onUserLogin(UserLoginEvent event) {
                 callEventByIndex((byte) 2, event);
             }
 
