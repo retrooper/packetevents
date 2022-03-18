@@ -33,7 +33,6 @@ public class PacketEventsInjectorMixin {
         PacketEncoder encoder = new PacketEncoder(user);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, encoder);
-        //TODO Handle compression
         PacketEventsMod.LOGGER.info("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
     }
 
