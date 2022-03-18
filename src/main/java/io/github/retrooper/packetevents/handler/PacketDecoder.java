@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -27,39 +28,17 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         this.user = user;
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
-        int firstReaderIndex = buffer.readerIndex();
-        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer);
-        int readerIndex = buffer.readerIndex();
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> buffer.readerIndex(readerIndex));
-        if (!packetSendEvent.isCancelled()) {
-            if (packetSendEvent.getLastUsedWrapper() != null) {
-                ByteBufHelper.clear(packetSendEvent.getByteBuf());
-                packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
-                packetSendEvent.getLastUsedWrapper().write();
-            }
-            buffer.readerIndex(firstReaderIndex);
-        }
-        else {
-            buffer.clear();
-        }
-        if (packetSendEvent.hasPostTasks()) {
-            for (Runnable task : packetSendEvent.getPostTasks()) {
-                task.run();
-            }
-        }
-    }
-
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         if (msg.isReadable()) {
-            boolean recompress = handleCompression(ctx, msg) && msg.isReadable();
-            read(ctx, msg);
-            if (recompress) {
-                recompress(ctx, msg);
-            }
-            if (msg.isReadable()) {
-                out.add(msg.retain());
+            ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(msg);
+            boolean recompress = handleCompression(ctx, outputBuffer);
+            PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, outputBuffer);
+            if (outputBuffer.isReadable()) {
+                if (recompress) {
+                    recompress(ctx, outputBuffer);
+                }
+                out.add(outputBuffer.retain());
             }
         }
     }

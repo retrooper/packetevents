@@ -18,6 +18,8 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
         PacketEvents.setAPI(FabricPacketEventsBuilder.build("packetevents"));
         PacketEvents.getAPI().getSettings().debug(true).bStats(true);
         PacketEvents.getAPI().load();
+        //TODO Test if userconnectevent and userdisconnectevent work.
+        //especially disconnect
     }
 
     @Override

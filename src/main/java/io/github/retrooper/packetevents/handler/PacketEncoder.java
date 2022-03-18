@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,29 +22,6 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
 
     public PacketEncoder(User user) {
         this.user = user;
-    }
-
-    public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
-        int firstReaderIndex = buffer.readerIndex();
-        PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player, buffer);
-        int readerIndex = buffer.readerIndex();
-        PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> buffer.readerIndex(readerIndex));
-        if (!packetReceiveEvent.isCancelled()) {
-            if (packetReceiveEvent.getLastUsedWrapper() != null) {
-                ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
-                packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
-                packetReceiveEvent.getLastUsedWrapper().write();
-            }
-            buffer.readerIndex(firstReaderIndex);
-        } else {
-            //Clear the buffer, our custom write method will discard the packet for us.
-            buffer.clear();
-        }
-        if (packetReceiveEvent.hasPostTasks()) {
-            for (Runnable task : packetReceiveEvent.getPostTasks()) {
-                task.run();
-            }
-        }
     }
 
     @Override
@@ -83,7 +61,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
         if (msg.isReadable()) {
-            read(ctx, msg);
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, msg);
             out.writeBytes(msg);
         }
     }
