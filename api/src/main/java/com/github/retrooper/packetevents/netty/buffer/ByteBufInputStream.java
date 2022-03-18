@@ -19,8 +19,7 @@
 package com.github.retrooper.packetevents.netty.buffer;
 
 import java.io.*;
-
-//TODO Give netty credit, also credit for our other abstract interfaces defining netty functions
+//TODO give netty credit
 public class ByteBufInputStream extends InputStream implements DataInput {
     private final Object buffer;
     private final int startIndex;

@@ -523,6 +523,7 @@ public final class SpigotReflectionUtil {
             //TODO Finish for 1.7.10
             throw new IllegalStateException("This operation is not supported yet on 1.7.10!");
         }
+        //TODO Finish
         int combinedID;
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
             combinedID = -1;

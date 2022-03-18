@@ -36,14 +36,6 @@ public class EntityTypes {
     private static JsonObject MAPPINGS;
     private static JsonObject LEGACY_MAPPINGS;
 
-    static {
-        //Mappings have been used, we can clear them.
-        //TODO Test this to see if it works.
-        /*
-        MAPPINGS = null;
-        LEGACY_MAPPINGS = null;*/
-    }
-
     @NotNull
     private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
         if (serverVersion.isOlderThan(ServerVersion.V_1_11)) {
