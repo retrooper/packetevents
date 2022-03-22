@@ -73,24 +73,24 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         HIDE_FOR_OTHER_TEAMS("hideForOtherTeams"),
         HIDE_FOR_OWN_TEAM("hideForOwnTeam");
 
-        private final String ID;
+        private final String id;
 
-        NameTagVisibility(String ID) {
-            this.ID = ID;
+        NameTagVisibility(String id) {
+            this.id = id;
         }
 
         @Nullable
-        public static NameTagVisibility fromID(String ID) {
+        public static NameTagVisibility fromID(String id) {
             for (NameTagVisibility value : NameTagVisibility.values()) {
-                if (value.ID.equalsIgnoreCase(ID)) {
+                if (value.id.equalsIgnoreCase(id)) {
                     return value;
                 }
             }
             return null;
         }
 
-        public String getID() {
-            return ID;
+        public String getId() {
+            return id;
         }
     }
 
@@ -100,24 +100,24 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         PUSH_OTHER_TEAMS("pushOtherTeams"),
         PUSH_OWN_TEAM("pushOwnTeam");
 
-        private final String ID;
+        private final String id;
 
-        CollisionRule(String ID) {
-            this.ID = ID;
+        CollisionRule(String id) {
+            this.id = id;
         }
 
         @Nullable
-        public static CollisionRule fromID(String ID) {
+        public static CollisionRule fromID(String id) {
             for (CollisionRule value : CollisionRule.values()) {
-                if (value.ID.equalsIgnoreCase(ID)) {
+                if (value.id.equalsIgnoreCase(id)) {
                     return value;
                 }
             }
             return null;
         }
 
-        public String getID() {
-            return ID;
+        public String getId() {
+            return id;
         }
 
     }
@@ -217,19 +217,19 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
                 writeString(AdventureSerializer.asVanilla(info.suffix));
                 writeByte(info.optionData.ordinal());
                 if (serverVersion == ServerVersion.V_1_7_10) {
-                    writeString(NameTagVisibility.ALWAYS.getID());
+                    writeString(NameTagVisibility.ALWAYS.getId());
                     writeByte(15);
                 } else {
-                    writeString(info.tagVisibility.ID);
+                    writeString(info.tagVisibility.id);
                     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9))
-                        writeString(info.collisionRule.getID());
+                        writeString(info.collisionRule.getId());
                     writeByte(ColorUtil.getId(info.color));
                 }
             } else {
                 writeComponent(info.displayName);
                 writeByte(info.optionData.getByteValue());
-                writeString(info.tagVisibility.ID);
-                writeString(info.collisionRule.getID());
+                writeString(info.tagVisibility.id);
+                writeString(info.collisionRule.getId());
                 writeByte(ColorUtil.getId(info.color));
                 writeComponent(info.prefix);
                 writeComponent(info.suffix);

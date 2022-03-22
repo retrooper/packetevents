@@ -84,7 +84,7 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
             writeVarInt(this.blockData.length);
             for (EncodedBlock record : blockData) {
                 writeShort((record.getX() - (chunkPosition.getX() << 4)) << 12 | (record.getZ() - (chunkPosition.getZ() << 4)) << 8 | record.getY());
-                writeVarInt(record.getBlockID());
+                writeVarInt(record.getBlockId());
             }
         }
     }
@@ -137,11 +137,11 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
             return (long) blockID << 12 | (x & 0xF) << 8 | (z & 0xF) << 4 | (y & 0xF);
         }
 
-        public int getBlockID() {
+        public int getBlockId() {
             return blockID;
         }
 
-        public void setBlockID(int blockID) {
+        public void setBlockId(int blockID) {
             this.blockID = blockID;
         }
 
