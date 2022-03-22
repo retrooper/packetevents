@@ -150,7 +150,7 @@ public enum ClientboundPacketType_1_17 {
 
     //These 2 new packets were added
     SET_TITLE_TEXT,
-    SET_TITLE_TIME,
+    SET_TITLE_TIMES,
 
 
     //This packet was removed and split up into 3 new packets

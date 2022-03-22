@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
@@ -27,8 +28,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -133,6 +133,44 @@ public class User {
     public void sendMessage(Component component, ChatPosition position) {
         WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(component, position);
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatMessage);
+    }
+
+    public void sendTitle(Component title, Component subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        boolean modern = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_17);
+        PacketWrapper<?> animation;
+        PacketWrapper<?> setTitle = null;
+        PacketWrapper<?> setSubtitle = null;
+        if (modern) {
+            animation = new WrapperPlayServerSetTitleTimes(fadeInTicks, stayTicks, fadeOutTicks);
+            if (title != null) {
+                setTitle = new WrapperPlayServerSetTitleText(title);
+            }
+            if (subtitle != null) {
+                setSubtitle = new WrapperPlayServerSetTitleSubtitle(subtitle);
+            }
+        }
+        else {
+            animation = new WrapperPlayServerTitle(WrapperPlayServerTitle.
+                    TitleAction.SET_TIMES_AND_DISPLAY, (Component)null, null, null,
+                    fadeInTicks, stayTicks, fadeOutTicks);
+            if (title != null) {
+                setTitle = new WrapperPlayServerTitle(WrapperPlayServerTitle.
+                        TitleAction.SET_TITLE, title, null, null,
+                        0, 0, 0);
+            }
+            if (subtitle != null) {
+                setSubtitle = new WrapperPlayServerTitle(WrapperPlayServerTitle.
+                        TitleAction.SET_SUBTITLE, null, subtitle, null,
+                        0, 0, 0);
+            }
+        }
+        sendPacket(animation);
+        if (setTitle != null) {
+            sendPacket(setTitle);
+        }
+        if (setSubtitle != null) {
+            sendPacket(setSubtitle);
+        }
     }
 
     //TODO sendTitle that is cross-version

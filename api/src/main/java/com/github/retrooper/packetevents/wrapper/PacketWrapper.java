@@ -376,6 +376,10 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
+    public String readComponentJSON() {
+        return readString(getMaxMessageLength());
+    }
+
     public void writeString(String s) {
         writeString(s, 32767);
     }
@@ -395,6 +399,10 @@ public class PacketWrapper<T extends PacketWrapper> {
             writeVarInt(bytes.length);
             ByteBufHelper.writeBytes(buffer, bytes);
         }
+    }
+
+    public void writeComponentJSON(String json){
+        writeString(json, getMaxMessageLength());
     }
 
     public Component readComponent() {

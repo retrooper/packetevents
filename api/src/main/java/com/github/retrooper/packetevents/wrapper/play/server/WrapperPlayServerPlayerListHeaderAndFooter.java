@@ -52,9 +52,8 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
 
     @Override
     public void read() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        headerJson = readString(maxMessageLength);
-        footerJson = readString(maxMessageLength);
+        headerJson = readComponentJSON();
+        footerJson = readComponentJSON();
         if (HANDLE_JSON) {
             headerComponent = AdventureSerializer.parseComponent(headerJson);
             footerComponent = AdventureSerializer.parseComponent(footerJson);
@@ -71,13 +70,12 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
 
     @Override
     public void write() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
             headerJson = AdventureSerializer.toJson(headerComponent);
             footerJson = AdventureSerializer.toJson(footerComponent);
         }
-        writeString(headerJson, maxMessageLength);
-        writeString(footerJson, maxMessageLength);
+        writeComponentJSON(headerJson);
+        writeComponentJSON(footerJson);
     }
 
     public String getHeaderJson() {

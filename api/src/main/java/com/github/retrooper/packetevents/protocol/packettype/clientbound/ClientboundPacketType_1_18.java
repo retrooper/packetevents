@@ -114,7 +114,7 @@ public enum ClientboundPacketType_1_18 {
     SET_TITLE_SUBTITLE,
     TIME_UPDATE,
     SET_TITLE_TEXT,
-    SET_TITLE_TIME,
+    SET_TITLE_TIMES,
     ENTITY_SOUND_EFFECT,
     SOUND_EFFECT,
     STOP_SOUND,

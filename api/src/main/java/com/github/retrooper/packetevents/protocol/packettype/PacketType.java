@@ -351,6 +351,7 @@ public final class PacketType {
         }
 
         public enum Server implements PacketTypeCommon {
+            //Packets that are no longer present on latest version
             SET_COMPRESSION,
             MAP_CHUNK_BULK,
             UPDATE_ENTITY_NBT,
@@ -361,7 +362,7 @@ public final class PacketType {
             WORLD_BORDER,
             COMBAT_EVENT,
             ENTITY_MOVEMENT,
-
+            //Okay these are normal ones
             WINDOW_CONFIRMATION,
             SPAWN_ENTITY,
             SPAWN_EXPERIENCE_ORB,
@@ -454,7 +455,7 @@ public final class PacketType {
             SET_TITLE_SUBTITLE,
             TIME_UPDATE,
             SET_TITLE_TEXT,
-            SET_TITLE_TIME,
+            SET_TITLE_TIMES,
             ENTITY_SOUND_EFFECT,
             SOUND_EFFECT,
             STOP_SOUND,

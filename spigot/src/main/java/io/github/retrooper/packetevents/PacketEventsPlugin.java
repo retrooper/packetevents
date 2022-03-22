@@ -87,6 +87,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
                             user.writePacket(particlePacket);
 
+                            Component title = Component.text("Hello, you must be " + user.getProfile().getName() + "!")
+                                    .color(NamedTextColor.DARK_GREEN);
+                            Component subtitle = Component.text("Welcome...")
+                                    .color(NamedTextColor.GREEN);
+                            user.sendTitle(title, subtitle, 40, 20, 40);
 
                             Vector3i bp = SpigotDataHelper.fromBukkitLocation(((Player) event.getPlayer()).getLocation())
                                     .getPosition().toVector3i();
