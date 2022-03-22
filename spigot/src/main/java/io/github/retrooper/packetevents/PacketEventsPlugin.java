@@ -35,6 +35,7 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
+import com.github.retrooper.packetevents.util.TimeStampMode;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
@@ -65,7 +66,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         //Register your listeners
         PacketEvents.getAPI().getSettings().debug(false).bStats(true)
-                .checkForUpdates(false).readOnlyListeners(false);
+                .checkForUpdates(false).timeStampMode(TimeStampMode.MILLIS).readOnlyListeners(false);
         PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
             @Override

@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.settings;
 
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.util.TimeStampMode;
 
 /**
  * Packet Events' settings.
@@ -29,27 +30,30 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
  */
 public class PacketEventsSettings {
 
-
+    private TimeStampMode timestampMode = TimeStampMode.MILLIS;
     private ServerVersion fallbackServerVersion = ServerVersion.V_1_7_10;
-
     private boolean readOnlyListeners = false;
-
-    /**
-     * This boolean stores if PacketEvents should check for updates,
-     * and give you a notice in the console.
-     */
     private boolean checkForUpdates = true;
-
-
-    /**
-     * Can PacketEvents collect server data like player count, java version, plugins, etc... anonymously and report to bStats?
-     */
     private boolean bStatsEnabled = true;
+    private boolean debugEnabled = false;
 
     /**
-     * Should Packetevents spam debug messages to the console?
+     * Time stamp mode. How precise should the timestamps in the events be.
+     * @param timeStampMode Time Stamp mode
+     * @return Settings instance
      */
-    private boolean debugEnabled = false;
+    public PacketEventsSettings timeStampMode(TimeStampMode timeStampMode) {
+        this.timestampMode = timeStampMode;
+        return this;
+    }
+
+    /**
+     * Get the timestamp mode
+     * @return Time Stamp Mode
+     */
+    public TimeStampMode getTimeStampMode() {
+        return timestampMode;
+    }
 
     /**
      * This is the server version PacketEvents should assume the server is when detecting

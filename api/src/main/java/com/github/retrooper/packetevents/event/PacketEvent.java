@@ -19,6 +19,9 @@
 package com.github.retrooper.packetevents.event;
 
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.util.TimeStampMode;
+
 /**
  * An event in both of PacketEvents' event systems.
  *
@@ -26,7 +29,23 @@ package com.github.retrooper.packetevents.event;
  * @since 1.2.6
  */
 public abstract class PacketEvent implements CallableEvent {
-    private long timestamp = System.currentTimeMillis();
+    private final long timestamp;
+
+    public PacketEvent() {
+        TimeStampMode timeStampMode = PacketEvents.getAPI().getSettings()
+                .getTimeStampMode();
+        switch (timeStampMode) {
+            case MILLIS:
+                timestamp = System.currentTimeMillis();
+                break;
+            case NANO:
+                timestamp = System.nanoTime();
+                break;
+                //AKA NONE:
+            default:
+                timestamp = 0L;
+        }
+    }
 
     /**
      * Timestamp of when the PacketEvent was created.
@@ -36,15 +55,6 @@ public abstract class PacketEvent implements CallableEvent {
      */
     public long getTimestamp() {
         return timestamp;
-    }
-
-    /**
-     * Setter for the timestamp.
-     *
-     * @param timestamp Packet timestamp in milliseconds.
-     */
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
     }
 
     public void callPacketEventExternal(PacketListenerCommon listener) {
