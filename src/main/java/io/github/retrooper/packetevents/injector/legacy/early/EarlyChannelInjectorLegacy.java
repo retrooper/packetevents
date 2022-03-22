@@ -25,7 +25,6 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.netty.channel.epoll.EpollSocketChannel;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
@@ -130,8 +129,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 WrappedPacket networkManagerWrapper = new WrappedPacket(new NMSPacket(networkManager), NMSUtils.networkManagerClass);
                 Channel channel = (Channel) networkManagerWrapper.readObject(0, NMSUtils.nettyChannelClass);
                 if (channel == null ||
-                        (!(channel.getClass().equals(NioSocketChannel.class))) &&
-                                !(channel.getClass().equals(EpollSocketChannel.class))) {
+                        (!channel.getClass().equals(NioSocketChannel.class))) {
                     continue;
                 }
 
