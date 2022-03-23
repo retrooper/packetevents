@@ -23,16 +23,6 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         super(event);
     }
 
-    public WrapperPlayServerEntityEffect(int entityID, int potionTypeID, int amplifier, int duration, byte flags) {
-        super(PacketType.Play.Server.ENTITY_EFFECT);
-        this.entityID = entityID;
-        this.potionType = PotionTypes.getById(potionTypeID);
-        this.effectAmplifier = amplifier;
-        this.effectDurationTicks = duration;
-        this.flags = flags;
-    }
-
-
     public WrapperPlayServerEntityEffect(int entityID, PotionType potionType, int amplifier, int duration, byte flags) {
         super(PacketType.Play.Server.ENTITY_EFFECT);
         this.entityID = entityID;

@@ -21,11 +21,6 @@ public class WrapperPlayServerRemoveEntityEffect extends PacketWrapper<WrapperPl
         this.potionType = potionType;
     }
 
-    @Deprecated
-    public WrapperPlayServerRemoveEntityEffect(int entityId, int effectId) {
-        this(entityId, PotionTypes.getById(effectId));
-    }
-
     @Override
     public void read() {
         this.entityId = readVarInt();
@@ -62,16 +57,6 @@ public class WrapperPlayServerRemoveEntityEffect extends PacketWrapper<WrapperPl
 
     public void setEntityId(int entityId) {
         this.entityId = entityId;
-    }
-
-    @Deprecated
-    public int getEffectId() {
-        return potionType.getId();
-    }
-
-    @Deprecated
-    public void setEffectId(int effectId) {
-        this.potionType = PotionTypes.getById(effectId);
     }
 
     public PotionType getPotionType() {
