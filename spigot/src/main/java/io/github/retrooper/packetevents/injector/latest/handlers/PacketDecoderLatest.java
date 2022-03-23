@@ -111,7 +111,7 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
         //Check if the minecraft server will already print our exception for us.
-        if (!SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
+        if (ExceptionUtil.isException(cause, PacketProcessException.class) && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
                 && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();
         }

@@ -18,80 +18,16 @@
 
 package com.github.retrooper.packetevents.exception;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
-import org.jetbrains.annotations.Nullable;
-
 public class PacketProcessException extends Exception {
-    public enum PacketProcessExceptionReason {
-        PACKET_ID,
-        PACKET_CONTENT
-    }
-    private final PacketProcessExceptionReason reason;
-    @Nullable
-    private final PacketSide side;
-    @Nullable
-    private final PacketTypeCommon type;
-    private final int packetSize;
-
-    public PacketProcessException(Throwable throwable, PacketProcessExceptionReason reason,
-                                  @Nullable PacketSide side,
-                                  @Nullable Integer packetSize,
-                                  @Nullable PacketTypeCommon type) {
-        super(throwable);
-        this.side = side;
-        this.reason = reason;
-        this.type = type;
-        this.packetSize = packetSize != null ? packetSize : -1;
+    public PacketProcessException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 
-    public PacketProcessException(PacketProcessExceptionReason reason,
-                                  @Nullable PacketSide side, @Nullable Integer packetSize,
-                                  @Nullable PacketTypeCommon type) {
-        this.side = side;
-        this.reason = reason;
-        this.type = type;
-        this.packetSize = packetSize != null ? packetSize : -1;
+    public PacketProcessException(Throwable cause) {
+        super(cause);
     }
 
-    public PacketSide getSide() {
-        return side;
-    }
-
-    public PacketProcessExceptionReason getReason() {
-        return reason;
-    }
-
-    @Nullable
-    public PacketTypeCommon getType() {
-        return type;
-    }
-
-    @Override
-    public String getMessage() {
-        String message = "PacketEvents failed to process a " + (side != null ? side.name().toLowerCase() : "") + " packet.\n";
-        switch (reason) {
-            case PACKET_ID:
-                message += "The packet ID could not be found in the buffer.\n";
-                break;
-            case PACKET_CONTENT:
-                //TODO More clear
-                message += "The packet content was not read successfully.\n";
-                break;
-        }
-        if (type != null) {
-            message += "Packet type: " + type.getName() + ", Packet ID: " + type.getId() + "\n";
-        }
-        if (packetSize != -1) {
-            message += "Packet size: " + packetSize + "\n";
-        }
-        message += "Platform version: " + PacketEvents.getAPI().getServerManager().getVersion().getReleaseName() + "\n";
-        return message;
-    }
-
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-        return this;
+    public PacketProcessException(String msg) {
+        super(msg);
     }
 }

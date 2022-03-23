@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 public class PacketEventsImplHelper {
@@ -37,10 +38,17 @@ public class PacketEventsImplHelper {
             ByteBufHelper.readerIndex(buffer, processIndex);
         });
         if (!packetSendEvent.isCancelled()) {
-            if (packetSendEvent.getLastUsedWrapper() != null) {
+            PacketWrapper<?> wrapper = packetSendEvent.getLastUsedWrapper();
+            if (wrapper != null) {
                 ByteBufHelper.clear(buffer);
-                packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
-                packetSendEvent.getLastUsedWrapper().write();
+                int packetId = packetSendEvent.getPacketId();
+                packetSendEvent.getLastUsedWrapper().writeVarInt(packetId);
+                try {
+                    packetSendEvent.getLastUsedWrapper().write();
+                } catch (Exception e) {
+                    throw new PacketProcessException("PacketEvents failed to re-encode an outgoing packet with its packet wrapper. Packet ID: " + packetId
+                            + ". Failed to encode " + wrapper.getClass().getSimpleName() + ".", e);
+                }
             }
             ByteBufHelper.readerIndex(buffer, preProcessIndex);
         } else {
@@ -75,10 +83,9 @@ public class PacketEventsImplHelper {
 
             //Correct the reader index, basically what the next handler is expecting.
             ByteBufHelper.readerIndex(buffer, preProcessIndex);
-        }
-        else {
+        } else {
             //Cancelling the packet, lets clear the buffer
-             ByteBufHelper.clear(buffer);
+            ByteBufHelper.clear(buffer);
         }
         if (packetReceiveEvent.hasPostTasks()) {
             for (Runnable task : packetReceiveEvent.getPostTasks()) {

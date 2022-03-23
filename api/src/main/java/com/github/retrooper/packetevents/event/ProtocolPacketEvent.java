@@ -61,15 +61,18 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
 
         this.byteBuf = byteBuf;
         int size = ByteBufHelper.readableBytes(byteBuf);
+        if (size == 0) {
+            throw new PacketProcessException("Trying to process a packet, but it has no content. (Size=0)");
+        }
         try {
             this.packetID = ByteBufHelper.readVarInt(byteBuf);
         } catch (Exception e) {
-            throw new PacketProcessException(e,
-                    PacketProcessException.PacketProcessExceptionReason.PACKET_ID,
-                    packetSide, size, null);
+            throw new PacketProcessException("Failed to read the Packet ID of a packet. (Size: " + size + ")");
         }
         this.packetType = PacketType.getById(packetSide, user.getConnectionState(), this.serverVersion, packetID);
-
+        if (this.packetType == null) {
+            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Connection state: " + user.getConnectionState() +  ", Server version: " + serverVersion.getReleaseName());
+        }
         this.connectionState = user.getConnectionState();
     }
 
