@@ -2,6 +2,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.util.Vector3i;
@@ -43,14 +44,17 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
         } else { // Copied from MCProtocolLib
             int chunkX = readInt();
             int chunkZ = readInt();
-
-            blockData = new EncodedBlock[readVarInt()];
-            for (int i = 0; i < blockData.length; i++) {
+            chunkPosition = new Vector3i(chunkX, 0, chunkZ);
+            int len = readVarInt();
+            blockData = new EncodedBlock[len];
+            for (int i = 0; i < len; i++) {
                 short pos = readShort();
+                //chunkX << 4 = chunkX * 16
                 int x = (chunkX << 4) + (pos >> 12 & 15);
                 int y = pos & 255;
                 int z = (chunkZ << 4) + (pos >> 8 & 15);
-                this.blockData[i] = new EncodedBlock(readVarInt(), x, y, z);
+                int blockId = readVarInt();
+                this.blockData[i] = new EncodedBlock(blockId, x, y, z);
             }
         }
     }
@@ -70,9 +74,7 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
             encodedPos |= (chunkPosition.getZ() & 0x3FFFFFL) << 20;
             writeLong(encodedPos | (chunkPosition.getY() & 0xFFFFFL));
 
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-                writeBoolean(trustEdges);
-            }
+            writeBoolean(trustEdges);
 
             writeVarInt(blockData.length);
             for (EncodedBlock blockDatum : blockData) {
@@ -83,7 +85,10 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
             writeInt(chunkPosition.getZ());
             writeVarInt(this.blockData.length);
             for (EncodedBlock record : blockData) {
-                writeShort((record.getX() - (chunkPosition.getX() << 4)) << 12 | (record.getZ() - (chunkPosition.getZ() << 4)) << 8 | record.getY());
+                int x = record.getX() & 0xF;
+                int z = record.getZ() & 0xF;
+                short pos = (short) (x << 12 | z << 8 | record.getY());
+                writeShort(pos);
                 writeVarInt(record.getBlockId());
             }
         }
