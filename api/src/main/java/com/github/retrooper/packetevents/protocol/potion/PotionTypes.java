@@ -65,7 +65,7 @@ public class PotionTypes {
 
     @Nullable
     public static PotionType getById(int id) {
-        return POTION_TYPE_ID_MAP.get(id);
+        return POTION_TYPE_ID_MAP.get((byte)id);
     }
 
     public static final PotionType SPEED = define("speed", 1);
