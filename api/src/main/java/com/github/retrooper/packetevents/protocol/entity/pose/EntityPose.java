@@ -18,8 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.entity.pose;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
 public enum EntityPose {
     STANDING,
@@ -31,20 +30,18 @@ public enum EntityPose {
     LONG_JUMPING,
     DYING;
 
-   public static final EntityPose[] VALUES = values();
-
-   public int getId() {
-       if (this == DYING && PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_17)) {
+   public int getId(ClientVersion version) {
+       if (this == DYING && version.isOlderThan(ClientVersion.V_1_17)) {
            return 6;
        }
        return ordinal();
    }
 
-   public static EntityPose getById(int id) {
+   public static EntityPose getById(ClientVersion version, int id) {
        // The LONG_JUMPING pose was added in 1.17, shifting things by 1
-       if (id == 6 && PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_17)) {
+       if (id == 6 && version.isOlderThan(ClientVersion.V_1_17)) {
            return DYING;
        }
-       return VALUES[id];
+       return values()[id];
    }
 }

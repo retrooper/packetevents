@@ -158,6 +158,7 @@ public class WrappedBlockState {
     }
 
     private static void loadModern() {
+        //TODO Make more version dynamic, get id for specific version
         JsonObject MAPPINGS = MappingHelper.getJSONObject("block/modern_block_mappings");
         String modernVersion = getModernJsonPath(PacketEvents.getAPI().getServerManager().getVersion());
 

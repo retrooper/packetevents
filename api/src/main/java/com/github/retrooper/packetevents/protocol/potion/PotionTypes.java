@@ -19,8 +19,6 @@
 package com.github.retrooper.packetevents.protocol.potion;
 
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.MappingHelper;
-import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -65,7 +63,7 @@ public class PotionTypes {
 
     @Nullable
     public static PotionType getById(int id) {
-        return POTION_TYPE_ID_MAP.get(id);
+        return POTION_TYPE_ID_MAP.get((byte)id);
     }
 
     public static final PotionType SPEED = define("speed", 1);

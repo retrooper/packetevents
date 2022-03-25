@@ -78,6 +78,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     public PacketWrapper(PacketReceiveEvent event, boolean readData) {
         this.clientVersion = event.getUser().getClientVersion();
         this.serverVersion = event.getServerVersion();
+        //this.serverVersion = this.clientVersion.toServerVersion();
         this.user = event.getUser();
         this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
@@ -297,7 +298,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         if (typeID < 0) {
             return ItemStack.EMPTY;
         }
-        ItemType type = ItemTypes.getById(typeID);
+        ItemType type = ItemTypes.getById(serverVersion.toClientVersion(), typeID);
         int amount = readByte();
         int legacyData = v1_13_2 ? -1 : readShort();
         NBTCompound nbt = readNBT();
@@ -323,7 +324,7 @@ public class PacketWrapper<T extends PacketWrapper> {
                 if (itemStack.getType() == null || ItemStack.EMPTY.equals(itemStack)) {
                     typeID = -1;
                 } else {
-                    typeID = itemStack.getType().getId();
+                    typeID = itemStack.getType().getId(serverVersion.toClientVersion());
                 }
                 writeVarInt(typeID);
                 if (typeID >= 0) {
@@ -336,7 +337,7 @@ public class PacketWrapper<T extends PacketWrapper> {
             if (itemStack.isEmpty()) {
                 typeID = -1;
             } else {
-                typeID = itemStack.getType().getId();
+                typeID = itemStack.getType().getId(serverVersion.toClientVersion());
             }
             writeShort(typeID);
             if (typeID >= 0) {
@@ -650,7 +651,7 @@ public class PacketWrapper<T extends PacketWrapper> {
             short index;
             while ((index = readUnsignedByte()) != 255) {
                 int typeID = v1_10 ? readVarInt() : readUnsignedByte();
-                EntityDataType<?> type = EntityDataTypes.getById(typeID);
+                EntityDataType<?> type = EntityDataTypes.getById(serverVersion.toClientVersion(), typeID);
                 Object value = type.getDataDeserializer().apply(this);
                 list.add(new EntityData(index, type, value));
             }
@@ -658,7 +659,7 @@ public class PacketWrapper<T extends PacketWrapper> {
             for (byte data = readByte(); data != 127; data = readByte()) {
                 int typeID = (data & 224) >> 5;
                 int index = data & 31;
-                EntityDataType<?> type = EntityDataTypes.getById(typeID);
+                EntityDataType<?> type = EntityDataTypes.getById(serverVersion.toClientVersion(), typeID);
                 Object value = type.getDataDeserializer().apply(this);
                 EntityData entityData = new EntityData(index, type, value);
                 list.add(entityData);
@@ -673,16 +674,16 @@ public class PacketWrapper<T extends PacketWrapper> {
             for (EntityData entityData : list) {
                 writeByte(entityData.getIndex());
                 if (v1_10) {
-                    writeVarInt(entityData.getType().getId());
+                    writeVarInt(entityData.getType().getId(serverVersion.toClientVersion()));
                 } else {
-                    writeByte(entityData.getType().getId());
+                    writeByte(entityData.getType().getId(serverVersion.toClientVersion()));
                 }
                 entityData.getType().getDataSerializer().accept(this, entityData.getValue());
             }
             writeByte(255); // End of metadata array
         } else {
             for (EntityData entityData : list) {
-                int typeID = entityData.getType().getId();
+                int typeID = entityData.getType().getId(serverVersion.toClientVersion());
                 int index = entityData.getIndex();
                 int data = (typeID << 5 | index & 31) & 255;
                 writeByte(data);

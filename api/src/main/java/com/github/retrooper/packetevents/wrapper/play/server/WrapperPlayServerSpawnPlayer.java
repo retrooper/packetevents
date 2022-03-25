@@ -83,7 +83,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         yaw = readByte() /  ROTATION_DIVISOR;
         pitch = readByte() / ROTATION_DIVISOR;
         if (!v1_9) {
-            item = ItemTypes.getById(readByte());
+            item = ItemTypes.getById(serverVersion.toClientVersion(), readByte());
         }
         else {
             item = ItemTypes.AIR;
@@ -123,7 +123,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         writeByte((byte) (yaw * ROTATION_DIVISOR));
         writeByte((byte) (pitch * ROTATION_DIVISOR));
         if (!v1_9) {
-            writeShort(item.getId());
+            writeShort(item.getId(serverVersion.toClientVersion()));
         }
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             writeEntityMetadata(entityMetadata);

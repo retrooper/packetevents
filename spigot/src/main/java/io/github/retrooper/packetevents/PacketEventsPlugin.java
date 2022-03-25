@@ -40,8 +40,7 @@ import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.util.SpigotDataHelper;
 import net.kyori.adventure.text.Component;
@@ -53,6 +52,7 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -187,6 +187,21 @@ public class PacketEventsPlugin extends JavaPlugin {
                     PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), clone);
                     System.out.println("Delayed " + chatMessage.getChatComponentJson());
                 } */
+                else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
+                    WrapperPlayServerEntityEffect effect = new WrapperPlayServerEntityEffect(event);
+                    System.out.println("type: "+ effect.getPotionType().getName() + ", type id: " + effect.getPotionType().getId());
+                }
+                else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+                    WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
+                    EntityType type = spawnLivingEntity.getEntityType();
+                    System.out.println("type: " + type.getName() + ", type id: " + type.getId(event.getClientVersion()) + ", server type id: "
+                            + type.getId(event.getServerVersion().toClientVersion()));
+                }
+                else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+                    WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
+                    System.out.println("item: " + setSlot.getItem().toString() + ", enchantments: " + Arrays.toString(setSlot.getItem().getEnchantments().toArray(new
+                            com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment[0])));
+                }
             }
 
             @Override

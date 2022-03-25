@@ -18,11 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.item.enchantment.type;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.MappingHelper;
-import com.google.gson.JsonObject;
+import com.github.retrooper.packetevents.util.TypesBuilder;
+import com.github.retrooper.packetevents.util.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -30,66 +29,44 @@ import java.util.Map;
 
 public class EnchantmentTypes {
     private static final Map<String, EnchantmentType> ENCHANTMENT_TYPE_MAPPINGS = new HashMap<>();
-    private static final Map<Integer, EnchantmentType> ENCHANTMENT_TYPE_ID_MAPPINGS = new HashMap<>();
-    private static JsonObject ENCHANTMENT_TYPE_JSON;
-
-    private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-            return ServerVersion.V_1_12;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_14)) {
-            return ServerVersion.V_1_13;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16)) {
-            return ServerVersion.V_1_14;
-        } else {
-            return ServerVersion.V_1_16;
-        }
-    }
+    private static final Map<Byte, Map<Integer, EnchantmentType>> ENCHANTMENT_TYPE_ID_MAPPINGS = new HashMap<>();
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("enchantment/enchantment_type_mappings",
+            ClientVersion.V_1_12,
+            ClientVersion.V_1_13,
+            ClientVersion.V_1_14,
+            ClientVersion.V_1_16);
 
     public static EnchantmentType define(String key) {
-        if (ENCHANTMENT_TYPE_JSON == null) {
-            ENCHANTMENT_TYPE_JSON = MappingHelper.getJSONObject("enchantment/enchantment_type_mappings");
-        }
-
-        ResourceLocation identifier = ResourceLocation.minecraft(key);
-        ServerVersion mappingsVersion = getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
-
-        final int id;
-
-        if (ENCHANTMENT_TYPE_JSON.has(mappingsVersion.name())) {
-            JsonObject map = ENCHANTMENT_TYPE_JSON.getAsJsonObject(mappingsVersion.name());
-            if (map.has(identifier.toString())) {
-                id = map.get(identifier.toString()).getAsInt();
-            } else {
-                id = -1;
-            }
-        } else {
-            throw new IllegalStateException("Failed to find Enchantments mappings for the " + mappingsVersion.name() + " mappings version!");
-        }
-
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         EnchantmentType enchantmentType = new EnchantmentType() {
+            private final int[] ids = data.getData();
+
             @Override
             public ResourceLocation getName() {
-                return identifier;
+                return data.getName();
             }
 
-            // TODO: Why is this useful? Does some outdated version use it? I don't know, but ViaVersion translates it.
-            // TODO: Fix this (not that it is being used currently)
             @Override
-            public int getId() {
-                return id;
+            public int getId(ClientVersion version) {
+                int index = TYPES_BUILDER.getDataIndex(version);
+                return ids[index];
             }
 
             @Override
             public boolean equals(Object obj) {
                 if (obj instanceof EnchantmentType) {
-                    return getId() == ((EnchantmentType) obj).getId();
+                    return getName() == ((EnchantmentType) obj).getName();
                 }
                 return false;
             }
         };
 
         ENCHANTMENT_TYPE_MAPPINGS.put(enchantmentType.getName().toString(), enchantmentType);
-        ENCHANTMENT_TYPE_ID_MAPPINGS.put(enchantmentType.getId(), enchantmentType);
+        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
+            int index = TYPES_BUILDER.getDataIndex(version);
+            Map<Integer, EnchantmentType> typeIdMap = ENCHANTMENT_TYPE_ID_MAPPINGS.computeIfAbsent((byte) index, k -> new HashMap<>());
+            typeIdMap.put(enchantmentType.getId(version), enchantmentType);
+        }
         return enchantmentType;
     }
 
@@ -99,8 +76,10 @@ public class EnchantmentTypes {
     }
 
     @Nullable
-    public static EnchantmentType getById(int id) {
-        return ENCHANTMENT_TYPE_ID_MAPPINGS.get(id);
+    public static EnchantmentType getById(ClientVersion version, int id) {
+        int index = TYPES_BUILDER.getDataIndex(version);
+        Map<Integer, EnchantmentType> typeIdMap = ENCHANTMENT_TYPE_ID_MAPPINGS.get((byte) index);
+        return typeIdMap.get(id);
     }
 
     public static final EnchantmentType ALL_DAMAGE_PROTECTION = define("protection");

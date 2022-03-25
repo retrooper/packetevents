@@ -18,15 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.particle.type;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.particle.data.*;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.MappingHelper;
+import com.github.retrooper.packetevents.util.TypesBuilder;
+import com.github.retrooper.packetevents.util.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,68 +32,31 @@ import java.util.function.Function;
 
 public class ParticleTypes {
     private static final Map<String, ParticleType> PARTICLE_TYPE_MAP = new HashMap<>();
-    private static final Map<Integer, ParticleType> PARTICLE_TYPE_ID_MAP = new HashMap<>();
-    private static JsonObject MAPPINGS;
-
-    private static ServerVersion getMappingsVersion(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-            return ServerVersion.V_1_12_2;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_13_2)) {
-            return ServerVersion.V_1_13;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_14)) {
-            return ServerVersion.V_1_13_2;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            return ServerVersion.V_1_14;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16)) {
-            return ServerVersion.V_1_15;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
-            return ServerVersion.V_1_16;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
-            return ServerVersion.V_1_16_2;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_18)) {
-            return ServerVersion.V_1_17;
-        } else {
-            return ServerVersion.V_1_18;
-        }
-    }
+    private static final Map<Byte, Map<Integer, ParticleType>> PARTICLE_TYPE_ID_MAP = new HashMap<>();
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("particle/particle_type_mappings",
+            ClientVersion.V_1_12_2,
+            ClientVersion.V_1_13,
+            ClientVersion.V_1_13_2,
+            ClientVersion.V_1_14,
+            ClientVersion.V_1_15,
+            ClientVersion.V_1_16,
+            ClientVersion.V_1_16_2,
+            ClientVersion.V_1_17,
+            ClientVersion.V_1_18);
 
     public static ParticleType define(String key, Function<PacketWrapper<?>, ParticleData> readDataFunction, BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction) {
-        if (MAPPINGS == null) {
-            MAPPINGS = MappingHelper.getJSONObject("particle/particle_type_mappings");
-        }
-
-        ResourceLocation identifier = ResourceLocation.minecraft(key);
-        ServerVersion mappingsVersion = getMappingsVersion(PacketEvents.getAPI().getServerManager().getVersion());
-        int tempId = -1;
-
-        if (MAPPINGS.has(mappingsVersion.name())) {
-            JsonArray array = MAPPINGS.getAsJsonArray(mappingsVersion.name());
-            int index = 0;
-            //Might be rather inefficient
-            for (JsonElement element : array) {
-                if (element.isJsonPrimitive()) {
-                    String elementString = element.getAsString();
-                    if (elementString.equals(key)) {
-                        tempId = index;
-                        break;
-                    }
-                }
-                index++;
-            }
-        } else {
-            throw new IllegalStateException("Failed to find ParticleType mappings for the " + mappingsVersion.name() + " mappings version!");
-        }
-
-        int id = tempId;
+        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
         ParticleType particleType = new ParticleType() {
+            private final int[] ids = data.getData();
             @Override
             public ResourceLocation getName() {
-                return identifier;
+                return data.getName();
             }
 
             @Override
-            public int getId() {
-                return id;
+            public int getId(ClientVersion version) {
+                int index = TYPES_BUILDER.getDataIndex(version);
+                return ids[index];
             }
 
             @Override
@@ -112,14 +72,18 @@ public class ParticleTypes {
             @Override
             public boolean equals(Object obj) {
                 if (obj instanceof ParticleType) {
-                    return ((ParticleType) obj).getId() == getId();
+                    return getName().equals(((ParticleType) obj).getName());
                 }
                 return false;
             }
         };
 
         PARTICLE_TYPE_MAP.put(particleType.getName().toString(), particleType);
-        PARTICLE_TYPE_ID_MAP.put(particleType.getId(), particleType);
+        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
+            int index = TYPES_BUILDER.getDataIndex(version);
+            Map<Integer, ParticleType> typeIdMap = PARTICLE_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
+            typeIdMap.put(particleType.getId(version), particleType);
+        }
         return particleType;
     }
 
@@ -141,8 +105,10 @@ public class ParticleTypes {
         return PARTICLE_TYPE_MAP.get(name);
     }
 
-    public static ParticleType getById(int id) {
-        return PARTICLE_TYPE_ID_MAP.get(id);
+    public static ParticleType getById(ClientVersion version, int id) {
+        int index = TYPES_BUILDER.getDataIndex(version);
+        Map<Integer, ParticleType> typeIdMap = PARTICLE_TYPE_ID_MAP.get((byte) index);
+        return typeIdMap.get(id);
     }
 
     public static final ParticleType AMBIENT_ENTITY_EFFECT = define("ambient_entity_effect");

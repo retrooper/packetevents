@@ -468,7 +468,7 @@ public final class PacketType {
             ENTITY_EFFECT,
             DECLARE_RECIPES,
             TAGS;
-
+            //TODO Map<Integer, Map<Integer.... to be more dynamic
             private static final Map<Integer, PacketTypeCommon> PACKET_ID_CACHE = new IdentityHashMap<>();
             private int id = -1;
 

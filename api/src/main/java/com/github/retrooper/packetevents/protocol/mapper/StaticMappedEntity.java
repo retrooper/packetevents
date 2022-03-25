@@ -19,10 +19,11 @@
 package com.github.retrooper.packetevents.protocol.mapper;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
 
-public interface MappedEntity {
-    ResourceLocation getName();
+public interface StaticMappedEntity extends MappedEntity{
+    int getId();
 
-    int getId(ClientVersion version);
+    default int getId(ClientVersion version) {
+        return getId();
+    }
 }
