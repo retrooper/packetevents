@@ -114,7 +114,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public PacketWrapper(PacketTypeCommon packetType) {
-        this(packetType.getId());
+        this(packetType.getId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
     }
 
     public static PacketWrapper<?> createUniversalPacketWrapper(Object byteBuf) {

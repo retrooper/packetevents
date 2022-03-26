@@ -2,6 +2,7 @@ package com.github.retrooper.packetevents.protocol.world.states;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.states.enums.*;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
@@ -89,18 +90,18 @@ public class WrappedBlockState {
         return state.clone();
     }
 
-    private static String getModernJsonPath(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_1)) {
+    private static String getModernJsonPath(ClientVersion version) {
+        if (version.isOlderThanOrEquals(ClientVersion.V_1_13_1)) {
             return "1.13";
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_13_2)) {
             return "1.13.2";
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_14_4)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_14_4)) {
             return "1.14";
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_15_2)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_15_2)) {
             return "1.15";
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_16_1)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_1)) {
             return "1.16";
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_2)) {
             return "1.16.2";
         } else {
             return "1.17";
@@ -160,7 +161,7 @@ public class WrappedBlockState {
     private static void loadModern() {
         //TODO Make more version dynamic, get id for specific version
         JsonObject MAPPINGS = MappingHelper.getJSONObject("block/modern_block_mappings");
-        String modernVersion = getModernJsonPath(PacketEvents.getAPI().getServerManager().getVersion());
+        String modernVersion = getModernJsonPath(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
 
         if (MAPPINGS.has(modernVersion)) {
             JsonObject map = MAPPINGS.getAsJsonObject(modernVersion);
@@ -865,7 +866,7 @@ public class WrappedBlockState {
      */
     public void checkIsStillValid() {
         int oldGlobalID = globalID;
-        globalID = getGlobalIDNoCache();
+        globalID = getGlobalIdNoCache();
         if (globalID == -1) { // -1 maps to no block as negative ID are impossible
             WrappedBlockState blockState = getByGlobalId(oldGlobalID);
             this.type = blockState.type;
@@ -910,7 +911,7 @@ public class WrappedBlockState {
     /**
      * Internal method for determining if the block state is still valid
      */
-    private int getGlobalIDNoCache() {
+    private int getGlobalIdNoCache() {
         return INTO_ID.getOrDefault(this, -1);
     }
 

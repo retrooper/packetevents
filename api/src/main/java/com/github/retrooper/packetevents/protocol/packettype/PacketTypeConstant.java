@@ -20,11 +20,10 @@ package com.github.retrooper.packetevents.protocol.packettype;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
-public interface PacketTypeCommon {
-
-    default String getName() {
-        return ((Enum<?>)this).name();
+public interface PacketTypeConstant extends PacketTypeCommon{
+    default int getId(ClientVersion version) {
+        return getId();
     }
 
-    int getId(ClientVersion version);
+    int getId();
 }

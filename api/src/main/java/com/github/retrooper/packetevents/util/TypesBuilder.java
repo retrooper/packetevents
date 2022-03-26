@@ -27,19 +27,12 @@ import com.google.gson.JsonObject;
 public class TypesBuilder {
     private final String mapPath;
     private JsonObject fileMappings;
-    private final ClientVersion[] versions;
-    private final ClientVersion[] reversedVersions;
+    private final VersionMapper versionMapper;
 
     public TypesBuilder(String mapPath,
                         ClientVersion... versions) {
         this.mapPath = mapPath;
-        this.versions = versions;
-        reversedVersions = new ClientVersion[versions.length];
-        int index = 0;
-        for (int i = versions.length - 1; i >= 0; i--) {
-            reversedVersions[index] = versions[i];
-            index++;
-        }
+        this.versionMapper = new VersionMapper(versions);
     }
 
     public JsonObject getFileMappings() {
@@ -47,23 +40,15 @@ public class TypesBuilder {
     }
 
     public ClientVersion[] getVersions() {
-        return versions;
+        return versionMapper.getVersions();
     }
 
     public ClientVersion[] getReversedVersions() {
-        return reversedVersions;
+        return versionMapper.getReversedVersions();
     }
 
     public int getDataIndex(ClientVersion rawVersion) {
-        int index = reversedVersions.length - 1;
-        for (ClientVersion v : reversedVersions) {
-            if (rawVersion.isNewerThanOrEquals(v)) {
-                return index;
-            }
-            index--;
-        }
-        //Give them the oldest version
-        return 0;
+        return versionMapper.getIndex(rawVersion);
     }
 
     public TypesBuilderData defineFromArray(String key) {
@@ -71,9 +56,9 @@ public class TypesBuilder {
             fileMappings = MappingHelper.getJSONObject(mapPath);
         }
         ResourceLocation name = new ResourceLocation(key);
-        int[] ids = new int[versions.length];
+        int[] ids = new int[getVersions().length];
         int index = 0;
-        for (ClientVersion v : versions) {
+        for (ClientVersion v : getVersions()) {
             JsonArray array = fileMappings.getAsJsonArray(v.name());
             int tempId = 0;
             for (JsonElement element : array) {
@@ -96,9 +81,9 @@ public class TypesBuilder {
             fileMappings = MappingHelper.getJSONObject(mapPath);
         }
         ResourceLocation name = new ResourceLocation(key);
-        int[] ids = new int[versions.length];
+        int[] ids = new int[getVersions().length];
         int index = 0;
-        for (ClientVersion v : versions) {
+        for (ClientVersion v : getVersions()) {
             if (fileMappings.has(v.name())) {
                 JsonObject jsonMap = fileMappings.getAsJsonObject(v.name());
                 if (jsonMap.has(key)) {

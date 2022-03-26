@@ -92,14 +92,18 @@ public class SpigotChannelInjectorLatest implements ChannelInjector {
             reflectServerConnection.writeList(connectionChannelsListIndex, wrappedList);
 
             //Player channels might have been registered already. Let us add our handlers. We are a little late though.
-            List<Object> networkManagers = SpigotReflectionUtil.getNetworkManagers();
-            for (Object networkManager : networkManagers) {
-                ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
-                Channel channel = networkManagerWrapper.readObject(0, Channel.class);
-                if (channel == null) {
-                    continue;
+            if (networkManagers == null) {
+                networkManagers = SpigotReflectionUtil.getNetworkManagers();
+            }
+            synchronized (networkManagers) {
+                for (Object networkManager : networkManagers) {
+                    ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
+                    Channel channel = networkManagerWrapper.readObject(0, Channel.class);
+                    if (channel == null) {
+                        continue;
+                    }
+                    ServerConnectionInitializerLatest.initChannel(channel, ConnectionState.PLAY);
                 }
-                ServerConnectionInitializerLatest.initChannel(channel, ConnectionState.PLAY);
             }
         }
     }

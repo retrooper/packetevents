@@ -69,7 +69,8 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         } catch (Exception e) {
             throw new PacketProcessException("Failed to read the Packet ID of a packet. (Size: " + size + ")");
         }
-        this.packetType = PacketType.getById(packetSide, user.getConnectionState(), this.serverVersion, packetID);
+        this.packetType = PacketType.getById(packetSide, user.getConnectionState(),
+                this.serverVersion.toClientVersion(), packetID);
         if (this.packetType == null) {
             throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Connection state: " + user.getConnectionState() +  ", Server version: " + serverVersion.getReleaseName());
         }
