@@ -58,6 +58,10 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.player = player;
 
         this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
+        if (packetSide == PacketSide.CLIENT && user.getClientVersion() != null) {
+            //TODO Optimize
+            this.serverVersion = user.getClientVersion().toServerVersion();
+        }
 
         this.byteBuf = byteBuf;
         int size = ByteBufHelper.readableBytes(byteBuf);
@@ -69,10 +73,11 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         } catch (Exception e) {
             throw new PacketProcessException("Failed to read the Packet ID of a packet. (Size: " + size + ")");
         }
+        ClientVersion version = serverVersion.toClientVersion();
         this.packetType = PacketType.getById(packetSide, user.getConnectionState(),
-                this.serverVersion.toClientVersion(), packetID);
+                version, packetID);
         if (this.packetType == null) {
-            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Connection state: " + user.getConnectionState() +  ", Server version: " + serverVersion.getReleaseName());
+            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Packet Side: " + packetSide +  ", Connection state: " + user.getConnectionState() +  ", Server version: " + serverVersion.getReleaseName());
         }
         this.connectionState = user.getConnectionState();
     }

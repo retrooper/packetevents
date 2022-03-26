@@ -112,7 +112,6 @@ public class EntityDataTypes {
     public static EntityDataType<?> getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);
         Map<Integer, EntityDataType<?>> typeIdMap = ENTITY_DATA_TYPE_ID_MAP.get((byte)index);
-        System.out.println("Index: " + index);
         return typeIdMap.get(id);
     }
 
@@ -131,7 +130,6 @@ public class EntityDataTypes {
             Map<Integer, EntityDataType<?>> typeIdMap = ENTITY_DATA_TYPE_ID_MAP
                     .computeIfAbsent((byte) index, k -> new HashMap<>());
             typeIdMap.put(type.getId(version), type);
-            System.out.println("Index: "+ index + ", Type ID: " + type.getId(version) + ", type: " + type.getName());
         }
         return type;
     }

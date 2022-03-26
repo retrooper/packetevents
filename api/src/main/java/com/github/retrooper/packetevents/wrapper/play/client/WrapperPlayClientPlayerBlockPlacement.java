@@ -29,7 +29,7 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
-//TODO Test on 1.8 and later versions. Make sure its not mixed up with Use Item
+
 public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<WrapperPlayClientPlayerBlockPlacement> {
     private InteractionHand interactionHand;
     private Vector3i blockPosition;

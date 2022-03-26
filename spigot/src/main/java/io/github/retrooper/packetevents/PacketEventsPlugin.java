@@ -52,7 +52,6 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -194,13 +193,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                 else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     EntityType type = spawnLivingEntity.getEntityType();
-                    System.out.println("type: " + type.getName() + ", type id: " + type.getId(event.getClientVersion()) + ", server type id: "
-                            + type.getId(event.getServerVersion().toClientVersion()));
-                }
-                else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
-                    WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
-                    System.out.println("item: " + setSlot.getItem().toString() + ", enchantments: " + Arrays.toString(setSlot.getItem().getEnchantments().toArray(new
-                            com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment[0])));
                 }
             }
 

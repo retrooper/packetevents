@@ -18,11 +18,13 @@
 
 package io.github.retrooper.packetevents.injector.latest.handlers;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
@@ -37,6 +39,7 @@ public class PacketEncoderLatest extends MessageToByteEncoder<Object> {
     public User user;
     public volatile Player player;
     public MessageToByteEncoder<?> vanillaEncoder;
+    public boolean handledCompression;
 
     public PacketEncoderLatest(User user) {
         this.user = user;
@@ -44,6 +47,7 @@ public class PacketEncoderLatest extends MessageToByteEncoder<Object> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf out) throws Exception {
+        handleCompressionOrder(ctx);
         if (!(o instanceof ByteBuf)) {
             //Convert NMS object to bytes, so we can process it right away.
             if (vanillaEncoder == null) return;
@@ -57,6 +61,18 @@ public class PacketEncoderLatest extends MessageToByteEncoder<Object> {
             out.writeBytes(in);
         }
         PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out);
+    }
+
+    private void handleCompressionOrder(ChannelHandlerContext ctx) {
+        if (handledCompression) return;
+        int decompressorIndex = ctx.pipeline().names().indexOf("decompress");
+        if (decompressorIndex == -1) return;
+        if (decompressorIndex > ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME)) {
+            //Relocate handlers
+            PacketDecoderLatest decoder = (PacketDecoderLatest) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
+            ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, new PacketDecoderLatest(decoder));
+            handledCompression = true;
+        }
     }
 
     @Override

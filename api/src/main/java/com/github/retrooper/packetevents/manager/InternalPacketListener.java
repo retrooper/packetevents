@@ -75,6 +75,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
         }
 
         // Join game can be used to update world height, and sets dimension data
+        /*
         if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
             WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
             user.setEntityId(joinGame.getEntityId());
@@ -104,7 +105,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             NBTCompound worldNBT = user.getWorldNBT(respawn.getDimension().getType().getName()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
             user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
             user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
-        }
+        }*/
     }
 
     @Override

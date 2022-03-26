@@ -26,7 +26,6 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.injector.latest.handlers.PacketDecoderLatest;
 import io.github.retrooper.packetevents.injector.latest.handlers.PacketEncoderLatest;
@@ -35,11 +34,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 
@@ -89,50 +85,8 @@ public class ServerConnectionInitializerLatest {
         }
         UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
         PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
-        ChannelHandler viaDecoder = channel.pipeline().get("decoder");
-        if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitDecodeHandlerClass().equals(viaDecoder.getClass())) {
-            ReflectionObject reflectViaDecoder = new ReflectionObject(viaDecoder);
-            ByteToMessageDecoder decoder = reflectViaDecoder.readObject(0, ByteToMessageDecoder.class);
-            //We are the father decoder.(but child of ViaVersion's decoder)
-            if (decoder instanceof PacketDecoderLatest) {
-                PacketDecoderLatest decoderModern = (PacketDecoderLatest) decoder;
-                //No decoders injected into our decoder.
-                //We can just let Via wrap the vanilla decoder again.
-                if (decoderModern.decoders.isEmpty()) {
-                    reflectViaDecoder.write(ByteToMessageDecoder.class, 0, decoderModern.mcDecoder);
-                }
-                //Some decoders injected into our decoder, lets do some cleaning up
-                else {
-                    //Elect a new father decoder. They will now manage the rest of the packetevents instances.
-                    ByteToMessageDecoder newDecoderModern = decoderModern.decoders.get(0);
-                    //Copy our decoder's data into there.
-                    ReflectionObject reflectNewDecoderModern = new ReflectionObject(newDecoderModern);
-                    decoderModern.decoders.remove(0);
-                    reflectNewDecoderModern.writeList(0, decoderModern.decoders);
-                    reflectNewDecoderModern.write(ByteToMessageDecoder.class, 0, decoderModern.mcDecoder);
-                    reflectNewDecoderModern.write(User.class, 0, decoderModern.user);
-                    reflectNewDecoderModern.write(Player.class, 0, decoderModern.player);
-                    reflectNewDecoderModern.write(boolean.class, 0, decoderModern.handledCompression);
-                    reflectNewDecoderModern.write(boolean.class, 1, decoderModern.skipDoubleTransform);
-                    //Force via to now wrap this new father decoder.
-                    reflectViaDecoder.write(ByteToMessageDecoder.class, 0, newDecoderModern);
-                }
-            } else if (ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketDecoderLatest")
-                    || ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketDecoderModern")) {
-                //Possibly another instance of packetevents has already injected into ViaVersion.
-                //Let us try to remove our own decoder without breaking the other instance.
-                ReflectionObject reflectDecoder = new ReflectionObject(decoder);
-                List<Object> decoders = reflectDecoder.readList(0);
-                decoders.removeIf(d -> d instanceof PacketDecoderLatest);
-            } else {
-                //ViaVersion is present, we didn't inject into ViaVersion yet, because we haven't needed to.
-                channel.pipeline().remove(PacketEvents.DECODER_NAME);
-            }
-        } else {
-            channel.pipeline().remove(PacketEvents.DECODER_NAME);
-        }
 
-        //Easily cleanup the encoder
+        channel.pipeline().remove(PacketEvents.DECODER_NAME);
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
 
         ProtocolManager.USERS.remove(channel);
