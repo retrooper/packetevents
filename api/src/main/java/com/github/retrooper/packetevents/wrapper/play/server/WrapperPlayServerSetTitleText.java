@@ -25,7 +25,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
 public class WrapperPlayServerSetTitleText extends PacketWrapper<WrapperPlayServerSetTitleText> {
-    public static boolean HANDLE_JSON = false;
+    public static boolean HANDLE_JSON = true;
     private String titleJson;
     private Component title;
     public WrapperPlayServerSetTitleText(PacketSendEvent event) {
