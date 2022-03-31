@@ -52,6 +52,7 @@ public class ServerConnectionInitializerLatest {
         }
         if (channel.pipeline().get(PacketEvents.DECODER_NAME) != null) {
             channel.pipeline().remove(PacketEvents.DECODER_NAME);
+            //TODO This is a reload, so do we call userdisconnectevent, will this call connectevent for the second time now?
         }
         if (channel.pipeline().get(PacketEvents.ENCODER_NAME) != null) {
             channel.pipeline().remove(PacketEvents.ENCODER_NAME);
