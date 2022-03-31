@@ -50,6 +50,12 @@ public class ServerConnectionInitializerLatest {
                 !(channel instanceof NioSocketChannel)) {
             return;
         }
+        if (channel.pipeline().get(PacketEvents.DECODER_NAME) != null) {
+            channel.pipeline().remove(PacketEvents.DECODER_NAME);
+        }
+        if (channel.pipeline().get(PacketEvents.ENCODER_NAME) != null) {
+            channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+        }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
         UserConnectEvent connectEvent = new UserConnectEvent(user);
         PacketEvents.getAPI().getEventManager().callEvent(connectEvent);
@@ -87,8 +93,6 @@ public class ServerConnectionInitializerLatest {
         if (user == null) {
             return;
         }
-        UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
-        PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
         ChannelHandler viaDecoder = channel.pipeline().get("decoder");
         if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitDecodeHandlerClass().equals(viaDecoder.getClass())) {
             ReflectionObject reflectViaDecoder = new ReflectionObject(viaDecoder);

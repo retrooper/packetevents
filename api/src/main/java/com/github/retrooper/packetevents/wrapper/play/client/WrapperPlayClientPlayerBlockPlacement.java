@@ -53,6 +53,8 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
 
     @Override
     public void read() {
+        itemStack = Optional.empty();
+        insideBlock = Optional.empty();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             interactionHand = InteractionHand.getById(readVarInt());
             blockPosition = readBlockPosition();
@@ -81,7 +83,6 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
             } else {
                 cursorPosition = new Vector3f(readUnsignedByte() / 16.0F, readUnsignedByte() / 16.0F, readUnsignedByte() / 16.0F);
             }
-            insideBlock = Optional.empty();
         }
     }
 
@@ -104,7 +105,6 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
             writeFloat(cursorPosition.y);
             writeFloat(cursorPosition.z);
             writeBoolean(insideBlock.orElse(false));
-            insideBlock = Optional.of(readBoolean());
         } else {
             if (serverVersion == ServerVersion.V_1_7_10) {
                 writeInt(blockPosition.x);
