@@ -71,7 +71,15 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
     @Override
     protected void load() {
         getNMSBlockMethodCache = Reflection.getMethod(NMSUtils.iBlockDataClass, "getBlock", 0);
+        if (getNMSBlockMethodCache == null) {
+            Class<?> blockDataClass = NMSUtils.iBlockDataClass.getSuperclass();
+            getNMSBlockMethodCache = Reflection.getMethod(blockDataClass, NMSUtils.blockClass, 0);
+        }
         getNMSWorldTypeMethodCache = Reflection.getMethod(NMSUtils.nmsWorldClass, "getType", 0);
+        if (getNMSWorldTypeMethodCache == null) {
+            getNMSWorldTypeMethodCache = Reflection.getMethod(NMSUtils.nmsWorldClass,
+                    "getBlockStateIfLoaded", 0);
+        }
         v_1_7_10 = version.isOlderThan(ServerVersion.v_1_8);
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         if (v_1_17) {
