@@ -52,6 +52,8 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -75,6 +77,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         System.out.println("Running 10 seconds later");
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                         if (chatMessage.getMessage().equalsIgnoreCase("mrmcyeet")) {
+                            System.out.println("pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                             event.setCancelled(true);
                             Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
                             Vector3d position = SpigotDataHelper
@@ -84,6 +87,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     = new WrapperPlayServerParticle(particle, true, position,
                                     new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
                             user.writePacket(particlePacket);
+                            //PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(),
+                              //      particlePacket);
 
                             Component title = Component.text("Hello, you must be " + user.getProfile().getName() + "!")
                                     .color(NamedTextColor.DARK_GREEN);

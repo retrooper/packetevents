@@ -135,6 +135,13 @@ public class User {
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatMessage);
     }
 
+    public void sendTitle(String legacyTitle, String legacySubtitle,
+                          int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        Component title = AdventureSerializer.asAdventure(legacyTitle);
+        Component subtitle = AdventureSerializer.asAdventure(legacySubtitle);
+        sendTitle(title, subtitle, fadeInTicks, stayTicks, fadeOutTicks);
+    }
+
     public void sendTitle(Component title, Component subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         boolean modern = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_17);
         PacketWrapper<?> animation;

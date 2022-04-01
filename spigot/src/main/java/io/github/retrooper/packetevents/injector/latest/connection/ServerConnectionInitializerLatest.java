@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.injector.latest.handlers.PacketDecoderLatest;
 import io.github.retrooper.packetevents.injector.latest.handlers.PacketEncoderLatest;
@@ -34,8 +35,11 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 
@@ -45,6 +49,13 @@ public class ServerConnectionInitializerLatest {
         if (!(channel instanceof EpollSocketChannel) &&
                 !(channel instanceof NioSocketChannel)) {
             return;
+        }
+        if (channel.pipeline().get(PacketEvents.DECODER_NAME) != null) {
+            channel.pipeline().remove(PacketEvents.DECODER_NAME);
+            //TODO This is a reload, so do we call userdisconnectevent, will this call connectevent for the second time now?
+        }
+        if (channel.pipeline().get(PacketEvents.ENCODER_NAME) != null) {
+            channel.pipeline().remove(PacketEvents.ENCODER_NAME);
         }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
         UserConnectEvent connectEvent = new UserConnectEvent(user);
