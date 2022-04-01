@@ -65,7 +65,8 @@ public class PacketDecoderLegacy extends MessageToMessageDecoder<ByteBuf> {
         try {
             boolean doRecompression =
                     handleCompressionOrder(ctx, outputBuffer);
-            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer);
+            //TODO Use protocol translation dependencies on spigot!
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer, false);
             if (outputBuffer.isReadable()) {
                 if (doRecompression) {
                     PacketCompressionUtil.recompress(ctx, outputBuffer);

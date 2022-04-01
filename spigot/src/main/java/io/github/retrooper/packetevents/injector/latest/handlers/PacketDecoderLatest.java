@@ -47,7 +47,9 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
         ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(input);
         try {
-            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer);
+            //TODO Use protocol translation dependencies on spigot!
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer,
+                    false);
             if (outputBuffer.isReadable()) {
                 out.add(outputBuffer.retain());
             }

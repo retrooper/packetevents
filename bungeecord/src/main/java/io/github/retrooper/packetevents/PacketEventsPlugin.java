@@ -41,10 +41,10 @@ public final class PacketEventsPlugin extends Plugin {
     public void onEnable() {
 
         //Register your listeners
-        /*PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+       /* PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
-                //System.out.println("Receiving: " + event.getPacketType().getName());
+                System.out.println("Receiving: " + event.getPacketType().getName());
             }
 
             @Override

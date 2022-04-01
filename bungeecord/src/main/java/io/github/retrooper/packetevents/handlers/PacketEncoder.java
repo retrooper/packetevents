@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
 import io.github.retrooper.packetevents.injector.ServerConnectionInitializer;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -47,7 +48,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
         boolean doCompression = handleCompressionOrder(ctx, buffer);
         int firstReaderIndex = buffer.readerIndex();
-        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer);
+        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer, true);
         int readerIndex = buffer.readerIndex();
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> buffer.readerIndex(readerIndex));
         if (!packetSendEvent.isCancelled()) {
@@ -99,7 +100,11 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
                     }
                 }
                 //Relocate handlers
-                ServerConnectionInitializer.reloadChannel(ctx.channel());
+                Channel channel = ctx.channel();
+                PacketDecoder decoder = (PacketDecoder) channel.pipeline().remove(PacketEvents.DECODER_NAME);
+                PacketEncoder encoder = (PacketEncoder) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+                channel.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
+                channel.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
                 handledCompression = true;
                 return true;
             } catch (InvocationTargetException e) {

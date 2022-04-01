@@ -52,13 +52,14 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private boolean cloned;
 
     public ProtocolPacketEvent(PacketSide packetSide, Object channel,
-                               User user, T player, Object byteBuf) throws PacketProcessException {
+                               User user, T player, Object byteBuf,
+                               boolean autoProtocolTranslation) throws PacketProcessException {
         this.channel = channel;
         this.user = user;
         this.player = player;
 
         this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
-        if (packetSide == PacketSide.CLIENT && user.getClientVersion() != null) {
+        if (!autoProtocolTranslation && packetSide == PacketSide.CLIENT && user.getClientVersion() != null) {
             //TODO Optimize
             this.serverVersion = user.getClientVersion().toServerVersion();
         }

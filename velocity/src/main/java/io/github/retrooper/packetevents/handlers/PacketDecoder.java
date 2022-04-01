@@ -45,7 +45,8 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         ByteBuf transformed = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
             int firstReaderIndex = transformed.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player, transformed);
+            PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player,
+                    transformed, false);
             int readerIndex = transformed.readerIndex();
             PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> transformed.readerIndex(readerIndex));
             if (!packetReceiveEvent.isCancelled()) {

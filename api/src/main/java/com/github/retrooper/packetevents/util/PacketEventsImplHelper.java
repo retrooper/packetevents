@@ -32,7 +32,9 @@ import org.jetbrains.annotations.Nullable;
 public class PacketEventsImplHelper {
     public static void handleClientBoundPacket(Object channel, User user, Object player, Object buffer) throws PacketProcessException {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
-        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer);
+        boolean autoProtocolTranslation = true;
+        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer,
+                autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
@@ -64,9 +66,11 @@ public class PacketEventsImplHelper {
 
     public static void handleServerBoundPacket(Object channel, User user,
                                                Object player,
-                                               Object buffer) throws PacketProcessException {
+                                               Object buffer,
+                                               boolean autoProtocolTranslation) throws PacketProcessException {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
-        PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer);
+        PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer,
+                autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
