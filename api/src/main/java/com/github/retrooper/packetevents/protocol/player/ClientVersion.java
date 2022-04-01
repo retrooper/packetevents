@@ -120,8 +120,6 @@ public enum ClientVersion {
     private final int protocolVersion;
     private final String name;
 
-    private static final Set<Integer> RELEASE_PROTOCOL_VERSIONS = new HashSet<>();
-
     ClientVersion(int protocolVersion) {
         this.protocolVersion = protocolVersion;
         this.name = name().substring(2).replace("_", ".");
@@ -136,24 +134,14 @@ public enum ClientVersion {
         }
     }
 
-    private static void loadReleases() {
-        if (RELEASE_PROTOCOL_VERSIONS.isEmpty()) {
-            for (ClientVersion version : values()) {
-                if (isRelease(version.protocolVersion)) {
-                    RELEASE_PROTOCOL_VERSIONS.add(version.protocolVersion);
-                }
-            }
-        }
-    }
-
     public static boolean isPreRelease(int protocolVersion) {
-        return !isRelease(protocolVersion) && getLatest().protocolVersion <= protocolVersion
-                && getOldest().protocolVersion >= protocolVersion;
+        return getLatest().protocolVersion <= protocolVersion
+                || getOldest().protocolVersion >= protocolVersion;
     }
 
     public static boolean isRelease(int protocolVersion) {
-        loadReleases();
-        return RELEASE_PROTOCOL_VERSIONS.contains(protocolVersion);
+        return protocolVersion <= getLatest().protocolVersion
+                && protocolVersion >= getOldest().protocolVersion;
     }
 
     public boolean isPreRelease() {

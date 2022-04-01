@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.world.chunk;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16.Chunk_v1_9;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_7.Chunk_v1_7;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8.Chunk_v1_8;
@@ -31,9 +32,9 @@ import com.github.retrooper.packetevents.protocol.world.chunk.storage.LegacyFlex
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
 public interface BaseChunk {
-    WrappedBlockState get(int x, int y, int z);
+    WrappedBlockState get(ClientVersion version, int x, int y, int z);
 
-    void set(int x, int y, int z, int combinedID);
+    void set(ClientVersion version, int x, int y, int z, int combinedID);
 
     boolean isEmpty();
 

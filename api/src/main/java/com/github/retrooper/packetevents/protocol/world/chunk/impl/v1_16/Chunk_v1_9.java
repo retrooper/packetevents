@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
@@ -82,11 +83,12 @@ public class Chunk_v1_9 implements BaseChunk {
         }
     }
 
-    public WrappedBlockState get(int x, int y, int z) {
-        return WrappedBlockState.getByGlobalId(this.dataPalette.get(x, y, z));
+    @Override
+    public WrappedBlockState get(ClientVersion version, int x, int y, int z) {
+        return WrappedBlockState.getByGlobalId(version, this.dataPalette.get(x, y, z));
     }
 
-    public void set(int x, int y, int z, int state) {
+    public void set(ClientVersion version, int x, int y, int z, int state) {
         int curr = this.dataPalette.set(x, y, z, state);
         // Pre-1.14 we don't get block counts
         if (blockCount == Integer.MAX_VALUE) return;

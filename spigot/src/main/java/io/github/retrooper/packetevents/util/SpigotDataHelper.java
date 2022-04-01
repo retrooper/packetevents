@@ -94,7 +94,8 @@ public class SpigotDataHelper {
 
     public static WrappedBlockState fromBukkitBlockData(org.bukkit.material.MaterialData materialData) {
         int combinedID = SpigotReflectionUtil.getBlockDataCombinedId(materialData);
-        return WrappedBlockState.getByGlobalId(combinedID);
+        ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
+        return WrappedBlockState.getByGlobalId(serverVersion.toClientVersion(), combinedID);
     }
 
     public static org.bukkit.material.MaterialData toBukkitBlockData(WrappedBlockState state) {

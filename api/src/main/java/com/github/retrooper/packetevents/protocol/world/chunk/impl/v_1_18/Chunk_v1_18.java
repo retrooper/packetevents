@@ -1,5 +1,6 @@
 package com.github.retrooper.packetevents.protocol.world.chunk.impl.v_1_18;
 
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
@@ -42,12 +43,12 @@ public class Chunk_v1_18 implements BaseChunk {
     }
 
     @Override
-    public WrappedBlockState get(int x, int y, int z) {
-        return WrappedBlockState.getByGlobalId(this.chunkData.get(x, y, z));
+    public WrappedBlockState get(ClientVersion version, int x, int y, int z) {
+        return WrappedBlockState.getByGlobalId(version, this.chunkData.get(x, y, z));
     }
 
     @Override
-    public void set(int x, int y, int z, int state) {
+    public void set(ClientVersion version, int x, int y, int z, int state) {
         int curr = this.chunkData.set(x, y, z, state);
         if (state != AIR && curr == AIR) {
             this.blockCount++;

@@ -75,12 +75,11 @@ public class InternalPacketListener extends PacketListenerAbstract {
         }
 
         // Join game can be used to update world height, and sets dimension data
-        /*
+
         if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
             WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
             user.setEntityId(joinGame.getEntityId());
-            if (PacketEvents.getAPI().getServerManager().getVersion()
-                    .isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
+            if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
             }
             // Store world height
@@ -96,7 +95,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
         // Respawn is used to switch dimensions
         if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
-            if (PacketEvents.getAPI().getServerManager().getVersion()
+            if (event.getServerVersion()
                     .isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
             }
@@ -105,7 +104,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             NBTCompound worldNBT = user.getWorldNBT(respawn.getDimension().getType().getName()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
             user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
             user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
-        }*/
+        }
     }
 
     @Override
@@ -117,8 +116,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             WrapperHandshakingClientHandshake handshake;
             try {
                 handshake = new WrapperHandshakingClientHandshake(event);
-            }
-            catch (ArrayIndexOutOfBoundsException exception) {
+            } catch (ArrayIndexOutOfBoundsException exception) {
                 user.closeConnection();
                 PacketEvents.getAPI().getLogManager().debug("Disconnected " + address.getHostString() + ":" + address.getPort() + " for sending an invalid handshaking packet. They might be on an outdated client.");
                 return;

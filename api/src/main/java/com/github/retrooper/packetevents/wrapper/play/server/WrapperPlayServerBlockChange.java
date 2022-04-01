@@ -81,6 +81,6 @@ public class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServe
     }
 
     public WrappedBlockState getBlockState() {
-        return WrappedBlockState.getByGlobalId(blockID);
+        return WrappedBlockState.getByGlobalId(serverVersion.toClientVersion(), blockID);
     }
 }

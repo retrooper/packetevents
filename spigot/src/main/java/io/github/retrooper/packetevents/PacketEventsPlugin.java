@@ -52,8 +52,6 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -99,8 +97,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                             Vector3i bp = SpigotDataHelper.fromBukkitLocation(((Player) event.getPlayer()).getLocation())
                                     .getPosition().toVector3i();
                             bp.setY(bp.getY() - 1);
-                            StateType type = StateTypes.GRASS_BLOCK;
-                            WrappedBlockState blockState = type.createBlockState();
+                            StateType type = StateTypes.GOLD_BLOCK;
+                            WrappedBlockState blockState = type.createBlockState(event.getServerVersion().toClientVersion());
                             WrapperPlayServerBlockChange blockChange = new WrapperPlayServerBlockChange(bp,
                                     blockState.getGlobalId());
                             user.writePacket(blockChange);

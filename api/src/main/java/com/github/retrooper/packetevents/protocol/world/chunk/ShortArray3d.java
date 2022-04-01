@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class ShortArray3d {
 
-    private short[] data;
+    private final short[] data;
 
     public ShortArray3d(int size) {
         this.data = new short[size];

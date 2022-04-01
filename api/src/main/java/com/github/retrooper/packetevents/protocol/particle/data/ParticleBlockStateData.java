@@ -46,7 +46,8 @@ public class ParticleBlockStateData extends ParticleData {
         else {
             blockID = wrapper.readInt();
         }
-        return new ParticleBlockStateData(WrappedBlockState.getByGlobalId(blockID));
+        return new ParticleBlockStateData(WrappedBlockState.getByGlobalId(wrapper.getServerVersion()
+                .toClientVersion(), blockID));
     }
 
     public static void write(PacketWrapper<?> wrapper, ParticleBlockStateData data) {
