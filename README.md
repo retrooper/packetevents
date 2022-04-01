@@ -14,7 +14,7 @@ PacketEvents is an open-source Packet API. It has many cross-version packet-wrap
 [Learn more](https://github.com/retrooper/packetevents/wiki/Setup)
 
 ### Contributing
-[Learn more](https://github.com/retrooper/packetevents/wiki/Contributing)\
+[Learn more](https://github.com/retrooper/packetevents/wiki/Contributing)
 
 ### Sponsorships
 [![](https://www.ej-technologies.com/images/product_banners/jprofiler_small.png)](https://www.ej-technologies.com/products/jprofiler/overview.html)
@@ -24,10 +24,10 @@ PacketEvents optionally collects statistics using [bStats](https://bstats.org/)\
 Check out our [bStats page](https://bstats.org/plugin/bukkit/packetevents/11327)
 
 ### Credit to
-[wiki.vg/Protocol](https://wiki.vg/Protocol)\
-[adventure](https://github.com/KyoriPowered/adventure)\ 
-[gson](https://github.com/google/gson)\
-[ViaVersion](https://github.com/ViaVersion/ViaVersion)\  
-[ProtocolSupport](https://github.com/ProtocolSupport/ProtocolSupport)\  
-[MCProtocolLib](https://github.com/GeyserMC/MCProtocolLib/)\  
-[netty](https://github.com/netty/netty)\ 
+[wiki.vg/Protocol](https://wiki.vg/Protocol)  
+[adventure](https://github.com/KyoriPowered/adventure)  
+[gson](https://github.com/google/gson)  
+[ViaVersion](https://github.com/ViaVersion/ViaVersion)  
+[ProtocolSupport](https://github.com/ProtocolSupport/ProtocolSupport)  
+[MCProtocolLib](https://github.com/GeyserMC/MCProtocolLib/)  
+[netty](https://github.com/netty/netty)  
