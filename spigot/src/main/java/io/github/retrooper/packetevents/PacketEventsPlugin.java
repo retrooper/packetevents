@@ -98,7 +98,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     .getPosition().toVector3i();
                             bp.setY(bp.getY() - 1);
                             StateType type = StateTypes.GOLD_BLOCK;
-                            WrappedBlockState blockState = type.createBlockState(event.getServerVersion().toClientVersion());
+                            WrappedBlockState blockState = type.createBlockState(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
                             WrapperPlayServerBlockChange blockChange = new WrapperPlayServerBlockChange(bp,
                                     blockState.getGlobalId());
                             user.writePacket(blockChange);
@@ -215,7 +215,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
