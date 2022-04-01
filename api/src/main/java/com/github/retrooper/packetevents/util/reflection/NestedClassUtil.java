@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.util.reflection;
 
 import java.lang.annotation.Annotation;
 
-public class SubclassUtil {
-    public static Class<?> getSubClass(Class<?> cls, String name) {
+public class NestedClassUtil {
+    public static Class<?> getNestedClass(Class<?> cls, String name) {
         if (cls == null) {
             return null;
         }
@@ -33,7 +33,7 @@ public class SubclassUtil {
         return null;
     }
 
-    public static Class<?> getSubClass(Class<?> cls, int index) {
+    public static Class<?> getNestedClass(Class<?> cls, int index) {
         if (cls == null) {
             return null;
         }
@@ -46,7 +46,7 @@ public class SubclassUtil {
         return null;
     }
 
-    public static Class<?> getSubClass(Class<?> cls, Annotation annotation, int index) {
+    public static Class<?> getNestedClass(Class<?> cls, Annotation annotation, int index) {
         int currentIndex = 0;
         for (Class<?> subClass : cls.getDeclaredClasses()) {
             if (subClass.isAnnotationPresent(annotation.getClass())) {

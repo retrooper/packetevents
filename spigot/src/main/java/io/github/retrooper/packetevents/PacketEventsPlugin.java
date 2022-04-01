@@ -75,11 +75,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                 User user = event.getUser();
                 switch (event.getPacketType()) {
                     case CHAT_MESSAGE:
-                        List<Integer> i = new ArrayList<>();
-                        i.add(0);
-                        if (i.contains("a")) {
-
-                        }
                         System.out.println("Running 10 seconds later");
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                         if (chatMessage.getMessage().equalsIgnoreCase("mrmcyeet")) {

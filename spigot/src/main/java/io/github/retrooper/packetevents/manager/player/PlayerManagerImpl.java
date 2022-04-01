@@ -24,17 +24,33 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.util.reflection.NestedClassUtil;
+import com.github.retrooper.packetevents.util.reflection.Reflection;
+import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonSerializationContext;
 import io.github.retrooper.packetevents.util.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.util.SpigotVersionLookup_1_7;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
-import io.github.retrooper.packetevents.util.SpigotVersionLookup_1_7;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Map;
+
 public class PlayerManagerImpl implements PlayerManager {
+    private static Class<?> PROPERTY_MAP_CLASS;
+    private static Method PROPERTY_MAP_GET_METHOD;
+
     @Override
     public int getPing(@NotNull Object player) {
         //Yay, we contributed this to Spigot and now we can use it on 1.17+ servers.
@@ -93,12 +109,44 @@ public class PlayerManagerImpl implements PlayerManager {
         Object channel = getChannel(p);
         User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
         if (user == null) {
-            //TODO Extract texture properties from NMS entity player and pass into user profile(not priority)
             user = new User(channel, ConnectionState.PLAY,
                     null, new UserProfile(p.getUniqueId(),
                     p.getName()));
             ProtocolManager.USERS.put(channel, user);
             PacketEvents.getAPI().getInjector().updateUser(channel, user);
+        }
+        UserProfile profile = user.getProfile();
+        if (profile.getTextureProperties().isEmpty()) {
+            if (PROPERTY_MAP_CLASS == null) {
+                PROPERTY_MAP_CLASS = Reflection.getClassByNameWithoutException("" +
+                        "com.mojang.authlib.properties.PropertyMap");
+                if (PROPERTY_MAP_CLASS == null) {
+                    PROPERTY_MAP_CLASS = Reflection.getClassByNameWithoutException("" +
+                            "net.minecraft.util.com.mojang.authlib.properties.PropertyMap");
+                }
+                PROPERTY_MAP_GET_METHOD = Reflection.getMethod(PROPERTY_MAP_CLASS, "get", Collection.class, Object.class);
+            }
+            //Get the player's game profile in NMS
+            Object nmsGameProfile = SpigotReflectionUtil.getGameProfile((Player) player);
+            ReflectionObject reflectGameProfile = new ReflectionObject(nmsGameProfile);
+            Object nmsPropertyMap = reflectGameProfile.readObject(0, PROPERTY_MAP_CLASS);
+            //Convert the nms property map into a java one to avoid direct GSON access.
+            Collection<Object> nmsProperties = null;
+            try {
+                nmsProperties = (Collection<Object>) PROPERTY_MAP_GET_METHOD.invoke(nmsPropertyMap, "textures");
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            for (Object nmsProperty : nmsProperties) {
+                //Read the NMS texture property data
+                ReflectionObject reflectProperty = new ReflectionObject(nmsProperty);
+                String name = "textures"; //Save us a reflection call :)
+                String value = reflectProperty.readString(1);
+                String signature = reflectProperty.readString(2);
+                TextureProperty textureProperty = new TextureProperty(name, value, signature);
+                //Add it to our profile.
+                profile.getTextureProperties().add(textureProperty);
+            }
         }
         return user;
     }
