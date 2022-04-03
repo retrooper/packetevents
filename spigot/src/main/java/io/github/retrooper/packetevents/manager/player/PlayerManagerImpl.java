@@ -27,25 +27,19 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.util.reflection.NestedClassUtil;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
 import io.github.retrooper.packetevents.util.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.SpigotVersionLookup_1_7;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Map;
 
 public class PlayerManagerImpl implements PlayerManager {
     private static Class<?> PROPERTY_MAP_CLASS;

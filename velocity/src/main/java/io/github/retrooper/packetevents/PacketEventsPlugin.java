@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.google.inject.Inject;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -44,7 +45,7 @@ public class PacketEventsPlugin {
         logger.info("Plugin started?");
     }
 
-    @Subscribe
+    @Subscribe(order = PostOrder.LATE)
     public void onProxyInitialize(ProxyInitializeEvent event) {
         logger.info("Injecting packetevents...");
         PluginContainer plugin = server.getPluginManager().getPlugin("packetevents").orElse(null);

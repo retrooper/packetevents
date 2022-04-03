@@ -156,15 +156,19 @@ public class ItemStack {
     }
 
     private static List<Enchantment> getEnchantments(NBTCompound nbt) {
-        if (nbt.getCompoundListTagOrNull("Enchantments") == null) return new ArrayList<>();
+        NBTList<NBTCompound> nbtList = nbt.getCompoundListTagOrNull("Enchantments");
+        if (nbtList == null) {
+            return new ArrayList<>(0);
+        }
 
-        List<NBTCompound> compounds = nbt.getCompoundListTagOrNull("Enchantments").getTags();
+        List<NBTCompound> compounds = nbtList.getTags();
         List<Enchantment> enchantments = new ArrayList<>(compounds.size());
         for (NBTCompound compound : compounds) {
             String id = compound.getStringTagValueOrNull("id");
             EnchantmentType type = EnchantmentTypes.getByName(id);
             if (type != null) {
-                int level = compound.getTagOfTypeOrNull("lvl", NBTShort.class).getAsInt();
+                NBTShort levelTag = compound.getTagOfTypeOrNull("lvl", NBTShort.class);
+                int level = levelTag.getAsInt();
                 Enchantment enchantment = Enchantment.builder().type(type).level(level).build();
                 enchantments.add(enchantment);
             }

@@ -56,7 +56,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             Object channel = event.getChannel();
             //Process outgoing login success packet
             WrapperLoginServerLoginSuccess loginSuccess = new WrapperLoginServerLoginSuccess(event);
-            UserProfile profile = loginSuccess.getUser();
+            UserProfile profile = loginSuccess.getUserProfile();
 
             //Update user profile
             user.getProfile().setUUID(profile.getUUID());
