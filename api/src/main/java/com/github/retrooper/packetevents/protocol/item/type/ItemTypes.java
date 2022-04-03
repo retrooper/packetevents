@@ -41,6 +41,7 @@ public class ItemTypes {
             ClientVersion.V_1_14,
             ClientVersion.V_1_15,
             ClientVersion.V_1_16,
+            ClientVersion.V_1_16_2,
             ClientVersion.V_1_17,
             ClientVersion.V_1_18);
 
