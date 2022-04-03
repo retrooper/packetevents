@@ -215,7 +215,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(listener);
+        //PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
