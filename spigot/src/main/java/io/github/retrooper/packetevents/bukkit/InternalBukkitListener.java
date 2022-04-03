@@ -47,7 +47,6 @@ public class InternalBukkitListener implements Listener {
         ClientVersion version = PacketEvents.getAPI().getPlayerManager().getClientVersion(player);
 
         injector.updatePlayer(user, player);
-        PacketEvents.getAPI().getEventManager().callEvent(new UserLoginEvent(user, e.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

@@ -30,9 +30,9 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 public class PacketEventsImplHelper {
-    public static void handleClientBoundPacket(Object channel, User user, Object player, Object buffer) throws PacketProcessException {
+    public static void handleClientBoundPacket(Object channel, User user, Object player,
+                                               Object buffer, boolean autoProtocolTranslation) throws PacketProcessException {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
-        boolean autoProtocolTranslation = true;
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer,
                 autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);

@@ -60,7 +60,7 @@ public class PacketEncoderLatest extends MessageToByteEncoder<Object> {
             if (!in.isReadable()) return;
             out.writeBytes(in);
         }
-        PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out);
+        PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out, true);
     }
 
     private void handleCompressionOrder(ChannelHandlerContext ctx) {

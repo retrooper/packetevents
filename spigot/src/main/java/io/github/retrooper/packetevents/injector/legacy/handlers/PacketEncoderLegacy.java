@@ -51,7 +51,7 @@ public class PacketEncoderLegacy extends MessageToByteEncoder<ByteBuf> {
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
         boolean doCompression = handleCompressionOrder(ctx, buffer);
 
-        PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, buffer);
+        PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, buffer, true);
         if (doCompression && buffer.isReadable()) {
             PacketCompressionUtil.recompress(ctx, buffer);
         }
