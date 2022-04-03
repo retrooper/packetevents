@@ -59,7 +59,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.player = player;
 
         this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
-        if (!autoProtocolTranslation && packetSide == PacketSide.CLIENT && user.getClientVersion() != null) {
+        if (!autoProtocolTranslation && user.getClientVersion() != null) {
             //TODO Optimize
             this.serverVersion = user.getClientVersion().toServerVersion();
         }

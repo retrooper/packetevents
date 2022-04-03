@@ -40,7 +40,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
         int firstReaderIndex = buffer.readerIndex();
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer,
-                true);
+                false);
         int readerIndex = buffer.readerIndex();
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> buffer.readerIndex(readerIndex));
         if (!packetSendEvent.isCancelled()) {
