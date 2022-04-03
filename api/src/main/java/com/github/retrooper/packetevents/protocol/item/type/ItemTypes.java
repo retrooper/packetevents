@@ -1172,8 +1172,10 @@ public class ItemTypes {
             return ServerVersion.V_1_14;
         } else if (serverVersion.isOlderThan(ServerVersion.V_1_16)) {
             return ServerVersion.V_1_15;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
             return ServerVersion.V_1_16;
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
+            return ServerVersion.V_1_16_2;
         } else if (serverVersion.isOlderThan(ServerVersion.V_1_18)) {
             return ServerVersion.V_1_17;
         } else {
