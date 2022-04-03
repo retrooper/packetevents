@@ -46,8 +46,7 @@ public class InternalBukkitListener implements Listener {
         //TODO With Via we might have to run this a tick AFTER join event (atleast when via & viabackwards & rewind are present)
         ClientVersion version = PacketEvents.getAPI().getPlayerManager().getClientVersion(player);
 
-        injector.updatePlayer(player);
-
+        injector.updatePlayer(user, player);
         PacketEvents.getAPI().getEventManager().callEvent(new UserLoginEvent(user, e.getPlayer()));
     }
 

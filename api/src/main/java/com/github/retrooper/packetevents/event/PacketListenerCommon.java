@@ -29,28 +29,18 @@ import java.util.Map;
  * @since 1.8
  */
 public abstract class PacketListenerCommon {
-    protected final Map<Byte, List<Method>> methods;
     private final PacketListenerPriority priority;
+
     public PacketListenerCommon(PacketListenerPriority priority) {
         this.priority = priority;
-        this.methods = null;
-    }
-
-    public PacketListenerCommon(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
-        this.priority = priority;
-        this.methods = methods;
     }
 
     public PacketListenerCommon() {
         this.priority = PacketListenerPriority.NORMAL;
-        this.methods = null;
     }
 
     public PacketListenerPriority getPriority() {
         return priority;
-    }
-
-    public void onPlayerInject(PlayerInjectEvent event) {
     }
 
     public void onUserConnect(UserConnectEvent event) {

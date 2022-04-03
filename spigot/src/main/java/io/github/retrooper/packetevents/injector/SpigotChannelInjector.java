@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PlayerInjectEvent;
+import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -56,13 +56,13 @@ public class SpigotChannelInjector implements ChannelInjector {
         injector.updateUser(channel, user);
     }
 
-    public void updatePlayer(Object player) {
-        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
-        PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
-        if (!injectEvent.isCancelled()) {
-            Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-            setPlayer(channel, player);
+    public void updatePlayer(User user, Object player) {
+        PacketEvents.getAPI().getEventManager().callEvent(new UserLoginEvent(user, player));
+        Object channel = user.getChannel();
+        if (channel == null) {
+            channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         }
+        setPlayer(channel, player);
     }
 
     @Override

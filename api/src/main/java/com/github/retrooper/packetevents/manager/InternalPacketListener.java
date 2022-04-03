@@ -70,7 +70,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             //This also updates it for the user instance
             event.getPostTasks().add(() -> {
                 PacketEvents.getAPI().getInjector().changeConnectionState(channel, ConnectionState.PLAY);
-                PacketEvents.getAPI().getLogManager().debug("Transitioned user " + profile.getName() + " into the PLAY state!");
+                PacketEvents.getAPI().getLogManager().debug("Transitioned " + profile.getName() + " into the PLAY state!");
             });
         }
 

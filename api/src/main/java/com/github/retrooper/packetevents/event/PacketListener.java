@@ -22,11 +22,6 @@ public interface PacketListener {
     default PacketListenerAbstract asAbstract(PacketListenerPriority priority) {
         return new PacketListenerAbstract(priority) {
             @Override
-            public void onPlayerInject(PlayerInjectEvent event) {
-                PacketListener.this.onPlayerInject(event);
-            }
-
-            @Override
             public void onUserConnect(UserConnectEvent event) {
                 PacketListener.this.onUserConnect(event);
             }
@@ -56,9 +51,6 @@ public interface PacketListener {
                 PacketListener.this.onPacketEventExternal(event);
             }
         };
-    }
-
-    default void onPlayerInject(PlayerInjectEvent event) {
     }
 
     default void onUserConnect(UserConnectEvent event) {

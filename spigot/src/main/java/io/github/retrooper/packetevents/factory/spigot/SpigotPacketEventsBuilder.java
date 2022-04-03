@@ -148,8 +148,8 @@ public class SpigotPacketEventsBuilder {
                         Bukkit.getPluginManager().registerEvents(internalBukkitListener, plugin);
                         for (final Player p : Bukkit.getOnlinePlayers()) {
                             try {
-                                injector.updatePlayer(p);
                                 User user = PacketEvents.getAPI().getPlayerManager().getUser(p);
+                                injector.updatePlayer(user, p);
                                 getEventManager().callEvent(new UserLoginEvent(user, p));
                             } catch (Exception ex) {
                                 p.kickPlayer("Failed to inject... Please rejoin!");

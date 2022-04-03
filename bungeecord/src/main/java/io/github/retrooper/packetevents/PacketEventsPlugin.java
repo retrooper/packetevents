@@ -41,29 +41,17 @@ public final class PacketEventsPlugin extends Plugin {
     public void onEnable() {
 
         //Register your listeners
-       /* PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
-                System.out.println("Receiving: " + event.getPacketType().getName());
+                System.out.println("In type: " + event.getPacketType().getName());
             }
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
-                if (event.getPacketType() == PacketType.Play.Server.PLAYER_INFO) {
-                    WrapperPlayServerPlayerInfo info = new WrapperPlayServerPlayerInfo(event);
-                    System.out.println("Sending: " + event.getPacketType().getName() + " - " + info.getAction());
-                }
-                if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
-                    WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
-                    System.out.println("Sending: " + event.getPacketType().getName() + " - " + joinGame.getWorldName());
-                }
-                if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
-                    System.out.println("Sending chunk data: " + event.getPacketType().getName());
-                    WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
-                    System.out.println("Column: " + chunkData.getColumn().getX() + ", " + chunkData.getColumn().getZ());
-                }
+                System.out.println("Out type: " + event.getPacketType().getName());
             }
-        });*/
+        });
         PacketEvents.getAPI().init();
     }
 
