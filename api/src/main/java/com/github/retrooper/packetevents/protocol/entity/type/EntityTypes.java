@@ -254,6 +254,8 @@ public class EntityTypes {
     public static final EntityType ENDER_PEARL = define("ender_pearl", PROJECTILE_ABSTRACT);
     public static final EntityType EXPERIENCE_BOTTLE = define("experience_bottle", PROJECTILE_ABSTRACT);
     public static final EntityType POTION = define("potion", PROJECTILE_ABSTRACT);
+    @Deprecated // Exists only in 1.9 and 1.10
+    public static final EntityType TIPPED_ARROW = define("tipped_arrow", ARROW);
     public static final EntityType TRIDENT = define("trident", ABSTRACT_ARROW);
     public static final EntityType TRADER_LLAMA = define("trader_llama", CHESTED_HORSE);
     public static final EntityType TROPICAL_FISH = define("tropical_fish", ABSTRACT_FISHES);
