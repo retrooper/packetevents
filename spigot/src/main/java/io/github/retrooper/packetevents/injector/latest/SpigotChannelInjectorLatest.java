@@ -187,6 +187,33 @@ public class SpigotChannelInjectorLatest implements ChannelInjector {
         if (decoder != null) {
             //Change connection state in decoder
             decoder.user.setConnectionState(connectionState);
+            if (connectionState == ConnectionState.PLAY) {
+                if (ViaVersionUtil.isAvailable()) {
+                    channel.pipeline().remove(PacketEvents.DECODER_NAME);
+                    decoder.handledCompression = true;
+                    //Clone our decoder(as it is not sharable)
+                    decoder = new PacketDecoderLatest(decoder);
+                    //Inject our decoder into ViaVersion's decoder (because we have to)
+                    ChannelHandler viaDecoder = channel.pipeline().get("decoder");
+                    ReflectionObject reflectionObject = new ReflectionObject(viaDecoder);
+                    ByteToMessageDecoder mcDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
+                    String decoderClassName = ClassUtil.getClassSimpleName(mcDecoder.getClass());
+                    if (decoderClassName.equals("PacketDecoderModern")
+                            || decoderClassName.equals("PacketDecoderLatest")) {
+                        //We aren't the first packetevents instance to inject into ViaVersion's decoder
+                        ReflectionObject reflectPacketDecoderModern = new ReflectionObject(mcDecoder);
+                        List<ByteToMessageDecoder> decoders = reflectPacketDecoderModern.readList(0);
+                        decoders.add(decoder);
+                    } else {
+                        //We are the first packetevents instance to inject into ViaVersion's decoder
+                        decoder.mcDecoder = mcDecoder;
+                        reflectionObject.write(ByteToMessageDecoder.class, 0, decoder);
+                    }
+                } else if (ProtocolSupportUtil.isAvailable()) {
+                    channel.pipeline().remove(PacketEvents.DECODER_NAME);
+                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, decoder);
+                }
+            }
         }
     }
 

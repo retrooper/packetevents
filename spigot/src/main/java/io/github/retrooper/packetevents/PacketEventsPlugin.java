@@ -176,9 +176,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                 if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
                     if (player != null) {
                         player.sendMessage("Hii " + player.getName());
-                        event.getUser().sendMessage(ChatColor.GREEN + "Hi pt TWOOO");
+                        user.sendMessage(ChatColor.GREEN + "Hi pt TWOOO");
                     } else {
-                        event.getUser().sendMessage(ChatColor.RED + "player null, but hi dude!!!");
+                        user.sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
                     System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                 } /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {

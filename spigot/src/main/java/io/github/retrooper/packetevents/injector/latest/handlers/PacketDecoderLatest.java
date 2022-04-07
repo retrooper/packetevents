@@ -18,22 +18,32 @@
 
 package io.github.retrooper.packetevents.injector.latest.handlers;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PacketDecoderLatest extends ByteToMessageDecoder {
     public User user;
     public volatile Player player;
+
+    public ByteToMessageDecoder mcDecoder = null;
+    public List<ByteToMessageDecoder> decoders = new ArrayList<>();
+    public boolean handledCompression;
+    public boolean skipDoubleTransform;
 
     public PacketDecoderLatest(User user) {
         this.user = user;
@@ -45,15 +55,24 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
+        if (skipDoubleTransform) {
+            skipDoubleTransform = false;
+            out.add(input.retain());
+        }
         ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(input);
         try {
-            //TODO Use protocol translation dependencies on spigot!
-            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer,
-                    false);
+            boolean doRecompression =
+                    handleCompressionOrder(ctx, outputBuffer);
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer, true);
             if (outputBuffer.isReadable()) {
+                if (doRecompression) {
+                    PacketCompressionUtil.recompress(ctx, outputBuffer);
+                    skipDoubleTransform = true;
+                }
                 out.add(outputBuffer.retain());
             }
-        } finally {
+        }
+        finally {
             outputBuffer.release();
         }
     }
@@ -62,6 +81,26 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
     public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
         if (buffer.isReadable()) {
             read(ctx, buffer, out);
+            for (ByteToMessageDecoder decoder : decoders) {
+                //Only support one output object
+                if (!out.isEmpty()) {
+                    Object input = out.get(0);
+                    out.clear();
+                    out.addAll(CustomPipelineUtil.callDecode(decoder, ctx, input));
+                }
+            }
+            if (mcDecoder != null) {
+                //Call minecraft decoder to convert the ByteBuf to an NMS object for the next handlers
+                try {
+                    if (!out.isEmpty()) {
+                        Object input = out.get(0);
+                        out.clear();
+                        out.addAll(CustomPipelineUtil.callDecode(mcDecoder, ctx, input));
+                    }
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -73,5 +112,25 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
                 && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();
         }
+    }
+
+
+    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {
+        if (handledCompression) return false;
+
+        int decoderIndex = ctx.pipeline().names().indexOf("decompress");
+        if (decoderIndex == -1) return false;
+        handledCompression = true;
+        int peDecoderIndex = ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME);
+        if (peDecoderIndex == -1) return false;
+        if (decoderIndex > peDecoderIndex) {
+            // Need to decompress this packet due to bad order
+            ByteBuf decompressed = ctx.alloc().buffer();
+            PacketCompressionUtil.decompress(ctx.pipeline(), buffer, decompressed);
+
+            PacketCompressionUtil.relocateHandlers(ctx.pipeline(), buffer, decompressed);
+            return true;
+        }
+        return false;
     }
 }

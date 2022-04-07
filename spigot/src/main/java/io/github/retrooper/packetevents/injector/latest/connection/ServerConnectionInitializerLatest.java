@@ -44,18 +44,41 @@ import java.util.NoSuchElementException;
 
 
 public class ServerConnectionInitializerLatest {
+
+    private static void destroyHandlers(Channel channel) {
+        channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
+        if (decoder instanceof PacketDecoderLatest) {
+            channel.pipeline().remove(PacketEvents.DECODER_NAME);
+        } else if (ViaVersionUtil.isAvailable()) {
+            decoder = channel.pipeline().get("decoder");
+            if (ViaVersionUtil.getBukkitDecodeHandlerClass().equals(decoder.getClass())) {
+                ReflectionObject reflectMCDecoder = new ReflectionObject(decoder);
+                ByteToMessageDecoder injectedDecoder = reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
+                //We are the father decoder
+                if (injectedDecoder instanceof PacketDecoderLatest) {
+                    PacketDecoderLatest peDecoder = (PacketDecoderLatest) injectedDecoder;
+                    reflectMCDecoder.writeObject(0, peDecoder.mcDecoder);
+                } else if (ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoderLatest")
+                        || ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoderModern")) {
+                    //Some other packetevents instance already injected. Let us find our child decoder somewhere in here.
+                    ReflectionObject reflectInjectedDecoder = new ReflectionObject(injectedDecoder);
+                    List<Object> decoders = reflectInjectedDecoder.readList(0);
+                    decoders.removeIf(o -> o instanceof PacketDecoderLatest);
+                }
+            }
+        }
+    }
+
     public static void initChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
         if (!(channel instanceof EpollSocketChannel) &&
                 !(channel instanceof NioSocketChannel)) {
             return;
         }
-        if (channel.pipeline().get(PacketEvents.DECODER_NAME) != null) {
-            channel.pipeline().remove(PacketEvents.DECODER_NAME);
-            //TODO This is a reload, so do we call userdisconnectevent, will this call connectevent for the second time now?
-        }
         if (channel.pipeline().get(PacketEvents.ENCODER_NAME) != null) {
-            channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+            //This is a reload...
+           destroyHandlers(channel);
         }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
         UserConnectEvent connectEvent = new UserConnectEvent(user);
@@ -97,9 +120,7 @@ public class ServerConnectionInitializerLatest {
         UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
         PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
 
-        channel.pipeline().remove(PacketEvents.DECODER_NAME);
-        channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-
+        destroyHandlers(channel);
         ProtocolManager.USERS.remove(channel);
     }
 }
