@@ -32,15 +32,15 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
-import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
+import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjectorLatest;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
-import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
+import io.github.retrooper.packetevents.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.util.BukkitLogManager;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
-import io.github.retrooper.packetevents.netty.NettyManagerImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -78,7 +78,7 @@ public class SpigotPacketEventsBuilder {
             private final ServerManager serverManager = new ServerManagerImpl();
             private final PlayerManager playerManager = new PlayerManagerImpl();
             private final NettyManager nettyManager = new NettyManagerImpl();
-            private SpigotChannelInjector injector;
+            private final SpigotChannelInjectorLatest injector = new SpigotChannelInjectorLatest();
             private final InternalBukkitListener internalBukkitListener = new InternalBukkitListener();
             private final LogManager logManager = new BukkitLogManager();
             private boolean loaded;
@@ -103,7 +103,6 @@ public class SpigotPacketEventsBuilder {
                         throw new IllegalStateException(ex);
                     }
 
-                    injector = new SpigotChannelInjector();
                     //Server hasn't bound to the port yet.
                     lateBind = !injector.isServerBound();
                     //If late-bind is enabled, we will inject a bit later.
@@ -111,11 +110,10 @@ public class SpigotPacketEventsBuilder {
                         injector.inject();
                     }
 
-                    loaded = true;
-
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalPacketListener());
+                    loaded = true;
                 }
             }
 
@@ -140,9 +138,9 @@ public class SpigotPacketEventsBuilder {
                             return getVersion().toString() + "-beta";//TODO Cut off "-beta" once 2.0 releases
                         }));
                     }
-
-                    PacketType.Play.Client.load();
-                    PacketType.Play.Server.load();
+                    if (PacketType.isPrepared()) {
+                        PacketType.prepare();
+                    }
                     //TODO Test reloads
                     Runnable postInjectTask = () -> {
                         Bukkit.getPluginManager().registerEvents(internalBukkitListener, plugin);

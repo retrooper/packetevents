@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.latest.connection;
+package io.github.retrooper.packetevents.injector.connection;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;

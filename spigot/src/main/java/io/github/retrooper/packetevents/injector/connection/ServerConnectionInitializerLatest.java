@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.latest.connection;
+package io.github.retrooper.packetevents.injector.connection;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
@@ -28,8 +28,9 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
-import io.github.retrooper.packetevents.injector.latest.handlers.PacketDecoderLatest;
-import io.github.retrooper.packetevents.injector.latest.handlers.PacketEncoderLatest;
+import io.github.retrooper.packetevents.injector.handlers.PacketDecoderLatest;
+import io.github.retrooper.packetevents.injector.handlers.PacketEncoderLatest;
+import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -37,7 +38,6 @@ import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -48,7 +48,7 @@ public class ServerConnectionInitializerLatest {
     private static void destroyHandlers(Channel channel) {
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
-        if (decoder instanceof PacketDecoderLatest) {
+        if (decoder != null && ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketDecoderLatest")) {
             channel.pipeline().remove(PacketEvents.DECODER_NAME);
         } else if (ViaVersionUtil.isAvailable()) {
             decoder = channel.pipeline().get("decoder");
@@ -59,8 +59,8 @@ public class ServerConnectionInitializerLatest {
                 if (injectedDecoder instanceof PacketDecoderLatest) {
                     PacketDecoderLatest peDecoder = (PacketDecoderLatest) injectedDecoder;
                     reflectMCDecoder.writeObject(0, peDecoder.mcDecoder);
-                } else if (ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoderLatest")
-                        || ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoderModern")) {
+                } else if (injectedDecoder != null && (ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoderLatest")
+                        || ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoderModern"))) {
                     //Some other packetevents instance already injected. Let us find our child decoder somewhere in here.
                     ReflectionObject reflectInjectedDecoder = new ReflectionObject(injectedDecoder);
                     List<Object> decoders = reflectInjectedDecoder.readList(0);
@@ -76,9 +76,11 @@ public class ServerConnectionInitializerLatest {
                 !(channel instanceof NioSocketChannel)) {
             return;
         }
+        boolean isReload = false;
         if (channel.pipeline().get(PacketEvents.ENCODER_NAME) != null) {
             //This is a reload...
            destroyHandlers(channel);
+           isReload = true;
         }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
         UserConnectEvent connectEvent = new UserConnectEvent(user);
@@ -89,7 +91,36 @@ public class ServerConnectionInitializerLatest {
         }
         ProtocolManager.USERS.put(channel, user);
         try {
-            channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLatest(user));
+            PacketDecoderLatest decoder = new PacketDecoderLatest(user);
+            if (!isReload) {
+                channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
+            }
+            else {
+                decoder.handledCompression = true;
+                if (ViaVersionUtil.isAvailable()) {
+                    //Inject our decoder into ViaVersion's decoder (because we have to)
+                    ChannelHandler viaDecoder = channel.pipeline().get("decoder");
+                    ReflectionObject reflectionObject = new ReflectionObject(viaDecoder);
+                    ByteToMessageDecoder mcDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
+                    String decoderClassName = ClassUtil.getClassSimpleName(mcDecoder.getClass());
+                    if (decoderClassName.equals("PacketDecoderModern")
+                            || decoderClassName.equals("PacketDecoderLatest")) {
+                        //We aren't the first packetevents instance to inject into ViaVersion's decoder
+                        ReflectionObject reflectPacketDecoderModern = new ReflectionObject(mcDecoder);
+                        List<ByteToMessageDecoder> decoders = reflectPacketDecoderModern.readList(0);
+                        decoders.add(decoder);
+                    } else {
+                        //We are the first packetevents instance to inject into ViaVersion's decoder
+                        decoder.mcDecoder = mcDecoder;
+                        reflectionObject.write(ByteToMessageDecoder.class, 0, decoder);
+                    }
+                } else if (ProtocolSupportUtil.isAvailable()) {
+                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, decoder);
+                }
+                else {
+                    channel.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
+                }
+            }
         } catch (NoSuchElementException ex) {
             String handlers = ChannelHelper.pipelineHandlerNamesAsString(channel);
             throw new IllegalStateException("PacketEvents failed to add a decoder to the netty pipeline. Pipeline handlers: " + handlers, ex);

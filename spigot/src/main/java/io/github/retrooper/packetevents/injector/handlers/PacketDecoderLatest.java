@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.legacy.handlers;
+package io.github.retrooper.packetevents.injector.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
@@ -26,34 +26,32 @@ import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
-import net.minecraft.util.io.netty.buffer.ByteBuf;
-import net.minecraft.util.io.netty.channel.ChannelHandler;
-import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
-import net.minecraft.util.io.netty.handler.codec.MessageToMessageDecoder;
+import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-@ChannelHandler.Sharable
-public class PacketDecoderLegacy extends MessageToMessageDecoder<ByteBuf> {
-    public volatile Player player;
+public class PacketDecoderLatest extends ByteToMessageDecoder {
     public User user;
-    public boolean handledCompression;
-    private boolean skipDoubleTransform;
-    private final List<Runnable> postTasks = new ArrayList<>();
+    public volatile Player player;
 
-    public PacketDecoderLegacy(User user) {
+    public ByteToMessageDecoder mcDecoder = null;
+    public List<ByteToMessageDecoder> decoders = new ArrayList<>();
+    public boolean handledCompression;
+    public boolean skipDoubleTransform;
+
+    public PacketDecoderLatest(User user) {
         this.user = user;
     }
 
-    public PacketDecoderLegacy(PacketDecoderLegacy decoder) {
-        this.player = decoder.player;
-        this.user = decoder.user;
-        this.handledCompression = decoder.handledCompression;
-        this.skipDoubleTransform = decoder.skipDoubleTransform;
-        postTasks.clear();
-        postTasks.addAll(decoder.postTasks);
+    public PacketDecoderLatest(PacketDecoderLatest decoder) {
+        user = decoder.user;
+        player = decoder.player;
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
@@ -65,8 +63,7 @@ public class PacketDecoderLegacy extends MessageToMessageDecoder<ByteBuf> {
         try {
             boolean doRecompression =
                     handleCompressionOrder(ctx, outputBuffer);
-            //TODO Use protocol translation dependencies on spigot!
-            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer, false);
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer, true);
             if (outputBuffer.isReadable()) {
                 if (doRecompression) {
                     PacketCompressionUtil.recompress(ctx, outputBuffer);
@@ -74,14 +71,37 @@ public class PacketDecoderLegacy extends MessageToMessageDecoder<ByteBuf> {
                 }
                 out.add(outputBuffer.retain());
             }
-        } finally {
+        }
+        finally {
             outputBuffer.release();
         }
     }
 
     @Override
-    public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
-        read(ctx, byteBuf, out);
+    public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
+        if (buffer.isReadable()) {
+            read(ctx, buffer, out);
+            for (ByteToMessageDecoder decoder : decoders) {
+                //Only support one output object
+                if (!out.isEmpty()) {
+                    Object input = out.get(0);
+                    out.clear();
+                    out.addAll(CustomPipelineUtil.callDecode(decoder, ctx, input));
+                }
+            }
+            if (mcDecoder != null) {
+                //Call minecraft decoder to convert the ByteBuf to an NMS object for the next handlers
+                try {
+                    if (!out.isEmpty()) {
+                        Object input = out.get(0);
+                        out.clear();
+                        out.addAll(CustomPipelineUtil.callDecode(mcDecoder, ctx, input));
+                    }
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
@@ -94,15 +114,20 @@ public class PacketDecoderLegacy extends MessageToMessageDecoder<ByteBuf> {
         }
     }
 
+
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {
         if (handledCompression) return false;
+
         int decoderIndex = ctx.pipeline().names().indexOf("decompress");
         if (decoderIndex == -1) return false;
         handledCompression = true;
-        if (decoderIndex > ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME)) {
+        int peDecoderIndex = ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME);
+        if (peDecoderIndex == -1) return false;
+        if (decoderIndex > peDecoderIndex) {
             // Need to decompress this packet due to bad order
             ByteBuf decompressed = ctx.alloc().buffer();
             PacketCompressionUtil.decompress(ctx.pipeline(), buffer, decompressed);
+
             PacketCompressionUtil.relocateHandlers(ctx.pipeline(), buffer, decompressed);
             return true;
         }

@@ -74,7 +74,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     case CHAT_MESSAGE:
                         System.out.println("Running 10 seconds later");
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
-                        if (chatMessage.getMessage().equalsIgnoreCase("mrmcyeet")) {
+                        if (chatMessage.getMessage().equalsIgnoreCase("keyword")) {
                             System.out.println("pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                             event.setCancelled(true);
                             Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);

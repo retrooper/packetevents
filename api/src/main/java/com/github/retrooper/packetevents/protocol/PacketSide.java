@@ -19,5 +19,14 @@
 package com.github.retrooper.packetevents.protocol;
 
 public enum PacketSide {
-    CLIENT, SERVER
+    CLIENT, SERVER;
+
+    public PacketSide getOpposite() {
+        if (this == CLIENT) {
+            return SERVER;
+        }
+        else {
+            return CLIENT;
+        }
+    }
 }

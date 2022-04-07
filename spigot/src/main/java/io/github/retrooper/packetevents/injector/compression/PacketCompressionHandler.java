@@ -16,23 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.legacy.compression;
+package io.github.retrooper.packetevents.injector.compression;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import io.github.retrooper.packetevents.injector.PacketCompressionManager;
 import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
-import io.github.retrooper.packetevents.injector.legacy.handlers.PacketDecoderLegacy;
+import io.github.retrooper.packetevents.injector.handlers.PacketDecoderLatest;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
-import net.minecraft.util.io.netty.buffer.ByteBuf;
-import net.minecraft.util.io.netty.channel.ChannelHandler;
-import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
-import net.minecraft.util.io.netty.channel.ChannelPipeline;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 
 import java.util.zip.DataFormatException;
 
-public class PacketCompressionLegacy implements PacketCompressionManager {
-    @Override
+public class PacketCompressionHandler {
     public void decompress(Object rawPipeline, Object rawBuffer, Object rawOutput) {
         ChannelPipeline pipeline = (ChannelPipeline) rawPipeline;
         ByteBuf buffer = (ByteBuf) rawBuffer;
@@ -70,7 +68,6 @@ public class PacketCompressionLegacy implements PacketCompressionManager {
         }
     }
 
-    @Override
     public void compress(Object rawPipeline, Object rawBuffer, Object rawOutput) {
         ChannelPipeline pipeline = (ChannelPipeline) rawPipeline;
         ByteBuf buffer = (ByteBuf) rawBuffer;
@@ -101,7 +98,6 @@ public class PacketCompressionLegacy implements PacketCompressionManager {
         }
     }
 
-    @Override
     public void recompress(Object rawCtx, Object rawBuffer) {
         ChannelHandlerContext ctx = (ChannelHandlerContext) rawCtx;
         ByteBuf buffer = (ByteBuf) rawBuffer;
@@ -114,8 +110,6 @@ public class PacketCompressionLegacy implements PacketCompressionManager {
         }
     }
 
-
-    @Override
     public void relocateHandlers(Object rawPipeline, Object rawBuffer, Object rawDecompressed) {
         ChannelPipeline pipeline = (ChannelPipeline) rawPipeline;
         ByteBuf buffer = (ByteBuf) rawBuffer;
@@ -128,7 +122,7 @@ public class PacketCompressionLegacy implements PacketCompressionManager {
         ChannelHandler encoder = pipeline.remove(PacketEvents.ENCODER_NAME);
         pipeline.addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
 
-        PacketDecoderLegacy decoder = (PacketDecoderLegacy) pipeline.remove(PacketEvents.DECODER_NAME);
-        pipeline.addAfter("decompress", PacketEvents.DECODER_NAME, new PacketDecoderLegacy(decoder));
+        PacketDecoderLatest decoder = (PacketDecoderLatest) pipeline.remove(PacketEvents.DECODER_NAME);
+        pipeline.addAfter("decompress", PacketEvents.DECODER_NAME, new PacketDecoderLatest(decoder));
     }
 }
