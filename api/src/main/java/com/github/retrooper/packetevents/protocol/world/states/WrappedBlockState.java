@@ -2,6 +2,7 @@ package com.github.retrooper.packetevents.protocol.world.states;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.states.enums.*;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
@@ -30,29 +31,32 @@ import java.util.*;
  */
 public class WrappedBlockState {
     private static final WrappedBlockState AIR = new WrappedBlockState(StateTypes.AIR, new EnumMap<>(StateValue.class), 0);
-    private static final HashMap<String, WrappedBlockState> BY_STRING = new HashMap<>();
-    private static final HashMap<Integer, WrappedBlockState> BY_ID = new HashMap<>();
-    private static final HashMap<WrappedBlockState, String> INTO_STRING = new HashMap<>();
-    private static final HashMap<WrappedBlockState, Integer> INTO_ID = new HashMap<>();
-    private static final HashMap<StateType, WrappedBlockState> DEFAULT_STATES = new HashMap<>();
+    private static final Map<Byte, Map<String, WrappedBlockState>> BY_STRING = new HashMap<>();
+    private static final Map<Byte, Map<Integer, WrappedBlockState>> BY_ID = new HashMap<>();
+    private static final Map<Byte, Map<WrappedBlockState, String>> INTO_STRING = new HashMap<>();
+    private static final Map<Byte, Map<WrappedBlockState, Integer>> INTO_ID = new HashMap<>();
+    private static final Map<Byte, Map<StateType, WrappedBlockState>> DEFAULT_STATES = new HashMap<>();
 
-    private static final HashMap<String, String> STRING_UPDATER = new HashMap<>();
+    private static final Map<String, String> STRING_UPDATER = new HashMap<>();
 
     static {
         STRING_UPDATER.put("minecraft:grass_path", "minecraft:dirt_path"); // 1.16 -> 1.17
 
-        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_13)) {
             loadLegacy();
-        } else {
-            loadModern();
-        }
+            for (ClientVersion version : ClientVersion.values()) {
+                if (version.isNewerThanOrEquals(ClientVersion.V_1_13)
+                && version.isRelease()) {
+                    loadModern(version);
+                }
+            }
     }
 
     int globalID;
     StateType type;
     EnumMap<StateValue, Object> data = new EnumMap<>(StateValue.class);
+    byte mappingsIndex;
 
-    public WrappedBlockState(StateType type, String[] data, int globalID) {
+    public WrappedBlockState(StateType type, String[] data, int globalID, byte mappingsIndex) {
         this.type = type;
         this.globalID = globalID;
         if (data == null) return;
@@ -61,6 +65,7 @@ public class WrappedBlockState {
             StateValue value = StateValue.byName(split[0]);
             this.data.put(value, value.getParser().apply(split[1].toUpperCase(Locale.ROOT)));
         }
+        this.mappingsIndex = mappingsIndex;
     }
 
     public WrappedBlockState(StateType type, EnumMap<StateValue, Object> data, int globalID) {
@@ -70,18 +75,21 @@ public class WrappedBlockState {
     }
 
     @NotNull
-    public static WrappedBlockState getByGlobalId(int globalID) {
-        return BY_ID.getOrDefault(globalID, AIR).clone();
+    public static WrappedBlockState getByGlobalId(ClientVersion version, int globalID) {
+        byte mappingsIndex = getMappingsIndex(version);
+        return BY_ID.get(mappingsIndex).getOrDefault(globalID, AIR).clone();
     }
 
     @NotNull
-    public static WrappedBlockState getByString(String string) {
-        return BY_STRING.getOrDefault(string, AIR).clone();
+    public static WrappedBlockState getByString(ClientVersion version, String string) {
+        byte mappingsIndex = getMappingsIndex(version);
+        return BY_STRING.get(mappingsIndex).getOrDefault(string, AIR).clone();
     }
 
     @NotNull
-    public static WrappedBlockState getDefaultState(StateType type) {
-        WrappedBlockState state = DEFAULT_STATES.get(type);
+    public static WrappedBlockState getDefaultState(ClientVersion version, StateType type) {
+        byte mappingsIndex = getMappingsIndex(version);
+        WrappedBlockState state = DEFAULT_STATES.get(mappingsIndex).get(type);
         if (state == null) {
             PacketEvents.getAPI().getLogger().warning("Default state for " + type.getName() + " is null. Returning AIR");
             return AIR;
@@ -89,18 +97,45 @@ public class WrappedBlockState {
         return state.clone();
     }
 
-    private static String getModernJsonPath(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_1)) {
+    private static byte getMappingsIndex(ClientVersion version) {
+        if (version.isOlderThan(ClientVersion.V_1_13)) {
+            return 0;
+        }
+        else if (version.isOlderThanOrEquals(ClientVersion.V_1_13_1)) {
+            return 1;
+        }
+        else if (version.isOlderThanOrEquals(ClientVersion.V_1_13_2)) {
+            return 2;
+        }
+        else if (version.isOlderThanOrEquals(ClientVersion.V_1_14_4)) {
+            return 3;
+        }
+        else if (version.isOlderThanOrEquals(ClientVersion.V_1_15_2)) {
+            return 4;
+        }
+        else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_1)) {
+            return 5;
+        }
+        else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_2)) {
+            return 6;
+        }
+        else {
+            return 7;
+        }
+    }
+
+    private static String getModernJsonPath(ClientVersion version) {
+        if (version.isOlderThanOrEquals(ClientVersion.V_1_13_1)) {
             return "1.13";
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_13_2)) {
             return "1.13.2";
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_14_4)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_14_4)) {
             return "1.14";
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_15_2)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_15_2)) {
             return "1.15";
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_16_1)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_1)) {
             return "1.16";
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_2)) {
             return "1.16.2";
         } else {
             return "1.17";
@@ -109,13 +144,17 @@ public class WrappedBlockState {
 
     private static void loadLegacy() {
         String line;
+        Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
+        Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
+        Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
+        Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
+        Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
         try {
             InputStream mappings = WrappedBlockState.class.getClassLoader().getResourceAsStream("assets/mappings/block/legacy_block_mappings.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(mappings));
 
             boolean isPointEight = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8) &&
                     PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_9);
-
             while ((line = reader.readLine()) != null) {
                 String[] split = line.split(",");
                 int id = Integer.parseInt(split[0]);
@@ -139,29 +178,42 @@ public class WrappedBlockState {
                     PacketEvents.getAPI().getLogger().warning("Could not find type for " + blockString);
                 }
 
-                WrappedBlockState state = new WrappedBlockState(type, dataStrings, combinedID);
+                WrappedBlockState state = new WrappedBlockState(type, dataStrings, combinedID, (byte)0);
 
-                BY_STRING.put(fullString, state);
-                BY_ID.put(combinedID, state);
-                INTO_STRING.put(state, fullString);
-                INTO_ID.put(state, combinedID);
+                stateByStringMap.put(fullString, state);
+                stateByIdMap.put(combinedID, state);
+                stateToStringMap.put(state, fullString);
+                stateToIdMap.put(state, combinedID);
 
                 // 1.12's data type system doesn't support "default states" so I guess this works...
-                if (!DEFAULT_STATES.containsKey(type)) {
-                    DEFAULT_STATES.put(type, state);
+                if (!stateTypeToBlockStateMap.containsKey(type)) {
+                    stateTypeToBlockStateMap.put(type, state);
                 }
             }
         } catch (IOException e) {
             PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
             e.printStackTrace();
         }
+        BY_ID.put((byte)0, stateByIdMap);
+        INTO_ID.put((byte)0, stateToIdMap);
+        BY_STRING.put((byte)0, stateByStringMap);
+        INTO_STRING.put((byte)0, stateToStringMap);
+        DEFAULT_STATES.put((byte)0, stateTypeToBlockStateMap);
     }
 
-    private static void loadModern() {
+    private static void loadModern(ClientVersion version) {
         JsonObject MAPPINGS = MappingHelper.getJSONObject("block/modern_block_mappings");
-        String modernVersion = getModernJsonPath(PacketEvents.getAPI().getServerManager().getVersion());
-
+        byte mappingsIndex = getMappingsIndex(version);
+        String modernVersion = getModernJsonPath(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+        Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
+        Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
+        Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
+        Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
+        Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
         if (MAPPINGS.has(modernVersion)) {
+            if (BY_ID.containsKey(mappingsIndex)) {
+                return;
+            }
             JsonObject map = MAPPINGS.getAsJsonObject(modernVersion);
             map.entrySet().forEach(entry -> {
                 int id = Integer.parseInt(entry.getKey());
@@ -192,20 +244,25 @@ public class WrappedBlockState {
                     data = fullBlockString.substring(index + 1, fullBlockString.length() - 1).split(",");
                 }
 
-                WrappedBlockState state = new WrappedBlockState(type, data, id);
+                WrappedBlockState state = new WrappedBlockState(type, data, id, mappingsIndex);
 
                 if (isDefault) {
-                    DEFAULT_STATES.put(state.getType(), state);
+                    stateTypeToBlockStateMap.put(state.getType(), state);
                 }
 
-                BY_STRING.put(fullBlockString, state);
-                BY_ID.put(id, state);
-                INTO_STRING.put(state, fullBlockString);
-                INTO_ID.put(state, id);
+                stateByStringMap.put(fullBlockString, state);
+                stateByIdMap.put(id, state);
+                stateToStringMap.put(state, fullBlockString);
+                stateToIdMap.put(state, id);
             });
         } else {
             throw new IllegalStateException("Failed to find block palette mappings for the " + modernVersion + " mappings version!");
         }
+        BY_ID.put(mappingsIndex, stateByIdMap);
+        INTO_ID.put(mappingsIndex, stateToIdMap);
+        BY_STRING.put(mappingsIndex, stateByStringMap);
+        INTO_STRING.put(mappingsIndex, stateToStringMap);
+        DEFAULT_STATES.put(mappingsIndex, stateTypeToBlockStateMap);
     }
 
     @Override
@@ -864,9 +921,9 @@ public class WrappedBlockState {
      */
     public void checkIsStillValid() {
         int oldGlobalID = globalID;
-        globalID = getGlobalIDNoCache();
+        globalID = getGlobalIdNoCache();
         if (globalID == -1) { // -1 maps to no block as negative ID are impossible
-            WrappedBlockState blockState = getByGlobalId(oldGlobalID);
+            WrappedBlockState blockState = BY_ID.get(mappingsIndex).getOrDefault(globalID, AIR).clone();
             this.type = blockState.type;
             this.globalID = blockState.globalID;
             this.data = blockState.data.clone();
@@ -909,12 +966,12 @@ public class WrappedBlockState {
     /**
      * Internal method for determining if the block state is still valid
      */
-    private int getGlobalIDNoCache() {
-        return INTO_ID.getOrDefault(this, -1);
+    private int getGlobalIdNoCache() {
+        return INTO_ID.get(mappingsIndex).getOrDefault(this, -1);
     }
 
     @Override
     public String toString() {
-        return INTO_STRING.get(this);
+        return INTO_STRING.get(mappingsIndex).get(this);
     }
 }

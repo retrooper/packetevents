@@ -19,8 +19,6 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -67,11 +65,6 @@ public class EventManager {
     }
 
     public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority) {
-        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority);
-        return registerListener(packetListenerAbstract);
-    }
-
-    public PacketListenerCommon registerListener(PacketListenerReflect listener, PacketListenerPriority priority) {
         PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority);
         return registerListener(packetListenerAbstract);
     }

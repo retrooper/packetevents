@@ -16,13 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.mapper;
+package com.github.retrooper.packetevents.protocol.packettype;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
 
-public interface MappedEntity {
-    ResourceLocation getName();
+public interface PacketTypeConstant extends PacketTypeCommon{
+    default int getId(ClientVersion version) {
+        return getId();
+    }
 
-    int getId(ClientVersion version);
+    int getId();
 }

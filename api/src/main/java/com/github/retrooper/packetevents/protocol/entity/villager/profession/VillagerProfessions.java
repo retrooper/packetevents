@@ -19,13 +19,14 @@
 package com.github.retrooper.packetevents.protocol.entity.villager.profession;
 
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.TypesBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class VillagerProfessions {
-    public static final Map<String, VillagerProfession> VILLAGER_PROFESSION_MAP = new HashMap<>();
-    public static final Map<Integer, VillagerProfession> VILLAGER_PROFESSION_ID_MAP = new HashMap<>();
+    private static final Map<String, VillagerProfession> VILLAGER_PROFESSION_MAP = new HashMap<>();
+    private static final Map<Byte, VillagerProfession> VILLAGER_PROFESSION_ID_MAP = new HashMap<>();
 
     public static VillagerProfession define(int id, String name) {
         ResourceLocation location = new ResourceLocation(name);
@@ -41,12 +42,12 @@ public class VillagerProfessions {
             }
         };
         VILLAGER_PROFESSION_MAP.put(type.getName().toString(), type);
-        VILLAGER_PROFESSION_ID_MAP.put(type.getId(), type);
+        VILLAGER_PROFESSION_ID_MAP.put((byte) type.getId(), type);
         return type;
     }
 
     public static VillagerProfession getById(int id) {
-        return VILLAGER_PROFESSION_ID_MAP.get(id);
+        return VILLAGER_PROFESSION_ID_MAP.get((byte)id);
     }
 
 

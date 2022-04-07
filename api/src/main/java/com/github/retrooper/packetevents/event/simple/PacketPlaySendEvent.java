@@ -28,8 +28,9 @@ import com.github.retrooper.packetevents.protocol.player.User;
 
 public class PacketPlaySendEvent extends PacketSendEvent {
     public PacketPlaySendEvent(Object channel, User user,
-                               Object player, Object rawByteBuf) throws PacketProcessException {
-        super(channel, user, player, rawByteBuf);
+                               Object player, Object rawByteBuf,
+                               boolean autoProtocolTranslation) throws PacketProcessException {
+        super(channel, user, player, rawByteBuf, autoProtocolTranslation);
     }
 
     protected PacketPlaySendEvent(int packetId, PacketTypeCommon packetType,

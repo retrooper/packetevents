@@ -23,11 +23,11 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
-import com.github.retrooper.packetevents.util.MappingHelper;
-import com.github.retrooper.packetevents.util.Vector3f;
-import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.*;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.gson.JsonObject;
 import net.kyori.adventure.text.Component;
@@ -37,14 +37,19 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class EntityDataTypes {
-    private static JsonObject MAPPINGS;
     //1.7 -> 1.18 block_position is just 3 ints, not serialized with a long
     //short was removed in 1.9+
     //boolean was added in 1.9
     //nbt was added in 1.12
 
     private static final Map<String, EntityDataType<?>> ENTITY_DATA_TYPE_MAP = new HashMap<>();
-    private static final Map<Integer, EntityDataType<?>> ENTITY_DATA_TYPE_ID_MAP = new HashMap<>();
+    private static final Map<Byte, Map<Integer, EntityDataType<?>>> ENTITY_DATA_TYPE_ID_MAP = new HashMap<>();
+    protected static final TypesBuilder TYPES_BUILDER = new TypesBuilder("entity/entity_data_type_mappings",
+            ClientVersion.V_1_8,
+            ClientVersion.V_1_9,
+            ClientVersion.V_1_11,
+            ClientVersion.V_1_13, //Fix? Why did we not acknoledge 1.13
+            ClientVersion.V_1_16);
 
     public static final EntityDataType<Byte> BYTE = define("byte", PacketWrapper::readByte, PacketWrapper::writeByte);
     public static final EntityDataType<Integer> INT = define("int", readIntDeserializer(), writeIntSerializer());
@@ -98,26 +103,16 @@ public class EntityDataTypes {
 
     public static final EntityDataType<EntityPose> ENTITY_POSE = define("entity_pose", (PacketWrapper<?> wrapper) -> {
         int id = wrapper.readVarInt();
-        return EntityPose.getById(id);
-    }, (PacketWrapper<?> wrapper, EntityPose value) -> wrapper.writeVarInt(value.getId()));
+        return EntityPose.getById(wrapper.getServerVersion().toClientVersion(), id);
+    }, (PacketWrapper<?> wrapper, EntityPose value) -> wrapper.writeVarInt(value.getId(wrapper.getServerVersion().toClientVersion())));
 
     @Deprecated
     public static final EntityDataType<Short> SHORT = define("short", PacketWrapper::readShort, PacketWrapper::writeShort);
 
-    private static ServerVersion getMappingsServerVersion(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
-            return ServerVersion.V_1_8;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_11)) {
-            return ServerVersion.V_1_9;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-            return ServerVersion.V_1_11;
-        } else {
-            return ServerVersion.V_1_16;
-        }
-    }
-
-    public static EntityDataType<?> getById(int id) {
-        return ENTITY_DATA_TYPE_ID_MAP.get(id);
+    public static EntityDataType<?> getById(ClientVersion version, int id) {
+        int index = TYPES_BUILDER.getDataIndex(version);
+        Map<Integer, EntityDataType<?>> typeIdMap = ENTITY_DATA_TYPE_ID_MAP.get((byte)index);
+        return typeIdMap.get(id);
     }
 
     public static EntityDataType<?> getByName(String name) {
@@ -125,26 +120,17 @@ public class EntityDataTypes {
     }
 
     public static <T> EntityDataType<T> define(String name, Function<PacketWrapper<?>, T> deserializer, BiConsumer<PacketWrapper<?>, T> serializer) {
-        if (MAPPINGS == null) {
-            MAPPINGS = MappingHelper.getJSONObject("entity/entity_data_type_mappings");
-        }
-        ServerVersion mappingsVersion = getMappingsServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
-        final int id;
-
-        if (MAPPINGS.has(mappingsVersion.name())) {
-            JsonObject map = MAPPINGS.getAsJsonObject(mappingsVersion.name());
-            if (map.has(name)) {
-                id = map.get(name).getAsInt();
-            } else {
-                id = -1;
-            }
-        } else {
-            throw new IllegalStateException("Failed to find EntityDataType mappings for the " + mappingsVersion.name() + " mappings version!");
-
-        }
-        EntityDataType<T> type = new EntityDataType<T>(name, id, deserializer, (BiConsumer<PacketWrapper<?>, Object>) serializer);
+        TypesBuilderData data = TYPES_BUILDER.define(name);
+        EntityDataType<T> type = new EntityDataType<>(name, data.getData(), deserializer,
+                (BiConsumer<PacketWrapper<?>, Object>) serializer);
         ENTITY_DATA_TYPE_MAP.put(type.getName(), type);
-        ENTITY_DATA_TYPE_ID_MAP.put(type.getId(), type);
+        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
+            int index = TYPES_BUILDER.getDataIndex(version);
+            if (index == -1) continue;
+            Map<Integer, EntityDataType<?>> typeIdMap = ENTITY_DATA_TYPE_ID_MAP
+                    .computeIfAbsent((byte) index, k -> new HashMap<>());
+            typeIdMap.put(type.getId(version), type);
+        }
         return type;
     }
 

@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -150,8 +151,8 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
             this.blockID = blockID;
         }
 
-        public WrappedBlockState getBlockState() {
-            return WrappedBlockState.getByGlobalId(blockID);
+        public WrappedBlockState getBlockState(ClientVersion version) {
+            return WrappedBlockState.getByGlobalId(version, blockID);
         }
 
         public void setBlockState(WrappedBlockState blockState) {

@@ -16,14 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector;
+package io.github.retrooper.packetevents.injector.connection;
 
-public interface PacketCompressionManager {
-    void decompress(Object pipeline, Object buffer, Object output);
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
 
-    void compress(Object pipeline, Object buffer, Object output);
-
-    void recompress(Object ctx, Object buffer);
-
-    void relocateHandlers(Object pipeline, Object buffer, Object decompressed);
+public class PreChannelInitializerLatest_v1_8 extends ChannelInitializer<Channel> {
+    @Override
+    protected void initChannel(Channel channel) {
+        channel.pipeline().addLast(new ChannelInitializer<Channel>() {
+            @Override
+            protected void initChannel(Channel channel) {
+                ServerConnectionInitializerLatest.initChannel(channel, ConnectionState.HANDSHAKING);
+            }
+        });
+    }
 }

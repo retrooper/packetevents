@@ -18,17 +18,9 @@
 
 package com.github.retrooper.packetevents.event;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-
 public abstract class PacketListenerAbstract extends PacketListenerCommon {
     public PacketListenerAbstract(PacketListenerPriority priority) {
         super(priority);
-    }
-
-    public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
-        super(priority, methods);
     }
 
     public PacketListenerAbstract() {

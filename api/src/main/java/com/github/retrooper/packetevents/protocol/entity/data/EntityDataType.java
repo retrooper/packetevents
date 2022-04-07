@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.entity.data;
 
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.function.BiConsumer;
@@ -25,13 +26,13 @@ import java.util.function.Function;
 
 public class EntityDataType<T> {
     private final String name;
-    private final int id;
+    private final int[] ids;
     private final Function<PacketWrapper<?>, T> dataDeserializer;
     private final BiConsumer<PacketWrapper<?>, Object> dataSerializer;
 
-    public EntityDataType(String name, int id, Function<PacketWrapper<?>, T> dataDeserializer, BiConsumer<PacketWrapper<?>, Object> dataSerializer) {
+    public EntityDataType(String name, int[] ids, Function<PacketWrapper<?>, T> dataDeserializer, BiConsumer<PacketWrapper<?>, Object> dataSerializer) {
         this.name = name;
-        this.id = id;
+        this.ids = ids;
         this.dataDeserializer = dataDeserializer;
         this.dataSerializer = dataSerializer;
     }
@@ -40,8 +41,9 @@ public class EntityDataType<T> {
         return name;
     }
 
-    public int getId() {
-        return id;
+    public int getId(ClientVersion version) {
+        int index = EntityDataTypes.TYPES_BUILDER.getDataIndex(version);
+        return ids[index];
     }
 
     public Function<PacketWrapper<?>, T> getDataDeserializer() {

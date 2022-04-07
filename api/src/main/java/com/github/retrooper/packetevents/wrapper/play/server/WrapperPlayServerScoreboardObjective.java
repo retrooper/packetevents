@@ -1,5 +1,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -73,15 +74,12 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
     public void write() {
         writeString(name);
         writeByte((byte) mode.ordinal());
-        if (mode == ObjectiveMode.CREATE || mode == ObjectiveMode.UPDATE) {
-            writeString(displayName.orElse(""));
-            if (serverVersion == ServerVersion.V_1_7_10)
-                writeString("integer");
-            else if (serverVersion.isOlderThan(ServerVersion.V_1_13))
-                writeString(display.orElse(HealthDisplay.INTEGER).name().toLowerCase());
-            else
-                writeVarInt(display.orElse(HealthDisplay.INTEGER).ordinal());
-        }
+        if (serverVersion == ServerVersion.V_1_7_10)
+            writeString("integer");
+        else if (serverVersion.isOlderThan(ServerVersion.V_1_13))
+            writeString(display.orElse(HealthDisplay.INTEGER).name().toLowerCase());
+        else
+            writeVarInt(display.orElse(HealthDisplay.INTEGER).ordinal());
     }
 
     public String getName() {

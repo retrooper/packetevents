@@ -18,13 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.item.type;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.MappingHelper;
-import com.google.gson.JsonObject;
+import com.github.retrooper.packetevents.util.TypesBuilder;
+import com.github.retrooper.packetevents.util.TypesBuilderData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,10 +32,18 @@ import java.util.stream.Collectors;
 
 public class ItemTypes {
     private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
-    private static final Map<Integer, ItemType> ITEM_TYPE_ID_MAP = new HashMap<>();
+    private static final Map<Byte, Map<Integer, ItemType>> ITEM_TYPE_ID_MAP = new HashMap<>();
     private static final Map<StateType, ItemType> HELD_TO_PLACED_MAP = new HashMap<>();
-
-    private static JsonObject MAPPINGS;
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_type_mappings",
+            ClientVersion.V_1_12,
+            ClientVersion.V_1_13,
+            ClientVersion.V_1_13_2,
+            ClientVersion.V_1_14,
+            ClientVersion.V_1_15,
+            ClientVersion.V_1_16,
+            ClientVersion.V_1_16_2,
+            ClientVersion.V_1_17,
+            ClientVersion.V_1_18);
 
     public static final ItemType GILDED_BLACKSTONE = builder("gilded_blackstone").setMaxAmount(64).setPlacedType(StateTypes.GILDED_BLACKSTONE).build();
     public static final ItemType NETHER_BRICK_SLAB = builder("nether_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.NETHER_BRICK_SLAB).build();
@@ -1161,60 +1168,21 @@ public class ItemTypes {
         return ITEM_TYPE_MAP.values();
     }
 
-    private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-            return ServerVersion.V_1_12;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_13_2)) {
-            return ServerVersion.V_1_13;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_14)) {
-            return ServerVersion.V_1_13_2;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            return ServerVersion.V_1_14;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16)) {
-            return ServerVersion.V_1_15;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
-            return ServerVersion.V_1_16;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
-            return ServerVersion.V_1_16_2;
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_18)) {
-            return ServerVersion.V_1_17;
-        } else {
-            return ServerVersion.V_1_18;
-        }
-    }
-
     public static Builder builder(String key) {
         return new Builder(key);
     }
 
     public static ItemType define(int maxAmount, String key, ItemType craftRemainder, StateType placedType, int maxDurability, List<ItemAttribute> attributesArr) {
-        if (MAPPINGS == null) {
-            MAPPINGS = MappingHelper.getJSONObject("item/item_type_mappings");
-        }
-
         // Creates an immutable set
         Set<ItemAttribute> attributes = attributesArr == null ? Collections.emptySet() :
                 Collections.unmodifiableSet(new HashSet<>(attributesArr));
 
-        ResourceLocation identifier = ResourceLocation.minecraft(key);
-
-        final int id;
-        ServerVersion mappingsVersion = getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
-        if (MAPPINGS.has(mappingsVersion.name())) {
-            JsonObject map = MAPPINGS.getAsJsonObject(mappingsVersion.name());
-            if (map.has(identifier.toString())) {
-                id = map.get(identifier.toString()).getAsInt();
-            } else {
-                id = -1;
-            }
-        } else {
-            throw new IllegalStateException("Failed to find ItemType mappings for the " + mappingsVersion.name() + " mappings version!");
-        }
-
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
 
-
         ItemType type = new ItemType() {
+            private final int[] ids = data.getData();
+
             @Override
             public int getMaxAmount() {
                 return maxAmount;
@@ -1227,12 +1195,13 @@ public class ItemTypes {
 
             @Override
             public ResourceLocation getName() {
-                return identifier;
+                return data.getName();
             }
 
             @Override
-            public int getId() {
-                return id;
+            public int getId(ClientVersion version) {
+                int index = TYPES_BUILDER.getDataIndex(version);
+                return ids[index];
             }
 
             @Override
@@ -1264,13 +1233,17 @@ public class ItemTypes {
             @Override
             public boolean equals(Object obj) {
                 if (obj instanceof ItemType) {
-                    return getId() == ((ItemType) obj).getId();
+                    return getName().equals(((ItemType) obj).getName());
                 }
                 return false;
             }
         };
         ITEM_TYPE_MAP.put(type.getName().toString(), type);
-        ITEM_TYPE_ID_MAP.put(type.getId(), type);
+        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
+            int index = TYPES_BUILDER.getDataIndex(version);
+            Map<Integer, ItemType> typeIdMap = ITEM_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
+            typeIdMap.put(type.getId(version), type);
+        }
         return type;
     }
 
@@ -1280,12 +1253,10 @@ public class ItemTypes {
     }
 
     @NotNull
-    public static ItemType getById(int id) {
-        ItemType cache = ITEM_TYPE_ID_MAP.get(id);
-        if (cache == null) {
-            cache = ItemTypes.AIR;
-        }
-        return cache;
+    public static ItemType getById(ClientVersion version, int id) {
+        int index = TYPES_BUILDER.getDataIndex(version);
+        Map<Integer, ItemType> typeIdMap = ITEM_TYPE_ID_MAP.get((byte) index);
+        return typeIdMap.getOrDefault(id, ItemTypes.AIR);
     }
 
     public static ItemType getTypePlacingState(StateType type) {

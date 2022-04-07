@@ -56,23 +56,25 @@ public class SpigotDataHelper {
     }
 
     public static EntityType fromBukkitEntityType(org.bukkit.entity.EntityType entityType) {
-        if (PacketEvents.getAPI().getServerManager().getVersion()
+        ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
+        if (serverVersion
                 .isNewerThanOrEquals(ServerVersion.V_1_13)) {
             return EntityTypes.getByName(entityType.getName());
         } else {
             if (entityType.getTypeId() == -1) {
                 return null;
             }
-            return EntityTypes.getById(entityType.getTypeId());
+            return EntityTypes.getById(serverVersion.toClientVersion(), entityType.getTypeId());
         }
     }
 
     public static org.bukkit.entity.EntityType toBukkitEntityType(EntityType entityType) {
-        if (PacketEvents.getAPI().getServerManager().getVersion()
+        ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
+        if (serverVersion
                 .isNewerThanOrEquals(ServerVersion.V_1_13)) {
             return org.bukkit.entity.EntityType.fromName(entityType.getName().getKey());
         } else {
-            return org.bukkit.entity.EntityType.fromId(entityType.getId());
+            return org.bukkit.entity.EntityType.fromId(entityType.getId(serverVersion.toClientVersion()));
         }
     }
 
@@ -92,7 +94,8 @@ public class SpigotDataHelper {
 
     public static WrappedBlockState fromBukkitBlockData(org.bukkit.material.MaterialData materialData) {
         int combinedID = SpigotReflectionUtil.getBlockDataCombinedId(materialData);
-        return WrappedBlockState.getByGlobalId(combinedID);
+        ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
+        return WrappedBlockState.getByGlobalId(serverVersion.toClientVersion(), combinedID);
     }
 
     public static org.bukkit.material.MaterialData toBukkitBlockData(WrappedBlockState state) {

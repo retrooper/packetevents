@@ -114,7 +114,7 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
     }
 
     public WrappedBlockState getBlockType() {
-        return WrappedBlockState.getByGlobalId(blockTypeID);
+        return WrappedBlockState.getByGlobalId(serverVersion.toClientVersion(), blockTypeID);
     }
 
     public void setBlockType(WrappedBlockState blockType) {

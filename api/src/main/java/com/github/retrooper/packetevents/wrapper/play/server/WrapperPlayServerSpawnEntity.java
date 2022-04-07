@@ -68,13 +68,13 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             uuid = Optional.empty();
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            entityType = EntityTypes.getById(readVarInt());
+            entityType = EntityTypes.getById(serverVersion.toClientVersion(), readVarInt());
         }
         else {
             int id = readByte();
-            entityType = EntityTypes.getByLegacyId(id);
+            entityType = EntityTypes.getByLegacyId(serverVersion.toClientVersion(), id);
             if (entityType == null) // Should not happen but anyway
-                entityType = EntityTypes.getById(id);
+                entityType = EntityTypes.getById(serverVersion.toClientVersion(), id);
         }
         double x;
         double y;
@@ -136,13 +136,13 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             writeUUID(uuid.orElse(new UUID(0L, 0L)));
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            writeVarInt(entityType.getId());
+            writeVarInt(entityType.getId(serverVersion.toClientVersion()));
         }
         else {
-            if (entityType.getLegacyId() != -1) { // Will always be true if they use correct EntityTypes for this packet
-                writeByte(entityType.getLegacyId());
+            if (entityType.getLegacyId(serverVersion.toClientVersion()) != -1) { // Will always be true if they use correct EntityTypes for this packet
+                writeByte(entityType.getLegacyId(serverVersion.toClientVersion()));
             } else {
-                writeByte(entityType.getId());
+                writeByte(entityType.getId(serverVersion.toClientVersion()));
             }
         }
 

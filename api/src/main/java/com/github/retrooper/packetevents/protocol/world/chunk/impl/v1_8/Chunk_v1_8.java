@@ -1,5 +1,6 @@
 package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8;
 
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.ShortArray3d;
@@ -33,13 +34,13 @@ public class Chunk_v1_8 implements BaseChunk {
     }
 
     @Override
-    public WrappedBlockState get(int x, int y, int z) {
+    public WrappedBlockState get(ClientVersion version, int x, int y, int z) {
         int combinedID = this.blocks.get(x, y, z);
-        return WrappedBlockState.getByGlobalId(combinedID);
+        return WrappedBlockState.getByGlobalId(version, combinedID);
     }
 
     @Override
-    public void set(int x, int y, int z, int combinedID) {
+    public void set(ClientVersion version, int x, int y, int z, int combinedID) {
         this.blocks.set(x, y, z, combinedID);
     }
 

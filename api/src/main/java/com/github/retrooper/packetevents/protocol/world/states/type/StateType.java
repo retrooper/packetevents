@@ -1,5 +1,6 @@
 package com.github.retrooper.packetevents.protocol.world.states.type;
 
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.MaterialType;
 import com.github.retrooper.packetevents.protocol.world.PushReaction;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
@@ -49,8 +50,8 @@ public class StateType {
         this.materialType = materialType;
     }
 
-    public WrappedBlockState createBlockState() {
-        return WrappedBlockState.getDefaultState(this);
+    public WrappedBlockState createBlockState(ClientVersion version) {
+        return WrappedBlockState.getDefaultState(version, this);
     }
 
     public String getName() {

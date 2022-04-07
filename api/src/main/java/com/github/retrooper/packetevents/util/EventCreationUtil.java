@@ -25,29 +25,31 @@ import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 public class EventCreationUtil {
-    public static PacketReceiveEvent createReceiveEvent(Object channel, User user, Object player, Object buffer) throws PacketProcessException {
+    public static PacketReceiveEvent createReceiveEvent(Object channel, User user, Object player, Object buffer,
+                                                        boolean autoProtocolTranslation) throws PacketProcessException {
         switch (user.getConnectionState()) {
             case HANDSHAKING:
-                return new PacketHandshakeReceiveEvent(channel, user, player, buffer);
+                return new PacketHandshakeReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
             case STATUS:
-                return new PacketStatusReceiveEvent(channel, user, player, buffer);
+                return new PacketStatusReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
             case LOGIN:
-                return new PacketLoginReceiveEvent(channel, user, player, buffer);
+                return new PacketLoginReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
             case PLAY:
-                return new PacketPlayReceiveEvent(channel, user, player, buffer);
+                return new PacketPlayReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
             default:
                 return null;
         }
     }
 
-    public static PacketSendEvent createSendEvent(Object channel, User user, Object player, Object buffer) throws PacketProcessException{
+    public static PacketSendEvent createSendEvent(Object channel, User user, Object player, Object buffer,
+                                                  boolean autoProtocolTranslation) throws PacketProcessException{
         switch (user.getConnectionState()) {
             case STATUS:
-                return new PacketStatusSendEvent(channel, user, player, buffer);
+                return new PacketStatusSendEvent(channel, user, player, buffer, autoProtocolTranslation);
             case LOGIN:
-                return new PacketLoginSendEvent(channel, user, player, buffer);
+                return new PacketLoginSendEvent(channel, user, player, buffer, autoProtocolTranslation);
             case PLAY:
-                return new PacketPlaySendEvent(channel, user, player, buffer);
+                return new PacketPlaySendEvent(channel, user, player, buffer, autoProtocolTranslation);
             default:
                 return null;
         }

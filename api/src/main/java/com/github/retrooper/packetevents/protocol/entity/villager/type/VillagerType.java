@@ -18,8 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.entity.villager.type;
 
-import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.mapper.StaticMappedEntity;
 
-public interface VillagerType extends MappedEntity {
+public interface VillagerType extends StaticMappedEntity {
 
 }

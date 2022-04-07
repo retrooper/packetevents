@@ -21,13 +21,16 @@ package io.github.retrooper.packetevents.handlers;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
 import io.github.retrooper.packetevents.injector.ServerConnectionInitializer;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -47,7 +50,8 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
         boolean doCompression = handleCompressionOrder(ctx, buffer);
         int firstReaderIndex = buffer.readerIndex();
-        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer);
+        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player,
+                buffer, false);
         int readerIndex = buffer.readerIndex();
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> buffer.readerIndex(readerIndex));
         if (!packetSendEvent.isCancelled()) {
@@ -83,12 +87,13 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {
+        ChannelPipeline pipe = ctx.pipeline();
         if (handledCompression) return false;
-        int encoderIndex = ctx.pipeline().names().indexOf("compress");
+        int encoderIndex = pipe.names().indexOf("compress");
         if (encoderIndex == -1) return false;
-        if (encoderIndex > ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME)) {
+        if (encoderIndex > pipe.names().indexOf(PacketEvents.ENCODER_NAME)) {
             // Need to decompress this packet due to bad order
-            ChannelHandler decompressor = ctx.pipeline().get("decompress");
+            ChannelHandler decompressor = pipe.get("decompress");
             try {
                 ByteBuf decompressed = (ByteBuf) CustomPipelineUtil.callPacketDecodeByteBuf(decompressor, ctx, buffer).get(0);
                 if (buffer != decompressed) {
@@ -99,7 +104,11 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
                     }
                 }
                 //Relocate handlers
-                ServerConnectionInitializer.reloadChannel(ctx.channel());
+                PacketDecoder decoder = (PacketDecoder) pipe.remove(PacketEvents.DECODER_NAME);
+                PacketEncoder encoder = (PacketEncoder) pipe.remove(PacketEvents.ENCODER_NAME);
+                pipe.addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
+                pipe.addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
+                System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
                 handledCompression = true;
                 return true;
             } catch (InvocationTargetException e) {

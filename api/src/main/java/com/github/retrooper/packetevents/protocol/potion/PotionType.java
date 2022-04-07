@@ -18,8 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.potion;
 
-import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.mapper.StaticMappedEntity;
 
-public interface PotionType extends MappedEntity {
+public interface PotionType extends StaticMappedEntity {
 
 }

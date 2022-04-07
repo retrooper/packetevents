@@ -16,34 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.netty.buffer;
+package com.github.retrooper.packetevents.util;
 
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationOperator;
-import net.minecraft.util.io.netty.buffer.Unpooled;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 
-public class ByteBufAllocationOperatorLegacyImpl implements ByteBufAllocationOperator {
-    @Override
-    public Object wrappedBuffer(byte[] bytes) {
-        return Unpooled.wrappedBuffer(bytes);
+public class TypesBuilderData {
+    private final int[] data;
+    private final ResourceLocation name;
+
+    public TypesBuilderData(ResourceLocation name, int[] data) {
+        this.name = name;
+        this.data = data;
     }
 
-    @Override
-    public Object copiedBuffer(byte[] bytes) {
-        return Unpooled.copiedBuffer(bytes);
+    public int[] getData() {
+        return data;
     }
 
-    @Override
-    public Object buffer() {
-        return Unpooled.buffer();
-    }
-
-    @Override
-    public Object directBuffer() {
-        return Unpooled.directBuffer();
-    }
-
-    @Override
-    public Object compositeBuffer() {
-        return Unpooled.compositeBuffer();
+    public ResourceLocation getName() {
+        return name;
     }
 }

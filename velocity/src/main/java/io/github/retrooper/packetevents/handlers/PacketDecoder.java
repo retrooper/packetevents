@@ -21,13 +21,17 @@ package io.github.retrooper.packetevents.handlers;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.EnumUtil;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
+import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.velocitypowered.api.proxy.Player;
 import io.github.retrooper.packetevents.injector.ServerConnectionInitializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,8 +39,10 @@ import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
+    private static Enum<?> VELOCITY_CONNECTION_EVENT_CONSTANT;
     public User user;
     public Player player;
+    public boolean handledCompression;
     public PacketDecoder(User user) {
         this.user = user;
     }
@@ -45,7 +51,8 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         ByteBuf transformed = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
             int firstReaderIndex = transformed.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player, transformed);
+            PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player,
+                    transformed, false);
             int readerIndex = transformed.readerIndex();
             PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> transformed.readerIndex(readerIndex));
             if (!packetReceiveEvent.isCancelled()) {
@@ -75,10 +82,23 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
-        super.exceptionCaught(ctx, cause);
-        //}
+    public void userEventTriggered(ChannelHandlerContext ctx, Object event) throws Exception {
+        if (VELOCITY_CONNECTION_EVENT_CONSTANT == null) {
+            Class<? extends Enum<?>> clazz = (Class<? extends Enum<?>>) Reflection.getClassByNameWithoutException("com.velocitypowered.proxy.protocol.VelocityConnectionEvent");
+            VELOCITY_CONNECTION_EVENT_CONSTANT = EnumUtil.valueOf(clazz, "COMPRESSION_ENABLED");
+        }
+        //We can use == as it is an enum constant
+        if (event == VELOCITY_CONNECTION_EVENT_CONSTANT && !handledCompression) {
+            System.out.println("constant: " + VELOCITY_CONNECTION_EVENT_CONSTANT.name());
+            ChannelPipeline pipe = ctx.pipeline();
+            PacketEncoder encoder = (PacketEncoder) pipe.remove(PacketEvents.ENCODER_NAME);
+            pipe.addBefore("minecraft-encoder", PacketEvents.ENCODER_NAME, encoder);
+            PacketDecoder decoder = (PacketDecoder) pipe.remove(PacketEvents.DECODER_NAME);
+            pipe.addBefore("minecraft-decoder", PacketEvents.DECODER_NAME, decoder);
+            System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
+            handledCompression = true;
+        }
+        super.userEventTriggered(ctx, event);
     }
 
     @Override

@@ -40,8 +40,7 @@ import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.util.SpigotDataHelper;
 import net.kyori.adventure.text.Component;
@@ -53,8 +52,6 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -77,7 +74,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     case CHAT_MESSAGE:
                         System.out.println("Running 10 seconds later");
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
-                        if (chatMessage.getMessage().equalsIgnoreCase("mrmcyeet")) {
+                        if (chatMessage.getMessage().equalsIgnoreCase("keyword")) {
                             System.out.println("pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                             event.setCancelled(true);
                             Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
@@ -100,8 +97,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                             Vector3i bp = SpigotDataHelper.fromBukkitLocation(((Player) event.getPlayer()).getLocation())
                                     .getPosition().toVector3i();
                             bp.setY(bp.getY() - 1);
-                            StateType type = StateTypes.GRASS_BLOCK;
-                            WrappedBlockState blockState = type.createBlockState();
+                            StateType type = StateTypes.GOLD_BLOCK;
+                            WrappedBlockState blockState = type.createBlockState(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
                             WrapperPlayServerBlockChange blockChange = new WrapperPlayServerBlockChange(bp,
                                     blockState.getGlobalId());
                             user.writePacket(blockChange);
@@ -179,9 +176,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                 if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
                     if (player != null) {
                         player.sendMessage("Hii " + player.getName());
-                        event.getUser().sendMessage(ChatColor.GREEN + "Hi pt TWOOO");
+                        user.sendMessage(ChatColor.GREEN + "Hi pt TWOOO");
                     } else {
-                        event.getUser().sendMessage(ChatColor.RED + "player null, but hi dude!!!");
+                        user.sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
                     System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                 } /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
@@ -192,6 +189,14 @@ public class PacketEventsPlugin extends JavaPlugin {
                     PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), clone);
                     System.out.println("Delayed " + chatMessage.getChatComponentJson());
                 } */
+                else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
+                    WrapperPlayServerEntityEffect effect = new WrapperPlayServerEntityEffect(event);
+                    System.out.println("type: "+ effect.getPotionType().getName() + ", type id: " + effect.getPotionType().getId());
+                }
+                else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+                    WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
+                    EntityType type = spawnLivingEntity.getEntityType();
+                }
             }
 
             @Override

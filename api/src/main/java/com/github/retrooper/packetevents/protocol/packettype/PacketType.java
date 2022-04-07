@@ -18,13 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.packettype;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.*;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.*;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.VersionMapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -32,7 +31,50 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 public final class PacketType {
-    public static PacketTypeCommon getById(PacketSide side, ConnectionState state, int protocolVersion, int packetID) {
+    private static boolean PREPARED = false;
+    //TODO UPDATE Update packet type mappings (clientbound pt. 1)
+    private static final VersionMapper CLIENTBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
+            ClientVersion.V_1_7_10,
+            ClientVersion.V_1_8,
+            ClientVersion.V_1_9,
+            ClientVersion.V_1_10,
+            ClientVersion.V_1_12,
+            ClientVersion.V_1_12_1,
+            ClientVersion.V_1_13,
+            ClientVersion.V_1_14,
+            ClientVersion.V_1_14_4,
+            ClientVersion.V_1_15,
+            ClientVersion.V_1_15_2,
+            ClientVersion.V_1_16,
+            ClientVersion.V_1_16_2,
+            ClientVersion.V_1_17,
+            ClientVersion.V_1_18);
+
+    //TODO UPDATE Update packet type mappings (serverbound pt. 1)
+    private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
+            ClientVersion.V_1_7_10,
+            ClientVersion.V_1_8,
+            ClientVersion.V_1_9,
+            ClientVersion.V_1_12,
+            ClientVersion.V_1_12_1,
+            ClientVersion.V_1_13,
+            ClientVersion.V_1_14,
+            ClientVersion.V_1_15_2,
+            ClientVersion.V_1_16,
+            ClientVersion.V_1_16_2,
+            ClientVersion.V_1_17);
+
+    public static void prepare() {
+        PacketType.Play.Client.load();
+        PacketType.Play.Server.load();
+        PREPARED = true;
+    }
+
+    public static boolean isPrepared() {
+        return PREPARED;
+    }
+
+    public static PacketTypeCommon getById(PacketSide side, ConnectionState state, ClientVersion version, int packetID) {
         switch (state) {
             case HANDSHAKING:
                 return Handshaking.Client.getById(packetID);
@@ -50,27 +92,17 @@ public final class PacketType {
                 }
             case PLAY:
                 if (side == PacketSide.CLIENT) {
-                    return Play.Client.getById(protocolVersion, packetID);
+                    return Play.Client.getById(version, packetID);
                 } else {
-                    return Play.Server.getById(packetID);
+                    return Play.Server.getById(version, packetID);
                 }
             default:
                 return null;
         }
     }
 
-    public static PacketTypeCommon getById(PacketSide side, ConnectionState state, @Nullable ClientVersion version, int packetID) {
-        int protocolVersion = version != null ? version.getProtocolVersion() : -1;
-        return getById(side, state, protocolVersion, packetID);
-    }
-
-    public static PacketTypeCommon getById(PacketSide side, ConnectionState state, @Nullable ServerVersion version, int packetID) {
-        int protocolVersion = version != null ? version.getProtocolVersion() : -1;
-        return getById(side, state, protocolVersion, packetID);
-    }
-
     public static class Handshaking {
-        public enum Client implements PacketTypeCommon {
+        public enum Client implements PacketTypeConstant {
             HANDSHAKE(0),
             /**
              * Technically not part of the current protocol, but clients older than 1.7 will send this to initiate Server List Ping.
@@ -102,7 +134,7 @@ public final class PacketType {
     }
 
     public static class Status {
-        public enum Client implements PacketTypeCommon {
+        public enum Client implements PacketTypeConstant {
             REQUEST(0),
             PING(1);
 
@@ -113,10 +145,10 @@ public final class PacketType {
             }
 
             @Nullable
-            public static PacketTypeCommon getById(int packetID) {
-                if (packetID == 0) {
+            public static PacketTypeCommon getById(int packetId) {
+                if (packetId == 0) {
                     return REQUEST;
-                } else if (packetID == 1) {
+                } else if (packetId == 1) {
                     return PING;
                 } else {
                     return null;
@@ -128,7 +160,7 @@ public final class PacketType {
             }
         }
 
-        public enum Server implements PacketTypeCommon {
+        public enum Server implements PacketTypeConstant {
             RESPONSE(0),
             PONG(1);
 
@@ -156,7 +188,7 @@ public final class PacketType {
     }
 
     public static class Login {
-        public enum Client implements PacketTypeCommon {
+        public enum Client implements PacketTypeConstant {
             LOGIN_START(0),
             ENCRYPTION_RESPONSE(1),
             ///Added in 1.13
@@ -186,7 +218,7 @@ public final class PacketType {
             }
         }
 
-        public enum Server implements PacketTypeCommon {
+        public enum Server implements PacketTypeConstant {
             DISCONNECT(0),
             ENCRYPTION_REQUEST(1),
             LOGIN_SUCCESS(2),
@@ -278,75 +310,55 @@ public final class PacketType {
             PLAYER_BLOCK_PLACEMENT,
             USE_ITEM;
 
-            private static final Map<Integer, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new HashMap<>();
-            private static final Map<Integer, Map<PacketTypeCommon, Integer>> PACKET_TYPE_CACHE = new HashMap<>();
-            private int id = -1;
+            private static int INDEX = 0;
+            private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
+            private final int[] ids = new int[SERVERBOUND_PLAY_VERSION_MAPPER.getVersions().length];
 
             @Nullable
-            public static PacketTypeCommon getById(int protocolVersion, int packetID) {
-                Map<Integer, PacketTypeCommon> innerMap = PACKET_ID_CACHE.get(protocolVersion);
-                if (innerMap != null) {
-                    return innerMap.get(packetID);
+            public static PacketTypeCommon getById(ClientVersion version, int packetId) {
+                if (!PREPARED) {
+                    PacketType.prepare();
                 }
-                return null;
+                int index = SERVERBOUND_PLAY_VERSION_MAPPER.getIndex(version);
+               Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte)index, k -> new HashMap<>());
+               return packetIdMap.get(packetId);
             }
 
-            private static void loadPacketIds(ClientVersion version, Enum<?>[] enumConstants) {
-                int serverProtocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
-                Map<Integer, PacketTypeCommon> innerMap = new IdentityHashMap<>();
-                Map<PacketTypeCommon, Integer> secondInnerMap = new IdentityHashMap<>();
-                for (int id = 0; id < enumConstants.length; id++) {
-                    Client value = Client.valueOf(enumConstants[id].name());
-                    if (version.getProtocolVersion() == serverProtocolVersion) {
-                        value.id = id;
-                    }
-                    innerMap.put(id, value);
-                    secondInnerMap.put(value, id);
+            private static void loadPacketIds(Enum<?>[] enumConstants) {
+                int index = INDEX;
+                for (Enum<?> constant : enumConstants) {
+                    int id = constant.ordinal();
+                    Client value = Client.valueOf(constant.name());
+                    value.ids[index] = id;
+                    Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte) index,
+                            k -> new HashMap<>());
+                    packetIdMap.put(id, value);
                 }
-                PACKET_ID_CACHE.put(version.getProtocolVersion(), innerMap);
-                PACKET_TYPE_CACHE.put(version.getProtocolVersion(), secondInnerMap);
+                INDEX++;
             }
 
             public static void load() {
-                loadPacketIds(ClientVersion.V_1_7_10, ServerboundPacketType_1_7_10.values());
-                loadPacketIds(ClientVersion.V_1_8, ServerboundPacketType_1_8.values());
-                loadPacketIds(ClientVersion.V_1_9, ServerboundPacketType_1_9.values());
-                loadPacketIds(ClientVersion.V_1_9_1, ServerboundPacketType_1_9.values());
-                loadPacketIds(ClientVersion.V_1_9_2, ServerboundPacketType_1_9.values());
-                loadPacketIds(ClientVersion.V_1_9_3, ServerboundPacketType_1_9.values());
-                loadPacketIds(ClientVersion.V_1_10, ServerboundPacketType_1_9.values());
-                loadPacketIds(ClientVersion.V_1_11, ServerboundPacketType_1_9.values());
-                loadPacketIds(ClientVersion.V_1_11_1, ServerboundPacketType_1_9.values());
-                loadPacketIds(ClientVersion.V_1_12, ServerboundPacketType_1_12.values());
-                loadPacketIds(ClientVersion.V_1_12_1, ServerboundPacketType_1_12_1.values());
-                loadPacketIds(ClientVersion.V_1_12_2, ServerboundPacketType_1_12_1.values());
-                loadPacketIds(ClientVersion.V_1_13, ServerboundPacketType_1_13.values());
-                loadPacketIds(ClientVersion.V_1_14, ServerboundPacketType_1_14.values());
-                loadPacketIds(ClientVersion.V_1_14_1, ServerboundPacketType_1_14.values());
-                loadPacketIds(ClientVersion.V_1_14_2, ServerboundPacketType_1_14.values());
-                loadPacketIds(ClientVersion.V_1_14_3, ServerboundPacketType_1_14.values());
-                loadPacketIds(ClientVersion.V_1_14_4, ServerboundPacketType_1_14.values());
-                loadPacketIds(ClientVersion.V_1_15, ServerboundPacketType_1_14.values());
-                loadPacketIds(ClientVersion.V_1_15_1, ServerboundPacketType_1_14.values());
-                loadPacketIds(ClientVersion.V_1_15_2, ServerboundPacketType_1_15_2.values());
-                loadPacketIds(ClientVersion.V_1_16, ServerboundPacketType_1_16.values());
-                loadPacketIds(ClientVersion.V_1_16_1, ServerboundPacketType_1_16.values());
-                loadPacketIds(ClientVersion.V_1_16_2, ServerboundPacketType_1_16_2.values());
-                loadPacketIds(ClientVersion.V_1_16_3, ServerboundPacketType_1_16_2.values());
-                loadPacketIds(ClientVersion.V_1_16_4, ServerboundPacketType_1_16_2.values());
-                loadPacketIds(ClientVersion.V_1_17, ServerboundPacketType_1_17.values());
-                loadPacketIds(ClientVersion.V_1_17_1, ServerboundPacketType_1_17.values());
-                loadPacketIds(ClientVersion.V_1_18, ServerboundPacketType_1_17.values());
-                loadPacketIds(ClientVersion.V_1_18_2, ServerboundPacketType_1_17.values());
-                //TODO UPDATE Map client version
+                INDEX = 0;
+                loadPacketIds(ServerboundPacketType_1_7_10.values());
+                loadPacketIds(ServerboundPacketType_1_8.values());
+                loadPacketIds(ServerboundPacketType_1_9.values());
+                loadPacketIds(ServerboundPacketType_1_12.values());
+                loadPacketIds(ServerboundPacketType_1_12_1.values());
+                loadPacketIds(ServerboundPacketType_1_13.values());
+                loadPacketIds(ServerboundPacketType_1_14.values());
+                loadPacketIds(ServerboundPacketType_1_15_2.values());
+                loadPacketIds(ServerboundPacketType_1_16.values());
+                loadPacketIds(ServerboundPacketType_1_16_2.values());
+                loadPacketIds(ServerboundPacketType_1_17.values());
+                //TODO UPDATE Update packet type mappings (serverbound pt. 2)
             }
 
-            public int getId() {
-                return id;
-            }
-
-            public int getPacketId(int protocolVersion) {
-                return PACKET_TYPE_CACHE.get(protocolVersion).getOrDefault(this, -1);
+            public int getId(ClientVersion version) {
+                if (!PREPARED) {
+                    PacketType.prepare();
+                }
+                int index = SERVERBOUND_PLAY_VERSION_MAPPER.getIndex(version);
+                return ids[index];
             }
         }
 
@@ -468,89 +480,58 @@ public final class PacketType {
             ENTITY_EFFECT,
             DECLARE_RECIPES,
             TAGS;
+            private static int INDEX = 0;
+            private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new IdentityHashMap<>();
+            private final int[] ids = new int[CLIENTBOUND_PLAY_VERSION_MAPPER.getVersions().length];
 
-            private static final Map<Integer, PacketTypeCommon> PACKET_ID_CACHE = new IdentityHashMap<>();
-            private int id = -1;
+            public int getId(ClientVersion version) {
+                if (!PREPARED) {
+                    PacketType.prepare();
+                }
+                int index = CLIENTBOUND_PLAY_VERSION_MAPPER.getIndex(version);
+                return ids[index];
+            }
 
             @Nullable
-            public static PacketTypeCommon getById(int packetID) {
-                return PACKET_ID_CACHE.get(packetID);
+            public static PacketTypeCommon getById(ClientVersion version, int packetId) {
+                if (!PREPARED) {
+                    PacketType.prepare();
+                }
+                int index = CLIENTBOUND_PLAY_VERSION_MAPPER.getIndex(version);
+                Map<Integer, PacketTypeCommon> map = PACKET_TYPE_ID_MAP.get((byte) index);
+                return map.get(packetId);
             }
 
             private static void loadPacketIds(Enum<?>[] enumConstants) {
-                for (int id = 0; id < enumConstants.length; id++) {
-                    Server value = Server.valueOf(enumConstants[id].name());
-                    value.id = id;
-                    PACKET_ID_CACHE.put(id, value);
+                int index = INDEX;
+                for (Enum<?> constant : enumConstants) {
+                    int id = constant.ordinal();
+                    Server value = Server.valueOf(constant.name());
+                    value.ids[index] = id;
+                    Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
+                    packetIdMap.put(id, value);
                 }
+                INDEX++;
             }
 
             public static void load() {
-                ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
-                //1.7.10
-                if (version == ServerVersion.V_1_7_10) {
-                    loadPacketIds(ClientboundPacketType_1_7_10.values());
-                }
-                //1.8 - 1.8.8
-                else if (version.isOlderThan(ServerVersion.V_1_9)) {
-                    loadPacketIds(ClientboundPacketType_1_8.values());
-                }
-                //1.9 - 1.9.2
-                //(Should be 1.9 - 1.9.3, but I can't find a 1.9.3 build of Spigot)
-                else if (version.isOlderThan(ServerVersion.V_1_9_4)) {
-                    loadPacketIds(ClientboundPacketType_1_9.values());
-                }
-                //1.10 - 1.11.2
-                else if (version.isOlderThan(ServerVersion.V_1_12)) {
-                    loadPacketIds(ClientboundPacketType_1_9_3.values());
-                }
-                //1.12
-                else if (version.isOlderThan(ServerVersion.V_1_12_1)) {
-                    loadPacketIds(ClientboundPacketType_1_12.values());
-                }
-                //1.12.1 - 1.12.2
-                else if (version.isOlderThan(ServerVersion.V_1_13)) {
-                    loadPacketIds(ClientboundPacketType_1_12_1.values());
-                }
-                //1.13 - 1.13.2
-                else if (version.isOlderThan(ServerVersion.V_1_14)) {
-                    loadPacketIds(ClientboundPacketType_1_13.values());
-                }
-                //1.14 - 1.14.3
-                else if (version.isOlderThan(ServerVersion.V_1_14_4)) {
-                    loadPacketIds(ClientboundPacketType_1_14.values());
-                }
-                //1.14.4
-                else if (version.isOlderThan(ServerVersion.V_1_15)) {
-                    loadPacketIds(ClientboundPacketType_1_14_4.values());
-                }
-                //1.15 - 1.15.1
-                else if (version.isOlderThan(ServerVersion.V_1_15_2)) {
-                    loadPacketIds(ClientboundPacketType_1_15.values());
-                }
-                //1.15.2
-                else if (version.isOlderThan(ServerVersion.V_1_16)) {
-                    loadPacketIds(ClientboundPacketType_1_15_2.values());
-                }
-                //1.16 - 1.16.1
-                else if (version.isOlderThan(ServerVersion.V_1_16_2)) {
-                    loadPacketIds(ClientboundPacketType_1_16.values());
-                }
-                //1.16.2 - 1.16.5
-                else if (version.isOlderThan(ServerVersion.V_1_17)) {
-                    loadPacketIds(ClientboundPacketType_1_16_2.values());
-                }
-                //1.17 - 1.17.1
-                else if (version.isOlderThan(ServerVersion.V_1_18)) {
-                    loadPacketIds(ClientboundPacketType_1_17.values());
-                }
-                else {
-                    loadPacketIds(ClientboundPacketType_1_18.values());
-                }
-            }
-
-            public int getId() {
-                return id;
+                INDEX = 0;
+                loadPacketIds(ClientboundPacketType_1_7_10.values());
+                loadPacketIds(ClientboundPacketType_1_8.values());
+                loadPacketIds(ClientboundPacketType_1_9.values());
+                loadPacketIds(ClientboundPacketType_1_9_3.values());
+                loadPacketIds(ClientboundPacketType_1_12.values());
+                loadPacketIds(ClientboundPacketType_1_12_1.values());
+                loadPacketIds(ClientboundPacketType_1_13.values());
+                loadPacketIds(ClientboundPacketType_1_14.values());
+                loadPacketIds(ClientboundPacketType_1_14_4.values());
+                loadPacketIds(ClientboundPacketType_1_15.values());
+                loadPacketIds(ClientboundPacketType_1_15_2.values());
+                loadPacketIds(ClientboundPacketType_1_16.values());
+                loadPacketIds(ClientboundPacketType_1_16_2.values());
+                loadPacketIds(ClientboundPacketType_1_17.values());
+                loadPacketIds(ClientboundPacketType_1_18.values());
+                //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }
     }

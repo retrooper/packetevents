@@ -16,20 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.latest.connection;
+package com.github.retrooper.packetevents.protocol.mapper;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
-public class PreChannelInitializerLatest_v1_8 extends ChannelInitializer<Channel> {
-    @Override
-    protected void initChannel(Channel channel) {
-        channel.pipeline().addLast(new ChannelInitializer<Channel>() {
-            @Override
-            protected void initChannel(Channel channel) {
-                ServerConnectionInitializerLatest.initChannel(channel, ConnectionState.HANDSHAKING);
-            }
-        });
+public interface StaticMappedEntity extends MappedEntity{
+    int getId();
+
+    default int getId(ClientVersion version) {
+        return getId();
     }
 }

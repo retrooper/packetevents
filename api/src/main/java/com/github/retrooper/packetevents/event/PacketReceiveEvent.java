@@ -27,8 +27,9 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
-    protected PacketReceiveEvent(Object channel, User user, Object player, Object rawByteBuf) throws PacketProcessException {
-        super(PacketSide.CLIENT, channel, user, player, rawByteBuf);
+    protected PacketReceiveEvent(Object channel, User user, Object player, Object rawByteBuf,
+                                 boolean autoProtocolTranslation) throws PacketProcessException {
+        super(PacketSide.CLIENT, channel, user, player, rawByteBuf, autoProtocolTranslation);
     }
 
     protected PacketReceiveEvent(int packetID, PacketTypeCommon packetType,

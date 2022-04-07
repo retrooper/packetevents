@@ -57,10 +57,4 @@ public class ServerConnectionInitializer {
         channel.pipeline().remove(PacketEvents.DECODER_NAME);
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
     }
-
-    public static void reloadChannel(Channel channel) {
-        PacketDecoder decoder = (PacketDecoder) channel.pipeline().remove(PacketEvents.DECODER_NAME);
-        PacketEncoder encoder = (PacketEncoder) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-        prepareChannel(channel, decoder, encoder);
-    }
 }

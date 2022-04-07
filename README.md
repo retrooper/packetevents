@@ -3,7 +3,7 @@
 [![](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://github.com/retrooper/packetevents/blob/dev/LICENSE)
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
-PacketEvents is an open-source Packet API. It has many cross-version packet-wrappers. You can process incoming and outgoing packets on the server. You can even send packets with our packet-wrappers. We are here to save you a ton of time.
+PacketEvents is a powerful packet library. Our packet wrappers are efficient and easy to use. With our API, you can write code that runs on many platforms including Spigot, BungeeCord, Velocity, and even client-sided Fabric! 
 
 ### Resources
 * [SpigotMC](https://www.spigotmc.org/resources/packetevents-api.80279/)
@@ -13,21 +13,21 @@ PacketEvents is an open-source Packet API. It has many cross-version packet-wrap
 ### Setup
 [Learn more](https://github.com/retrooper/packetevents/wiki/Setup)
 
-### Contributing/Forking
-[Learn more](https://github.com/retrooper/packetevents/wiki/Contributing-and-Forking)\
-Our discord server has a role for contributors and forkers.
+### Contributing
+[Learn more](https://github.com/retrooper/packetevents/wiki/Contributing)
 
 ### Sponsorships
 [![](https://www.ej-technologies.com/images/product_banners/jprofiler_small.png)](https://www.ej-technologies.com/products/jprofiler/overview.html)
 
 ### Statistics
-PacketEvents collects statistics anonymously using bStats. It helps give us an overview of what platforms use our project. If you really don't like, you can turn it off.
+PacketEvents optionally collects statistics using [bStats](https://bstats.org/)\
+Check out our [bStats page](https://bstats.org/plugin/bukkit/packetevents/11327)
 
 ### Credit to
-[Kyori Adventure API](https://github.com/KyoriPowered/adventure) for their amazing chat component API.\
-[Gson](https://github.com/google/gson) for their JSON API.\
-[ViaVersion](https://github.com/ViaVersion/ViaVersion) for mappings and inspiration on our pipeline injector.\
-[ProtocolSupport](https://github.com/ProtocolSupport/ProtocolSupport) for mappings, NBT API and inspiration on our pipeline injector.\
-[MCProtocolLib](https://github.com/GeyserMC/MCProtocolLib/)\
-[Netty](https://github.com/netty/netty) for their networking library.\
-[wiki.vg/Protocol](https://wiki.vg/Protocol) for documentation on the protocol, we contribute back when we can. :)
+[wiki.vg/Protocol](https://wiki.vg/Protocol)  
+[adventure](https://github.com/KyoriPowered/adventure)  
+[gson](https://github.com/google/gson)  
+[ViaVersion](https://github.com/ViaVersion/ViaVersion)  
+[ProtocolSupport](https://github.com/ProtocolSupport/ProtocolSupport)  
+[MCProtocolLib](https://github.com/GeyserMC/MCProtocolLib/)  
+[netty](https://github.com/netty/netty)  

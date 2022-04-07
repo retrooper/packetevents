@@ -18,12 +18,11 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Client Version.
@@ -97,11 +96,6 @@ public enum ClientVersion {
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
     HIGHER_THAN_SUPPORTED_VERSIONS(V_1_18_2.protocolVersion + 1, true),
-    /**
-     * Pre releases just aren't supported, we would end up with so many enum constants.
-     * This constant assures you they are on a pre-release.
-     */
-    ANY_PRE_RELEASE_VERSION(0, true),
 
     UNKNOWN(-1, true);
 
@@ -123,9 +117,6 @@ public enum ClientVersion {
     private static final int HIGHEST_SUPPORTED_PROTOCOL_VERSION = HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1;
 
     private static final Map<Integer, ClientVersion> CLIENT_VERSION_CACHE = new IdentityHashMap<>();
-    //TODO UPDATE Add version protocol version
-    private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
-            340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754, 755, 756, 757, 758};
     private final int protocolVersion;
     private final String name;
 
@@ -143,6 +134,23 @@ public enum ClientVersion {
         }
     }
 
+    public static boolean isPreRelease(int protocolVersion) {
+        return getLatest().protocolVersion <= protocolVersion
+                || getOldest().protocolVersion >= protocolVersion;
+    }
+
+    public static boolean isRelease(int protocolVersion) {
+        return protocolVersion <= getLatest().protocolVersion
+                && protocolVersion >= getOldest().protocolVersion;
+    }
+
+    public boolean isPreRelease() {
+        return isPreRelease(protocolVersion);
+    }
+
+    public boolean isRelease() {
+        return isRelease(protocolVersion);
+    }
 
     /**
      * Get the release name of this client version.
@@ -189,11 +197,17 @@ public enum ClientVersion {
     }
 
     public static ClientVersion getLatest() {
-        return REVERSED_VALUES[4];
+        return REVERSED_VALUES[3];
     }
 
     public static ClientVersion getOldest() {
         return values()[0];
+    }
+
+    //TODO Optimize
+    @Deprecated
+    public ServerVersion toServerVersion() {
+        return ServerVersion.getById(protocolVersion);
     }
 
     /**
@@ -251,20 +265,5 @@ public enum ClientVersion {
      */
     public boolean isOlderThanOrEquals(ClientVersion target) {
         return this == target || isOlderThan(target);
-    }
-
-
-    /**
-     * Is this client version a pre-release?
-     * This method checks if this version is a pre-release.
-     *
-     * @return Is pre-release
-     */
-    public boolean isPreRelease() {
-        if (protocolVersion > LOWEST_SUPPORTED_PROTOCOL_VERSION && protocolVersion < HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
-            //We don't have to iterate through the LOWEST and the HIGHEST supported version anymore...
-            return Arrays.binarySearch(CLIENT_VERSIONS, protocolVersion) < 0;
-        }
-        return true;
     }
 }

@@ -24,8 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class VillagerTypes {
-    public static final Map<String, VillagerType> VILLAGER_TYPE_MAP = new HashMap<>();
-    public static final Map<Integer, VillagerType> VILLAGER_TYPE_ID_MAP = new HashMap<>();
+    private static final Map<String, VillagerType> VILLAGER_TYPE_MAP = new HashMap<>();
+    private static final Map<Byte, VillagerType> VILLAGER_TYPE_ID_MAP = new HashMap<>();
+
+
     public static VillagerType define(int id, String name) {
         ResourceLocation location = new ResourceLocation(name);
         VillagerType type = new VillagerType() {
@@ -40,12 +42,12 @@ public class VillagerTypes {
             }
         };
         VILLAGER_TYPE_MAP.put(type.getName().toString(), type);
-        VILLAGER_TYPE_ID_MAP.put(type.getId(), type);
+        VILLAGER_TYPE_ID_MAP.put((byte)type.getId(), type);
         return type;
     }
 
     public static VillagerType getById(int id) {
-        return VILLAGER_TYPE_ID_MAP.get(id);
+        return VILLAGER_TYPE_ID_MAP.get((byte)id);
     }
 
 

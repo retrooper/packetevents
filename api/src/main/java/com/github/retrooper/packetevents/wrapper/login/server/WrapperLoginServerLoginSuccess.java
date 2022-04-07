@@ -47,23 +47,33 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
         this.userProfile = userProfile;
     }
 
-    public static int[] serializeUUID(UUID uuid) {
-        long mostSigBits = uuid.getMostSignificantBits();
-        long leastSigBits = uuid.getLeastSignificantBits();
-        return new int[]{(int) (mostSigBits >> 32), (int) mostSigBits, (int) (leastSigBits >> 32), (int) leastSigBits};
+    private UUID readUUIDAsIntArray() {
+        long mostSignificantBits = (long) readInt() << 32L | readInt() & 0xFFFFFFFFL;
+        long leastSignificantBits = (long) readInt() << 32L | readInt() & 0xFFFFFFFFL;
+        return new UUID(mostSignificantBits, leastSignificantBits);
     }
 
+    private void writeUUIDAsIntArray(UUID uuid) {
+        writeInt((int)(uuid.getMostSignificantBits() >> 32L));
+        writeInt((int)uuid.getMostSignificantBits());
+        writeInt((int)(uuid.getLeastSignificantBits() >> 32L));
+        writeInt((int)uuid.getLeastSignificantBits());
+    }
+
+    private UUID readUUIDAsString() {
+        return UUID.fromString(readString(36));
+    }
+
+    private void writeUUIDAsString(UUID uuid) {
+        writeString(uuid.toString(), 36);
+    }
     @Override
     public void read() {
         UUID uuid;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            int[] data = new int[4];
-            for (int i = 0; i < 4; i++) {
-                data[i] = readInt();
-            }
-            uuid = deserializeUUID(data);
+            uuid = readUUIDAsIntArray();
         } else {
-            uuid = UUID.fromString(readString(36));
+            uuid = readUUIDAsString();
         }
         String username = readString(16);
         this.userProfile = new UserProfile(uuid, username);
@@ -77,25 +87,18 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
     @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            int[] data = serializeUUID(userProfile.getUUID());
-            for (int i = 0; i < 4; i++) {
-                writeInt(data[i]);
-            }
+           writeUUIDAsIntArray(userProfile.getUUID());
         } else {
-            writeString(userProfile.getUUID().toString(), 36);
+            writeUUIDAsString(userProfile.getUUID());
         }
         writeString(userProfile.getName(), 16);
     }
 
-    private UUID deserializeUUID(int[] data) {
-        return new UUID((long) data[0] << 32 | data[1] & 4294967295L, (long) data[2] << 32 | data[3] & 4294967295L);
-    }
-
-    public UserProfile getUser() {
+    public UserProfile getUserProfile() {
         return userProfile;
     }
 
-    public void setUser(UserProfile userProfile) {
+    public void setUserProfile(UserProfile userProfile) {
         this.userProfile = userProfile;
     }
 }

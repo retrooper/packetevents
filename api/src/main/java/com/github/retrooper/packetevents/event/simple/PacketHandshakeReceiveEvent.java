@@ -28,8 +28,9 @@ import com.github.retrooper.packetevents.protocol.player.User;
 
 public class PacketHandshakeReceiveEvent extends PacketReceiveEvent {
     public PacketHandshakeReceiveEvent(Object channel, User user,
-                                       Object player, Object rawByteBuf) throws PacketProcessException {
-        super(channel, user, player, rawByteBuf);
+                                       Object player, Object rawByteBuf,
+                                       boolean autoProtocolTranslation) throws PacketProcessException {
+        super(channel, user, player, rawByteBuf, autoProtocolTranslation);
     }
 
     protected PacketHandshakeReceiveEvent(int packetId, PacketTypeCommon packetType,

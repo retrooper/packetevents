@@ -65,7 +65,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             particleType = ParticleTypes.getByName("minecraft:" + particleName);
         } else {
             particleTypeId = readInt();
-            particleType = ParticleTypes.getById(particleTypeId);
+            particleType = ParticleTypes.getById(serverVersion.toClientVersion(), particleTypeId);
         }
         longDistance = readBoolean();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
@@ -120,7 +120,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeString(particle.getType().getName().getKey(), 64);
         } else {
-            writeInt(particle.getType().getId());
+            writeInt(particle.getType().getId(serverVersion.toClientVersion()));
         }
         writeBoolean(longDistance);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
@@ -142,10 +142,12 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         } else {
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
                 int count;
-                if (particle.getType().getId() == 37 || particle.getType().getId() == 38 || particle.getType().getId() == 46) {
+                if (particle.getType().getId(serverVersion.toClientVersion()) == 37
+                        || particle.getType().getId(serverVersion.toClientVersion()) == 38 ||
+                        particle.getType().getId(serverVersion.toClientVersion()) == 46) {
                     count = 1;
                 }
-                else if (particle.getType().getId() == 36) {
+                else if (particle.getType().getId(serverVersion.toClientVersion()) == 36) {
                     count = 2;
                 }
                 else {

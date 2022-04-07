@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.latest.handlers;
+package io.github.retrooper.packetevents.injector.handlers;
 
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -56,7 +56,7 @@ public class PacketEncoderLatest extends MessageToByteEncoder<Object> {
             if (!in.isReadable()) return;
             out.writeBytes(in);
         }
-        PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out);
+        PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out, true);
     }
 
     @Override

@@ -23,7 +23,7 @@ import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
-import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjectorLatest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,7 +35,7 @@ public class InternalBukkitListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+        SpigotChannelInjectorLatest injector = (SpigotChannelInjectorLatest) PacketEvents.getAPI().getInjector();
         //By accessing user with the player object, we ensure that a valid user is cached.
         //In the spigot PlayerManager impl, if there was no user cached,
         //we will create one with help of the Player object.
@@ -45,10 +45,7 @@ public class InternalBukkitListener implements Listener {
         //if we failed to catch it.(shouldn't ever happen really)
         //TODO With Via we might have to run this a tick AFTER join event (atleast when via & viabackwards & rewind are present)
         ClientVersion version = PacketEvents.getAPI().getPlayerManager().getClientVersion(player);
-
-        injector.updatePlayer(player);
-
-        PacketEvents.getAPI().getEventManager().callEvent(new UserLoginEvent(user, e.getPlayer()));
+        injector.updatePlayer(user, player);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

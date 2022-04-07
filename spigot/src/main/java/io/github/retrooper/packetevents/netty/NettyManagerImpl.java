@@ -27,44 +27,22 @@ import io.github.retrooper.packetevents.netty.buffer.*;
 import io.github.retrooper.packetevents.netty.channel.*;
 
 public class NettyManagerImpl implements NettyManager {
-    private static ByteBufOperator BYTE_BUF_OPERATOR;
-    private static ByteBufAllocationOperator BYTE_BUF_ALLOCATION_OPERATOR;
-    private static ChannelOperator CHANNEL_OPERATOR;
+    private static final ByteBufOperator BYTE_BUF_OPERATOR = new ByteBufOperatorModernImpl();
+    private static final ByteBufAllocationOperator BYTE_BUF_ALLOCATION_OPERATOR = new ByteBufAllocationOperatorModernImpl();
+    private static final ChannelOperator CHANNEL_OPERATOR = new ChannelOperatorModernImpl();
 
     @Override
     public ChannelOperator getChannelOperator() {
-        if (CHANNEL_OPERATOR == null) {
-            if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
-                CHANNEL_OPERATOR = new ChannelOperatorModernImpl();
-            }
-            else {
-                CHANNEL_OPERATOR = new ChannelOperatorLegacyImpl();
-            }
-        }
         return CHANNEL_OPERATOR;
     }
 
     @Override
     public ByteBufOperator getByteBufOperator() {
-        if (BYTE_BUF_OPERATOR == null) {
-            if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
-                BYTE_BUF_OPERATOR = new ByteBufOperatorModernImpl();
-            } else {
-                BYTE_BUF_OPERATOR = new ByteBufOperatorLegacyImpl();
-            }
-        }
         return BYTE_BUF_OPERATOR;
     }
 
     @Override
     public ByteBufAllocationOperator getByteBufAllocationOperator() {
-        if (BYTE_BUF_ALLOCATION_OPERATOR == null) {
-            if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
-                BYTE_BUF_ALLOCATION_OPERATOR = new ByteBufAllocationOperatorModernImpl();
-            } else {
-                BYTE_BUF_ALLOCATION_OPERATOR = new ByteBufAllocationOperatorLegacyImpl();
-            }
-        }
         return BYTE_BUF_ALLOCATION_OPERATOR;
     }
 }

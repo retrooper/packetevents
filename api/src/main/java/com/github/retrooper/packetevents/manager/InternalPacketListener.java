@@ -56,7 +56,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             Object channel = event.getChannel();
             //Process outgoing login success packet
             WrapperLoginServerLoginSuccess loginSuccess = new WrapperLoginServerLoginSuccess(event);
-            UserProfile profile = loginSuccess.getUser();
+            UserProfile profile = loginSuccess.getUserProfile();
 
             //Update user profile
             user.getProfile().setUUID(profile.getUUID());
@@ -70,16 +70,16 @@ public class InternalPacketListener extends PacketListenerAbstract {
             //This also updates it for the user instance
             event.getPostTasks().add(() -> {
                 PacketEvents.getAPI().getInjector().changeConnectionState(channel, ConnectionState.PLAY);
-                PacketEvents.getAPI().getLogManager().debug("Transitioned user " + profile.getName() + " into the PLAY state!");
+                PacketEvents.getAPI().getLogManager().debug("Transitioned " + profile.getName() + " into the PLAY state!");
             });
         }
 
         // Join game can be used to update world height, and sets dimension data
+
         if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
             WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
             user.setEntityId(joinGame.getEntityId());
-            if (PacketEvents.getAPI().getServerManager().getVersion()
-                    .isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
+            if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
             }
             // Store world height
@@ -95,7 +95,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
         // Respawn is used to switch dimensions
         if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
-            if (PacketEvents.getAPI().getServerManager().getVersion()
+            if (event.getServerVersion()
                     .isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
             }
@@ -116,8 +116,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             WrapperHandshakingClientHandshake handshake;
             try {
                 handshake = new WrapperHandshakingClientHandshake(event);
-            }
-            catch (ArrayIndexOutOfBoundsException exception) {
+            } catch (ArrayIndexOutOfBoundsException exception) {
                 user.closeConnection();
                 PacketEvents.getAPI().getLogManager().debug("Disconnected " + address.getHostString() + ":" + address.getPort() + " for sending an invalid handshaking packet. They might be on an outdated client.");
                 return;

@@ -27,8 +27,9 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 public class PacketLoginSendEvent extends PacketSendEvent {
-    public PacketLoginSendEvent(Object channel, User user, Object player, Object rawByteBuf) throws PacketProcessException {
-        super(channel, user, player, rawByteBuf);
+    public PacketLoginSendEvent(Object channel, User user, Object player, Object rawByteBuf,
+                                boolean autoProtocolTranslation) throws PacketProcessException {
+        super(channel, user, player, rawByteBuf, autoProtocolTranslation);
     }
 
     protected PacketLoginSendEvent(int packetId, PacketTypeCommon packetType,

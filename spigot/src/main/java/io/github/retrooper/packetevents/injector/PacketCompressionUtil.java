@@ -18,9 +18,7 @@
 
 package io.github.retrooper.packetevents.injector;
 
-import io.github.retrooper.packetevents.injector.legacy.compression.PacketCompressionLegacy;
-import io.github.retrooper.packetevents.injector.latest.compression.PacketCompressionLatest;
-import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.injector.compression.PacketCompressionHandler;
 
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -34,38 +32,22 @@ public class PacketCompressionUtil {
     public static int MAXIMUM = 2097152;
     public static final byte[] COMPRESSED_DATA = new byte[8192];
 
-    public static PacketCompressionManager COMPRESSION_MANAGER = null;
-
-    private static void loadManager() {
-        if (COMPRESSION_MANAGER == null) {
-            if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
-                COMPRESSION_MANAGER = new PacketCompressionLatest();
-            }
-            else {
-                COMPRESSION_MANAGER = new PacketCompressionLegacy();
-            }
-        }
-    }
-
+    public static PacketCompressionHandler COMPRESSION_MANAGER = new PacketCompressionHandler();
 
 
     public static void decompress(Object pipeline, Object buffer, Object output) {
-        loadManager();
         COMPRESSION_MANAGER.decompress(pipeline, buffer, output);
     }
 
     public static void compress(Object pipeline, Object buffer, Object output) {
-        loadManager();
         COMPRESSION_MANAGER.compress(pipeline, buffer, output);
     }
 
     public static void recompress(Object ctx, Object buffer) {
-        loadManager();
         COMPRESSION_MANAGER.recompress(ctx, buffer);
     }
 
     public static void relocateHandlers(Object pipeline, Object buffer, Object decompressed) {
-        loadManager();
         COMPRESSION_MANAGER.relocateHandlers(pipeline, buffer, decompressed);
     }
 }

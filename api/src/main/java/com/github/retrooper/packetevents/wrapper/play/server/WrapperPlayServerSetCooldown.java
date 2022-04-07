@@ -22,7 +22,7 @@ public class WrapperPlayServerSetCooldown extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        item = ItemTypes.getById(readVarInt());
+        item = ItemTypes.getById(serverVersion.toClientVersion(), readVarInt());
         cooldownTicks = readVarInt();
     }
 
@@ -34,7 +34,7 @@ public class WrapperPlayServerSetCooldown extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
-        writeVarInt(item.getId());
+        writeVarInt(item.getId(serverVersion.toClientVersion()));
         writeVarInt(cooldownTicks);
     }
 

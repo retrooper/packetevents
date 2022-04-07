@@ -52,12 +52,18 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private boolean cloned;
 
     public ProtocolPacketEvent(PacketSide packetSide, Object channel,
-                               User user, T player, Object byteBuf) throws PacketProcessException {
+                               User user, T player, Object byteBuf,
+                               boolean autoProtocolTranslation) throws PacketProcessException {
         this.channel = channel;
         this.user = user;
         this.player = player;
-
-        this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
+        if (autoProtocolTranslation || user.getClientVersion() == null) {
+            this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
+        }
+        else {
+            //TODO Optimize
+            this.serverVersion = user.getClientVersion().toServerVersion();
+        }
 
         this.byteBuf = byteBuf;
         int size = ByteBufHelper.readableBytes(byteBuf);
@@ -69,9 +75,11 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         } catch (Exception e) {
             throw new PacketProcessException("Failed to read the Packet ID of a packet. (Size: " + size + ")");
         }
-        this.packetType = PacketType.getById(packetSide, user.getConnectionState(), this.serverVersion, packetID);
+        ClientVersion version = serverVersion.toClientVersion();
+        this.packetType = PacketType.getById(packetSide, user.getConnectionState(),
+                version, packetID);
         if (this.packetType == null) {
-            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Connection state: " + user.getConnectionState() +  ", Server version: " + serverVersion.getReleaseName());
+            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Bound: " + packetSide.getOpposite() +  ", Connection state: " + user.getConnectionState() +  ", Server version: " + serverVersion.getReleaseName());
         }
         this.connectionState = user.getConnectionState();
     }

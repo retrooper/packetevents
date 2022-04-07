@@ -28,8 +28,9 @@ import com.github.retrooper.packetevents.protocol.player.User;
 
 public class PacketStatusReceiveEvent extends PacketReceiveEvent {
     public PacketStatusReceiveEvent(Object channel, User user,
-                                    Object player, Object rawByteBuf) throws PacketProcessException {
-        super(channel, user, player, rawByteBuf);
+                                    Object player, Object rawByteBuf,
+                                    boolean autoProtocolTranslation) throws PacketProcessException {
+        super(channel, user, player, rawByteBuf, autoProtocolTranslation);
     }
 
     protected PacketStatusReceiveEvent(int packetId, PacketTypeCommon packetType,
