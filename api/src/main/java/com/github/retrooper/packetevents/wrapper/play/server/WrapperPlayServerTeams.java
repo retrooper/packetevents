@@ -148,7 +148,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
 
     @Override
     public void read() {
-        teamName = readString();
+        teamName = readString(16);
         teamMode = TeamMode.values()[readByte()];
         ScoreBoardTeamInfo info = null;
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
@@ -206,7 +206,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
 
     @Override
     public void write() {
-        writeString(teamName);
+        writeString(teamName, 16);
         writeByte(teamMode.ordinal());
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
             ScoreBoardTeamInfo info = teamInfo.orElse(new ScoreBoardTeamInfo(Component.empty(), Component.empty(), Component.empty(),
