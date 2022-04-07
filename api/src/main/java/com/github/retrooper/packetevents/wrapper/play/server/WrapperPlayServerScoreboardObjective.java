@@ -55,7 +55,11 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
         name = readString();
         mode = ObjectiveMode.values()[readByte()];
         displayName = Optional.ofNullable(readString());
-        display = Optional.ofNullable(HealthDisplay.getByName(readString()));
+        if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
+            display = Optional.ofNullable(HealthDisplay.getByName(readString()));
+        } else {
+            display = Optional.of(HealthDisplay.values()[readVarInt()]);
+        }
     }
 
     @Override
@@ -70,13 +74,12 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
     public void write() {
         writeString(name);
         writeByte((byte) mode.ordinal());
-        if (mode == ObjectiveMode.CREATE || mode == ObjectiveMode.UPDATE) {
-            writeString(displayName.orElse(""));
-            if (serverVersion == ServerVersion.V_1_7_10)
-                writeString("integer");
-            else
-                writeString(display.orElse(HealthDisplay.INTEGER).name().toLowerCase());
-        }
+        if (serverVersion == ServerVersion.V_1_7_10)
+            writeString("integer");
+        else if (serverVersion.isOlderThan(ServerVersion.V_1_13))
+            writeString(display.orElse(HealthDisplay.INTEGER).name().toLowerCase());
+        else
+            writeVarInt(display.orElse(HealthDisplay.INTEGER).ordinal());
     }
 
     public String getName() {
