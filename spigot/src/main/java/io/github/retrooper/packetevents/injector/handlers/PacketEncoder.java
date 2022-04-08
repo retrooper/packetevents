@@ -33,12 +33,12 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 
 @ChannelHandler.Sharable
-public class PacketEncoderLatest extends MessageToByteEncoder<Object> {
+public class PacketEncoder extends MessageToByteEncoder<Object> {
     public User user;
     public volatile Player player;
     public MessageToByteEncoder<?> vanillaEncoder;
 
-    public PacketEncoderLatest(User user) {
+    public PacketEncoder(User user) {
         this.user = user;
     }
 

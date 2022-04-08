@@ -16,14 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.util.google;
+package io.github.retrooper.packetevents.injector.connection;
 
-import com.google.common.collect.MapMaker;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
 
-import java.util.concurrent.ConcurrentMap;
-
-public class GuavaUtils_8 {
-    public static <T, K> ConcurrentMap<T, K> makeMap() {
-        return new MapMaker().weakValues().makeMap();
+public class PreChannelInitializer_v1_8 extends ChannelInitializer<Channel> {
+    @Override
+    protected void initChannel(Channel channel) {
+        channel.pipeline().addLast(new ChannelInitializer<Channel>() {
+            @Override
+            protected void initChannel(Channel channel) {
+                ServerConnectionInitializer.initChannel(channel, ConnectionState.HANDSHAKING);
+            }
+        });
     }
 }

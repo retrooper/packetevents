@@ -25,13 +25,13 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-public class PreChannelInitializerLatest_v1_12 extends ChannelInboundHandlerAdapter {
+public class PreChannelInitializer_v1_12 extends ChannelInboundHandlerAdapter {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(io.netty.channel.ChannelInitializer.class);
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) {
         try {
-            ServerConnectionInitializerLatest.initChannel(ctx.channel(), ConnectionState.HANDSHAKING);
+            ServerConnectionInitializer.initChannel(ctx.channel(), ConnectionState.HANDSHAKING);
         } catch (Throwable t) {
             exceptionCaught(ctx, t);
         } finally {
@@ -47,7 +47,7 @@ public class PreChannelInitializerLatest_v1_12 extends ChannelInboundHandlerAdap
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable t) {
-        PreChannelInitializerLatest_v1_12.logger.warn("Failed to initialize a channel. Closing: " + ctx.channel(), t);
+        PreChannelInitializer_v1_12.logger.warn("Failed to initialize a channel. Closing: " + ctx.channel(), t);
         ctx.close();
     }
 }

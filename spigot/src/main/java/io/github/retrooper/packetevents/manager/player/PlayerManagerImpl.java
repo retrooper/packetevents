@@ -107,10 +107,6 @@ public class PlayerManagerImpl implements PlayerManager {
             if (PROPERTY_MAP_CLASS == null) {
                 PROPERTY_MAP_CLASS = Reflection.getClassByNameWithoutException("" +
                         "com.mojang.authlib.properties.PropertyMap");
-                if (PROPERTY_MAP_CLASS == null) {
-                    PROPERTY_MAP_CLASS = Reflection.getClassByNameWithoutException("" +
-                            "net.minecraft.util.com.mojang.authlib.properties.PropertyMap");
-                }
                 PROPERTY_MAP_GET_METHOD = Reflection.getMethod(PROPERTY_MAP_CLASS, "get", Collection.class, Object.class);
             }
             //Get the player's game profile in NMS

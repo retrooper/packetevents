@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.injector.compression;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
-import io.github.retrooper.packetevents.injector.handlers.PacketDecoderLatest;
+import io.github.retrooper.packetevents.injector.handlers.PacketDecoder;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -122,7 +122,7 @@ public class PacketCompressionHandler {
         ChannelHandler encoder = pipeline.remove(PacketEvents.ENCODER_NAME);
         pipeline.addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
 
-        PacketDecoderLatest decoder = (PacketDecoderLatest) pipeline.remove(PacketEvents.DECODER_NAME);
-        pipeline.addAfter("decompress", PacketEvents.DECODER_NAME, new PacketDecoderLatest(decoder));
+        PacketDecoder decoder = (PacketDecoder) pipeline.remove(PacketEvents.DECODER_NAME);
+        pipeline.addAfter("decompress", PacketEvents.DECODER_NAME, new PacketDecoder(decoder));
     }
 }

@@ -36,7 +36,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PacketDecoderLatest extends ByteToMessageDecoder {
+public class PacketDecoder extends ByteToMessageDecoder {
     public User user;
     public volatile Player player;
 
@@ -45,11 +45,11 @@ public class PacketDecoderLatest extends ByteToMessageDecoder {
     public boolean handledCompression;
     public boolean skipDoubleTransform;
 
-    public PacketDecoderLatest(User user) {
+    public PacketDecoder(User user) {
         this.user = user;
     }
 
-    public PacketDecoderLatest(PacketDecoderLatest decoder) {
+    public PacketDecoder(PacketDecoder decoder) {
         user = decoder.user;
         player = decoder.player;
     }

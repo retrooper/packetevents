@@ -31,7 +31,6 @@ import com.github.retrooper.packetevents.util.TimeStampMode;
 public class PacketEventsSettings {
 
     private TimeStampMode timestampMode = TimeStampMode.MILLIS;
-    private ServerVersion fallbackServerVersion = ServerVersion.V_1_7_10;
     private boolean readOnlyListeners = false;
     private boolean checkForUpdates = true;
     private boolean bStatsEnabled = true;
@@ -53,19 +52,6 @@ public class PacketEventsSettings {
      */
     public TimeStampMode getTimeStampMode() {
         return timestampMode;
-    }
-
-    /**
-     * This is the server version PacketEvents should assume the server is when detecting
-     * the server version fails using the Bukkit API.
-     * This seems to be most common on 1.7.10 paper forks.
-     *
-     * @param version ServerVersion
-     * @return Settings instance.
-     */
-    public PacketEventsSettings fallbackServerVersion(ServerVersion version) {
-        this.fallbackServerVersion = version;
-        return this;
     }
 
     /**
@@ -109,16 +95,6 @@ public class PacketEventsSettings {
     public PacketEventsSettings debug(boolean debugEnabled) {
         this.debugEnabled = debugEnabled;
         return this;
-    }
-
-    /**
-     * Fallback server version.
-     *
-     * @return Getter for {@link #fallbackServerVersion}
-     */
-
-    public ServerVersion getFallbackServerVersion() {
-        return fallbackServerVersion;
     }
 
     /**

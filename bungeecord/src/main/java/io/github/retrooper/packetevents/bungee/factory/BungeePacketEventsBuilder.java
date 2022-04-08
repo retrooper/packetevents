@@ -99,9 +99,6 @@ public class BungeePacketEventsBuilder {
                                 return version = val;
                             }
                         }
-                        if (version == null) {
-                            version = PacketEvents.getAPI().getSettings().getFallbackServerVersion();
-                        }
                     }
                     return version;
                 }

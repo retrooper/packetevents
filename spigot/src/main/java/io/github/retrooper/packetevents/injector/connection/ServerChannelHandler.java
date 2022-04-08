@@ -24,14 +24,14 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
-public class ServerChannelHandlerLatest extends ChannelInboundHandlerAdapter {
+public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = (Channel) msg;
         if (SpigotReflectionUtil.V_1_12_OR_HIGHER) {
-            channel.pipeline().addLast(PacketEvents.SERVER_CHANNEL_HANDLER_NAME, new PreChannelInitializerLatest_v1_12());
+            channel.pipeline().addLast(PacketEvents.SERVER_CHANNEL_HANDLER_NAME, new PreChannelInitializer_v1_12());
         } else {
-            channel.pipeline().addFirst(PacketEvents.SERVER_CHANNEL_HANDLER_NAME, new PreChannelInitializerLatest_v1_8());
+            channel.pipeline().addFirst(PacketEvents.SERVER_CHANNEL_HANDLER_NAME, new PreChannelInitializer_v1_8());
         }
         super.channelRead(ctx, msg);
     }

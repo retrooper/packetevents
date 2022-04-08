@@ -102,7 +102,7 @@ public class VelocityPacketEventsBuilder {
                                 return version = val;
                             }
                         }
-                        return version = PacketEvents.getAPI().getSettings().getFallbackServerVersion();
+                        return null;
                     }
                     return version;
                 }

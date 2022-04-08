@@ -33,7 +33,8 @@ import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
-import io.github.retrooper.packetevents.injector.SpigotChannelInjectorLatest;
+import io.github.retrooper.packetevents.injector.PaperChannelInjector;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
@@ -78,7 +79,7 @@ public class SpigotPacketEventsBuilder {
             private final ServerManager serverManager = new ServerManagerImpl();
             private final PlayerManager playerManager = new PlayerManagerImpl();
             private final NettyManager nettyManager = new NettyManagerImpl();
-            private final SpigotChannelInjectorLatest injector = new SpigotChannelInjectorLatest();
+            private final SpigotChannelInjector injector = PaperChannelInjector.canBeUsed() ? new PaperChannelInjector() : new SpigotChannelInjector();
             private final InternalBukkitListener internalBukkitListener = new InternalBukkitListener();
             private final LogManager logManager = new BukkitLogManager();
             private boolean loaded;

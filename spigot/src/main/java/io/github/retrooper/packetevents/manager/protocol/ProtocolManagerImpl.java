@@ -32,28 +32,6 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     //TODO Implement
     private ProtocolVersion resolveVersionNoCache() {
-       /* for (final ServerVersion val : ServerVersion.reversedValues()) {
-            //For example "V_1_18" -> "1.18"
-            if (Bukkit.getBukkitVersion().contains(val.getReleaseName())) {
-                return val;
-            }
-        }
-
-        ServerVersion fallbackVersion = PacketEvents.getAPI().getSettings().getFallbackServerVersion();
-        if (fallbackVersion != null) {
-            if (fallbackVersion == ServerVersion.V_1_7_10) {
-                try {
-                    Class.forName("net.minecraft.util.io.netty.buffer.ByteBuf");
-                } catch (Exception ex) {
-                    //We will assume its 1.8.8
-                    fallbackVersion = ServerVersion.V_1_8_8;
-                }
-            }
-            Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
-            plugin.getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the server version is " + fallbackVersion.name() + "...");
-            return fallbackVersion;
-        }
-        return ServerVersion.ERROR;*/
         return ProtocolVersion.UNKNOWN;
     }
 
