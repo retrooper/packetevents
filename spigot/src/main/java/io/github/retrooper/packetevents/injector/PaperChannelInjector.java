@@ -21,9 +21,7 @@ package io.github.retrooper.packetevents.injector;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
-import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
-import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.netty.channel.Channel;
 import net.kyori.adventure.key.Key;
 
@@ -81,6 +79,7 @@ public class PaperChannelInjector extends SpigotChannelInjector {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
+        //TODO Deal with networkManagers like on Spigot, initialize already registered channels...
     }
 
     @Override
