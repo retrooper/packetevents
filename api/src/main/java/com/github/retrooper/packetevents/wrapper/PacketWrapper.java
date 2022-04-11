@@ -146,8 +146,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         PacketWrapper<?> last = event.getLastUsedWrapper();
         if (last != null) {
             copy((T) last);
-        }
-        else {
+        } else {
             event.setLastUsedWrapper(this);
             read();
         }
@@ -294,7 +293,7 @@ public class PacketWrapper<T extends PacketWrapper> {
             }
         }
         int typeID = v1_13_2 ? readVarInt() : readShort();
-        if (typeID < 0) {
+        if (typeID < 0 && !v1_13_2) { // 1.13.2 doesn't have this logic
             return ItemStack.EMPTY;
         }
         ItemType type = ItemTypes.getById(serverVersion.toClientVersion(), typeID);
@@ -315,7 +314,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
-            if (ItemStack.EMPTY.equals(itemStack)) {
+            if (itemStack.isEmpty()) {
                 writeBoolean(false);
             } else {
                 writeBoolean(true);
@@ -326,10 +325,8 @@ public class PacketWrapper<T extends PacketWrapper> {
                     typeID = itemStack.getType().getId(serverVersion.toClientVersion());
                 }
                 writeVarInt(typeID);
-                if (typeID >= 0) {
-                    writeByte(itemStack.getAmount());
-                    writeNBT(itemStack.getNBT());
-                }
+                writeByte(itemStack.getAmount());
+                writeNBT(itemStack.getNBT());
             }
         } else {
             int typeID;
@@ -401,7 +398,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    public void writeComponentJSON(String json){
+    public void writeComponentJSON(String json) {
         writeString(json, getMaxMessageLength());
     }
 
