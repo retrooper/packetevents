@@ -318,12 +318,7 @@ public class PacketWrapper<T extends PacketWrapper> {
                 writeBoolean(false);
             } else {
                 writeBoolean(true);
-                int typeID;
-                if (itemStack.getType() == null || ItemStack.EMPTY.equals(itemStack)) {
-                    typeID = -1;
-                } else {
-                    typeID = itemStack.getType().getId(serverVersion.toClientVersion());
-                }
+                int typeID = itemStack.getType().getId(serverVersion.toClientVersion());
                 writeVarInt(typeID);
                 writeByte(itemStack.getAmount());
                 writeNBT(itemStack.getNBT());
