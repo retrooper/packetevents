@@ -151,6 +151,28 @@ public class Vector3f {
         return new Vector3f(getX(), getY(), getZ());
     }
 
+    public Vector3f add(float x, float y, float z) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
+        return this;
+    }
+
+    public Vector3f add(Vector3f target) {
+        return add(target.x, target.y, target.z);
+    }
+
+    public Vector3f subtract(float x, float y, float z) {
+        this.x -= x;
+        this.y -= y;
+        this.z -= z;
+        return this;
+    }
+
+    public Vector3f subtract(Vector3f target) {
+        return subtract(target.x, target.y, target.z);
+    }
+
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;

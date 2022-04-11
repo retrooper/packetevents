@@ -151,28 +151,26 @@ public class Vector3d {
         return new Vector3d(getX(), getY(), getZ());
     }
 
-    public Vector3d add(Vector3d target) {
-        Vector3d result = new Vector3d(x, y, z);
-        result.x += target.x;
-        result.y += target.y;
-        result.z += target.z;
-        return result;
-    }
-
     public Vector3d add(double x, double y, double z) {
-        return add(new Vector3d(x, y, z));
+        this.x += x;
+        this.y += y;
+        this.z += z;
+        return this;
     }
 
-    public Vector3d subtract(Vector3d target) {
-        Vector3d result = new Vector3d(x, y, z);
-        result.x -= target.x;
-        result.y -= target.y;
-        result.z -= target.z;
-        return result;
+    public Vector3d add(Vector3d target) {
+        return add(target.x, target.y, target.z);
     }
 
     public Vector3d subtract(double x, double y, double z) {
-        return subtract(new Vector3d(x, y, z));
+        this.x -= x;
+        this.y -= y;
+        this.z -= z;
+        return this;
+    }
+
+    public Vector3d subtract(Vector3d target) {
+        return subtract(target.x, target.y, target.z);
     }
 
     public double distance(Vector3d target) {

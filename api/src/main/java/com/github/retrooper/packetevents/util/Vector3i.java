@@ -207,6 +207,28 @@ public class Vector3i {
         return new Vector3i(getX(), getY(), getZ());
     }
 
+    public Vector3i add(int x, int y, int z) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
+        return this;
+    }
+
+    public Vector3i add(Vector3i target) {
+        return add(target.x, target.y, target.z);
+    }
+
+    public Vector3i subtract(int x, int y, int z) {
+        this.x -= x;
+        this.y -= y;
+        this.z -= z;
+        return this;
+    }
+
+    public Vector3i subtract(Vector3i target) {
+        return subtract(target.x, target.y, target.z);
+    }
+
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;
