@@ -52,6 +52,9 @@ public class PaperChannelInjector extends SpigotChannelInjector {
 
     @Override
     public boolean isServerBound() {
+        if (HAS_LISTENER_METHOD == null) {
+            return false;
+        }
         Key key = Key.key(PacketEvents.IDENTIFIER, "injector");
         try {
             return HAS_LISTENER_METHOD.invoke(null, key) != null;
