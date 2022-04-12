@@ -83,7 +83,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         yaw = readByte() /  ROTATION_DIVISOR;
         pitch = readByte() / ROTATION_DIVISOR;
         if (!v1_9) {
-            item = ItemTypes.getById(serverVersion.toClientVersion(), readByte());
+            item = ItemTypes.getById(serverVersion.toClientVersion(), readShort());
         }
         else {
             item = ItemTypes.AIR;
