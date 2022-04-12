@@ -22,20 +22,18 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.google.gson.JsonObject;
+import net.kyori.adventure.text.Component;
 
 public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServerResponse> {
-    public static boolean HANDLE_JSON = true;
     private String componentJson;
-    private JsonObject component;
 
     public WrapperStatusServerResponse(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperStatusServerResponse(JsonObject component) {
+    public WrapperStatusServerResponse(Component component) {
         super(PacketType.Status.Server.RESPONSE);
-        this.component = component;
+        this.componentJson = AdventureSerializer.asVanilla(component);
     }
 
     public WrapperStatusServerResponse(String componentJson) {
@@ -46,31 +44,24 @@ public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServ
     @Override
     public void read() {
         componentJson = readString();
-        if (HANDLE_JSON) {
-            component = AdventureSerializer.getGsonSerializer().serializer().fromJson(componentJson, JsonObject.class);
-        }
     }
 
     @Override
     public void copy(WrapperStatusServerResponse wrapper) {
         componentJson = wrapper.componentJson;
-        component = wrapper.component;
     }
 
     @Override
     public void write() {
-        if (HANDLE_JSON) {
-            componentJson = component.toString();
-        }
         writeString(componentJson);
     }
 
-    public JsonObject getComponent() {
-        return component;
+    public Component getComponent() {
+        return AdventureSerializer.parseComponent(componentJson);
     }
 
-    public void setComponent(JsonObject component) {
-        this.component = component;
+    public void setComponent(Component component) {
+        this.componentJson = AdventureSerializer.asVanilla(component);
     }
 
     public String getComponentJson() {
