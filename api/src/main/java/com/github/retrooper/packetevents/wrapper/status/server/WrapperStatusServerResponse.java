@@ -22,7 +22,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import net.kyori.adventure.text.Component;
+import com.google.gson.JsonObject;
 
 public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServerResponse> {
     private String componentJson;
@@ -31,9 +31,8 @@ public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServ
         super(event);
     }
 
-    public WrapperStatusServerResponse(Component component) {
+    public WrapperStatusServerResponse(JsonObject component) {
         super(PacketType.Status.Server.RESPONSE);
-        this.componentJson = AdventureSerializer.asVanilla(component);
     }
 
     public WrapperStatusServerResponse(String componentJson) {
@@ -56,12 +55,12 @@ public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServ
         writeString(componentJson);
     }
 
-    public Component getComponent() {
-        return AdventureSerializer.parseComponent(componentJson);
+    public JsonObject getComponent() {
+        return AdventureSerializer.getGsonSerializer().serializer().fromJson(componentJson, JsonObject.class);
     }
 
-    public void setComponent(Component component) {
-        this.componentJson = AdventureSerializer.asVanilla(component);
+    public void setComponent(JsonObject component) {
+        this.componentJson = AdventureSerializer.getGsonSerializer().serializer().toJson(component);
     }
 
     public String getComponentJson() {
