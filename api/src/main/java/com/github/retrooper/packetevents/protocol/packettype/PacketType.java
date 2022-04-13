@@ -27,7 +27,6 @@ import com.github.retrooper.packetevents.util.VersionMapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Map;
 
 public final class PacketType {
@@ -481,7 +480,7 @@ public final class PacketType {
             DECLARE_RECIPES,
             TAGS;
             private static int INDEX = 0;
-            private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new IdentityHashMap<>();
+            private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
             private final int[] ids = new int[CLIENTBOUND_PLAY_VERSION_MAPPER.getVersions().length];
 
             public int getId(ClientVersion version) {
