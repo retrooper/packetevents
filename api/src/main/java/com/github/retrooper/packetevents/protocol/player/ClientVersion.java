@@ -20,9 +20,6 @@ package com.github.retrooper.packetevents.protocol.player;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
 
 /**
  * Client Version.
@@ -116,7 +113,6 @@ public enum ClientVersion {
     private static final int LOWEST_SUPPORTED_PROTOCOL_VERSION = LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1;
     private static final int HIGHEST_SUPPORTED_PROTOCOL_VERSION = HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1;
 
-    private static final Map<Integer, ClientVersion> CLIENT_VERSION_CACHE = new IdentityHashMap<>();
     private final int protocolVersion;
     private final String name;
 
@@ -179,16 +175,11 @@ public enum ClientVersion {
         } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
         } else {
-            ClientVersion cached = CLIENT_VERSION_CACHE.get(protocolVersion);
-            if (cached != null) {
-                return cached;
-            }
             for (ClientVersion version : values()) {
                 if (version.protocolVersion > protocolVersion) {
                     break;
                 } else if (version.protocolVersion == protocolVersion) {
                     //Cache for next time
-                    CLIENT_VERSION_CACHE.put(protocolVersion, version);
                     return version;
                 }
             }
