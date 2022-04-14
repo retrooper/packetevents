@@ -164,6 +164,12 @@ public class PacketEventsPlugin extends JavaPlugin {
                                 .append(Component.text(" Data: " + brandData)
                                         .color(NamedTextColor.GOLD));
                         break;
+                    case STEER_VEHICLE:
+                        WrapperPlayClientSteerVehicle steerVehicle = new WrapperPlayClientSteerVehicle(event);
+                        float sideways = steerVehicle.getSideways();
+                        float forward = steerVehicle.getForward();
+                        user.sendMessage(ChatColor.GOLD + "Sideways: " + sideways + ", forward: " + forward);
+                        break;
                     default:
                         break;
                 }
