@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.protocol.item.enchantment.type.Enchantm
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -145,29 +146,29 @@ public class ItemStack {
         this.legacyData = legacyData;
     }
 
-    public boolean isEnchantable() {
+    public boolean isEnchantable(ClientVersion version) {
         if (getType() == ItemTypes.BOOK) return getAmount() == 1;
         if (getType() == ItemTypes.ENCHANTED_BOOK) return false;
-        return getMaxStackSize() == 1 && canBeDepleted() && !isEnchanted();
+        return getMaxStackSize() == 1 && canBeDepleted() && !isEnchanted(version);
     }
 
-    public boolean isEnchanted() {
-        if (!isEmpty() && this.nbt != null && this.nbt.getCompoundListTagOrNull("Enchantments") != null) {
-            return !this.nbt.getCompoundListTagOrNull("Enchantments").isEmpty();
-        } else {
-            return false;
-        }
+    public boolean isEnchanted(ClientVersion version) {
+        String tag = version.isNewerThanOrEquals(ClientVersion.V_1_13) ? "Enchantments" : "ench";
+        return !isEmpty() && this.nbt != null && this.nbt.getCompoundListTagOrNull(tag) != null && !this.nbt.getCompoundListTagOrNull(tag).getTags().isEmpty();
     }
 
-    private static List<Enchantment> getEnchantments(@Nullable NBTCompound nbt) {
-        if (nbt == null || nbt.getCompoundListTagOrNull("Enchantments") == null)
+    private static List<Enchantment> getEnchantments(@Nullable NBTCompound nbt, ClientVersion version) {
+        String tag = version.isNewerThanOrEquals(ClientVersion.V_1_13) ? "Enchantments" : "ench";
+        if (nbt == null || nbt.getCompoundListTagOrNull(tag) == null)
             return new ArrayList<>(0);
-        NBTList<NBTCompound> nbtList = nbt.getCompoundListTagOrNull("Enchantments");
+
+        NBTList<NBTCompound> nbtList = nbt.getCompoundListTagOrNull(tag);
         List<NBTCompound> compounds = nbtList.getTags();
         List<Enchantment> enchantments = new ArrayList<>(compounds.size());
+
         for (NBTCompound compound : compounds) {
-            String id = compound.getStringTagValueOrNull("id");
-            EnchantmentType type = EnchantmentTypes.getByName(id);
+            EnchantmentType type = getEnchantmentTypeFromTag(compound, version);
+
             if (type != null) {
                 NBTShort levelTag = compound.getTagOfTypeOrNull("lvl", NBTShort.class);
                 int level = levelTag.getAsInt();
@@ -175,21 +176,22 @@ public class ItemStack {
                 enchantments.add(enchantment);
             }
         }
+
         return enchantments;
     }
 
-    public List<Enchantment> getEnchantments() {
-        return getEnchantments(this.nbt);
+    public List<Enchantment> getEnchantments(ClientVersion version) {
+        return getEnchantments(this.nbt, version);
     }
 
-    // TODO: Test on outdated versions
-    public int getEnchantmentLevel(EnchantmentType enchantment) {
-        if (isEnchanted()) {
+    public int getEnchantmentLevel(EnchantmentType enchantment, ClientVersion version) {
+        if (isEnchanted(version)) {
             // isEnchanted() is true, so we can assume that nbt is not null
             assert nbt != null;
-            for (NBTCompound base : nbt.getCompoundListTagOrNull("Enchantments").getTags()) {
-                NBTString string = base.getTagOfTypeOrNull("id", NBTString.class);
-                if (string != null && enchantment == EnchantmentTypes.getByName(string.getValue())) {
+            String tag = version.isNewerThanOrEquals(ClientVersion.V_1_13) ? "Enchantments" : "ench";
+            for (NBTCompound base : nbt.getCompoundListTagOrNull(tag).getTags()) {
+                EnchantmentType type = getEnchantmentTypeFromTag(base, version);
+                if (enchantment == type) {
                     return base.getTagOfTypeOrNull("lvl", NBTShort.class).getAsInt();
                 }
             }
@@ -198,24 +200,40 @@ public class ItemStack {
         return 0;
     }
 
-    public void setEnchantments(List<Enchantment> enchantments) {
+    @Nullable
+    private static EnchantmentType getEnchantmentTypeFromTag(NBTCompound tag, ClientVersion version) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_13)) {
+            String id = tag.getStringTagValueOrNull("id");
+            return EnchantmentTypes.getByName(id);
+        } else {
+            NBTShort idTag = tag.getTagOfTypeOrNull("id", NBTShort.class);
+            return EnchantmentTypes.getById(version, idTag.getAsInt());
+        }
+    }
+
+    public void setEnchantments(List<Enchantment> enchantments, ClientVersion version) {
         nbt = getOrCreateTag(); // Create tag if null
+        String tagName = version.isNewerThanOrEquals(ClientVersion.V_1_13) ? "Enchantments" : "ench";
         if (enchantments.isEmpty()) {
             //Let us clear the enchantments
-            if (nbt.getTagOrNull("Enchantments") != null) {
-                nbt.removeTag("Enchantments");
+            if (nbt.getTagOrNull(tagName) != null) {
+                nbt.removeTag(tagName);
             }
-        }
-        else {
+        } else {
             List<NBTCompound> list = new ArrayList<>();
             for (Enchantment enchantment : enchantments) {
                 NBTCompound compound = new NBTCompound();
-                compound.setTag("id", new NBTString(enchantment.getType().getName().toString()));
+                if (version.isNewerThanOrEquals(ClientVersion.V_1_13)) {
+                    compound.setTag("id", new NBTString(enchantment.getType().getName().toString()));
+                } else {
+                    compound.setTag("id", new NBTShort((short) enchantment.getType().getId(version)));
+                }
+
                 compound.setTag("lvl", new NBTShort((short) enchantment.getLevel()));
                 list.add(compound);
             }
             assert nbt != null; // NBT was created in getOrCreateTag()
-            nbt.setTag("Enchantments", new NBTList<>(NBTType.COMPOUND, list));
+            nbt.setTag(tagName, new NBTList<>(NBTType.COMPOUND, list));
         }
     }
 
@@ -275,6 +293,7 @@ public class ItemStack {
         private NBTCompound nbt = null;
         private int legacyData = -1;
         private List<Enchantment> enchantments = null;
+        private ClientVersion version;
 
         public Builder type(ItemType type) {
             this.type = type;
@@ -286,15 +305,16 @@ public class ItemStack {
             return this;
         }
 
-        public Builder nbt(NBTCompound nbt) {
-            this.nbt = nbt;
+        public Builder nbt(NBTCompound nbt, ClientVersion version) { // TODO: There should be a better way to do enchantments
+            this.version = version;
 
-            List<Enchantment> nbtEnchantments = getEnchantments(nbt);
+            List<Enchantment> nbtEnchantments = getEnchantments(nbt, version);
             // This assumes logically, if already set enchants before NBT, then they would still want the enchants
             if (!nbtEnchantments.isEmpty()) {
                 this.enchantments = nbtEnchantments;
             }
 
+            this.nbt = nbt;
             return this;
         }
 
@@ -310,12 +330,14 @@ public class ItemStack {
          * @param enchantments The enchantments to set
          * @return This builder
          */
-        public Builder enchantments(List<Enchantment> enchantments) {
+        public Builder enchantments(List<Enchantment> enchantments, ClientVersion version) {
+            this.version = version;
             this.enchantments = enchantments;
             return this;
         }
 
-        public Builder addEnchantment(Enchantment enchantment) {
+        public Builder addEnchantment(Enchantment enchantment, ClientVersion version) {
+            this.version = version;
             if (enchantments == null) {
                 enchantments = new ArrayList<>();
             }
@@ -326,7 +348,7 @@ public class ItemStack {
         public ItemStack build() {
             ItemStack stack = new ItemStack(type, amount, nbt, legacyData);
             if (enchantments != null) {
-                stack.setEnchantments(enchantments);
+                stack.setEnchantments(enchantments, version);
             }
             return stack;
         }
