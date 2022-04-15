@@ -303,7 +303,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         return ItemStack.builder()
                 .type(type)
                 .amount(amount)
-                .nbt(nbt, serverVersion.toClientVersion()) // TODO: We need something more independent for client version... this line is hacky and won't work on proxies
+                .nbt(nbt)
                 .legacyData(legacyData)
                 .build();
     }
