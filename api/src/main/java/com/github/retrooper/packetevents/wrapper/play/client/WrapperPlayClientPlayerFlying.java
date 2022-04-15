@@ -72,9 +72,7 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
                 double stance = readDouble();
             }
             double z = readDouble();
-            position.setX(x);
-            position.setY(y);
-            position.setZ(z);
+            position = new Vector3d(x, y, z);
         }
         if (rotationChanged) {
             yaw = readFloat();

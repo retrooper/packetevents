@@ -30,15 +30,15 @@ public class Vector3f {
     /**
      * X (coordinate/angle/whatever you wish)
      */
-    public float x;
+    public final float x;
     /**
      * Y (coordinate/angle/whatever you wish)
      */
-    public float y;
+    public final float y;
     /**
      * Z (coordinate/angle/whatever you wish)
      */
-    public float z;
+    public final float z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).
@@ -99,27 +99,12 @@ public class Vector3f {
         return x;
     }
 
-    public Vector3f setX(float x) {
-        this.x = x;
-        return this;
-    }
-
     public float getY() {
         return y;
     }
 
-    public Vector3f setY(float y) {
-        this.y = y;
-        return this;
-    }
-
     public float getZ() {
         return z;
-    }
-
-    public Vector3f setZ(float z) {
-        this.z = z;
-        return this;
     }
 
     /**
@@ -144,21 +129,8 @@ public class Vector3f {
         return false;
     }
 
-    /**
-     * Simply clone an instance of this class.
-     *
-     * @return Clone.
-     */
-    @Override
-    public Vector3f clone() {
-        return new Vector3f(getX(), getY(), getZ());
-    }
-
     public Vector3f add(float x, float y, float z) {
-        this.x += x;
-        this.y += y;
-        this.z += z;
-        return this;
+        return new Vector3f(this.x + x, this.y + y, this.z + z);
     }
 
     public Vector3f add(Vector3f other) {
@@ -166,10 +138,7 @@ public class Vector3f {
     }
 
     public Vector3f subtract(float x, float y, float z) {
-        this.x -= x;
-        this.y -= y;
-        this.z -= z;
-        return this;
+        return new Vector3f(this.x - x, this.y - y, this.z - z);
     }
 
     public Vector3f subtract(Vector3f other) {
@@ -177,10 +146,7 @@ public class Vector3f {
     }
 
     public Vector3f multiply(float x, float y, float z) {
-        this.x *= x;
-        this.y *= y;
-        this.z *= z;
-        return this;
+        return new Vector3f(this.x * x, this.y * y, this.z * z);
     }
 
     public Vector3f multiply(Vector3f other) {
@@ -195,10 +161,7 @@ public class Vector3f {
         float newX = this.y * other.z - other.y * this.z;
         float newY = this.z * other.x - other.z * this.x;
         float newZ = this.x * other.y - other.x * this.y;
-        this.x = newX;
-        this.y = newY;
-        this.z = newZ;
-        return this;
+        return new Vector3f(newX, newY, newZ);
     }
 
     public float dot(Vector3f other) {
