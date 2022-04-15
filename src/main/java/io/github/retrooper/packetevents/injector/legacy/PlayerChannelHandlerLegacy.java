@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.injector.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
+import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelDuplexHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
@@ -44,6 +45,11 @@ public class PlayerChannelHandlerLegacy extends ChannelDuplexHandler {
 
     @Override
     public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
+         if (packet instanceof ByteBuf) {
+            //Ignore bytebufs!
+            super.write(ctx, packet, promise);
+            return;
+        }
         PacketProcessorInternal.PacketData data = PacketEvents.get().getInternalPacketProcessor().write(player, ctx.channel(), packet);
         if (data.postAction != null) {
             promise.addListener(f -> {
