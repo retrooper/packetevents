@@ -243,6 +243,10 @@ public class Vector3i {
         return multiply(target.x, target.y, target.z);
     }
 
+    public Vector3i multiply(int value) {
+        return multiply(value, value, value);
+    }
+
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;

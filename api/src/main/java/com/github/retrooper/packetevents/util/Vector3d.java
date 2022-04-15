@@ -187,6 +187,10 @@ public class Vector3d {
         return multiply(target.x, target.y, target.z);
     }
 
+    public Vector3d multiply(double value) {
+        return multiply(value, value, value);
+    }
+
     public double distance(Vector3d target) {
         return Math.sqrt(distanceSquared(target));
     }
