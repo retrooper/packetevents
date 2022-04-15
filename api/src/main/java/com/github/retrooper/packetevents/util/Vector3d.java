@@ -99,24 +99,27 @@ public class Vector3d {
         return x;
     }
 
-    public void setX(double x) {
+    public Vector3d setX(double x) {
         this.x = x;
+        return this;
     }
 
     public double getY() {
         return y;
     }
 
-    public void setY(double y) {
+    public Vector3d setY(double y) {
         this.y = y;
+        return this;
     }
 
     public double getZ() {
         return z;
     }
 
-    public void setZ(double z) {
+    public Vector3d setZ(double z) {
         this.z = z;
+        return this;
     }
 
     /**
@@ -171,6 +174,21 @@ public class Vector3d {
 
     public Vector3d subtract(Vector3d target) {
         return subtract(target.x, target.y, target.z);
+    }
+
+    public Vector3d multiply(double x, double y, double z) {
+        this.x *= x;
+        this.y *= y;
+        this.z *= z;
+        return this;
+    }
+
+    public Vector3d multiply(Vector3d target) {
+        return multiply(target.x, target.y, target.z);
+    }
+
+    public Vector3d multiply(double value) {
+        return multiply(value, value, value);
     }
 
     public double distance(Vector3d target) {

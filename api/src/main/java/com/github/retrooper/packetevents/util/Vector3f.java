@@ -99,24 +99,27 @@ public class Vector3f {
         return x;
     }
 
-    public void setX(float x) {
+    public Vector3f setX(float x) {
         this.x = x;
+        return this;
     }
 
     public float getY() {
         return y;
     }
 
-    public void setY(float y) {
+    public Vector3f setY(float y) {
         this.y = y;
+        return this;
     }
 
     public float getZ() {
         return z;
     }
 
-    public void setZ(float z) {
+    public Vector3f setZ(float z) {
         this.z = z;
+        return this;
     }
 
     /**
@@ -171,6 +174,21 @@ public class Vector3f {
 
     public Vector3f subtract(Vector3f target) {
         return subtract(target.x, target.y, target.z);
+    }
+
+    public Vector3f multiply(float x, float y, float z) {
+        this.x *= x;
+        this.y *= y;
+        this.z *= z;
+        return this;
+    }
+
+    public Vector3f multiply(Vector3f target) {
+        return multiply(target.x, target.y, target.z);
+    }
+
+    public Vector3f multiply(float value) {
+        return multiply(value, value, value);
     }
 
     @Override

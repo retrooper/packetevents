@@ -151,24 +151,27 @@ public class Vector3i {
         return x;
     }
 
-    public void setX(int x) {
+    public Vector3i setX(int x) {
         this.x = x;
+        return this;
     }
 
     public int getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public Vector3i setY(int y) {
         this.y = y;
+        return this;
     }
 
     public int getZ() {
         return z;
     }
 
-    public void setZ(int z) {
+    public Vector3i setZ(int z) {
         this.z = z;
+        return this;
     }
 
     /**
@@ -227,6 +230,21 @@ public class Vector3i {
 
     public Vector3i subtract(Vector3i target) {
         return subtract(target.x, target.y, target.z);
+    }
+
+    public Vector3i multiply(int x, int y, int z) {
+        this.x *= x;
+        this.y *= y;
+        this.z *= z;
+        return this;
+    }
+
+    public Vector3i multiply(Vector3i target) {
+        return multiply(target.x, target.y, target.z);
+    }
+
+    public Vector3i multiply(int value) {
+        return multiply(value, value, value);
     }
 
     @Override
