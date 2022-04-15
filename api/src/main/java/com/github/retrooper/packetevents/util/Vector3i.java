@@ -247,6 +247,16 @@ public class Vector3i {
         return multiply(value, value, value);
     }
 
+    public Vector3i crossProduct(Vector3i target) {
+        int newX = this.y * target.z - target.y * this.z;
+        int newY = this.z * target.x - target.z * this.x;
+        int newZ = this.x * target.y - target.x * this.y;
+        this.x = newX;
+        this.y = newY;
+        this.z = newZ;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;

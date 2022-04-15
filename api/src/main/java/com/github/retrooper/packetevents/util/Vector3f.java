@@ -191,6 +191,16 @@ public class Vector3f {
         return multiply(value, value, value);
     }
 
+    public Vector3f crossProduct(Vector3f target) {
+        float newX = this.y * target.z - target.y * this.z;
+        float newY = this.z * target.x - target.z * this.x;
+        float newZ = this.x * target.y - target.x * this.y;
+        this.x = newX;
+        this.y = newY;
+        this.z = newZ;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;

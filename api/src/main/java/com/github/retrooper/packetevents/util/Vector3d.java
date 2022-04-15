@@ -191,6 +191,16 @@ public class Vector3d {
         return multiply(value, value, value);
     }
 
+    public Vector3d crossProduct(Vector3d target) {
+        double newX = this.y * target.z - target.y * this.z;
+        double newY = this.z * target.x - target.z * this.x;
+        double newZ = this.x * target.y - target.x * this.y;
+        this.x = newX;
+        this.y = newY;
+        this.z = newZ;
+        return this;
+    }
+
     public double distance(Vector3d target) {
         return Math.sqrt(distanceSquared(target));
     }
