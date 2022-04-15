@@ -96,7 +96,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
                             Vector3i bp = SpigotDataHelper.fromBukkitLocation(((Player) event.getPlayer()).getLocation())
                                     .getPosition().toVector3i();
-                            bp.setY(bp.getY() - 1);
+                            bp = bp.subtract(0, 1, 0);
                             StateType type = StateTypes.GOLD_BLOCK;
                             WrappedBlockState blockState = type.createBlockState(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
                             WrapperPlayServerBlockChange blockChange = new WrapperPlayServerBlockChange(bp,

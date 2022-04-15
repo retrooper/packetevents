@@ -43,24 +43,12 @@ public class Location {
         return position.getX();
     }
 
-    public void setX(double x) {
-        position.setX(x);
-    }
-
     public double getY() {
         return position.getY();
     }
 
-    public void setY(double y) {
-        position.setY(y);
-    }
-
     public double getZ() {
         return position.getZ();
-    }
-
-    public void setZ(double z) {
-        position.setZ(z);
     }
 
     public void setPosition(Vector3d position) {
@@ -85,7 +73,7 @@ public class Location {
 
     @Override
     public Location clone() {
-        return new Location(position.clone(), yaw, pitch);
+        return new Location(position, yaw, pitch);
     }
 
     @Override
