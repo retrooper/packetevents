@@ -115,6 +115,7 @@ public enum ClientVersion {
 
     private final int protocolVersion;
     private final String name;
+    private ServerVersion serverVersion;
 
     ClientVersion(int protocolVersion) {
         this.protocolVersion = protocolVersion;
@@ -195,10 +196,12 @@ public enum ClientVersion {
         return values()[0];
     }
 
-    //TODO Optimize
     @Deprecated
     public ServerVersion toServerVersion() {
-        return ServerVersion.getById(protocolVersion);
+        if (serverVersion == null) {
+            serverVersion = ServerVersion.getById(protocolVersion);
+        }
+        return serverVersion;
     }
 
     /**
