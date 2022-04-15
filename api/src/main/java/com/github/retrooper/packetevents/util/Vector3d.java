@@ -30,15 +30,15 @@ public class Vector3d {
     /**
      * X (coordinate/angle/whatever you wish)
      */
-    public double x;
+    public final double x;
     /**
      * Y (coordinate/angle/whatever you wish)
      */
-    public double y;
+    public final double y;
     /**
      * Z (coordinate/angle/whatever you wish)
      */
-    public double z;
+    public final double z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).
@@ -99,27 +99,12 @@ public class Vector3d {
         return x;
     }
 
-    public Vector3d setX(double x) {
-        this.x = x;
-        return this;
-    }
-
     public double getY() {
         return y;
     }
 
-    public Vector3d setY(double y) {
-        this.y = y;
-        return this;
-    }
-
     public double getZ() {
         return z;
-    }
-
-    public Vector3d setZ(double z) {
-        this.z = z;
-        return this;
     }
 
     /**
@@ -144,21 +129,8 @@ public class Vector3d {
         return false;
     }
 
-    /**
-     * Simply clone an instance of this class.
-     *
-     * @return Clone.
-     */
-    @Override
-    public Vector3d clone() {
-        return new Vector3d(getX(), getY(), getZ());
-    }
-
     public Vector3d add(double x, double y, double z) {
-        this.x += x;
-        this.y += y;
-        this.z += z;
-        return this;
+        return new Vector3d(this.x + x, this.y + y, this.z + z);
     }
 
     public Vector3d add(Vector3d other) {
@@ -166,10 +138,7 @@ public class Vector3d {
     }
 
     public Vector3d subtract(double x, double y, double z) {
-        this.x -= x;
-        this.y -= y;
-        this.z -= z;
-        return this;
+        return new Vector3d(this.x - x, this.y - y, this.z - z);
     }
 
     public Vector3d subtract(Vector3d other) {
@@ -177,10 +146,7 @@ public class Vector3d {
     }
 
     public Vector3d multiply(double x, double y, double z) {
-        this.x *= x;
-        this.y *= y;
-        this.z *= z;
-        return this;
+        return new Vector3d(this.x * x, this.y * y, this.z * z);
     }
 
     public Vector3d multiply(Vector3d other) {
@@ -195,10 +161,7 @@ public class Vector3d {
         double newX = this.y * other.z - other.y * this.z;
         double newY = this.z * other.x - other.z * this.x;
         double newZ = this.x * other.y - other.x * this.y;
-        this.x = newX;
-        this.y = newY;
-        this.z = newZ;
-        return this;
+        return new Vector3d(newX, newY, newZ);
     }
 
     public double dot(Vector3d other) {
@@ -220,11 +183,7 @@ public class Vector3d {
     public Vector3d normalize() {
         double length = length();
 
-        x /= length;
-        y /= length;
-        z /= length;
-
-        return this;
+        return new Vector3d(x / length, y / length, z / length);
     }
 
     public double distanceSquared(Vector3d other) {

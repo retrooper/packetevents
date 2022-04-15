@@ -34,15 +34,15 @@ public class Vector3i {
     /**
      * X (coordinate/angle/whatever you wish)
      */
-    public int x;
+    public final int x;
     /**
      * Y (coordinate/angle/whatever you wish)
      */
-    public int y;
+    public final int y;
     /**
      * Z (coordinate/angle/whatever you wish)
      */
-    public int z;
+    public final int z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).
@@ -77,9 +77,9 @@ public class Vector3i {
             z = (int) (val << 38 >> 38);
         }
 
-        setX(x);
-        setY(y);
-        setZ(z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     /**
@@ -151,27 +151,12 @@ public class Vector3i {
         return x;
     }
 
-    public Vector3i setX(int x) {
-        this.x = x;
-        return this;
-    }
-
     public int getY() {
         return y;
     }
 
-    public Vector3i setY(int y) {
-        this.y = y;
-        return this;
-    }
-
     public int getZ() {
         return z;
-    }
-
-    public Vector3i setZ(int z) {
-        this.z = z;
-        return this;
     }
 
     /**
@@ -200,21 +185,8 @@ public class Vector3i {
         return new Vector3d(x, y, z);
     }
 
-    /**
-     * Simply clone an instance of this class.
-     *
-     * @return Clone.
-     */
-    @Override
-    public Vector3i clone() {
-        return new Vector3i(getX(), getY(), getZ());
-    }
-
     public Vector3i add(int x, int y, int z) {
-        this.x += x;
-        this.y += y;
-        this.z += z;
-        return this;
+        return new Vector3i(this.x + x, this.y + y, this.z + z);
     }
 
     public Vector3i add(Vector3i other) {
@@ -222,10 +194,7 @@ public class Vector3i {
     }
 
     public Vector3i subtract(int x, int y, int z) {
-        this.x -= x;
-        this.y -= y;
-        this.z -= z;
-        return this;
+        return new Vector3i(this.x + x, this.y + y, this.z + z);
     }
 
     public Vector3i subtract(Vector3i other) {
@@ -233,10 +202,7 @@ public class Vector3i {
     }
 
     public Vector3i multiply(int x, int y, int z) {
-        this.x *= x;
-        this.y *= y;
-        this.z *= z;
-        return this;
+        return new Vector3i(this.x * x, this.y * y, this.z * z);
     }
 
     public Vector3i multiply(Vector3i other) {
@@ -251,10 +217,7 @@ public class Vector3i {
         int newX = this.y * other.z - other.y * this.z;
         int newY = this.z * other.x - other.z * this.x;
         int newZ = this.x * other.y - other.x * this.y;
-        this.x = newX;
-        this.y = newY;
-        this.z = newZ;
-        return this;
+        return new Vector3i(newX, newY, newZ);
     }
 
     public int dot(Vector3i other) {
