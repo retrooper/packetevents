@@ -161,8 +161,8 @@ public class Vector3d {
         return this;
     }
 
-    public Vector3d add(Vector3d target) {
-        return add(target.x, target.y, target.z);
+    public Vector3d add(Vector3d other) {
+        return add(other.x, other.y, other.z);
     }
 
     public Vector3d subtract(double x, double y, double z) {
@@ -172,8 +172,8 @@ public class Vector3d {
         return this;
     }
 
-    public Vector3d subtract(Vector3d target) {
-        return subtract(target.x, target.y, target.z);
+    public Vector3d subtract(Vector3d other) {
+        return subtract(other.x, other.y, other.z);
     }
 
     public Vector3d multiply(double x, double y, double z) {
@@ -183,16 +183,30 @@ public class Vector3d {
         return this;
     }
 
-    public Vector3d multiply(Vector3d target) {
-        return multiply(target.x, target.y, target.z);
+    public Vector3d multiply(Vector3d other) {
+        return multiply(other.x, other.y, other.z);
     }
 
     public Vector3d multiply(double value) {
         return multiply(value, value, value);
     }
 
-    public double distance(Vector3d target) {
-        return Math.sqrt(distanceSquared(target));
+    public Vector3d crossProduct(Vector3d other) {
+        double newX = this.y * other.z - other.y * this.z;
+        double newY = this.z * other.x - other.z * this.x;
+        double newZ = this.x * other.y - other.x * this.y;
+        this.x = newX;
+        this.y = newY;
+        this.z = newZ;
+        return this;
+    }
+
+    public double dot(Vector3d other) {
+        return this.x * other.x + this.y * other.y + this.z * other.z;
+    }
+
+    public double distance(Vector3d other) {
+        return Math.sqrt(distanceSquared(other));
     }
 
     public double length() {
@@ -213,10 +227,10 @@ public class Vector3d {
         return this;
     }
 
-    public double distanceSquared(Vector3d target) {
-        double distX = (x - target.x) * (x - target.x);
-        double distY = (y - target.y) * (y - target.y);
-        double distZ = (z - target.z) * (z - target.z);
+    public double distanceSquared(Vector3d other) {
+        double distX = (x - other.x) * (x - other.x);
+        double distY = (y - other.y) * (y - other.y);
+        double distZ = (z - other.z) * (z - other.z);
         return distX + distY + distZ;
     }
 

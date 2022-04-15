@@ -217,8 +217,8 @@ public class Vector3i {
         return this;
     }
 
-    public Vector3i add(Vector3i target) {
-        return add(target.x, target.y, target.z);
+    public Vector3i add(Vector3i other) {
+        return add(other.x, other.y, other.z);
     }
 
     public Vector3i subtract(int x, int y, int z) {
@@ -228,8 +228,8 @@ public class Vector3i {
         return this;
     }
 
-    public Vector3i subtract(Vector3i target) {
-        return subtract(target.x, target.y, target.z);
+    public Vector3i subtract(Vector3i other) {
+        return subtract(other.x, other.y, other.z);
     }
 
     public Vector3i multiply(int x, int y, int z) {
@@ -239,12 +239,26 @@ public class Vector3i {
         return this;
     }
 
-    public Vector3i multiply(Vector3i target) {
-        return multiply(target.x, target.y, target.z);
+    public Vector3i multiply(Vector3i other) {
+        return multiply(other.x, other.y, other.z);
     }
 
     public Vector3i multiply(int value) {
         return multiply(value, value, value);
+    }
+
+    public Vector3i crossProduct(Vector3i other) {
+        int newX = this.y * other.z - other.y * this.z;
+        int newY = this.z * other.x - other.z * this.x;
+        int newZ = this.x * other.y - other.x * this.y;
+        this.x = newX;
+        this.y = newY;
+        this.z = newZ;
+        return this;
+    }
+
+    public int dot(Vector3i other) {
+        return this.x * other.x + this.y * other.y + this.z * other.z;
     }
 
     @Override
