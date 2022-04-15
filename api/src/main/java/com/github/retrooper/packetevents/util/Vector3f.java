@@ -99,24 +99,27 @@ public class Vector3f {
         return x;
     }
 
-    public void setX(float x) {
+    public Vector3f setX(float x) {
         this.x = x;
+        return this;
     }
 
     public float getY() {
         return y;
     }
 
-    public void setY(float y) {
+    public Vector3f setY(float y) {
         this.y = y;
+        return this;
     }
 
     public float getZ() {
         return z;
     }
 
-    public void setZ(float z) {
+    public Vector3f setZ(float z) {
         this.z = z;
+        return this;
     }
 
     /**

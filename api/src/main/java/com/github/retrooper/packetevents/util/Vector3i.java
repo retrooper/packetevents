@@ -151,24 +151,27 @@ public class Vector3i {
         return x;
     }
 
-    public void setX(int x) {
+    public Vector3i setX(int x) {
         this.x = x;
+        return this;
     }
 
     public int getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public Vector3i setY(int y) {
         this.y = y;
+        return this;
     }
 
     public int getZ() {
         return z;
     }
 
-    public void setZ(int z) {
+    public Vector3i setZ(int z) {
         this.z = z;
+        return this;
     }
 
     /**

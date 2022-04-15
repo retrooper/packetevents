@@ -99,24 +99,27 @@ public class Vector3d {
         return x;
     }
 
-    public void setX(double x) {
+    public Vector3d setX(double x) {
         this.x = x;
+        return this;
     }
 
     public double getY() {
         return y;
     }
 
-    public void setY(double y) {
+    public Vector3d setY(double y) {
         this.y = y;
+        return this;
     }
 
     public double getZ() {
         return z;
     }
 
-    public void setZ(double z) {
+    public Vector3d setZ(double z) {
         this.z = z;
+        return this;
     }
 
     /**
