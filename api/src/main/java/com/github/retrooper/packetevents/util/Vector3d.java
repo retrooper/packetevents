@@ -173,6 +173,17 @@ public class Vector3d {
         return subtract(target.x, target.y, target.z);
     }
 
+    public Vector3d multiply(double x, double y, double z) {
+        this.x *= x;
+        this.y *= y;
+        this.z *= z;
+        return this;
+    }
+
+    public Vector3d multiply(Vector3d target) {
+        return multiply(target.x, target.y, target.z);
+    }
+
     public double distance(Vector3d target) {
         return Math.sqrt(distanceSquared(target));
     }

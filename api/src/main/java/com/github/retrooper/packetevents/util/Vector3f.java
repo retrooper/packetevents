@@ -173,6 +173,17 @@ public class Vector3f {
         return subtract(target.x, target.y, target.z);
     }
 
+    public Vector3f multiply(float x, float y, float z) {
+        this.x *= x;
+        this.y *= y;
+        this.z *= z;
+        return this;
+    }
+
+    public Vector3f multiply(Vector3f target) {
+        return multiply(target.x, target.y, target.z);
+    }
+
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;

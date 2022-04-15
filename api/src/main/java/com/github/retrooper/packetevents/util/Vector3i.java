@@ -229,6 +229,17 @@ public class Vector3i {
         return subtract(target.x, target.y, target.z);
     }
 
+    public Vector3i multiply(int x, int y, int z) {
+        this.x *= x;
+        this.y *= y;
+        this.z *= z;
+        return this;
+    }
+
+    public Vector3i multiply(Vector3i target) {
+        return multiply(target.x, target.y, target.z);
+    }
+
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;
