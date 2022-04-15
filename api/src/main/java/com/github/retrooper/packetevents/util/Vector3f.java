@@ -161,8 +161,8 @@ public class Vector3f {
         return this;
     }
 
-    public Vector3f add(Vector3f target) {
-        return add(target.x, target.y, target.z);
+    public Vector3f add(Vector3f other) {
+        return add(other.x, other.y, other.z);
     }
 
     public Vector3f subtract(float x, float y, float z) {
@@ -172,8 +172,8 @@ public class Vector3f {
         return this;
     }
 
-    public Vector3f subtract(Vector3f target) {
-        return subtract(target.x, target.y, target.z);
+    public Vector3f subtract(Vector3f other) {
+        return subtract(other.x, other.y, other.z);
     }
 
     public Vector3f multiply(float x, float y, float z) {
@@ -183,22 +183,26 @@ public class Vector3f {
         return this;
     }
 
-    public Vector3f multiply(Vector3f target) {
-        return multiply(target.x, target.y, target.z);
+    public Vector3f multiply(Vector3f other) {
+        return multiply(other.x, other.y, other.z);
     }
 
     public Vector3f multiply(float value) {
         return multiply(value, value, value);
     }
 
-    public Vector3f crossProduct(Vector3f target) {
-        float newX = this.y * target.z - target.y * this.z;
-        float newY = this.z * target.x - target.z * this.x;
-        float newZ = this.x * target.y - target.x * this.y;
+    public Vector3f crossProduct(Vector3f other) {
+        float newX = this.y * other.z - other.y * this.z;
+        float newY = this.z * other.x - other.z * this.x;
+        float newZ = this.x * other.y - other.x * this.y;
         this.x = newX;
         this.y = newY;
         this.z = newZ;
         return this;
+    }
+
+    public float dot(Vector3f other) {
+        return this.x * other.x + this.y * other.y + this.z * other.z;
     }
 
     @Override
