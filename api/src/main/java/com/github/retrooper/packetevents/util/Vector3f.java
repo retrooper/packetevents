@@ -168,6 +168,22 @@ public class Vector3f {
         return this.x * other.x + this.y * other.y + this.z * other.z;
     }
 
+    public Vector3f with(Float x, Float y, Float z) {
+        return new Vector3f(x == null ? this.x : x, y == null ? this.y : y, z == null ? this.z : z);
+    }
+
+    public Vector3f withX(float x) {
+        return new Vector3f(x, this.y, this.z);
+    }
+
+    public Vector3f withY(float y) {
+        return new Vector3f(this.x, y, this.z);
+    }
+
+    public Vector3f withZ(float z) {
+        return new Vector3f(this.x, this.y, z);
+    }
+
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;

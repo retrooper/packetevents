@@ -168,6 +168,22 @@ public class Vector3d {
         return this.x * other.x + this.y * other.y + this.z * other.z;
     }
 
+    public Vector3d with(Double x, Double y, Double z) {
+        return new Vector3d(x == null ? this.x : x, y == null ? this.y : y, z == null ? this.z : z);
+    }
+
+    public Vector3d withX(double x) {
+        return new Vector3d(x, this.y, this.z);
+    }
+
+    public Vector3d withY(double y) {
+        return new Vector3d(this.x, y, this.z);
+    }
+
+    public Vector3d withZ(double z) {
+        return new Vector3d(this.x, this.y, z);
+    }
+
     public double distance(Vector3d other) {
         return Math.sqrt(distanceSquared(other));
     }
