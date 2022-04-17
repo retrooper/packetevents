@@ -21,10 +21,10 @@ PacketEvents optionally collects statistics using [bStats](https://bstats.org/)\
 Check out our [bStats page](https://bstats.org/plugin/bukkit/packetevents/11327)
 
 ### Credit to these projects
-[wiki.vg/Protocol](https://wiki.vg/Protocol)
-[netty](https://github.com/netty/netty)
-[gson](https://github.com/google/gson)    
-[adventure](https://github.com/KyoriPowered/adventure)  
-[ViaVersion](https://github.com/ViaVersion/ViaVersion)  
-[ProtocolSupport](https://github.com/ProtocolSupport/ProtocolSupport)  
+[wiki.vg/Protocol](https://wiki.vg/Protocol)\
+[netty](https://github.com/netty/netty)\
+[gson](https://github.com/google/gson)\
+[adventure](https://github.com/KyoriPowered/adventure)\
+[ViaVersion](https://github.com/ViaVersion/ViaVersion)\
+[ProtocolSupport](https://github.com/ProtocolSupport/ProtocolSupport)\
 [MCProtocolLib](https://github.com/GeyserMC/MCProtocolLib/)  
