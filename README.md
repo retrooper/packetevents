@@ -13,10 +13,6 @@ PacketEvents is an open-source Packet API. It has many cross-version packet-wrap
 ### Setup
 [Learn more](https://github.com/retrooper/packetevents/wiki/1.-Setup)
 
-### Contributing/Forking
-[Learn more](https://github.com/retrooper/packetevents/wiki/2.-Contributing-and-Forking)\
-Our discord server has a role for contributors and forkers.
-
 ### Sponsorships
 [![](https://www.ej-technologies.com/images/product_banners/jprofiler_small.png)](https://www.ej-technologies.com/products/jprofiler/overview.html)
 
