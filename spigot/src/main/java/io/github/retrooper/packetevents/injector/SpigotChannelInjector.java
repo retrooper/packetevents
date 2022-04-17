@@ -51,6 +51,8 @@ public class SpigotChannelInjector implements ChannelInjector {
     private final Set<Channel> injectedConnectionChannels = new HashSet<>();
     protected List<Object> networkManagers;
     private int connectionChannelsListIndex = -1;
+    private boolean inboundAheadProtocolTranslation = false;
+    private boolean outboundAheadProtocolTranslation = false;
 
     public void updatePlayer(User user, Object player) {
         PacketEvents.getAPI().getEventManager().callEvent(new UserLoginEvent(user, player));
