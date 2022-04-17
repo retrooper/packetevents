@@ -398,11 +398,11 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public Component readComponent() {
-        return AdventureSerializer.parseComponent(readString(getMaxMessageLength()));
+        return AdventureSerializer.parseComponent(readComponentJSON());
     }
 
     public void writeComponent(Component component) {
-        writeString(AdventureSerializer.toJson(component));
+        writeComponentJSON(AdventureSerializer.toJson(component));
     }
 
     public ResourceLocation readIdentifier(int maxLen) {

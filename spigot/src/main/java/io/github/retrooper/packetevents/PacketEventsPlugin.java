@@ -40,7 +40,10 @@ import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
-import com.github.retrooper.packetevents.wrapper.play.server.*;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEffect;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.util.SpigotDataHelper;
 import net.kyori.adventure.text.Component;
@@ -86,7 +89,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
                             user.writePacket(particlePacket);
                             //PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(),
-                              //      particlePacket);
+                            //      particlePacket);
 
                             Component title = Component.text("Hello, you must be " + user.getProfile().getName() + "!")
                                     .color(NamedTextColor.DARK_GREEN);
@@ -194,12 +197,10 @@ public class PacketEventsPlugin extends JavaPlugin {
                     clone.copy(chatMessage);
                     PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), clone);
                     System.out.println("Delayed " + chatMessage.getChatComponentJson());
-                } */
-                else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
+                } */ else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
                     WrapperPlayServerEntityEffect effect = new WrapperPlayServerEntityEffect(event);
-                    System.out.println("type: "+ effect.getPotionType().getName() + ", type id: " + effect.getPotionType().getId());
-                }
-                else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+                    System.out.println("type: " + effect.getPotionType().getName() + ", type id: " + effect.getPotionType().getId());
+                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     EntityType type = spawnLivingEntity.getEntityType();
                 }
