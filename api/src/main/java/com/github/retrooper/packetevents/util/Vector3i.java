@@ -224,6 +224,22 @@ public class Vector3i {
         return this.x * other.x + this.y * other.y + this.z * other.z;
     }
 
+    public Vector3i with(Integer x, Integer y, Integer z) {
+        return new Vector3i(x == null ? this.x : x, y == null ? this.y : y, z == null ? this.z : z);
+    }
+
+    public Vector3i withX(int x) {
+        return new Vector3i(x, this.y, this.z);
+    }
+
+    public Vector3i withY(int y) {
+        return new Vector3i(this.x, y, this.z);
+    }
+
+    public Vector3i withZ(int z) {
+        return new Vector3i(this.x, this.y, z);
+    }
+
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;
