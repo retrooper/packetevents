@@ -3,7 +3,7 @@
 [![](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://github.com/retrooper/packetevents/blob/dev/LICENSE)
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
-PacketEvents is an open-source Packet API. It has many cross-version packet-wrappers. You can process incoming and outgoing packets on the server. You can even send packets with our packet-wrappers. We are here to save you a ton of time.
+PacketEvents is a powerful packet library. Our packet wrappers are efficient and easy to use. We support many protocol versions. (1.8+)
 
 ### Resources
 * [SpigotMC](https://www.spigotmc.org/resources/packetevents-api.80279/)
