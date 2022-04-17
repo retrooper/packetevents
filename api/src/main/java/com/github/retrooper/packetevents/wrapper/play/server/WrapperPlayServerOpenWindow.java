@@ -32,7 +32,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         super(PacketType.Play.Server.OPEN_WINDOW);
         this.containerId = containerId;
         this.type = type;
-        this.title = AdventureSerializer.asVanilla(title);
+        this.title = AdventureSerializer.toJson(title);
     }
 
     // 1.8 through 1.13
@@ -42,7 +42,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.legacyType = legacyType;
         this.legacySlots = legacySlots;
         this.horseId = horseId;
-        this.title = AdventureSerializer.asVanilla(title);
+        this.title = AdventureSerializer.toJson(title);
     }
 
     // 1.7
@@ -50,7 +50,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         super(PacketType.Play.Server.OPEN_WINDOW);
         this.containerId = containerId;
         this.type = type;
-        this.title = AdventureSerializer.asVanilla(title);
+        this.title = AdventureSerializer.toJson(title);
         this.legacySlots = legacySlots;
         this.useProvidedWindowTitle = useProvidedWindowTitle;
         this.horseId = horseId;
