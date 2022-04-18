@@ -30,7 +30,7 @@ import java.util.*;
  * Mappings from modern versions are from ViaVersion, who have a similar (but a bit slower) system.
  */
 public class WrappedBlockState {
-    private static final WrappedBlockState AIR = new WrappedBlockState(StateTypes.AIR, new EnumMap<>(StateValue.class), 0);
+    private static final WrappedBlockState AIR = new WrappedBlockState(StateTypes.AIR, new EnumMap<>(StateValue.class), 0, (byte) 0);
     private static final Map<Byte, Map<String, WrappedBlockState>> BY_STRING = new HashMap<>();
     private static final Map<Byte, Map<Integer, WrappedBlockState>> BY_ID = new HashMap<>();
     private static final Map<Byte, Map<WrappedBlockState, String>> INTO_STRING = new HashMap<>();
@@ -68,10 +68,11 @@ public class WrappedBlockState {
         this.mappingsIndex = mappingsIndex;
     }
 
-    public WrappedBlockState(StateType type, EnumMap<StateValue, Object> data, int globalID) {
+    public WrappedBlockState(StateType type, EnumMap<StateValue, Object> data, int globalID, byte mappingsIndex) {
         this.globalID = globalID;
         this.type = type;
         this.data = data;
+        this.mappingsIndex = mappingsIndex;
     }
 
     @NotNull
@@ -267,7 +268,7 @@ public class WrappedBlockState {
 
     @Override
     public WrappedBlockState clone() {
-        return new WrappedBlockState(type, data.clone(), globalID);
+        return new WrappedBlockState(type, data.clone(), globalID, mappingsIndex);
     }
 
     @Override
