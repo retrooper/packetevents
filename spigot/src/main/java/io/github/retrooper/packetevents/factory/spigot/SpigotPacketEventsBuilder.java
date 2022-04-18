@@ -182,10 +182,13 @@ public class SpigotPacketEventsBuilder {
                 if (protocolLibPlugin != null) {
                     int majorVersion = Integer.parseInt(protocolLibPlugin.getDescription().getVersion().split("\\.", 2)[0]);
                     if (majorVersion < 5) {
-                        throw new IllegalStateException("You are attempting to combine 2.0 PacketEvents with a " +
+                        PacketEvents.getAPI().getLogManager().severe("You are attempting to combine 2.0 PacketEvents with a " +
                                 "ProtocolLib version older than v5.0.0. " +
                                 "This is no longer works, please update to their dev builds. " +
                                 "https://ci.dmulloy2.net/job/ProtocolLib/lastBuild/");
+                        Plugin ourPlugin = getPlugin();
+                        Bukkit.getPluginManager().disablePlugin(ourPlugin);
+                        throw new IllegalStateException("ProtocolLib incompatibility! Update to v5.0.0!");
                     }
                 }
             }
