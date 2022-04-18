@@ -169,7 +169,24 @@ public class SpigotPacketEventsBuilder {
                         postInjectTask.run();
                     }
 
+                    checkCompatibility();
                     initialized = true;
+                }
+
+
+            }
+
+            private void checkCompatibility() {
+                //If ProtocolLib is present, it needs to be v5.0.0
+                Plugin protocolLibPlugin = Bukkit.getPluginManager().getPlugin("ProtocolLib");
+                if (protocolLibPlugin != null) {
+                    int majorVersion = Integer.parseInt(protocolLibPlugin.getDescription().getVersion().split("\\.", 2)[0]);
+                    if (majorVersion < 5) {
+                        throw new IllegalStateException("You are attempting to combine 2.0 PacketEvents with a " +
+                                "ProtocolLib version older than v5.0.0. " +
+                                "This is no longer works, please update to their dev builds. " +
+                                "https://ci.dmulloy2.net/job/ProtocolLib/lastBuild/");
+                    }
                 }
             }
 
@@ -228,6 +245,8 @@ public class SpigotPacketEventsBuilder {
             public LogManager getLogManager() {
                 return logManager;
             }
-        };
+        }
+
+                ;
     }
 }
