@@ -8,7 +8,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperPlayServerAttachEntity extends PacketWrapper<WrapperPlayServerAttachEntity> {
     int attachedId;
     int holdingId;
-    boolean leash = true;
+    boolean leash;
 
     public WrapperPlayServerAttachEntity(PacketSendEvent event) {
         super(event);
@@ -28,6 +28,8 @@ public class WrapperPlayServerAttachEntity extends PacketWrapper<WrapperPlayServ
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
             // YES, vanilla uses == 1 and not != 0
             this.leash = readUnsignedByte() == 1;
+        } else {
+            this.leash = true;
         }
     }
 
