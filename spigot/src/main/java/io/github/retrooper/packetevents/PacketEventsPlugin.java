@@ -25,20 +25,19 @@ import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.npc.NPC;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
-import com.github.retrooper.packetevents.util.TimeStampMode;
-import com.github.retrooper.packetevents.util.Vector3d;
-import com.github.retrooper.packetevents.util.Vector3f;
-import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.*;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEffect;
@@ -46,6 +45,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPa
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.util.SpigotDataHelper;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
@@ -55,6 +55,7 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -73,6 +74,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
                 User user = event.getUser();
+                Player player = (Player) event.getPlayer();
                 switch (event.getPacketType()) {
                     case CHAT_MESSAGE:
                         System.out.println("Running 10 seconds later");
@@ -105,6 +107,16 @@ public class PacketEventsPlugin extends JavaPlugin {
                             WrapperPlayServerBlockChange blockChange = new WrapperPlayServerBlockChange(bp,
                                     blockState.getGlobalId());
                             user.writePacket(blockChange);
+                            String npcName = "retrooper";
+                            UUID npcUUID = MojangAPIUtil.requestPlayerUUID(npcName);
+                            UserProfile up = new UserProfile(npcUUID, npcName);
+                            Component prefixName = Component.text("[Admin] ").color(NamedTextColor.DARK_RED);
+                            NPC npc = new NPC(up, SpigotReflectionUtil.generateEntityId(), null,
+                                    NamedTextColor.BLUE, prefixName, null);
+                            Location playerLocation = SpigotDataHelper.fromBukkitLocation(player.getLocation());
+                            npc.setLocation(playerLocation);
+                            npc.spawn(user.getChannel());
+                            user.sendMessage("Spawned npc!");
                         } else if (chatMessage.getMessage().equalsIgnoreCase("test3")) {
                             Material ironDoor = Material.IRON_DOOR;
                             WrappedBlockState state = SpigotDataHelper.fromBukkitBlockData(new MaterialData(ironDoor, (byte) 0));
