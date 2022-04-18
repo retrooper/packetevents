@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.UUID;
 
 public class User {
     private final Object channel;
@@ -80,6 +81,14 @@ public class User {
 
     public UserProfile getProfile() {
         return profile;
+    }
+
+    public String getName() {
+        return profile.getName();
+    }
+
+    public UUID getUUID() {
+        return profile.getUUID();
     }
 
     public int getEntityId() {
