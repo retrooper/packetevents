@@ -398,7 +398,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public Component readComponent() {
-        return AdventureSerializer.parseComponent(readComponentJSON());
+        return AdventureSerializer.asAdventure(readComponentJSON());
     }
 
     public void writeComponent(Component component) {
