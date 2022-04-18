@@ -767,7 +767,7 @@ public class ItemTypes {
     public static final ItemType MAGENTA_STAINED_GLASS = builder("magenta_stained_glass").setMaxAmount(64).setPlacedType(StateTypes.MAGENTA_STAINED_GLASS).build();
     public static final ItemType LAPIS_LAZULI = builder("lapis_lazuli").setMaxAmount(64).build();
     public static final ItemType MUSIC_DISC_WAIT = builder("music_disc_wait").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).build();
-    public static final ItemType NETHERITE_PICKAXE = builder("netherite_pickaxe").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT, ItemAttribute.NETHERITE_TIER).setMaxDurability(2031).build();
+    public static final ItemType NETHERITE_PICKAXE = builder("netherite_pickaxe").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT, ItemAttribute.NETHERITE_TIER, ItemAttribute.PICKAXE).setMaxDurability(2031).build();
     public static final ItemType BUNDLE = builder("bundle").setMaxAmount(1).build();
     public static final ItemType MOOSHROOM_SPAWN_EGG = builder("mooshroom_spawn_egg").setMaxAmount(64).build();
     public static final ItemType MAP = builder("map").setMaxAmount(64).build();
