@@ -35,8 +35,8 @@ public class AdventureSerializer {
         return LEGACY.serialize(component);
     }
 
-    public static Component asAdventure(String vanilla) {
-        return LEGACY.deserialize(vanilla);
+    public static Component fromLegacyFormat(String legacyMessage) {
+        return LEGACY.deserialize(legacyMessage);
     }
 
     public static GsonComponentSerializer getGsonSerializer() {

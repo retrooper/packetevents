@@ -131,7 +131,7 @@ public class User {
     }
 
     public void sendMessage(String legacyMessage) {
-        Component component = AdventureSerializer.asAdventure(legacyMessage);
+        Component component = AdventureSerializer.fromLegacyFormat(legacyMessage);
         sendMessage(component);
     }
 
@@ -146,8 +146,8 @@ public class User {
 
     public void sendTitle(String legacyTitle, String legacySubtitle,
                           int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        Component title = AdventureSerializer.asAdventure(legacyTitle);
-        Component subtitle = AdventureSerializer.asAdventure(legacySubtitle);
+        Component title = AdventureSerializer.fromLegacyFormat(legacyTitle);
+        Component subtitle = AdventureSerializer.fromLegacyFormat(legacySubtitle);
         sendTitle(title, subtitle, fadeInTicks, stayTicks, fadeOutTicks);
     }
 

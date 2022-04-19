@@ -39,10 +39,7 @@ import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.util.*;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEffect;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.util.SpigotDataHelper;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
@@ -111,12 +108,18 @@ public class PacketEventsPlugin extends JavaPlugin {
                             UUID npcUUID = MojangAPIUtil.requestPlayerUUID(npcName);
                             UserProfile up = new UserProfile(npcUUID, npcName);
                             Component prefixName = Component.text("[Admin] ").color(NamedTextColor.DARK_RED);
-                            NPC npc = new NPC(up, SpigotReflectionUtil.generateEntityId(), null,
+                            Component tabName = Component.text(npcName).color(NamedTextColor.DARK_RED);
+                            NPC npc = new NPC(up, SpigotReflectionUtil.generateEntityId(), tabName,
                                     NamedTextColor.BLUE, prefixName, null);
                             Location playerLocation = SpigotDataHelper.fromBukkitLocation(player.getLocation());
                             npc.setLocation(playerLocation);
                             npc.spawn(user.getChannel());
                             user.sendMessage("Spawned npc!");
+
+                            /*WrapperPlayServerResourcePackSend rps = new WrapperPlayServerResourcePackSend(
+                                    "https://download1474.mediafire.com/4jz7u8rh55ug/x5t624tzzbk9n1y/Sherbert+Textures.zip",
+                                    "susbaka", false, Component.text("Please accept the resource pack!").color(NamedTextColor.DARK_RED));
+                            user.sendPacket(rps);*/
                         } else if (chatMessage.getMessage().equalsIgnoreCase("test3")) {
                             Material ironDoor = Material.IRON_DOOR;
                             WrappedBlockState state = SpigotDataHelper.fromBukkitBlockData(new MaterialData(ironDoor, (byte) 0));

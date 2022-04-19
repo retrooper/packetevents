@@ -158,9 +158,9 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
             CollisionRule collisionRule = null;
             NamedTextColor color;
             if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-                displayName = AdventureSerializer.asAdventure(readString());
-                prefix = AdventureSerializer.asAdventure(readString());
-                suffix = AdventureSerializer.asAdventure(readString());
+                displayName = AdventureSerializer.fromLegacyFormat(readString());
+                prefix = AdventureSerializer.fromLegacyFormat(readString());
+                suffix = AdventureSerializer.fromLegacyFormat(readString());
                 optionData = OptionData.values()[readByte()];
                 if (serverVersion == ServerVersion.V_1_7_10) {
                     nameTagVisibility = NameTagVisibility.ALWAYS;
