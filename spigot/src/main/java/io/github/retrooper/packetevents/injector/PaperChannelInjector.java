@@ -42,7 +42,7 @@ public class PaperChannelInjector extends SpigotChannelInjector {
             CHANNEL_INITIALIZE_LISTENER_CLASS = Reflection.getClassByNameWithoutException("io.papermc.paper.network.ChannelInitializeListener");
             ADD_LISTENER_METHOD = Reflection.getMethod(CHANNEL_INITIALIZE_LISTENER_HOLDER_CLASS, "addListener", null, Key.class, CHANNEL_INITIALIZE_LISTENER_CLASS);
             HAS_LISTENER_METHOD = Reflection.getMethod(CHANNEL_INITIALIZE_LISTENER_HOLDER_CLASS, "hasListener", null, Key.class);
-            REMOVE_LISTENER_METHOD = Reflection.getMethod(CHANNEL_INITIALIZE_LISTENER_HOLDER_CLASS, "removeListener", CHANNEL_INITIALIZE_LISTENER_CLASS, Key.class);
+            REMOVE_LISTENER_METHOD = Reflection.getMethod(CHANNEL_INITIALIZE_LISTENER_HOLDER_CLASS, "removeListener", null, Key.class);
         }
     }
 
