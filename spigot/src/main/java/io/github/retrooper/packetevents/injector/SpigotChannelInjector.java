@@ -21,13 +21,11 @@ package io.github.retrooper.packetevents.injector;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.injector.connection.ServerChannelHandler;
-import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.injector.handlers.PacketDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEncoder;
 import io.github.retrooper.packetevents.util.InjectedList;
@@ -102,21 +100,6 @@ public class SpigotChannelInjector implements ChannelInjector {
             });
             //Replace the list with our wrapped one.
             reflectServerConnection.writeList(connectionChannelsListIndex, wrappedList);
-
-            //Player channels might have been registered already. Let us add our handlers. We are a little late though.
-            if (networkManagers == null) {
-                networkManagers = SpigotReflectionUtil.getNetworkManagers();
-            }
-            synchronized (networkManagers) {
-                for (Object networkManager : networkManagers) {
-                    ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
-                    Channel channel = networkManagerWrapper.readObject(0, Channel.class);
-                    if (channel == null) {
-                        continue;
-                    }
-                    ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
-                }
-            }
         }
     }
 

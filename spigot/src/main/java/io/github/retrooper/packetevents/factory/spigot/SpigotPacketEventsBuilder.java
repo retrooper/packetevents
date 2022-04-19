@@ -42,6 +42,7 @@ import io.github.retrooper.packetevents.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.util.BukkitLogManager;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -177,6 +178,8 @@ public class SpigotPacketEventsBuilder {
             }
 
             private void checkCompatibility() {
+                // PacketEvents is now enabled, we can now check
+                ViaVersionUtil.checkIfViaIsPresent();
                 //If ProtocolLib is present, it needs to be v5.0.0
                 Plugin protocolLibPlugin = Bukkit.getPluginManager().getPlugin("ProtocolLib");
                 if (protocolLibPlugin != null) {
