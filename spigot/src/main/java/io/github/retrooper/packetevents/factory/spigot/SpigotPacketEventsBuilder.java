@@ -41,12 +41,15 @@ import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.util.BukkitLogManager;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SpigotPacketEventsBuilder {
     private static PacketEventsAPI<Plugin> API_INSTANCE;
@@ -83,13 +86,13 @@ public class SpigotPacketEventsBuilder {
             private final SpigotChannelInjector injector = PaperChannelInjector.canBeUsed() ? new PaperChannelInjector() : new SpigotChannelInjector();
             private final InternalBukkitListener internalBukkitListener = new InternalBukkitListener();
             private final LogManager logManager = new BukkitLogManager();
-            private boolean loaded;
-            private boolean initialized;
+            private final AtomicBoolean loaded = new AtomicBoolean(false);
+            private final AtomicBoolean initialized = new AtomicBoolean(false);
             private boolean lateBind = false;
 
             @Override
             public void load() {
-                if (!loaded) {
+                if (!loaded.getAndSet(true)) {
                     //Resolve server version and cache
                     String id = plugin.getName().toLowerCase();
                     PacketEvents.IDENTIFIER = "pe-" + id;
@@ -115,20 +118,19 @@ public class SpigotPacketEventsBuilder {
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalPacketListener());
-                    loaded = true;
                 }
             }
 
             @Override
             public boolean isLoaded() {
-                return loaded;
+                return loaded.get();
             }
 
             @Override
             public void init() {
                 //Load if we haven't loaded already
                 load();
-                if (!initialized) {
+                if (!initialized.getAndSet(true)) {
                     if (settings.shouldCheckForUpdates()) {
                         getUpdateChecker().handleUpdateCheck();
                     }
@@ -171,15 +173,13 @@ public class SpigotPacketEventsBuilder {
                     }
 
                     checkCompatibility();
-                    initialized = true;
                 }
-
-
             }
 
             private void checkCompatibility() {
                 // PacketEvents is now enabled, we can now check
                 ViaVersionUtil.checkIfViaIsPresent();
+                ProtocolSupportUtil.checkIfProtocolSupportIsPresent();
                 //If ProtocolLib is present, it needs to be v5.0.0
                 Plugin protocolLibPlugin = Bukkit.getPluginManager().getPlugin("ProtocolLib");
                 if (protocolLibPlugin != null) {
@@ -198,17 +198,16 @@ public class SpigotPacketEventsBuilder {
 
             @Override
             public boolean isInitialized() {
-                return initialized;
+                return initialized.get();
             }
 
             @Override
             public void terminate() {
-                if (initialized) {
+                if (initialized.getAndSet(false)) {
                     //Uninject the injector if needed(depends on the injector implementation)
                     injector.uninject();
                     //Unregister all our listeners
                     getEventManager().unregisterAllListeners();
-                    initialized = false;
                 }
             }
 
@@ -251,8 +250,6 @@ public class SpigotPacketEventsBuilder {
             public LogManager getLogManager() {
                 return logManager;
             }
-        }
-
-                ;
+        };
     }
 }

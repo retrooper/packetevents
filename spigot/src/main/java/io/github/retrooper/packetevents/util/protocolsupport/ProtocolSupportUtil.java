@@ -25,14 +25,24 @@ import protocolsupport.api.ProtocolSupportAPI;
 import java.net.SocketAddress;
 
 public class ProtocolSupportUtil {
-    private static byte available = -1;
+    private static ProtocolSupportState available = ProtocolSupportState.UNKNOWN;
 
     public static boolean isAvailable() {
-        if (available == -1) {
-            boolean present = Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
-            available = (byte) (present ? 1 : 0);
+        if (available == ProtocolSupportState.UNKNOWN) {
+            try {
+                Class.forName("protocolsupport.api.ProtocolSupportAPI");
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        } else {
+            return available == ProtocolSupportState.ENABLED;
         }
-        return available == 1;
+    }
+
+    public static void checkIfProtocolSupportIsPresent() {
+        boolean present = Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
+        available = present ? ProtocolSupportState.ENABLED : ProtocolSupportState.DISABLED;
     }
 
     public static int getProtocolVersion(SocketAddress address) {
@@ -42,4 +52,10 @@ public class ProtocolSupportUtil {
     public static int getProtocolVersion(Player player) {
         return ProtocolSupportAPI.getProtocolVersion(player).getId();
     }
+}
+
+enum ProtocolSupportState {
+    UNKNOWN,
+    DISABLED,
+    ENABLED
 }

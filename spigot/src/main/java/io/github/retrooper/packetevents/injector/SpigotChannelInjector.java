@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.injector.connection.ServerChannelHandler;
+import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.injector.handlers.PacketDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEncoder;
 import io.github.retrooper.packetevents.util.InjectedList;
@@ -100,6 +101,25 @@ public class SpigotChannelInjector implements ChannelInjector {
             });
             //Replace the list with our wrapped one.
             reflectServerConnection.writeList(connectionChannelsListIndex, wrappedList);
+
+            //Player channels might have been registered already. Let us add our handlers. We are a little late though.
+            if (networkManagers == null) {
+                networkManagers = SpigotReflectionUtil.getNetworkManagers();
+            }
+            synchronized (networkManagers) {
+                for (Object networkManager : networkManagers) {
+                    ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
+                    Channel channel = networkManagerWrapper.readObject(0, Channel.class);
+                    if (channel == null) {
+                        continue;
+                    }
+                    try {
+                        ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
+                    } catch (Exception e) {
+                        System.out.println("Failed to inject into existing channel, client kicked before we could inject?");
+                    }
+                }
+            }
         }
     }
 
