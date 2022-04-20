@@ -34,7 +34,12 @@ public class ViaVersionUtil {
                 Class.forName("com.viaversion.viaversion.api.Via");
                 viaVersionAccessor = new ViaVersionAccessorImpl();
             } catch (Exception e) {
-                viaVersionAccessor = new ViaVersionAccessorImplLegacy();
+                try {
+                    Class.forName("us.myles.ViaVersion.api.Via");
+                    viaVersionAccessor = new ViaVersionAccessorImplLegacy();
+                } catch (ClassNotFoundException ex) {
+                    viaVersionAccessor = null;
+                }
             }
         }
     }
