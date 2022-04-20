@@ -44,6 +44,8 @@ public class EventCreationUtil {
     public static PacketSendEvent createSendEvent(Object channel, User user, Object player, Object buffer,
                                                   boolean autoProtocolTranslation) throws PacketProcessException{
         switch (user.getConnectionState()) {
+            case HANDSHAKING:
+                return new PacketHandshakeSendEvent(channel, user, player, buffer, autoProtocolTranslation);
             case STATUS:
                 return new PacketStatusSendEvent(channel, user, player, buffer, autoProtocolTranslation);
             case LOGIN:

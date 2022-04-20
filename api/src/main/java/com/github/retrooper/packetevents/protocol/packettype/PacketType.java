@@ -76,7 +76,11 @@ public final class PacketType {
     public static PacketTypeCommon getById(PacketSide side, ConnectionState state, ClientVersion version, int packetID) {
         switch (state) {
             case HANDSHAKING:
-                return Handshaking.Client.getById(packetID);
+                if (side == PacketSide.CLIENT) {
+                    return PacketType.Handshaking.Client.getById(packetID);
+                } else {
+                    return PacketType.Handshaking.Server.getById(packetID);
+                }
             case STATUS:
                 if (side == PacketSide.CLIENT) {
                     return Status.Client.getById(packetID);
@@ -124,6 +128,25 @@ public final class PacketType {
                 } else {
                     return null;
                 }
+            }
+
+            public int getId() {
+                return id;
+            }
+        }
+
+        public enum Server implements PacketTypeConstant {
+            LEGACY_SERVER_LIST_RESPONSE(254); //0xFE in hex
+
+            private final int id;
+
+            Server(int id) {
+                this.id = id;
+            }
+
+            @Nullable
+            public static PacketTypeCommon getById(int packetID) {
+                return packetID == 254 ? LEGACY_SERVER_LIST_RESPONSE : null;
             }
 
             public int getId() {
