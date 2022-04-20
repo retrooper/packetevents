@@ -39,7 +39,10 @@ import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.util.*;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
-import com.github.retrooper.packetevents.wrapper.play.server.*;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEffect;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.util.SpigotDataHelper;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
@@ -64,7 +67,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.getAPI().getSettings().debug(true).bStats(true)
+        PacketEvents.getAPI().getSettings().debug(false).bStats(true)
                 .checkForUpdates(false).timeStampMode(TimeStampMode.MILLIS).readOnlyListeners(false);
         PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
