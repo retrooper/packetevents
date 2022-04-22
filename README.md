@@ -1,6 +1,6 @@
 # packetevents
 
-[![](https://www.gnu.org/graphics/gplv3-with-text-136x68.png)](https://github.com/retrooper/packetevents/blob/dev/LICENSE)\
+[![](https://www.gnu.org/graphics/gplv3-with-text-136x68.png)](https://github.com/retrooper/packetevents/blob/2.0/LICENSE)\
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
 PacketEvents is a powerful packet library. Our packet wrappers are efficient and easy to use. With our API, you can write code that runs on many platforms including Spigot, BungeeCord, Velocity, and even client-sided Fabric! 
