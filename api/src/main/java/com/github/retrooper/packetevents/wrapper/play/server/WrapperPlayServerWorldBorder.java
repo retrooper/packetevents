@@ -15,7 +15,7 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
     private long speed;
 
     private double centerX;
-    private double centerY;
+    private double centerZ;
 
     private int portalTeleportBoundary;
 
@@ -41,18 +41,18 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
         this.speed = speed;
     }
 
-    public WrapperPlayServerWorldBorder(double centerX, double centerY) {
+    public WrapperPlayServerWorldBorder(double centerX, double centerZ) {
         super(PacketType.Play.Server.WORLD_BORDER);
         this.action = WorldBorderAction.SET_CENTER;
         this.centerX = centerX;
-        this.centerY = centerY;
+        this.centerZ = centerZ;
     }
 
-    public WrapperPlayServerWorldBorder(double centerX, double centerY, double oldRadius, double newRadius, long speed, int portalTeleportBoundary, int warningTime, int warningBlocks) {
+    public WrapperPlayServerWorldBorder(double centerX, double centerZ, double oldRadius, double newRadius, long speed, int portalTeleportBoundary, int warningTime, int warningBlocks) {
         super(PacketType.Play.Server.WORLD_BORDER);
         this.action = WorldBorderAction.INITIALIZE;
         this.centerX = centerX;
-        this.centerY = centerY;
+        this.centerZ = centerZ;
         this.oldRadius = oldRadius;
         this.newRadius = newRadius;
         this.speed = speed;
@@ -96,8 +96,8 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
         return this.centerX;
     }
 
-    public double getCenterY() {
-        return this.centerY;
+    public double getCenterZ() {
+        return this.centerZ;
     }
 
     public int getPortalTeleportBoundary() {
@@ -123,10 +123,10 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
             this.speed = readVarLong();
         } else if (this.action == WorldBorderAction.SET_CENTER) {
             this.centerX = readDouble();
-            this.centerY = readDouble();
+            this.centerZ = readDouble();
         } else if (this.action == WorldBorderAction.INITIALIZE) {
             this.centerX = readDouble();
-            this.centerY = readDouble();
+            this.centerZ = readDouble();
             this.oldRadius = readDouble();
             this.newRadius = readDouble();
             this.speed = readVarLong();
@@ -148,7 +148,7 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
         this.newRadius = wrapper.newRadius;
         this.speed = wrapper.speed;
         this.centerX = wrapper.centerX;
-        this.centerY = wrapper.centerY;
+        this.centerZ = wrapper.centerZ;
         this.portalTeleportBoundary = wrapper.portalTeleportBoundary;
         this.warningTime = wrapper.warningTime;
         this.warningBlocks = wrapper.warningBlocks;
@@ -165,10 +165,10 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
             writeVarLong(this.speed);
         } else if (this.action == WorldBorderAction.SET_CENTER) {
             writeDouble(this.centerX);
-            writeDouble(this.centerY);
+            writeDouble(this.centerZ);
         } else if (this.action == WorldBorderAction.INITIALIZE) {
             writeDouble(this.centerX);
-            writeDouble(this.centerY);
+            writeDouble(this.centerZ);
             writeDouble(this.oldRadius);
             writeDouble(this.newRadius);
             writeVarLong(this.speed);
