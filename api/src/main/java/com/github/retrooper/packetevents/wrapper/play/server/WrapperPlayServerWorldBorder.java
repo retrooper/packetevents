@@ -1,5 +1,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -21,6 +22,10 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
     private int warningTime;
 
     private int warningBlocks;
+
+    public WrapperPlayServerWorldBorder(PacketSendEvent event) {
+        super(event);
+    }
 
     public WrapperPlayServerWorldBorder(double radius) {
         super(PacketType.Play.Server.WORLD_BORDER);
