@@ -30,4 +30,12 @@ public class WrapperPlayServerWorldBorderSize extends PacketWrapper<WrapperPlayS
     public void write() {
         writeDouble(diameter);
     }
+
+    public double getDiameter() {
+        return diameter;
+    }
+
+    public void setDiameter(double diameter) {
+        this.diameter = diameter;
+    }
 }
