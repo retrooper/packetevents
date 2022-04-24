@@ -30,7 +30,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 public class PaperChannelInjector extends SpigotChannelInjector {
-    private static Class<?> CHANNEL_INITIALIZE_LISTENER_HOLDER_CLASS;
+    private static final Class<?> CHANNEL_INITIALIZE_LISTENER_HOLDER_CLASS;
     private static Class<?> CHANNEL_INITIALIZE_LISTENER_CLASS;
     private static Method ADD_LISTENER_METHOD;
     private static Method HAS_LISTENER_METHOD;
@@ -52,16 +52,7 @@ public class PaperChannelInjector extends SpigotChannelInjector {
 
     @Override
     public boolean isServerBound() {
-        if (HAS_LISTENER_METHOD == null) {
-            return false;
-        }
-        Key key = Key.key(PacketEvents.IDENTIFIER, "injector");
-        try {
-            return HAS_LISTENER_METHOD.invoke(null, key) != null;
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return true;
     }
 
     @Override
@@ -82,7 +73,6 @@ public class PaperChannelInjector extends SpigotChannelInjector {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        //TODO Deal with networkManagers like on Spigot, initialize already registered channels...
     }
 
     @Override

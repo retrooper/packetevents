@@ -38,6 +38,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,11 +48,11 @@ import java.util.Set;
 
 public class SpigotChannelInjector implements ChannelInjector {
     //Channels that process connecting clients.
-    private final Set<Channel> injectedConnectionChannels = new HashSet<>();
-    protected List<Object> networkManagers;
+    public final Set<Channel> injectedConnectionChannels = new HashSet<>();
+    public List<Object> networkManagers;
     private int connectionChannelsListIndex = -1;
-    private boolean inboundAheadProtocolTranslation = false;
-    private boolean outboundAheadProtocolTranslation = false;
+    public boolean inboundAheadProtocolTranslation = false;
+    public boolean outboundAheadProtocolTranslation = false;
 
     public void updatePlayer(User user, Object player) {
         PacketEvents.getAPI().getEventManager().callEvent(new UserLoginEvent(user, player));
@@ -116,7 +117,8 @@ public class SpigotChannelInjector implements ChannelInjector {
                     try {
                         ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
                     } catch (Exception e) {
-                        System.out.println("Failed to inject into existing channel, client kicked before we could inject?");
+                        System.out.println("Spigot injector failed to inject into an existing channel.");
+                        e.printStackTrace();
                     }
                 }
             }
@@ -283,8 +285,7 @@ public class SpigotChannelInjector implements ChannelInjector {
                 //We are the father decoder
                 if (injectedDecoder instanceof PacketDecoder) {
                     return (PacketDecoder) injectedDecoder;
-                } else if (ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoderLatest")
-                        || ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoderModern")) {
+                } else if (ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketDecoder")) {
                     //Some other packetevents instance already injected. Let us find our child decoder somewhere in here.
                     ReflectionObject reflectInjectedDecoder = new ReflectionObject(injectedDecoder);
                     List<Object> decoders = reflectInjectedDecoder.readList(0);

@@ -22,6 +22,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ViaVersionUtil {
+    //TODO Cut support for legacy versions of viaversion(also include an error when users load with outdated via), as we will force everyone to update soon
     private static ViaState available = ViaState.UNKNOWN;
     private static ViaVersionAccessor viaVersionAccessor;
 

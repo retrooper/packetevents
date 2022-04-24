@@ -136,7 +136,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                             }
                             org.bukkit.inventory.ItemStack bukkitStack = new org.bukkit.inventory.ItemStack(Material.EMERALD, 10);
                             ItemStack stack = SpigotDataHelper.fromBukkitItemStack(bukkitStack);
-                            user.sendMessage("Bukkit itemstack type: " + bukkitStack.getType().name() + ", packetevents type: " + stack.getType().getName());
+                            user.sendMessage("Bukkit itemstack type: " + bukkitStack.getType().name()
+                                    + ", packetevents type: " + stack.getType().getName());
                             org.bukkit.inventory.ItemStack backToBukkitStack = SpigotDataHelper.toBukkitItemStack(stack);
                             user.sendMessage("Back to Bukkit itemstack type: " + backToBukkitStack.getType().name() + ", type: " + backToBukkitStack.getClass().getSimpleName());
 
