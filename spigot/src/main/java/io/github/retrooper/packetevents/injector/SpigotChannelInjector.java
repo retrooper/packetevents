@@ -228,7 +228,7 @@ public class SpigotChannelInjector implements ChannelInjector {
                     }
                 } else if (ProtocolSupportUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);
-                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, decoder);
+                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, new PacketDecoder(decoder));
                 }
             }
         }
