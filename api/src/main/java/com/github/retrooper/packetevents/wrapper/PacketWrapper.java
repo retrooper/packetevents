@@ -147,9 +147,9 @@ public class PacketWrapper<T extends PacketWrapper> {
         if (last != null) {
             copy((T) last);
         } else {
-            event.setLastUsedWrapper(this);
             read();
         }
+        event.setLastUsedWrapper(this);
     }
 
     public boolean hasPreparedForSending() {
