@@ -20,10 +20,13 @@ package io.github.retrooper.packetevents.manager.protocol;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
+import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
+import io.netty.buffer.ByteBuf;
 
 import java.util.List;
 
@@ -46,6 +49,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void sendPacket(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
+            if (ProtocolSupportUtil.isAvailable() && packet instanceof ByteBuf) {
+                ((ByteBuf)packet).retain();
+            }
             ChannelHelper.writeAndFlush(channel, packet);
         }
     }
@@ -61,7 +67,10 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void writePacket(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
-            //Call write to all encoders.
+            //Write to all encoders.
+            if (ProtocolSupportUtil.isAvailable() && packet instanceof ByteBuf) {
+                ((ByteBuf)packet).retain();
+            }
             ChannelHelper.write(channel, packet);
         }
     }
