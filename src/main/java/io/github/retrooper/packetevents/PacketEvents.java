@@ -57,7 +57,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class PacketEvents implements Listener, EventManager {
     private static PacketEvents instance;
     private static Plugin plugin;
-    private final PEVersion version = new PEVersion(1, 8, 3);
+    private final PEVersion version = new PEVersion(1, 8, 4);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
@@ -161,10 +161,12 @@ public final class PacketEvents implements Listener, EventManager {
         }
     }
 
+    @Deprecated
     public void loadAsyncNewThread() {
         new Thread(this::load).start();
     }
 
+    @Deprecated
     public void loadAsync(ExecutorService executorService) {
         executorService.execute(this::load);
     }

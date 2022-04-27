@@ -53,7 +53,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.jetbrains:annotations:22.0.0'
+    implementation 'org.jetbrains:annotations:23.0.0'
 
     compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
@@ -66,7 +66,7 @@ dependencies {
 }
 
 group = 'io.github.retrooper'
-version = '1.8.3'
+version = '1.8.4'
 description = 'packetevents'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
