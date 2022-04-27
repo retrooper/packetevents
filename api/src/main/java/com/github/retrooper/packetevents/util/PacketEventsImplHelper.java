@@ -30,8 +30,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 public class PacketEventsImplHelper {
-    public static void handleClientBoundPacket(Object channel, User user, Object player,
-                                               Object buffer, boolean autoProtocolTranslation) throws PacketProcessException {
+    public static PacketSendEvent handleClientBoundPacket(Object channel, User user, Object player,
+                                               Object buffer, boolean autoProtocolTranslation, boolean runPostTasks) throws PacketProcessException {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer,
                 autoProtocolTranslation);
@@ -57,14 +57,18 @@ public class PacketEventsImplHelper {
             //Make the buffer unreadable for the next handlers
             ByteBufHelper.clear(buffer);
         }
-        if (packetSendEvent.hasPostTasks()) {
-            for (Runnable task : packetSendEvent.getPostTasks()) {
-                task.run();
+
+        if (runPostTasks) {
+            if (packetSendEvent.hasPostTasks()) {
+                for (Runnable task : packetSendEvent.getPostTasks()) {
+                    task.run();
+                }
             }
         }
+        return packetSendEvent;
     }
 
-    public static void handleServerBoundPacket(Object channel, User user,
+    public static PacketReceiveEvent handleServerBoundPacket(Object channel, User user,
                                                Object player,
                                                Object buffer,
                                                boolean autoProtocolTranslation) throws PacketProcessException {
@@ -96,6 +100,7 @@ public class PacketEventsImplHelper {
                 task.run();
             }
         }
+        return packetReceiveEvent;
     }
 
     public static void handleDisconnection(Object channel, @Nullable String username) {

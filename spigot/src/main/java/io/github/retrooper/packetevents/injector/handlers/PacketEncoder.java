@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.injector.handlers;
 
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -26,17 +27,24 @@ import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.util.ReferenceCountUtil;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketEncoder extends MessageToByteEncoder<Object> {
     public User user;
     public volatile Player player;
     public MessageToByteEncoder<?> vanillaEncoder;
+    public final List<Runnable> queuedPostTasks = new ArrayList<>();
 
     public PacketEncoder(User user) {
         this.user = user;
@@ -56,7 +64,53 @@ public class PacketEncoder extends MessageToByteEncoder<Object> {
             if (!in.isReadable()) return;
             out.writeBytes(in);
         }
-        PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out, true);
+        PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out, true, false);
+        if (sendEvent.hasPostTasks()) {
+            queuedPostTasks.addAll(sendEvent.getPostTasks());
+        }
+    }
+
+    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        ByteBuf buf = null;
+
+        try {
+            if (this.acceptOutboundMessage(msg)) {
+                buf = this.allocateBuffer(ctx, msg, true);
+                try {
+                    this.encode(ctx, msg, buf);
+                } finally {
+                    ReferenceCountUtil.release(msg);
+                    //Now we added the post tasks to the queuedPostTasks list, so let us execute them after we send the packet.
+                    if (!queuedPostTasks.isEmpty()) {
+                        List<Runnable> tasks = new ArrayList<>(queuedPostTasks);
+                        queuedPostTasks.clear();
+                        promise.addListener(f -> {
+                            for (Runnable task : tasks) {
+                                task.run();
+                            }
+                        });
+                    }
+                }
+                if (buf.isReadable()) {
+                    ctx.write(buf, promise);
+                } else {
+                    buf.release();
+                    ctx.write(Unpooled.EMPTY_BUFFER, promise);
+                }
+                buf = null;
+            } else {
+                ctx.write(msg, promise);
+            }
+        } catch (EncoderException var17) {
+            throw var17;
+        } catch (Throwable var18) {
+            throw new EncoderException(var18);
+        } finally {
+            if (buf != null) {
+                buf.release();
+            }
+        }
     }
 
     @Override

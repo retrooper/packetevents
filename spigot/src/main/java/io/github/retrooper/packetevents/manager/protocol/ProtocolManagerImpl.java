@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.manager.protocol;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -49,8 +48,10 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void sendPacket(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
+            //When ProtocolSupport is available, and we send a message through their logic handler,
+            //we must retain the message.
             if (ProtocolSupportUtil.isAvailable() && packet instanceof ByteBuf) {
-                ((ByteBuf)packet).retain();
+                ((ByteBuf) packet).retain();
             }
             ChannelHelper.writeAndFlush(channel, packet);
         }
@@ -60,6 +61,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public void sendPacketSilently(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
             //Only call the encoders after ours in the pipeline.
+            //Here we do not need to retain when ProtocolSupport is present
             ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, packet);
         }
     }
@@ -68,8 +70,10 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public void writePacket(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
             //Write to all encoders.
+            //When ProtocolSupport is available, and we send a message through their logic handler,
+            //we must retain the message.
             if (ProtocolSupportUtil.isAvailable() && packet instanceof ByteBuf) {
-                ((ByteBuf)packet).retain();
+                ((ByteBuf) packet).retain();
             }
             ChannelHelper.write(channel, packet);
         }
@@ -79,6 +83,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public void writePacketSilently(Object channel, Object packet) {
         if (ChannelHelper.isOpen(channel)) {
             //Only call the encoders after ours in the pipeline
+            //Here we do not need to retain when ProtocolSupport is present
             ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, packet);
         }
     }

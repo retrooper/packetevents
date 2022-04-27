@@ -39,10 +39,7 @@ import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.util.*;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEffect;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.util.SpigotDataHelper;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
@@ -209,14 +206,19 @@ public class PacketEventsPlugin extends JavaPlugin {
                         user.sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
                     System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
-                } /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
-                    event.setCancelled(true);
-                    WrapperPlayServerChatMessage clone = new WrapperPlayServerChatMessage((Component) null, null);
-                    clone.copy(chatMessage);
-                    PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), clone);
-                    System.out.println("Delayed " + chatMessage.getChatComponentJson());
-                } */ else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
+                    /*event.setCancelled(true);
+                    Object buffer = chatMessage.getBuffer();
+                    Object copy = ByteBufHelper.duplicate(buffer);
+                    ByteBufHelper.retain(copy);
+                    ByteBufHelper.readerIndex(copy, 0);
+                    PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), copy);
+                    System.out.println("Delayed " + chatMessage.getChatComponentJson());*/
+                    event.getPostTasks().add(() -> {
+                       user.sendTitle("Post chat message", "Pretty much", 10, 10, 10);
+                    });
+                }  else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
                     WrapperPlayServerEntityEffect effect = new WrapperPlayServerEntityEffect(event);
                     System.out.println("type: " + effect.getPotionType().getName() + ", type id: " + effect.getPotionType().getId());
                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
