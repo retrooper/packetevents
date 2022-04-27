@@ -72,8 +72,8 @@ public class PacketEncoder extends MessageToByteEncoder<Object> {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        //This is netty code of the write method and we are just "injecting" into it.
         ByteBuf buf = null;
-
         try {
             if (this.acceptOutboundMessage(msg)) {
                 buf = this.allocateBuffer(ctx, msg, true);
@@ -81,6 +81,7 @@ public class PacketEncoder extends MessageToByteEncoder<Object> {
                     this.encode(ctx, msg, buf);
                 } finally {
                     ReferenceCountUtil.release(msg);
+                    //PacketEvents - Start
                     //Now we added the post tasks to the queuedPostTasks list, so let us execute them after we send the packet.
                     if (!queuedPostTasks.isEmpty()) {
                         List<Runnable> tasks = new ArrayList<>(queuedPostTasks);
@@ -91,6 +92,7 @@ public class PacketEncoder extends MessageToByteEncoder<Object> {
                             }
                         });
                     }
+                    //PacketEvents - End
                 }
                 if (buf.isReadable()) {
                     ctx.write(buf, promise);
