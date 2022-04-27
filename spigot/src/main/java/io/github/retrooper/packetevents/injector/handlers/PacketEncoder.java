@@ -72,7 +72,7 @@ public class PacketEncoder extends MessageToByteEncoder<Object> {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        //This is netty code of the write method and we are just "injecting" into it.
+        //This is netty code of the write method, and we are just "injecting" into it.
         ByteBuf buf = null;
         try {
             if (this.acceptOutboundMessage(msg)) {
