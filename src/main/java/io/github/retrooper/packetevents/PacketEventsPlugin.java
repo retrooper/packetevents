@@ -18,8 +18,14 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.out.setslot.WrappedPacketOutSetSlot;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -37,6 +43,16 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        /*PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+                if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
+                    ItemStack stack = new ItemStack(Material.STICK);
+                    WrappedPacketOutSetSlot setSlot = new WrappedPacketOutSetSlot(0, 2, stack);
+                    PacketEvents.get().getPlayerUtils().sendPacket(event.getPlayer(), setSlot);
+                }
+            }
+        });*/
         PacketEvents.get().init();
     }
 
