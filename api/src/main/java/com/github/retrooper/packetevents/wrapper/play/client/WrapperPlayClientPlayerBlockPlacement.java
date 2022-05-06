@@ -92,6 +92,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
         blockPosition = wrapper.blockPosition;
         face = wrapper.face;
         cursorPosition = wrapper.cursorPosition;
+        itemStack = wrapper.itemStack;
         insideBlock = wrapper.insideBlock;
     }
 
