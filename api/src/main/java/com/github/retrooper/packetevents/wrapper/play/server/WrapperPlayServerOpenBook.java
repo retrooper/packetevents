@@ -31,4 +31,12 @@ public class WrapperPlayServerOpenBook extends PacketWrapper<WrapperPlayServerOp
     public void write() {
         writeVarInt(hand.ordinal());
     }
+
+    public InteractionHand getHand() {
+        return hand;
+    }
+
+    public void setHand(InteractionHand hand) {
+        this.hand = hand;
+    }
 }
