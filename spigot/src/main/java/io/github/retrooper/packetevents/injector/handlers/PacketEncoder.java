@@ -104,10 +104,10 @@ public class PacketEncoder extends MessageToByteEncoder<Object> {
             } else {
                 ctx.write(msg, promise);
             }
-        } catch (EncoderException var17) {
-            throw var17;
-        } catch (Throwable var18) {
-            throw new EncoderException(var18);
+        } catch (EncoderException e) {
+            throw e;
+        } catch (Throwable e2) {
+            throw new EncoderException(e2);
         } finally {
             if (buf != null) {
                 buf.release();
