@@ -64,15 +64,6 @@ public class CustomPipelineUtil {
         }
     }
 
-    /**
-     * Call the decode method on a netty ByteToMessageDecoder
-     *
-     * @param decoder The decoder
-     * @param ctx     The current context
-     * @param input   The packet to decode
-     * @return A list of the decoders output
-     * @throws InvocationTargetException If an exception happens while executing
-     */
     public static List<Object> callDecode(Object decoder, Object ctx, Object input) throws InvocationTargetException {
         List<Object> output = new ArrayList<>();
         try {
@@ -83,15 +74,6 @@ public class CustomPipelineUtil {
         return output;
     }
 
-    /**
-     * Call the encode method on a netty MessageToByteEncoder
-     *
-     * @param encoder The encoder
-     * @param ctx     The current context
-     * @param msg     The packet to encode
-     * @param output  The bytebuf to write the output to
-     * @throws InvocationTargetException If an exception happens while executing
-     */
     public static void callEncode(Object encoder, Object ctx, Object msg, Object output) throws InvocationTargetException {
         try {
             CustomPipelineUtil.ENCODE_METHOD.invoke(encoder, ctx, msg, output);

@@ -24,10 +24,10 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
-import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
@@ -62,17 +62,22 @@ public class PacketDecoder extends ByteToMessageDecoder {
         ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(input);
         try {
             boolean doRecompression =
-                    handleCompressionOrder(ctx, outputBuffer);
+                    handleCompression(ctx, outputBuffer);
             PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer, true);
             if (outputBuffer.isReadable()) {
                 if (doRecompression) {
-                    PacketCompressionUtil.recompress(ctx, outputBuffer);
+                    ByteBuf temp = ctx.alloc().buffer();
+                    compress(ctx, outputBuffer, temp);
+                    try {
+                        outputBuffer.clear().writeBytes(temp);
+                    } finally {
+                        temp.release();
+                    }
                     skipDoubleTransform = true;
                 }
                 out.add(outputBuffer.retain());
             }
-        }
-        finally {
+        } finally {
             outputBuffer.release();
         }
     }
@@ -89,14 +94,12 @@ public class PacketDecoder extends ByteToMessageDecoder {
                     out.addAll(CustomPipelineUtil.callDecode(decoder, ctx, input));
                 }
             }
-            if (mcDecoder != null) {
+            if (mcDecoder != null && !out.isEmpty()) {
                 //Call minecraft decoder to convert the ByteBuf to an NMS object for the next handlers
                 try {
-                    if (!out.isEmpty()) {
-                        Object input = out.get(0);
-                        out.clear();
-                        out.addAll(CustomPipelineUtil.callDecode(mcDecoder, ctx, input));
-                    }
+                    Object input = out.get(0);
+                    out.clear();
+                    out.addAll(CustomPipelineUtil.callDecode(mcDecoder, ctx, input));
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -114,21 +117,41 @@ public class PacketDecoder extends ByteToMessageDecoder {
         }
     }
 
+    private void compress(ChannelHandlerContext ctx, ByteBuf input, ByteBuf output) throws InvocationTargetException {
+        ChannelHandler compressor = ctx.pipeline().get("compress");
+        if (compressor != null) {
+            CustomPipelineUtil.callEncode(compressor, ctx, input, output);
+        }
+    }
 
-    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {
+    private void decompress(ChannelHandlerContext ctx, ByteBuf input, ByteBuf output) throws InvocationTargetException {
+        ChannelHandler decompressor = ctx.pipeline().get("decompress");
+        if (decompressor != null) {
+            ByteBuf temp = (ByteBuf) CustomPipelineUtil.callDecode(decompressor, ctx, input).get(0);
+            try {
+                output.clear().writeBytes(temp);
+            } finally {
+                temp.release();
+            }
+        }
+    }
+
+    private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
         if (handledCompression) return false;
-
-        int decoderIndex = ctx.pipeline().names().indexOf("decompress");
-        if (decoderIndex == -1) return false;
+        int decompressIndex = ctx.pipeline().names().indexOf("decompress");
+        if (decompressIndex == -1) return false;
         handledCompression = true;
         int peDecoderIndex = ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME);
         if (peDecoderIndex == -1) return false;
-        if (decoderIndex > peDecoderIndex) {
-            // Need to decompress this packet due to bad order
-            ByteBuf decompressed = ctx.alloc().buffer();
-            PacketCompressionUtil.decompress(ctx.pipeline(), buffer, decompressed);
-
-            PacketCompressionUtil.relocateHandlers(ctx.pipeline(), buffer, decompressed);
+        if (decompressIndex > peDecoderIndex) {
+            //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
+            //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
+            decompress(ctx, buffer, buffer);
+            //Let us relocate and no longer deal with compression.
+            ChannelHandler encoder = ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
+            ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
+            PacketDecoder decoder = (PacketDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
+            ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, new PacketDecoder(decoder));
             return true;
         }
         return false;
