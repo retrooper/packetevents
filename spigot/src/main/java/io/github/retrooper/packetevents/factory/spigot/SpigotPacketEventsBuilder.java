@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
+import io.github.retrooper.packetevents.injector.PacketCompressionUtil;
 import io.github.retrooper.packetevents.injector.PaperChannelInjector;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
@@ -114,6 +115,8 @@ public class SpigotPacketEventsBuilder {
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalPacketListener());
+
+                    PacketCompressionUtil.THRESHOLD = SpigotReflectionUtil.getServerProperty("network-compression-threshold", 256);
                 }
             }
 

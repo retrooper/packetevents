@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class SpigotReflectionUtil {
@@ -63,13 +64,14 @@ public final class SpigotReflectionUtil {
             MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, WORLD_SERVER_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
             GAME_PROFILE_CLASS, CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS,
             LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
-            BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS;
+            BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS, SETTINGS_CLASS, DEDICATED_SERVER_SETTINGS_CLASS, DEDICATED_SERVER_PROPERTIES_CLASS;
 
     //Netty classes
     public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS, BYTE_TO_MESSAGE_DECODER, MESSAGE_TO_BYTE_ENCODER;
 
     //Fields
-    public static Field ENTITY_PLAYER_PING_FIELD, ENTITY_BOUNDING_BOX_FIELD, BYTE_BUF_IN_PACKET_DATA_SERIALIZER;
+    public static Field ENTITY_PLAYER_PING_FIELD, ENTITY_BOUNDING_BOX_FIELD, BYTE_BUF_IN_PACKET_DATA_SERIALIZER,
+            DEDICATED_SERVER_SETTINGS_FIELD, DEDICATED_SERVER_PROPERTIES_FIELD, OLD_PROPERTY_MANAGER_FIELD, OLD_PROPERTIES_FIELD;
 
     //Methods
     public static Method IS_DEBUGGING, GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
@@ -78,7 +80,7 @@ public final class SpigotReflectionUtil {
             CRAFT_ITEM_STACK_AS_BUKKIT_COPY, CRAFT_ITEM_STACK_AS_NMS_COPY,
             READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD,
             WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD, GET_COMBINED_ID,
-            GET_BY_COMBINED_ID, GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA;
+            GET_BY_COMBINED_ID, GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA, GET_SERVER_PROPERTY;
 
     //Constructors
     private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR;
@@ -129,12 +131,18 @@ public final class SpigotReflectionUtil {
         if (CRAFT_BLOCK_DATA_CLASS != null) {
             GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA = Reflection.getMethod(CRAFT_BLOCK_DATA_CLASS, "fromData", CRAFT_BLOCK_DATA_CLASS, IBLOCK_DATA_CLASS);
         }
+        GET_SERVER_PROPERTY = Reflection.getMethod(SETTINGS_CLASS, int.class, 0, String.class, int.class);
     }
 
     private static void initFields() {
         ENTITY_BOUNDING_BOX_FIELD = Reflection.getField(NMS_ENTITY_CLASS, BOUNDING_BOX_CLASS, 0, true);
         ENTITY_PLAYER_PING_FIELD = Reflection.getField(ENTITY_PLAYER_CLASS, "ping");
         BYTE_BUF_IN_PACKET_DATA_SERIALIZER = Reflection.getField(NMS_PACKET_DATA_SERIALIZER_CLASS, BYTE_BUF_CLASS, 0, true);
+
+        DEDICATED_SERVER_SETTINGS_FIELD = Reflection.getField(DEDICATED_SERVER_CLASS, DEDICATED_SERVER_SETTINGS_CLASS, 0, true);
+        DEDICATED_SERVER_PROPERTIES_FIELD = Reflection.getField(DEDICATED_SERVER_SETTINGS_CLASS, DEDICATED_SERVER_PROPERTIES_CLASS, 0, true);
+        OLD_PROPERTY_MANAGER_FIELD = Reflection.getField(DEDICATED_SERVER_CLASS, SETTINGS_CLASS, 0, true);
+        OLD_PROPERTIES_FIELD = Reflection.getField(SETTINGS_CLASS, Properties.class, 0, true);
     }
 
     private static void initClasses() {
@@ -158,6 +166,9 @@ public final class SpigotReflectionUtil {
             LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
             PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
         }
+        SETTINGS_CLASS = getServerClass("server.dedicated.PropertyManager", "PropertyManager");
+        DEDICATED_SERVER_SETTINGS_CLASS = getServerClass("server.dedicated.DedicatedServerSettings", "DedicatedServerSettings");
+        DEDICATED_SERVER_PROPERTIES_CLASS = getServerClass("server.dedicated.DedicatedServerProperties", "DedicatedServerProperties");
 
         CRAFT_MAGIC_NUMBERS_CLASS = getOBCClass("util.CraftMagicNumbers");
         //IBlockData does not exist on 1.7.10
@@ -198,6 +209,76 @@ public final class SpigotReflectionUtil {
         } else {
             return Reflection.getClassByNameWithoutException(LEGACY_NMS_PACKAGE + legacy);
         }
+    }
+
+    public static Object getDedicatedServerSettings() {
+        Object dedicatedServer = getMinecraftServerInstance(Bukkit.getServer());
+        if (dedicatedServer != null && DEDICATED_SERVER_SETTINGS_FIELD != null) {
+            try {
+                return DEDICATED_SERVER_SETTINGS_FIELD.get(dedicatedServer);
+            } catch (IllegalAccessException e) {
+                DEDICATED_SERVER_SETTINGS_FIELD = null;
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public static Object getDedicatedServerProperties() {
+        Object dedicatedServerSettings = getDedicatedServerSettings();
+        if (dedicatedServerSettings != null && DEDICATED_SERVER_PROPERTIES_FIELD != null) {
+            try {
+                return DEDICATED_SERVER_PROPERTIES_FIELD.get(dedicatedServerSettings);
+            } catch (IllegalAccessException e) {
+                DEDICATED_SERVER_PROPERTIES_FIELD = null;
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public static Object getOldPropertyManager() {
+        Object dedicatedServer = getMinecraftServerInstance(Bukkit.getServer());
+        if (dedicatedServer != null && OLD_PROPERTY_MANAGER_FIELD != null) {
+            try {
+                return OLD_PROPERTY_MANAGER_FIELD.get(dedicatedServer);
+            } catch (IllegalAccessException e) {
+                OLD_PROPERTY_MANAGER_FIELD = null;
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public static Properties getOldProperties() {
+        Object propertyManager = getOldPropertyManager();
+        if (propertyManager != null && OLD_PROPERTIES_FIELD != null) {
+            try {
+                return (Properties) OLD_PROPERTIES_FIELD.get(propertyManager);
+            } catch (IllegalAccessException e) {
+                OLD_PROPERTIES_FIELD = null;
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public static int getServerProperty(String key, int def) {
+        Properties properties = getOldProperties();
+        if (properties != null) {
+            return properties.getProperty(key) != null ? Integer.parseInt(properties.getProperty(key)) : def;
+        }
+
+        Object dedicatedServerProperties = getDedicatedServerProperties();
+        if (dedicatedServerProperties != null && GET_SERVER_PROPERTY != null) {
+            try {
+                return (int) GET_SERVER_PROPERTY.invoke(dedicatedServerProperties, key, def);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                GET_SERVER_PROPERTY = null;
+                return def;
+            }
+        }
+        return def;
     }
 
     public static boolean isMinecraftServerInstanceDebugging() {
