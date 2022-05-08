@@ -96,7 +96,6 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
             ChannelHandler decompressor = pipe.get("decompress");
             try {
                 ByteBuf decompressed = (ByteBuf) CustomPipelineUtil.callPacketDecodeByteBuf(decompressor, ctx, buffer).get(0);
-                System.out.println("Decompressor: " + decompressor.getClass().getName());
                 if (buffer != decompressed) {
                     try {
                         buffer.clear().writeBytes(decompressed);
