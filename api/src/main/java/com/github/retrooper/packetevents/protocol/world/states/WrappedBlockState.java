@@ -77,6 +77,7 @@ public class WrappedBlockState {
 
     @NotNull
     public static WrappedBlockState getByGlobalId(ClientVersion version, int globalID) {
+        if (globalID == 0) return AIR; // Hardcode for performance
         byte mappingsIndex = getMappingsIndex(version);
         return BY_ID.get(mappingsIndex).getOrDefault(globalID, AIR).clone();
     }
@@ -89,13 +90,14 @@ public class WrappedBlockState {
 
     @NotNull
     public static WrappedBlockState getDefaultState(ClientVersion version, StateType type) {
+        if (type == StateTypes.AIR) return AIR;
         byte mappingsIndex = getMappingsIndex(version);
         WrappedBlockState state = DEFAULT_STATES.get(mappingsIndex).get(type);
         if (state == null) {
             PacketEvents.getAPI().getLogger().warning("Default state for " + type.getName() + " is null. Returning AIR");
             return AIR;
         }
-        return state;
+        return state.clone();
     }
 
     private static byte getMappingsIndex(ClientVersion version) {
