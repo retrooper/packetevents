@@ -32,7 +32,7 @@ public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServ
     }
 
     public WrapperStatusServerResponse(JsonObject component) {
-        super(PacketType.Status.Server.RESPONSE);
+        this(component.toString());
     }
 
     public WrapperStatusServerResponse(String componentJson) {
