@@ -1,7 +1,6 @@
 package com.github.retrooper.packetevents.protocol.world.states;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.states.enums.*;
@@ -42,18 +41,19 @@ public class WrappedBlockState {
     static {
         STRING_UPDATER.put("minecraft:grass_path", "minecraft:dirt_path"); // 1.16 -> 1.17
 
-            loadLegacy();
-            for (ClientVersion version : ClientVersion.values()) {
-                if (version.isNewerThanOrEquals(ClientVersion.V_1_13)
-                && version.isRelease()) {
-                    loadModern(version);
-                }
+        loadLegacy();
+        for (ClientVersion version : ClientVersion.values()) {
+            if (version.isNewerThanOrEquals(ClientVersion.V_1_13)
+                    && version.isRelease()) {
+                loadModern(version);
             }
+        }
     }
 
     int globalID;
     StateType type;
     EnumMap<StateValue, Object> data = new EnumMap<>(StateValue.class);
+    boolean hasClonedData = false;
     byte mappingsIndex;
 
     public WrappedBlockState(StateType type, String[] data, int globalID, byte mappingsIndex) {
@@ -95,32 +95,25 @@ public class WrappedBlockState {
             PacketEvents.getAPI().getLogger().warning("Default state for " + type.getName() + " is null. Returning AIR");
             return AIR;
         }
-        return state.clone();
+        return state;
     }
 
     private static byte getMappingsIndex(ClientVersion version) {
         if (version.isOlderThan(ClientVersion.V_1_13)) {
             return 0;
-        }
-        else if (version.isOlderThanOrEquals(ClientVersion.V_1_13_1)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_13_1)) {
             return 1;
-        }
-        else if (version.isOlderThanOrEquals(ClientVersion.V_1_13_2)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_13_2)) {
             return 2;
-        }
-        else if (version.isOlderThanOrEquals(ClientVersion.V_1_14_4)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_14_4)) {
             return 3;
-        }
-        else if (version.isOlderThanOrEquals(ClientVersion.V_1_15_2)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_15_2)) {
             return 4;
-        }
-        else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_1)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_1)) {
             return 5;
-        }
-        else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_2)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_2)) {
             return 6;
-        }
-        else {
+        } else {
             return 7;
         }
     }
@@ -154,8 +147,6 @@ public class WrappedBlockState {
             InputStream mappings = WrappedBlockState.class.getClassLoader().getResourceAsStream("assets/mappings/block/legacy_block_mappings.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(mappings));
 
-            boolean isPointEight = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8) &&
-                    PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_9);
             while ((line = reader.readLine()) != null) {
                 String[] split = line.split(",");
                 int id = Integer.parseInt(split[0]);
@@ -179,7 +170,7 @@ public class WrappedBlockState {
                     PacketEvents.getAPI().getLogger().warning("Could not find type for " + blockString);
                 }
 
-                WrappedBlockState state = new WrappedBlockState(type, dataStrings, combinedID, (byte)0);
+                WrappedBlockState state = new WrappedBlockState(type, dataStrings, combinedID, (byte) 0);
 
                 stateByStringMap.put(fullString, state);
                 stateByIdMap.put(combinedID, state);
@@ -195,11 +186,11 @@ public class WrappedBlockState {
             PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
             e.printStackTrace();
         }
-        BY_ID.put((byte)0, stateByIdMap);
-        INTO_ID.put((byte)0, stateToIdMap);
-        BY_STRING.put((byte)0, stateByStringMap);
-        INTO_STRING.put((byte)0, stateToStringMap);
-        DEFAULT_STATES.put((byte)0, stateTypeToBlockStateMap);
+        BY_ID.put((byte) 0, stateByIdMap);
+        INTO_ID.put((byte) 0, stateToIdMap);
+        BY_STRING.put((byte) 0, stateByStringMap);
+        INTO_STRING.put((byte) 0, stateToStringMap);
+        DEFAULT_STATES.put((byte) 0, stateTypeToBlockStateMap);
     }
 
     private static void loadModern(ClientVersion version) {
@@ -268,13 +259,13 @@ public class WrappedBlockState {
 
     @Override
     public WrappedBlockState clone() {
-        return new WrappedBlockState(type, data.clone(), globalID, mappingsIndex);
+        return new WrappedBlockState(type, data, globalID, mappingsIndex);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof WrappedBlockState)) return false;
         WrappedBlockState that = (WrappedBlockState) o;
         // Don't check the global ID, it is determined by the other data types
         return type == that.type && data.equals(that.data);
@@ -296,6 +287,7 @@ public class WrappedBlockState {
     }
 
     public void setAge(int age) {
+        checkIfCloneNeeded();
         data.put(StateValue.AGE, age);
         checkIsStillValid();
     }
@@ -305,6 +297,7 @@ public class WrappedBlockState {
     }
 
     public void setAttached(boolean attached) {
+        checkIfCloneNeeded();
         data.put(StateValue.ATTACHED, attached);
         checkIsStillValid();
     }
@@ -314,6 +307,7 @@ public class WrappedBlockState {
     }
 
     public void setAttachment(Attachment attachment) {
+        checkIfCloneNeeded();
         data.put(StateValue.ATTACHMENT, attachment);
         checkIsStillValid();
     }
@@ -323,6 +317,7 @@ public class WrappedBlockState {
     }
 
     public void setAxis(Axis axis) {
+        checkIfCloneNeeded();
         data.put(StateValue.AXIS, axis);
         checkIsStillValid();
     }
@@ -332,6 +327,7 @@ public class WrappedBlockState {
     }
 
     public void setBerries(boolean berries) {
+        checkIfCloneNeeded();
         data.put(StateValue.BERRIES, berries);
         checkIsStillValid();
     }
@@ -341,6 +337,7 @@ public class WrappedBlockState {
     }
 
     public void setBites(int bites) {
+        checkIfCloneNeeded();
         data.put(StateValue.BITES, bites);
         checkIsStillValid();
     }
@@ -350,6 +347,7 @@ public class WrappedBlockState {
     }
 
     public void setBottom(boolean bottom) {
+        checkIfCloneNeeded();
         data.put(StateValue.BOTTOM, bottom);
         checkIsStillValid();
     }
@@ -359,6 +357,7 @@ public class WrappedBlockState {
     }
 
     public void setCandles(int candles) {
+        checkIfCloneNeeded();
         data.put(StateValue.CANDLES, candles);
         checkIsStillValid();
     }
@@ -368,6 +367,7 @@ public class WrappedBlockState {
     }
 
     public void setCharges(int charges) {
+        checkIfCloneNeeded();
         data.put(StateValue.CHARGES, charges);
         checkIsStillValid();
     }
@@ -377,6 +377,7 @@ public class WrappedBlockState {
     }
 
     public void setConditional(boolean conditional) {
+        checkIfCloneNeeded();
         data.put(StateValue.CONDITIONAL, conditional);
         checkIsStillValid();
     }
@@ -386,6 +387,7 @@ public class WrappedBlockState {
     }
 
     public void setDelay(int delay) {
+        checkIfCloneNeeded();
         data.put(StateValue.DELAY, delay);
         checkIsStillValid();
     }
@@ -395,6 +397,7 @@ public class WrappedBlockState {
     }
 
     public void setDisarmed(boolean disarmed) {
+        checkIfCloneNeeded();
         data.put(StateValue.DISARMED, disarmed);
         checkIsStillValid();
     }
@@ -404,6 +407,7 @@ public class WrappedBlockState {
     }
 
     public void setDistance(int distance) {
+        checkIfCloneNeeded();
         data.put(StateValue.DISTANCE, distance);
         checkIsStillValid();
     }
@@ -413,6 +417,7 @@ public class WrappedBlockState {
     }
 
     public void setDown(boolean down) {
+        checkIfCloneNeeded();
         data.put(StateValue.DOWN, down);
         checkIsStillValid();
     }
@@ -422,6 +427,7 @@ public class WrappedBlockState {
     }
 
     public void setDrag(boolean drag) {
+        checkIfCloneNeeded();
         data.put(StateValue.DRAG, drag);
         checkIsStillValid();
     }
@@ -431,6 +437,7 @@ public class WrappedBlockState {
     }
 
     public void setEggs(int eggs) {
+        checkIfCloneNeeded();
         data.put(StateValue.EGGS, eggs);
         checkIsStillValid();
     }
@@ -440,6 +447,7 @@ public class WrappedBlockState {
     }
 
     public void setEnabled(boolean enabled) {
+        checkIfCloneNeeded();
         data.put(StateValue.ENABLED, enabled);
         checkIsStillValid();
     }
@@ -449,6 +457,7 @@ public class WrappedBlockState {
     }
 
     public void setExtended(boolean extended) {
+        checkIfCloneNeeded();
         data.put(StateValue.EXTENDED, extended);
         checkIsStillValid();
     }
@@ -458,6 +467,7 @@ public class WrappedBlockState {
     }
 
     public void setEye(boolean eye) {
+        checkIfCloneNeeded();
         data.put(StateValue.EYE, eye);
         checkIsStillValid();
     }
@@ -467,6 +477,7 @@ public class WrappedBlockState {
     }
 
     public void setFace(Face face) {
+        checkIfCloneNeeded();
         data.put(StateValue.FACE, face);
         checkIsStillValid();
     }
@@ -476,6 +487,7 @@ public class WrappedBlockState {
     }
 
     public void setFacing(BlockFace facing) {
+        checkIfCloneNeeded();
         data.put(StateValue.FACING, facing);
         checkIsStillValid();
     }
@@ -485,6 +497,7 @@ public class WrappedBlockState {
     }
 
     public void setHalf(Half half) {
+        checkIfCloneNeeded();
         data.put(StateValue.HALF, half);
         checkIsStillValid();
     }
@@ -494,6 +507,7 @@ public class WrappedBlockState {
     }
 
     public void setHanging(boolean hanging) {
+        checkIfCloneNeeded();
         data.put(StateValue.HANGING, hanging);
         checkIsStillValid();
     }
@@ -503,6 +517,7 @@ public class WrappedBlockState {
     }
 
     public void setHasBook(boolean hasBook) {
+        checkIfCloneNeeded();
         data.put(StateValue.HAS_BOOK, hasBook);
         checkIsStillValid();
     }
@@ -512,6 +527,7 @@ public class WrappedBlockState {
     }
 
     public void setHasBottle0(boolean hasBottle0) {
+        checkIfCloneNeeded();
         data.put(StateValue.HAS_BOTTLE_0, hasBottle0);
         checkIsStillValid();
     }
@@ -521,6 +537,7 @@ public class WrappedBlockState {
     }
 
     public void setHasBottle1(boolean hasBottle1) {
+        checkIfCloneNeeded();
         data.put(StateValue.HAS_BOTTLE_1, hasBottle1);
         checkIsStillValid();
     }
@@ -530,6 +547,7 @@ public class WrappedBlockState {
     }
 
     public void setHasBottle2(boolean hasBottle2) {
+        checkIfCloneNeeded();
         data.put(StateValue.HAS_BOTTLE_2, hasBottle2);
         checkIsStillValid();
     }
@@ -539,6 +557,7 @@ public class WrappedBlockState {
     }
 
     public void setHasRecord(boolean hasRecord) {
+        checkIfCloneNeeded();
         data.put(StateValue.HAS_RECORD, hasRecord);
         checkIsStillValid();
     }
@@ -548,6 +567,7 @@ public class WrappedBlockState {
     }
 
     public void setHatch(int hatch) {
+        checkIfCloneNeeded();
         data.put(StateValue.HATCH, hatch);
         checkIsStillValid();
     }
@@ -557,6 +577,7 @@ public class WrappedBlockState {
     }
 
     public void setHinge(Hinge hinge) {
+        checkIfCloneNeeded();
         data.put(StateValue.HINGE, hinge);
         checkIsStillValid();
     }
@@ -566,6 +587,7 @@ public class WrappedBlockState {
     }
 
     public void setHoneyLevel(int honeyLevel) {
+        checkIfCloneNeeded();
         data.put(StateValue.HONEY_LEVEL, honeyLevel);
         checkIsStillValid();
     }
@@ -575,6 +597,7 @@ public class WrappedBlockState {
     }
 
     public void setInWall(boolean inWall) {
+        checkIfCloneNeeded();
         data.put(StateValue.IN_WALL, inWall);
         checkIsStillValid();
     }
@@ -584,6 +607,7 @@ public class WrappedBlockState {
     }
 
     public void setInstrument(Instrument instrument) {
+        checkIfCloneNeeded();
         data.put(StateValue.INSTRUMENT, instrument);
         checkIsStillValid();
     }
@@ -593,6 +617,7 @@ public class WrappedBlockState {
     }
 
     public void setInverted(boolean inverted) {
+        checkIfCloneNeeded();
         data.put(StateValue.INVERTED, inverted);
         checkIsStillValid();
     }
@@ -602,6 +627,7 @@ public class WrappedBlockState {
     }
 
     public void setLayers(int layers) {
+        checkIfCloneNeeded();
         data.put(StateValue.LAYERS, layers);
         checkIsStillValid();
     }
@@ -611,6 +637,7 @@ public class WrappedBlockState {
     }
 
     public void setLeaves(Leaves leaves) {
+        checkIfCloneNeeded();
         data.put(StateValue.LEAVES, leaves);
         checkIsStillValid();
     }
@@ -620,6 +647,7 @@ public class WrappedBlockState {
     }
 
     public void setLevel(int level) {
+        checkIfCloneNeeded();
         data.put(StateValue.LEVEL, level);
         checkIsStillValid();
     }
@@ -629,6 +657,7 @@ public class WrappedBlockState {
     }
 
     public void setLit(boolean lit) {
+        checkIfCloneNeeded();
         data.put(StateValue.LIT, lit);
         checkIsStillValid();
     }
@@ -638,6 +667,7 @@ public class WrappedBlockState {
     }
 
     public void setLocked(boolean locked) {
+        checkIfCloneNeeded();
         data.put(StateValue.LOCKED, locked);
         checkIsStillValid();
     }
@@ -647,6 +677,7 @@ public class WrappedBlockState {
     }
 
     public void setMode(Mode mode) {
+        checkIfCloneNeeded();
         data.put(StateValue.MODE, mode);
         checkIsStillValid();
     }
@@ -656,6 +687,7 @@ public class WrappedBlockState {
     }
 
     public void setMoisture(int moisture) {
+        checkIfCloneNeeded();
         data.put(StateValue.MOISTURE, moisture);
         checkIsStillValid();
     }
@@ -665,6 +697,7 @@ public class WrappedBlockState {
     }
 
     public void setNorth(North north) {
+        checkIfCloneNeeded();
         data.put(StateValue.NORTH, north);
         checkIsStillValid();
     }
@@ -674,6 +707,7 @@ public class WrappedBlockState {
     }
 
     public void setNote(int note) {
+        checkIfCloneNeeded();
         data.put(StateValue.NOTE, note);
         checkIsStillValid();
     }
@@ -683,6 +717,7 @@ public class WrappedBlockState {
     }
 
     public void setOccupied(boolean occupied) {
+        checkIfCloneNeeded();
         data.put(StateValue.OCCUPIED, occupied);
         checkIsStillValid();
     }
@@ -692,6 +727,7 @@ public class WrappedBlockState {
     }
 
     public void setOpen(boolean open) {
+        checkIfCloneNeeded();
         data.put(StateValue.OPEN, open);
         checkIsStillValid();
     }
@@ -701,6 +737,7 @@ public class WrappedBlockState {
     }
 
     public void setOrientation(Orientation orientation) {
+        checkIfCloneNeeded();
         data.put(StateValue.ORIENTATION, orientation);
         checkIsStillValid();
     }
@@ -710,6 +747,7 @@ public class WrappedBlockState {
     }
 
     public void setPart(Part part) {
+        checkIfCloneNeeded();
         data.put(StateValue.PART, part);
         checkIsStillValid();
     }
@@ -719,6 +757,7 @@ public class WrappedBlockState {
     }
 
     public void setPersistent(boolean persistent) {
+        checkIfCloneNeeded();
         data.put(StateValue.PERSISTENT, persistent);
         checkIsStillValid();
     }
@@ -728,6 +767,7 @@ public class WrappedBlockState {
     }
 
     public void setPickles(int pickles) {
+        checkIfCloneNeeded();
         data.put(StateValue.PICKLES, pickles);
         checkIsStillValid();
     }
@@ -737,6 +777,7 @@ public class WrappedBlockState {
     }
 
     public void setPower(int power) {
+        checkIfCloneNeeded();
         data.put(StateValue.POWER, power);
         checkIsStillValid();
     }
@@ -746,6 +787,7 @@ public class WrappedBlockState {
     }
 
     public void setPowered(boolean powered) {
+        checkIfCloneNeeded();
         data.put(StateValue.POWERED, powered);
         checkIsStillValid();
     }
@@ -755,6 +797,7 @@ public class WrappedBlockState {
     }
 
     public void setRotation(int rotation) {
+        checkIfCloneNeeded();
         data.put(StateValue.ROTATION, rotation);
         checkIsStillValid();
     }
@@ -764,6 +807,7 @@ public class WrappedBlockState {
     }
 
     public void setSculkSensorPhase(SculkSensorPhase sculkSensorPhase) {
+        checkIfCloneNeeded();
         data.put(StateValue.SCULK_SENSOR_PHASE, sculkSensorPhase);
         checkIsStillValid();
     }
@@ -773,6 +817,7 @@ public class WrappedBlockState {
     }
 
     public void setShape(Shape shape) {
+        checkIfCloneNeeded();
         data.put(StateValue.SHAPE, shape);
         checkIsStillValid();
     }
@@ -782,6 +827,7 @@ public class WrappedBlockState {
     }
 
     public void setShort(boolean short_) {
+        checkIfCloneNeeded();
         data.put(StateValue.SHORT, short_);
         checkIsStillValid();
     }
@@ -791,6 +837,7 @@ public class WrappedBlockState {
     }
 
     public void setSignalFire(boolean signalFire) {
+        checkIfCloneNeeded();
         data.put(StateValue.SIGNAL_FIRE, signalFire);
         checkIsStillValid();
     }
@@ -800,6 +847,7 @@ public class WrappedBlockState {
     }
 
     public void setSnowy(boolean snowy) {
+        checkIfCloneNeeded();
         data.put(StateValue.SNOWY, snowy);
         checkIsStillValid();
     }
@@ -809,6 +857,7 @@ public class WrappedBlockState {
     }
 
     public void setStage(int stage) {
+        checkIfCloneNeeded();
         data.put(StateValue.STAGE, stage);
         checkIsStillValid();
     }
@@ -818,6 +867,7 @@ public class WrappedBlockState {
     }
 
     public void setSouth(South south) {
+        checkIfCloneNeeded();
         data.put(StateValue.SOUTH, south);
         checkIsStillValid();
     }
@@ -827,6 +877,7 @@ public class WrappedBlockState {
     }
 
     public void setThickness(Thickness thickness) {
+        checkIfCloneNeeded();
         data.put(StateValue.THICKNESS, thickness);
         checkIsStillValid();
     }
@@ -836,6 +887,7 @@ public class WrappedBlockState {
     }
 
     public void setTilt(Tilt tilt) {
+        checkIfCloneNeeded();
         data.put(StateValue.TILT, tilt);
         checkIsStillValid();
     }
@@ -845,6 +897,7 @@ public class WrappedBlockState {
     }
 
     public void setTriggered(boolean triggered) {
+        checkIfCloneNeeded();
         data.put(StateValue.TRIGGERED, triggered);
         checkIsStillValid();
     }
@@ -854,6 +907,7 @@ public class WrappedBlockState {
     }
 
     public void setTypeData(Type type) {
+        checkIfCloneNeeded();
         data.put(StateValue.TYPE, type);
         checkIsStillValid();
     }
@@ -863,6 +917,7 @@ public class WrappedBlockState {
     }
 
     public void setUnstable(boolean unstable) {
+        checkIfCloneNeeded();
         data.put(StateValue.UNSTABLE, unstable);
         checkIsStillValid();
     }
@@ -872,6 +927,7 @@ public class WrappedBlockState {
     }
 
     public void setUp(boolean up) {
+        checkIfCloneNeeded();
         data.put(StateValue.UP, up);
         checkIsStillValid();
     }
@@ -881,6 +937,7 @@ public class WrappedBlockState {
     }
 
     public void setVerticalDirection(VerticalDirection verticalDirection) {
+        checkIfCloneNeeded();
         data.put(StateValue.VERTICAL_DIRECTION, verticalDirection);
         checkIsStillValid();
     }
@@ -889,9 +946,8 @@ public class WrappedBlockState {
         return (boolean) data.get(StateValue.WATERLOGGED);
     }
 
-    // End all block data types
-
     public void setWaterlogged(boolean waterlogged) {
+        checkIfCloneNeeded();
         data.put(StateValue.WATERLOGGED, waterlogged);
         checkIsStillValid();
     }
@@ -901,6 +957,7 @@ public class WrappedBlockState {
     }
 
     public void setEast(East west) {
+        checkIfCloneNeeded();
         data.put(StateValue.EAST, west);
         checkIsStillValid();
     }
@@ -910,8 +967,22 @@ public class WrappedBlockState {
     }
 
     public void setWest(West west) {
+        checkIfCloneNeeded();
         data.put(StateValue.WEST, west);
         checkIsStillValid();
+    }
+
+    // End all block data types
+
+    /**
+     * We can't modify all blocks of a type when modifying a single block.
+     * Cloning on every wrapped block state is too expensive.
+     */
+    private void checkIfCloneNeeded() {
+        if (!hasClonedData) {
+            data = data.clone();
+            hasClonedData = true;
+        }
     }
 
     /**
@@ -920,11 +991,11 @@ public class WrappedBlockState {
      * This is because I believe it's better to revert illegal modification than to simply set to air for doing so
      * As multi-version makes block data still annoying
      */
-    public void checkIsStillValid() {
+    private void checkIsStillValid() {
         int oldGlobalID = globalID;
         globalID = getGlobalIdNoCache();
         if (globalID == -1) { // -1 maps to no block as negative ID are impossible
-            WrappedBlockState blockState = BY_ID.get(mappingsIndex).getOrDefault(globalID, AIR).clone();
+            WrappedBlockState blockState = BY_ID.get(mappingsIndex).getOrDefault(oldGlobalID, AIR).clone();
             this.type = blockState.type;
             this.globalID = blockState.globalID;
             this.data = blockState.data.clone();
