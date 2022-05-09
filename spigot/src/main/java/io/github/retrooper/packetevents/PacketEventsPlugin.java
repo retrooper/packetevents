@@ -19,7 +19,11 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.*;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
+import com.github.retrooper.packetevents.event.UserConnectEvent;
+import com.github.retrooper.packetevents.event.UserDisconnectEvent;
+import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
@@ -37,9 +41,22 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
-import com.github.retrooper.packetevents.util.*;
-import com.github.retrooper.packetevents.wrapper.play.client.*;
-import com.github.retrooper.packetevents.wrapper.play.server.*;
+import com.github.retrooper.packetevents.util.MojangAPIUtil;
+import com.github.retrooper.packetevents.util.TimeStampMode;
+import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.util.Vector3f;
+import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerVehicle;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEffect;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.util.SpigotDataHelper;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
@@ -189,13 +206,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                         float forward = steerVehicle.getForward();
                         user.sendMessage(ChatColor.GOLD + "Sideways: " + sideways + ", forward: " + forward);
                         break;
-                    case CRAFT_RECIPE_REQUEST:
-                        WrapperPlayClientCraftRecipeRequest wrapper = new WrapperPlayClientCraftRecipeRequest(event);
-                        int windowId = wrapper.getWindowId();
-                        Object recipe = wrapper.getRecipe();
-                        boolean makeAll = wrapper.isMakeAll();
-                        user.sendMessage(ChatColor.GOLD + "WindowId: " + windowId + ", recipe: " + recipe + ", makeAll: " + makeAll);
-                        break;
                     default:
                         break;
                 }
@@ -231,11 +241,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     EntityType type = spawnLivingEntity.getEntityType();
-                } else if (event.getPacketType() == PacketType.Play.Server.CRAFT_RECIPE_RESPONSE) {
-                    WrapperPlayServerCraftRecipeResponse wrapper = new WrapperPlayServerCraftRecipeResponse(event);
-                    int windowId = wrapper.getWindowId();
-                    Object recipe = wrapper.getRecipe();
-                    user.sendMessage(ChatColor.GOLD + "WindowId: " + windowId + ", recipe: " + recipe);
                 }
             }
 
