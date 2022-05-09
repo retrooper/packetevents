@@ -5,6 +5,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0' apply(false)
 }
 java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.targetCompatibility = JavaVersion.VERSION_1_8
 
 wrapper {
     gradleVersion = "7.3.1"

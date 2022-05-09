@@ -189,6 +189,13 @@ public class PacketEventsPlugin extends JavaPlugin {
                         float forward = steerVehicle.getForward();
                         user.sendMessage(ChatColor.GOLD + "Sideways: " + sideways + ", forward: " + forward);
                         break;
+                    case CRAFT_RECIPE_REQUEST:
+                        WrapperPlayClientCraftRecipeRequest wrapper = new WrapperPlayClientCraftRecipeRequest(event);
+                        int windowId = wrapper.getWindowId();
+                        Object recipe = wrapper.getRecipe();
+                        boolean makeAll = wrapper.isMakeAll();
+                        user.sendMessage(ChatColor.GOLD + "WindowId: " + windowId + ", recipe: " + recipe + ", makeAll: " + makeAll);
+                        break;
                     default:
                         break;
                 }
@@ -216,7 +223,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), copy);
                     System.out.println("Delayed " + chatMessage.getChatComponentJson());*/
                     event.getPostTasks().add(() -> {
-                       user.sendTitle("Post chat message", "Pretty much", 10, 10, 10);
+                        user.sendTitle("Post chat message", "Pretty much", 10, 10, 10);
                     });
                 }  else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
                     WrapperPlayServerEntityEffect effect = new WrapperPlayServerEntityEffect(event);
@@ -224,6 +231,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     EntityType type = spawnLivingEntity.getEntityType();
+                } else if (event.getPacketType() == PacketType.Play.Server.CRAFT_RECIPE_RESPONSE) {
+                    WrapperPlayServerCraftRecipeResponse wrapper = new WrapperPlayServerCraftRecipeResponse(event);
+                    int windowId = wrapper.getWindowId();
+                    Object recipe = wrapper.getRecipe();
+                    user.sendMessage(ChatColor.GOLD + "WindowId: " + windowId + ", recipe: " + recipe);
                 }
             }
 
@@ -243,7 +255,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
