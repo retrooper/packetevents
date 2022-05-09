@@ -113,7 +113,7 @@ public class WrappedBlockState {
             return 4;
         } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_1)) {
             return 5;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_2)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_4)) {
             return 6;
         } else {
             return 7;
@@ -131,7 +131,7 @@ public class WrappedBlockState {
             return "1.15";
         } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_1)) {
             return "1.16";
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_2)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_4)) {
             return "1.16.2";
         } else {
             return "1.17";
