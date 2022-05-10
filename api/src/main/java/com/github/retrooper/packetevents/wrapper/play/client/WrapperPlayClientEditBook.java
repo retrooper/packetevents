@@ -19,17 +19,25 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.List;
 
 public class WrapperPlayClientEditBook extends PacketWrapper<WrapperPlayClientEditBook> {
-    int slot;
-    List<String> pages;
-    String title;
+    private int slot;
+    private List<String> pages;
+    private String title;
 
     public WrapperPlayClientEditBook(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperPlayClientEditBook(int slot, List<String> pages, String title) {
+        super(PacketType.Play.Client.EDIT_BOOK);
+        this.slot = slot;
+        this.pages = pages;
+        this.title = title;
     }
 
     @Override
