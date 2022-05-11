@@ -65,7 +65,7 @@ public class WrapperPlayClientRecipeBookData extends PacketWrapper<WrapperPlayCl
   public void write() {
     writeVarInt(this.state.ordinal());
     if (this.state == RecipeState.DISPLAYED_RECIPE) {
-      writeString(this.recipeId.orElse(null));
+      writeString(this.recipeId.get());
     } else {
       writeBoolean(this.craftingRecipeBookOpen);
       writeBoolean(this.craftingRecipeBookFilterActive);
