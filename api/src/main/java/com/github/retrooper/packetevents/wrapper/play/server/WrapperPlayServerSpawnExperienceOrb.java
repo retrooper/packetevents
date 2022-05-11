@@ -73,8 +73,7 @@ public class WrapperPlayServerSpawnExperienceOrb extends PacketWrapper<WrapperPl
       writeDouble(this.x);
       writeDouble(this.y);
       writeDouble(this.z);
-    }
-    else {
+    } else {
       writeInt(floor(this.x * 32.0));
       writeInt(floor(this.y * 32.0));
       writeInt(floor(this.z * 32.0));
@@ -134,16 +133,5 @@ public class WrapperPlayServerSpawnExperienceOrb extends PacketWrapper<WrapperPl
   private int floor(double value) {
     int temp = (int) value;
     return value < (float) temp ? temp - 1 : temp;
-  }
-
-  @Override
-  public String toString() {
-    return "WrapperPlayServerSpawnExperienceOrb{" +
-            "entityId=" + entityId +
-            ", x=" + x +
-            ", y=" + y +
-            ", z=" + z +
-            ", count=" + count +
-            '}';
   }
 }
