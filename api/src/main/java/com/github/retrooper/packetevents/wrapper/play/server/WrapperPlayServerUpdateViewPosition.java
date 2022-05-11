@@ -80,12 +80,4 @@ public class WrapperPlayServerUpdateViewPosition extends PacketWrapper<WrapperPl
   public void setChunkZ(int chunkZ) {
     this.chunkZ = chunkZ;
   }
-
-  @Override
-  public String toString() {
-    return "WrapperPlayServerUpdateViewPosition{" +
-            "chunkX=" + chunkX +
-            ", chunkZ=" + chunkZ +
-            '}';
-  }
 }
