@@ -140,15 +140,4 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
   public void setDeathMessage(Optional<String> deathMessage) {
     this.deathMessage = deathMessage;
   }
-
-  @Override
-  public String toString() {
-    return "WrapperPlayServerCombatEvent{" +
-            "combat=" + combat +
-            ", duration=" + duration +
-            ", entityId=" + entityId +
-            ", playerId=" + playerId +
-            ", deathMessage=" + deathMessage +
-            '}';
-  }
 }
