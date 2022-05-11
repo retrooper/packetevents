@@ -23,24 +23,27 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.Optional;
+import java.util.OptionalInt;
+
 public class WrapperPlayClientCraftRecipeRequest extends PacketWrapper<WrapperPlayClientCraftRecipeRequest> {
   private int windowId;
-  private int recipeLegacy;
-  private String recipeModern;
+  private OptionalInt recipeLegacy;
+  private Optional<String> recipeModern;
   private boolean makeAll;
 
   public WrapperPlayClientCraftRecipeRequest(PacketReceiveEvent event) {
     super(event);
   }
 
-  public WrapperPlayClientCraftRecipeRequest(int windowId, int recipeLegacy, boolean makeAll) {
+  public WrapperPlayClientCraftRecipeRequest(int windowId, OptionalInt recipeLegacy, boolean makeAll) {
     super(PacketType.Play.Client.CRAFT_RECIPE_REQUEST);
     this.windowId = windowId;
     this.recipeLegacy = recipeLegacy;
     this.makeAll = makeAll;
   }
 
-  public WrapperPlayClientCraftRecipeRequest(int windowId, String recipeModern, boolean makeAll) {
+  public WrapperPlayClientCraftRecipeRequest(int windowId, Optional<String> recipeModern, boolean makeAll) {
     super(PacketType.Play.Client.CRAFT_RECIPE_REQUEST);
     this.windowId = windowId;
     this.recipeModern = recipeModern;
@@ -49,13 +52,26 @@ public class WrapperPlayClientCraftRecipeRequest extends PacketWrapper<WrapperPl
 
   @Override
   public void read() {
+    this.recipeLegacy = OptionalInt.empty();
+    this.recipeModern = Optional.empty();
     this.windowId = readByte();
     if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-      this.recipeLegacy = readVarInt();
+      this.recipeLegacy = OptionalInt.of(readVarInt());
     } else {
-      this.recipeModern = readString();
+      this.recipeModern = Optional.of(readString());
     }
     this.makeAll = readBoolean();
+  }
+
+  @Override
+  public void write() {
+    writeByte(this.windowId);
+    if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
+      writeVarInt(this.recipeLegacy.getAsInt());
+    } else {
+      writeString(this.recipeModern.get());
+    }
+    writeBoolean(this.makeAll);
   }
 
   @Override
@@ -66,17 +82,6 @@ public class WrapperPlayClientCraftRecipeRequest extends PacketWrapper<WrapperPl
     this.makeAll = wrapper.makeAll;
   }
 
-  @Override
-  public void write() {
-    writeByte(this.windowId);
-    if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-      writeVarInt(this.recipeLegacy);
-    } else {
-      writeString(this.recipeModern);
-    }
-    writeBoolean(this.makeAll);
-  }
-
   public int getWindowId() {
     return this.windowId;
   }
@@ -85,19 +90,19 @@ public class WrapperPlayClientCraftRecipeRequest extends PacketWrapper<WrapperPl
     this.windowId = windowId;
   }
 
-  public int getRecipeLegacy() {
+  public OptionalInt getRecipeLegacy() {
     return recipeLegacy;
   }
 
-  public void setRecipeLegacy(int recipeLegacy) {
+  public void setRecipeLegacy(OptionalInt recipeLegacy) {
     this.recipeLegacy = recipeLegacy;
   }
 
-  public String getRecipeModern() {
+  public Optional<String> getRecipeModern() {
     return recipeModern;
   }
 
-  public void setRecipeModern(String recipeModern) {
+  public void setRecipeModern(Optional<String> recipeModern) {
     this.recipeModern = recipeModern;
   }
 
