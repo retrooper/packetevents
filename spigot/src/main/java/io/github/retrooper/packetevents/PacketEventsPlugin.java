@@ -224,21 +224,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     EntityType type = spawnLivingEntity.getEntityType();
-                } else if (event.getPacketType() == PacketType.Play.Server.END_COMBAT_EVENT) {
-                    System.out.println("END COMBAT EVENT");
-                    WrapperPlayServerEndCombatEvent wrapper = new WrapperPlayServerEndCombatEvent(event);
-                    int duration = wrapper.getDuration();
-                    int entityId = wrapper.getEntityId();
-                    System.out.println("duration: " + duration + ", entityId: " + entityId);
-                } else if (event.getPacketType() == PacketType.Play.Server.ENTER_COMBAT_EVENT) {
-                    System.out.println("ENTER COMBAT EVENT");
-                } else if (event.getPacketType() == PacketType.Play.Server.DEATH_COMBAT_EVENT) {
-                    System.out.println("DEATH COMBAT EVENT");
-                    WrapperPlayServerDeathCombatEvent wrapper = new WrapperPlayServerDeathCombatEvent(event);
-                    int playerId = wrapper.getPlayerId();
-                    int entityId = wrapper.getEntityId();
-                    String message = wrapper.getDeathMessage();
-                    System.out.println("playerId: " + playerId + ", entityId: " + entityId + ", message: " + message);
                 }
             }
 
@@ -258,7 +243,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(listener);
+        //PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
