@@ -25,26 +25,23 @@ import com.github.retrooper.packetevents.protocol.world.Direction;
 import com.github.retrooper.packetevents.protocol.world.PaintingType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.UUID;
 
 // Mostly from MCProtocolLib
 public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlayServerSpawnPainting> {
   private int entityId;
-  private UUID uuid;
-  @Nullable
-  private String title;
-  @Nullable
-  private PaintingType type;
+  private Optional<UUID> uuid;
+  private Optional<String> title;
+  private Optional<PaintingType> type;
   private Vector3i position;
   private Direction direction;
 
   public WrapperPlayServerSpawnPainting(PacketSendEvent event) {
     super(event);
   }
-
-  public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, @Nullable String title, @Nullable PaintingType type, Vector3i position, Direction direction) {
+  public WrapperPlayServerSpawnPainting(int entityId, Optional<UUID> uuid, Optional<String> title, Optional<PaintingType> type, Vector3i position, Direction direction) {
     super(PacketType.Play.Server.SPAWN_PAINTING);
     this.entityId = entityId;
     this.uuid = uuid;
@@ -56,18 +53,21 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
 
   @Override
   public void read() {
+    this.uuid = Optional.empty();
+    this.title = Optional.empty();
+    this.type = Optional.empty();
     if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
       this.entityId = readInt();
     } else {
       this.entityId = readVarInt();
     }
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-      this.uuid = readUUID();
+      this.uuid = Optional.of(readUUID());
     }
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-      this.type = PaintingType.VALUES[readVarInt()];
+      this.type = Optional.of(PaintingType.VALUES[readVarInt()]);
     } else {
-      this.title = readString(13);
+      this.title = Optional.of(readString(13));
     }
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
       this.position = readBlockPosition();
@@ -88,12 +88,12 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
       writeVarInt(this.entityId);
     }
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-      writeUUID(this.uuid);
+      writeUUID(this.uuid.get());
     }
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-      writeVarInt(this.type.ordinal());
+      writeVarInt(this.type.get().ordinal());
     } else {
-      writeString(this.title, 13);
+      writeString(this.title.get(), 13);
     }
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
       long positionVector = this.position.getSerializedPosition();
@@ -124,27 +124,27 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
     this.entityId = entityId;
   }
 
-  public UUID getUuid() {
+  public Optional<UUID> getUuid() {
     return uuid;
   }
 
-  public void setUuid(UUID uuid) {
+  public void setUuid(Optional<UUID> uuid) {
     this.uuid = uuid;
   }
 
-  public @Nullable String getTitle() {
+  public Optional<String> getTitle() {
     return title;
   }
 
-  public void setTitle(@Nullable String title) {
+  public void setTitle(Optional<String> title) {
     this.title = title;
   }
 
-  public @Nullable PaintingType getType() {
+  public Optional<PaintingType> getType() {
     return type;
   }
 
-  public void setType(@Nullable PaintingType type) {
+  public void setType(Optional<PaintingType> type) {
     this.type = type;
   }
 
