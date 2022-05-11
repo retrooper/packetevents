@@ -18,17 +18,14 @@
 
 package com.github.retrooper.packetevents.protocol.world.states.enums;
 
-public enum Mode {
-    SAVE,
-    LOAD,
-    CORNER,
-    DATA,
-    COMPARE,
-    SUBTRACT;
+public enum Mirror {
+    NONE,
+    LEFT_RIGHT,
+    FRONT_BACK;
 
-    private static final Mode[] VALUES = values();
+    private static final Mirror[] VALUES = values();
 
-    public static Mode getById(int index) {
+    public static Mirror getById(int index) {
         return VALUES[index];
     }
 }
