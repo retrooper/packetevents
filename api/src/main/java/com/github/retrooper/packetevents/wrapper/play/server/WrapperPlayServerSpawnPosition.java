@@ -24,15 +24,22 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.Optional;
+
 public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlayServerSpawnPosition> {
   private Vector3i position;
-  private float angle;
+  private Optional<Float> angle;
 
   public WrapperPlayServerSpawnPosition(PacketSendEvent event) {
     super(event);
   }
 
-  public WrapperPlayServerSpawnPosition(Vector3i position, float angle) {
+  public WrapperPlayServerSpawnPosition(Vector3i position) {
+    super(PacketType.Play.Server.SPAWN_POSITION);
+    this.position = position;
+  }
+
+  public WrapperPlayServerSpawnPosition(Vector3i position, Optional<Float> angle) {
     super(PacketType.Play.Server.SPAWN_POSITION);
     this.position = position;
     this.angle = angle;
@@ -40,6 +47,7 @@ public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlaySer
 
   @Override
   public void read() {
+    this.angle = Optional.empty();
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
       this.position = new Vector3i(readLong());
     } else {
@@ -49,7 +57,7 @@ public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlaySer
       this.position = new Vector3i(x, y, z);
     }
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-      this.angle = readFloat();
+      this.angle = Optional.of(readFloat());
     }
   }
 
@@ -64,7 +72,7 @@ public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlaySer
       writeInt(this.position.z);
     }
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-      writeFloat(this.angle);
+      writeFloat(this.angle.get());
     }
   }
 
@@ -82,11 +90,11 @@ public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlaySer
     this.position = position;
   }
 
-  public float getAngle() {
+  public Optional<Float> getAngle() {
     return angle;
   }
 
-  public void setAngle(float angle) {
+  public void setAngle(Optional<Float> angle) {
     this.angle = angle;
   }
 }
