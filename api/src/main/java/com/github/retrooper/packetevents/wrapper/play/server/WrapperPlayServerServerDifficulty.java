@@ -25,59 +25,59 @@ import com.github.retrooper.packetevents.protocol.world.Difficulty;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerServerDifficulty extends PacketWrapper<WrapperPlayServerServerDifficulty> {
-    private Difficulty difficulty;
-    private boolean locked;
+  private Difficulty difficulty;
+  private boolean locked;
 
-    public WrapperPlayServerServerDifficulty(PacketSendEvent event) {
-        super(event);
-    }
+  public WrapperPlayServerServerDifficulty(PacketSendEvent event) {
+    super(event);
+  }
 
-    public WrapperPlayServerServerDifficulty(Difficulty difficulty) {
-        super(PacketType.Play.Server.SERVER_DIFFICULTY);
-        this.difficulty = difficulty;
-    }
+  public WrapperPlayServerServerDifficulty(Difficulty difficulty) {
+    super(PacketType.Play.Server.SERVER_DIFFICULTY);
+    this.difficulty = difficulty;
+  }
 
-    public WrapperPlayServerServerDifficulty(Difficulty difficulty, boolean locked) {
-        super(PacketType.Play.Server.SERVER_DIFFICULTY);
-        this.difficulty = difficulty;
-        this.locked = locked;
-    }
+  public WrapperPlayServerServerDifficulty(Difficulty difficulty, boolean locked) {
+    super(PacketType.Play.Server.SERVER_DIFFICULTY);
+    this.difficulty = difficulty;
+    this.locked = locked;
+  }
 
-    @Override
-    public void read() {
-        this.difficulty = Difficulty.getById(readByte());
-        if (serverVersion.isNewerThan(ServerVersion.V_1_14_4)) {
-            this.locked = readBoolean();
-        }
+  @Override
+  public void read() {
+    this.difficulty = Difficulty.getById(readByte());
+    if (serverVersion.isNewerThan(ServerVersion.V_1_14_4)) {
+      this.locked = readBoolean();
     }
+  }
 
-    @Override
-    public void copy(WrapperPlayServerServerDifficulty wrapper) {
-        this.difficulty = wrapper.difficulty;
-        this.locked = wrapper.locked;
+  @Override
+  public void write() {
+    writeByte(this.difficulty.getId());
+    if (serverVersion.isNewerThan(ServerVersion.V_1_14_4)) {
+      writeBoolean(this.locked);
     }
+  }
 
-    @Override
-    public void write() {
-        writeByte(difficulty.getId());
-        if (serverVersion.isNewerThan(ServerVersion.V_1_14_4)) {
-            writeBoolean(locked);
-        }
-    }
+  @Override
+  public void copy(WrapperPlayServerServerDifficulty wrapper) {
+    this.difficulty = wrapper.difficulty;
+    this.locked = wrapper.locked;
+  }
 
-    public Difficulty getDifficulty() {
-        return difficulty;
-    }
+  public Difficulty getDifficulty() {
+    return difficulty;
+  }
 
-    public void setDifficulty(Difficulty difficulty) {
-        this.difficulty = difficulty;
-    }
+  public void setDifficulty(Difficulty difficulty) {
+    this.difficulty = difficulty;
+  }
 
-    public boolean isLocked() {
-        return locked;
-    }
+  public boolean isLocked() {
+    return locked;
+  }
 
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
+  public void setLocked(boolean locked) {
+    this.locked = locked;
+  }
 }
