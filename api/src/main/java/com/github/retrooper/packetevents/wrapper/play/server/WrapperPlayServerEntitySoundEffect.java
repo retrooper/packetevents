@@ -109,15 +109,4 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
   public void setPitch(float pitch) {
     this.pitch = pitch;
   }
-
-  @Override
-  public String toString() {
-    return "WrapperPlayServerEntitySoundEffect{" +
-            "soundId=" + soundId +
-            ", soundCategory=" + soundCategory +
-            ", entityId=" + entityId +
-            ", volume=" + volume +
-            ", pitch=" + pitch +
-            '}';
-  }
 }
