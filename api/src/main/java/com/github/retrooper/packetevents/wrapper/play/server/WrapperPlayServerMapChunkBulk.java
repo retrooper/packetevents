@@ -19,8 +19,11 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
+import java.util.OptionalInt;
 
 public class WrapperPlayServerMapChunkBulk extends PacketWrapper<WrapperPlayServerMapChunkBulk> {
   private boolean skyLightSent;
@@ -29,9 +32,24 @@ public class WrapperPlayServerMapChunkBulk extends PacketWrapper<WrapperPlayServ
   private int chunkY;
   private int primaryBitmap;
   private byte[] data;
+  private OptionalInt dataLength;
+  private OptionalInt addBitmap;
 
   public WrapperPlayServerMapChunkBulk(PacketSendEvent event) {
     super(event);
+  }
+
+  public WrapperPlayServerMapChunkBulk(int chunkColumnCount, OptionalInt dataLength, boolean skyLightSent, byte[] data, int chunkX, int chunkY,
+                                       int primaryBitmap, OptionalInt addBitmap) {
+    super(PacketType.Play.Server.MAP_CHUNK_BULK);
+    this.chunkColumnCount = chunkColumnCount;
+    this.dataLength = dataLength;
+    this.skyLightSent = skyLightSent;
+    this.data = data;
+    this.chunkX = chunkX;
+    this.chunkY = chunkY;
+    this.primaryBitmap = primaryBitmap;
+    this.addBitmap = addBitmap;
   }
 
   public WrapperPlayServerMapChunkBulk(boolean skyLightSent, int chunkColumnCount, int chunkX, int chunkY, short primaryBitmap, byte[] data) {
@@ -46,22 +64,46 @@ public class WrapperPlayServerMapChunkBulk extends PacketWrapper<WrapperPlayServ
 
   @Override
   public void read() {
-    this.skyLightSent = readBoolean();
-    this.chunkColumnCount = readVarInt();
-    this.chunkX = readInt();
-    this.chunkY = readInt();
-    this.primaryBitmap = readUnsignedShort();
-    this.data = readRemainingBytes();
+    this.dataLength = OptionalInt.empty();
+    this.addBitmap = OptionalInt.empty();
+    if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+      this.skyLightSent = readBoolean();
+      this.chunkColumnCount = readVarInt();
+      this.chunkX = readInt();
+      this.chunkY = readInt();
+      this.primaryBitmap = readUnsignedShort();
+      this.data = readRemainingBytes();
+    } else if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
+      this.chunkColumnCount = readShort();
+      this.dataLength = OptionalInt.of(readInt());
+      this.skyLightSent = readBoolean();
+      this.data = readRemainingBytes();
+      this.chunkX = readInt();
+      this.chunkY = readInt();
+      this.primaryBitmap = readUnsignedShort();
+      this.addBitmap = OptionalInt.of(readUnsignedShort());
+    }
   }
 
   @Override
   public void write() {
-    writeBoolean(skyLightSent);
-    writeVarInt(chunkColumnCount);
-    writeInt(chunkX);
-    writeInt(chunkY);
-    writeShort(primaryBitmap);
-    writeBytes(data);
+    if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+      writeBoolean(skyLightSent);
+      writeVarInt(chunkColumnCount);
+      writeInt(chunkX);
+      writeInt(chunkY);
+      writeShort(primaryBitmap);
+      writeBytes(data);
+    } else if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
+      writeShort(chunkColumnCount);
+      writeInt(dataLength.getAsInt());
+      writeBoolean(skyLightSent);
+      writeBytes(data);
+      writeInt(chunkX);
+      writeInt(chunkY);
+      writeShort(primaryBitmap);
+      writeShort(addBitmap.getAsInt());
+    }
   }
 
   @Override
@@ -72,6 +114,8 @@ public class WrapperPlayServerMapChunkBulk extends PacketWrapper<WrapperPlayServ
     this.chunkY = wrapper.chunkY;
     this.primaryBitmap = wrapper.primaryBitmap;
     this.data = wrapper.data;
+    this.dataLength = wrapper.dataLength;
+    this.addBitmap = wrapper.addBitmap;
   }
 
   public boolean isSkyLightSent() {
@@ -120,5 +164,21 @@ public class WrapperPlayServerMapChunkBulk extends PacketWrapper<WrapperPlayServ
 
   public void setData(byte[] data) {
     this.data = data;
+  }
+
+  public OptionalInt getDataLength() {
+    return dataLength;
+  }
+
+  public void setDataLength(OptionalInt dataLength) {
+    this.dataLength = dataLength;
+  }
+
+  public OptionalInt getAddBitmap() {
+    return addBitmap;
+  }
+
+  public void setAddBitmap(OptionalInt addBitmap) {
+    this.addBitmap = addBitmap;
   }
 }
