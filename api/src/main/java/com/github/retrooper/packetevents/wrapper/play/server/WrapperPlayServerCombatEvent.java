@@ -29,7 +29,7 @@ import java.util.OptionalInt;
 public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServerCombatEvent> {
   private Combat combat;
   private OptionalInt duration;
-  private int entityId;
+  private OptionalInt entityId;
   private OptionalInt playerId;
   private Optional<String> deathMessage;
 
@@ -42,14 +42,14 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
     this.combat = combat;
   }
 
-  public WrapperPlayServerCombatEvent(Combat combat, OptionalInt duration, int entityId) {
+  public WrapperPlayServerCombatEvent(Combat combat, OptionalInt duration, OptionalInt entityId) {
     super(PacketType.Play.Server.COMBAT_EVENT);
     this.combat = combat;
     this.duration = duration;
     this.entityId = entityId;
   }
 
-  public WrapperPlayServerCombatEvent(Combat combat, OptionalInt playerId, int entityId, Optional<String> deathMessage) {
+  public WrapperPlayServerCombatEvent(Combat combat, OptionalInt playerId, OptionalInt entityId, Optional<String> deathMessage) {
     super(PacketType.Play.Server.COMBAT_EVENT);
     this.combat = combat;
     this.playerId = playerId;
@@ -60,17 +60,18 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
   @Override
   public void read() {
     this.duration = OptionalInt.empty();
+    this.entityId = OptionalInt.empty();
     this.playerId = OptionalInt.empty();
     this.deathMessage = Optional.empty();
     this.combat = Combat.VALUES[readVarInt()];
     switch (combat) {
       case END_COMBAT:
         this.duration = OptionalInt.of(readVarInt());
-        this.entityId = readInt();
+        this.entityId = OptionalInt.of(readInt());
         break;
       case ENTITY_DEAD:
         this.playerId = OptionalInt.of(readVarInt());
-        this.entityId = readInt();
+        this.entityId = OptionalInt.of(readInt());
         this.deathMessage = Optional.of(readString());
         break;
     }
@@ -82,12 +83,12 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
     switch (combat) {
       case END_COMBAT:
         writeVarInt(duration.getAsInt());
-        writeInt(entityId);
+        writeInt(entityId.getAsInt());
         break;
       case ENTITY_DEAD:
         writeVarInt(playerId.getAsInt());
-        writeInt(entityId);
-        writeString(deathMessage.orElse(""));
+        writeInt(entityId.getAsInt());
+        writeString(deathMessage.get());
         break;
     }
   }
@@ -117,11 +118,11 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
     this.duration = duration;
   }
 
-  public int getEntityId() {
+  public OptionalInt getEntityId() {
     return entityId;
   }
 
-  public void setEntityId(int entityId) {
+  public void setEntityId(OptionalInt entityId) {
     this.entityId = entityId;
   }
 
