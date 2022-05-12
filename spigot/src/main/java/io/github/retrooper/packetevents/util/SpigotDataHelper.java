@@ -57,9 +57,10 @@ public class SpigotDataHelper {
 
     public static EntityType fromBukkitEntityType(org.bukkit.entity.EntityType entityType) {
         ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
-        if (serverVersion
-                .isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            return EntityTypes.getByName(entityType.getName());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+            return EntityTypes.getByName(entityType.getKey().toString());
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            return EntityTypes.getByName("minecraft:" + entityType.getName());
         } else {
             if (entityType.getTypeId() == -1) {
                 return null;
@@ -70,8 +71,7 @@ public class SpigotDataHelper {
 
     public static org.bukkit.entity.EntityType toBukkitEntityType(EntityType entityType) {
         ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
-        if (serverVersion
-                .isNewerThanOrEquals(ServerVersion.V_1_13)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             return org.bukkit.entity.EntityType.fromName(entityType.getName().getKey());
         } else {
             return org.bukkit.entity.EntityType.fromId(entityType.getId(serverVersion.toClientVersion()));
