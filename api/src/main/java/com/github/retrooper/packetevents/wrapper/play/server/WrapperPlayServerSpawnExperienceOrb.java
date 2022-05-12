@@ -45,11 +45,7 @@ public class WrapperPlayServerSpawnExperienceOrb extends PacketWrapper<WrapperPl
 
   @Override
   public void read() {
-    if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
-      this.entityId = readShort();
-    } else {
-      this.entityId = readVarInt();
-    }
+    this.entityId = readVarInt();
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
       this.x = readDouble();
       this.y = readDouble();
@@ -64,11 +60,7 @@ public class WrapperPlayServerSpawnExperienceOrb extends PacketWrapper<WrapperPl
 
   @Override
   public void write() {
-    if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
-      writeShort(this.entityId);
-    } else {
-      writeVarInt(this.entityId);
-    }
+    writeVarInt(this.entityId);
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
       writeDouble(this.x);
       writeDouble(this.y);
