@@ -41,6 +41,24 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
   public WrapperPlayServerSpawnPainting(PacketSendEvent event) {
     super(event);
   }
+
+  public WrapperPlayServerSpawnPainting(int entityId, Optional<String> title, Vector3i position, Direction direction) {
+    super(PacketType.Play.Server.SPAWN_PAINTING);
+    this.entityId = entityId;
+    this.title = title;
+    this.position = position;
+    this.direction = direction;
+  }
+
+  public WrapperPlayServerSpawnPainting(int entityId, Optional<UUID> uuid, Optional<String> title, Vector3i position, Direction direction) {
+    super(PacketType.Play.Server.SPAWN_PAINTING);
+    this.entityId = entityId;
+    this.uuid = uuid;
+    this.title = title;
+    this.position = position;
+    this.direction = direction;
+  }
+
   public WrapperPlayServerSpawnPainting(int entityId, Optional<UUID> uuid, Optional<String> title, Optional<PaintingType> type, Vector3i position, Direction direction) {
     super(PacketType.Play.Server.SPAWN_PAINTING);
     this.entityId = entityId;
@@ -56,11 +74,7 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
     this.uuid = Optional.empty();
     this.title = Optional.empty();
     this.type = Optional.empty();
-    if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
-      this.entityId = readInt();
-    } else {
-      this.entityId = readVarInt();
-    }
+    this.entityId = readVarInt();
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
       this.uuid = Optional.of(readUUID());
     }
@@ -77,16 +91,16 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
       int z = readInt();
       this.position = new Vector3i(x, y, z);
     }
-    this.direction = Direction.getByHorizontalIndex(readUnsignedByte());
+    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+      this.direction = Direction.getByHorizontalIndex(readUnsignedByte());
+    } else {
+      this.direction = Direction.getByHorizontalIndex(readInt());
+    }
   }
 
   @Override
   public void write() {
-    if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
-      writeInt(this.entityId);
-    } else {
-      writeVarInt(this.entityId);
-    }
+    writeVarInt(this.entityId);
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
       writeUUID(this.uuid.get());
     }
@@ -103,7 +117,11 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
       writeShort(this.position.y);
       writeInt(this.position.z);
     }
-    writeByte(this.direction.getHorizontalIndex());
+    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+      writeByte(this.direction.getHorizontalIndex());
+    } else {
+      writeInt(this.direction.getHorizontalIndex());
+    }
   }
 
   @Override
