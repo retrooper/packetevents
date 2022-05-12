@@ -87,7 +87,7 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
       this.position = readBlockPosition();
     } else {
       int x = readInt();
-      int y = readUnsignedByte();
+      int y = readInt();
       int z = readInt();
       this.position = new Vector3i(x, y, z);
     }
