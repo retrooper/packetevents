@@ -19,11 +19,7 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListenerPriority;
-import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
-import com.github.retrooper.packetevents.event.UserConnectEvent;
-import com.github.retrooper.packetevents.event.UserDisconnectEvent;
-import com.github.retrooper.packetevents.event.UserLoginEvent;
+import com.github.retrooper.packetevents.event.*;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
@@ -41,22 +37,9 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
-import com.github.retrooper.packetevents.util.MojangAPIUtil;
-import com.github.retrooper.packetevents.util.TimeStampMode;
-import com.github.retrooper.packetevents.util.Vector3d;
-import com.github.retrooper.packetevents.util.Vector3f;
-import com.github.retrooper.packetevents.util.Vector3i;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerVehicle;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEffect;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
+import com.github.retrooper.packetevents.util.*;
+import com.github.retrooper.packetevents.wrapper.play.client.*;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.util.SpigotDataHelper;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
@@ -82,7 +65,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         //Register your listeners
         PacketEvents.getAPI().getSettings().debug(false).bStats(true)
-                .checkForUpdates(false).timeStampMode(TimeStampMode.MILLIS).readOnlyListeners(false);
+            .checkForUpdates(false).timeStampMode(TimeStampMode.MILLIS).readOnlyListeners(false);
         PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
             @Override
@@ -98,28 +81,28 @@ public class PacketEventsPlugin extends JavaPlugin {
                             event.setCancelled(true);
                             Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
                             Vector3d position = SpigotDataHelper
-                                    .fromBukkitLocation(((Player) event.getPlayer()).getLocation())
-                                    .getPosition().add(0, 2, 0);
+                                .fromBukkitLocation(((Player) event.getPlayer()).getLocation())
+                                .getPosition().add(0, 2, 0);
                             WrapperPlayServerParticle particlePacket
-                                    = new WrapperPlayServerParticle(particle, true, position,
-                                    new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
+                                = new WrapperPlayServerParticle(particle, true, position,
+                                new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
                             user.writePacket(particlePacket);
                             //PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(),
                             //      particlePacket);
 
                             Component title = Component.text("Hello, you must be " + user.getProfile().getName() + "!")
-                                    .color(NamedTextColor.DARK_GREEN);
+                                .color(NamedTextColor.DARK_GREEN);
                             Component subtitle = Component.text("Welcome...")
-                                    .color(NamedTextColor.GREEN);
+                                .color(NamedTextColor.GREEN);
                             user.sendTitle(title, subtitle, 40, 20, 40);
 
                             Vector3i bp = SpigotDataHelper.fromBukkitLocation(((Player) event.getPlayer()).getLocation())
-                                    .getPosition().toVector3i();
+                                .getPosition().toVector3i();
                             bp = bp.subtract(0, 1, 0);
                             StateType type = StateTypes.GOLD_BLOCK;
                             WrappedBlockState blockState = type.createBlockState(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
                             WrapperPlayServerBlockChange blockChange = new WrapperPlayServerBlockChange(bp,
-                                    blockState.getGlobalId());
+                                blockState.getGlobalId());
                             user.writePacket(blockChange);
                             String npcName = "retrooper";
                             UUID npcUUID = MojangAPIUtil.requestPlayerUUID(npcName);
@@ -127,7 +110,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                             Component prefixName = Component.text("[Admin] ").color(NamedTextColor.DARK_RED);
                             Component tabName = Component.text(npcName).color(NamedTextColor.DARK_RED);
                             NPC npc = new NPC(up, SpigotReflectionUtil.generateEntityId(), tabName,
-                                    NamedTextColor.BLUE, prefixName, null);
+                                NamedTextColor.BLUE, prefixName, null);
                             Location playerLocation = SpigotDataHelper.fromBukkitLocation(player.getLocation());
                             npc.setLocation(playerLocation);
                             npc.spawn(user.getChannel());
@@ -151,7 +134,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                             org.bukkit.inventory.ItemStack bukkitStack = new org.bukkit.inventory.ItemStack(Material.EMERALD, 10);
                             ItemStack stack = SpigotDataHelper.fromBukkitItemStack(bukkitStack);
                             user.sendMessage("Bukkit itemstack type: " + bukkitStack.getType().name()
-                                    + ", packetevents type: " + stack.getType().getName());
+                                + ", packetevents type: " + stack.getType().getName());
                             org.bukkit.inventory.ItemStack backToBukkitStack = SpigotDataHelper.toBukkitItemStack(stack);
                             user.sendMessage("Back to Bukkit itemstack type: " + backToBukkitStack.getType().name() + ", type: " + backToBukkitStack.getClass().getSimpleName());
 
@@ -196,9 +179,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                         byte[] data = pluginMessage.getData();
                         String brandData = new String(data, StandardCharsets.UTF_8);
                         Component component = Component.text("The channel name: " + channel)
-                                .color(NamedTextColor.RED)
-                                .append(Component.text(" Data: " + brandData)
-                                        .color(NamedTextColor.GOLD));
+                            .color(NamedTextColor.RED)
+                            .append(Component.text(" Data: " + brandData)
+                                .color(NamedTextColor.GOLD));
                         break;
                     case STEER_VEHICLE:
                         WrapperPlayClientSteerVehicle steerVehicle = new WrapperPlayClientSteerVehicle(event);
@@ -260,8 +243,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-
-        // PacketEvents.getAPI().getEventManager().registerListener(listener);
+        //PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
