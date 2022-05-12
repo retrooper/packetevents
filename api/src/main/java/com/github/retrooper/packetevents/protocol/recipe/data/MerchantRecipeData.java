@@ -2,7 +2,7 @@ package com.github.retrooper.packetevents.protocol.recipe.data;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 
-public class MerchantRecipeData implements RecipeData{
+public class MerchantRecipeData implements RecipeData {
 
     private ItemStack buyItem1;
     private ItemStack buyItem2;
