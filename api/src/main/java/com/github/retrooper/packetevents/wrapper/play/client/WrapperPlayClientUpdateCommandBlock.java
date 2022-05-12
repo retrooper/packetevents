@@ -55,17 +55,9 @@ public class WrapperPlayClientUpdateCommandBlock extends PacketWrapper<WrapperPl
 
   @Override
   public void read() {
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      this.position = new Vector3i(readLong());
-    } else {
-      int x = readInt();
-      int y = readShort();
-      int z = readInt();
-      this.position = new Vector3i(x, y, z);
-    }
+    this.position = new Vector3i(readLong());
     this.command = readString();
     this.mode = CommandBlockMode.VALUES[readVarInt()];
-
     this.flags = readUnsignedByte();
     this.doesTrackOutput = (flags & FLAG_TRACK_OUTPUT) != 0;
     this.conditional = (flags & FLAG_CONDITIONAL) != 0;
@@ -74,29 +66,18 @@ public class WrapperPlayClientUpdateCommandBlock extends PacketWrapper<WrapperPl
 
   @Override
   public void write() {
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      long positionVector = position.getSerializedPosition();
-      writeLong(positionVector);
-    } else {
-      writeInt(position.x);
-      writeShort(position.y);
-      writeInt(position.z);
-    }
+    writeLong(position.getSerializedPosition());
     writeString(command);
     writeVarInt(mode.ordinal());
-
     if (this.doesTrackOutput) {
       flags |= FLAG_TRACK_OUTPUT;
     }
-
     if (this.conditional) {
       flags |= FLAG_CONDITIONAL;
     }
-
     if (this.automatic) {
       flags |= FLAG_AUTOMATIC;
     }
-
     writeByte(flags);
   }
 
