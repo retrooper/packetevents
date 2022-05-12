@@ -42,7 +42,7 @@ public class WrapperPlayServerOpenSignEditor extends PacketWrapper<WrapperPlaySe
       this.position = new Vector3i(readLong());
     } else {
       int x = readInt();
-      int y = readShort();
+      int y = readInt();
       int z = readInt();
       this.position = new Vector3i(x, y, z);
     }
@@ -55,7 +55,7 @@ public class WrapperPlayServerOpenSignEditor extends PacketWrapper<WrapperPlaySe
       writeLong(positionVector);
     } else {
       writeInt(position.x);
-      writeShort(position.y);
+      writeInt(position.y);
       writeInt(position.z);
     }
   }
