@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerSpawnExperienceOrb extends PacketWrapper<WrapperPlayServerSpawnExperienceOrb> {
@@ -66,9 +67,9 @@ public class WrapperPlayServerSpawnExperienceOrb extends PacketWrapper<WrapperPl
       writeDouble(this.y);
       writeDouble(this.z);
     } else {
-      writeInt(floor(this.x * 32.0));
-      writeInt(floor(this.y * 32.0));
-      writeInt(floor(this.z * 32.0));
+      writeInt(MathUtil.floor(this.x * 32.0));
+      writeInt(MathUtil.floor(this.y * 32.0));
+      writeInt(MathUtil.floor(this.z * 32.0));
     }
     writeShort(this.count);
   }
@@ -120,10 +121,5 @@ public class WrapperPlayServerSpawnExperienceOrb extends PacketWrapper<WrapperPl
 
   public void setCount(short count) {
     this.count = count;
-  }
-
-  private int floor(double value) {
-    int temp = (int) value;
-    return value < (float) temp ? temp - 1 : temp;
   }
 }
