@@ -31,154 +31,125 @@ import java.util.UUID;
 
 // Mostly from MCProtocolLib
 public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlayServerSpawnPainting> {
-  private int entityId;
-  private Optional<UUID> uuid;
-  private Optional<String> title;
-  private Optional<PaintingType> type;
-  private Vector3i position;
-  private Direction direction;
+    private int entityId;
+    private UUID uuid;
+    private PaintingType type;
+    private Vector3i position;
+    private Direction direction;
 
-  public WrapperPlayServerSpawnPainting(PacketSendEvent event) {
-    super(event);
-  }
-
-  public WrapperPlayServerSpawnPainting(int entityId, Optional<String> title, Vector3i position, Direction direction) {
-    super(PacketType.Play.Server.SPAWN_PAINTING);
-    this.entityId = entityId;
-    this.title = title;
-    this.position = position;
-    this.direction = direction;
-  }
-
-  public WrapperPlayServerSpawnPainting(int entityId, Optional<UUID> uuid, Optional<String> title, Vector3i position, Direction direction) {
-    super(PacketType.Play.Server.SPAWN_PAINTING);
-    this.entityId = entityId;
-    this.uuid = uuid;
-    this.title = title;
-    this.position = position;
-    this.direction = direction;
-  }
-
-  public WrapperPlayServerSpawnPainting(int entityId, Optional<UUID> uuid, Optional<String> title, Optional<PaintingType> type, Vector3i position, Direction direction) {
-    super(PacketType.Play.Server.SPAWN_PAINTING);
-    this.entityId = entityId;
-    this.uuid = uuid;
-    this.title = title;
-    this.type = type;
-    this.position = position;
-    this.direction = direction;
-  }
-
-  @Override
-  public void read() {
-    this.uuid = Optional.empty();
-    this.title = Optional.empty();
-    this.type = Optional.empty();
-    this.entityId = readVarInt();
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-      this.uuid = Optional.of(readUUID());
+    public WrapperPlayServerSpawnPainting(PacketSendEvent event) {
+        super(event);
     }
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-      this.type = Optional.of(PaintingType.VALUES[readVarInt()]);
-    } else {
-      this.title = Optional.of(readString(13));
+
+    public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, PaintingType type, Vector3i position, Direction direction) {
+        super(PacketType.Play.Server.SPAWN_PAINTING);
+        this.entityId = entityId;
+        this.uuid = uuid;
+        this.type = type;
+        this.position = position;
+        this.direction = direction;
     }
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      this.position = readBlockPosition();
-    } else {
-      int x = readInt();
-      int y = readInt();
-      int z = readInt();
-      this.position = new Vector3i(x, y, z);
+
+    @Override
+    public void read() {
+        this.entityId = readVarInt();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            this.uuid = readUUID();
+        } else {
+            this.uuid = new UUID(0L, 0L);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            this.type = PaintingType.getById(readVarInt());
+        } else {
+            this.type = PaintingType.getByTitle(readString(13));
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            this.position = readBlockPosition();
+        } else {
+            int x = readInt();
+            int y = readInt();
+            int z = readInt();
+            this.position = new Vector3i(x, y, z);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            this.direction = Direction.getByHorizontalIndex(readUnsignedByte());
+        } else {
+            this.direction = Direction.getByHorizontalIndex(readInt());
+        }
     }
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      this.direction = Direction.getByHorizontalIndex(readUnsignedByte());
-    } else {
-      this.direction = Direction.getByHorizontalIndex(readInt());
+
+    @Override
+    public void write() {
+        writeVarInt(this.entityId);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            writeUUID(this.uuid);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            writeVarInt(this.type.getId());
+        } else {
+            writeString(this.type.getTitle(), 13);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            long positionVector = this.position.getSerializedPosition();
+            writeLong(positionVector);
+        } else {
+            writeInt(this.position.x);
+            writeShort(this.position.y);
+            writeInt(this.position.z);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            writeByte(this.direction.getHorizontalIndex());
+        } else {
+            writeInt(this.direction.getHorizontalIndex());
+        }
     }
-  }
 
-  @Override
-  public void write() {
-    writeVarInt(this.entityId);
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-      writeUUID(this.uuid.get());
+    @Override
+    public void copy(WrapperPlayServerSpawnPainting wrapper) {
+        this.entityId = wrapper.entityId;
+        this.uuid = wrapper.uuid;
+        this.type = wrapper.type;
+        this.position = wrapper.position;
+        this.direction = wrapper.direction;
     }
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-      writeVarInt(this.type.get().ordinal());
-    } else {
-      writeString(this.title.get(), 13);
+
+    public int getEntityId() {
+        return entityId;
     }
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      long positionVector = this.position.getSerializedPosition();
-      writeLong(positionVector);
-    } else {
-      writeInt(this.position.x);
-      writeShort(this.position.y);
-      writeInt(this.position.z);
+
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
     }
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      writeByte(this.direction.getHorizontalIndex());
-    } else {
-      writeInt(this.direction.getHorizontalIndex());
+
+    public UUID getUUID() {
+        return uuid;
     }
-  }
 
-  @Override
-  public void copy(WrapperPlayServerSpawnPainting wrapper) {
-    this.entityId = wrapper.entityId;
-    this.uuid = wrapper.uuid;
-    this.title = wrapper.title;
-    this.type = wrapper.type;
-    this.position = wrapper.position;
-    this.direction = wrapper.direction;
-  }
+    public void setUUID(UUID uuid) {
+        this.uuid = uuid;
+    }
 
-  public int getEntityId() {
-    return entityId;
-  }
+    public PaintingType getType() {
+        return type;
+    }
 
-  public void setEntityId(int entityId) {
-    this.entityId = entityId;
-  }
+    public void setType(PaintingType type) {
+        this.type = type;
+    }
 
-  public Optional<UUID> getUuid() {
-    return uuid;
-  }
+    public Vector3i getPosition() {
+        return position;
+    }
 
-  public void setUuid(Optional<UUID> uuid) {
-    this.uuid = uuid;
-  }
+    public void setPosition(Vector3i position) {
+        this.position = position;
+    }
 
-  public Optional<String> getTitle() {
-    return title;
-  }
+    public Direction getDirection() {
+        return direction;
+    }
 
-  public void setTitle(Optional<String> title) {
-    this.title = title;
-  }
-
-  public Optional<PaintingType> getType() {
-    return type;
-  }
-
-  public void setType(Optional<PaintingType> type) {
-    this.type = type;
-  }
-
-  public Vector3i getPosition() {
-    return position;
-  }
-
-  public void setPosition(Vector3i position) {
-    this.position = position;
-  }
-
-  public Direction getDirection() {
-    return direction;
-  }
-
-  public void setDirection(Direction direction) {
-    this.direction = direction;
-  }
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
 }
