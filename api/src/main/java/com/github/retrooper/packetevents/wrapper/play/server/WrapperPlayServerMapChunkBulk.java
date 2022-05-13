@@ -32,15 +32,15 @@ public class WrapperPlayServerMapChunkBulk extends PacketWrapper<WrapperPlayServ
   private int chunkY;
   private int primaryBitmap;
   private byte[] data;
-  private OptionalInt dataLength;
-  private OptionalInt addBitmap;
+  private int dataLength;
+  private int addBitmap;
 
   public WrapperPlayServerMapChunkBulk(PacketSendEvent event) {
     super(event);
   }
 
-  public WrapperPlayServerMapChunkBulk(int chunkColumnCount, OptionalInt dataLength, boolean skyLightSent, byte[] data, int chunkX, int chunkY,
-                                       int primaryBitmap, OptionalInt addBitmap) {
+  public WrapperPlayServerMapChunkBulk(int chunkColumnCount, int dataLength, boolean skyLightSent, byte[] data, int chunkX, int chunkY,
+                                       int primaryBitmap, int addBitmap) {
     super(PacketType.Play.Server.MAP_CHUNK_BULK);
     this.chunkColumnCount = chunkColumnCount;
     this.dataLength = dataLength;
@@ -64,8 +64,6 @@ public class WrapperPlayServerMapChunkBulk extends PacketWrapper<WrapperPlayServ
 
   @Override
   public void read() {
-    this.dataLength = OptionalInt.empty();
-    this.addBitmap = OptionalInt.empty();
     if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
       this.skyLightSent = readBoolean();
       this.chunkColumnCount = readVarInt();
@@ -75,13 +73,13 @@ public class WrapperPlayServerMapChunkBulk extends PacketWrapper<WrapperPlayServ
       this.data = readRemainingBytes();
     } else if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
       this.chunkColumnCount = readShort();
-      this.dataLength = OptionalInt.of(readInt());
+      this.dataLength = readInt();
       this.skyLightSent = readBoolean();
       this.data = readRemainingBytes();
       this.chunkX = readInt();
       this.chunkY = readInt();
       this.primaryBitmap = readUnsignedShort();
-      this.addBitmap = OptionalInt.of(readUnsignedShort());
+      this.addBitmap = readUnsignedShort();
     }
   }
 
@@ -96,13 +94,13 @@ public class WrapperPlayServerMapChunkBulk extends PacketWrapper<WrapperPlayServ
       writeBytes(data);
     } else if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
       writeShort(chunkColumnCount);
-      writeInt(dataLength.getAsInt());
+      writeInt(dataLength);
       writeBoolean(skyLightSent);
       writeBytes(data);
       writeInt(chunkX);
       writeInt(chunkY);
       writeShort(primaryBitmap);
-      writeShort(addBitmap.getAsInt());
+      writeShort(addBitmap);
     }
   }
 
@@ -167,18 +165,18 @@ public class WrapperPlayServerMapChunkBulk extends PacketWrapper<WrapperPlayServ
   }
 
   public OptionalInt getDataLength() {
-    return dataLength;
+    return OptionalInt.of(dataLength);
   }
 
-  public void setDataLength(OptionalInt dataLength) {
+  public void setDataLength(int dataLength) {
     this.dataLength = dataLength;
   }
 
   public OptionalInt getAddBitmap() {
-    return addBitmap;
+    return OptionalInt.of(addBitmap);
   }
 
-  public void setAddBitmap(OptionalInt addBitmap) {
+  public void setAddBitmap(int addBitmap) {
     this.addBitmap = addBitmap;
   }
 }
