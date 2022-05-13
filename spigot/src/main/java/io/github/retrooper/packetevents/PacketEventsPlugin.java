@@ -34,6 +34,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.protocol.world.PaintingType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
@@ -78,7 +79,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                         if (chatMessage.getMessage().equalsIgnoreCase("keyword")) {
                             System.out.println("pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
-                            event.setCancelled(true);
+                            chatMessage.setMessage(chatMessage.getMessage() + " (edited) - client version: " + user.getClientVersion());
                             Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
                             Vector3d position = SpigotDataHelper
                                     .fromBukkitLocation(((Player) event.getPlayer()).getLocation())
@@ -87,8 +88,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     = new WrapperPlayServerParticle(particle, true, position,
                                     new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
                             user.writePacket(particlePacket);
-                            //PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(),
-                            //      particlePacket);
 
                             Component title = Component.text("Hello, you must be " + user.getProfile().getName() + "!")
                                     .color(NamedTextColor.DARK_GREEN);
@@ -115,11 +114,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                             npc.setLocation(playerLocation);
                             npc.spawn(user.getChannel());
                             user.sendMessage("Spawned npc!");
-
-                            /*WrapperPlayServerResourcePackSend rps = new WrapperPlayServerResourcePackSend(
-                                    "https://download1474.mediafire.com/4jz7u8rh55ug/x5t624tzzbk9n1y/Sherbert+Textures.zip",
-                                    "susbaka", false, Component.text("Please accept the resource pack!").color(NamedTextColor.DARK_RED));
-                            user.sendPacket(rps);*/
                         } else if (chatMessage.getMessage().equalsIgnoreCase("test3")) {
                             Material ironDoor = Material.IRON_DOOR;
                             WrappedBlockState state = SpigotDataHelper.fromBukkitBlockData(new MaterialData(ironDoor, (byte) 0));
@@ -216,14 +210,17 @@ public class PacketEventsPlugin extends JavaPlugin {
                     PacketEvents.getAPI().getProtocolManager().sendPacketSilently(event.getChannel(), copy);
                     System.out.println("Delayed " + chatMessage.getChatComponentJson());*/
                     event.getPostTasks().add(() -> {
-                       user.sendTitle("Post chat message", "Pretty much", 10, 10, 10);
+                        user.sendTitle("Post chat message", "Pretty much", 10, 10, 10);
                     });
-                }  else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
+                } else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
                     WrapperPlayServerEntityEffect effect = new WrapperPlayServerEntityEffect(event);
                     System.out.println("type: " + effect.getPotionType().getName() + ", type id: " + effect.getPotionType().getId());
                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     EntityType type = spawnLivingEntity.getEntityType();
+                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_PAINTING) {
+                    WrapperPlayServerSpawnPainting spawnPainting = new WrapperPlayServerSpawnPainting(event);
+                    //System.out.println("Painting: " + spawnPainting.getEntityId() + ", " + spawnPainting.getType().name() + ", " + spawnPainting.getPosition().toString() + ", " + spawnPainting.getDirection().name() + ", " + spawnPainting.getUUID().toString());
                 }
             }
 
