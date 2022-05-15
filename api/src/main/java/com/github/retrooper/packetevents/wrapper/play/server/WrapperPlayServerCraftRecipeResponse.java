@@ -27,76 +27,76 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 public class WrapperPlayServerCraftRecipeResponse extends PacketWrapper<WrapperPlayServerCraftRecipeResponse> {
-  private int windowId;
-  private OptionalInt recipeLegacy;
-  private Optional<String> recipeModern;
+    private int windowId;
+    private OptionalInt recipeLegacy;
+    private Optional<String> recipeModern;
 
-  public WrapperPlayServerCraftRecipeResponse(PacketSendEvent event) {
-    super(event);
-  }
-
-  public WrapperPlayServerCraftRecipeResponse(int windowId, OptionalInt recipeLegacy) {
-    super(PacketType.Play.Server.CRAFT_RECIPE_RESPONSE);
-    this.windowId = windowId;
-    this.recipeLegacy = recipeLegacy;
-  }
-
-  public WrapperPlayServerCraftRecipeResponse(int windowId, Optional<String> recipeModern) {
-    super(PacketType.Play.Server.CRAFT_RECIPE_RESPONSE);
-    this.windowId = windowId;
-    this.recipeModern = recipeModern;
-  }
-
-  @Override
-  public void read() {
-    this.recipeLegacy = OptionalInt.empty();
-    this.recipeModern = Optional.empty();
-    this.windowId = readByte();
-    if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-      this.recipeLegacy = OptionalInt.of(readVarInt());
-    } else {
-      this.recipeModern = Optional.of(readString());
+    public WrapperPlayServerCraftRecipeResponse(PacketSendEvent event) {
+        super(event);
     }
-  }
 
-  @Override
-  public void write() {
-    writeByte(this.windowId);
-    if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-      writeVarInt(this.recipeLegacy.getAsInt());
-    } else {
-      writeString(this.recipeModern.get());
+    public WrapperPlayServerCraftRecipeResponse(int windowId, OptionalInt recipeLegacy) {
+        super(PacketType.Play.Server.CRAFT_RECIPE_RESPONSE);
+        this.windowId = windowId;
+        this.recipeLegacy = recipeLegacy;
     }
-  }
 
-  @Override
-  public void copy(WrapperPlayServerCraftRecipeResponse wrapper) {
-    this.windowId = wrapper.windowId;
-    this.recipeLegacy = wrapper.recipeLegacy;
-    this.recipeModern = wrapper.recipeModern;
-  }
+    public WrapperPlayServerCraftRecipeResponse(int windowId, Optional<String> recipeModern) {
+        super(PacketType.Play.Server.CRAFT_RECIPE_RESPONSE);
+        this.windowId = windowId;
+        this.recipeModern = recipeModern;
+    }
 
-  public int getWindowId() {
-    return this.windowId;
-  }
+    @Override
+    public void read() {
+        this.recipeLegacy = OptionalInt.empty();
+        this.recipeModern = Optional.empty();
+        this.windowId = readByte();
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
+            this.recipeLegacy = OptionalInt.of(readVarInt());
+        } else {
+            this.recipeModern = Optional.of(readString());
+        }
+    }
 
-  public void setWindowId(int windowId) {
-    this.windowId = windowId;
-  }
+    @Override
+    public void write() {
+        writeByte(this.windowId);
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
+            writeVarInt(this.recipeLegacy.getAsInt());
+        } else {
+            writeString(this.recipeModern.get());
+        }
+    }
 
-  public OptionalInt getRecipeLegacy() {
-    return recipeLegacy;
-  }
+    @Override
+    public void copy(WrapperPlayServerCraftRecipeResponse wrapper) {
+        this.windowId = wrapper.windowId;
+        this.recipeLegacy = wrapper.recipeLegacy;
+        this.recipeModern = wrapper.recipeModern;
+    }
 
-  public void setRecipeLegacy(OptionalInt recipeLegacy) {
-    this.recipeLegacy = recipeLegacy;
-  }
+    public int getWindowId() {
+        return this.windowId;
+    }
 
-  public Optional<String> getRecipeModern() {
-    return recipeModern;
-  }
+    public void setWindowId(int windowId) {
+        this.windowId = windowId;
+    }
 
-  public void setRecipeModern(Optional<String> recipeModern) {
-    this.recipeModern = recipeModern;
-  }
+    public OptionalInt getRecipeLegacy() {
+        return recipeLegacy;
+    }
+
+    public void setRecipeLegacy(OptionalInt recipeLegacy) {
+        this.recipeLegacy = recipeLegacy;
+    }
+
+    public Optional<String> getRecipeModern() {
+        return recipeModern;
+    }
+
+    public void setRecipeModern(Optional<String> recipeModern) {
+        this.recipeModern = recipeModern;
+    }
 }
