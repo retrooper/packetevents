@@ -25,101 +25,101 @@ import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerSpawnExperienceOrb extends PacketWrapper<WrapperPlayServerSpawnExperienceOrb> {
-  private int entityId;
-  private double x;
-  private double y;
-  private double z;
-  private short count;
+    private int entityId;
+    private double x;
+    private double y;
+    private double z;
+    private short count;
 
-  public WrapperPlayServerSpawnExperienceOrb(PacketSendEvent event) {
-    super(event);
-  }
-
-  public WrapperPlayServerSpawnExperienceOrb(int entityId, double x, double y, double z, short count) {
-    super(PacketType.Play.Server.SPAWN_EXPERIENCE_ORB);
-    this.entityId = entityId;
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.count = count;
-  }
-
-  @Override
-  public void read() {
-    this.entityId = readVarInt();
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-      this.x = readDouble();
-      this.y = readDouble();
-      this.z = readDouble();
-    } else {
-      this.x = readInt() / 32.0;
-      this.y = readInt() / 32.0;
-      this.z = readInt() / 32.0;
+    public WrapperPlayServerSpawnExperienceOrb(PacketSendEvent event) {
+        super(event);
     }
-    this.count = readShort();
-  }
 
-  @Override
-  public void write() {
-    writeVarInt(this.entityId);
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-      writeDouble(this.x);
-      writeDouble(this.y);
-      writeDouble(this.z);
-    } else {
-      writeInt(MathUtil.floor(this.x * 32.0));
-      writeInt(MathUtil.floor(this.y * 32.0));
-      writeInt(MathUtil.floor(this.z * 32.0));
+    public WrapperPlayServerSpawnExperienceOrb(int entityId, double x, double y, double z, short count) {
+        super(PacketType.Play.Server.SPAWN_EXPERIENCE_ORB);
+        this.entityId = entityId;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.count = count;
     }
-    writeShort(this.count);
-  }
 
-  @Override
-  public void copy(WrapperPlayServerSpawnExperienceOrb wrapper) {
-    this.entityId = wrapper.entityId;
-    this.x = wrapper.x;
-    this.y = wrapper.y;
-    this.z = wrapper.z;
-    this.count = wrapper.count;
-  }
+    @Override
+    public void read() {
+        this.entityId = readVarInt();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            this.x = readDouble();
+            this.y = readDouble();
+            this.z = readDouble();
+        } else {
+            this.x = readInt() / 32.0;
+            this.y = readInt() / 32.0;
+            this.z = readInt() / 32.0;
+        }
+        this.count = readShort();
+    }
 
-  public int getEntityId() {
-    return entityId;
-  }
+    @Override
+    public void write() {
+        writeVarInt(this.entityId);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            writeDouble(this.x);
+            writeDouble(this.y);
+            writeDouble(this.z);
+        } else {
+            writeInt(MathUtil.floor(this.x * 32.0));
+            writeInt(MathUtil.floor(this.y * 32.0));
+            writeInt(MathUtil.floor(this.z * 32.0));
+        }
+        writeShort(this.count);
+    }
 
-  public void setEntityId(int entityId) {
-    this.entityId = entityId;
-  }
+    @Override
+    public void copy(WrapperPlayServerSpawnExperienceOrb wrapper) {
+        this.entityId = wrapper.entityId;
+        this.x = wrapper.x;
+        this.y = wrapper.y;
+        this.z = wrapper.z;
+        this.count = wrapper.count;
+    }
 
-  public double getX() {
-    return x;
-  }
+    public int getEntityId() {
+        return entityId;
+    }
 
-  public void setX(double x) {
-    this.x = x;
-  }
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
 
-  public double getY() {
-    return y;
-  }
+    public double getX() {
+        return x;
+    }
 
-  public void setY(double y) {
-    this.y = y;
-  }
+    public void setX(double x) {
+        this.x = x;
+    }
 
-  public double getZ() {
-    return z;
-  }
+    public double getY() {
+        return y;
+    }
 
-  public void setZ(double z) {
-    this.z = z;
-  }
+    public void setY(double y) {
+        this.y = y;
+    }
 
-  public short getCount() {
-    return count;
-  }
+    public double getZ() {
+        return z;
+    }
 
-  public void setCount(short count) {
-    this.count = count;
-  }
+    public void setZ(double z) {
+        this.z = z;
+    }
+
+    public short getCount() {
+        return count;
+    }
+
+    public void setCount(short count) {
+        this.count = count;
+    }
 }
