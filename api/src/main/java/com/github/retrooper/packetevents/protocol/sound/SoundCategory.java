@@ -29,4 +29,6 @@ public enum SoundCategory {
     PLAYER,
     AMBIENT,
     VOICE;
+
+    public static final SoundCategory[] VALUES = values();
 }
