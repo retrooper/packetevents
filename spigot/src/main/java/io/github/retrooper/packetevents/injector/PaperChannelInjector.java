@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.util.reflection.Reflection;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.netty.channel.Channel;
 import net.kyori.adventure.key.Key;
+import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,7 +48,9 @@ public class PaperChannelInjector extends SpigotChannelInjector {
     }
 
     public static boolean canBeUsed() {
-        return CHANNEL_INITIALIZE_LISTENER_HOLDER_CLASS != null;
+        //ProtocolSupport breaks it as their handlers would be added afterwards.
+        return CHANNEL_INITIALIZE_LISTENER_HOLDER_CLASS != null
+                && Bukkit.getPluginManager().getPlugin("ProtocolSupport") == null;
     }
 
     @Override
