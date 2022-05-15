@@ -55,14 +55,6 @@ public class WrapperPlayServerNBTQueryResponse extends PacketWrapper<WrapperPlay
         tag = wrapper.tag;
     }
 
-    @Override
-    public String toString() {
-        return "WrapperPlayServerNBTQueryResponse{" +
-                "transactionId=" + transactionId +
-                ", tag=" + tag +
-                '}';
-    }
-
     public int getTransactionId() {
         return transactionId;
     }
