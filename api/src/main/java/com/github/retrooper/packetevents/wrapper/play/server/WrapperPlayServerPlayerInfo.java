@@ -177,7 +177,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                                 writeString(textureProperty.getSignature());
                             }
                         }
-                        writeGameMode(data.gameMode);
+                        writeVarInt(data.gameMode.ordinal());
                         writeVarInt(data.ping);
                         if (data.displayName != null) {
                             writeBoolean(true);
