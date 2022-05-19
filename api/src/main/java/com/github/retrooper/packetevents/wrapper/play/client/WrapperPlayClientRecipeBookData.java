@@ -28,210 +28,208 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 public class WrapperPlayClientRecipeBookData extends PacketWrapper<WrapperPlayClientRecipeBookData> {
-  private RecipeState state;
-  private Optional<String> recipeIdModern;
-  private OptionalInt recipeIdLegacy;
-  private boolean craftingRecipeBookOpen;
-  private boolean craftingRecipeBookFilterActive;
-  private boolean smeltingRecipeBookOpen;
-  private boolean smeltingRecipeBookFilterActive;
-  private boolean blastFurnaceRecipeBookOpen;
-  private boolean blastFurnaceRecipeBookFilterActive;
-  private boolean smokerRecipeBookOpen;
-  private boolean smokerRecipeBookFilterActive;
+    private RecipeState state;
+    private String recipeIdModern;
+    private int recipeIdLegacy;
+    private boolean craftingRecipeBookOpen;
+    private boolean craftingRecipeBookFilterActive;
+    private boolean smeltingRecipeBookOpen;
+    private boolean smeltingRecipeBookFilterActive;
+    private boolean blastFurnaceRecipeBookOpen;
+    private boolean blastFurnaceRecipeBookFilterActive;
+    private boolean smokerRecipeBookOpen;
+    private boolean smokerRecipeBookFilterActive;
 
-  public WrapperPlayClientRecipeBookData(PacketReceiveEvent event) {
-    super(event);
-  }
-
-  public WrapperPlayClientRecipeBookData(RecipeState state, OptionalInt recipeIdLegacy, boolean craftingRecipeBookOpen, boolean craftingRecipeBookFilterActive) {
-    super(PacketType.Play.Client.RECIPE_BOOK_DATA);
-    this.state = state;
-    this.recipeIdLegacy = recipeIdLegacy;
-    this.craftingRecipeBookOpen = craftingRecipeBookOpen;
-    this.craftingRecipeBookFilterActive = craftingRecipeBookFilterActive;
-  }
-
-  public WrapperPlayClientRecipeBookData(RecipeState state, Optional<String> recipeIdModern, boolean craftingRecipeBookOpen,
-                                         boolean craftingRecipeBookFilterActive, boolean smeltingRecipeBookOpen, boolean smeltingRecipeBookFilterActive) {
-    super(PacketType.Play.Client.RECIPE_BOOK_DATA);
-    this.state = state;
-    this.recipeIdModern = recipeIdModern;
-    this.craftingRecipeBookOpen = craftingRecipeBookOpen;
-    this.craftingRecipeBookFilterActive = craftingRecipeBookFilterActive;
-    this.smeltingRecipeBookOpen = smeltingRecipeBookOpen;
-    this.smeltingRecipeBookFilterActive = smeltingRecipeBookFilterActive;
-  }
-
-  public WrapperPlayClientRecipeBookData(RecipeState state, Optional<String> recipeIdModern, boolean craftingRecipeBookOpen,
-                                         boolean craftingRecipeBookFilterActive, boolean smeltingRecipeBookOpen, boolean smeltingRecipeBookFilterActive,
-                                         boolean blastFurnaceRecipeBookOpen, boolean blastFurnaceRecipeBookFilterActive, boolean smokerRecipeBookOpen,
-                                         boolean smokerRecipeBookFilterActive) {
-    super(PacketType.Play.Client.RECIPE_BOOK_DATA);
-    this.state = state;
-    this.recipeIdModern = recipeIdModern;
-    this.craftingRecipeBookOpen = craftingRecipeBookOpen;
-    this.craftingRecipeBookFilterActive = craftingRecipeBookFilterActive;
-    this.smeltingRecipeBookOpen = smeltingRecipeBookOpen;
-    this.smeltingRecipeBookFilterActive = smeltingRecipeBookFilterActive;
-    this.blastFurnaceRecipeBookOpen = blastFurnaceRecipeBookOpen;
-    this.blastFurnaceRecipeBookFilterActive = blastFurnaceRecipeBookFilterActive;
-    this.smokerRecipeBookOpen = smokerRecipeBookOpen;
-    this.smokerRecipeBookFilterActive = smokerRecipeBookFilterActive;
-  }
-
-  @Override
-  public void read() {
-    this.recipeIdModern = Optional.empty();
-    this.recipeIdLegacy = OptionalInt.empty();
-    this.state = RecipeState.VALUES[readVarInt()];
-    if (this.state == RecipeState.DISPLAYED_RECIPE) {
-      if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-        this.recipeIdModern = Optional.of(readString());
-      } else {
-        this.recipeIdLegacy = OptionalInt.of(readVarInt());
-      }
-    } else {
-      this.craftingRecipeBookOpen = readBoolean();
-      this.craftingRecipeBookFilterActive = readBoolean();
-      if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-        this.smeltingRecipeBookOpen = readBoolean();
-        this.smeltingRecipeBookFilterActive = readBoolean();
-      }
-      if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-        this.blastFurnaceRecipeBookOpen = readBoolean();
-        this.blastFurnaceRecipeBookFilterActive = readBoolean();
-        this.smokerRecipeBookOpen = readBoolean();
-        this.smokerRecipeBookFilterActive = readBoolean();
-      }
+    public WrapperPlayClientRecipeBookData(PacketReceiveEvent event) {
+        super(event);
     }
-  }
 
-  @Override
-  public void write() {
-    writeVarInt(this.state.ordinal());
-    if (this.state == RecipeState.DISPLAYED_RECIPE) {
-      if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-        writeString(this.recipeIdModern.get());
-      } else {
-        writeVarInt(this.recipeIdLegacy.getAsInt());
-      }
-    } else {
-      writeBoolean(this.craftingRecipeBookOpen);
-      writeBoolean(this.craftingRecipeBookFilterActive);
-      if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-        writeBoolean(this.smeltingRecipeBookOpen);
-        writeBoolean(this.smeltingRecipeBookFilterActive);
-      }
-      if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-        writeBoolean(this.blastFurnaceRecipeBookOpen);
-        writeBoolean(this.blastFurnaceRecipeBookFilterActive);
-        writeBoolean(this.smokerRecipeBookOpen);
-        writeBoolean(this.smokerRecipeBookFilterActive);
-      }
+    public WrapperPlayClientRecipeBookData(RecipeState state, int recipeIdLegacy, boolean craftingRecipeBookOpen, boolean craftingRecipeBookFilterActive) {
+        super(PacketType.Play.Client.RECIPE_BOOK_DATA);
+        this.state = state;
+        this.recipeIdLegacy = recipeIdLegacy;
+        this.craftingRecipeBookOpen = craftingRecipeBookOpen;
+        this.craftingRecipeBookFilterActive = craftingRecipeBookFilterActive;
     }
-  }
 
-  @Override
-  public void copy(WrapperPlayClientRecipeBookData wrapper) {
-    this.state = wrapper.state;
-    this.recipeIdModern = wrapper.recipeIdModern;
-    this.recipeIdLegacy = wrapper.recipeIdLegacy;
-    this.craftingRecipeBookOpen = wrapper.craftingRecipeBookOpen;
-    this.craftingRecipeBookFilterActive = wrapper.craftingRecipeBookFilterActive;
-    this.smeltingRecipeBookOpen = wrapper.smeltingRecipeBookOpen;
-    this.smeltingRecipeBookFilterActive = wrapper.smeltingRecipeBookFilterActive;
-    this.blastFurnaceRecipeBookOpen = wrapper.blastFurnaceRecipeBookOpen;
-    this.blastFurnaceRecipeBookFilterActive = wrapper.blastFurnaceRecipeBookFilterActive;
-    this.smokerRecipeBookOpen = wrapper.smokerRecipeBookOpen;
-    this.smokerRecipeBookFilterActive = wrapper.smokerRecipeBookFilterActive;
-  }
+    public WrapperPlayClientRecipeBookData(RecipeState state, String recipeIdModern, boolean craftingRecipeBookOpen,
+                                           boolean craftingRecipeBookFilterActive, boolean smeltingRecipeBookOpen, boolean smeltingRecipeBookFilterActive) {
+        super(PacketType.Play.Client.RECIPE_BOOK_DATA);
+        this.state = state;
+        this.recipeIdModern = recipeIdModern;
+        this.craftingRecipeBookOpen = craftingRecipeBookOpen;
+        this.craftingRecipeBookFilterActive = craftingRecipeBookFilterActive;
+        this.smeltingRecipeBookOpen = smeltingRecipeBookOpen;
+        this.smeltingRecipeBookFilterActive = smeltingRecipeBookFilterActive;
+    }
 
-  public RecipeState getState() {
-    return state;
-  }
+    public WrapperPlayClientRecipeBookData(RecipeState state, String recipeIdModern, boolean craftingRecipeBookOpen,
+                                           boolean craftingRecipeBookFilterActive, boolean smeltingRecipeBookOpen, boolean smeltingRecipeBookFilterActive,
+                                           boolean blastFurnaceRecipeBookOpen, boolean blastFurnaceRecipeBookFilterActive, boolean smokerRecipeBookOpen,
+                                           boolean smokerRecipeBookFilterActive) {
+        super(PacketType.Play.Client.RECIPE_BOOK_DATA);
+        this.state = state;
+        this.recipeIdModern = recipeIdModern;
+        this.craftingRecipeBookOpen = craftingRecipeBookOpen;
+        this.craftingRecipeBookFilterActive = craftingRecipeBookFilterActive;
+        this.smeltingRecipeBookOpen = smeltingRecipeBookOpen;
+        this.smeltingRecipeBookFilterActive = smeltingRecipeBookFilterActive;
+        this.blastFurnaceRecipeBookOpen = blastFurnaceRecipeBookOpen;
+        this.blastFurnaceRecipeBookFilterActive = blastFurnaceRecipeBookFilterActive;
+        this.smokerRecipeBookOpen = smokerRecipeBookOpen;
+        this.smokerRecipeBookFilterActive = smokerRecipeBookFilterActive;
+    }
 
-  public void setState(RecipeState state) {
-    this.state = state;
-  }
+    @Override
+    public void read() {
+        this.state = RecipeState.VALUES[readVarInt()];
+        if (this.state == RecipeState.DISPLAYED_RECIPE) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                this.recipeIdModern = readString();
+            } else {
+                this.recipeIdLegacy = readVarInt();
+            }
+        } else {
+            this.craftingRecipeBookOpen = readBoolean();
+            this.craftingRecipeBookFilterActive = readBoolean();
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                this.smeltingRecipeBookOpen = readBoolean();
+                this.smeltingRecipeBookFilterActive = readBoolean();
+            }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+                this.blastFurnaceRecipeBookOpen = readBoolean();
+                this.blastFurnaceRecipeBookFilterActive = readBoolean();
+                this.smokerRecipeBookOpen = readBoolean();
+                this.smokerRecipeBookFilterActive = readBoolean();
+            }
+        }
+    }
 
-  public Optional<String> getRecipeIdModern() {
-    return recipeIdModern;
-  }
+    @Override
+    public void write() {
+        writeVarInt(this.state.ordinal());
+        if (this.state == RecipeState.DISPLAYED_RECIPE) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                writeString(this.recipeIdModern);
+            } else {
+                writeVarInt(this.recipeIdLegacy);
+            }
+        } else {
+            writeBoolean(this.craftingRecipeBookOpen);
+            writeBoolean(this.craftingRecipeBookFilterActive);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                writeBoolean(this.smeltingRecipeBookOpen);
+                writeBoolean(this.smeltingRecipeBookFilterActive);
+            }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+                writeBoolean(this.blastFurnaceRecipeBookOpen);
+                writeBoolean(this.blastFurnaceRecipeBookFilterActive);
+                writeBoolean(this.smokerRecipeBookOpen);
+                writeBoolean(this.smokerRecipeBookFilterActive);
+            }
+        }
+    }
 
-  public void setRecipeIdModern(Optional<String> recipeIdModern) {
-    this.recipeIdModern = recipeIdModern;
-  }
+    @Override
+    public void copy(WrapperPlayClientRecipeBookData wrapper) {
+        this.state = wrapper.state;
+        this.recipeIdModern = wrapper.recipeIdModern;
+        this.recipeIdLegacy = wrapper.recipeIdLegacy;
+        this.craftingRecipeBookOpen = wrapper.craftingRecipeBookOpen;
+        this.craftingRecipeBookFilterActive = wrapper.craftingRecipeBookFilterActive;
+        this.smeltingRecipeBookOpen = wrapper.smeltingRecipeBookOpen;
+        this.smeltingRecipeBookFilterActive = wrapper.smeltingRecipeBookFilterActive;
+        this.blastFurnaceRecipeBookOpen = wrapper.blastFurnaceRecipeBookOpen;
+        this.blastFurnaceRecipeBookFilterActive = wrapper.blastFurnaceRecipeBookFilterActive;
+        this.smokerRecipeBookOpen = wrapper.smokerRecipeBookOpen;
+        this.smokerRecipeBookFilterActive = wrapper.smokerRecipeBookFilterActive;
+    }
 
-  public OptionalInt getRecipeIdLegacy() {
-    return recipeIdLegacy;
-  }
+    public RecipeState getState() {
+        return state;
+    }
 
-  public void setRecipeIdLegacy(OptionalInt recipeIdLegacy) {
-    this.recipeIdLegacy = recipeIdLegacy;
-  }
+    public void setState(RecipeState state) {
+        this.state = state;
+    }
 
-  public boolean isCraftingRecipeBookOpen() {
-    return craftingRecipeBookOpen;
-  }
+    public Optional<String> getRecipeIdModern() {
+        return Optional.ofNullable(recipeIdModern);
+    }
 
-  public void setCraftingRecipeBookOpen(boolean craftingRecipeBookOpen) {
-    this.craftingRecipeBookOpen = craftingRecipeBookOpen;
-  }
+    public void setRecipeIdModern(String recipeIdModern) {
+        this.recipeIdModern = recipeIdModern;
+    }
 
-  public boolean isCraftingRecipeBookFilterActive() {
-    return craftingRecipeBookFilterActive;
-  }
+    public OptionalInt getRecipeIdLegacy() {
+        return OptionalInt.of(recipeIdLegacy);
+    }
 
-  public void setCraftingRecipeBookFilterActive(boolean craftingRecipeBookFilterActive) {
-    this.craftingRecipeBookFilterActive = craftingRecipeBookFilterActive;
-  }
+    public void setRecipeIdLegacy(int recipeIdLegacy) {
+        this.recipeIdLegacy = recipeIdLegacy;
+    }
 
-  public boolean isSmeltingRecipeBookOpen() {
-    return smeltingRecipeBookOpen;
-  }
+    public boolean isCraftingRecipeBookOpen() {
+        return craftingRecipeBookOpen;
+    }
 
-  public void setSmeltingRecipeBookOpen(boolean smeltingRecipeBookOpen) {
-    this.smeltingRecipeBookOpen = smeltingRecipeBookOpen;
-  }
+    public void setCraftingRecipeBookOpen(boolean craftingRecipeBookOpen) {
+        this.craftingRecipeBookOpen = craftingRecipeBookOpen;
+    }
 
-  public boolean isSmeltingRecipeBookFilterActive() {
-    return smeltingRecipeBookFilterActive;
-  }
+    public boolean isCraftingRecipeBookFilterActive() {
+        return craftingRecipeBookFilterActive;
+    }
 
-  public void setSmeltingRecipeBookFilterActive(boolean smeltingRecipeBookFilterActive) {
-    this.smeltingRecipeBookFilterActive = smeltingRecipeBookFilterActive;
-  }
+    public void setCraftingRecipeBookFilterActive(boolean craftingRecipeBookFilterActive) {
+        this.craftingRecipeBookFilterActive = craftingRecipeBookFilterActive;
+    }
 
-  public boolean isBlastFurnaceRecipeBookOpen() {
-    return blastFurnaceRecipeBookOpen;
-  }
+    public boolean isSmeltingRecipeBookOpen() {
+        return smeltingRecipeBookOpen;
+    }
 
-  public void setBlastFurnaceRecipeBookOpen(boolean blastFurnaceRecipeBookOpen) {
-    this.blastFurnaceRecipeBookOpen = blastFurnaceRecipeBookOpen;
-  }
+    public void setSmeltingRecipeBookOpen(boolean smeltingRecipeBookOpen) {
+        this.smeltingRecipeBookOpen = smeltingRecipeBookOpen;
+    }
 
-  public boolean isBlastFurnaceRecipeBookFilterActive() {
-    return blastFurnaceRecipeBookFilterActive;
-  }
+    public boolean isSmeltingRecipeBookFilterActive() {
+        return smeltingRecipeBookFilterActive;
+    }
 
-  public void setBlastFurnaceRecipeBookFilterActive(boolean blastFurnaceRecipeBookFilterActive) {
-    this.blastFurnaceRecipeBookFilterActive = blastFurnaceRecipeBookFilterActive;
-  }
+    public void setSmeltingRecipeBookFilterActive(boolean smeltingRecipeBookFilterActive) {
+        this.smeltingRecipeBookFilterActive = smeltingRecipeBookFilterActive;
+    }
 
-  public boolean isSmokerRecipeBookOpen() {
-    return smokerRecipeBookOpen;
-  }
+    public boolean isBlastFurnaceRecipeBookOpen() {
+        return blastFurnaceRecipeBookOpen;
+    }
 
-  public void setSmokerRecipeBookOpen(boolean smokerRecipeBookOpen) {
-    this.smokerRecipeBookOpen = smokerRecipeBookOpen;
-  }
+    public void setBlastFurnaceRecipeBookOpen(boolean blastFurnaceRecipeBookOpen) {
+        this.blastFurnaceRecipeBookOpen = blastFurnaceRecipeBookOpen;
+    }
 
-  public boolean isSmokerRecipeBookFilterActive() {
-    return smokerRecipeBookFilterActive;
-  }
+    public boolean isBlastFurnaceRecipeBookFilterActive() {
+        return blastFurnaceRecipeBookFilterActive;
+    }
 
-  public void setSmokerRecipeBookFilterActive(boolean smokerRecipeBookFilterActive) {
-    this.smokerRecipeBookFilterActive = smokerRecipeBookFilterActive;
-  }
+    public void setBlastFurnaceRecipeBookFilterActive(boolean blastFurnaceRecipeBookFilterActive) {
+        this.blastFurnaceRecipeBookFilterActive = blastFurnaceRecipeBookFilterActive;
+    }
+
+    public boolean isSmokerRecipeBookOpen() {
+        return smokerRecipeBookOpen;
+    }
+
+    public void setSmokerRecipeBookOpen(boolean smokerRecipeBookOpen) {
+        this.smokerRecipeBookOpen = smokerRecipeBookOpen;
+    }
+
+    public boolean isSmokerRecipeBookFilterActive() {
+        return smokerRecipeBookFilterActive;
+    }
+
+    public void setSmokerRecipeBookFilterActive(boolean smokerRecipeBookFilterActive) {
+        this.smokerRecipeBookFilterActive = smokerRecipeBookFilterActive;
+    }
 }
