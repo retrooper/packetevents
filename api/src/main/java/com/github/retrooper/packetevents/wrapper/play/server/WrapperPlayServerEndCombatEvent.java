@@ -23,50 +23,50 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEndCombatEvent extends PacketWrapper<WrapperPlayServerEndCombatEvent> {
-  private int duration;
-  private int entityId;
+    private int duration;
+    private int entityId;
 
-  public WrapperPlayServerEndCombatEvent(PacketSendEvent event) {
-    super(event);
-  }
+    public WrapperPlayServerEndCombatEvent(PacketSendEvent event) {
+        super(event);
+    }
 
-  public WrapperPlayServerEndCombatEvent(int duration, int entityId) {
-    super(PacketType.Play.Server.END_COMBAT_EVENT);
-    this.duration = duration;
-    this.entityId = entityId;
-  }
+    public WrapperPlayServerEndCombatEvent(int duration, int entityId) {
+        super(PacketType.Play.Server.END_COMBAT_EVENT);
+        this.duration = duration;
+        this.entityId = entityId;
+    }
 
-  @Override
-  public void read() {
-    this.duration = readVarInt();
-    this.entityId = readInt();
-  }
+    @Override
+    public void read() {
+        this.duration = readVarInt();
+        this.entityId = readInt();
+    }
 
-  @Override
-  public void write() {
-    writeVarInt(this.duration);
-    writeInt(this.entityId);
-  }
+    @Override
+    public void write() {
+        writeVarInt(this.duration);
+        writeInt(this.entityId);
+    }
 
-  @Override
-  public void copy(WrapperPlayServerEndCombatEvent wrapper) {
-    this.duration = wrapper.duration;
-    this.entityId = wrapper.entityId;
-  }
+    @Override
+    public void copy(WrapperPlayServerEndCombatEvent wrapper) {
+        this.duration = wrapper.duration;
+        this.entityId = wrapper.entityId;
+    }
 
-  public int getDuration() {
-    return duration;
-  }
+    public int getDuration() {
+        return duration;
+    }
 
-  public void setDuration(int duration) {
-    this.duration = duration;
-  }
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
 
-  public int getEntityId() {
-    return entityId;
-  }
+    public int getEntityId() {
+        return entityId;
+    }
 
-  public void setEntityId(int entityId) {
-    this.entityId = entityId;
-  }
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
 }

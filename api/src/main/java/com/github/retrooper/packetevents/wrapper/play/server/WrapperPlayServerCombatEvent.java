@@ -27,118 +27,118 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServerCombatEvent> {
-  private Combat combat;
-  private OptionalInt duration;
-  private OptionalInt entityId;
-  private OptionalInt playerId;
-  private Optional<String> deathMessage;
+    private Combat combat;
+    private int duration;
+    private int entityId;
+    private int playerId;
+    private String deathMessage;
 
-  public WrapperPlayServerCombatEvent(PacketSendEvent event) {
-    super(event);
-  }
-
-  public WrapperPlayServerCombatEvent(Combat combat) {
-    super(PacketType.Play.Server.COMBAT_EVENT);
-    this.combat = combat;
-  }
-
-  public WrapperPlayServerCombatEvent(Combat combat, OptionalInt duration, OptionalInt entityId) {
-    super(PacketType.Play.Server.COMBAT_EVENT);
-    this.combat = combat;
-    this.duration = duration;
-    this.entityId = entityId;
-  }
-
-  public WrapperPlayServerCombatEvent(Combat combat, OptionalInt playerId, OptionalInt entityId, Optional<String> deathMessage) {
-    super(PacketType.Play.Server.COMBAT_EVENT);
-    this.combat = combat;
-    this.playerId = playerId;
-    this.entityId = entityId;
-    this.deathMessage = deathMessage;
-  }
-
-  @Override
-  public void read() {
-    this.duration = OptionalInt.empty();
-    this.entityId = OptionalInt.empty();
-    this.playerId = OptionalInt.empty();
-    this.deathMessage = Optional.empty();
-    this.combat = Combat.VALUES[readVarInt()];
-    switch (combat) {
-      case END_COMBAT:
-        this.duration = OptionalInt.of(readVarInt());
-        this.entityId = OptionalInt.of(readInt());
-        break;
-      case ENTITY_DEAD:
-        this.playerId = OptionalInt.of(readVarInt());
-        this.entityId = OptionalInt.of(readInt());
-        this.deathMessage = Optional.of(readString());
-        break;
+    public WrapperPlayServerCombatEvent(PacketSendEvent event) {
+        super(event);
     }
-  }
 
-  @Override
-  public void write() {
-    writeVarInt(combat.ordinal());
-    switch (combat) {
-      case END_COMBAT:
-        writeVarInt(duration.getAsInt());
-        writeInt(entityId.getAsInt());
-        break;
-      case ENTITY_DEAD:
-        writeVarInt(playerId.getAsInt());
-        writeInt(entityId.getAsInt());
-        writeString(deathMessage.get());
-        break;
+    public WrapperPlayServerCombatEvent(Combat combat) {
+        super(PacketType.Play.Server.COMBAT_EVENT);
+        this.combat = combat;
     }
-  }
 
-  @Override
-  public void copy(WrapperPlayServerCombatEvent wrapper) {
-    this.combat = wrapper.combat;
-    this.duration = wrapper.duration;
-    this.entityId = wrapper.entityId;
-    this.playerId = wrapper.playerId;
-    this.deathMessage = wrapper.deathMessage;
-  }
+    public WrapperPlayServerCombatEvent(Combat combat, int duration, int entityId) {
+        super(PacketType.Play.Server.COMBAT_EVENT);
+        this.combat = combat;
+        this.duration = duration;
+        this.entityId = entityId;
+    }
 
-  public Combat getCombat() {
-    return combat;
-  }
+    public WrapperPlayServerCombatEvent(Combat combat, int playerId, int entityId, String deathMessage) {
+        super(PacketType.Play.Server.COMBAT_EVENT);
+        this.combat = combat;
+        this.playerId = playerId;
+        this.entityId = entityId;
+        this.deathMessage = deathMessage;
+    }
 
-  public void setCombat(Combat combat) {
-    this.combat = combat;
-  }
+    @Override
+    public void read() {
+        this.combat = Combat.VALUES[readVarInt()];
+        switch (combat) {
+            case END_COMBAT:
+                this.duration = readVarInt();
+                this.entityId = readInt();
+                break;
+            case ENTITY_DEAD:
+                this.playerId = readVarInt();
+                this.entityId = readInt();
+                this.deathMessage = readString();
+                break;
+            default:
+                throw new UnsupportedOperationException("This combat id does not exist.");
+        }
+    }
 
-  public OptionalInt getDuration() {
-    return duration;
-  }
+    @Override
+    public void write() {
+        writeVarInt(combat.ordinal());
+        switch (combat) {
+            case END_COMBAT:
+                writeVarInt(duration);
+                writeInt(entityId);
+                break;
+            case ENTITY_DEAD:
+                writeVarInt(playerId);
+                writeInt(entityId);
+                writeString(deathMessage);
+                break;
+            default:
+                throw new UnsupportedOperationException("This combat id does not exist.");
+        }
+    }
 
-  public void setDuration(OptionalInt duration) {
-    this.duration = duration;
-  }
+    @Override
+    public void copy(WrapperPlayServerCombatEvent wrapper) {
+        this.combat = wrapper.combat;
+        this.duration = wrapper.duration;
+        this.entityId = wrapper.entityId;
+        this.playerId = wrapper.playerId;
+        this.deathMessage = wrapper.deathMessage;
+    }
 
-  public OptionalInt getEntityId() {
-    return entityId;
-  }
+    public Combat getCombat() {
+        return combat;
+    }
 
-  public void setEntityId(OptionalInt entityId) {
-    this.entityId = entityId;
-  }
+    public void setCombat(Combat combat) {
+        this.combat = combat;
+    }
 
-  public OptionalInt getPlayerId() {
-    return playerId;
-  }
+    public OptionalInt getDuration() {
+        return OptionalInt.of(duration);
+    }
 
-  public void setPlayerId(OptionalInt playerId) {
-    this.playerId = playerId;
-  }
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
 
-  public Optional<String> getDeathMessage() {
-    return deathMessage;
-  }
+    public OptionalInt getEntityId() {
+        return OptionalInt.of(entityId);
+    }
 
-  public void setDeathMessage(Optional<String> deathMessage) {
-    this.deathMessage = deathMessage;
-  }
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
+
+    public OptionalInt getPlayerId() {
+        return OptionalInt.of(playerId);
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
+
+    public Optional<String> getDeathMessage() {
+        return Optional.ofNullable(deathMessage);
+    }
+
+    public void setDeathMessage(String deathMessage) {
+        this.deathMessage = deathMessage;
+    }
 }

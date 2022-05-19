@@ -23,23 +23,23 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEnterCombatEvent extends PacketWrapper<WrapperPlayServerEnterCombatEvent> {
-  public WrapperPlayServerEnterCombatEvent(PacketSendEvent event) {
-    super(event);
-  }
+    public WrapperPlayServerEnterCombatEvent(PacketSendEvent event) {
+        super(event);
+    }
 
-  public WrapperPlayServerEnterCombatEvent(int duration, int entityId) {
-    super(PacketType.Play.Server.ENTER_COMBAT_EVENT);
-  }
+    public WrapperPlayServerEnterCombatEvent(int duration, int entityId) {
+        super(PacketType.Play.Server.ENTER_COMBAT_EVENT);
+    }
 
-  @Override
-  public void read() {
-  }
+    @Override
+    public void read() {
+    }
 
-  @Override
-  public void write() {
-  }
+    @Override
+    public void write() {
+    }
 
-  @Override
-  public void copy(WrapperPlayServerEnterCombatEvent wrapper) {
-  }
+    @Override
+    public void copy(WrapperPlayServerEnterCombatEvent wrapper) {
+    }
 }

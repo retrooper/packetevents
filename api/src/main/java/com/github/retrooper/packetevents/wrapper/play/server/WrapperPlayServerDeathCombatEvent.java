@@ -23,63 +23,63 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerDeathCombatEvent extends PacketWrapper<WrapperPlayServerDeathCombatEvent> {
-  private int playerId;
-  private int entityId;
-  private String deathMessage;
+    private int playerId;
+    private int entityId;
+    private String deathMessage;
 
-  public WrapperPlayServerDeathCombatEvent(PacketSendEvent event) {
-    super(event);
-  }
+    public WrapperPlayServerDeathCombatEvent(PacketSendEvent event) {
+        super(event);
+    }
 
-  public WrapperPlayServerDeathCombatEvent(int playerId, int entityId, String deathMessage) {
-    super(PacketType.Play.Server.DEATH_COMBAT_EVENT);
-    this.playerId = playerId;
-    this.entityId = entityId;
-    this.deathMessage = deathMessage;
-  }
+    public WrapperPlayServerDeathCombatEvent(int playerId, int entityId, String deathMessage) {
+        super(PacketType.Play.Server.DEATH_COMBAT_EVENT);
+        this.playerId = playerId;
+        this.entityId = entityId;
+        this.deathMessage = deathMessage;
+    }
 
-  @Override
-  public void read() {
-    this.playerId = readVarInt();
-    this.entityId = readInt();
-    this.deathMessage = readString();
-  }
+    @Override
+    public void read() {
+        this.playerId = readVarInt();
+        this.entityId = readInt();
+        this.deathMessage = readString();
+    }
 
-  @Override
-  public void write() {
-    writeVarInt(this.playerId);
-    writeInt(this.entityId);
-    writeString(this.deathMessage);
-  }
+    @Override
+    public void write() {
+        writeVarInt(this.playerId);
+        writeInt(this.entityId);
+        writeString(this.deathMessage);
+    }
 
-  @Override
-  public void copy(WrapperPlayServerDeathCombatEvent wrapper) {
-    this.playerId = wrapper.playerId;
-    this.entityId = wrapper.entityId;
-    this.deathMessage = wrapper.deathMessage;
-  }
+    @Override
+    public void copy(WrapperPlayServerDeathCombatEvent wrapper) {
+        this.playerId = wrapper.playerId;
+        this.entityId = wrapper.entityId;
+        this.deathMessage = wrapper.deathMessage;
+    }
 
-  public int getPlayerId() {
-    return playerId;
-  }
+    public int getPlayerId() {
+        return playerId;
+    }
 
-  public void setPlayerId(int playerId) {
-    this.playerId = playerId;
-  }
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
 
-  public int getEntityId() {
-    return entityId;
-  }
+    public int getEntityId() {
+        return entityId;
+    }
 
-  public void setEntityId(int entityId) {
-    this.entityId = entityId;
-  }
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
 
-  public String getDeathMessage() {
-    return deathMessage;
-  }
+    public String getDeathMessage() {
+        return deathMessage;
+    }
 
-  public void setDeathMessage(String deathMessage) {
-    this.deathMessage = deathMessage;
-  }
+    public void setDeathMessage(String deathMessage) {
+        this.deathMessage = deathMessage;
+    }
 }
