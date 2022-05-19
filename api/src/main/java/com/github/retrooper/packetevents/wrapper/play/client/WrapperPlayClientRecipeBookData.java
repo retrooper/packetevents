@@ -23,13 +23,14 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.recipe.RecipeState;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.OptionalInt;
 
 public class WrapperPlayClientRecipeBookData extends PacketWrapper<WrapperPlayClientRecipeBookData> {
     private RecipeState state;
-    private String recipeIdModern;
+    private @Nullable String recipeIdModern;
     private int recipeIdLegacy;
     private boolean craftingRecipeBookOpen;
     private boolean craftingRecipeBookFilterActive;
@@ -52,7 +53,7 @@ public class WrapperPlayClientRecipeBookData extends PacketWrapper<WrapperPlayCl
         this.craftingRecipeBookFilterActive = craftingRecipeBookFilterActive;
     }
 
-    public WrapperPlayClientRecipeBookData(RecipeState state, String recipeIdModern, boolean craftingRecipeBookOpen,
+    public WrapperPlayClientRecipeBookData(RecipeState state, @Nullable String recipeIdModern, boolean craftingRecipeBookOpen,
                                            boolean craftingRecipeBookFilterActive, boolean smeltingRecipeBookOpen, boolean smeltingRecipeBookFilterActive) {
         super(PacketType.Play.Client.RECIPE_BOOK_DATA);
         this.state = state;
@@ -63,7 +64,7 @@ public class WrapperPlayClientRecipeBookData extends PacketWrapper<WrapperPlayCl
         this.smeltingRecipeBookFilterActive = smeltingRecipeBookFilterActive;
     }
 
-    public WrapperPlayClientRecipeBookData(RecipeState state, String recipeIdModern, boolean craftingRecipeBookOpen,
+    public WrapperPlayClientRecipeBookData(RecipeState state, @Nullable String recipeIdModern, boolean craftingRecipeBookOpen,
                                            boolean craftingRecipeBookFilterActive, boolean smeltingRecipeBookOpen, boolean smeltingRecipeBookFilterActive,
                                            boolean blastFurnaceRecipeBookOpen, boolean blastFurnaceRecipeBookFilterActive, boolean smokerRecipeBookOpen,
                                            boolean smokerRecipeBookFilterActive) {
@@ -157,7 +158,7 @@ public class WrapperPlayClientRecipeBookData extends PacketWrapper<WrapperPlayCl
         return Optional.ofNullable(recipeIdModern);
     }
 
-    public void setRecipeIdModern(String recipeIdModern) {
+    public void setRecipeIdModern(@Nullable String recipeIdModern) {
         this.recipeIdModern = recipeIdModern;
     }
 
