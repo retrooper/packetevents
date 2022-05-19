@@ -23,38 +23,37 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerSetCompression extends PacketWrapper<WrapperPlayServerSetCompression> {
-  private int threshold;
+    private int threshold;
 
-  public WrapperPlayServerSetCompression(PacketSendEvent event) {
-    super(event);
-  }
+    public WrapperPlayServerSetCompression(PacketSendEvent event) {
+        super(event);
+    }
 
-  public WrapperPlayServerSetCompression(int threshold) {
-    super(PacketType.Play.Server.SET_COMPRESSION);
-    this.threshold = threshold;
-  }
+    public WrapperPlayServerSetCompression(int threshold) {
+        super(PacketType.Play.Server.SET_COMPRESSION);
+        this.threshold = threshold;
+    }
 
+    @Override
+    public void read() {
+        this.threshold = readVarInt();
+    }
 
-  @Override
-  public void read() {
-    this.threshold = readVarInt();
-  }
+    @Override
+    public void write() {
+        writeVarInt(threshold);
+    }
 
-  @Override
-  public void write() {
-    writeVarInt(threshold);
-  }
+    @Override
+    public void copy(WrapperPlayServerSetCompression wrapper) {
+        this.threshold = wrapper.threshold;
+    }
 
-  @Override
-  public void copy(WrapperPlayServerSetCompression wrapper) {
-    this.threshold = wrapper.threshold;
-  }
+    public int getThreshold() {
+        return threshold;
+    }
 
-  public int getThreshold() {
-    return threshold;
-  }
-
-  public void setThreshold(int threshold) {
-    this.threshold = threshold;
-  }
+    public void setThreshold(int threshold) {
+        this.threshold = threshold;
+    }
 }
