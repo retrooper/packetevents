@@ -25,90 +25,90 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEffect extends PacketWrapper<WrapperPlayServerEffect> {
-  private int effectId;
-  private Vector3i position;
-  private int data;
-  private boolean disableRelativeVolume;
+    private int effectId;
+    private Vector3i position;
+    private int data;
+    private boolean disableRelativeVolume;
 
-  public WrapperPlayServerEffect(PacketSendEvent event) {
-    super(event);
-  }
-
-  public WrapperPlayServerEffect(int effectId, Vector3i position, int data, boolean disableRelativeVolume) {
-    super(PacketType.Play.Server.EFFECT);
-    this.effectId = effectId;
-    this.position = position;
-    this.data = data;
-    this.disableRelativeVolume = disableRelativeVolume;
-  }
-
-  @Override
-  public void read() {
-    this.effectId = readInt();
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      this.position = new Vector3i(readLong());
-    } else {
-      int x = readInt();
-      int y = readShort();
-      int z = readInt();
-      this.position = new Vector3i(x, y, z);
+    public WrapperPlayServerEffect(PacketSendEvent event) {
+        super(event);
     }
-    this.data = readInt();
-    this.disableRelativeVolume = readBoolean();
-  }
 
-  @Override
-  public void write() {
-    writeInt(this.effectId);
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      long positionVector = this.position.getSerializedPosition();
-      writeLong(positionVector);
-    } else {
-      writeInt(this.position.x);
-      writeShort(this.position.y);
-      writeInt(this.position.z);
+    public WrapperPlayServerEffect(int effectId, Vector3i position, int data, boolean disableRelativeVolume) {
+        super(PacketType.Play.Server.EFFECT);
+        this.effectId = effectId;
+        this.position = position;
+        this.data = data;
+        this.disableRelativeVolume = disableRelativeVolume;
     }
-    writeInt(this.data);
-    writeBoolean(this.disableRelativeVolume);
-  }
 
-  @Override
-  public void copy(WrapperPlayServerEffect wrapper) {
-    this.effectId = wrapper.effectId;
-    this.position = wrapper.position;
-    this.data = wrapper.data;
-    this.disableRelativeVolume = wrapper.disableRelativeVolume;
-  }
+    @Override
+    public void read() {
+        this.effectId = readInt();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            this.position = new Vector3i(readLong());
+        } else {
+            int x = readInt();
+            int y = readShort();
+            int z = readInt();
+            this.position = new Vector3i(x, y, z);
+        }
+        this.data = readInt();
+        this.disableRelativeVolume = readBoolean();
+    }
 
-  public int getEffectId() {
-    return effectId;
-  }
+    @Override
+    public void write() {
+        writeInt(this.effectId);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            long positionVector = this.position.getSerializedPosition();
+            writeLong(positionVector);
+        } else {
+            writeInt(this.position.x);
+            writeShort(this.position.y);
+            writeInt(this.position.z);
+        }
+        writeInt(this.data);
+        writeBoolean(this.disableRelativeVolume);
+    }
 
-  public void setEffectId(int effectId) {
-    this.effectId = effectId;
-  }
+    @Override
+    public void copy(WrapperPlayServerEffect wrapper) {
+        this.effectId = wrapper.effectId;
+        this.position = wrapper.position;
+        this.data = wrapper.data;
+        this.disableRelativeVolume = wrapper.disableRelativeVolume;
+    }
 
-  public Vector3i getPosition() {
-    return position;
-  }
+    public int getEffectId() {
+        return effectId;
+    }
 
-  public void setPosition(Vector3i position) {
-    this.position = position;
-  }
+    public void setEffectId(int effectId) {
+        this.effectId = effectId;
+    }
 
-  public int getData() {
-    return data;
-  }
+    public Vector3i getPosition() {
+        return position;
+    }
 
-  public void setData(int data) {
-    this.data = data;
-  }
+    public void setPosition(Vector3i position) {
+        this.position = position;
+    }
 
-  public boolean isDisableRelativeVolume() {
-    return disableRelativeVolume;
-  }
+    public int getData() {
+        return data;
+    }
 
-  public void setDisableRelativeVolume(boolean disableRelativeVolume) {
-    this.disableRelativeVolume = disableRelativeVolume;
-  }
+    public void setData(int data) {
+        this.data = data;
+    }
+
+    public boolean isDisableRelativeVolume() {
+        return disableRelativeVolume;
+    }
+
+    public void setDisableRelativeVolume(boolean disableRelativeVolume) {
+        this.disableRelativeVolume = disableRelativeVolume;
+    }
 }
