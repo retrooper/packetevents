@@ -19,140 +19,139 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 // From MCProtocolLib
 public class WrapperPlayClientUpdateCommandBlock extends PacketWrapper<WrapperPlayClientUpdateCommandBlock> {
-  private static final int FLAG_TRACK_OUTPUT = 0x01;
-  private static final int FLAG_CONDITIONAL = 0x02;
-  private static final int FLAG_AUTOMATIC = 0x04;
+    private static final int FLAG_TRACK_OUTPUT = 0x01;
+    private static final int FLAG_CONDITIONAL = 0x02;
+    private static final int FLAG_AUTOMATIC = 0x04;
 
-  private Vector3i position;
-  private String command;
-  private CommandBlockMode mode;
-  private boolean doesTrackOutput;
-  private boolean conditional;
-  private boolean automatic;
-  // PacketEvents
-  private short flags;
+    private Vector3i position;
+    private String command;
+    private CommandBlockMode mode;
+    private boolean doesTrackOutput;
+    private boolean conditional;
+    private boolean automatic;
+    // PacketEvents
+    private short flags;
 
-  public WrapperPlayClientUpdateCommandBlock(PacketReceiveEvent event) {
-    super(event);
-  }
-
-  public WrapperPlayClientUpdateCommandBlock(Vector3i position, String command, CommandBlockMode mode, boolean doesTrackOutput, boolean conditional, boolean automatic) {
-    super(PacketType.Play.Client.UPDATE_COMMAND_BLOCK);
-    this.position = position;
-    this.command = command;
-    this.mode = mode;
-    this.doesTrackOutput = doesTrackOutput;
-    this.conditional = conditional;
-    this.automatic = automatic;
-  }
-
-  @Override
-  public void read() {
-    this.position = new Vector3i(readLong());
-    this.command = readString();
-    this.mode = CommandBlockMode.VALUES[readVarInt()];
-    this.flags = readUnsignedByte();
-    this.doesTrackOutput = (flags & FLAG_TRACK_OUTPUT) != 0;
-    this.conditional = (flags & FLAG_CONDITIONAL) != 0;
-    this.automatic = (flags & FLAG_AUTOMATIC) != 0;
-  }
-
-  @Override
-  public void write() {
-    writeLong(position.getSerializedPosition());
-    writeString(command);
-    writeVarInt(mode.ordinal());
-    if (this.doesTrackOutput) {
-      flags |= FLAG_TRACK_OUTPUT;
+    public WrapperPlayClientUpdateCommandBlock(PacketReceiveEvent event) {
+        super(event);
     }
-    if (this.conditional) {
-      flags |= FLAG_CONDITIONAL;
+
+    public WrapperPlayClientUpdateCommandBlock(Vector3i position, String command, CommandBlockMode mode, boolean doesTrackOutput, boolean conditional, boolean automatic) {
+        super(PacketType.Play.Client.UPDATE_COMMAND_BLOCK);
+        this.position = position;
+        this.command = command;
+        this.mode = mode;
+        this.doesTrackOutput = doesTrackOutput;
+        this.conditional = conditional;
+        this.automatic = automatic;
     }
-    if (this.automatic) {
-      flags |= FLAG_AUTOMATIC;
+
+    @Override
+    public void read() {
+        this.position = new Vector3i(readLong());
+        this.command = readString();
+        this.mode = CommandBlockMode.VALUES[readVarInt()];
+        this.flags = readUnsignedByte();
+        this.doesTrackOutput = (flags & FLAG_TRACK_OUTPUT) != 0;
+        this.conditional = (flags & FLAG_CONDITIONAL) != 0;
+        this.automatic = (flags & FLAG_AUTOMATIC) != 0;
     }
-    writeByte(flags);
-  }
 
-  @Override
-  public void copy(WrapperPlayClientUpdateCommandBlock wrapper) {
-    this.position = wrapper.position;
-    this.command = wrapper.command;
-    this.mode = wrapper.mode;
-    this.doesTrackOutput = wrapper.doesTrackOutput;
-    this.conditional = wrapper.conditional;
-    this.automatic = wrapper.automatic;
-    this.flags = wrapper.flags;
-  }
+    @Override
+    public void write() {
+        writeLong(position.getSerializedPosition());
+        writeString(command);
+        writeVarInt(mode.ordinal());
+        if (this.doesTrackOutput) {
+            flags |= FLAG_TRACK_OUTPUT;
+        }
+        if (this.conditional) {
+            flags |= FLAG_CONDITIONAL;
+        }
+        if (this.automatic) {
+            flags |= FLAG_AUTOMATIC;
+        }
+        writeByte(flags);
+    }
 
-  public Vector3i getPosition() {
-    return position;
-  }
+    @Override
+    public void copy(WrapperPlayClientUpdateCommandBlock wrapper) {
+        this.position = wrapper.position;
+        this.command = wrapper.command;
+        this.mode = wrapper.mode;
+        this.doesTrackOutput = wrapper.doesTrackOutput;
+        this.conditional = wrapper.conditional;
+        this.automatic = wrapper.automatic;
+        this.flags = wrapper.flags;
+    }
 
-  public void setPosition(Vector3i position) {
-    this.position = position;
-  }
+    public Vector3i getPosition() {
+        return position;
+    }
 
-  public String getCommand() {
-    return command;
-  }
+    public void setPosition(Vector3i position) {
+        this.position = position;
+    }
 
-  public void setCommand(String command) {
-    this.command = command;
-  }
+    public String getCommand() {
+        return command;
+    }
 
-  public CommandBlockMode getMode() {
-    return mode;
-  }
+    public void setCommand(String command) {
+        this.command = command;
+    }
 
-  public void setMode(CommandBlockMode mode) {
-    this.mode = mode;
-  }
+    public CommandBlockMode getMode() {
+        return mode;
+    }
 
-  public boolean isDoesTrackOutput() {
-    return doesTrackOutput;
-  }
+    public void setMode(CommandBlockMode mode) {
+        this.mode = mode;
+    }
 
-  public void setDoesTrackOutput(boolean doesTrackOutput) {
-    this.doesTrackOutput = doesTrackOutput;
-  }
+    public boolean isDoesTrackOutput() {
+        return doesTrackOutput;
+    }
 
-  public boolean isConditional() {
-    return conditional;
-  }
+    public void setDoesTrackOutput(boolean doesTrackOutput) {
+        this.doesTrackOutput = doesTrackOutput;
+    }
 
-  public void setConditional(boolean conditional) {
-    this.conditional = conditional;
-  }
+    public boolean isConditional() {
+        return conditional;
+    }
 
-  public boolean isAutomatic() {
-    return automatic;
-  }
+    public void setConditional(boolean conditional) {
+        this.conditional = conditional;
+    }
 
-  public void setAutomatic(boolean automatic) {
-    this.automatic = automatic;
-  }
+    public boolean isAutomatic() {
+        return automatic;
+    }
 
-  public short getFlags() {
-    return flags;
-  }
+    public void setAutomatic(boolean automatic) {
+        this.automatic = automatic;
+    }
 
-  public void setFlags(short flags) {
-    this.flags = flags;
-  }
+    public short getFlags() {
+        return flags;
+    }
 
-  public enum CommandBlockMode {
-    SEQUENCE,
-    AUTO,
-    REDSTONE;
+    public void setFlags(short flags) {
+        this.flags = flags;
+    }
 
-    public static final CommandBlockMode[] VALUES = values();
-  }
+    public enum CommandBlockMode {
+        SEQUENCE,
+        AUTO,
+        REDSTONE;
+
+        public static final CommandBlockMode[] VALUES = values();
+    }
 }
