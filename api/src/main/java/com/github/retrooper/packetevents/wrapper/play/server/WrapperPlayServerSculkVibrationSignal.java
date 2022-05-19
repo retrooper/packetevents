@@ -25,104 +25,104 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<WrapperPlayServerSculkVibrationSignal> {
-  private Vector3i sourcePosition;
-  private String destinationIdentifier;
-  private Vector3i blockPosition;
-  private int arrivalTicks;
+    private Vector3i sourcePosition;
+    private String destinationIdentifier;
+    private Vector3i blockPosition;
+    private int arrivalTicks;
 
-  public WrapperPlayServerSculkVibrationSignal(PacketSendEvent event) {
-    super(event);
-  }
-
-  public WrapperPlayServerSculkVibrationSignal(Vector3i sourcePosition, String destinationIdentifier, Vector3i blockPosition, int arrivalTicks) {
-    super(PacketType.Play.Server.SCULK_VIBRATION_SIGNAL);
-    this.sourcePosition = sourcePosition;
-    this.destinationIdentifier = destinationIdentifier;
-    this.blockPosition = blockPosition;
-    this.arrivalTicks = arrivalTicks;
-  }
-
-  @Override
-  public void read() {
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      this.sourcePosition = new Vector3i(readLong());
-    } else {
-      int x = readInt();
-      int y = readShort();
-      int z = readInt();
-      this.sourcePosition = new Vector3i(x, y, z);
+    public WrapperPlayServerSculkVibrationSignal(PacketSendEvent event) {
+        super(event);
     }
-    this.destinationIdentifier = readString();
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      this.blockPosition = new Vector3i(readLong());
-    } else {
-      int x = readInt();
-      int y = readShort();
-      int z = readInt();
-      this.blockPosition = new Vector3i(x, y, z);
+
+    public WrapperPlayServerSculkVibrationSignal(Vector3i sourcePosition, String destinationIdentifier, Vector3i blockPosition, int arrivalTicks) {
+        super(PacketType.Play.Server.SCULK_VIBRATION_SIGNAL);
+        this.sourcePosition = sourcePosition;
+        this.destinationIdentifier = destinationIdentifier;
+        this.blockPosition = blockPosition;
+        this.arrivalTicks = arrivalTicks;
     }
-    this.arrivalTicks = readVarInt();
-  }
 
-  @Override
-  public void write() {
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      long positionVector = this.sourcePosition.getSerializedPosition();
-      writeLong(positionVector);
-    } else {
-      writeInt(this.sourcePosition.x);
-      writeShort(this.sourcePosition.y);
-      writeInt(this.sourcePosition.z);
+    @Override
+    public void read() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            this.sourcePosition = new Vector3i(readLong());
+        } else {
+            int x = readInt();
+            int y = readShort();
+            int z = readInt();
+            this.sourcePosition = new Vector3i(x, y, z);
+        }
+        this.destinationIdentifier = readString();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            this.blockPosition = new Vector3i(readLong());
+        } else {
+            int x = readInt();
+            int y = readShort();
+            int z = readInt();
+            this.blockPosition = new Vector3i(x, y, z);
+        }
+        this.arrivalTicks = readVarInt();
     }
-    writeString(this.destinationIdentifier);
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      long positionVector = this.blockPosition.getSerializedPosition();
-      writeLong(positionVector);
-    } else {
-      writeInt(this.blockPosition.x);
-      writeShort(this.blockPosition.y);
-      writeInt(this.blockPosition.z);
+
+    @Override
+    public void write() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            long positionVector = this.sourcePosition.getSerializedPosition();
+            writeLong(positionVector);
+        } else {
+            writeInt(this.sourcePosition.x);
+            writeShort(this.sourcePosition.y);
+            writeInt(this.sourcePosition.z);
+        }
+        writeString(this.destinationIdentifier);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            long positionVector = this.blockPosition.getSerializedPosition();
+            writeLong(positionVector);
+        } else {
+            writeInt(this.blockPosition.x);
+            writeShort(this.blockPosition.y);
+            writeInt(this.blockPosition.z);
+        }
+        writeVarInt(this.arrivalTicks);
     }
-    writeVarInt(this.arrivalTicks);
-  }
 
-  @Override
-  public void copy(WrapperPlayServerSculkVibrationSignal wrapper) {
-    this.sourcePosition = wrapper.sourcePosition;
-    this.destinationIdentifier = wrapper.destinationIdentifier;
-    this.blockPosition = wrapper.blockPosition;
-    this.arrivalTicks = wrapper.arrivalTicks;
-  }
+    @Override
+    public void copy(WrapperPlayServerSculkVibrationSignal wrapper) {
+        this.sourcePosition = wrapper.sourcePosition;
+        this.destinationIdentifier = wrapper.destinationIdentifier;
+        this.blockPosition = wrapper.blockPosition;
+        this.arrivalTicks = wrapper.arrivalTicks;
+    }
 
-  public Vector3i getSourcePosition() {
-    return sourcePosition;
-  }
+    public Vector3i getSourcePosition() {
+        return sourcePosition;
+    }
 
-  public void setSourcePosition(Vector3i sourcePosition) {
-    this.sourcePosition = sourcePosition;
-  }
+    public void setSourcePosition(Vector3i sourcePosition) {
+        this.sourcePosition = sourcePosition;
+    }
 
-  public String getDestinationIdentifier() {
-    return destinationIdentifier;
-  }
+    public String getDestinationIdentifier() {
+        return destinationIdentifier;
+    }
 
-  public void setDestinationIdentifier(String destinationIdentifier) {
-    this.destinationIdentifier = destinationIdentifier;
-  }
+    public void setDestinationIdentifier(String destinationIdentifier) {
+        this.destinationIdentifier = destinationIdentifier;
+    }
 
-  public Vector3i getBlockPosition() {
-    return blockPosition;
-  }
+    public Vector3i getBlockPosition() {
+        return blockPosition;
+    }
 
-  public void setBlockPosition(Vector3i blockPosition) {
-    this.blockPosition = blockPosition;
-  }
+    public void setBlockPosition(Vector3i blockPosition) {
+        this.blockPosition = blockPosition;
+    }
 
-  public int getArrivalTicks() {
-    return arrivalTicks;
-  }
+    public int getArrivalTicks() {
+        return arrivalTicks;
+    }
 
-  public void setArrivalTicks(int arrivalTicks) {
-    this.arrivalTicks = arrivalTicks;
-  }
+    public void setArrivalTicks(int arrivalTicks) {
+        this.arrivalTicks = arrivalTicks;
+    }
 }
