@@ -28,7 +28,7 @@ import java.util.Optional;
 
 public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlayServerSpawnPosition> {
   private Vector3i position;
-  private Optional<Float> angle;
+  private float angle;
 
   public WrapperPlayServerSpawnPosition(PacketSendEvent event) {
     super(event);
@@ -39,7 +39,7 @@ public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlaySer
     this.position = position;
   }
 
-  public WrapperPlayServerSpawnPosition(Vector3i position, Optional<Float> angle) {
+  public WrapperPlayServerSpawnPosition(Vector3i position, float angle) {
     super(PacketType.Play.Server.SPAWN_POSITION);
     this.position = position;
     this.angle = angle;
@@ -47,7 +47,6 @@ public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlaySer
 
   @Override
   public void read() {
-    this.angle = Optional.empty();
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
       this.position = new Vector3i(readLong());
     } else {
@@ -57,7 +56,7 @@ public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlaySer
       this.position = new Vector3i(x, y, z);
     }
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-      this.angle = Optional.of(readFloat());
+      this.angle = readFloat();
     }
   }
 
@@ -72,7 +71,7 @@ public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlaySer
       writeInt(this.position.z);
     }
     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-      writeFloat(this.angle.get());
+      writeFloat(this.angle);
     }
   }
 
@@ -91,10 +90,10 @@ public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlaySer
   }
 
   public Optional<Float> getAngle() {
-    return angle;
+    return Optional.of(angle);
   }
 
-  public void setAngle(Optional<Float> angle) {
+  public void setAngle(float angle) {
     this.angle = angle;
   }
 }
