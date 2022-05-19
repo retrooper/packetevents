@@ -131,6 +131,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void read() {
     }
 
+    //TODO Rename to copyFrom, as it copies data from the passed in wrapper.
     public void copy(T wrapper) {
 
     }

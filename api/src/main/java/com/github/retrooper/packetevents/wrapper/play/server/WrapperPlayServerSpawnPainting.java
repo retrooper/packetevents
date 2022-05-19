@@ -65,10 +65,6 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         this.entityId = entityId;
         this.uuid = uuid;
         this.title = title;
-        this.type = type;
-        this.position = position;
-        this.direction = direction;
-    }
 
     @Override
     public void read() {
@@ -80,6 +76,13 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
             this.type = PaintingType.VALUES[readVarInt()];
         } else {
             this.title = readString(13);
+        } else {
+            this.uuid = new UUID(0L, 0L);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            this.type = PaintingType.getById(readVarInt());
+        } else {
+            this.type = PaintingType.getByTitle(readString(13));
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             this.position = readBlockPosition();
@@ -106,6 +109,9 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
             writeVarInt(this.type.ordinal());
         } else {
             writeString(this.title, 13);
+            writeVarInt(this.type.getId());
+        } else {
+            writeString(this.type.getTitle(), 13);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             long positionVector = this.position.getSerializedPosition();
