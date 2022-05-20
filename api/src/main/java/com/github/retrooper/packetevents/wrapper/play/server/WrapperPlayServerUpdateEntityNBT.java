@@ -63,11 +63,11 @@ public class WrapperPlayServerUpdateEntityNBT extends PacketWrapper<WrapperPlayS
         this.entityId = entityId;
     }
 
-    public NBTCompound getNbtCompound() {
+    public NBTCompound getNBTCompound() {
         return nbtCompound;
     }
 
-    public void setNbtCompound(NBTCompound nbtCompound) {
+    public void setNBTCompound(NBTCompound nbtCompound) {
         this.nbtCompound = nbtCompound;
     }
 }
