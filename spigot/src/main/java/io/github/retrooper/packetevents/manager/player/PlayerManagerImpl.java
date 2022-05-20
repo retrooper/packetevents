@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.manager.player;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
@@ -83,7 +84,9 @@ public class PlayerManagerImpl implements PlayerManager {
         Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(username);
         if (channel == null) {
             channel = SpigotReflectionUtil.getChannel((Player) player);
-            if (channel != null) {
+            // This is removed from the HashMap on channel close
+            // So if the channel is already closed, there will be a memory leak if we add an offline player
+            if (channel != null && ChannelHelper.isOpen(channel)) {
                 ProtocolManager.CHANNELS.put(username, channel);
             }
         }

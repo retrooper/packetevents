@@ -94,6 +94,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
         boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
+        boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
         if (v1_16) {
             hardcore = readBoolean();
             gameMode = readGameMode();
@@ -124,9 +125,10 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 difficulty = Difficulty.getById(readByte());
             } else {
                 difficulty = Difficulty.NORMAL;
+                //Max players
             }
         }
-        if (v1_14) {
+        if (v1_15) {
             hashedSeed = readLong();
         } else {
             hashedSeed = 0L;
@@ -194,6 +196,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
         boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
+        boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
         if (v1_16) {
             writeBoolean(hardcore);
             writeGameMode(gameMode);
@@ -232,7 +235,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 writeByte(difficulty.getId());
             }
         }
-        if (v1_14) {
+        if (v1_15) {
             writeLong(hashedSeed);
         }
         if (v1_16) {
@@ -246,6 +249,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         } else {
             writeByte(maxPlayers);
             String levelType;
+            //TODO Proper backwards compatibility for level type
             if (isFlat) {
                 levelType = WorldType.FLAT.getName();
             }
