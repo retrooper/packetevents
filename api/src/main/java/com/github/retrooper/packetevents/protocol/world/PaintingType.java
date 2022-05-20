@@ -23,66 +23,66 @@ import java.util.Map;
 
 // From MCProtocolLib
 public enum PaintingType {
-  KEBAB("Kebab"),
-  AZTEC("Aztec"),
-  ALBAN("Alban"),
-  AZTEC2("Aztec2"),
-  BOMB("Bomb"),
-  PLANT("Plant"),
-  WASTELAND("Wasteland"),
-  POOL("Pool"),
-  COURBET("Courbet"),
-  SEA("Sea"),
-  SUNSET("Sunset"),
-  CREEBET("Creebet"),
-  WANDERER("Wanderer"),
-  GRAHAM("Graham"),
-  MATCH("Match"),
-  BUST("Bust"),
-  STAGE("Stage"),
-  VOID("Void"),
-  SKULL_AND_ROSES("SkullAndRoses"),
-  WITHER("Wither"),
-  FIGHTERS("Fighters"),
-  POINTER("Pointer"),
-  PIG_SCENE("Pigscene"),
-  BURNING_SKULL("BurningSkull"),
-  SKELETON("Skeleton"),
-  DONKEY_KONG("DonkeyKong");
+    KEBAB("Kebab"),
+    AZTEC("Aztec"),
+    ALBAN("Alban"),
+    AZTEC2("Aztec2"),
+    BOMB("Bomb"),
+    PLANT("Plant"),
+    WASTELAND("Wasteland"),
+    POOL("Pool"),
+    COURBET("Courbet"),
+    SEA("Sea"),
+    SUNSET("Sunset"),
+    CREEBET("Creebet"),
+    WANDERER("Wanderer"),
+    GRAHAM("Graham"),
+    MATCH("Match"),
+    BUST("Bust"),
+    STAGE("Stage"),
+    VOID("Void"),
+    SKULL_AND_ROSES("SkullAndRoses"),
+    WITHER("Wither"),
+    FIGHTERS("Fighters"),
+    POINTER("Pointer"),
+    PIG_SCENE("Pigscene"),
+    BURNING_SKULL("BurningSkull"),
+    SKELETON("Skeleton"),
+    DONKEY_KONG("DonkeyKong");
 
-  private final String title;
-  private static final Map<String, PaintingType> TITLE_TO_NAME_MAP = new HashMap<>();
+    private final String title;
+    private static final Map<String, PaintingType> TITLE_TO_NAME_MAP = new HashMap<>();
 
-  PaintingType(String title) {
-    this.title = title;
-  }
-
-  public static PaintingType getById(int id) {
-    return VALUES[id];
-  }
-
-  @Deprecated
-  public static PaintingType getByTitle(String title) {
-    PaintingType type = TITLE_TO_NAME_MAP.get(title);
-    if (type == null) {
-      for (PaintingType t : VALUES) {
-        if (t.title.equals(title)) {
-          TITLE_TO_NAME_MAP.put(title, t);
-          return t;
-        }
-      }
+    PaintingType(String title) {
+        this.title = title;
     }
-    return type;
-  }
 
-  @Deprecated
-  public String getTitle() {
-    return title;
-  }
+    public static PaintingType getById(int id) {
+        return VALUES[id];
+    }
 
-  public int getId() {
-    return ordinal();
-  }
+    @Deprecated
+    public static PaintingType getByTitle(String title) {
+        PaintingType type = TITLE_TO_NAME_MAP.get(title);
+        if (type == null) {
+            for (PaintingType t : VALUES) {
+                if (t.title.equals(title)) {
+                    TITLE_TO_NAME_MAP.put(title, t);
+                    return t;
+                }
+            }
+        }
+        return type;
+    }
 
-  private static final PaintingType[] VALUES = values();
+    @Deprecated
+    public String getTitle() {
+        return title;
+    }
+
+    public int getId() {
+        return ordinal();
+    }
+
+    private static final PaintingType[] VALUES = values();
 }
