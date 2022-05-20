@@ -34,7 +34,6 @@ import java.util.UUID;
 public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlayServerSpawnPainting> {
     private int entityId;
     private @Nullable UUID uuid;
-    private @Nullable String title;
     private @Nullable PaintingType type;
     private Vector3i position;
     private Direction direction;
@@ -43,28 +42,25 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         super(event);
     }
 
-    public WrapperPlayServerSpawnPainting(int entityId, String title, Vector3i position, Direction direction) {
+    public WrapperPlayServerSpawnPainting(int entityId, Vector3i position, Direction direction) {
         super(PacketType.Play.Server.SPAWN_PAINTING);
         this.entityId = entityId;
-        this.title = title;
         this.position = position;
         this.direction = direction;
     }
 
-    public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, String title, Vector3i position, Direction direction) {
+    public WrapperPlayServerSpawnPainting(int entityId, @Nullable UUID uuid, Vector3i position, Direction direction) {
         super(PacketType.Play.Server.SPAWN_PAINTING);
         this.entityId = entityId;
         this.uuid = uuid;
-        this.title = title;
         this.position = position;
         this.direction = direction;
     }
 
-    public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, String title, PaintingType type, Vector3i position, Direction direction) {
+    public WrapperPlayServerSpawnPainting(int entityId, @Nullable UUID uuid, @Nullable PaintingType type, Vector3i position, Direction direction) {
         super(PacketType.Play.Server.SPAWN_PAINTING);
         this.entityId = entityId;
         this.uuid = uuid;
-        this.title = title;
         this.type = type;
         this.position = position;
         this.direction = direction;
@@ -77,9 +73,9 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
             this.uuid = readUUID();
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.type = PaintingType.VALUES[readVarInt()];
+            this.type = PaintingType.getById(readVarInt());
         } else {
-            this.title = readString(13);
+            this.type = PaintingType.getByTitle(readString(13));
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             this.position = readBlockPosition();
@@ -103,9 +99,9 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
             writeUUID(this.uuid);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeVarInt(this.type.ordinal());
+            writeVarInt(this.type.getId());
         } else {
-            writeString(this.title, 13);
+            writeString(this.type.getTitle(), 13);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             long positionVector = this.position.getSerializedPosition();
@@ -126,7 +122,6 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
     public void copy(WrapperPlayServerSpawnPainting wrapper) {
         this.entityId = wrapper.entityId;
         this.uuid = wrapper.uuid;
-        this.title = wrapper.title;
         this.type = wrapper.type;
         this.position = wrapper.position;
         this.direction = wrapper.direction;
@@ -146,14 +141,6 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
 
     public void setUuid(@Nullable UUID uuid) {
         this.uuid = uuid;
-    }
-
-    public Optional<String> getTitle() {
-        return Optional.ofNullable(title);
-    }
-
-    public void setTitle(@Nullable String title) {
-        this.title = title;
     }
 
     public Optional<PaintingType> getType() {
