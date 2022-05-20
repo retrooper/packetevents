@@ -21,12 +21,13 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<WrapperPlayServerSculkVibrationSignal> {
     private Vector3i sourcePosition;
-    private String destinationIdentifier;
+    private ResourceLocation destinationIdentifier;
     private Vector3i blockPosition;
     private int arrivalTicks;
 
@@ -34,7 +35,7 @@ public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<Wrapper
         super(event);
     }
 
-    public WrapperPlayServerSculkVibrationSignal(Vector3i sourcePosition, String destinationIdentifier, Vector3i blockPosition, int arrivalTicks) {
+    public WrapperPlayServerSculkVibrationSignal(Vector3i sourcePosition, ResourceLocation destinationIdentifier, Vector3i blockPosition, int arrivalTicks) {
         super(PacketType.Play.Server.SCULK_VIBRATION_SIGNAL);
         this.sourcePosition = sourcePosition;
         this.destinationIdentifier = destinationIdentifier;
@@ -52,7 +53,7 @@ public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<Wrapper
             int z = readInt();
             this.sourcePosition = new Vector3i(x, y, z);
         }
-        this.destinationIdentifier = readString();
+        this.destinationIdentifier = readIdentifier();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             this.blockPosition = new Vector3i(readLong());
         } else {
@@ -74,7 +75,7 @@ public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<Wrapper
             writeShort(this.sourcePosition.y);
             writeInt(this.sourcePosition.z);
         }
-        writeString(this.destinationIdentifier);
+        writeIdentifier(this.destinationIdentifier);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             long positionVector = this.blockPosition.getSerializedPosition();
             writeLong(positionVector);
@@ -102,11 +103,11 @@ public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<Wrapper
         this.sourcePosition = sourcePosition;
     }
 
-    public String getDestinationIdentifier() {
+    public ResourceLocation getDestinationIdentifier() {
         return destinationIdentifier;
     }
 
-    public void setDestinationIdentifier(String destinationIdentifier) {
+    public void setDestinationIdentifier(ResourceLocation destinationIdentifier) {
         this.destinationIdentifier = destinationIdentifier;
     }
 
