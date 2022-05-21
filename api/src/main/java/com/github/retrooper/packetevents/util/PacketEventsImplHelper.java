@@ -29,6 +29,8 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 public class PacketEventsImplHelper {
     public static PacketSendEvent handleClientBoundPacket(Object channel, User user, Object player,
                                                Object buffer, boolean autoProtocolTranslation, boolean runPostTasks) throws PacketProcessException {
@@ -103,7 +105,7 @@ public class PacketEventsImplHelper {
         return packetReceiveEvent;
     }
 
-    public static void handleDisconnection(Object channel, @Nullable String username) {
+    public static void handleDisconnection(Object channel, @Nullable UUID uuid) {
         User user = ProtocolManager.USERS.get(channel);
         if (user != null) {
             UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
@@ -111,8 +113,12 @@ public class PacketEventsImplHelper {
             ProtocolManager.USERS.remove(user.getChannel());
         }
 
-        if (username != null) {
-            ProtocolManager.CHANNELS.remove(username);
+        if (uuid == null) {
+            // Only way to be sure of removing a channel
+            ProtocolManager.CHANNELS.entrySet().removeIf(pair -> pair.getValue() == channel);
+        } else {
+            // This is the efficient way that we should prefer
+            ProtocolManager.CHANNELS.remove(uuid);
         }
     }
 }

@@ -87,7 +87,7 @@ public class ServerConnectionInitializer {
             return;
         }
 
-        channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getName()));
+        channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
 
         ProtocolManager.USERS.put(channel, user);
         try {

@@ -54,6 +54,6 @@ public class InternalBukkitListener implements Listener {
         Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         //When we receive LOGIN_SUCCESS, we cache username with their channel.
         //Here we clean that up.
-        PacketEventsImplHelper.handleDisconnection(channel, player.getName());
+        PacketEventsImplHelper.handleDisconnection(channel, player.getUniqueId());
     }
 }
