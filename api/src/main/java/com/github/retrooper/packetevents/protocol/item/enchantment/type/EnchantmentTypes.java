@@ -120,4 +120,8 @@ public class EnchantmentTypes {
     public static final EnchantmentType PIERCING = define("piercing");
     public static final EnchantmentType MENDING = define("mending");
     public static final EnchantmentType VANISHING_CURSE = define("vanishing_curse");
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
+    }
 }
