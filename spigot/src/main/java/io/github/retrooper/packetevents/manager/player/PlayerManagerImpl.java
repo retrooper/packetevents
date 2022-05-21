@@ -42,9 +42,6 @@ import java.util.Collection;
 import java.util.UUID;
 
 public class PlayerManagerImpl implements PlayerManager {
-    private static Class<?> PROPERTY_MAP_CLASS;
-    private static Method PROPERTY_MAP_GET_METHOD;
-
     @Override
     public int getPing(@NotNull Object player) {
         //Yay, we contributed this to Spigot and now we can use it on 1.17+ servers.
@@ -59,6 +56,7 @@ public class PlayerManagerImpl implements PlayerManager {
     public @NotNull ClientVersion getClientVersion(@NotNull Object p) {
         Player player = (Player) p;
         User user = getUser(player);
+        if (user == null) return ClientVersion.UNKNOWN;
         if (user.getClientVersion() == null) {
             int protocolVersion;
             if (ProtocolSupportUtil.isAvailable()) {
@@ -95,10 +93,16 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public @NotNull User getUser(@NotNull Object player) {
+    public User getUser(@NotNull Object player) {
         Player p = (Player) player;
         Object channel = getChannel(p);
         User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+
+        // Creating a user that is offline will memory leak
+        if (channel != null && ChannelHelper.isOpen(channel)) {
+            return null;
+        }
+
         if (user == null) {
             user = new User(channel, ConnectionState.PLAY,
                     null, new UserProfile(p.getUniqueId(),
@@ -106,35 +110,8 @@ public class PlayerManagerImpl implements PlayerManager {
             ProtocolManager.USERS.put(channel, user);
             PacketEvents.getAPI().getInjector().updateUser(channel, user);
         }
+
         UserProfile profile = user.getProfile();
-        if (profile.getTextureProperties().isEmpty()) {
-            if (PROPERTY_MAP_CLASS == null) {
-                PROPERTY_MAP_CLASS = Reflection.getClassByNameWithoutException("" +
-                        "com.mojang.authlib.properties.PropertyMap");
-                PROPERTY_MAP_GET_METHOD = Reflection.getMethod(PROPERTY_MAP_CLASS, "get", Collection.class, Object.class);
-            }
-            //Get the player's game profile in NMS
-            Object nmsGameProfile = SpigotReflectionUtil.getGameProfile((Player) player);
-            ReflectionObject reflectGameProfile = new ReflectionObject(nmsGameProfile);
-            Object nmsPropertyMap = reflectGameProfile.readObject(0, PROPERTY_MAP_CLASS);
-            //Convert the nms property map into a java one to avoid direct GSON access.
-            Collection<Object> nmsProperties = null;
-            try {
-                nmsProperties = (Collection<Object>) PROPERTY_MAP_GET_METHOD.invoke(nmsPropertyMap, "textures");
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            for (Object nmsProperty : nmsProperties) {
-                //Read the NMS texture property data
-                ReflectionObject reflectProperty = new ReflectionObject(nmsProperty);
-                String name = "textures"; //Save us a reflection call :)
-                String value = reflectProperty.readString(1);
-                String signature = reflectProperty.readString(2);
-                TextureProperty textureProperty = new TextureProperty(name, value, signature);
-                //Add it to our profile.
-                profile.getTextureProperties().add(textureProperty);
-            }
-        }
         if (profile.getName() == null) {
             profile.setName(p.getName());
         }

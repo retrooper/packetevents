@@ -34,6 +34,7 @@ public class InternalBungeeProcessor implements Listener {
         Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         PacketEvents.getAPI().getInjector().setPlayer(channel, player);
         User user = PacketEvents.getAPI().getPlayerManager().getUser(event.getPlayer());
+        if (user == null) return;
         UserLoginEvent loginEvent = new UserLoginEvent(user, player);
         PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
     }
