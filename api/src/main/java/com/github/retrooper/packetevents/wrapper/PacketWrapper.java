@@ -65,6 +65,9 @@ public class PacketWrapper<T extends PacketWrapper> {
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
 
     public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, int packetID) {
+        if (packetID == -1) {
+            throw new IllegalArgumentException("Packet does not exist on this protocol version!");
+        }
         this.clientVersion = clientVersion;
         this.serverVersion = serverVersion;
         this.buffer = null;
