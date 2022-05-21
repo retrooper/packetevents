@@ -38,6 +38,18 @@ public class WrappedBlockState {
 
     private static final Map<String, String> STRING_UPDATER = new HashMap<>();
 
+    // Try to reduce memory footprint by re-using hashmaps when they are equal
+    // We do this by setting the key and value equal to one another
+    // this.data = cache.computeIfAbsent(this.data, (key) -> key);
+    // This will get an equal value if present, otherwise it will add the key to the cache
+    // Once this is done, we remove this cache to save memory
+    // A HashMap is used instead of another data type because a hashmap is o(1)
+    //
+    // 4845 total combinations, last updated with 1.18.2 (which uses 1.17 block mappings)
+    // This brings total memory usage from 62 MB to 34 MB, a 28 MB reduction
+    // Using a HashMap reduces memory usage to less than a megabyte, I can't get precise numbers because hard to see on a heapdump
+    private static Map<Map<StateValue, Object>, Map<StateValue, Object>> cache = new HashMap<>(4845, 70);
+
     static {
         STRING_UPDATER.put("grass_path", "dirt_path"); // 1.16 -> 1.17
 
@@ -47,27 +59,34 @@ public class WrappedBlockState {
                 loadModern(version);
             }
         }
+
+        cache = null; // Everything is loaded, there is no need to cache anymore
     }
 
     int globalID;
     StateType type;
-    EnumMap<StateValue, Object> data = new EnumMap<>(StateValue.class);
+    Map<StateValue, Object> data = new HashMap<>(0);
     boolean hasClonedData = false;
     byte mappingsIndex;
 
     public WrappedBlockState(StateType type, String[] data, int globalID, byte mappingsIndex) {
         this.type = type;
         this.globalID = globalID;
-        if (data == null) return;
-        for (String s : data) {
-            String[] split = s.split("=");
-            StateValue value = StateValue.byName(split[0]);
-            this.data.put(value, value.getParser().apply(split[1].toUpperCase(Locale.ROOT)));
+
+        if (data != null) {
+            for (String s : data) {
+                String[] split = s.split("=");
+                StateValue value = StateValue.byName(split[0]);
+                this.data.put(value, value.getParser().apply(split[1].toUpperCase(Locale.ROOT)));
+            }
         }
+
+
+        this.data = cache.computeIfAbsent(this.data, (key) -> key);
         this.mappingsIndex = mappingsIndex;
     }
 
-    public WrappedBlockState(StateType type, EnumMap<StateValue, Object> data, int globalID, byte mappingsIndex) {
+    public WrappedBlockState(StateType type, Map<StateValue, Object> data, int globalID, byte mappingsIndex) {
         this.globalID = globalID;
         this.type = type;
         this.data = data;
@@ -1000,7 +1019,7 @@ public class WrappedBlockState {
      */
     private void checkIfCloneNeeded() {
         if (!hasClonedData) {
-            data = data.clone();
+            data = new HashMap<>(data);
             hasClonedData = true;
         }
     }
@@ -1018,7 +1037,7 @@ public class WrappedBlockState {
             WrappedBlockState blockState = BY_ID.get(mappingsIndex).getOrDefault(oldGlobalID, AIR).clone();
             this.type = blockState.type;
             this.globalID = blockState.globalID;
-            this.data = blockState.data.clone();
+            this.data = new HashMap<>(blockState.data);
 
             // Stack tracing is expensive
             if (PacketEvents.getAPI().getSettings().isDebugEnabled()) {
@@ -1040,7 +1059,7 @@ public class WrappedBlockState {
      * It can result in invalid block types when modified directly
      */
     @Deprecated
-    public EnumMap<StateValue, Object> getInternalData() {
+    public Map<StateValue, Object> getInternalData() {
         return data;
     }
 
