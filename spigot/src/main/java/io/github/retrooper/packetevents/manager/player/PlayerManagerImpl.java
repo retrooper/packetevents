@@ -85,8 +85,12 @@ public class PlayerManagerImpl implements PlayerManager {
             channel = SpigotReflectionUtil.getChannel((Player) player);
             // This is removed from the HashMap on channel close
             // So if the channel is already closed, there will be a memory leak if we add an offline player
-            if (channel != null && ChannelHelper.isOpen(channel)) {
-                ProtocolManager.CHANNELS.put(uuid, channel);
+            if (channel != null) {
+                synchronized (channel) {
+                    if (ChannelHelper.isOpen(channel)) {
+                        ProtocolManager.CHANNELS.put(uuid, channel);
+                    }
+                }
             }
         }
         return channel;
@@ -99,16 +103,19 @@ public class PlayerManagerImpl implements PlayerManager {
         User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
 
         // Creating a user that is offline will memory leak
-        if (channel == null || !ChannelHelper.isOpen(channel)) {
-            return null;
-        }
+        if (channel == null) return null;
 
         if (user == null) {
-            user = new User(channel, ConnectionState.PLAY,
-                    null, new UserProfile(p.getUniqueId(),
-                    p.getName()));
-            ProtocolManager.USERS.put(channel, user);
-            PacketEvents.getAPI().getInjector().updateUser(channel, user);
+            user = new User(channel, ConnectionState.PLAY, null, new UserProfile(p.getUniqueId(), p.getName()));
+
+            synchronized (channel) {
+                if (!ChannelHelper.isOpen(channel)) {
+                    return null;
+                }
+
+                ProtocolManager.USERS.put(channel, user);
+                PacketEvents.getAPI().getInjector().updateUser(channel, user);
+            }
         }
 
         UserProfile profile = user.getProfile();

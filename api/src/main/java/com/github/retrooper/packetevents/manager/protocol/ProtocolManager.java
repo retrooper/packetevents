@@ -198,7 +198,9 @@ public interface ProtocolManager {
     }
 
     default void setUser(Object channel, User user) {
-        USERS.put(channel, user);
+        synchronized (channel) {
+            USERS.put(channel, user);
+        }
         PacketEvents.getAPI().getInjector().updateUser(channel, user);
     }
 

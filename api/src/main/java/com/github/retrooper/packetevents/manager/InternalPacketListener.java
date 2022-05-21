@@ -63,7 +63,10 @@ public class InternalPacketListener extends PacketListenerAbstract {
             user.getProfile().setName(profile.getName());
 
             //Map username with channel
-            ProtocolManager.CHANNELS.put(profile.getUUID(), channel);
+            synchronized (channel) {
+                ProtocolManager.CHANNELS.put(profile.getUUID(), channel);
+            }
+
             PacketEvents.getAPI().getLogManager().debug("Mapped player UUID with their channel.");
 
             //Update connection state(injectors might do some adjustments when we transition into PLAY state)

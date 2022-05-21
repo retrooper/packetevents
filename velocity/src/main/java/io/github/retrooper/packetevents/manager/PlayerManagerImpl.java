@@ -50,7 +50,10 @@ public class PlayerManagerImpl extends PlayerManagerAbstract {
             Object minecraftConnection = reflectConnectedPlayer.readObject(0, MINECRAFT_CONNECTION_CLASS);
             ReflectionObject reflectConnection = new ReflectionObject(minecraftConnection);
             channel = reflectConnection.readObject(0, Channel.class);
-            ProtocolManager.CHANNELS.put(((Player) player).getUniqueId(), channel);
+
+            synchronized (channel) {
+                ProtocolManager.CHANNELS.put(((Player) player).getUniqueId(), channel);
+            }
         }
         return channel;
     }
