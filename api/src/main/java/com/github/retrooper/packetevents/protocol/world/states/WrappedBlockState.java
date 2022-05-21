@@ -39,12 +39,11 @@ public class WrappedBlockState {
     private static final Map<String, String> STRING_UPDATER = new HashMap<>();
 
     static {
-        STRING_UPDATER.put("minecraft:grass_path", "minecraft:dirt_path"); // 1.16 -> 1.17
+        STRING_UPDATER.put("grass_path", "dirt_path"); // 1.16 -> 1.17
 
         loadLegacy();
         for (ClientVersion version : ClientVersion.values()) {
-            if (version.isNewerThanOrEquals(ClientVersion.V_1_13)
-                    && version.isRelease()) {
+            if (version.isNewerThanOrEquals(ClientVersion.V_1_13) && version.isRelease()) {
                 loadModern(version);
             }
         }
@@ -196,29 +195,45 @@ public class WrappedBlockState {
     }
 
     private static void loadModern(ClientVersion version) {
-        JsonObject MAPPINGS = MappingHelper.getJSONObject("block/modern_block_mappings");
+        // We call this for every 1.13+ version, which is inefficient to parse the JSON if it didn't change
         byte mappingsIndex = getMappingsIndex(version);
-        String modernVersion = getModernJsonPath(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+        if (BY_ID.containsKey(mappingsIndex)) {
+            return;
+        }
+
+        InputStream mappings = WrappedBlockState.class.getClassLoader().getResourceAsStream("assets/mappings/block/modern_block_mappings.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(mappings));
+
         Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
         Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
         Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
         Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
         Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
-        if (MAPPINGS.has(modernVersion)) {
-            if (BY_ID.containsKey(mappingsIndex)) {
-                return;
-            }
-            JsonObject map = MAPPINGS.getAsJsonObject(modernVersion);
-            map.entrySet().forEach(entry -> {
-                int id = Integer.parseInt(entry.getKey());
 
-                String fullBlockString = entry.getValue().getAsString();
+        String versionString = version.getReleaseName();
+        boolean found = false;
+        int id = 0;
+
+        String fullBlockString;
+        try {
+            while ((fullBlockString = reader.readLine()) != null) {
+                if (!found) {
+                    if (fullBlockString.equals(versionString)) {
+                        found = true;
+                    }
+                    continue;
+                } else {
+                    if (fullBlockString.charAt(1) == '.') { // 1.13, 1.16, 2.0
+                        break;
+                    }
+                }
+
                 boolean isDefault = fullBlockString.startsWith("*");
                 fullBlockString = fullBlockString.replace("*", "");
                 int index = fullBlockString.indexOf("[");
 
                 String blockString = fullBlockString.substring(0, index == -1 ? fullBlockString.length() : index);
-                StateType type = StateTypes.getByName(blockString.replace("minecraft:", ""));
+                StateType type = StateTypes.getByName(blockString);
 
                 if (type == null) {
                     // Let's update the state type to a modern version
@@ -226,7 +241,7 @@ public class WrappedBlockState {
                         blockString = blockString.replace(stringEntry.getKey(), stringEntry.getValue());
                     }
 
-                    type = StateTypes.getByName(blockString.replace("minecraft:", ""));
+                    type = StateTypes.getByName(blockString);
 
                     if (type == null) {
                         PacketEvents.getAPI().getLogger().warning("Unknown block type: " + fullBlockString);
@@ -248,10 +263,13 @@ public class WrappedBlockState {
                 stateByIdMap.put(id, state);
                 stateToStringMap.put(state, fullBlockString);
                 stateToIdMap.put(state, id);
-            });
-        } else {
-            throw new IllegalStateException("Failed to find block palette mappings for the " + modernVersion + " mappings version!");
+
+                id++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         BY_ID.put(mappingsIndex, stateByIdMap);
         INTO_ID.put(mappingsIndex, stateToIdMap);
         BY_STRING.put(mappingsIndex, stateByStringMap);
