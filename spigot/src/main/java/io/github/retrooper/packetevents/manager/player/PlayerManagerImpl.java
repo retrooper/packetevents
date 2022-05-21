@@ -39,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.UUID;
 
 public class PlayerManagerImpl implements PlayerManager {
     private static Class<?> PROPERTY_MAP_CLASS;
@@ -80,14 +81,14 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public Object getChannel(@NotNull Object player) {
-        String username = ((Player) player).getName();
-        Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(username);
+        UUID uuid = ((Player) player).getUniqueId();
+        Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(uuid);
         if (channel == null) {
             channel = SpigotReflectionUtil.getChannel((Player) player);
             // This is removed from the HashMap on channel close
             // So if the channel is already closed, there will be a memory leak if we add an offline player
             if (channel != null && ChannelHelper.isOpen(channel)) {
-                ProtocolManager.CHANNELS.put(username, channel);
+                ProtocolManager.CHANNELS.put(uuid, channel);
             }
         }
         return channel;
