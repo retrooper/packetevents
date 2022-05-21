@@ -99,7 +99,7 @@ public class PlayerManagerImpl implements PlayerManager {
         User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
 
         // Creating a user that is offline will memory leak
-        if (channel != null && ChannelHelper.isOpen(channel)) {
+        if (channel == null || !ChannelHelper.isOpen(channel)) {
             return null;
         }
 
