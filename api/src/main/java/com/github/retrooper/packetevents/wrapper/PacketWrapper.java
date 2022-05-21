@@ -119,7 +119,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public static PacketWrapper<?> createUniversalPacketWrapper(Object byteBuf) {
-        PacketWrapper<?> wrapper = new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), -1);
+        PacketWrapper<?> wrapper = new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), -2);
         wrapper.buffer = byteBuf;
         return wrapper;
     }
