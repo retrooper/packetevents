@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -39,24 +38,14 @@ public class WrapperPlayServerUpdateViewPosition extends PacketWrapper<WrapperPl
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            this.chunkX = readVarInt();
-            this.chunkZ = readVarInt();
-        } else {
-            this.chunkX = readInt();
-            this.chunkZ = readInt();
-        }
+        this.chunkX = readVarInt();
+        this.chunkZ = readVarInt();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            writeVarInt(this.chunkX);
-            writeVarInt(this.chunkZ);
-        } else {
-            writeInt(this.chunkX);
-            writeInt(this.chunkZ);
-        }
+        writeVarInt(this.chunkX);
+        writeVarInt(this.chunkZ);
     }
 
     @Override
