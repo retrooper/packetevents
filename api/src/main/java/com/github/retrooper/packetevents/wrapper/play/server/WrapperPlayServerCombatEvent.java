@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.Combat;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -31,7 +33,7 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
     private int duration;
     private int entityId;
     private int playerId;
-    private String deathMessage;
+    private @Nullable Component deathMessage;
 
     public WrapperPlayServerCombatEvent(PacketSendEvent event) {
         super(event);
@@ -49,7 +51,7 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
         this.entityId = entityId;
     }
 
-    public WrapperPlayServerCombatEvent(Combat combat, int playerId, int entityId, String deathMessage) {
+    public WrapperPlayServerCombatEvent(Combat combat, int playerId, int entityId, @Nullable Component deathMessage) {
         super(PacketType.Play.Server.COMBAT_EVENT);
         this.combat = combat;
         this.playerId = playerId;
@@ -68,7 +70,7 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
             case ENTITY_DEAD:
                 this.playerId = readVarInt();
                 this.entityId = readInt();
-                this.deathMessage = readString();
+                this.deathMessage = readComponent();
                 break;
             default:
                 throw new UnsupportedOperationException("This combat id does not exist.");
@@ -86,7 +88,7 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
             case ENTITY_DEAD:
                 writeVarInt(playerId);
                 writeInt(entityId);
-                writeString(deathMessage);
+                writeComponent(deathMessage);
                 break;
             default:
                 throw new UnsupportedOperationException("This combat id does not exist.");
@@ -134,11 +136,11 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
         this.playerId = playerId;
     }
 
-    public Optional<String> getDeathMessage() {
+    public Optional<Component> getDeathMessage() {
         return Optional.ofNullable(deathMessage);
     }
 
-    public void setDeathMessage(String deathMessage) {
+    public void setDeathMessage(@Nullable Component deathMessage) {
         this.deathMessage = deathMessage;
     }
 }
