@@ -215,8 +215,7 @@ public class SpigotChannelInjector implements ChannelInjector {
                     ReflectionObject reflectionObject = new ReflectionObject(viaDecoder);
                     ByteToMessageDecoder mcDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
                     String decoderClassName = ClassUtil.getClassSimpleName(mcDecoder.getClass());
-                    if (decoderClassName.equals("PacketDecoderModern")
-                            || decoderClassName.equals("PacketDecoderLatest")) {
+                    if (decoderClassName.equals("PacketDecoder")) {
                         //We aren't the first packetevents instance to inject into ViaVersion's decoder
                         ReflectionObject reflectPacketDecoderModern = new ReflectionObject(mcDecoder);
                         List<ByteToMessageDecoder> decoders = reflectPacketDecoderModern.readList(0);
