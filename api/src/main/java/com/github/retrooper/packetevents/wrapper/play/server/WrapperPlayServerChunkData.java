@@ -173,7 +173,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         byte[] data = readByteArray();
         data = deflate(data, chunkMask, fullChunk);
 
-        boolean hasBlocklight = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThan(ServerVersion.V_1_14);
+        boolean hasBlocklight = (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThan(ServerVersion.V_1_14))
+                && !serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8);
         boolean checkForSky = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
 
         // 1.7/1.8 don't use this NetStreamInput
@@ -191,7 +192,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 for (int i = 0; i < biomeDataBytes.length; i++) {
                     biomeDataBytes[i] = dataIn.readByte();
                 }
-            } else if (data.length >= 256) { // some MCM jars don't send biome data always, unlike vanilla
+            } else {
                 biomeDataBytes = Arrays.copyOfRange(data, data.length - 256, data.length);
             }
         }
