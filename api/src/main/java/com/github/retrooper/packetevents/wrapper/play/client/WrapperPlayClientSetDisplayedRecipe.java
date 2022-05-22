@@ -20,28 +20,29 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientSetDisplayedRecipe extends PacketWrapper<WrapperPlayClientSetDisplayedRecipe> {
-    private String recipe;
+    private ResourceLocation recipe;
 
     public WrapperPlayClientSetDisplayedRecipe(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientSetDisplayedRecipe(String recipe) {
+    public WrapperPlayClientSetDisplayedRecipe(ResourceLocation recipe) {
         super(PacketType.Play.Client.SET_DISPLAYED_RECIPE);
         this.recipe = recipe;
     }
 
     @Override
     public void read() {
-        this.recipe = readString();
+        this.recipe = readIdentifier();
     }
 
     @Override
     public void write() {
-        writeString(this.recipe);
+        writeIdentifier(this.recipe);
     }
 
     @Override
@@ -49,11 +50,11 @@ public class WrapperPlayClientSetDisplayedRecipe extends PacketWrapper<WrapperPl
         this.recipe = packet.recipe;
     }
 
-    public String getRecipe() {
+    public ResourceLocation getRecipe() {
         return recipe;
     }
 
-    public void setRecipe(String recipe) {
+    public void setRecipe(ResourceLocation recipe) {
         this.recipe = recipe;
     }
 }
