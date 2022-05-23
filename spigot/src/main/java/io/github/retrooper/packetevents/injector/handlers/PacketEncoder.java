@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.injector.handlers;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
@@ -64,7 +63,6 @@ public class PacketEncoder extends MessageToByteEncoder<Object> {
             //Empty packets?
             if (!in.isReadable()) return;
             out.writeBytes(in);
-            ByteBufHelper.release(in);
         }
         PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out, true, false);
         if (sendEvent.hasPostTasks()) {
