@@ -30,6 +30,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
+import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
 import io.github.retrooper.packetevents.injector.PaperChannelInjector;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
@@ -140,7 +141,8 @@ public class SpigotPacketEventsBuilder {
                     if (PacketType.isPrepared()) {
                         PacketType.prepare();
                     }
-
+                    Bukkit.getPluginManager().registerEvents(new InternalBukkitListener(),
+                            plugin);
                     //TODO Clean up and remove redundant post inject task
                     Runnable postInjectTask = () -> {
                         /*for (final Player p : Bukkit.getOnlinePlayers()) {
