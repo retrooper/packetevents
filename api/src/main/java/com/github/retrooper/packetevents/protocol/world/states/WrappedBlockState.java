@@ -103,7 +103,7 @@ public class WrappedBlockState {
     @NotNull
     public static WrappedBlockState getByString(ClientVersion version, String string) {
         byte mappingsIndex = getMappingsIndex(version);
-        return BY_STRING.get(mappingsIndex).getOrDefault(string, AIR).clone();
+        return BY_STRING.get(mappingsIndex).getOrDefault(string.replace("minecraft:", ""), AIR).clone();
     }
 
     @NotNull
