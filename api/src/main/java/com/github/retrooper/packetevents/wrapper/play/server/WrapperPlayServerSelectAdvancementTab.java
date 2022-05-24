@@ -27,22 +27,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class WrapperPlayServerSelectAdvancementTab extends PacketWrapper<WrapperPlayServerSelectAdvancementTab> {
-    private boolean hasId;
     private @Nullable ResourceLocation identifier;
 
     public WrapperPlayServerSelectAdvancementTab(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerSelectAdvancementTab(boolean hasId, @Nullable ResourceLocation identifier) {
+    public WrapperPlayServerSelectAdvancementTab(@Nullable ResourceLocation identifier) {
         super(PacketType.Play.Server.SELECT_ADVANCEMENT_TAB);
-        this.hasId = hasId;
         this.identifier = identifier;
     }
 
     @Override
     public void read() {
-        hasId = readBoolean();
+        boolean hasId = readBoolean();
         if (hasId) {
             identifier = readIdentifier();
         }
@@ -50,24 +48,16 @@ public class WrapperPlayServerSelectAdvancementTab extends PacketWrapper<Wrapper
 
     @Override
     public void write() {
-        writeBoolean(hasId);
-        if (hasId) {
+        boolean hasTitle = identifier != null;
+        writeBoolean(hasTitle);
+        if (hasTitle) {
             writeIdentifier(identifier);
         }
     }
 
     @Override
     public void copy(WrapperPlayServerSelectAdvancementTab wrapper) {
-        this.hasId = wrapper.hasId;
         this.identifier = wrapper.identifier;
-    }
-
-    public boolean isHasId() {
-        return hasId;
-    }
-
-    public void setHasId(boolean hasId) {
-        this.hasId = hasId;
     }
 
     public Optional<ResourceLocation> getIdentifier() {
