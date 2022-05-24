@@ -16,21 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.wrapper.login.server;
+package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperLoginServerSetCompression extends PacketWrapper<WrapperLoginServerSetCompression> {
+public class WrapperPlayServerSetCompression extends PacketWrapper<WrapperPlayServerSetCompression> {
     private int threshold;
 
-    public WrapperLoginServerSetCompression(PacketSendEvent event) {
+    public WrapperPlayServerSetCompression(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperLoginServerSetCompression(int threshold) {
-        super(PacketType.Login.Server.SET_COMPRESSION);
+    public WrapperPlayServerSetCompression(int threshold) {
+        super(PacketType.Play.Server.SET_COMPRESSION);
         this.threshold = threshold;
     }
 
@@ -45,7 +45,7 @@ public class WrapperLoginServerSetCompression extends PacketWrapper<WrapperLogin
     }
 
     @Override
-    public void copy(WrapperLoginServerSetCompression wrapper) {
+    public void copy(WrapperPlayServerSetCompression wrapper) {
         this.threshold = wrapper.threshold;
     }
 
