@@ -23,6 +23,14 @@ import com.github.retrooper.packetevents.PacketEvents;
 import java.nio.charset.Charset;
 
 public class ByteBufHelper {
+    public static int capacity(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().capacity(buffer);
+    }
+
+    public static Object capacity(Object buffer, int capacity) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().capacity(buffer, capacity);
+    }
+
     public static int readerIndex(Object buffer) {
         return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readerIndex(buffer);
     }
