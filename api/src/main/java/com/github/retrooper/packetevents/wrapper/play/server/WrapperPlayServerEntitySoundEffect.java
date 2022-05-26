@@ -21,64 +21,61 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
-import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServerSoundEffect> {
-    private int soundID;
+public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPlayServerEntitySoundEffect> {
+    private int soundId;
     private SoundCategory soundCategory;
-    private Vector3i effectPosition;
+    private int entityId;
     private float volume;
     private float pitch;
-    public WrapperPlayServerSoundEffect(PacketSendEvent event) {
+
+    public WrapperPlayServerEntitySoundEffect(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerSoundEffect(int soundID, SoundCategory soundCategory,
-                                        Vector3i effectPosition, float volume, float pitch) {
-        super(PacketType.Play.Server.SOUND_EFFECT);
-        this.soundID= soundID;
+    public WrapperPlayServerEntitySoundEffect(int soundId, SoundCategory soundCategory, int entityId, float volume, float pitch) {
+        super(PacketType.Play.Server.ENTITY_SOUND_EFFECT);
+        this.soundId = soundId;
         this.soundCategory = soundCategory;
-        this.effectPosition = effectPosition;
+        this.entityId = entityId;
         this.volume = volume;
         this.pitch = pitch;
     }
 
     @Override
     public void read() {
-        soundID = readVarInt();
-        soundCategory = SoundCategory.VALUES[readVarInt()];
-        effectPosition = new Vector3i(readInt(), readInt(), readInt());
-        volume = readFloat();
-        pitch = readFloat();
-    }
-
-    @Override
-    public void copy(WrapperPlayServerSoundEffect wrapper) {
-        soundID = wrapper.soundID;
-        soundCategory = wrapper.soundCategory;
-        effectPosition = wrapper.effectPosition;
-        volume = wrapper.volume;
-        pitch = wrapper.pitch;
+        this.soundId = readVarInt();
+        this.soundCategory = SoundCategory.VALUES[readVarInt()];
+        this.entityId = readVarInt();
+        this.volume = readFloat();
+        this.pitch = readFloat();
     }
 
     @Override
     public void write() {
-        writeVarInt(soundID);
-        writeVarInt(soundCategory.ordinal());
-        writeInt(effectPosition.x);
-        writeInt(effectPosition.y);
-        writeInt(effectPosition.z);
-        writeFloat(volume);
-        writeFloat(pitch);
+        writeVarInt(this.soundId);
+        writeVarInt(this.soundCategory.ordinal());
+        writeVarInt(this.entityId);
+        writeFloat(this.volume);
+        writeFloat(this.pitch);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerEntitySoundEffect wrapper) {
+        this.soundId = wrapper.soundId;
+        this.soundCategory = wrapper.soundCategory;
+        this.entityId = wrapper.entityId;
+        this.volume = wrapper.volume;
+        this.pitch = wrapper.pitch;
     }
 
     public int getSoundId() {
-        return soundID;
+        return soundId;
     }
 
-    public void setSoundId(int soundID) {
-        this.soundID = soundID;
+    public void setSoundId(int soundId) {
+        this.soundId = soundId;
     }
 
     public SoundCategory getSoundCategory() {
@@ -89,12 +86,12 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         this.soundCategory = soundCategory;
     }
 
-    public Vector3i getEffectPosition() {
-        return effectPosition;
+    public int getEntityId() {
+        return entityId;
     }
 
-    public void setEffectPosition(Vector3i effectPosition) {
-        this.effectPosition = effectPosition;
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
     }
 
     public float getVolume() {
