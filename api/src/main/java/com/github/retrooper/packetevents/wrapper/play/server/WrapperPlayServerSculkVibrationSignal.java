@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
@@ -45,45 +44,17 @@ public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<Wrapper
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.sourcePosition = new Vector3i(readLong());
-        } else {
-            int x = readInt();
-            int y = readShort();
-            int z = readInt();
-            this.sourcePosition = new Vector3i(x, y, z);
-        }
+        this.sourcePosition = new Vector3i(readLong());
         this.destinationIdentifier = readIdentifier();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.blockPosition = new Vector3i(readLong());
-        } else {
-            int x = readInt();
-            int y = readShort();
-            int z = readInt();
-            this.blockPosition = new Vector3i(x, y, z);
-        }
+        this.blockPosition = new Vector3i(readLong());
         this.arrivalTicks = readVarInt();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            long positionVector = this.sourcePosition.getSerializedPosition();
-            writeLong(positionVector);
-        } else {
-            writeInt(this.sourcePosition.x);
-            writeShort(this.sourcePosition.y);
-            writeInt(this.sourcePosition.z);
-        }
+        writeLong(this.sourcePosition.getSerializedPosition());
         writeIdentifier(this.destinationIdentifier);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            long positionVector = this.blockPosition.getSerializedPosition();
-            writeLong(positionVector);
-        } else {
-            writeInt(this.blockPosition.x);
-            writeShort(this.blockPosition.y);
-            writeInt(this.blockPosition.z);
-        }
+        writeLong(this.blockPosition.getSerializedPosition());
         writeVarInt(this.arrivalTicks);
     }
 
