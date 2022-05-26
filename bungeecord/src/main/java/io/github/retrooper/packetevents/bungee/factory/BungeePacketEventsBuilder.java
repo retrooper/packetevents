@@ -27,8 +27,12 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
@@ -113,6 +117,39 @@ public class BungeePacketEventsBuilder {
                 @Override
                 public Object getChannel(@NotNull Object player) {
                     return PacketEvents.getAPI().getProtocolManager().getChannel(((ProxiedPlayer) player).getUniqueId());
+                }
+
+                @Override
+                public User getUser(@NotNull Object player) {
+                    ProxiedPlayer p = (ProxiedPlayer) player;
+                    Object channel = getChannel(p);
+                    User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+
+                    // Creating a user that is offline will memory leak
+                    if (channel == null) return null;
+
+                    if (user == null) {
+                        System.out.println("Usero null???");
+                        user = new User(channel, ConnectionState.PLAY, null, new UserProfile(p.getUniqueId(), p.getName()));
+
+                        synchronized (channel) {
+                            if (!ChannelHelper.isOpen(channel)) {
+                                return null;
+                            }
+
+                            ProtocolManager.USERS.put(channel, user);
+                            PacketEvents.getAPI().getInjector().updateUser(channel, user);
+                        }
+                    }
+
+                    UserProfile profile = user.getProfile();
+                    if (profile.getName() == null) {
+                        profile.setName(p.getName());
+                    }
+                    if (profile.getUUID() == null) {
+                        profile.setUUID(p.getUniqueId());
+                    }
+                    return user;
                 }
             };
 

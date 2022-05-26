@@ -31,7 +31,7 @@ import io.netty.channel.Channel;
 
 public class ServerConnectionInitializer {
     //This can be called on connection refactors. Not specifically on channel initialization,
-    public static void prepareChannel(Channel channel, PacketDecoder decoder, PacketEncoder encoder) {
+    public static void addChannelHandlers(Channel channel, PacketDecoder decoder, PacketEncoder encoder) {
         channel.pipeline().addBefore("packet-decoder", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addBefore("packet-encoder", PacketEvents.ENCODER_NAME, encoder);
     }
@@ -45,9 +45,10 @@ public class ServerConnectionInitializer {
             channel.unsafe().closeForcibly();
             return;
         }
+        ProtocolManager.USERS.put(channel, user);
         PacketDecoder decoder = new PacketDecoder(user);
         PacketEncoder encoder = new PacketEncoder(user);
-        prepareChannel(channel, decoder, encoder);
+        addChannelHandlers(channel, decoder, encoder);
     }
 
     public static void destroyChannel(Channel channel) {
