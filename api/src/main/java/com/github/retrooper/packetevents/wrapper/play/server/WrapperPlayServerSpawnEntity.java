@@ -22,9 +22,10 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -63,14 +64,12 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
         if (v1_9) {
             uuid = Optional.of(readUUID());
-        }
-        else {
+        } else {
             uuid = Optional.empty();
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             entityType = EntityTypes.getById(serverVersion.toClientVersion(), readVarInt());
-        }
-        else {
+        } else {
             int id = readByte();
             entityType = EntityTypes.getByLegacyId(serverVersion.toClientVersion(), id);
             if (entityType == null) // Should not happen but anyway
@@ -83,8 +82,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             x = readDouble();
             y = readDouble();
             z = readDouble();
-        }
-        else {
+        } else {
             x = readInt() / 32.0;
             y = readInt() / 32.0;
             z = readInt() / 32.0;
@@ -100,8 +98,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             double velY = readShort() / VELOCITY_FACTOR;
             double velZ = readShort() / VELOCITY_FACTOR;
             velocity = Optional.of(new Vector3d(velX, velY, velZ));
-        }
-        else {
+        } else {
             velocity = Optional.empty();
         }
     }
@@ -118,16 +115,6 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         velocity = wrapper.velocity;
     }
 
-    private int floor(double value) {
-        int temp = (int) value;
-        return value < (double) temp ? temp - 1 : temp;
-    }
-
-    private int floor(float value) {
-        int temp = (int) value;
-        return value < (float) temp ? temp - 1 : temp;
-    }
-
     @Override
     public void write() {
         writeVarInt(entityID);
@@ -137,8 +124,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             writeVarInt(entityType.getId(serverVersion.toClientVersion()));
-        }
-        else {
+        } else {
             if (entityType.getLegacyId(serverVersion.toClientVersion()) != -1) { // Will always be true if they use correct EntityTypes for this packet
                 writeByte(entityType.getLegacyId(serverVersion.toClientVersion()));
             } else {
@@ -150,14 +136,13 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             writeDouble(position.x);
             writeDouble(position.y);
             writeDouble(position.z);
+        } else {
+            writeInt(MathUtil.floor(position.x * 32.0));
+            writeInt(MathUtil.floor(position.y * 32.0));
+            writeInt(MathUtil.floor(position.z * 32.0));
         }
-        else {
-            writeInt(floor(position.x * 32.0));
-            writeInt(floor(position.y * 32.0));
-            writeInt(floor(position.z * 32.0));
-        }
-        writeByte(floor(yaw * ROTATION_FACTOR));
-        writeByte(floor(pitch * ROTATION_FACTOR));
+        writeByte(MathUtil.floor(yaw * ROTATION_FACTOR));
+        writeByte(MathUtil.floor(pitch * ROTATION_FACTOR));
         writeInt(data);
 
         //On 1.8 check if data > 0 before reading, or it won't be in the packet
