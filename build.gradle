@@ -24,7 +24,7 @@ subprojects {
 
     project.ext.nettyVersion = '4.1.72.Final'
     project.ext.adventureVersion = '4.10.1'
-    project.ext.adventureDependencies=["net.kyori:adventure-api:${adventureVersion}", "net.kyori:adventure-text-serializer-gson:${adventureVersion}", "net.kyori:adventure-text-serializer-legacy:${adventureVersion}", "net.kyori:adventure-text-serializer-gson-legacy-impl:${adventureVersion}"]
+    project.ext.adventureDependencies=["net.kyori:adventure-api:${adventureVersion}", "net.kyori:adventure-text-serializer-gson:${adventureVersion}", "net.kyori:adventure-text-serializer-legacy:${adventureVersion}", "net.kyori:adventure-nbt:${adventureVersion}"]
 
     repositories {
         mavenLocal()
