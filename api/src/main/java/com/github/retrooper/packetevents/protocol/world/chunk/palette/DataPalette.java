@@ -29,9 +29,9 @@ import org.jetbrains.annotations.Nullable;
 public class DataPalette {
     public static final int GLOBAL_PALETTE_BITS_PER_ENTRY = 14;
 
-    private @NotNull Palette palette;
-    private BaseStorage storage;
-    private final PaletteType paletteType;
+    public @NotNull Palette palette;
+    public BaseStorage storage;
+    public final PaletteType paletteType;
 
     public static DataPalette createForChunk() {
         return createEmpty(PaletteType.CHUNK);

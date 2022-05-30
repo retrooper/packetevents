@@ -45,6 +45,7 @@ import io.github.retrooper.packetevents.util.SpigotDataHelper;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -182,6 +183,10 @@ public class PacketEventsPlugin extends JavaPlugin {
                         float forward = steerVehicle.getForward();
                         user.sendMessage(ChatColor.GOLD + "Sideways: " + sideways + ", forward: " + forward);
                         break;
+                    case UPDATE_SIGN:
+                        WrapperPlayClientUpdateSign sign = new WrapperPlayClientUpdateSign(event);
+                        user.sendMessage("Sign is " + sign.getBlockPosition());
+                        break;
                     default:
                         break;
                 }
@@ -220,6 +225,14 @@ public class PacketEventsPlugin extends JavaPlugin {
                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_PAINTING) {
                     WrapperPlayServerSpawnPainting spawnPainting = new WrapperPlayServerSpawnPainting(event);
                     //System.out.println("Painting: " + spawnPainting.getEntityId() + ", " + spawnPainting.getType().name() + ", " + spawnPainting.getPosition().toString() + ", " + spawnPainting.getDirection().name() + ", " + spawnPainting.getUUID().toString());
+                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_ENTITY) {
+                    WrapperPlayServerSpawnEntity spawnEntity = new WrapperPlayServerSpawnEntity(event);
+                    System.out.println("Spawning a new entity of type: " + spawnEntity.getEntityType());
+                } else if (event.getPacketType() == PacketType.Play.Server.BLOCK_CHANGE) {
+                    WrapperPlayServerBlockChange change = new WrapperPlayServerBlockChange(event);
+                    Bukkit.broadcastMessage(change.getBlockState().toString());
+                } else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
+                    WrapperPlayServerChunkData data = new WrapperPlayServerChunkData(event);
                 }
             }
 
@@ -239,7 +252,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
