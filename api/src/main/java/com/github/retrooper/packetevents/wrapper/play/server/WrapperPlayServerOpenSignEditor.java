@@ -25,51 +25,51 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerOpenSignEditor extends PacketWrapper<WrapperPlayServerOpenSignEditor> {
-  private Vector3i position;
+    private Vector3i position;
 
-  public WrapperPlayServerOpenSignEditor(PacketSendEvent event) {
-    super(event);
-  }
-
-  public WrapperPlayServerOpenSignEditor(Vector3i position) {
-    super(PacketType.Play.Server.OPEN_SIGN_EDITOR);
-    this.position = position;
-  }
-
-  @Override
-  public void read() {
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      this.position = new Vector3i(readLong());
-    } else {
-      int x = readInt();
-      int y = readInt();
-      int z = readInt();
-      this.position = new Vector3i(x, y, z);
+    public WrapperPlayServerOpenSignEditor(PacketSendEvent event) {
+        super(event);
     }
-  }
 
-  @Override
-  public void write() {
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      long positionVector = position.getSerializedPosition();
-      writeLong(positionVector);
-    } else {
-      writeInt(position.x);
-      writeInt(position.y);
-      writeInt(position.z);
+    public WrapperPlayServerOpenSignEditor(Vector3i position) {
+        super(PacketType.Play.Server.OPEN_SIGN_EDITOR);
+        this.position = position;
     }
-  }
 
-  @Override
-  public void copy(WrapperPlayServerOpenSignEditor wrapper) {
-    this.position = wrapper.position;
-  }
+    @Override
+    public void read() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            this.position = new Vector3i(readLong());
+        } else {
+            int x = readInt();
+            int y = readInt();
+            int z = readInt();
+            this.position = new Vector3i(x, y, z);
+        }
+    }
 
-  public Vector3i getPosition() {
-    return position;
-  }
+    @Override
+    public void write() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            long positionVector = position.getSerializedPosition();
+            writeLong(positionVector);
+        } else {
+            writeInt(position.x);
+            writeInt(position.y);
+            writeInt(position.z);
+        }
+    }
 
-  public void setPosition(Vector3i position) {
-    this.position = position;
-  }
+    @Override
+    public void copy(WrapperPlayServerOpenSignEditor wrapper) {
+        this.position = wrapper.position;
+    }
+
+    public Vector3i getPosition() {
+        return position;
+    }
+
+    public void setPosition(Vector3i position) {
+        this.position = position;
+    }
 }

@@ -23,37 +23,37 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerCamera extends PacketWrapper<WrapperPlayServerCamera> {
-  private int cameraId;
+    private int cameraId;
 
-  public WrapperPlayServerCamera(PacketSendEvent event) {
-    super(event);
-  }
+    public WrapperPlayServerCamera(PacketSendEvent event) {
+        super(event);
+    }
 
-  public WrapperPlayServerCamera(int cameraId) {
-    super(PacketType.Play.Server.CAMERA);
-    this.cameraId = cameraId;
-  }
+    public WrapperPlayServerCamera(int cameraId) {
+        super(PacketType.Play.Server.CAMERA);
+        this.cameraId = cameraId;
+    }
 
-  @Override
-  public void read() {
-    this.cameraId = readVarInt();
-  }
+    @Override
+    public void read() {
+        this.cameraId = readVarInt();
+    }
 
-  @Override
-  public void write() {
-    writeVarInt(this.cameraId);
-  }
+    @Override
+    public void write() {
+        writeVarInt(this.cameraId);
+    }
 
-  @Override
-  public void copy(WrapperPlayServerCamera wrapper) {
-    this.cameraId = wrapper.cameraId;
-  }
+    @Override
+    public void copy(WrapperPlayServerCamera wrapper) {
+        this.cameraId = wrapper.cameraId;
+    }
 
-  public int getCameraId() {
-    return cameraId;
-  }
+    public int getCameraId() {
+        return cameraId;
+    }
 
-  public void setCameraId(int cameraId) {
-    this.cameraId = cameraId;
-  }
+    public void setCameraId(int cameraId) {
+        this.cameraId = cameraId;
+    }
 }
