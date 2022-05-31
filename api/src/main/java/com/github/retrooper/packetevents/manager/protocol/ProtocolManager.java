@@ -26,15 +26,14 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface ProtocolManager {
-    Map<String, Object> CHANNELS = new ConcurrentHashMap<>();
+    Map<UUID, Object> CHANNELS = new ConcurrentHashMap<>();
     Map<Object, User> USERS = new ConcurrentHashMap<>();
 
     default Collection<User> getUsers() {
@@ -48,17 +47,17 @@ public interface ProtocolManager {
     //Methods to implement
     ProtocolVersion getPlatformVersion();
 
-    void sendPacket(Object channel, Object packet);
+    void sendPacket(Object channel, Object byteBuf);
 
-    void sendPacketSilently(Object channel, Object packet);
+    void sendPacketSilently(Object channel, Object byteBuf);
 
-    void writePacket(Object channel, Object packet);
+    void writePacket(Object channel, Object byteBuf);
 
-    void writePacketSilently(Object channel, Object packet);
+    void writePacketSilently(Object channel, Object byteBuf);
 
-    void receivePacket(Object channel, Object packet);
+    void receivePacket(Object channel, Object byteBuf);
 
-    void receivePacketSilently(Object channel, Object packet);
+    void receivePacketSilently(Object channel, Object byteBuf);
 
     ClientVersion getClientVersion(Object channel);
 
@@ -199,11 +198,13 @@ public interface ProtocolManager {
     }
 
     default void setUser(Object channel, User user) {
-        USERS.put(channel, user);
+        synchronized (channel) {
+            USERS.put(channel, user);
+        }
         PacketEvents.getAPI().getInjector().updateUser(channel, user);
     }
 
-    default Object getChannel(String username) {
-        return CHANNELS.get(username);
+    default Object getChannel(UUID uuid) {
+        return CHANNELS.get(uuid);
     }
 }

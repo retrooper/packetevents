@@ -36,7 +36,7 @@ public class PlayerManagerImpl extends PlayerManagerAbstract {
 
     @Override
     public Object getChannel(@NotNull Object player) {
-        Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(((Player) player).getUsername());
+        Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(((Player) player).getUniqueId());
         if (channel == null) {
             if (CONNECTED_PLAYER == null) {
                 CONNECTED_PLAYER = Reflection
@@ -50,7 +50,10 @@ public class PlayerManagerImpl extends PlayerManagerAbstract {
             Object minecraftConnection = reflectConnectedPlayer.readObject(0, MINECRAFT_CONNECTION_CLASS);
             ReflectionObject reflectConnection = new ReflectionObject(minecraftConnection);
             channel = reflectConnection.readObject(0, Channel.class);
-            ProtocolManager.CHANNELS.put(((Player) player).getUsername(), channel);
+
+            synchronized (channel) {
+                ProtocolManager.CHANNELS.put(((Player) player).getUniqueId(), channel);
+            }
         }
         return channel;
     }

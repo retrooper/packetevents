@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.VersionMapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -334,7 +335,12 @@ public final class PacketType {
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
-            private final int[] ids = new int[SERVERBOUND_PLAY_VERSION_MAPPER.getVersions().length];
+            private final int[] ids;
+
+            Client() {
+                ids = new int[SERVERBOUND_PLAY_VERSION_MAPPER.getVersions().length];
+                Arrays.fill(ids, -1);
+            }
 
             @Nullable
             public static PacketTypeCommon getById(ClientVersion version, int packetId) {
@@ -504,7 +510,12 @@ public final class PacketType {
             TAGS;
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
-            private final int[] ids = new int[CLIENTBOUND_PLAY_VERSION_MAPPER.getVersions().length];
+            private final int[] ids;
+
+            Server() {
+                ids = new int[CLIENTBOUND_PLAY_VERSION_MAPPER.getVersions().length];
+                Arrays.fill(ids, -1);
+            }
 
             public int getId(ClientVersion version) {
                 if (!PREPARED) {

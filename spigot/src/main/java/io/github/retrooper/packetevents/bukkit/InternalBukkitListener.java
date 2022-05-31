@@ -39,6 +39,7 @@ public class InternalBukkitListener implements Listener {
         //In the spigot PlayerManager impl, if there was no user cached,
         //we will create one with help of the Player object.
         User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+        if (user == null) return;
         //By accessing the client version with the player object, we should ensure the client version is valid.
         //In the spigot PlayerManager impl, we ask protocol translation dependencies for the version
         //if we failed to catch it.(shouldn't ever happen really)
@@ -53,6 +54,6 @@ public class InternalBukkitListener implements Listener {
         Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         //When we receive LOGIN_SUCCESS, we cache username with their channel.
         //Here we clean that up.
-        PacketEventsImplHelper.handleDisconnection(channel, player.getName());
+        PacketEventsImplHelper.handleDisconnection(channel, player.getUniqueId());
     }
 }

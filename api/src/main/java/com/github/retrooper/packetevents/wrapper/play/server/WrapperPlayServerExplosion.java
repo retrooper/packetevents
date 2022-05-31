@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -95,9 +96,9 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
             writeInt(records.size());
         }
 
-        int floorX = (int) Math.floor(position.x);
-        int floorY = (int) Math.floor(position.y);
-        int floorZ = (int) Math.floor(position.z);
+        int floorX = MathUtil.floor(position.x);
+        int floorY = MathUtil.floor(position.y);
+        int floorZ = MathUtil.floor(position.z);
 
         for (Vector3i record : records) {
             writeByte(record.x - floorX);

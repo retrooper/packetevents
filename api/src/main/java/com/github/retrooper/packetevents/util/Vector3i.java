@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.world.BlockFace;
 
 /**
  * 3D int Vector.
@@ -191,6 +192,10 @@ public class Vector3i {
 
     public Vector3i add(Vector3i other) {
         return add(other.x, other.y, other.z);
+    }
+
+    public Vector3i offset(BlockFace face) {
+        return add(face.getModX(), face.getModY(), face.getModZ());
     }
 
     public Vector3i subtract(int x, int y, int z) {

@@ -116,12 +116,6 @@ public class PacketEncoder extends MessageToByteEncoder<Object> {
     }
 
     @Override
-    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        PacketEventsImplHelper.handleDisconnection(ctx.channel(), null);
-        super.close(ctx, promise);
-    }
-
-    @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
         //Check if the minecraft server will already print our exception for us.

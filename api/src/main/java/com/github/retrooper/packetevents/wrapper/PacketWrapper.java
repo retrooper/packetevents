@@ -52,7 +52,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class PacketWrapper<T extends PacketWrapper> {
-    public final Object buffer;
+    public Object buffer;
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
     private int packetID;
@@ -64,10 +64,13 @@ public class PacketWrapper<T extends PacketWrapper> {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
 
-    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, Object buffer, int packetID) {
+    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, int packetID) {
+        if (packetID == -1) {
+            throw new IllegalArgumentException("Packet does not exist on this protocol version!");
+        }
         this.clientVersion = clientVersion;
         this.serverVersion = serverVersion;
-        this.buffer = buffer;
+        this.buffer = null;
         this.packetID = packetID;
     }
 
@@ -102,14 +105,13 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public PacketWrapper(int packetID, ClientVersion clientVersion) {
-        this(clientVersion, PacketEvents.getAPI().getServerManager().getVersion(),
-                UnpooledByteBufAllocationHelper.buffer(), packetID);
+        this(clientVersion, PacketEvents.getAPI().getServerManager().getVersion(), packetID);
     }
 
     public PacketWrapper(int packetID) {
         this(ClientVersion.UNKNOWN,
                 PacketEvents.getAPI().getServerManager().getVersion(),
-                UnpooledByteBufAllocationHelper.buffer(), packetID);
+                packetID);
     }
 
     public PacketWrapper(PacketTypeCommon packetType) {
@@ -117,10 +119,18 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public static PacketWrapper<?> createUniversalPacketWrapper(Object byteBuf) {
-        return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), byteBuf, -1);
+        PacketWrapper<?> wrapper = new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), -2);
+        wrapper.buffer = byteBuf;
+        return wrapper;
     }
 
     public final void prepareForSend() {
+        // Null means the packet was manually created and wasn't sent by the server itself
+        // A reference count of 0 means that the packet was freed (it was already sent)
+        if (buffer == null || ByteBufHelper.refCnt(buffer) == 0) {
+            buffer = UnpooledByteBufAllocationHelper.buffer();
+        }
+
         if (!hasPreparedForSending) {
             writeVarInt(packetID);
             write();
@@ -131,6 +141,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void read() {
     }
 
+    //TODO Rename to copyFrom, as it copies data from the passed in wrapper.
     public void copy(T wrapper) {
 
     }

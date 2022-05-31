@@ -199,4 +199,8 @@ public class ParticleTypes {
     public static final ParticleType WAX_OFF = define("wax_off");
     public static final ParticleType ELECTRIC_SPARK = define("electric_spark");
     public static final ParticleType SCRAPE = define("scrape");
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
+    }
 }

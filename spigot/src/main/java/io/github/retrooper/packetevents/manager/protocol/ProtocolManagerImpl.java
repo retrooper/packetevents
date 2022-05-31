@@ -46,45 +46,53 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public void sendPacket(Object channel, Object packet) {
+    public void sendPacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
             //When ProtocolSupport is available, and we send a message through their logic handler,
             //we must retain the message.
-            if (ProtocolSupportUtil.isAvailable() && packet instanceof ByteBuf) {
-                ((ByteBuf) packet).retain();
+            if (ProtocolSupportUtil.isAvailable() && byteBuf instanceof ByteBuf) {
+                ((ByteBuf) byteBuf).retain();
             }
-            ChannelHelper.writeAndFlush(channel, packet);
+            ChannelHelper.writeAndFlush(channel, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
-    public void sendPacketSilently(Object channel, Object packet) {
+    public void sendPacketSilently(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
             //Only call the encoders after ours in the pipeline.
             //Here we do not need to retain when ProtocolSupport is present
-            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, packet);
+            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
-    public void writePacket(Object channel, Object packet) {
+    public void writePacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
             //Write to all encoders.
             //When ProtocolSupport is available, and we send a message through their logic handler,
             //we must retain the message.
-            if (ProtocolSupportUtil.isAvailable() && packet instanceof ByteBuf) {
-                ((ByteBuf) packet).retain();
+            if (ProtocolSupportUtil.isAvailable() && byteBuf instanceof ByteBuf) {
+                ((ByteBuf) byteBuf).retain();
             }
-            ChannelHelper.write(channel, packet);
+            ChannelHelper.write(channel, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
-    public void writePacketSilently(Object channel, Object packet) {
+    public void writePacketSilently(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
             //Only call the encoders after ours in the pipeline
             //Here we do not need to retain when ProtocolSupport is present
-            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, packet);
+            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
@@ -112,6 +120,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
                     ChannelHelper.fireChannelReadInContext(channel, "splitter", byteBuf);
                 }
             }
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 

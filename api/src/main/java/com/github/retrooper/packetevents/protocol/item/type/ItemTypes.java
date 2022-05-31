@@ -1313,4 +1313,8 @@ public class ItemTypes {
             return this;
         }
     }
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
+    }
 }

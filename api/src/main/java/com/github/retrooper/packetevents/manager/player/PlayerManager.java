@@ -32,7 +32,7 @@ public interface PlayerManager {
 
     Object getChannel(@NotNull Object player);
 
-    @NotNull User getUser(@NotNull Object player);
+    User getUser(@NotNull Object player);
 
     default ConnectionState getConnectionState(@NotNull Object player) {
         return getUser(player).getConnectionState();

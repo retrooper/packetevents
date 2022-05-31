@@ -23,50 +23,50 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerTimeUpdate extends PacketWrapper<WrapperPlayServerTimeUpdate> {
-  private long worldAge;
-  private long timeOfDay;
+    private long worldAge;
+    private long timeOfDay;
 
-  public WrapperPlayServerTimeUpdate(PacketSendEvent event) {
-    super(event);
-  }
+    public WrapperPlayServerTimeUpdate(PacketSendEvent event) {
+        super(event);
+    }
 
-  public WrapperPlayServerTimeUpdate(long worldAge, long timeOfDay) {
-    super(PacketType.Play.Server.TIME_UPDATE);
-    this.worldAge = worldAge;
-    this.timeOfDay = timeOfDay;
-  }
+    public WrapperPlayServerTimeUpdate(long worldAge, long timeOfDay) {
+        super(PacketType.Play.Server.TIME_UPDATE);
+        this.worldAge = worldAge;
+        this.timeOfDay = timeOfDay;
+    }
 
-  @Override
-  public void read() {
-    this.worldAge = readLong();
-    this.timeOfDay = readLong();
-  }
+    @Override
+    public void read() {
+        this.worldAge = readLong();
+        this.timeOfDay = readLong();
+    }
 
-  @Override
-  public void write() {
-    writeLong(this.worldAge);
-    writeLong(this.timeOfDay);
-  }
+    @Override
+    public void write() {
+        writeLong(this.worldAge);
+        writeLong(this.timeOfDay);
+    }
 
-  @Override
-  public void copy(WrapperPlayServerTimeUpdate wrapper) {
-    this.worldAge = wrapper.worldAge;
-    this.timeOfDay = wrapper.timeOfDay;
-  }
+    @Override
+    public void copy(WrapperPlayServerTimeUpdate wrapper) {
+        this.worldAge = wrapper.worldAge;
+        this.timeOfDay = wrapper.timeOfDay;
+    }
 
-  public long getWorldAge() {
-    return worldAge;
-  }
+    public long getWorldAge() {
+        return worldAge;
+    }
 
-  public void setWorldAge(long worldAge) {
-    this.worldAge = worldAge;
-  }
+    public void setWorldAge(long worldAge) {
+        this.worldAge = worldAge;
+    }
 
-  public long getTimeOfDay() {
-    return timeOfDay;
-  }
+    public long getTimeOfDay() {
+        return timeOfDay;
+    }
 
-  public void setTimeOfDay(long timeOfDay) {
-    this.timeOfDay = timeOfDay;
-  }
+    public void setTimeOfDay(long timeOfDay) {
+        this.timeOfDay = timeOfDay;
+    }
 }

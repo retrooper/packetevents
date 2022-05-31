@@ -286,4 +286,9 @@ public class EntityTypes {
     public static final EntityType MINECART_TNT = define("minecart_tnt", MINECART_ABSTRACT);
     public static final EntityType MINECART_HOPPER = define("minecart_hopper", MINECART_ABSTRACT);
     public static final EntityType MINECART_MOB_SPAWNER = define("minecart_mob_spawner", MINECART_ABSTRACT);
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
+        LEGACY_TYPES_BUILDER.unloadFileMappings();
+    }
 }
