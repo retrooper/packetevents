@@ -33,11 +33,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 @ChannelHandler.Sharable
-public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
+public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public User user;
     public ProxiedPlayer player;
 
-    public PacketDecoder(User user) {
+    public PacketEventsDecoder(User user) {
         this.user = user;
     }
 

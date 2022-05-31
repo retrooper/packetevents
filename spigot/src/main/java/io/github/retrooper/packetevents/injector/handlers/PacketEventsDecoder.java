@@ -36,7 +36,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PacketDecoder extends ByteToMessageDecoder {
+public class PacketEventsDecoder extends ByteToMessageDecoder {
     public User user;
     public volatile Player player;
 
@@ -45,11 +45,11 @@ public class PacketDecoder extends ByteToMessageDecoder {
     public boolean handledCompression;
     public boolean skipDoubleTransform;
 
-    public PacketDecoder(User user) {
+    public PacketEventsDecoder(User user) {
         this.user = user;
     }
 
-    public PacketDecoder(PacketDecoder decoder) {
+    public PacketEventsDecoder(PacketEventsDecoder decoder) {
         user = decoder.user;
         player = decoder.player;
     }
@@ -150,8 +150,8 @@ public class PacketDecoder extends ByteToMessageDecoder {
             //Let us relocate and no longer deal with compression.
             ChannelHandler encoder = ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
             ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
-            PacketDecoder decoder = (PacketDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
-            ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, new PacketDecoder(decoder));
+            PacketEventsDecoder decoder = (PacketEventsDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
+            ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, new PacketEventsDecoder(decoder));
             return true;
         }
         return false;

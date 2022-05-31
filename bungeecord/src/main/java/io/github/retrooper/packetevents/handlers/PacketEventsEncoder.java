@@ -25,9 +25,7 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
-import io.github.retrooper.packetevents.injector.ServerConnectionInitializer;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
@@ -38,12 +36,12 @@ import java.lang.reflect.InvocationTargetException;
 
 //Thanks to ViaVersion for the compression method.
 @ChannelHandler.Sharable
-public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
+public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
     public ProxiedPlayer player;
     public User user;
     public boolean handledCompression;
 
-    public PacketEncoder(User user) {
+    public PacketEventsEncoder(User user) {
         this.user = user;
     }
 
@@ -104,8 +102,8 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
                     }
                 }
                 //Relocate handlers
-                PacketDecoder decoder = (PacketDecoder) pipe.remove(PacketEvents.DECODER_NAME);
-                PacketEncoder encoder = (PacketEncoder) pipe.remove(PacketEvents.ENCODER_NAME);
+                PacketEventsDecoder decoder = (PacketEventsDecoder) pipe.remove(PacketEvents.DECODER_NAME);
+                PacketEventsEncoder encoder = (PacketEventsEncoder) pipe.remove(PacketEvents.ENCODER_NAME);
                 pipe.addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
                 pipe.addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
                 System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));

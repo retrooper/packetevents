@@ -29,11 +29,11 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 @ChannelHandler.Sharable
-public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
+public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
     public Player player;
     public User user;
 
-    public PacketEncoder(User user) {
+    public PacketEventsEncoder(User user) {
         this.user = user;
     }
 
