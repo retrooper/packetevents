@@ -50,11 +50,7 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
     }
 
     public WrapperPlayServerSpawnPainting(int entityId, @Nullable UUID uuid, Vector3i position, Direction direction) {
-        super(PacketType.Play.Server.SPAWN_PAINTING);
-        this.entityId = entityId;
-        this.uuid = uuid;
-        this.position = position;
-        this.direction = direction;
+        this(entityId, uuid, null, position, direction);
     }
 
     public WrapperPlayServerSpawnPainting(int entityId, @Nullable UUID uuid, @Nullable PaintingType type, Vector3i position, Direction direction) {
@@ -71,6 +67,8 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         this.entityId = readVarInt();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             this.uuid = readUUID();
+        } else {
+            this.uuid = new UUID(0L, 0L);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             this.type = PaintingType.getById(readVarInt());
@@ -135,11 +133,11 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         this.entityId = entityId;
     }
 
-    public Optional<UUID> getUuid() {
+    public Optional<UUID> getUUID() {
         return Optional.ofNullable(uuid);
     }
 
-    public void setUuid(@Nullable UUID uuid) {
+    public void setUUID(@Nullable UUID uuid) {
         this.uuid = uuid;
     }
 
