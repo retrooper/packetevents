@@ -23,22 +23,27 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<WrapperPlayServerSculkVibrationSignal> {
     private Vector3i sourcePosition;
     private ResourceLocation destinationIdentifier;
-    private Vector3i blockPosition;
+    private @Nullable Vector3i blockPosition;
+    private int entityId;
     private int arrivalTicks;
 
     public WrapperPlayServerSculkVibrationSignal(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerSculkVibrationSignal(Vector3i sourcePosition, ResourceLocation destinationIdentifier, Vector3i blockPosition, int arrivalTicks) {
+    public WrapperPlayServerSculkVibrationSignal(Vector3i sourcePosition, ResourceLocation destinationIdentifier, Vector3i blockPosition, int entityId, int arrivalTicks) {
         super(PacketType.Play.Server.SCULK_VIBRATION_SIGNAL);
         this.sourcePosition = sourcePosition;
         this.destinationIdentifier = destinationIdentifier;
         this.blockPosition = blockPosition;
+        this.entityId = entityId;
         this.arrivalTicks = arrivalTicks;
     }
 
@@ -46,7 +51,11 @@ public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<Wrapper
     public void read() {
         this.sourcePosition = new Vector3i(readLong());
         this.destinationIdentifier = readIdentifier();
-        this.blockPosition = new Vector3i(readLong());
+        if (this.destinationIdentifier.getKey().contains("block")) {
+            this.blockPosition = new Vector3i(readLong());
+        } else {
+            this.entityId = readVarInt();
+        }
         this.arrivalTicks = readVarInt();
     }
 
@@ -54,7 +63,11 @@ public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<Wrapper
     public void write() {
         writeLong(this.sourcePosition.getSerializedPosition());
         writeIdentifier(this.destinationIdentifier);
-        writeLong(this.blockPosition.getSerializedPosition());
+        if (this.destinationIdentifier.getKey().contains("block")) {
+            writeLong(this.blockPosition.getSerializedPosition());
+        } else {
+            writeVarInt(this.entityId);
+        }
         writeVarInt(this.arrivalTicks);
     }
 
@@ -63,6 +76,7 @@ public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<Wrapper
         this.sourcePosition = wrapper.sourcePosition;
         this.destinationIdentifier = wrapper.destinationIdentifier;
         this.blockPosition = wrapper.blockPosition;
+        this.entityId = wrapper.entityId;
         this.arrivalTicks = wrapper.arrivalTicks;
     }
 
@@ -82,12 +96,20 @@ public class WrapperPlayServerSculkVibrationSignal extends PacketWrapper<Wrapper
         this.destinationIdentifier = destinationIdentifier;
     }
 
-    public Vector3i getBlockPosition() {
-        return blockPosition;
+    public Optional<Vector3i> getBlockPosition() {
+        return Optional.ofNullable(blockPosition);
     }
 
-    public void setBlockPosition(Vector3i blockPosition) {
+    public void setBlockPosition(@Nullable Vector3i blockPosition) {
         this.blockPosition = blockPosition;
+    }
+
+    public int getEntityId() {
+        return entityId;
+    }
+
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
     }
 
     public int getArrivalTicks() {
