@@ -33,7 +33,7 @@ import java.util.UUID;
 // Mostly from MCProtocolLib
 public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlayServerSpawnPainting> {
     private int entityId;
-    private @Nullable UUID uuid;
+    private UUID uuid;
     private @Nullable PaintingType type;
     private Vector3i position;
     private Direction direction;
@@ -43,17 +43,14 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
     }
 
     public WrapperPlayServerSpawnPainting(int entityId, Vector3i position, Direction direction) {
-        super(PacketType.Play.Server.SPAWN_PAINTING);
-        this.entityId = entityId;
-        this.position = position;
-        this.direction = direction;
+        this(entityId, new UUID(0L, 0L), null, position, direction);
     }
 
-    public WrapperPlayServerSpawnPainting(int entityId, @Nullable UUID uuid, Vector3i position, Direction direction) {
+    public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, Vector3i position, Direction direction) {
         this(entityId, uuid, null, position, direction);
     }
 
-    public WrapperPlayServerSpawnPainting(int entityId, @Nullable UUID uuid, @Nullable PaintingType type, Vector3i position, Direction direction) {
+    public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, @Nullable PaintingType type, Vector3i position, Direction direction) {
         super(PacketType.Play.Server.SPAWN_PAINTING);
         this.entityId = entityId;
         this.uuid = uuid;
@@ -133,11 +130,11 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         this.entityId = entityId;
     }
 
-    public Optional<UUID> getUUID() {
-        return Optional.ofNullable(uuid);
+    public UUID getUUID() {
+        return uuid;
     }
 
-    public void setUUID(@Nullable UUID uuid) {
+    public void setUUID(UUID uuid) {
         this.uuid = uuid;
     }
 
