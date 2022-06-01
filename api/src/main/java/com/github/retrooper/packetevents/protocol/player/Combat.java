@@ -19,9 +19,9 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 public enum Combat {
-  ENTER_COMBAT,
-  END_COMBAT,
-  ENTITY_DEAD;
+    ENTER_COMBAT,
+    END_COMBAT,
+    ENTITY_DEAD;
 
-  public static final Combat[] VALUES = values();
+    public static final Combat[] VALUES = values();
 }
