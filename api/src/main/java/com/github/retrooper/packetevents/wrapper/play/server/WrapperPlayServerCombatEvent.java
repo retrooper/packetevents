@@ -91,8 +91,9 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
                 writeInt(entityId);
                 writeComponent(deathMessage);
                 break;
+            case ENTER_COMBAT:
             default:
-                throw new UnsupportedOperationException("This combat id does not exist.");
+                break;
         }
     }
 
