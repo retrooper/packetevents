@@ -38,12 +38,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @ChannelHandler.Sharable
-public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
+public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     private static Enum<?> VELOCITY_CONNECTION_EVENT_CONSTANT;
     public User user;
     public Player player;
     public boolean handledCompression;
-    public PacketDecoder(User user) {
+    public PacketEventsDecoder(User user) {
         this.user = user;
     }
 
@@ -91,9 +91,9 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         if (event == VELOCITY_CONNECTION_EVENT_CONSTANT && !handledCompression) {
             System.out.println("constant: " + VELOCITY_CONNECTION_EVENT_CONSTANT.name());
             ChannelPipeline pipe = ctx.pipeline();
-            PacketEncoder encoder = (PacketEncoder) pipe.remove(PacketEvents.ENCODER_NAME);
+            PacketEventsEncoder encoder = (PacketEventsEncoder) pipe.remove(PacketEvents.ENCODER_NAME);
             pipe.addBefore("minecraft-encoder", PacketEvents.ENCODER_NAME, encoder);
-            PacketDecoder decoder = (PacketDecoder) pipe.remove(PacketEvents.DECODER_NAME);
+            PacketEventsDecoder decoder = (PacketEventsDecoder) pipe.remove(PacketEvents.DECODER_NAME);
             pipe.addBefore("minecraft-decoder", PacketEvents.DECODER_NAME, decoder);
             System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
             handledCompression = true;

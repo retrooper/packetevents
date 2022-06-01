@@ -40,13 +40,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ChannelHandler.Sharable
-public class PacketEncoder extends MessageToByteEncoder<Object> {
+public class PacketEventsEncoder extends MessageToByteEncoder<Object> {
     public User user;
     public volatile Player player;
     public MessageToByteEncoder<?> vanillaEncoder;
     public final List<Runnable> queuedPostTasks = new ArrayList<>();
 
-    public PacketEncoder(User user) {
+    public PacketEventsEncoder(User user) {
         this.user = user;
     }
 
