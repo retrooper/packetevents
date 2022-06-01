@@ -29,6 +29,7 @@ import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
+import com.github.retrooper.packetevents.util.PEVersion;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
@@ -179,7 +180,23 @@ public class SpigotPacketEventsBuilder {
                 // PacketEvents is now enabled, we can now check
                 ViaVersionUtil.checkIfViaIsPresent();
                 ProtocolSupportUtil.checkIfProtocolSupportIsPresent();
-                //If ProtocolLib is present, it needs to be v5.0.0
+                //If ProtocolSupport is present, it needs to be x or newer
+                Plugin protocolSupportPlugin = Bukkit.getPluginManager().getPlugin("ProtocolSupport");
+                if (protocolSupportPlugin != null) {
+                    String psVersionString = protocolSupportPlugin.getDescription().getVersion().split("-")[0];
+                    PEVersion psVersion = new PEVersion(psVersionString);
+                    PEVersion minimumPSVersion = new PEVersion(1, 18, 1);
+                    if (psVersion.isOlderThan(minimumPSVersion)) {
+                        PacketEvents.getAPI().getLogManager().severe("You are attempting to combine 2.0 PacketEvents with a " +
+                                "ProtocolSupport version older than v1.18.1-1. " +
+                                "This is no longer works, please update to a newer build. " +
+                                "https://ci.dmulloy2.net/job/ProtocolLib/lastBuild/");
+                        Plugin ourPlugin = getPlugin();
+                        Bukkit.getPluginManager().disablePlugin(ourPlugin);
+                        throw new IllegalStateException("ProtocolSupport incompatibility! Update to v1.18.1-1 or newer!");
+                    }
+                }
+                //If ProtocolLib is present, it needs to be v5.0.0 or newer
                 Plugin protocolLibPlugin = Bukkit.getPluginManager().getPlugin("ProtocolLib");
                 if (protocolLibPlugin != null) {
                     int majorVersion = Integer.parseInt(protocolLibPlugin.getDescription().getVersion().split("\\.", 2)[0]);
@@ -190,7 +207,7 @@ public class SpigotPacketEventsBuilder {
                                 "https://ci.dmulloy2.net/job/ProtocolLib/lastBuild/");
                         Plugin ourPlugin = getPlugin();
                         Bukkit.getPluginManager().disablePlugin(ourPlugin);
-                        throw new IllegalStateException("ProtocolLib incompatibility! Update to v5.0.0!");
+                        throw new IllegalStateException("ProtocolLib incompatibility! Update to v5.0.0 or newer!");
                     }
                 }
             }
