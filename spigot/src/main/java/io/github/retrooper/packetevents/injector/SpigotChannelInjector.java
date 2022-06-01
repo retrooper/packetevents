@@ -158,6 +158,7 @@ public class SpigotChannelInjector implements ChannelInjector {
         else if (pipeline.get("floodgate-init") != null) {
             pipeline.addAfter("floodgate-init", PacketEvents.CONNECTION_HANDLER_NAME, new ServerChannelHandler());
         }
+        //Some forks add a handler which adds the other necessary vanilla handlers like (decoder, encoder, etc...)
         else if (pipeline.get("MinecraftPipeline#0") != null) {
             pipeline.addAfter("MinecraftPipeline#0", PacketEvents.CONNECTION_HANDLER_NAME, new ServerChannelHandler());
         }
