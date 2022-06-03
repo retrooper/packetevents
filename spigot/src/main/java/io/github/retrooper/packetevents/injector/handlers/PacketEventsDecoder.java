@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.injector.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
@@ -100,6 +101,7 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
                     Object input = out.get(0);
                     out.clear();
                     out.addAll(CustomPipelineUtil.callDecode(mcDecoder, ctx, input));
+                    ByteBufHelper.release(input); // Idk why this is needed, but it fixes a memory leak
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 }
