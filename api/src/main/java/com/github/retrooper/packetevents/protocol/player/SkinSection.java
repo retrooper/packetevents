@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
+// This is an immutable container for a masking byte
 public final class SkinSection {
 
     public static final SkinSection CAPE = new SkinSection(1 << 0);

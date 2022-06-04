@@ -46,7 +46,7 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
     @Override
     public void read() {
         this.soundId = readVarInt();
-        this.soundCategory = SoundCategory.VALUES[readVarInt()];
+        this.soundCategory = SoundCategory.fromId(readVarInt());
         this.entityId = readVarInt();
         this.volume = readFloat();
         this.pitch = readFloat();

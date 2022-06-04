@@ -137,12 +137,12 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         relativeMask = flag.set(relativeMask, relative);
     }
 
-    public Set<RelativeFlag> getRelativeFlags() {
-        return RelativeFlag.getRelativeFlagsByMask(relativeMask);
+    public RelativeFlag getRelativeFlags() {
+        return new RelativeFlag(relativeMask);
     }
 
-    public void setRelativeFlags(Set<RelativeFlag> flags) {
-        relativeMask = RelativeFlag.getMaskByRelativeFlags(flags);
+    public void setRelativeFlags(RelativeFlag flags) {
+        relativeMask = flags.getMask();
     }
 
     public int getTeleportId() {

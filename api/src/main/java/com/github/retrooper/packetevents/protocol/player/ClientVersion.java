@@ -96,6 +96,7 @@ public enum ClientVersion {
 
     UNKNOWN(-1, true);
 
+    private static final ClientVersion[] VALUES = values();
     private static final ClientVersion[] REVERSED_VALUES;
 
     static {
@@ -159,10 +160,6 @@ public enum ClientVersion {
         return name;
     }
 
-    public static ClientVersion[] reversedValues() {
-        return REVERSED_VALUES;
-    }
-
     /**
      * Get a ClientVersion enum by protocol version.
      *
@@ -176,7 +173,7 @@ public enum ClientVersion {
         } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
         } else {
-            for (ClientVersion version : values()) {
+            for (ClientVersion version : VALUES) {
                 if (version.protocolVersion > protocolVersion) {
                     break;
                 } else if (version.protocolVersion == protocolVersion) {
@@ -193,7 +190,7 @@ public enum ClientVersion {
     }
 
     public static ClientVersion getOldest() {
-        return values()[0];
+        return VALUES[0];
     }
 
     @Deprecated
@@ -234,7 +231,7 @@ public enum ClientVersion {
      * @return Is this client version newer than or equal to the compared client version.
      */
     public boolean isNewerThanOrEquals(ClientVersion target) {
-        return this == target || isNewerThan(target);
+        return this.protocolVersion >= target.protocolVersion;
     }
 
     /**
@@ -258,6 +255,6 @@ public enum ClientVersion {
      * @return Is this client version older than or equal to the compared client version.
      */
     public boolean isOlderThanOrEquals(ClientVersion target) {
-        return this == target || isOlderThan(target);
+        return this.protocolVersion <= target.protocolVersion;
     }
 }

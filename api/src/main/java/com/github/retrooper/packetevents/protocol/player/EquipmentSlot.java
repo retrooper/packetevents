@@ -29,6 +29,8 @@ public enum EquipmentSlot {
     CHESTPLATE(3),
     HELMET(4);
 
+    private static final EquipmentSlot[] VALUES = values();
+
     private final byte legacyId;
 
     EquipmentSlot(int legacyId) {
@@ -46,7 +48,8 @@ public enum EquipmentSlot {
 
     @Nullable
     public static EquipmentSlot getById(ServerVersion version, int id) {
-        for (EquipmentSlot slot : values()) {
+        // FIXME: try making this O(1)
+        for (EquipmentSlot slot : VALUES) {
             if (slot.getId(version) == id) {
                 return slot;
             }
