@@ -114,6 +114,8 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         visibleSkinSectionMask = wrapper.visibleSkinSectionMask;
         hand = wrapper.hand;
         textFilteringEnabled = wrapper.textFilteringEnabled;
+        allowServerListings = wrapper.allowServerListings;
+        ignoredDifficulty = wrapper.ignoredDifficulty;
     }
 
     @Override
