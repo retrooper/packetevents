@@ -93,6 +93,7 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
                     Object input = out.get(0);
                     out.clear();
                     out.addAll(CustomPipelineUtil.callDecode(decoder, ctx, input));
+                    ByteBufHelper.release(input); // Decode doesn't free, so we must do it
                 }
             }
             if (mcDecoder != null && !out.isEmpty()) {
@@ -101,7 +102,7 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
                     Object input = out.get(0);
                     out.clear();
                     out.addAll(CustomPipelineUtil.callDecode(mcDecoder, ctx, input));
-                    ByteBufHelper.release(input); // Idk why this is needed, but it fixes a memory leak
+                    ByteBufHelper.release(input); // Decode doesn't free, so we must do it
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 }
