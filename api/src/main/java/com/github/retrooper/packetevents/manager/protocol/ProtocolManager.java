@@ -46,20 +46,49 @@ public interface ProtocolManager {
 
     //Methods to implement
     ProtocolVersion getPlatformVersion();
-
     void sendPacket(Object channel, Object byteBuf);
-
     void sendPacketSilently(Object channel, Object byteBuf);
-
     void writePacket(Object channel, Object byteBuf);
-
     void writePacketSilently(Object channel, Object byteBuf);
-
     void receivePacket(Object channel, Object byteBuf);
-
     void receivePacketSilently(Object channel, Object byteBuf);
-
     ClientVersion getClientVersion(Object channel);
+
+    default void sendPackets(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            sendPacket(channel, buf);
+        }
+    }
+
+    default void sendPacketsSilently(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            sendPacketSilently(channel, buf);
+        }
+    }
+
+    default void writePackets(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            writePacket(channel, buf);
+        }
+    }
+
+    default void writePacketsSilently(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            writePacketSilently(channel, buf);
+        }
+    }
+
+    default void receivePackets(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            receivePacket(channel, buf);
+        }
+    }
+
+    default void receivePacketsSilently(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            receivePacketSilently(channel, buf);
+        }
+    }
 
     //TODO Make it clear that this only updates the connection state in our user.
     //Sometimes you should use getInjector().changeConnectionState because that can allow the injector to make adjustments.
@@ -73,52 +102,46 @@ public interface ProtocolManager {
         getUser(channel).setClientVersion(version);
     }
 
-    default void sendPacket(Object channel, PacketWrapper<?> wrapper) {
+    default Object[] transformWrappers(PacketWrapper<?> wrapper) {
+        //It is possible that our packet transformer util decides to transform one wrapper into multiple packets.
+        //(Correcting some mistakes on your end)
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            sendPacket(channel, packet.buffer);
+        Object[] buffers = new Object[wrappers.length];
+        for (int i = 0; i < wrappers.length; i++) {
+            wrappers[i].prepareForSend();
+            buffers[i] = wrappers[i].buffer;
         }
+        return buffers;
+    }
+
+    default void sendPacket(Object channel, PacketWrapper<?> wrapper) {
+        Object[] transformed = transformWrappers(wrapper);
+        sendPackets(channel, transformed);
     }
 
     default void sendPacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            sendPacketSilently(channel, packet.buffer);
-        }
+        Object[] transformed = transformWrappers(wrapper);
+        sendPacketsSilently(channel, transformed);
     }
 
     default void writePacket(Object channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            writePacket(channel, packet.buffer);
-        }
+        Object[] transformed = transformWrappers(wrapper);
+        writePackets(channel, transformed);
     }
 
     default void writePacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            writePacketSilently(channel, packet.buffer);
-        }
+        Object[] transformed = transformWrappers(wrapper);
+        writePacketsSilently(channel, transformed);
     }
 
     default void receivePacket(Object channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            receivePacket(channel, packet.buffer);
-        }
+        Object[] transformed = transformWrappers(wrapper);
+        receivePackets(channel, transformed);
     }
 
     default void receivePacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            receivePacketSilently(channel, packet.buffer);
-        }
+        Object[] transformed = transformWrappers(wrapper);
+        receivePacketsSilently(channel, transformed);
     }
 
     default User getUser(Object channel) {
