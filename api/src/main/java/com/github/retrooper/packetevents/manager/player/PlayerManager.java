@@ -41,96 +41,47 @@ public interface PlayerManager {
     default void sendPacket(@NotNull Object player, @NotNull Object byteBuf) {
         PacketEvents.getAPI().getProtocolManager().sendPacket(getChannel(player), byteBuf);
     }
-
-    default void sendPacketAsync(@NotNull Object player, @NotNull Object byteBuf) {
-        PacketEvents.getAPI().getProtocolManager().sendPacketAsync(getChannel(player), byteBuf);
-    }
-
     default void sendPacket(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().sendPacket(getChannel(player), wrapper);
-    }
-
-    default void sendPacketAsync(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().sendPacketAsync(getChannel(player), wrapper);
     }
 
     default void sendPacketSilently(@NotNull Object player, @NotNull Object byteBuf) {
         PacketEvents.getAPI().getProtocolManager().sendPacketSilently(getChannel(player), byteBuf);
     }
 
-    default void sendPacketSilentlyAsync(@NotNull Object player, @NotNull Object byteBuf) {
-        PacketEvents.getAPI().getProtocolManager().sendPacketSilentlyAsync(getChannel(player), byteBuf);
-    }
-
     default void sendPacketSilently(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().sendPacketSilently(getChannel(player), wrapper);
-    }
-
-    default void sendPacketSilentlyAsync(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().sendPacketSilentlyAsync(getChannel(player), wrapper);
     }
 
     default void writePacket(@NotNull Object player, @NotNull Object byteBuf) {
         PacketEvents.getAPI().getProtocolManager().writePacket(getChannel(player), byteBuf);
     }
 
-    default void writePacketAsync(@NotNull Object player, @NotNull Object byteBuf) {
-        PacketEvents.getAPI().getProtocolManager().writePacketAsync(getChannel(player), byteBuf);
-    }
-
     default void writePacket(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().writePacket(getChannel(player), wrapper);
-    }
-
-    default void writePacketAsync(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().writePacketAsync(getChannel(player), wrapper);
     }
 
     default void writePacketSilently(@NotNull Object player, @NotNull Object byteBuf) {
         PacketEvents.getAPI().getProtocolManager().writePacketSilently(getChannel(player), byteBuf);
     }
 
-    default void writePacketSilentlyAsync(@NotNull Object player, @NotNull Object byteBuf) {
-        PacketEvents.getAPI().getProtocolManager().writePacketSilentlyAsync(getChannel(player), byteBuf);
-    }
-
     default void writePacketSilently(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().writePacketSilently(getChannel(player), wrapper);
-    }
-
-    default void writePacketSilentlyAsync(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().writePacketSilentlyAsync(getChannel(player), wrapper);
     }
 
     default void receivePacket(Object player, Object byteBuf) {
         PacketEvents.getAPI().getProtocolManager().receivePacket(getChannel(player), byteBuf);
     }
 
-    default void receivePacketAsync(Object player, Object byteBuf) {
-        PacketEvents.getAPI().getProtocolManager().receivePacketAsync(getChannel(player), byteBuf);
-    }
-
     default void receivePacket(Object player, PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().receivePacket(getChannel(player), wrapper);
-    }
-
-    default void receivePacketAsync(Object player, PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().receivePacketAsync(getChannel(player), wrapper);
     }
 
     default void receivePacketSilently(Object player, Object byteBuf) {
         PacketEvents.getAPI().getProtocolManager().receivePacketSilently(getChannel(player), byteBuf);
     }
 
-    default void receivePacketSilentlyAsync(Object player, Object byteBuf) {
-        PacketEvents.getAPI().getProtocolManager().receivePacketSilentlyAsync(getChannel(player), byteBuf);
-    }
-
     default void receivePacketSilently(Object player, PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().receivePacketSilently(getChannel(player), wrapper);
-    }
-
-    default void receivePacketSilentlyAsync(Object player, PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().receivePacketSilentlyAsync(getChannel(player), wrapper);
     }
 }

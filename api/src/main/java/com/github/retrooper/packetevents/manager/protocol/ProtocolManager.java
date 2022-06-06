@@ -61,42 +61,6 @@ public interface ProtocolManager {
 
     ClientVersion getClientVersion(Object channel);
 
-    default void sendPacketAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            sendPacket(channel, byteBuf);
-        });
-    }
-
-    default void sendPacketSilentlyAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            sendPacketSilently(channel, byteBuf);
-        });
-    }
-
-    default void writePacketAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            writePacket(channel, byteBuf);
-        });
-    }
-
-    default void writePacketSilentlyAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            writePacketSilently(channel, byteBuf);
-        });
-    }
-
-    default void receivePacketAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            receivePacket(channel, byteBuf);
-        });
-    }
-
-    default void receivePacketSilentlyAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            receivePacketSilently(channel, byteBuf);
-        });
-    }
-
     //TODO Make it clear that this only updates the connection state in our user.
     //Sometimes you should use getInjector().changeConnectionState because that can allow the injector to make adjustments.
     //This is very important, especially on Spigot.
@@ -117,24 +81,12 @@ public interface ProtocolManager {
         }
     }
 
-    default void sendPacketAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            sendPacket(channel, wrapper);
-        });
-    }
-
     default void sendPacketSilently(Object channel, PacketWrapper<?> wrapper) {
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
         for (PacketWrapper<?> packet : wrappers) {
             packet.prepareForSend();
             sendPacketSilently(channel, packet.buffer);
         }
-    }
-
-    default void sendPacketSilentlyAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            sendPacketSilently(channel, wrapper);
-        });
     }
 
     default void writePacket(Object channel, PacketWrapper<?> wrapper) {
@@ -145,24 +97,12 @@ public interface ProtocolManager {
         }
     }
 
-    default void writePacketAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            writePacket(channel, wrapper);
-        });
-    }
-
     default void writePacketSilently(Object channel, PacketWrapper<?> wrapper) {
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
         for (PacketWrapper<?> packet : wrappers) {
             packet.prepareForSend();
             writePacketSilently(channel, packet.buffer);
         }
-    }
-
-    default void writePacketSilentlyAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            writePacketSilently(channel, wrapper);
-        });
     }
 
     default void receivePacket(Object channel, PacketWrapper<?> wrapper) {
@@ -173,24 +113,12 @@ public interface ProtocolManager {
         }
     }
 
-    default void receivePacketAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            receivePacket(channel, wrapper);
-        });
-    }
-
     default void receivePacketSilently(Object channel, PacketWrapper<?> wrapper) {
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
         for (PacketWrapper<?> packet : wrappers) {
             packet.prepareForSend();
             receivePacketSilently(channel, packet.buffer);
         }
-    }
-
-    default void receivePacketSilentlyAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            receivePacketSilently(channel, wrapper);
-        });
     }
 
     default User getUser(Object channel) {
