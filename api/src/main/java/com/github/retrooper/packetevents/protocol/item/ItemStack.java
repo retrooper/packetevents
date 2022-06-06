@@ -237,7 +237,7 @@ public class ItemStack {
         }
     }
 
-    private String getEnchantmentsTagName(ClientVersion version) {
+    public String getEnchantmentsTagName(ClientVersion version) {
         String tagName = version.isNewerThanOrEquals(ClientVersion.V_1_13) ? "Enchantments" : "ench";
         if (type == ItemTypes.ENCHANTED_BOOK) {
             tagName = "StoredEnchantments";
