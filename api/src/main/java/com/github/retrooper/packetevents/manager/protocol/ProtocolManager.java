@@ -53,6 +53,7 @@ public interface ProtocolManager {
     void receivePacket(Object channel, Object byteBuf);
     void receivePacketSilently(Object channel, Object byteBuf);
     ClientVersion getClientVersion(Object channel);
+    //TODO Define method that accepts an array of channels/set/list of channels.
 
     default void sendPackets(Object channel, Object... byteBuf) {
         for (Object buf : byteBuf) {

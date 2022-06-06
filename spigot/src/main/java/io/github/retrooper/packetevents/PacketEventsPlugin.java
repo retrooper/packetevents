@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.*;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
+import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.npc.NPC;
@@ -148,6 +149,21 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     }
                                 }
                             }
+                        }
+                        else if (chatMessage.getMessage().equalsIgnoreCase("copium")) {
+                            new Thread(() -> {
+                                Component message = Component.text("Hi lmao");
+                                WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(message, ChatPosition.CHAT);
+                                for (int i = 0; i < 10; i++) {
+                                    System.out.println("Sent!");
+                                    user.sendPacket(cm);
+                                    try {
+                                        Thread.sleep(1000L);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }).start();
                         }
                         break;
                     case PLAYER_FLYING:
