@@ -35,7 +35,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
     }
 
     public WrapperPlayClientChatMessage(String message) {
-        super(PacketType.Play.Client.SYSTEM_CHAT_MESSAGE);
+        super(PacketType.Play.Client.CHAT_MESSAGE);
         this.message = message;
     }
 

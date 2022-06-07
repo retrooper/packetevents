@@ -514,14 +514,14 @@ public final class PacketType {
             ENTITY_EFFECT,
             DECLARE_RECIPES,
             TAGS,
+            CHAT_MESSAGE,
 
             //Added in 1.19
             ACKNOWLEDGE_BLOCK_CHANGES,
             CHAT_PREVIEW_PACKET,
-            PLAYER_CHAT_MESSAGE,
             SERVER_DATA,
             DISPLAY_CHAT_PREVIEW,
-            SYSTEM_CHAT_MESSAGE;
+            SYSTEM_MESSAGE;
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
             private final int[] ids;

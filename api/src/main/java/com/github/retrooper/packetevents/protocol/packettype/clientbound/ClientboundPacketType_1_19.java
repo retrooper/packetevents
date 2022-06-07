@@ -86,9 +86,9 @@ public enum ClientboundPacketType_1_19 {
     CRAFT_RECIPE_RESPONSE,
     PLAYER_ABILITIES,
 
-    //Added in 1.19. This is used by vanilla to broadcast messages sent by clients to all connected clients.
+    //Interesting changes in 1.19. This is used by vanilla to broadcast messages sent by clients to all connected clients.
     //TODO Cryptography.
-    PLAYER_CHAT_MESSAGE,
+    CHAT_MESSAGE,
 
     END_COMBAT_EVENT,
     ENTER_COMBAT_EVENT,
@@ -145,7 +145,7 @@ public enum ClientboundPacketType_1_19 {
     SOUND_EFFECT,
     STOP_SOUND,
 
-    //Purpose changed in 1.19. This is now used only for system messages by vanilla.
+    //Added in 1.19. This is now used only for system messages by vanilla.
     SYSTEM_CHAT_MESSAGE,
 
     PLAYER_LIST_HEADER_AND_FOOTER,
