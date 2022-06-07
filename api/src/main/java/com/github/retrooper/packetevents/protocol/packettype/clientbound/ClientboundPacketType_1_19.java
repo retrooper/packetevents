@@ -87,7 +87,7 @@ public enum ClientboundPacketType_1_19 {
     PLAYER_ABILITIES,
 
     //Added in 1.19. This is used by vanilla to broadcast messages sent by clients to all connected clients.
-    //This is also encrypted.
+    //TODO Cryptography.
     PLAYER_CHAT_MESSAGE,
 
     END_COMBAT_EVENT,
@@ -98,7 +98,6 @@ public enum ClientboundPacketType_1_19 {
     PLAYER_POSITION_AND_LOOK,
     UNLOCK_RECIPES,
 
-    //Since 1.17.1 you can destroy multiple entities again
     DESTROY_ENTITIES,
 
     REMOVE_ENTITY_EFFECT,

@@ -138,7 +138,7 @@ public class SpigotPacketEventsBuilder {
                             return getVersion().toString() + "-beta";//TODO Cut off "-beta" once 2.0 releases
                         }));
                     }
-                    if (PacketType.isPrepared()) {
+                    if (!PacketType.isPrepared()) {
                         PacketType.prepare();
                     }
                     Bukkit.getPluginManager().registerEvents(new InternalBukkitListener(),

@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.protocol.packettype.serverbound;
 
 public enum ServerboundPacketType_1_7_10 {
     KEEP_ALIVE,
-    SYSTEM_CHAT_MESSAGE,
+    CHAT_MESSAGE,
     INTERACT_ENTITY,
     PLAYER_FLYING,
     PLAYER_POSITION,

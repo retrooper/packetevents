@@ -21,7 +21,7 @@ package com.github.retrooper.packetevents.protocol.packettype.serverbound;
 public enum ServerboundPacketType_1_13 {
     TELEPORT_CONFIRM,
     QUERY_BLOCK_NBT,
-    SYSTEM_CHAT_MESSAGE,
+    CHAT_MESSAGE,
     CLIENT_STATUS,
     CLIENT_SETTINGS,
     TAB_COMPLETE,

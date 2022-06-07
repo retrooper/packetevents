@@ -18,15 +18,23 @@
 
 package com.github.retrooper.packetevents.protocol.packettype.serverbound;
 
-public enum ServerboundPacketType_1_15_2 {
+public enum ServerboundPacketType_1_19 {
     TELEPORT_CONFIRM,
     QUERY_BLOCK_NBT,
     SET_DIFFICULTY,
+
+    //Added in 1.19
+    CHAT_COMMAND,
+
+    //Interesting changes in 1.19
     CHAT_MESSAGE,
+
+    //Added in 1.19
+    CHAT_PREVIEW,
+
     CLIENT_STATUS,
     CLIENT_SETTINGS,
     TAB_COMPLETE,
-    WINDOW_CONFIRMATION,
     CLICK_WINDOW_BUTTON,
     CLICK_WINDOW,
     CLOSE_WINDOW,
@@ -34,6 +42,7 @@ public enum ServerboundPacketType_1_15_2 {
     EDIT_BOOK,
     QUERY_ENTITY_NBT,
     INTERACT_ENTITY,
+    GENERATE_STRUCTURE,
     KEEP_ALIVE,
     LOCK_DIFFICULTY,
     PLAYER_POSITION,
@@ -48,7 +57,9 @@ public enum ServerboundPacketType_1_15_2 {
     PLAYER_DIGGING,
     ENTITY_ACTION,
     STEER_VEHICLE,
-    RECIPE_BOOK_DATA,
+    PONG,
+    SET_RECIPE_BOOK_STATE,
+    SET_DISPLAYED_RECIPE,
     NAME_ITEM,
     RESOURCE_PACK_STATUS,
     ADVANCEMENT_TAB,
