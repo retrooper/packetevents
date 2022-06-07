@@ -184,11 +184,23 @@ public class SpigotPacketEventsBuilder {
                 Plugin protocolSupportPlugin = Bukkit.getPluginManager().getPlugin("ProtocolSupport");
                 if (protocolSupportPlugin != null) {
                     String psVersionString = protocolSupportPlugin.getDescription().getVersion().split("-")[0];
-                    PEVersion psVersion = new PEVersion(psVersionString);
+                    PEVersion psVersion;
+                    try {
+                        psVersion = new PEVersion(psVersionString);
+                    }
+                    catch (Exception ex) {
+                        PacketEvents.getAPI().getLogManager().severe("You are attempting to combine 2.0 PacketEvents with a " +
+                                "ProtocolSupport version older than v1.18.1-1. (Failed to parse the ProtocolSupport version)" +
+                                "This is no longer works, please update to a newer build. " +
+                                "https://ci.dmulloy2.net/job/ProtocolLib/lastBuild/");
+                        Plugin ourPlugin = getPlugin();
+                        Bukkit.getPluginManager().disablePlugin(ourPlugin);
+                        throw new IllegalStateException("ProtocolSupport incompatibility! Update to v1.18.1-1 or newer!");
+                    }
                     PEVersion minimumPSVersion = new PEVersion(1, 18, 1);
                     if (psVersion.isOlderThan(minimumPSVersion)) {
                         PacketEvents.getAPI().getLogManager().severe("You are attempting to combine 2.0 PacketEvents with a " +
-                                "ProtocolSupport version older than v1.18.1-1. " +
+                                "ProtocolSupport version older than v1.18.1-1. (" + psVersion.toString() + ") " +
                                 "This is no longer works, please update to a newer build. " +
                                 "https://ci.dmulloy2.net/job/ProtocolLib/lastBuild/");
                         Plugin ourPlugin = getPlugin();
