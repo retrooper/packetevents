@@ -285,7 +285,11 @@ public final class PacketType {
             TELEPORT_CONFIRM,
             QUERY_BLOCK_NBT,
             SET_DIFFICULTY,
-            CHAT_MESSAGE,
+
+            //Added in 1.19
+            PLAYER_CHAT_MESSAGE,
+
+            SYSTEM_CHAT_MESSAGE,
             CLIENT_STATUS,
             CLIENT_SETTINGS,
             TAB_COMPLETE,
@@ -419,7 +423,7 @@ public final class PacketType {
             BLOCK_CHANGE,
             BOSS_BAR,
             SERVER_DIFFICULTY,
-            CHAT_MESSAGE,
+            SYSTEM_CHAT_MESSAGE,
             CLEAR_TITLES,
             TAB_COMPLETE,
             MULTI_BLOCK_CHANGE,

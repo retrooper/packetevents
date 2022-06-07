@@ -21,7 +21,7 @@ package com.github.retrooper.packetevents.protocol.packettype.clientbound;
 public enum ClientboundPacketType_1_7_10 {
     KEEP_ALIVE,
     JOIN_GAME,
-    CHAT_MESSAGE,
+    SYSTEM_CHAT_MESSAGE,
     TIME_UPDATE,
     ENTITY_EQUIPMENT,
     SPAWN_POSITION,

@@ -29,35 +29,35 @@ import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 
-public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServerChatMessage> {
+public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPlayServerSystemChatMessage> {
     public static boolean HANDLE_JSON = true;
     private String chatComponentJson;
     private Component chatComponent;
     private ChatPosition position;
     private UUID senderUUID;
 
-    public WrapperPlayServerChatMessage(PacketSendEvent event) {
+    public WrapperPlayServerSystemChatMessage(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerChatMessage(Component chatComponent, ChatPosition position) {
+    public WrapperPlayServerSystemChatMessage(Component chatComponent, ChatPosition position) {
         this(chatComponent, position, new UUID(0L, 0L));
     }
 
-    public WrapperPlayServerChatMessage(Component chatComponent, ChatPosition position, UUID senderUUID) {
-        super(PacketType.Play.Server.CHAT_MESSAGE);
+    public WrapperPlayServerSystemChatMessage(Component chatComponent, ChatPosition position, UUID senderUUID) {
+        super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
         this.chatComponent = chatComponent;
         this.position = position;
         this.senderUUID = senderUUID;
     }
 
 
-    public WrapperPlayServerChatMessage(String chatComponentJson, ChatPosition position) {
+    public WrapperPlayServerSystemChatMessage(String chatComponentJson, ChatPosition position) {
         this(chatComponentJson, position, new UUID(0L, 0L));
     }
 
-    public WrapperPlayServerChatMessage(String chatComponentJson, ChatPosition position, UUID senderUUID) {
-        super(PacketType.Play.Server.CHAT_MESSAGE);
+    public WrapperPlayServerSystemChatMessage(String chatComponentJson, ChatPosition position, UUID senderUUID) {
+        super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
         this.chatComponentJson = chatComponentJson;
         this.position = position;
         this.senderUUID = senderUUID;
@@ -89,7 +89,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void copy(WrapperPlayServerChatMessage wrapper) {
+    public void copy(WrapperPlayServerSystemChatMessage wrapper) {
         this.chatComponentJson = wrapper.chatComponentJson;
         this.chatComponent = wrapper.chatComponent;
         this.position = wrapper.position;

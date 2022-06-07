@@ -45,7 +45,11 @@ public enum ClientboundPacketType_1_19 {
     BLOCK_CHANGE,
     BOSS_BAR,
     SERVER_DIFFICULTY,
-    CHAT_MESSAGE,
+
+    //Added in 1.19. This is used by vanilla to broadcast messages sent by clients to all connected clients.
+    //This is also encrypted.
+    PLAYER_CHAT_MESSAGE,
+
     CLEAR_TITLES,
     TAB_COMPLETE,
     DECLARE_COMMANDS,
@@ -130,8 +134,8 @@ public enum ClientboundPacketType_1_19 {
     SOUND_EFFECT,
     STOP_SOUND,
 
-    //Added in 1.19.
-    SYSTEM_MESSAGE,
+    //Purpose changed in 1.19. This is now used only for system messages by vanilla.
+    SYSTEM_CHAT_MESSAGE,
 
     PLAYER_LIST_HEADER_AND_FOOTER,
     NBT_QUERY_RESPONSE,

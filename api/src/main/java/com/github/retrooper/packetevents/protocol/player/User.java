@@ -140,7 +140,7 @@ public class User {
     }
 
     public void sendMessage(Component component, ChatPosition position) {
-        WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(component, position);
+        WrapperPlayServerSystemChatMessage chatMessage = new WrapperPlayServerSystemChatMessage(component, position);
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatMessage);
     }
 

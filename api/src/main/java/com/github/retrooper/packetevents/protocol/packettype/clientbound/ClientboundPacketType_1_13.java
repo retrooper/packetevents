@@ -33,7 +33,7 @@ public enum ClientboundPacketType_1_13 {
     BLOCK_CHANGE,
     BOSS_BAR,
     SERVER_DIFFICULTY,
-    CHAT_MESSAGE,
+    SYSTEM_CHAT_MESSAGE,
     MULTI_BLOCK_CHANGE,
     TAB_COMPLETE,
 
