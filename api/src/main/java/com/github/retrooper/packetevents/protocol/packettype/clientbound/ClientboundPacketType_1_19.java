@@ -46,9 +46,8 @@ public enum ClientboundPacketType_1_19 {
     BOSS_BAR,
     SERVER_DIFFICULTY,
 
-    //Added in 1.19. This is used by vanilla to broadcast messages sent by clients to all connected clients.
-    //This is also encrypted.
-    PLAYER_CHAT_MESSAGE,
+    //Added in 1.19.
+    CHAT_PREVIEW_PACKET,
 
     CLEAR_TITLES,
     TAB_COMPLETE,
@@ -86,6 +85,11 @@ public enum ClientboundPacketType_1_19 {
     PING,
     CRAFT_RECIPE_RESPONSE,
     PLAYER_ABILITIES,
+
+    //Added in 1.19. This is used by vanilla to broadcast messages sent by clients to all connected clients.
+    //This is also encrypted.
+    PLAYER_CHAT_MESSAGE,
+
     END_COMBAT_EVENT,
     ENTER_COMBAT_EVENT,
     DEATH_COMBAT_EVENT,
@@ -103,6 +107,10 @@ public enum ClientboundPacketType_1_19 {
     ENTITY_HEAD_LOOK,
     MULTI_BLOCK_CHANGE,
     SELECT_ADVANCEMENT_TAB,
+
+    //Added in 1.19. Relating preview chat message packet?
+    SERVER_DATA,
+
     ACTION_BAR,
     WORLD_BORDER_CENTER,
     WORLD_BORDER_LERP_SIZE,
@@ -114,6 +122,10 @@ public enum ClientboundPacketType_1_19 {
     UPDATE_VIEW_POSITION,
     UPDATE_VIEW_DISTANCE,
     SPAWN_POSITION,
+
+    //Added in 1.19. Relating chat previews?
+    DISPLAY_CHAT_PREVIEW,
+
     DISPLAY_SCOREBOARD,
     ENTITY_METADATA,
     ATTACH_ENTITY,
