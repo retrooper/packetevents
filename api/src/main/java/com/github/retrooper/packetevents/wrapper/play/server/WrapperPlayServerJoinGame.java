@@ -34,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-
 public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJoinGame> {
     private int entityID;
     private boolean hardcore;
@@ -111,6 +110,8 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 worldNames.add(readString());
             }
             dimensionCodec = readNBT();
+            }//TODO 1.19 SUPPORT, remove this
+            /*
             NBTCompound dimensionAttributes = readNBT();
             DimensionType dimensionType = DimensionType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", ""));
             dimension = new Dimension(dimensionType, dimensionAttributes);
@@ -166,7 +167,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 //TODO What is a valid value on legacy versions?
                 enableRespawnScreen = false;
             }
-        }
+        }*/
     }
 
     @Override

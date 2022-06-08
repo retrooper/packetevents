@@ -28,6 +28,7 @@ public class ServerManagerImpl implements ServerManager {
     private ServerVersion serverVersion;
 
     private ServerVersion resolveVersionNoCache() {
+        System.out.println("Bukkit vers: " + Bukkit.getBukkitVersion());
         for (final ServerVersion val : ServerVersion.reversedValues()) {
             //For example "V_1_18" -> "1.18"
             if (Bukkit.getBukkitVersion().contains(val.getReleaseName())) {

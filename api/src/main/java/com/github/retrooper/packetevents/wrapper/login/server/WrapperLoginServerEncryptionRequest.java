@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.login.server;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -48,7 +49,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken) {
         super(PacketType.Login.Server.ENCRYPTION_REQUEST);
         this.serverID = serverID;
-        this.publicKey = encrypt(publicKeyBytes);
+        this.publicKey = MinecraftEncryptionUtil.publicKey(publicKeyBytes);
         this.verifyToken = verifyToken;
     }
 
@@ -62,8 +63,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     @Override
     public void read() {
         this.serverID = readString(20);
-        byte[] publicKeyBytes = readByteArray(ByteBufHelper.readableBytes(buffer));
-        this.publicKey = encrypt(publicKeyBytes);
+        this.publicKey = readPublicKey();
         this.verifyToken = readByteArray(ByteBufHelper.readableBytes(buffer));
     }
 
@@ -77,8 +77,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     @Override
     public void write() {
         writeString(serverID, 20);
-        byte[] encoded = publicKey.getEncoded();
-        writeByteArray(encoded);
+        writePublicKey(publicKey);
         writeByteArray(verifyToken);
     }
 
@@ -123,16 +122,5 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
 
     public void setVerifyToken(byte[] verifyToken) {
         this.verifyToken = verifyToken;
-    }
-
-    private PublicKey encrypt(byte[] bytes) {
-        try {
-            EncodedKeySpec encodedKeySpec = new X509EncodedKeySpec(bytes);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            return keyFactory.generatePublic(encodedKeySpec);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }
     }
 }

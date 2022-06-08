@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.login.server;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -77,6 +78,17 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
         }
         String username = readString(16);
         this.userProfile = new UserProfile(uuid, username);
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            int propertyCount = readVarInt();
+            for (int j = 0; j < propertyCount; j++) {
+                String propertyName = readString();
+                String propertyValue = readString();
+                String propertySignature = readBoolean() ? readString() : null;
+                TextureProperty textureProperty = new TextureProperty(propertyName, propertyValue, propertySignature);
+                userProfile.getTextureProperties().add(textureProperty);
+            }
+        }
     }
 
     @Override
@@ -92,6 +104,19 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
             writeUUIDAsString(userProfile.getUUID());
         }
         writeString(userProfile.getName(), 16);
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            writeVarInt(userProfile.getTextureProperties().size());
+            for (TextureProperty textureProperty : userProfile.getTextureProperties()) {
+                writeString(textureProperty.getName());
+                writeString(textureProperty.getValue());
+                boolean hasSignature = textureProperty.getSignature() != null;
+                writeBoolean(hasSignature);
+                if (hasSignature) {
+                    writeString(textureProperty.getSignature());
+                }
+            }
+        }
     }
 
     public UserProfile getUserProfile() {

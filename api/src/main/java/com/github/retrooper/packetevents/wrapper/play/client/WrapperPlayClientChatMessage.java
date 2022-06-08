@@ -22,27 +22,47 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.crypto.MessageSignData;
+import com.github.retrooper.packetevents.util.crypto.MessageVerifier;
+import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * This packet is used to send a chat message to the server.
  */
 public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClientChatMessage> {
     private String message;
+    private Optional<MessageSignData> messageSignData = Optional.empty();
 
     public WrapperPlayClientChatMessage(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatMessage(String message) {
+    public WrapperPlayClientChatMessage(String message, @Nullable MessageSignData messageSignData) {
         super(PacketType.Play.Client.CHAT_MESSAGE);
         this.message = message;
+        this.messageSignData = Optional.ofNullable(messageSignData);
     }
 
     @Override
     public void read() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
         this.message = readString(maxMessageLength);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            long timestamp = readLong();
+            SaltSignature saltSignature = readSaltSignature();
+            boolean signedPreview = readBoolean();
+            this.messageSignData = Optional.of(new MessageSignData(saltSignature, timestamp, signedPreview));
+        }
     }
 
     @Override
@@ -76,5 +96,18 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
      */
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean verify(UUID uuid, PublicKey key) {
+        if (!messageSignData.isPresent()) {
+            return false;
+        }
+        Component component = Component.text(message);
+        try {
+            return MessageVerifier.verify(uuid, messageSignData.get(), key, component);
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

@@ -81,6 +81,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
         if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
             WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
+            event.setLastUsedWrapper(null);
             user.setEntityId(joinGame.getEntityId());
             if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
@@ -91,9 +92,9 @@ public class InternalPacketListener extends PacketListenerAbstract {
             user.setWorldNBT(list);
 
             // Update world height
-            NBTCompound worldNBT = user.getWorldNBT(joinGame.getDimension().getType().getName()).getCompoundTagOrNull("element");
+           /* NBTCompound worldNBT = user.getWorldNBT(joinGame.getDimension().getType().getName()).getCompoundTagOrNull("element");
             user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-            user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+            user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());*/
         }
 
         // Respawn is used to switch dimensions
@@ -104,9 +105,9 @@ public class InternalPacketListener extends PacketListenerAbstract {
             }
             WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
 
-            NBTCompound worldNBT = user.getWorldNBT(respawn.getDimension().getType().getName()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
+            /*NBTCompound worldNBT = user.getWorldNBT(respawn.getDimension().getType().getName()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
             user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-            user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+            user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());*/
         }
     }
 

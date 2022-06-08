@@ -16,18 +16,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.chat;
+package com.github.retrooper.packetevents.util.crypto;
 
-public enum ChatPosition {
-    CHAT,
-    SYSTEM,
-    GAME_INFO;
-    
-    public int getId() {
-        return ordinal();
+public class MessageSignData {
+    private final SaltSignature saltSignature;
+    private final long timestamp;
+    private final boolean signedPreview;
+
+    public MessageSignData(SaltSignature saltSignature, long timestamp, boolean signedPreview) {
+        this.saltSignature = saltSignature;
+        this.timestamp = timestamp;
+        this.signedPreview = signedPreview;
+    }
+    public SaltSignature getSaltSignature() {
+        return saltSignature;
     }
 
-    public static ChatPosition getById(int id) {
-        return values()[id];
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public boolean isSignedPreview() {
+        return signedPreview;
     }
 }
