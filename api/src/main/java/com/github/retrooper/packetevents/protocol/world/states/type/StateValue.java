@@ -31,6 +31,7 @@ public enum StateValue {
     AXIS("axis", Axis::valueOf),
     BERRIES("berries", Boolean::parseBoolean),
     BITES("bites", Integer::parseInt),
+    BLOOM("bloom", Boolean::parseBoolean),
     BOTTOM("bottom", Boolean::parseBoolean),
     CANDLES("candles", Integer::parseInt),
     CHARGES("charges", Integer::parseInt),

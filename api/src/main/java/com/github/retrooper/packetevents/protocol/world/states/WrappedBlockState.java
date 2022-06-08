@@ -995,6 +995,16 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
+    public Bloom getBloom() {
+        return (Bloom) data.get(StateValue.BLOOM);
+    }
+
+    public void setBloom(Bloom bloom) {
+        checkIfCloneNeeded();
+        data.put(StateValue.BLOOM, bloom);
+        checkIsStillValid();
+    }
+
     // End all block data types
 
     /**
