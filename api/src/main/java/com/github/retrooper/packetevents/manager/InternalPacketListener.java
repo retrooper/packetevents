@@ -61,6 +61,8 @@ public class InternalPacketListener extends PacketListenerAbstract {
             //Update user profile
             user.getProfile().setUUID(profile.getUUID());
             user.getProfile().setName(profile.getName());
+            //Texture properties are passed in login success on 1.19
+            user.getProfile().setTextureProperties(profile.getTextureProperties());
 
             //Map username with channel
             synchronized (channel) {

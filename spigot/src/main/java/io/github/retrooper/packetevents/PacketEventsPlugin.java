@@ -70,7 +70,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.getAPI().getSettings().debug(false).bStats(true)
+        PacketEvents.getAPI().getSettings().debug(true).bStats(true)
                 .checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).readOnlyListeners(false);
         PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
@@ -81,11 +81,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                 switch (event.getPacketType()) {
                     case CHAT_MESSAGE:
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
-                        if (chatMessage.getMessage().equalsIgnoreCase("please verify this")) {
-                            System.out.println("Pre verify! Remaining bytes: " + ByteBufHelper.readableBytes(chatMessage.getBuffer()));
+                        if (chatMessage.getMessage().equalsIgnoreCase("!verify")) {
                             PublicKey key = user.getPublicKey();
                             System.out.println("Verify this: " + chatMessage.verify(event.getUser().getUUID(), key));
                         }
+                        event.setLastUsedWrapper(null);
                          if (chatMessage.getMessage().equalsIgnoreCase("copium")) {
                             /*new Thread(() -> {
                                 Component message = Component.text("Hi lmao");

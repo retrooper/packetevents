@@ -22,8 +22,11 @@ import com.github.retrooper.packetevents.util.AdventureSerializer;
 import net.kyori.adventure.text.Component;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class MessageVerifier {
     private static byte[] byteArray(long value) {
@@ -43,25 +46,32 @@ public class MessageVerifier {
     public static boolean verify(UUID uuid, MessageSignData signData, PublicKey publicKey, String jsonMessage)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         //Create signature
-        Signature signature = Signature.getInstance("SHA256withDSA");
+        Signature signature = Signature.getInstance("SHA256withRSA");
         //Initialize it with public key
         signature.initVerify(publicKey);
         //Adding data to be verified (Salt, UUID, Timestamp, Message)
+        byte[] data = new byte[32];
+        ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN);
 
         //Verify salt
-        signature.update(byteArray(signData.getSaltSignature().getSalt()));
+        buffer.putLong(signData.getSaltSignature().getSalt());
 
         //Verify UUID
-        ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
-        bb.putLong(uuid.getMostSignificantBits());
-        bb.putLong(uuid.getLeastSignificantBits());
-        signature.update(bb.array());
+        buffer.putLong(uuid.getMostSignificantBits());
+        buffer.putLong(uuid.getLeastSignificantBits());
 
         //Verify timestamp
-        signature.update(byteArray(signData.getTimestamp()));
+        long timeMillis = System.currentTimeMillis();
+        long timeSeconds = TimeUnit.MILLISECONDS.toSeconds(timeMillis);
+        System.out.println("timestamp: " + signData.getTimestamp() + ", time seconds: " + timeSeconds);
+        //TODO Look into why it cant verify? Instant.now().getEpochSecond()
+        buffer.putLong(timeSeconds);
+
+        //Update this stuff
+        signature.update(data);
 
         //Verify message content
-        signature.update(jsonMessage.getBytes());
+        signature.update(jsonMessage.getBytes(StandardCharsets.UTF_8));
 
         //Verifying the signature
         return signature.verify(signData.getSaltSignature().getSignature());
