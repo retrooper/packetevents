@@ -815,6 +815,7 @@ public class StateTypes {
     public static StateType ACACIA_WALL_SIGN = StateTypes.builder().name("ACACIA_WALL_SIGN").blastResistance(1.0f).hardness(1.0f).isFlammable(true).isSolid(false).isBlocking(true).setMaterial(MaterialType.WOOD).build();
     public static StateType JUNGLE_WALL_SIGN = StateTypes.builder().name("JUNGLE_WALL_SIGN").blastResistance(1.0f).hardness(1.0f).isFlammable(true).isSolid(false).isBlocking(true).setMaterial(MaterialType.WOOD).build();
     public static StateType DARK_OAK_WALL_SIGN = StateTypes.builder().name("DARK_OAK_WALL_SIGN").blastResistance(1.0f).hardness(1.0f).isFlammable(true).isSolid(false).isBlocking(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType MANGROVE_WALL_SIGN = StateTypes.builder().name("MANGROVE_WALL_SIGN").blastResistance(1.0f).hardness(1.0f).isFlammable(true).isSolid(false).isBlocking(true).setMaterial(MaterialType.WOOD).build();
     public static StateType REDSTONE_WALL_TORCH = StateTypes.builder().name("REDSTONE_WALL_TORCH").setMaterial(MaterialType.DECORATION).build();
     public static StateType SOUL_WALL_TORCH = StateTypes.builder().name("SOUL_WALL_TORCH").setMaterial(MaterialType.DECORATION).build();
     public static StateType NETHER_PORTAL = StateTypes.builder().name("NETHER_PORTAL").blastResistance(0.0f).hardness(-1.0f).setMaterial(MaterialType.PORTAL).build();
@@ -834,6 +835,7 @@ public class StateTypes {
     public static StateType POTTED_JUNGLE_SAPLING = StateTypes.builder().name("POTTED_JUNGLE_SAPLING").setMaterial(MaterialType.DECORATION).isSolid(true).build();
     public static StateType POTTED_ACACIA_SAPLING = StateTypes.builder().name("POTTED_ACACIA_SAPLING").setMaterial(MaterialType.DECORATION).isSolid(true).build();
     public static StateType POTTED_DARK_OAK_SAPLING = StateTypes.builder().name("POTTED_DARK_OAK_SAPLING").setMaterial(MaterialType.DECORATION).isSolid(true).build();
+    public static StateType POTTED_MANGROVE_PROPAGULE = StateTypes.builder().name("POTTED_MANGROVE_PROPAGULE").setMaterial(MaterialType.DECORATION).isSolid(true).build();
     public static StateType POTTED_FERN = StateTypes.builder().name("POTTED_FERN").setMaterial(MaterialType.DECORATION).isSolid(true).build();
     public static StateType POTTED_DANDELION = StateTypes.builder().name("POTTED_DANDELION").setMaterial(MaterialType.DECORATION).isSolid(true).build();
     public static StateType POTTED_POPPY = StateTypes.builder().name("POTTED_POPPY").setMaterial(MaterialType.DECORATION).isSolid(true).build();
