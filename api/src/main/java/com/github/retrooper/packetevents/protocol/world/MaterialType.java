@@ -65,5 +65,7 @@ public enum MaterialType {
     EGG,
     CAKE,
     AMETHYST,
-    POWDER_SNOW
+    POWDER_SNOW,
+    FROGSPAWN,
+    FROGLIGHT
 }

@@ -1146,6 +1146,57 @@ public class ItemTypes {
     public static final ItemType PINK_CONCRETE = builder("pink_concrete").setMaxAmount(64).setPlacedType(StateTypes.PINK_CONCRETE).build();
     public static final ItemType CARROT = builder("carrot").setMaxAmount(64).setAttributes(ItemAttribute.EDIBLE).setPlacedType(StateTypes.CARROTS).build();
     public static final ItemType MUSIC_DISC_OTHERSIDE = builder("music_disc_otherside").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).build();
+    // 1.19 items
+    public static final ItemType MUD = builder("MUD").setMaxAmount(64).setPlacedType(StateTypes.MUD).build();
+    public static final ItemType MANGROVE_PLANKS = builder("MANGROVE_PLANKS").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_PLANKS).build();
+    public static final ItemType MANGROVE_PROPAGULE = builder("MANGROVE_PROPAGULE").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_PROPAGULE).build();
+    public static final ItemType MANGROVE_LOG = builder("MANGROVE_LOG").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_LOG).build();
+    public static final ItemType MANGROVE_ROOTS = builder("MANGROVE_ROOTS").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_ROOTS).build();
+    public static final ItemType MUDDY_MANGROVE_ROOTS = builder("MUDDY_MANGROVE_ROOTS").setMaxAmount(64).setPlacedType(StateTypes.MUDDY_MANGROVE_ROOTS).build();
+    public static final ItemType STRIPPED_MANGROVE_LOG = builder("STRIPPED_MANGROVE_LOG").setMaxAmount(64).setPlacedType(StateTypes.STRIPPED_MANGROVE_LOG).build();
+    public static final ItemType STRIPPED_MANGROVE_WOOD = builder("STRIPPED_MANGROVE_WOOD").setMaxAmount(64).setPlacedType(StateTypes.STRIPPED_MANGROVE_WOOD).build();
+    public static final ItemType MANGROVE_WOOD = builder("MANGROVE_WOOD").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_WOOD).build();
+    public static final ItemType MANGROVE_LEAVES = builder("MANGROVE_LEAVES").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_LEAVES).build();
+    public static final ItemType MANGROVE_SLAB = builder("MANGROVE_SLAB").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_SLAB).build();
+    public static final ItemType MUD_BRICK_SLAB = builder("MUD_BRICK_SLAB").setMaxAmount(64).setPlacedType(StateTypes.MUD_BRICK_SLAB).build();
+    public static final ItemType MANGROVE_FENCE = builder("MANGROVE_FENCE").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_FENCE).build();
+    public static final ItemType PACKED_MUD = builder("PACKED_MUD").setMaxAmount(64).setPlacedType(StateTypes.PACKED_MUD).build();
+    public static final ItemType MUD_BRICKS = builder("MUD_BRICKS").setMaxAmount(64).setPlacedType(StateTypes.MUD_BRICKS).build();
+    public static final ItemType REINFORCED_DEEPSLATE = builder("REINFORCED_DEEPSLATE").setMaxAmount(64).setPlacedType(StateTypes.REINFORCED_DEEPSLATE).build();
+    public static final ItemType MUD_BRICK_STAIRS = builder("MUD_BRICK_STAIRS").setMaxAmount(64).setPlacedType(StateTypes.MUD_BRICK_STAIRS).build();
+    public static final ItemType SCULK = builder("SCULK").setMaxAmount(64).setPlacedType(StateTypes.SCULK).build();
+    public static final ItemType SCULK_VEIN = builder("SCULK_VEIN").setMaxAmount(64).setPlacedType(StateTypes.SCULK_VEIN).build();
+    public static final ItemType SCULK_CATALYST = builder("SCULK_CATALYST").setMaxAmount(64).setPlacedType(StateTypes.SCULK_CATALYST).build();
+    public static final ItemType SCULK_SHRIEKER = builder("SCULK_SHRIEKER").setMaxAmount(64).setPlacedType(StateTypes.SCULK_SHRIEKER).build();
+    public static final ItemType MUD_BRICK_WALL = builder("MUD_BRICK_WALL").setMaxAmount(64).setPlacedType(StateTypes.MUD_BRICK_WALL).build();
+    public static final ItemType MANGROVE_BUTTON = builder("MANGROVE_BUTTON").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_BUTTON).build();
+    public static final ItemType MANGROVE_PRESSURE_PLATE = builder("MANGROVE_PRESSURE_PLATE").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_PRESSURE_PLATE).build();
+    public static final ItemType MANGROVE_DOOR = builder("MANGROVE_DOOR").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_DOOR).build();
+    public static final ItemType MANGROVE_TRAPDOOR = builder("MANGROVE_TRAPDOOR").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_TRAPDOOR).build();
+    public static final ItemType MANGROVE_FENCE_GATE = builder("MANGROVE_FENCE_GATE").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_FENCE_GATE).build();
+    public static final ItemType MANGROVE_SIGN = builder("MANGROVE_SIGN").setMaxAmount(16).setPlacedType(StateTypes.MANGROVE_SIGN).build();
+    public static final ItemType TADPOLE_BUCKET = builder("TADPOLE_BUCKET").setMaxAmount(1).build();
+    public static final ItemType RECOVERY_COMPASS = builder("RECOVERY_COMPASS").setMaxAmount(64).build();
+    public static final ItemType ALLAY_SPAWN_EGG = builder("ALLAY_SPAWN_EGG").setMaxAmount(64).build();
+    public static final ItemType FROG_SPAWN_EGG = builder("FROG_SPAWN_EGG").setMaxAmount(64).build();
+    public static final ItemType TADPOLE_SPAWN_EGG = builder("TADPOLE_SPAWN_EGG").setMaxAmount(64).build();
+    public static final ItemType WARDEN_SPAWN_EGG = builder("WARDEN_SPAWN_EGG").setMaxAmount(64).build();
+    public static final ItemType MUSIC_DISC_5 = builder("MUSIC_DISC_5").setMaxAmount(1).build();
+    public static final ItemType DISC_FRAGMENT_5 = builder("DISC_FRAGMENT_5").setMaxAmount(64).build();
+    public static final ItemType OCHRE_FROGLIGHT = builder("OCHRE_FROGLIGHT").setMaxAmount(64).setPlacedType(StateTypes.OCHRE_FROGLIGHT).build();
+    public static final ItemType VERDANT_FROGLIGHT = builder("VERDANT_FROGLIGHT").setMaxAmount(64).setPlacedType(StateTypes.VERDANT_FROGLIGHT).build();
+    public static final ItemType PEARLESCENT_FROGLIGHT = builder("PEARLESCENT_FROGLIGHT").setMaxAmount(64).setPlacedType(StateTypes.PEARLESCENT_FROGLIGHT).build();
+    public static final ItemType FROGSPAWN = builder("FROGSPAWN").setMaxAmount(64).setPlacedType(StateTypes.FROGSPAWN).build();
+    public static final ItemType ECHO_SHARD = builder("ECHO_SHARD").setMaxAmount(64).build();
+    public static final ItemType GOAT_HORN = builder("GOAT_HORN").setMaxAmount(1).build();
+    public static final ItemType OAK_CHEST_BOAT = builder("OAK_CHEST_BOAT").setMaxAmount(1).build();
+    public static final ItemType SPRUCE_CHEST_BOAT = builder("SPRUCE_CHEST_BOAT").setMaxAmount(1).build();
+    public static final ItemType BIRCH_CHEST_BOAT = builder("BIRCH_CHEST_BOAT").setMaxAmount(1).build();
+    public static final ItemType JUNGLE_CHEST_BOAT = builder("JUNGLE_CHEST_BOAT").setMaxAmount(1).build();
+    public static final ItemType ACACIA_CHEST_BOAT = builder("ACACIA_CHEST_BOAT").setMaxAmount(1).build();
+    public static final ItemType DARK_OAK_CHEST_BOAT = builder("DARK_OAK_CHEST_BOAT").setMaxAmount(1).build();
+    public static final ItemType MANGROVE_BOAT = builder("MANGROVE_BOAT").setMaxAmount(1).build();
+    public static final ItemType MANGROVE_CHEST_BOAT = builder("MANGROVE_CHEST_BOAT").setMaxAmount(1).build();
     /**
      * @deprecated Burning furnace shows up as a missing texture, removed in 1.9
      */
