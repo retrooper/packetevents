@@ -42,7 +42,8 @@ public class ParticleTypes {
             ClientVersion.V_1_16,
             ClientVersion.V_1_16_2,
             ClientVersion.V_1_17,
-            ClientVersion.V_1_18);
+            ClientVersion.V_1_18,
+            ClientVersion.V_1_19);
 
     public static ParticleType define(String key, Function<PacketWrapper<?>, ParticleData> readDataFunction, BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction) {
         TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
@@ -135,10 +136,14 @@ public class ParticleTypes {
     public static final ParticleType ENTITY_EFFECT = define("entity_effect");
     public static final ParticleType EXPLOSION_EMITTER = define("explosion_emitter");
     public static final ParticleType EXPLOSION = define("explosion");
+    public static final ParticleType SONIC_BOOM = define("sonic_boom");
     public static final ParticleType FALLING_DUST = define("falling_dust", ParticleBlockStateData::read, (wrapper, data) -> ParticleBlockStateData.write(wrapper, (ParticleBlockStateData) data));
     public static final ParticleType FIREWORK = define("firework");
     public static final ParticleType FISHING = define("fishing");
     public static final ParticleType FLAME = define("flame");
+    public static final ParticleType SCULK_SOUL = define("sculk_soul");
+    public static final ParticleType SCULK_CHARGE = define("sculk_charge");
+    public static final ParticleType SCULK_CHARGE_POP = define("sculk_charge_pop");
     public static final ParticleType SOUL_FIRE_FLAME = define("soul_fire_flame");
     public static final ParticleType SOUL = define("soul");
     public static final ParticleType FLASH = define("flash");
@@ -199,6 +204,7 @@ public class ParticleTypes {
     public static final ParticleType WAX_OFF = define("wax_off");
     public static final ParticleType ELECTRIC_SPARK = define("electric_spark");
     public static final ParticleType SCRAPE = define("scrape");
+    public static final ParticleType SHRIEK = define("shriek");
 
     static {
         TYPES_BUILDER.unloadFileMappings();
