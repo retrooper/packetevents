@@ -34,7 +34,8 @@ public class EnchantmentTypes {
             ClientVersion.V_1_12,
             ClientVersion.V_1_13,
             ClientVersion.V_1_14,
-            ClientVersion.V_1_16);
+            ClientVersion.V_1_16,
+            ClientVersion.V_1_19);
 
     public static EnchantmentType define(String key) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
