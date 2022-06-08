@@ -34,7 +34,7 @@ public enum ClientboundPacketType_1_18 {
     BLOCK_CHANGE,
     BOSS_BAR,
     SERVER_DIFFICULTY,
-    SYSTEM_CHAT_MESSAGE,
+    CHAT_MESSAGE,
     CLEAR_TITLES,
     TAB_COMPLETE,
     DECLARE_COMMANDS,

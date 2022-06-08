@@ -37,7 +37,7 @@ public enum ClientboundPacketType_1_17 {
     BLOCK_CHANGE,
     BOSS_BAR,
     SERVER_DIFFICULTY,
-    SYSTEM_CHAT_MESSAGE,
+    CHAT_MESSAGE,
 
     //This packet was added
     CLEAR_TITLES,
