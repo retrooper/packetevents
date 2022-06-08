@@ -521,7 +521,8 @@ public final class PacketType {
             CHAT_PREVIEW_PACKET,
             SERVER_DATA,
             DISPLAY_CHAT_PREVIEW,
-            SYSTEM_MESSAGE;
+            SYSTEM_CHAT_MESSAGE;
+
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
             private final int[] ids;
