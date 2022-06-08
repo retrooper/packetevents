@@ -42,7 +42,8 @@ public class EntityTypes {
             ClientVersion.V_1_15,
             ClientVersion.V_1_16,
             ClientVersion.V_1_16_2,
-            ClientVersion.V_1_17);
+            ClientVersion.V_1_17,
+            ClientVersion.V_1_19);
     private static final TypesBuilder LEGACY_TYPES_BUILDER = new TypesBuilder("entity/legacy_entity_type_mappings",
             ClientVersion.V_1_8,
             ClientVersion.V_1_9,
@@ -162,12 +163,14 @@ public class EntityTypes {
     public static final EntityType CHESTED_MINECART_ABSTRACT = define("chested_minecart_abstract", MINECART_ABSTRACT);
     public static final EntityType AREA_EFFECT_CLOUD = define("area_effect_cloud", ENTITY);
     public static final EntityType ARMOR_STAND = define("armor_stand", LIVINGENTITY);
+    public static final EntityType ALLAY = define("allay", ABSTRACT_CREATURE);
     public static final EntityType ARROW = define("arrow", ABSTRACT_ARROW);
     public static final EntityType AXOLOTL = define("axolotl", ABSTRACT_ANIMAL);
     public static final EntityType BAT = define("bat", ABSTRACT_AMBIENT);
     public static final EntityType BEE = define("bee", ABSTRACT_INSENTIENT);
     public static final EntityType BLAZE = define("blaze", ABSTRACT_MONSTER);
     public static final EntityType BOAT = define("boat", ENTITY);
+    public static final EntityType CHEST_BOAT = define("chest_boat", BOAT);
     public static final EntityType CAT = define("cat", ABSTRACT_TAMEABLE_ANIMAL);
     public static final EntityType SPIDER = define("spider", ABSTRACT_MONSTER);
     public static final EntityType CAVE_SPIDER = define("cave_spider", SPIDER);
@@ -193,6 +196,7 @@ public class EntityTypes {
     public static final EntityType FALLING_BLOCK = define("falling_block", ENTITY);
     public static final EntityType FIREWORK_ROCKET = define("firework_rocket", ENTITY);
     public static final EntityType FOX = define("fox", ABSTRACT_ANIMAL);
+    public static final EntityType FROG = define("frog", ABSTRACT_ANIMAL);
     public static final EntityType GHAST = define("ghast", ABSTRACT_FLYING);
     public static final EntityType GIANT = define("giant", ABSTRACT_MONSTER);
     public static final EntityType ITEM_FRAME = define("item_frame", ABSTRACT_HANGING);
@@ -254,6 +258,7 @@ public class EntityTypes {
     public static final EntityType ENDER_PEARL = define("ender_pearl", PROJECTILE_ABSTRACT);
     public static final EntityType EXPERIENCE_BOTTLE = define("experience_bottle", PROJECTILE_ABSTRACT);
     public static final EntityType POTION = define("potion", PROJECTILE_ABSTRACT);
+    public static final EntityType TADPOLE = define("tadpole", ABSTRACT_FISHES);
     @Deprecated // Exists only in 1.9 and 1.10
     public static final EntityType TIPPED_ARROW = define("tipped_arrow", ARROW);
     public static final EntityType TRIDENT = define("trident", ABSTRACT_ARROW);
@@ -264,6 +269,7 @@ public class EntityTypes {
     public static final EntityType VILLAGER = define("villager", ABSTRACT_AGEABLE);
     public static final EntityType VINDICATOR = define("vindicator", ABSTRACT_ILLAGER_BASE);
     public static final EntityType WANDERING_TRADER = define("wandering_trader", ABSTRACT_AGEABLE);
+    public static final EntityType WARDEN = define("warden", ABSTRACT_MONSTER);
     public static final EntityType WITCH = define("witch", ABSTRACT_MONSTER);
     public static final EntityType WITHER = define("wither", ABSTRACT_MONSTER);
     public static final EntityType WITHER_SKELETON = define("wither_skeleton", ABSTRACT_SKELETON);
