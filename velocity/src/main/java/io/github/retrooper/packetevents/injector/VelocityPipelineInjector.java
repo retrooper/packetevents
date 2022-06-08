@@ -26,8 +26,8 @@ import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import io.github.retrooper.packetevents.handlers.PacketDecoder;
-import io.github.retrooper.packetevents.handlers.PacketEncoder;
+import io.github.retrooper.packetevents.handlers.PacketEventsDecoder;
+import io.github.retrooper.packetevents.handlers.PacketEventsEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import org.jetbrains.annotations.Nullable;
@@ -87,7 +87,7 @@ public class VelocityPipelineInjector implements ChannelInjector {
 
     @Override
     public User getUser(Object channel) {
-        PacketDecoder decoder = (PacketDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME);
+        PacketEventsDecoder decoder = (PacketEventsDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME);
         return decoder.user;
     }
 
@@ -98,10 +98,10 @@ public class VelocityPipelineInjector implements ChannelInjector {
 
     @Override
     public void updateUser(Object channel, User user) {
-        PacketDecoder decoder = (PacketDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME);
+        PacketEventsDecoder decoder = (PacketEventsDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME);
         decoder.user = user;
 
-        PacketEncoder encoder = (PacketEncoder) ((Channel) channel).pipeline().get(PacketEvents.ENCODER_NAME);
+        PacketEventsEncoder encoder = (PacketEventsEncoder) ((Channel) channel).pipeline().get(PacketEvents.ENCODER_NAME);
         encoder.user = user;
     }
 
@@ -109,18 +109,18 @@ public class VelocityPipelineInjector implements ChannelInjector {
     public void setPlayer(Object ch, Object p) {
         Channel channel = (Channel) ch;
         Player player = (Player) p;
-        PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+        PacketEventsDecoder decoder = (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
         decoder.player = player;
         decoder.user.getProfile().setUUID(player.getUniqueId());
         decoder.user.getProfile().setName(player.getUsername());
-        PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
+        PacketEventsEncoder encoder = (PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
         encoder.player = player;
     }
 
     @Override
     public boolean hasPlayer(Object player) {
         Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+        PacketEventsDecoder decoder = (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
         return decoder != null
                 && decoder.player != null;
     }

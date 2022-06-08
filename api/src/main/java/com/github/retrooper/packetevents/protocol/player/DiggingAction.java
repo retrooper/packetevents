@@ -27,11 +27,13 @@ public enum DiggingAction {
     RELEASE_USE_ITEM,
     SWAP_ITEM_WITH_OFFHAND;
 
+    private static final DiggingAction[] VALUES = values();
+
     public int getId() {
         return ordinal();
     }
 
     public static DiggingAction getById(int id) {
-        return values()[id];
+        return VALUES[id];
     }
 }

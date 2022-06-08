@@ -34,7 +34,8 @@ public class EnchantmentTypes {
             ClientVersion.V_1_12,
             ClientVersion.V_1_13,
             ClientVersion.V_1_14,
-            ClientVersion.V_1_16);
+            ClientVersion.V_1_16,
+            ClientVersion.V_1_19);
 
     public static EnchantmentType define(String key) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
@@ -94,6 +95,7 @@ public class EnchantmentTypes {
     public static final EnchantmentType FROST_WALKER = define("frost_walker");
     public static final EnchantmentType BINDING_CURSE = define("binding_curse");
     public static final EnchantmentType SOUL_SPEED = define("soul_speed");
+    public static final EnchantmentType SWIFT_SNEAK = define("swift_sneak");
     public static final EnchantmentType SHARPNESS = define("sharpness");
     public static final EnchantmentType SMITE = define("smite");
     public static final EnchantmentType BANE_OF_ARTHROPODS = define("bane_of_arthropods");

@@ -47,7 +47,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     @Override
     public void read() {
         soundID = readVarInt();
-        soundCategory = SoundCategory.VALUES[readVarInt()];
+        soundCategory = SoundCategory.fromId(readVarInt());
         effectPosition = new Vector3i(readInt(), readInt(), readInt());
         volume = readFloat();
         pitch = readFloat();

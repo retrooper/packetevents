@@ -175,7 +175,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
         boolean hasBlocklight = (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThan(ServerVersion.V_1_14))
                 && !serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8);
-        boolean checkForSky = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
+        boolean checkForSky = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8);
 
         // 1.7/1.8 don't use this NetStreamInput
         NetStreamInput dataIn = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? new NetStreamInput(new ByteArrayInputStream(data)) : null;

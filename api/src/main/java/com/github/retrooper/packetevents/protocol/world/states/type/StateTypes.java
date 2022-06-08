@@ -815,6 +815,7 @@ public class StateTypes {
     public static StateType ACACIA_WALL_SIGN = StateTypes.builder().name("ACACIA_WALL_SIGN").blastResistance(1.0f).hardness(1.0f).isFlammable(true).isSolid(false).isBlocking(true).setMaterial(MaterialType.WOOD).build();
     public static StateType JUNGLE_WALL_SIGN = StateTypes.builder().name("JUNGLE_WALL_SIGN").blastResistance(1.0f).hardness(1.0f).isFlammable(true).isSolid(false).isBlocking(true).setMaterial(MaterialType.WOOD).build();
     public static StateType DARK_OAK_WALL_SIGN = StateTypes.builder().name("DARK_OAK_WALL_SIGN").blastResistance(1.0f).hardness(1.0f).isFlammable(true).isSolid(false).isBlocking(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType MANGROVE_WALL_SIGN = StateTypes.builder().name("MANGROVE_WALL_SIGN").blastResistance(1.0f).hardness(1.0f).isFlammable(true).isSolid(false).isBlocking(true).setMaterial(MaterialType.WOOD).build();
     public static StateType REDSTONE_WALL_TORCH = StateTypes.builder().name("REDSTONE_WALL_TORCH").setMaterial(MaterialType.DECORATION).build();
     public static StateType SOUL_WALL_TORCH = StateTypes.builder().name("SOUL_WALL_TORCH").setMaterial(MaterialType.DECORATION).build();
     public static StateType NETHER_PORTAL = StateTypes.builder().name("NETHER_PORTAL").blastResistance(0.0f).hardness(-1.0f).setMaterial(MaterialType.PORTAL).build();
@@ -834,6 +835,7 @@ public class StateTypes {
     public static StateType POTTED_JUNGLE_SAPLING = StateTypes.builder().name("POTTED_JUNGLE_SAPLING").setMaterial(MaterialType.DECORATION).isSolid(true).build();
     public static StateType POTTED_ACACIA_SAPLING = StateTypes.builder().name("POTTED_ACACIA_SAPLING").setMaterial(MaterialType.DECORATION).isSolid(true).build();
     public static StateType POTTED_DARK_OAK_SAPLING = StateTypes.builder().name("POTTED_DARK_OAK_SAPLING").setMaterial(MaterialType.DECORATION).isSolid(true).build();
+    public static StateType POTTED_MANGROVE_PROPAGULE = StateTypes.builder().name("POTTED_MANGROVE_PROPAGULE").setMaterial(MaterialType.DECORATION).isSolid(true).build();
     public static StateType POTTED_FERN = StateTypes.builder().name("POTTED_FERN").setMaterial(MaterialType.DECORATION).isSolid(true).build();
     public static StateType POTTED_DANDELION = StateTypes.builder().name("POTTED_DANDELION").setMaterial(MaterialType.DECORATION).isSolid(true).build();
     public static StateType POTTED_POPPY = StateTypes.builder().name("POTTED_POPPY").setMaterial(MaterialType.DECORATION).isSolid(true).build();
@@ -927,6 +929,39 @@ public class StateTypes {
     public static StateType BIG_DRIPLEAF_STEM = StateTypes.builder().name("BIG_DRIPLEAF_STEM").blastResistance(0.1f).hardness(0.1f).isBurnable(true).setMaterial(MaterialType.PLANT).build();
     public static StateType POTTED_AZALEA_BUSH = StateTypes.builder().name("POTTED_AZALEA_BUSH").setMaterial(MaterialType.DECORATION).isSolid(true).build();
     public static StateType POTTED_FLOWERING_AZALEA_BUSH = StateTypes.builder().name("POTTED_FLOWERING_AZALEA_BUSH").setMaterial(MaterialType.DECORATION).isSolid(true).build();
+    // 1.19 states
+    public static StateType MUD = StateTypes.builder().name("MUD").blastResistance(0.5f).hardness(0.5f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.DIRT).isSolid(true).build();
+    public static StateType MANGROVE_PLANKS = StateTypes.builder().name("MANGROVE_PLANKS").blastResistance(3.0f).hardness(2.0f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType MANGROVE_PROPAGULE = StateTypes.builder().name("MANGROVE_PROPAGULE").blastResistance(0.0f).hardness(0.0f).isOccluding(false).isBlocking(false).setMaterial(MaterialType.PLANT).isSolid(false).build();
+    public static StateType MANGROVE_LOG = StateTypes.builder().name("MANGROVE_LOG").blastResistance(2.0f).hardness(2.0f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType MANGROVE_ROOTS = StateTypes.builder().name("MANGROVE_ROOTS").blastResistance(0.7f).hardness(0.7f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType MUDDY_MANGROVE_ROOTS = StateTypes.builder().name("MUDDY_MANGROVE_ROOTS").blastResistance(0.7f).hardness(0.7f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.DIRT).isSolid(true).build();
+    public static StateType STRIPPED_MANGROVE_LOG = StateTypes.builder().name("STRIPPED_MANGROVE_LOG").blastResistance(2.0f).hardness(2.0f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType STRIPPED_MANGROVE_WOOD = StateTypes.builder().name("STRIPPED_MANGROVE_WOOD").blastResistance(2.0f).hardness(2.0f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType MANGROVE_WOOD = StateTypes.builder().name("MANGROVE_WOOD").blastResistance(2.0f).hardness(2.0f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType MANGROVE_LEAVES = StateTypes.builder().name("MANGROVE_LEAVES").blastResistance(0.2f).hardness(0.2f).isOccluding(false).isBlocking(true).setMaterial(MaterialType.LEAVES).isSolid(true).build();
+    public static StateType MANGROVE_SLAB = StateTypes.builder().name("MANGROVE_SLAB").blastResistance(3.0f).hardness(2.0f).isOccluding(false).isBlocking(true).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType MUD_BRICK_SLAB = StateTypes.builder().name("MUD_BRICK_SLAB").blastResistance(3.0f).hardness(1.5f).isOccluding(false).isBlocking(true).setMaterial(MaterialType.STONE).isSolid(true).build();
+    public static StateType MANGROVE_FENCE = StateTypes.builder().name("MANGROVE_FENCE").blastResistance(3.0f).hardness(2.0f).isOccluding(false).isBlocking(true).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType PACKED_MUD = StateTypes.builder().name("PACKED_MUD").blastResistance(3.0f).hardness(1.0f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.DIRT).isSolid(true).build();
+    public static StateType MUD_BRICKS = StateTypes.builder().name("MUD_BRICKS").blastResistance(3.0f).hardness(1.5f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.STONE).isSolid(true).build();
+    public static StateType REINFORCED_DEEPSLATE = StateTypes.builder().name("REINFORCED_DEEPSLATE").blastResistance(1200.0f).hardness(55.0f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.STONE).isSolid(true).build();
+    public static StateType MUD_BRICK_STAIRS = StateTypes.builder().name("MUD_BRICK_STAIRS").blastResistance(3.0f).hardness(1.5f).isOccluding(false).isBlocking(true).setMaterial(MaterialType.STONE).isSolid(true).build();
+    public static StateType SCULK = StateTypes.builder().name("SCULK").blastResistance(0.2f).hardness(0.2f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.SCULK).isSolid(true).build();
+    public static StateType SCULK_VEIN = StateTypes.builder().name("SCULK_VEIN").blastResistance(0.2f).hardness(0.2f).isOccluding(false).isBlocking(false).setMaterial(MaterialType.SCULK).isSolid(true).build();
+    public static StateType SCULK_CATALYST = StateTypes.builder().name("SCULK_CATALYST").blastResistance(3.0f).hardness(3.0f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.SCULK).isSolid(true).build();
+    public static StateType SCULK_SHRIEKER = StateTypes.builder().name("SCULK_SHRIEKER").blastResistance(3.0f).hardness(3.0f).isOccluding(false).isBlocking(true).setMaterial(MaterialType.SCULK).isSolid(true).build();
+    public static StateType MUD_BRICK_WALL = StateTypes.builder().name("MUD_BRICK_WALL").blastResistance(3.0f).hardness(1.5f).isOccluding(false).isBlocking(true).setMaterial(MaterialType.STONE).isSolid(true).build();
+    public static StateType MANGROVE_BUTTON = StateTypes.builder().name("MANGROVE_BUTTON").blastResistance(0.5f).hardness(0.5f).isOccluding(false).isBlocking(false).setMaterial(MaterialType.DECORATION).isSolid(false).build();
+    public static StateType MANGROVE_PRESSURE_PLATE = StateTypes.builder().name("MANGROVE_PRESSURE_PLATE").blastResistance(0.5f).hardness(0.5f).isOccluding(false).isBlocking(false).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType MANGROVE_DOOR = StateTypes.builder().name("MANGROVE_DOOR").blastResistance(3.0f).hardness(3.0f).isOccluding(false).isBlocking(true).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType MANGROVE_TRAPDOOR = StateTypes.builder().name("MANGROVE_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isOccluding(false).isBlocking(true).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType MANGROVE_FENCE_GATE = StateTypes.builder().name("MANGROVE_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isOccluding(false).isBlocking(true).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType MANGROVE_SIGN = StateTypes.builder().name("MANGROVE_SIGN").blastResistance(1.0f).hardness(1.0f).isOccluding(false).isBlocking(false).setMaterial(MaterialType.WOOD).isSolid(true).build();
+    public static StateType OCHRE_FROGLIGHT = StateTypes.builder().name("OCHRE_FROGLIGHT").blastResistance(0.3f).hardness(0.3f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.FROGLIGHT).isSolid(true).build();
+    public static StateType VERDANT_FROGLIGHT = StateTypes.builder().name("VERDANT_FROGLIGHT").blastResistance(0.3f).hardness(0.3f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.FROGLIGHT).isSolid(true).build();
+    public static StateType PEARLESCENT_FROGLIGHT = StateTypes.builder().name("PEARLESCENT_FROGLIGHT").blastResistance(0.3f).hardness(0.3f).isOccluding(true).isBlocking(true).setMaterial(MaterialType.FROGLIGHT).isSolid(true).build();
+    public static StateType FROGSPAWN = StateTypes.builder().name("FROGSPAWN").blastResistance(0.0f).hardness(0.0f).isOccluding(false).isBlocking(false).setMaterial(MaterialType.FROGSPAWN).isSolid(false).build();
 
     public static Builder builder() {
         return new Builder();
@@ -1082,6 +1117,7 @@ public class StateTypes {
                 case EGG:
                 case CAKE:
                 case SHULKER_SHELL:
+                case FROGSPAWN:
                     this.pushReaction = PushReaction.DESTROY;
                     return this;
                 case PORTAL:

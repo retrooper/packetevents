@@ -65,11 +65,7 @@ public class Vector3i {
 
         // 1.14 method for this is storing X Z Y
         // 1.17 added support for negative values
-        // 1.15+ might all be the same but let's be safe with not producing negative values on 1.14-1.16...
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            y = (int) (val << 52 >> 52);
-            z = (int) (val << 26 >> 38);
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             y = (int) (val << 52 >> 52);
             z = (int) (val << 26 >> 38);
         } else {

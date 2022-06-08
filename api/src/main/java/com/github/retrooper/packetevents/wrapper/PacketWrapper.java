@@ -52,11 +52,12 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class PacketWrapper<T extends PacketWrapper> {
+    @Nullable
     public Object buffer;
+
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
     private int packetID;
-    private boolean hasPreparedForSending;
     // For sending chunk data packets, which need this data
     @Nullable
     protected User user;
@@ -123,7 +124,6 @@ public class PacketWrapper<T extends PacketWrapper> {
         wrapper.buffer = byteBuf;
         return wrapper;
     }
-
     public final void prepareForSend() {
         // Null means the packet was manually created and wasn't sent by the server itself
         // A reference count of 0 means that the packet was freed (it was already sent)
@@ -131,11 +131,8 @@ public class PacketWrapper<T extends PacketWrapper> {
             buffer = UnpooledByteBufAllocationHelper.buffer();
         }
 
-        if (!hasPreparedForSending) {
-            writeVarInt(packetID);
-            write();
-            hasPreparedForSending = true;
-        }
+        writeVarInt(packetID);
+        write();
     }
 
     public void read() {
@@ -161,14 +158,6 @@ public class PacketWrapper<T extends PacketWrapper> {
             read();
         }
         event.setLastUsedWrapper(this);
-    }
-
-    public boolean hasPreparedForSending() {
-        return hasPreparedForSending;
-    }
-
-    public void setHasPrepareForSending(boolean hasPreparedForSending) {
-        this.hasPreparedForSending = hasPreparedForSending;
     }
 
     public ClientVersion getClientVersion() {

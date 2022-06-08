@@ -25,12 +25,12 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import io.github.retrooper.packetevents.handlers.PacketDecoder;
-import io.github.retrooper.packetevents.handlers.PacketEncoder;
+import io.github.retrooper.packetevents.handlers.PacketEventsDecoder;
+import io.github.retrooper.packetevents.handlers.PacketEventsEncoder;
 import io.netty.channel.Channel;
 
 public class ServerConnectionInitializer {
-    public static void addChannelHandlers(Channel channel, PacketDecoder decoder, PacketEncoder encoder) {
+    public static void addChannelHandlers(Channel channel, PacketEventsDecoder decoder, PacketEventsEncoder encoder) {
         channel.pipeline().addBefore("minecraft-decoder", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addBefore("minecraft-encoder", PacketEvents.ENCODER_NAME, encoder);
     }
@@ -44,8 +44,8 @@ public class ServerConnectionInitializer {
             return;
         }
         ProtocolManager.USERS.put(channel, user);
-        PacketDecoder decoder = new PacketDecoder(user);
-        PacketEncoder encoder = new PacketEncoder(user);
+        PacketEventsDecoder decoder = new PacketEventsDecoder(user);
+        PacketEventsEncoder encoder = new PacketEventsEncoder(user);
         addChannelHandlers(channel, decoder, encoder);
     }
 
@@ -58,8 +58,8 @@ public class ServerConnectionInitializer {
     }
 
     public static void reloadChannel(Channel channel) {
-        PacketDecoder decoder = (PacketDecoder) channel.pipeline().remove(PacketEvents.DECODER_NAME);
-        PacketEncoder encoder = (PacketEncoder) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+        PacketEventsDecoder decoder = (PacketEventsDecoder) channel.pipeline().remove(PacketEvents.DECODER_NAME);
+        PacketEventsEncoder encoder = (PacketEventsEncoder) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
         addChannelHandlers(channel, decoder, encoder);
     }
 }

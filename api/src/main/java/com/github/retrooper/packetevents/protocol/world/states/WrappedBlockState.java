@@ -133,26 +133,10 @@ public class WrappedBlockState {
             return 5;
         } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_4)) {
             return 6;
-        } else {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_18_2)) {
             return 7;
-        }
-    }
-
-    private static String getModernJsonPath(ClientVersion version) {
-        if (version.isOlderThanOrEquals(ClientVersion.V_1_13_1)) {
-            return "1.13";
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_13_2)) {
-            return "1.13.2";
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_14_4)) {
-            return "1.14";
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_15_2)) {
-            return "1.15";
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_1)) {
-            return "1.16";
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_4)) {
-            return "1.16.2";
         } else {
-            return "1.17";
+            return 8;
         }
     }
 
@@ -1008,6 +992,16 @@ public class WrappedBlockState {
     public void setWest(West west) {
         checkIfCloneNeeded();
         data.put(StateValue.WEST, west);
+        checkIsStillValid();
+    }
+
+    public Bloom getBloom() {
+        return (Bloom) data.get(StateValue.BLOOM);
+    }
+
+    public void setBloom(Bloom bloom) {
+        checkIfCloneNeeded();
+        data.put(StateValue.BLOOM, bloom);
         checkIsStillValid();
     }
 
