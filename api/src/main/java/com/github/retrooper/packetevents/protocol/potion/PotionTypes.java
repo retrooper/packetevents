@@ -98,6 +98,5 @@ public class PotionTypes {
     public static final PotionType DOLPHINS_GRACE = define("dolphins_grace", 30);
     public static final PotionType BAD_OMEN = define("bad_omen", 31);
     public static final PotionType HERO_OF_THE_VILLAGE = define("hero_of_the_village", 32);
-
-
+    public static final PotionType DARKNESS = define("darkness", 33);
 }
