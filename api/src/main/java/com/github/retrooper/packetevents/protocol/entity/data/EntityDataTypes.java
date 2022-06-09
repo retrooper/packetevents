@@ -106,6 +106,27 @@ public class EntityDataTypes {
         return EntityPose.getById(wrapper.getServerVersion().toClientVersion(), id);
     }, (PacketWrapper<?> wrapper, EntityPose value) -> wrapper.writeVarInt(value.getId(wrapper.getServerVersion().toClientVersion())));
 
+    public static final EntityDataType<Integer> CAT_VARIANT = define("cat_variant_type", readIntDeserializer(), writeIntSerializer());
+    public static final EntityDataType<Integer> FROG_VARIANT = define("frog_variant_type", readIntDeserializer(), writeIntSerializer());
+
+    public static final EntityDataType<Optional<Vector3i>> OPTIONAL_GLOBAL_POSITION = define("optional_global_position", (PacketWrapper<?> wrapper) -> {
+                if (wrapper.readBoolean()) {
+                    return Optional.of(wrapper.readBlockPosition());
+                } else {
+                    return Optional.empty();
+                }
+            },
+            (PacketWrapper<?> wrapper, Optional<Vector3i> value) -> {
+                if (value.isPresent()) {
+                    wrapper.writeBoolean(true);
+                    wrapper.writeBlockPosition(value.get());
+                } else {
+                    wrapper.writeBoolean(false);
+                }
+            });
+
+    public static final EntityDataType<Integer> PAINTING_VARIANT_TYPE = define("painting_variant_type", readIntDeserializer(), writeIntSerializer());
+
     @Deprecated
     public static final EntityDataType<Short> SHORT = define("short", PacketWrapper::readShort, PacketWrapper::writeShort);
 
