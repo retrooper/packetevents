@@ -18,12 +18,14 @@
 
 package com.github.retrooper.packetevents.util.crypto;
 
+import java.time.Instant;
+
 public class MessageSignData {
     private final SaltSignature saltSignature;
-    private final long timestamp;
+    private final Instant timestamp;
     private final boolean signedPreview;
 
-    public MessageSignData(SaltSignature saltSignature, long timestamp, boolean signedPreview) {
+    public MessageSignData(SaltSignature saltSignature, Instant timestamp, boolean signedPreview) {
         this.saltSignature = saltSignature;
         this.timestamp = timestamp;
         this.signedPreview = signedPreview;
@@ -32,7 +34,7 @@ public class MessageSignData {
         return saltSignature;
     }
 
-    public long getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 

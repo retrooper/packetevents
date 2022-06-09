@@ -50,6 +50,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -701,5 +702,13 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writePublicKey(PublicKey publicKey) {
         writeByteArray(publicKey.getEncoded());
+    }
+
+    public Instant readTimestamp() {
+        return Instant.ofEpochMilli(readLong());
+    }
+
+    public void writeTimestamp(Instant timestamp) {
+        writeLong(timestamp.toEpochMilli());
     }
 }

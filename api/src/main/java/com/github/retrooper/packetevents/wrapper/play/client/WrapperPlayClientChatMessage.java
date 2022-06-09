@@ -34,6 +34,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SignatureException;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,14 +59,11 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
     public void read() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
         this.message = readString(maxMessageLength);
-        System.out.println("crope!");
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            System.out.println("hi!");
-            long timestamp = readLong();
+            Instant timestamp = readTimestamp();
             SaltSignature saltSignature = readSaltSignature();
             boolean signedPreview = readBoolean();
             this.messageSignData = Optional.of(new MessageSignData(saltSignature, timestamp, signedPreview));
-            System.out.println("set!");
         }
     }
 
@@ -80,7 +78,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
         writeString(this.message, maxMessageLength);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeLong(messageSignData.get().getTimestamp());
+            writeTimestamp(messageSignData.get().getTimestamp());
             writeSaltSignature(messageSignData.get().getSaltSignature());
             writeBoolean(messageSignData.get().isSignedPreview());
         }
@@ -124,7 +122,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         Component component = Component.text(message);
         System.out.println("str: " + AdventureSerializer.toJson(component));
         try {
-            return MessageVerifier.verify(uuid, messageSignData.get(), key, component);
+            return MessageVerifier.verify(uuid, messageSignData.get(), key, String.format("{\"text\":\"%s\"}", message));
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
             e.printStackTrace();
         }
