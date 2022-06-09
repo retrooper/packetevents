@@ -28,7 +28,13 @@ public enum EntityPose {
     SPIN_ATTACK,
     CROUCHING,
     LONG_JUMPING,
-    DYING;
+    DYING,
+    CROAKING,
+    USING_TONGUE,
+    ROARING,
+    SNIFFING,
+    EMERGING,
+    DIGGING;
 
    public int getId(ClientVersion version) {
        if (this == DYING && version.isOlderThan(ClientVersion.V_1_17)) {
