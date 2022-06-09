@@ -745,6 +745,26 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
+    public boolean isShrieking() {
+        return (boolean) data.get(StateValue.SHRIEKING);
+    }
+
+    public void setShrieking(boolean shrieking) {
+        checkIfCloneNeeded();
+        data.put(StateValue.SHRIEKING, shrieking);
+        checkIsStillValid();
+    }
+
+    public boolean isCanSummon() {
+        return (boolean) data.get(StateValue.CAN_SUMMON);
+    }
+
+    public void setCanSummon(boolean canSummon) {
+        checkIfCloneNeeded();
+        data.put(StateValue.CAN_SUMMON, canSummon);
+        checkIsStillValid();
+    }
+
     public boolean isOpen() {
         return (boolean) data.get(StateValue.OPEN);
     }

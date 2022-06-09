@@ -52,6 +52,7 @@ public final class SpigotReflectionUtil {
     public static final String OBC_PACKAGE = "org.bukkit.craftbukkit." + MODIFIED_PACKAGE_NAME + ".";
     public static ServerVersion VERSION;
     //Booleans
+    public static boolean V_1_19_OR_HIGHER;
     public static boolean V_1_17_OR_HIGHER;
     public static boolean V_1_12_OR_HIGHER;
     //Minecraft classes
@@ -104,14 +105,14 @@ public final class SpigotReflectionUtil {
         GET_CRAFT_PLAYER_HANDLE_METHOD = Reflection.getMethod(CRAFT_PLAYER_CLASS, "getHandle", 0);
         GET_CRAFT_ENTITY_HANDLE_METHOD = Reflection.getMethod(CRAFT_ENTITY_CLASS, "getHandle", 0);
         GET_CRAFT_WORLD_HANDLE_METHOD = Reflection.getMethod(CRAFT_WORLD_CLASS, "getHandle", 0);
-        GET_MOB_EFFECT_LIST_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, "getId", 0);
-        GET_MOB_EFFECT_LIST_BY_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, "fromId", 0);
-        GET_ITEM_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, "getId", 0);
-        GET_ITEM_BY_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, "getById", 0);
+        GET_MOB_EFFECT_LIST_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, V_1_19_OR_HIGHER ? "g" : "getId", 0);
+        GET_MOB_EFFECT_LIST_BY_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS,  V_1_19_OR_HIGHER ? "a" :"fromId", 0);
+        GET_ITEM_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, V_1_19_OR_HIGHER ? "g" : "getId", 0);
+        GET_ITEM_BY_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, NMS_ITEM_CLASS, 0);
         if (V_1_17_OR_HIGHER) {
             GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, Iterable.class, 0);
         }
-        String getEntityByIdMethodName = (VERSION.getProtocolVersion() == (short) 47)
+        String getEntityByIdMethodName = (VERSION.getProtocolVersion() == (short) 47 || V_1_19_OR_HIGHER) // Back to these stupid mappings, thanks MD_5
                 ? "a" : "getEntity";
         GET_ENTITY_BY_ID_METHOD = Reflection.getMethod(WORLD_SERVER_CLASS, getEntityByIdMethodName, NMS_ENTITY_CLASS, int.class);
         if (GET_ENTITY_BY_ID_METHOD == null) {
@@ -122,8 +123,8 @@ public final class SpigotReflectionUtil {
         CRAFT_ITEM_STACK_AS_NMS_COPY = Reflection.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", 0);
         READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS, 0);
         WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, 0, NMS_ITEM_STACK_CLASS);
-        GET_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, "getCombinedId", int.class, IBLOCK_DATA_CLASS);
-        GET_BY_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, "getByCombinedId", IBLOCK_DATA_CLASS, int.class);
+        GET_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, IBLOCK_DATA_CLASS, 0, int.class);
+        GET_BY_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, IBLOCK_DATA_CLASS, 0, int.class);
         if (CRAFT_BLOCK_DATA_CLASS != null) {
             GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA = Reflection.getMethod(CRAFT_BLOCK_DATA_CLASS, "fromData", CRAFT_BLOCK_DATA_CLASS, IBLOCK_DATA_CLASS);
         }
@@ -179,6 +180,7 @@ public final class SpigotReflectionUtil {
 
     public static void init() {
         VERSION = PacketEvents.getAPI().getServerManager().getVersion();
+        V_1_19_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_19);
         V_1_17_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_17);
         V_1_12_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_12);
 

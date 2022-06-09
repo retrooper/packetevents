@@ -37,18 +37,20 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
     private Vector3f cursorPosition;
     private Optional<ItemStack> itemStack;
     private Optional<Boolean> insideBlock;
+    int sequence;
 
     public WrapperPlayClientPlayerBlockPlacement(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPlayerBlockPlacement(InteractionHand interactionHand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition, Optional<Boolean> insideBlock) {
+    public WrapperPlayClientPlayerBlockPlacement(InteractionHand interactionHand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition, Optional<Boolean> insideBlock, int sequence) {
         super(PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT);
         this.interactionHand = interactionHand;
         this.blockPosition = blockPosition;
         this.face = face;
-        this.cursorPosition= cursorPosition;
+        this.cursorPosition = cursorPosition;
         this.insideBlock = insideBlock;
+        this.sequence = sequence;
     }
 
     @Override
@@ -61,18 +63,19 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
             face = BlockFace.getBlockFaceByValue(readVarInt());
             cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
             insideBlock = Optional.of(readBoolean());
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+                sequence = readVarInt();
+            }
         } else {
             if (serverVersion == ServerVersion.V_1_7_10) {
                 blockPosition = new Vector3i(readInt(), readUnsignedByte(), readInt());
-            }
-            else {
+            } else {
                 blockPosition = readBlockPosition();
             }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
                 face = BlockFace.getBlockFaceByValue(readVarInt());
                 interactionHand = InteractionHand.getById(readVarInt());
-            }
-            else {
+            } else {
                 face = BlockFace.getBlockFaceByValue(readUnsignedByte());
                 //Optional itemstack
                 itemStack = Optional.of(readItemStack());
@@ -94,6 +97,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
         cursorPosition = wrapper.cursorPosition;
         itemStack = wrapper.itemStack;
         insideBlock = wrapper.insideBlock;
+        sequence = wrapper.sequence;
     }
 
     @Override
@@ -106,20 +110,21 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
             writeFloat(cursorPosition.y);
             writeFloat(cursorPosition.z);
             writeBoolean(insideBlock.orElse(false));
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+                writeVarInt(sequence);
+            }
         } else {
             if (serverVersion == ServerVersion.V_1_7_10) {
                 writeInt(blockPosition.x);
                 writeByte(blockPosition.x);
                 writeInt(blockPosition.z);
-            }
-            else {
+            } else {
                 writeBlockPosition(blockPosition);
             }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
                 writeVarInt(face.getFaceValue());
                 writeVarInt(interactionHand.getId());
-            }
-            else {
+            } else {
                 writeByte(face.getFaceValue());
                 writeItemStack(itemStack.orElse(ItemStack.EMPTY));
                 //Hand is always the main hand
@@ -182,5 +187,13 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
 
     public void setInsideBlock(Optional<Boolean> insideBlock) {
         this.insideBlock = insideBlock;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

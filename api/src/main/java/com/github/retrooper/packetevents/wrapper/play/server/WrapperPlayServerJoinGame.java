@@ -29,11 +29,13 @@ import com.github.retrooper.packetevents.protocol.world.Difficulty;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.WorldType;
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
 public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJoinGame> {
     private int entityID;
     private boolean hardcore;
@@ -55,6 +57,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     private boolean enableRespawnScreen;
     private boolean isDebug;
     private boolean isFlat;
+    private Vector3i lastDeathPosition;
 
     public WrapperPlayServerJoinGame(PacketSendEvent event) {
         super(event);
@@ -90,10 +93,11 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     @Override
     public void read() {
         entityID = readInt();
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
-        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
+        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         if (v1_16) {
             hardcore = readBoolean();
             gameMode = readGameMode();
@@ -110,11 +114,14 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 worldNames.add(readString());
             }
             dimensionCodec = readNBT();
-            }//TODO 1.19 SUPPORT, remove this
-            /*
-            NBTCompound dimensionAttributes = readNBT();
-            DimensionType dimensionType = DimensionType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", ""));
-            dimension = new Dimension(dimensionType, dimensionAttributes);
+            if (!v1_19) {
+                NBTCompound dimensionAttributes = readNBT();
+                DimensionType dimensionType = DimensionType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", ""));
+                dimension = new Dimension(dimensionType, dimensionAttributes);
+            } else {
+                DimensionType dimensionType = DimensionType.getByName(readString());
+                dimension = new Dimension(dimensionType);
+            }
             worldName = readString();
         } else {
             previousGameMode = gameMode;
@@ -157,17 +164,19 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             }
             if (v1_14) {
                 viewDistance = readVarInt();
-            } else {
-                viewDistance = 0;
             }
             reducedDebugInfo = readBoolean();
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
                 enableRespawnScreen = readBoolean();
             } else {
-                //TODO What is a valid value on legacy versions?
-                enableRespawnScreen = false;
+                enableRespawnScreen = true;
             }
-        }*/
+        }
+        if (v1_19) {
+            if (readBoolean()) {
+                lastDeathPosition = readBlockPosition();
+            }
+        }
     }
 
     @Override
@@ -189,11 +198,13 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         enableRespawnScreen = wrapper.enableRespawnScreen;
         isDebug = wrapper.isDebug;
         isFlat = wrapper.isFlat;
+        lastDeathPosition = wrapper.lastDeathPosition;
     }
 
     @Override
     public void write() {
         writeInt(entityID);
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
         boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
@@ -218,11 +229,15 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 writeString(name);
             }
             writeNBT(dimensionCodec);
-            NBT tag = new NBTString(dimension.getType().getName());
-            //TODO Fix orElse to generate a new nbt compound
-            dimension.getAttributes().orElse(new NBTCompound()).setTag("effects", tag);
-            //TODO Fix no value when get()
-            writeNBT(dimension.getAttributes().get());
+            if (!v1_19) {
+                NBT tag = new NBTString(dimension.getType().getName());
+                //TODO Fix orElse to generate a new nbt compound
+                dimension.getAttributes().orElse(new NBTCompound()).setTag("effects", tag);
+                //TODO Fix no value when get()
+                writeNBT(dimension.getAttributes().get());
+            } else {
+                writeString(dimension.getType().getName());
+            }
             writeString(worldName);
         } else {
             previousGameMode = gameMode;
@@ -267,6 +282,12 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             writeBoolean(reducedDebugInfo);
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
                 writeBoolean(enableRespawnScreen);
+            }
+        }
+        if (v1_19) {
+            writeBoolean(lastDeathPosition != null);
+            if (lastDeathPosition != null) {
+                writeBlockPosition(lastDeathPosition);
             }
         }
     }
