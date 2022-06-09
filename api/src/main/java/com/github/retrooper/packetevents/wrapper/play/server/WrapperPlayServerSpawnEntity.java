@@ -102,8 +102,11 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
 
         if (v1_19) {
             headYaw = readByte() / ROTATION_FACTOR;
+            data = readVarInt();
+        } else {
+            data = readInt();
         }
-        data = readInt();
+
         //On 1.8 check if data > 0 before reading, or it won't be in the packet
         if (v1_9 || data > 0) {
             double velX = readShort() / VELOCITY_FACTOR;
@@ -167,8 +170,10 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
 
         if (v1_19) {
             writeByte(MathUtil.floor(headYaw * ROTATION_FACTOR));
+            writeVarInt(data);
+        } else {
+            writeInt(data);
         }
-        writeInt(data);
 
         //On 1.8 check if data > 0 before reading, or it won't be in the packet
         if (v1_9 || data > 0) {
