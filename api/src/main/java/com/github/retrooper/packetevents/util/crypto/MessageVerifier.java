@@ -29,14 +29,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class MessageVerifier {
-    private static byte[] byteArray(long value) {
-        byte[] result = new byte[8];
-        for (int i = 7; i >= 0; i--) {
-            result[i] = (byte) (value & 0xffL);
-            value >>= 8;
-        }
-        return result;
-    }
 
     public static boolean verify(UUID uuid, MessageSignData signData, PublicKey publicKey, Component component)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
@@ -45,6 +37,9 @@ public class MessageVerifier {
 
     public static boolean verify(UUID uuid, MessageSignData signData, PublicKey publicKey, String jsonMessage)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        /*if (signData.getSaltSignature().getSignature().length > 0) {
+            System.out.println("Valid salt sig!");
+        }*/
         //Create signature
         Signature signature = Signature.getInstance("SHA256withRSA");
         //Initialize it with public key
@@ -61,11 +56,7 @@ public class MessageVerifier {
         buffer.putLong(uuid.getLeastSignificantBits());
 
         //Verify timestamp
-        long timeMillis = System.currentTimeMillis();
-        long timeSeconds = TimeUnit.MILLISECONDS.toSeconds(timeMillis);
-        System.out.println("timestamp: " + signData.getTimestamp() + ", time seconds: " + timeSeconds);
-        //TODO Look into why it cant verify? Instant.now().getEpochSecond()
-        buffer.putLong(timeSeconds);
+        buffer.putLong(signData.getTimestamp().getEpochSecond());
 
         //Update this stuff
         signature.update(data);
