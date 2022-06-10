@@ -98,7 +98,9 @@ public class PacketEventsEncoder extends MessageToByteEncoder<Object> {
                     ctx.write(buf, promise);
                 } else {
                     buf.release();
-                    ctx.write(Unpooled.EMPTY_BUFFER, promise);
+                    // While we should write an empty buffer, various proxies and custom minecraft client
+                    // are unable to handle an empty buffer, and it will break them...
+                    //ctx.write(Unpooled.EMPTY_BUFFER, promise);
                 }
                 buf = null;
             } else {
