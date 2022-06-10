@@ -58,7 +58,7 @@ public class WrapperPlayServerSetTitleText extends PacketWrapper<WrapperPlayServ
 
     @Override
     public void write() {
-        if (HANDLE_JSON) {
+        if (HANDLE_JSON && title != null) {
             titleJson = AdventureSerializer.toJson(title);
         }
         writeComponentJSON(titleJson);

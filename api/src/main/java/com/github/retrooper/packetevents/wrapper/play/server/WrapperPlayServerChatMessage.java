@@ -30,6 +30,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,10 +40,10 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     private String messageJson;
     private Component message;
     private @Nullable String unsignedMessageJson;
-    private Optional<Component> unsignedMessage;
+    private Optional<Component> unsignedMessage = Optional.empty();
 
     private ChatType type;
-    private Optional<Long> timestamp = Optional.empty();
+    private Optional<Instant> timestamp = Optional.empty();
     private Optional<SaltSignature> saltSignature = Optional.empty();
 
     public WrapperPlayServerChatMessage(PacketSendEvent event) {
@@ -56,8 +57,8 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     public WrapperPlayServerChatMessage(MessageSender sender, ChatType type, Component message) {
         super(PacketType.Play.Server.CHAT_MESSAGE);
         this.sender = sender;
-        this.message = message;
         this.type = type;
+        this.message = message;
     }
 
     public WrapperPlayServerChatMessage(ChatType type, String messageJson) {
@@ -67,14 +68,35 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     public WrapperPlayServerChatMessage(MessageSender sender, ChatType type, String messageJson) {
         super(PacketType.Play.Server.CHAT_MESSAGE);
         this.sender = sender;
-        this.messageJson = messageJson;
         this.type = type;
+        this.messageJson = messageJson;
+    }
+
+    public WrapperPlayServerChatMessage(MessageSender sender, ChatType type, Component signedMessage, @Nullable Component unsignedMessage, @Nullable Instant timestamp, @Nullable SaltSignature saltSignature) {
+        super(PacketType.Play.Server.CHAT_MESSAGE);
+        this.sender = sender;
+        this.type = type;
+        this.message = signedMessage;
+        this.unsignedMessage = Optional.ofNullable(unsignedMessage);
+        this.timestamp = Optional.ofNullable(timestamp);
+        this.saltSignature = Optional.ofNullable(saltSignature);
+    }
+
+    public WrapperPlayServerChatMessage(MessageSender sender, ChatType type, String signedMessageJson, @Nullable String unsignedMessageJson, @Nullable Instant timestamp, @Nullable SaltSignature saltSignature) {
+        super(PacketType.Play.Server.CHAT_MESSAGE);
+        this.sender = sender;
+        this.type = type;
+        this.messageJson = signedMessageJson;
+        this.unsignedMessageJson = unsignedMessageJson;
+        this.timestamp = Optional.ofNullable(timestamp);
+        this.saltSignature = Optional.ofNullable(saltSignature);
     }
 
     @Override
     public void read() {
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         this.messageJson = readString(getMaxMessageLength());
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+        if (v1_19 && readBoolean()) {
             this.unsignedMessageJson = readString(getMaxMessageLength());
         }
         else {
@@ -91,7 +113,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
             int positionIndex;
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            if (v1_19) {
                 positionIndex = readVarInt();
             } else {
                 positionIndex = readByte();
@@ -105,14 +127,14 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             //Read sender data.
             this.sender = new MessageSender(readUUID(), null, null);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            if (v1_19) {
                 this.sender.setDisplayName(readComponent());
                 if (readBoolean()) {
                     this.sender.setTeamName(readComponent());
                 }
 
                 //Read timestamp
-                timestamp = Optional.of(readLong());
+                timestamp = Optional.of(readTimestamp());
 
                 saltSignature = Optional.of(readSaltSignature());
             }
@@ -131,14 +153,24 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         if (HANDLE_JSON) {
-            messageJson = AdventureSerializer.toJson(message);
+            if (message != null) {
+                messageJson = AdventureSerializer.toJson(message);
+            }
+            unsignedMessage.ifPresent(component -> unsignedMessageJson = AdventureSerializer.toJson(component));
         }
         writeString(messageJson, getMaxMessageLength());
+        if (v1_19) {
+            writeBoolean(unsignedMessageJson != null);
+            if (unsignedMessageJson != null) {
+                writeString(unsignedMessageJson, getMaxMessageLength());
+            }
+        }
 
         //Is the server 1.8+ or is the client 1.8+? (1.7.10 servers support 1.8 clients, and send the chat position for 1.8 clients)
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            if (v1_19) {
                 writeVarInt(type.getId());
             } else {
                 writeByte(type.getId());
@@ -152,6 +184,15 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
                 uuid = new UUID(0L, 0L);
             }
             writeUUID(uuid);
+            if (v1_19) {
+                writeComponent(this.sender.getDisplayName());
+                writeBoolean(this.sender.getTeamName() != null);
+                if (this.sender.getTeamName() != null) {
+                    writeComponent(this.sender.getTeamName());
+                }
+                writeTimestamp(this.timestamp.get());
+                writeSaltSignature(this.saltSignature.get());
+            }
         }
     }
 

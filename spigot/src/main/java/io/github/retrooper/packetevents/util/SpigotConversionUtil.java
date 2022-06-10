@@ -30,7 +30,7 @@ import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
-public class SpigotDataHelper {
+public class SpigotConversionUtil {
     public static Location fromBukkitLocation(org.bukkit.Location location) {
         return new Location(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
     }
