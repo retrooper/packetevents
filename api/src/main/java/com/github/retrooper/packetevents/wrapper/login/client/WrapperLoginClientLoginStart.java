@@ -49,7 +49,7 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     public void read() {
         this.username = readString(16);
         if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19) && readBoolean()) {
-            SignatureData data = new SignatureData(readLong(), readPublicKey(), readBytes(4096));
+            SignatureData data = new SignatureData(readTimestamp(), readPublicKey(), readBytes(4096));
             this.signatureData = Optional.of(data);
         }
     }
@@ -67,7 +67,7 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
             writeBoolean(signatureData.isPresent());
             if (signatureData.isPresent()) {
                 SignatureData data = signatureData.get();
-                writeLong(data.getTimestamp());
+                writeTimestamp(data.getTimestamp());
                 writePublicKey(data.getPublicKey());
                 writeBytes(data.getSignature());
             }
