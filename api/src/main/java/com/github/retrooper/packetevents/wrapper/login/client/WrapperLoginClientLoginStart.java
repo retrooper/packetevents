@@ -63,12 +63,14 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     @Override
     public void write() {
         writeString(username, 16);
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19) && signatureData.isPresent()) {
-            writeBoolean(true);
-            SignatureData data = signatureData.get();
-            writeLong(data.getTimestamp());
-            writePublicKey(data.getPublicKey());
-            writeBytes(data.getSignature());
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19)) {
+            writeBoolean(signatureData.isPresent());
+            if (signatureData.isPresent()) {
+                SignatureData data = signatureData.get();
+                writeLong(data.getTimestamp());
+                writePublicKey(data.getPublicKey());
+                writeBytes(data.getSignature());
+            }
         }
     }
 

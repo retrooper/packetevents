@@ -46,6 +46,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().load();
+        //login, respawn, item thing
     }
 
     @Override
