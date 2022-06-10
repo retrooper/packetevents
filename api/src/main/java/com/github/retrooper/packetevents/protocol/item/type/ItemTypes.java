@@ -1230,7 +1230,6 @@ public class ItemTypes {
                 Collections.unmodifiableSet(new HashSet<>(attributesArr));
 
         TypesBuilderData data = TYPES_BUILDER.define(key);
-        boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
 
         ItemType type = new ItemType() {
             private final int[] ids = data.getData();
@@ -1258,7 +1257,7 @@ public class ItemTypes {
 
             @Override
             public boolean isMusicDisc() {
-                return musicDisc;
+                return getAttributes().contains(ItemAttribute.MUSIC_DISC);
             }
 
             @Override
