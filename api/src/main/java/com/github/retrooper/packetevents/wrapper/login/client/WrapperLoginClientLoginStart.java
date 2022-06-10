@@ -21,11 +21,15 @@ package com.github.retrooper.packetevents.wrapper.login.client;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClientLoginStart> {
     private String username;
-
+    private Optional<SignatureData> signatureData = Optional.empty();
     public WrapperLoginClientLoginStart(PacketReceiveEvent event) {
         super(event);
     }
@@ -35,19 +39,37 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
         this.username = username;
     }
 
+    public WrapperLoginClientLoginStart(ClientVersion clientVersion, String username, SignatureData signatureData) {
+        super(PacketType.Login.Client.LOGIN_START.getId(), clientVersion);
+        this.username = username;
+        this.signatureData = Optional.of(signatureData);
+    }
+
     @Override
     public void read() {
         this.username = readString(16);
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19) && readBoolean()) {
+            SignatureData data = new SignatureData(readLong(), readPublicKey(), readBytes(4096));
+            this.signatureData = Optional.of(data);
+        }
     }
 
     @Override
     public void copy(WrapperLoginClientLoginStart wrapper) {
         this.username = wrapper.username;
+        this.signatureData = wrapper.signatureData;
     }
 
     @Override
     public void write() {
         writeString(username, 16);
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19) && signatureData.isPresent()) {
+            writeBoolean(true);
+            SignatureData data = signatureData.get();
+            writeLong(data.getTimestamp());
+            writePublicKey(data.getPublicKey());
+            writeBytes(data.getSignature());
+        }
     }
 
     public String getUsername() {
@@ -56,5 +78,13 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Optional<SignatureData> getSignatureData() {
+        return signatureData;
+    }
+
+    public void setSignatureData(@Nullable SignatureData signatureData) {
+        this.signatureData = Optional.ofNullable(signatureData);
     }
 }

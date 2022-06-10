@@ -40,6 +40,8 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
+import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
+import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import net.kyori.adventure.text.Component;
@@ -47,6 +49,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -521,8 +524,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public byte[] readByteArray() {
-        int len = readVarInt();
-        return readBytes(len);
+        return readByteArray(ByteBufHelper.readableBytes(buffer));
     }
 
     public void writeByteArray(byte[] array) {
@@ -682,5 +684,22 @@ public class PacketWrapper<T extends PacketWrapper> {
             }
             writeByte(127); // End of metadata array
         }
+    }
+
+    public SaltSignature readSaltSignature() {
+        return new SaltSignature(readLong(), readByteArray());
+    }
+
+    public void writeSaltSignature(SaltSignature signature) {
+        writeLong(signature.getSalt());
+        writeByteArray(signature.getSignature());
+    }
+
+    public PublicKey readPublicKey() {
+        return MinecraftEncryptionUtil.publicKey(readByteArray(512));
+    }
+
+    public void writePublicKey(PublicKey publicKey) {
+        writeByteArray(publicKey.getEncoded());
     }
 }
