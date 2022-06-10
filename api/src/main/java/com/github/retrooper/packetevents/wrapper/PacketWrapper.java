@@ -38,6 +38,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
@@ -710,5 +711,14 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeTimestamp(Instant timestamp) {
         writeLong(timestamp.toEpochMilli());
+    }
+
+    public WorldBlockPosition readWorldBlockPosition() {
+        return new WorldBlockPosition(readIdentifier(), readBlockPosition());
+    }
+
+    public void writeWorldBlockPosition(WorldBlockPosition pos) {
+        writeIdentifier(pos.getWorld());
+        writeBlockPosition(pos.getBlockPosition());
     }
 }

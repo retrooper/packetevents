@@ -152,9 +152,15 @@ public class User {
     }
 
     public void sendMessage(Component component, ChatType type) {
-        MessageSender sender = new MessageSender(getUUID(), null, null);
-        WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(sender, type, component);
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatMessage);
+        PacketWrapper<?> chatPacket;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            chatPacket = new WrapperPlayServerSystemChatMessage(ChatType.CHAT, component);
+        }
+        else {
+            MessageSender sender = new MessageSender(getUUID(), null, null);
+            chatPacket = new WrapperPlayServerChatMessage(sender, type, component);
+        }
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatPacket);
     }
 
     public void sendTitle(String legacyTitle, String legacySubtitle,

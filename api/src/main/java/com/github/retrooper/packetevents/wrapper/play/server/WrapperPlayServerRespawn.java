@@ -25,10 +25,8 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.world.Difficulty;
-import com.github.retrooper.packetevents.protocol.world.Dimension;
-import com.github.retrooper.packetevents.protocol.world.DimensionType;
-import com.github.retrooper.packetevents.protocol.world.WorldType;
+import com.github.retrooper.packetevents.protocol.world.*;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,6 +43,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     private boolean worldDebug;
     private boolean worldFlat;
     private boolean keepingAllPlayerData;
+    private Optional<WorldBlockPosition> lastDeathPosition;
 
     //This should not be accessed
     private String levelType;
@@ -72,10 +71,15 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         boolean v1_15_0 = v1_14 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
         boolean v1_16_0 = v1_15_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
         boolean v1_16_2 = v1_16_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
+        boolean v1_19 = v1_16_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         if (v1_16_2) {
-            NBTCompound dimensionAttributes = readNBT();
-            DimensionType dimensionType = DimensionType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", ""));
-            dimension = new Dimension(dimensionType, dimensionAttributes);
+            if (v1_19) {
+                dimension = new Dimension(DimensionType.getByName(readIdentifier().toString()));
+            }
+            else {
+                NBTCompound dimensionAttributes = readNBT();
+                dimension = new Dimension(DimensionType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", "")), dimensionAttributes);
+            }
             worldName = Optional.of(readString());
             hashedSeed = readLong();
             gameMode = GameMode.values()[readByte()];
@@ -84,6 +88,9 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             worldDebug = readBoolean();
             worldFlat = readBoolean();
             keepingAllPlayerData = readBoolean();
+            if (readBoolean()) {
+                lastDeathPosition = Optional.of(readWorldBlockPosition());
+            }
         }
         else if (v1_16_0) {
             DimensionType dimensionType = DimensionType.getByName(readString());
@@ -166,12 +173,20 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         boolean v1_15_0 = v1_14 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
         boolean v1_16_0 = v1_15_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
         boolean v1_16_2 = v1_16_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
+        boolean v1_19 = v1_16_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         if (v1_16_2) {
-            NBT tag = new NBTString(dimension.getType().getName());
-            //TODO Fix orElse to generate a new nbt compound
-            dimension.getAttributes().orElse(new NBTCompound()).setTag("effects", tag);
-            //TODO Fix no value when get()
-            writeNBT(dimension.getAttributes().get());
+            if (v1_19) {
+                //writeIdentifier(new ResourceLocation(dimension.getType().getName()));
+                //Optimize by writing a string directly
+                writeString(dimension.getType().getName(), 32767);
+            }
+            else {
+                NBT tag = new NBTString(dimension.getType().getName());
+                //TODO Fix orElse to generate a new nbt compound
+                dimension.getAttributes().orElse(new NBTCompound()).setTag("effects", tag);
+                //TODO Fix no value when get()
+                writeNBT(dimension.getAttributes().get());
+            }
             writeString(worldName.orElse(""));
             writeLong(hashedSeed);
             writeByte(gameMode.ordinal());
@@ -179,6 +194,10 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             writeBoolean(worldDebug);
             writeBoolean(worldFlat);
             writeBoolean(keepingAllPlayerData);
+            if (v1_19) {
+                writeBoolean(lastDeathPosition.isPresent());
+                lastDeathPosition.ifPresent(this::writeWorldBlockPosition);
+            }
         }
         else if (v1_16_0) {
             writeString(dimension.getType().getName());

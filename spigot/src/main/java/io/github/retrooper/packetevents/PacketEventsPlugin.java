@@ -46,7 +46,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().load();
-        //login, respawn, item thing
+        //TODO for 1.19 respawn, item thing
     }
 
     @Override
@@ -65,6 +65,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                         if (chatMessage.getMessage().equalsIgnoreCase("!verify")) {
                             PublicKey key = user.getPublicKey();
+                            //user.sendMessage(ChatColor.RED + "Hello, world!");
+                            //TODO Fix verifying!
                             System.out.println("Verify this: " + chatMessage.verify(event.getUser().getUUID(), key));
                         }
                         event.setLastUsedWrapper(null);
