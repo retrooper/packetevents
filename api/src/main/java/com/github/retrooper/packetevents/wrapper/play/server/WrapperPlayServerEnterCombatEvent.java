@@ -27,7 +27,7 @@ public class WrapperPlayServerEnterCombatEvent extends PacketWrapper<WrapperPlay
         super(event);
     }
 
-    public WrapperPlayServerEnterCombatEvent(int duration, int entityId) {
+    public WrapperPlayServerEnterCombatEvent() {
         super(PacketType.Play.Server.ENTER_COMBAT_EVENT);
     }
 

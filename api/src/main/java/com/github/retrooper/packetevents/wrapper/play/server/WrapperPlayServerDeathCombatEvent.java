@@ -21,17 +21,18 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
 
 public class WrapperPlayServerDeathCombatEvent extends PacketWrapper<WrapperPlayServerDeathCombatEvent> {
     private int playerId;
     private int entityId;
-    private String deathMessage;
+    private Component deathMessage;
 
     public WrapperPlayServerDeathCombatEvent(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerDeathCombatEvent(int playerId, int entityId, String deathMessage) {
+    public WrapperPlayServerDeathCombatEvent(int playerId, int entityId, Component deathMessage) {
         super(PacketType.Play.Server.DEATH_COMBAT_EVENT);
         this.playerId = playerId;
         this.entityId = entityId;
@@ -42,14 +43,14 @@ public class WrapperPlayServerDeathCombatEvent extends PacketWrapper<WrapperPlay
     public void read() {
         this.playerId = readVarInt();
         this.entityId = readInt();
-        this.deathMessage = readString();
+        this.deathMessage = readComponent();
     }
 
     @Override
     public void write() {
         writeVarInt(this.playerId);
         writeInt(this.entityId);
-        writeString(this.deathMessage);
+        writeComponent(this.deathMessage);
     }
 
     @Override
@@ -75,11 +76,11 @@ public class WrapperPlayServerDeathCombatEvent extends PacketWrapper<WrapperPlay
         this.entityId = entityId;
     }
 
-    public String getDeathMessage() {
+    public Component getDeathMessage() {
         return deathMessage;
     }
 
-    public void setDeathMessage(String deathMessage) {
+    public void setDeathMessage(Component deathMessage) {
         this.deathMessage = deathMessage;
     }
 }
