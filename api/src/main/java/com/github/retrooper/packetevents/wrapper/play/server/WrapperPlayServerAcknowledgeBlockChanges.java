@@ -18,7 +18,7 @@ public class WrapperPlayServerAcknowledgeBlockChanges extends PacketWrapper<Wrap
 
     @Override
     public void read() {
-            sequence = readVarInt();
+        sequence = readVarInt();
     }
 
     @Override
