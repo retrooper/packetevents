@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -38,20 +39,46 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
 
     @Override
     public void read() {
-        this.primaryEffect = readVarInt();
-        this.secondaryEffect = readVarInt();
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19)) {
+            if (readBoolean()) {
+                this.primaryEffect = readVarInt();
+            } else {
+                this.primaryEffect = -1;
+            }
+
+            if (readBoolean()) {
+                this.secondaryEffect = readVarInt();
+            } else {
+                this.secondaryEffect = -1;
+            }
+        } else {
+            this.primaryEffect = readVarInt();
+            this.secondaryEffect = readVarInt();
+        }
+    }
+
+    @Override
+    public void write() {
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19)) {
+            writeBoolean(primaryEffect != -1);
+            if (primaryEffect != -1) {
+                writeVarInt(primaryEffect);
+            }
+            writeBoolean(secondaryEffect != -1);
+            if (secondaryEffect != -1) {
+                writeVarInt(secondaryEffect);
+            }
+        } else {
+            writeVarInt(primaryEffect);
+            writeVarInt(secondaryEffect);
+        }
     }
 
     @Override
     public void copy(WrapperPlayClientSetBeaconEffect wrapper) {
         this.primaryEffect = wrapper.primaryEffect;
         this.secondaryEffect = wrapper.secondaryEffect;
-    }
-
-    @Override
-    public void write() {
-        writeVarInt(primaryEffect);
-        writeVarInt(secondaryEffect);
     }
 
     public int getPrimaryEffect() {
