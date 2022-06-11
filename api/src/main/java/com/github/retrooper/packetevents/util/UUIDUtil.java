@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class UUIDUtil {
+    public static final UUID DUMMY = new UUID(0L, 0L);
     private static final Pattern PATTERN = Pattern.compile("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})");
 
     public static UUID fromStringWithoutDashes(String uuid) {

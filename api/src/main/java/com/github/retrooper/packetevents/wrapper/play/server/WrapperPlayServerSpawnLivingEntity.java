@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.MathUtil;
+import com.github.retrooper.packetevents.util.UUIDUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -76,7 +77,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     public void read() {
         this.entityID = readVarInt();
         if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
-            this.entityUUID = new UUID(0L, 0L);
+            this.entityUUID = UUIDUtil.DUMMY;
             int entityTypeID = readByte() & 255;
             entityType = EntityTypes.getById(serverVersion.toClientVersion(), entityTypeID);
             this.position = new Vector3d(readInt() / POSITION_FACTOR, readInt() / POSITION_FACTOR, readInt() / POSITION_FACTOR);

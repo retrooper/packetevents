@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Direction;
 import com.github.retrooper.packetevents.protocol.world.PaintingType;
+import com.github.retrooper.packetevents.util.UUIDUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +44,7 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
     }
 
     public WrapperPlayServerSpawnPainting(int entityId, Vector3i position, Direction direction) {
-        this(entityId, new UUID(0L, 0L), null, position, direction);
+        this(entityId, UUIDUtil.DUMMY, null, position, direction);
     }
 
     public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, Vector3i position, Direction direction) {
@@ -65,7 +66,7 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             this.uuid = readUUID();
         } else {
-            this.uuid = new UUID(0L, 0L);
+            this.uuid = UUIDUtil.DUMMY;
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             this.type = PaintingType.getById(readVarInt());

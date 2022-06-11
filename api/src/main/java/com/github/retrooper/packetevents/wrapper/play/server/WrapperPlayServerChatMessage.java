@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.protocol.chat.MessageSender;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
+import com.github.retrooper.packetevents.util.UUIDUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -181,7 +182,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
             //UUID never null, if unspecified, it should be 0L, 0L
             UUID uuid = sender.getUUID();
             if (uuid == null) {
-                uuid = new UUID(0L, 0L);
+                uuid = UUIDUtil.DUMMY;
             }
             writeUUID(uuid);
             if (v1_19) {

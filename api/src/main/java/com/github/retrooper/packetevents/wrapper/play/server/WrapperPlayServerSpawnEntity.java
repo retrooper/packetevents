@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.MathUtil;
+import com.github.retrooper.packetevents.util.UUIDUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -138,7 +139,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         if (v1_9) {
-            writeUUID(uuid.orElse(new UUID(0L, 0L)));
+            writeUUID(uuid.orElse(UUIDUtil.DUMMY));
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             writeVarInt(entityType.getId(serverVersion.toClientVersion()));

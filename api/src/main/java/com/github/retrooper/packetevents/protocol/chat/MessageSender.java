@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
+import com.github.retrooper.packetevents.util.UUIDUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +37,7 @@ public class MessageSender {
     }
 
     public MessageSender(@Nullable Component displayName, @Nullable Component teamName) {
-        this(new UUID(0L, 0L), displayName, teamName);
+        this(UUIDUtil.DUMMY, displayName, teamName);
     }
 
     public UUID getUUID() {
