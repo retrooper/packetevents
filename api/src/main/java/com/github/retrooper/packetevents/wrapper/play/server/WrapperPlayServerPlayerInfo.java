@@ -21,9 +21,11 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
+import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -114,7 +116,13 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         GameMode gameMode = GameMode.values()[readVarInt()];
                         int ping = readVarInt();
                         Component displayName = readBoolean() ? readComponent() : null;
-                        data = new PlayerData(displayName, userProfile, gameMode, ping);
+
+                        SignatureData signatureData = null;
+                        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19) && readBoolean()) {
+                            signatureData = new SignatureData(readTimestamp(), readPublicKey(), readBytes(4096));
+                        }
+
+                        data = new PlayerData(displayName, userProfile, gameMode, signatureData, ping);
                         break;
                     }
                     case UPDATE_GAME_MODE: {
@@ -185,6 +193,14 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         } else {
                             writeBoolean(false);
                         }
+                        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+                            writeBoolean(data.signatureData != null);
+                            if (data.signatureData != null) {
+                                writeTimestamp(data.signatureData.getTimestamp());
+                                writePublicKey(data.signatureData.getPublicKey());
+                                writeBytes(data.signatureData.getSignature());
+                            }
+                        }
                         break;
                     }
                     case UPDATE_GAME_MODE: {
@@ -236,14 +252,37 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         private UserProfile userProfile;
         @Nullable
         private GameMode gameMode;
+        @Nullable
+        private SignatureData signatureData;
 
         private int ping;
 
-        public PlayerData(@Nullable Component displayName, @Nullable UserProfile userProfile, @Nullable GameMode gameMode, int ping) {
+        public PlayerData(@Nullable Component displayName, @Nullable UserProfile userProfile, @Nullable GameMode gameMode, @Nullable SignatureData signatureData, int ping) {
             this.displayName = displayName;
             this.userProfile = userProfile;
             this.gameMode = gameMode;
+            this.signatureData = signatureData;
             this.ping = ping;
+        }
+
+        public PlayerData(@Nullable Component displayName, @Nullable UserProfile userProfile, @Nullable GameMode gameMode, int ping) {
+            this(displayName, userProfile, gameMode, null, ping);
+        }
+
+        public UserProfile getUserProfile() {
+            return userProfile;
+        }
+
+        public void setUserProfile(UserProfile userProfile) {
+            this.userProfile = userProfile;
+        }
+
+        public SignatureData getSignatureData() {
+            return signatureData;
+        }
+
+        public void setSignatureData(SignatureData signatureData) {
+            this.signatureData = signatureData;
         }
 
         @Nullable
