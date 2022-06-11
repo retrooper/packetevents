@@ -39,18 +39,9 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
 
     @Override
     public void read() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19)) {
-            if (readBoolean()) {
-                this.primaryEffect = readVarInt();
-            } else {
-                this.primaryEffect = -1;
-            }
-
-            if (readBoolean()) {
-                this.secondaryEffect = readVarInt();
-            } else {
-                this.secondaryEffect = -1;
-            }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            this.primaryEffect = readEffect();
+            this.secondaryEffect = readEffect();
         } else {
             this.primaryEffect = readVarInt();
             this.secondaryEffect = readVarInt();
@@ -59,16 +50,9 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
 
     @Override
     public void write() {
-        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19)) {
-            writeBoolean(primaryEffect != -1);
-            if (primaryEffect != -1) {
-                writeVarInt(primaryEffect);
-            }
-            writeBoolean(secondaryEffect != -1);
-            if (secondaryEffect != -1) {
-                writeVarInt(secondaryEffect);
-            }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            writeEffect(primaryEffect);
+            writeEffect(secondaryEffect);
         } else {
             writeVarInt(primaryEffect);
             writeVarInt(secondaryEffect);
@@ -95,5 +79,19 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
 
     public void setSecondaryEffect(int secondaryEffect) {
         this.secondaryEffect = secondaryEffect;
+    }
+
+    private int readEffect() {
+        if (readBoolean()) {
+            return readVarInt();
+        }
+        return -1;
+    }
+
+    private void writeEffect(int effect) {
+        writeBoolean(effect != -1);
+        if (effect != -1) {
+            writeVarInt(effect);
+        }
     }
 }
