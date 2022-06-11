@@ -32,12 +32,16 @@ import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.protocol.world.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
@@ -685,6 +689,28 @@ public class PacketWrapper<T extends PacketWrapper> {
                 entityData.getType().getDataSerializer().accept(this, entityData.getValue());
             }
             writeByte(127); // End of metadata array
+        }
+    }
+
+    public Dimension readDimension() {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            return new Dimension(DimensionType.getByName(readIdentifier().toString()));
+        }
+        else {
+            NBTCompound dimensionAttributes = readNBT();
+            return new Dimension(DimensionType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", "")), dimensionAttributes);
+        }
+    }
+
+    public void writeDimension(Dimension dimension) {
+        boolean v1_19 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19);
+        boolean v1_16_2 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2);
+        if (v1_19 || !v1_16_2) {
+            writeString(dimension.getType().getName(), 32767);
+        } else {
+            NBT tag = new NBTString(dimension.getType().getName());
+            dimension.getAttributes().orElse(new NBTCompound()).setTag("effects", tag);
+            writeNBT(dimension.getAttributes().get());
         }
     }
 

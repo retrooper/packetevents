@@ -56,4 +56,12 @@ public enum DimensionType {
     public String getName() {
         return name;
     }
+
+    public static boolean isFlat(String levelType) {
+        return WorldType.FLAT.getName().equals(levelType);
+    }
+
+    public static boolean isDebug(String levelType) {
+        return WorldType.DEBUG_ALL_BLOCK_STATES.getName().equals(levelType);
+    }
 }

@@ -18,20 +18,17 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.*;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-//TODO Test this wrapper
+
 public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRespawn> {
     private Dimension dimension;
     private Optional<String> worldName;
@@ -43,7 +40,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     private boolean worldDebug;
     private boolean worldFlat;
     private boolean keepingAllPlayerData;
-    private Optional<WorldBlockPosition> lastDeathPosition;
+    private WorldBlockPosition lastDeathPosition;
 
     //This should not be accessed
     private String levelType;
@@ -67,19 +64,11 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     @Override
     public void read() {
-        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
-        boolean v1_15_0 = v1_14 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
-        boolean v1_16_0 = v1_15_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
-        boolean v1_16_2 = v1_16_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
-        boolean v1_19 = v1_16_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        if (v1_16_2) {
-            if (v1_19) {
-                dimension = new Dimension(DimensionType.getByName(readIdentifier().toString()));
-            }
-            else {
-                NBTCompound dimensionAttributes = readNBT();
-                dimension = new Dimension(DimensionType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", "")), dimensionAttributes);
-            }
+        boolean v1_15_0 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
+
+        if (v1_15_0) {
+            dimension = readDimension();
             worldName = Optional.of(readString());
             hashedSeed = readLong();
             gameMode = GameMode.values()[readByte()];
@@ -88,69 +77,27 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             worldDebug = readBoolean();
             worldFlat = readBoolean();
             keepingAllPlayerData = readBoolean();
-            if (readBoolean()) {
-                lastDeathPosition = Optional.of(readWorldBlockPosition());
+            if (v1_19 && readBoolean()) {
+                lastDeathPosition = readWorldBlockPosition();
             }
-        }
-        else if (v1_16_0) {
-            DimensionType dimensionType = DimensionType.getByName(readString());
-            dimension = new Dimension(dimensionType);
-            worldName = Optional.of(readString());
-            hashedSeed = readLong();
-            gameMode = GameMode.values()[readByte()];
-            int previousMode = readByte();
-            previousGameMode = previousMode == -1 ? null : GameMode.values()[previousMode];
-            worldDebug = readBoolean();
-            worldFlat = readBoolean();
-            keepingAllPlayerData = readBoolean();
-        }
-        else if (v1_15_0) {
+        } else {
             DimensionType dimensionType = DimensionType.getById(readInt());
             dimension = new Dimension(dimensionType);
-            worldName = Optional.empty();
-            hashedSeed = readLong();
-            gameMode = GameMode.values()[readByte()];
-            levelType = readString(16);
-            if (WorldType.FLAT.getName().equals(levelType)) {
-                worldFlat = true;
-                worldDebug = false;
-            }
-            else if (WorldType.DEBUG_ALL_BLOCK_STATES.getName().equals(levelType)) {
-                worldDebug = true;
-                worldFlat = false;
-            }
-            else {
-                worldFlat = false;
-                worldDebug = false;
-            }
-        }
-        else {
-            DimensionType dimensionType = DimensionType.getById(readInt());
-            dimension = new Dimension(dimensionType);
-            if (!v1_14) {
-                //Handle 1.13.2 and below
+
+            if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
                 difficulty = Difficulty.getById(readByte());
-            }
-            else {
+            } else {
                 difficulty = Difficulty.NORMAL;
             }
+
             worldName = Optional.empty();
             hashedSeed = 0L;
+
             //Note: SPECTATOR will not be expected from a 1.7 client.
             gameMode = GameMode.values()[readByte()];
             levelType = readString(16);
-            if (WorldType.FLAT.getName().equals(levelType)) {
-                worldFlat = true;
-                worldDebug = false;
-            }
-            else if (WorldType.DEBUG_ALL_BLOCK_STATES.getName().equals(levelType)) {
-                worldDebug = true;
-                worldFlat = false;
-            }
-            else {
-                worldFlat = false;
-                worldDebug = false;
-            }
+            worldFlat = DimensionType.isFlat(levelType);
+            worldDebug = DimensionType.isDebug(levelType);
         }
     }
 
@@ -170,37 +117,12 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     @Override
     public void write() {
         boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
-        boolean v1_15_0 = v1_14 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
-        boolean v1_16_0 = v1_15_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
-        boolean v1_16_2 = v1_16_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
-        boolean v1_19 = v1_16_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        if (v1_16_2) {
-            if (v1_19) {
-                //writeIdentifier(new ResourceLocation(dimension.getType().getName()));
-                //Optimize by writing a string directly
-                writeString(dimension.getType().getName(), 32767);
-            }
-            else {
-                NBT tag = new NBTString(dimension.getType().getName());
-                //TODO Fix orElse to generate a new nbt compound
-                dimension.getAttributes().orElse(new NBTCompound()).setTag("effects", tag);
-                //TODO Fix no value when get()
-                writeNBT(dimension.getAttributes().get());
-            }
-            writeString(worldName.orElse(""));
-            writeLong(hashedSeed);
-            writeByte(gameMode.ordinal());
-            writeByte(previousGameMode == null ? -1 :previousGameMode.ordinal());
-            writeBoolean(worldDebug);
-            writeBoolean(worldFlat);
-            writeBoolean(keepingAllPlayerData);
-            if (v1_19) {
-                writeBoolean(lastDeathPosition.isPresent());
-                lastDeathPosition.ifPresent(this::writeWorldBlockPosition);
-            }
-        }
-        else if (v1_16_0) {
-            writeString(dimension.getType().getName());
+        boolean v1_15_0 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
+        boolean v1_16_0 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
+
+        if (v1_16_0) {
+            writeDimension(dimension);
             writeString(worldName.orElse(""));
             writeLong(hashedSeed);
             writeByte(gameMode.ordinal());
@@ -208,48 +130,34 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             writeBoolean(worldDebug);
             writeBoolean(worldFlat);
             writeBoolean(keepingAllPlayerData);
-        }
-        else if (v1_15_0) {
+            if (v1_19) {
+                writeBoolean(lastDeathPosition != null);
+                if (lastDeathPosition != null) writeWorldBlockPosition(lastDeathPosition);
+            }
+        } else {
             writeInt(dimension.getType().getId());
-            writeString(worldName.orElse(""));
-            writeLong(hashedSeed);
-            writeByte(gameMode.ordinal());
-            if (worldFlat) {
-                writeString(WorldType.FLAT.getName());
-            }
-            else if (worldDebug) {
-                writeString(WorldType.DEBUG_ALL_BLOCK_STATES.getName());
-            }
-            else {
-                if (levelType == null) {
-                    levelType = WorldType.DEFAULT.getName();
+            if (v1_15_0) {
+                writeString(worldName.orElse(""));
+                writeLong(hashedSeed);
+            } else {
+                if (!v1_14) {
+                    //Handle 1.13.2 and below
+                    if (difficulty == null) {
+                        difficulty = Difficulty.NORMAL;
+                    }
+                    writeByte(difficulty.getId());
                 }
-                writeString(levelType, 16);
             }
 
-        }
-        else {
-            writeInt(dimension.getType().getId());
-            if (!v1_14) {
-                //Handle 1.13.2 and below
-                if (difficulty == null) {
-                    difficulty = Difficulty.NORMAL;
-                }
-                writeByte(difficulty.getId());
-            }
             //Note: SPECTATOR will not be expected from a 1.7 client.
             writeByte(gameMode.ordinal());
+
             if (worldFlat) {
                 writeString(WorldType.FLAT.getName());
-            }
-            else if (worldDebug) {
+            } else if (worldDebug) {
                 writeString(WorldType.DEBUG_ALL_BLOCK_STATES.getName());
-            }
-            else {
-                if (levelType == null) {
-                    levelType = WorldType.DEFAULT.getName();
-                }
-                writeString(levelType, 16);
+            } else {
+                writeString(levelType == null ? WorldType.DEFAULT.getName() : levelType, 16);
             }
         }
     }
