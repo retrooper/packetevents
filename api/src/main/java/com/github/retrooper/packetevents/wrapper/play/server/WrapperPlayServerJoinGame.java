@@ -152,16 +152,8 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         } else {
             maxPlayers = readUnsignedByte();
             String levelType = readString(16);
-            if (WorldType.FLAT.getName().equals(levelType)) {
-                isFlat = true;
-                isDebug = false;
-            } else if (WorldType.DEBUG_ALL_BLOCK_STATES.getName().equals(levelType)) {
-                isDebug = true;
-                isFlat = false;
-            } else {
-                isFlat = false;
-                isDebug = false;
-            }
+            isFlat = DimensionType.isFlat(levelType);
+            isDebug = DimensionType.isDebug(levelType);
             if (v1_14) {
                 viewDistance = readVarInt();
             }
