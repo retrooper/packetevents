@@ -32,9 +32,7 @@ import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -45,10 +43,10 @@ import com.github.retrooper.packetevents.protocol.world.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
-import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
-import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
+import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,6 +56,7 @@ import java.security.PublicKey;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class PacketWrapper<T extends PacketWrapper> {
@@ -744,5 +743,18 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void writeWorldBlockPosition(WorldBlockPosition pos) {
         writeIdentifier(pos.getWorld());
         writeBlockPosition(pos.getBlockPosition());
+    }
+
+    public <S> void readOptional(S value, Consumer<S> writeValue) {
+        if (readBoolean()) {
+            writeValue.accept(value);
+        }
+    }
+
+    public <S> void writeOptional(S value, Consumer<S> writeValue) {
+        writeBoolean(value != null);
+        if (value != null) {
+            writeValue.accept(value);
+        }
     }
 }
