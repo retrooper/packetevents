@@ -19,10 +19,13 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
+import java.util.OptionalLong;
 
 public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServerSoundEffect> {
     private int soundID;
@@ -30,18 +33,26 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     private Vector3i effectPosition;
     private float volume;
     private float pitch;
+    private long seed;
+
     public WrapperPlayServerSoundEffect(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperPlayServerSoundEffect(int soundID, SoundCategory soundCategory,
                                         Vector3i effectPosition, float volume, float pitch) {
+        this(soundID, soundCategory, effectPosition, volume, pitch, -1);
+    }
+
+    public WrapperPlayServerSoundEffect(int soundID, SoundCategory soundCategory,
+                                        Vector3i effectPosition, float volume, float pitch, long seed) {
         super(PacketType.Play.Server.SOUND_EFFECT);
-        this.soundID= soundID;
+        this.soundID = soundID;
         this.soundCategory = soundCategory;
         this.effectPosition = effectPosition;
         this.volume = volume;
         this.pitch = pitch;
+        this.seed = seed;
     }
 
     @Override
@@ -51,15 +62,9 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         effectPosition = new Vector3i(readInt(), readInt(), readInt());
         volume = readFloat();
         pitch = readFloat();
-    }
-
-    @Override
-    public void copy(WrapperPlayServerSoundEffect wrapper) {
-        soundID = wrapper.soundID;
-        soundCategory = wrapper.soundCategory;
-        effectPosition = wrapper.effectPosition;
-        volume = wrapper.volume;
-        pitch = wrapper.pitch;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            this.seed = readLong();
+        }
     }
 
     @Override
@@ -71,13 +76,26 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         writeInt(effectPosition.z);
         writeFloat(volume);
         writeFloat(pitch);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            writeLong(seed);
+        }
     }
 
-    public int getSoundId() {
+    @Override
+    public void copy(WrapperPlayServerSoundEffect wrapper) {
+        soundID = wrapper.soundID;
+        soundCategory = wrapper.soundCategory;
+        effectPosition = wrapper.effectPosition;
+        volume = wrapper.volume;
+        pitch = wrapper.pitch;
+        seed = wrapper.seed;
+    }
+
+    public int getSoundID() {
         return soundID;
     }
 
-    public void setSoundId(int soundID) {
+    public void setSoundID(int soundID) {
         this.soundID = soundID;
     }
 
@@ -111,5 +129,13 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
 
     public void setPitch(float pitch) {
         this.pitch = pitch;
+    }
+
+    public OptionalLong getSeed() {
+        return OptionalLong.of(seed);
+    }
+
+    public void setSeed(long seed) {
+        this.seed = seed;
     }
 }
