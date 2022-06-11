@@ -48,8 +48,8 @@ public class EntityDataTypes {
             ClientVersion.V_1_8,
             ClientVersion.V_1_9,
             ClientVersion.V_1_11,
-            ClientVersion.V_1_13, //Fix? Why did we not acknoledge 1.13
-            ClientVersion.V_1_16,
+            ClientVersion.V_1_13,
+            ClientVersion.V_1_14,
             ClientVersion.V_1_19);
 
     public static final EntityDataType<Byte> BYTE = define("byte", PacketWrapper::readByte, PacketWrapper::writeByte);
