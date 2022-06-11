@@ -119,7 +119,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
 
                         SignatureData signatureData = null;
                         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19) && readBoolean()) {
-                            signatureData = new SignatureData(readTimestamp(), readPublicKey(), readBytes(4096));
+                            signatureData = new SignatureData(readTimestamp(), readPublicKey(), readByteArray(4096));
                         }
 
                         data = new PlayerData(displayName, userProfile, gameMode, signatureData, ping);
@@ -198,7 +198,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                             if (data.signatureData != null) {
                                 writeTimestamp(data.signatureData.getTimestamp());
                                 writePublicKey(data.signatureData.getPublicKey());
-                                writeBytes(data.signatureData.getSignature());
+                                writeByteArray(data.signatureData.getSignature());
                             }
                         }
                         break;
