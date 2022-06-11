@@ -698,7 +698,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
         else {
             NBTCompound dimensionAttributes = readNBT();
-            return new Dimension(DimensionType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", "")), dimensionAttributes);
+            return new Dimension(dimensionAttributes);
         }
     }
 
@@ -706,11 +706,9 @@ public class PacketWrapper<T extends PacketWrapper> {
         boolean v1_19 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19);
         boolean v1_16_2 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2);
         if (v1_19 || !v1_16_2) {
-            writeString(dimension.getType().getName(), 32767);
+            writeString(dimension.getDimensionName(), 32767);
         } else {
-            NBT tag = new NBTString(dimension.getType().getName());
-            dimension.getAttributes().orElse(new NBTCompound()).setTag("effects", tag);
-            writeNBT(dimension.getAttributes().get());
+            writeNBT(dimension.getAttributes());
         }
     }
 

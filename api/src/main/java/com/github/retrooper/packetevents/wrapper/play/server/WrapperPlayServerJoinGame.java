@@ -114,32 +114,19 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 worldNames.add(readString());
             }
             dimensionCodec = readNBT();
-            if (!v1_19) {
-                NBTCompound dimensionAttributes = readNBT();
-                DimensionType dimensionType = DimensionType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", ""));
-                dimension = new Dimension(dimensionType, dimensionAttributes);
-            } else {
-                DimensionType dimensionType = DimensionType.getByName(readString());
-                dimension = new Dimension(dimensionType);
-            }
+            dimension = readDimension();
             worldName = readString();
         } else {
             previousGameMode = gameMode;
             dimensionCodec = new NBTCompound();
-            DimensionType dimensionType = DimensionType.getById(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9_2) ?
-                    readInt() : readByte());
+            DimensionType dimensionType = DimensionType.getById(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9_2) ? readInt() : readByte());
             dimension = new Dimension(dimensionType);
             if (!v1_14) {
                 difficulty = Difficulty.getById(readByte());
-            } else {
-                difficulty = Difficulty.NORMAL;
-                //Max players
             }
         }
         if (v1_15) {
             hashedSeed = readLong();
-        } else {
-            hashedSeed = 0L;
         }
         if (v1_16) {
             maxPlayers = readVarInt();
@@ -160,8 +147,6 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             reducedDebugInfo = readBoolean();
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
                 enableRespawnScreen = readBoolean();
-            } else {
-                enableRespawnScreen = true;
             }
         }
         if (v1_19) {
@@ -221,15 +206,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 writeString(name);
             }
             writeNBT(dimensionCodec);
-            if (!v1_19) {
-                NBT tag = new NBTString(dimension.getType().getName());
-                //TODO Fix orElse to generate a new nbt compound
-                dimension.getAttributes().orElse(new NBTCompound()).setTag("effects", tag);
-                //TODO Fix no value when get()
-                writeNBT(dimension.getAttributes().get());
-            } else {
-                writeString(dimension.getType().getName());
-            }
+            writeDimension(dimension);
             writeString(worldName);
         } else {
             previousGameMode = gameMode;
