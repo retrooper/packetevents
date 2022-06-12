@@ -30,7 +30,6 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
         super(event);
     }
 
-
     public WrapperPlayClientClientStatus(Action action) {
         super(PacketType.Play.Client.CLIENT_STATUS);
         this.action = action;
@@ -38,18 +37,13 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
 
     @Override
     public void read() {
-        int index;
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            index = readVarInt();
-        } else {
-            index = readByte();
-        }
-        this.action = Action.VALUES[index];
-    }
-
-    @Override
-    public void copy(WrapperPlayClientClientStatus wrapper) {
-        this.action = wrapper.action;
+        multiOptional(action, actionType -> {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+                action = Action.getActionById(readVarInt());
+            } else {
+                action = Action.getActionById(readByte());
+            }
+        });
     }
 
     @Override
@@ -67,6 +61,11 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
         }
     }
 
+    @Override
+    public void copy(WrapperPlayClientClientStatus wrapper) {
+        this.action = wrapper.action;
+    }
+
     public Action getAction() {
         return action;
     }
@@ -82,6 +81,10 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
         //This only exists on 1.7.10 -> 1.15.2
         OPEN_INVENTORY_ACHIEVEMENT;
 
-        public static final Action[] VALUES = values();
+        private static final Action[] VALUES = values();
+
+        public static Action getActionById(int index) {
+            return VALUES[index];
+        }
     }
 }

@@ -22,7 +22,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayWorldBorderWarningReach extends PacketWrapper<WrapperPlayWorldBorderWarningReach> {
-    int warningBlocks;
+    private int warningBlocks;
 
     public WrapperPlayWorldBorderWarningReach(int warningBlocks) {
         super(PacketType.Play.Server.WORLD_BORDER_WARNING_REACH);
@@ -35,13 +35,13 @@ public class WrapperPlayWorldBorderWarningReach extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void copy(WrapperPlayWorldBorderWarningReach packet) {
-        warningBlocks = packet.warningBlocks;
+    public void write() {
+        writeVarInt(warningBlocks);
     }
 
     @Override
-    public void write() {
-        writeVarInt(warningBlocks);
+    public void copy(WrapperPlayWorldBorderWarningReach packet) {
+        warningBlocks = packet.warningBlocks;
     }
 
     public int getWarningBlocks() {

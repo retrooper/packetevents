@@ -35,8 +35,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     private Difficulty difficulty;
     private long hashedSeed;
     private GameMode gameMode;
-    @Nullable
-    private GameMode previousGameMode;
+    private @Nullable GameMode previousGameMode;
     private boolean worldDebug;
     private boolean worldFlat;
     private boolean keepingAllPlayerData;
@@ -71,9 +70,9 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             dimension = readDimension();
             worldName = Optional.of(readString());
             hashedSeed = readLong();
-            gameMode = GameMode.values()[readByte()];
+            gameMode = GameMode.getById(readUnsignedByte());
             int previousMode = readByte();
-            previousGameMode = previousMode == -1 ? null : GameMode.values()[previousMode];
+            previousGameMode = previousMode == -1 ? null : GameMode.getById(previousMode);
             worldDebug = readBoolean();
             worldFlat = readBoolean();
             keepingAllPlayerData = readBoolean();
@@ -94,24 +93,11 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             hashedSeed = 0L;
 
             //Note: SPECTATOR will not be expected from a 1.7 client.
-            gameMode = GameMode.values()[readByte()];
+            gameMode = GameMode.getById(readByte());
             levelType = readString(16);
             worldFlat = DimensionType.isFlat(levelType);
             worldDebug = DimensionType.isDebug(levelType);
         }
-    }
-
-    @Override
-    public void copy(WrapperPlayServerRespawn wrapper) {
-        dimension = wrapper.dimension;
-        worldName = wrapper.worldName;
-        difficulty = wrapper.difficulty;
-        hashedSeed = wrapper.hashedSeed;
-        gameMode = wrapper.gameMode;
-        previousGameMode = wrapper.previousGameMode;
-        worldDebug = wrapper.worldDebug;
-        worldFlat = wrapper.worldFlat;
-        keepingAllPlayerData = wrapper.keepingAllPlayerData;
     }
 
     @Override
@@ -160,6 +146,19 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
                 writeString(levelType == null ? WorldType.DEFAULT.getName() : levelType, 16);
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerRespawn wrapper) {
+        dimension = wrapper.dimension;
+        worldName = wrapper.worldName;
+        difficulty = wrapper.difficulty;
+        hashedSeed = wrapper.hashedSeed;
+        gameMode = wrapper.gameMode;
+        previousGameMode = wrapper.previousGameMode;
+        worldDebug = wrapper.worldDebug;
+        worldFlat = wrapper.worldFlat;
+        keepingAllPlayerData = wrapper.keepingAllPlayerData;
     }
 
     public Dimension getDimension() {

@@ -20,9 +20,9 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -48,8 +48,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             action = DiggingAction.getById(readVarInt());
-        }
-        else {
+        } else {
             action = DiggingAction.getById(readByte());
         }
 
@@ -70,14 +69,6 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
     }
 
     @Override
-    public void copy(WrapperPlayClientPlayerDigging wrapper) {
-        action = wrapper.action;
-        blockPosition = wrapper.blockPosition;
-        blockFace = wrapper.blockFace;
-        sequence = wrapper.sequence;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             writeVarInt(action.getId());
@@ -93,6 +84,14 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeVarInt(sequence);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientPlayerDigging wrapper) {
+        action = wrapper.action;
+        blockPosition = wrapper.blockPosition;
+        blockFace = wrapper.blockFace;
+        sequence = wrapper.sequence;
     }
 
     public DiggingAction getAction() {

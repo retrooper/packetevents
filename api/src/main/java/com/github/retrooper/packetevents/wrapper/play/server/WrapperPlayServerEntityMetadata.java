@@ -39,16 +39,11 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
         this.entityID = entityID;
         this.entityMetadata = entityMetadata;
     }
+
     @Override
     public void read() {
         entityID = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) ? readVarInt() : readInt();
         entityMetadata = readEntityMetadata();
-    }
-
-    @Override
-    public void copy(WrapperPlayServerEntityMetadata wrapper) {
-        entityID = wrapper.entityID;
-        entityMetadata = wrapper.entityMetadata;
     }
 
     @Override
@@ -59,6 +54,12 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
             writeInt(entityID);
         }
         writeEntityMetadata(entityMetadata);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerEntityMetadata wrapper) {
+        entityID = wrapper.entityID;
+        entityMetadata = wrapper.entityMetadata;
     }
 
     public int getEntityId() {

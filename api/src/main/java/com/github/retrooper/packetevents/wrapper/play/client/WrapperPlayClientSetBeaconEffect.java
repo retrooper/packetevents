@@ -43,15 +43,15 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
     }
 
     @Override
-    public void copy(WrapperPlayClientSetBeaconEffect wrapper) {
-        this.primaryEffect = wrapper.primaryEffect;
-        this.secondaryEffect = wrapper.secondaryEffect;
-    }
-
-    @Override
     public void write() {
         writeVarInt(primaryEffect);
         writeVarInt(secondaryEffect);
+    }
+
+    @Override
+    public void copy(WrapperPlayClientSetBeaconEffect wrapper) {
+        this.primaryEffect = wrapper.primaryEffect;
+        this.secondaryEffect = wrapper.secondaryEffect;
     }
 
     public int getPrimaryEffect() {

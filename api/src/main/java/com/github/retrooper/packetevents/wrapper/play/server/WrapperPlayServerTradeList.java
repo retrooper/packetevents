@@ -29,6 +29,12 @@ import java.util.Collection;
 import java.util.List;
 
 public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerTradeList> {
+    private int containerId;
+    private List<MerchantRecipeData> merchantRecipeData;
+    private int villagerLevel;
+    private int villagerXp;
+    private boolean showProgress;
+    private boolean canRestock;
 
     public WrapperPlayServerTradeList(PacketSendEvent event) {
         super(event);
@@ -43,13 +49,6 @@ public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerT
         this.showProgress = showProgress;
         this.canRestock = canRestock;
     }
-
-    private int containerId;
-    private List<MerchantRecipeData> merchantRecipeData;
-    private int villagerLevel;
-    private int villagerXp;
-    private boolean showProgress;
-    private boolean canRestock;
 
     @Override
     public void read() {
@@ -79,16 +78,6 @@ public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerT
     }
 
     @Override
-    public void copy(WrapperPlayServerTradeList wrapper) {
-        containerId = wrapper.containerId;
-        merchantRecipeData = wrapper.merchantRecipeData;
-        villagerLevel = wrapper.villagerLevel;
-        villagerXp = wrapper.villagerXp;
-        showProgress = wrapper.showProgress;
-        canRestock = wrapper.canRestock;
-    }
-
-    @Override
     public void write() {
         writeVarInt(containerId);
         writeByte(this.merchantRecipeData.size() & 0xFF);
@@ -114,6 +103,16 @@ public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerT
         writeVarInt(this.villagerXp);
         writeBoolean(this.showProgress);
         writeBoolean(this.canRestock);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerTradeList wrapper) {
+        containerId = wrapper.containerId;
+        merchantRecipeData = wrapper.merchantRecipeData;
+        villagerLevel = wrapper.villagerLevel;
+        villagerXp = wrapper.villagerXp;
+        showProgress = wrapper.showProgress;
+        canRestock = wrapper.canRestock;
     }
 
     public int getContainerId() {

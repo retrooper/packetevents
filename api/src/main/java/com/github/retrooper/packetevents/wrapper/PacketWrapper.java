@@ -48,6 +48,7 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -132,6 +133,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         wrapper.buffer = byteBuf;
         return wrapper;
     }
+
     public final void prepareForSend() {
         // Null means the packet was manually created and wasn't sent by the server itself
         // A reference count of 0 means that the packet was freed (it was already sent)
@@ -146,12 +148,12 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void read() {
     }
 
-    //TODO Rename to copyFrom, as it copies data from the passed in wrapper.
-    public void copy(T wrapper) {
+    public void write() {
 
     }
 
-    public void write() {
+    //TODO Rename to copyFrom, as it copies data from the passed in wrapper.
+    public void copy(T wrapper) {
 
     }
 
@@ -361,6 +363,7 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public String readString(int maxLen) {
         int j = readVarInt();
+        // TODO: Don't throw an exception if the string is too long (but still cut it off and probably kick the player)
         if (j > maxLen * 4) {
             throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + maxLen * 4 + ")");
         } else if (j < 0) {
@@ -694,8 +697,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     public Dimension readDimension() {
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
             return new Dimension(DimensionType.getByName(readIdentifier().toString()));
-        }
-        else {
+        } else {
             NBTCompound dimensionAttributes = readNBT();
             return new Dimension(dimensionAttributes);
         }
@@ -745,16 +747,47 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeBlockPosition(pos.getBlockPosition());
     }
 
-    public <S> void readOptional(S value, Consumer<S> writeValue) {
-        if (readBoolean()) {
-            writeValue.accept(value);
+    public <R> R readOptional(Reader<R> reader) {
+        return this.readBoolean() ? reader.apply(this) : null;
+    }
+
+    public <V> void writeOptional(V value, Writer<V> writer) {
+        if (value != null) {
+            this.writeBoolean(true);
+            writer.accept(this, value);
+        } else {
+            this.writeBoolean(false);
         }
     }
 
-    public <S> void writeOptional(S value, Consumer<S> writeValue) {
-        writeBoolean(value != null);
-        if (value != null) {
-            writeValue.accept(value);
+    @Experimental
+    public <U> void multiOptional(U value, Consumer<U> multiValue) {
+        multiValue.accept(value);
+    }
+
+    @Experimental
+    public <K> List<K> readVarIntList(K key) {
+        int size = readVarInt();
+        List<K> list = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            list.add(key);
         }
+        return list;
+    }
+
+    @Experimental
+    public <K> void writeVarIntList(List<K> list, Consumer<K> writeValue) {
+        writeVarInt(list.size());
+        for (K key : list) {
+            writeValue.accept(key);
+        }
+    }
+
+    @FunctionalInterface
+    public interface Reader<T> extends Function<PacketWrapper, T> {
+    }
+
+    @FunctionalInterface
+    public interface Writer<T> extends BiConsumer<PacketWrapper, T> {
     }
 }

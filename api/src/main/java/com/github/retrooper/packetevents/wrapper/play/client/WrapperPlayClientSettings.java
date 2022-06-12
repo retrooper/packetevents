@@ -78,44 +78,27 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
             if (showCape) {
                 visibleSkinSectionMask = SkinSection.CAPE.getMask();
             }
-        }
-        else {
-            visibleSkinSectionMask = readByte();
+        } else {
+            visibleSkinSectionMask = (byte) readUnsignedByte();
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             hand = HumanoidArm.VALUES[readVarInt()];
-        }
-        else {
+        } else {
             hand = HumanoidArm.RIGHT;
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             textFilteringEnabled = readBoolean();
-        }
-        else {
+        } else {
             textFilteringEnabled = false;
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
             allowServerListings = readBoolean();
-        }
-        else {
+        } else {
             allowServerListings = true;
         }
-    }
-
-    @Override
-    public void copy(WrapperPlayClientSettings wrapper) {
-        locale = wrapper.locale;
-        viewDistance = wrapper.viewDistance;
-        visibility = wrapper.visibility;
-        chatColorable = wrapper.chatColorable;
-        visibleSkinSectionMask = wrapper.visibleSkinSectionMask;
-        hand = wrapper.hand;
-        textFilteringEnabled = wrapper.textFilteringEnabled;
-        allowServerListings = wrapper.allowServerListings;
-        ignoredDifficulty = wrapper.ignoredDifficulty;
     }
 
     @Override
@@ -125,8 +108,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         writeByte(viewDistance);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeVarInt(visibility.ordinal());
-        }
-        else {
+        } else {
             writeByte(visibility.ordinal());
         }
         writeBoolean(chatColorable);
@@ -135,8 +117,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
             //Show cape
             boolean showCape = SkinSection.CAPE.isSet(visibleSkinSectionMask);
             writeBoolean(showCape);
-        }
-        else {
+        } else {
             writeByte(visibleSkinSectionMask);
         }
 
@@ -151,6 +132,19 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
             writeBoolean(allowServerListings);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientSettings wrapper) {
+        locale = wrapper.locale;
+        viewDistance = wrapper.viewDistance;
+        visibility = wrapper.visibility;
+        chatColorable = wrapper.chatColorable;
+        visibleSkinSectionMask = wrapper.visibleSkinSectionMask;
+        hand = wrapper.hand;
+        textFilteringEnabled = wrapper.textFilteringEnabled;
+        allowServerListings = wrapper.allowServerListings;
+        ignoredDifficulty = wrapper.ignoredDifficulty;
     }
 
     public String getLocale() {

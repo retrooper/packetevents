@@ -23,15 +23,15 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerWorldBorderSize extends PacketWrapper<WrapperPlayServerWorldBorderSize> {
-    double diameter;
+    private double diameter;
+
+    public WrapperPlayServerWorldBorderSize(PacketSendEvent event) {
+        super(event);
+    }
 
     public WrapperPlayServerWorldBorderSize(double diameter) {
         super(PacketType.Play.Server.WORLD_BORDER_SIZE);
         this.diameter = diameter;
-    }
-
-    public WrapperPlayServerWorldBorderSize(PacketSendEvent event) {
-        super(event);
     }
 
     @Override
@@ -40,13 +40,13 @@ public class WrapperPlayServerWorldBorderSize extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void copy(WrapperPlayServerWorldBorderSize packet) {
-        diameter = packet.diameter;
+    public void write() {
+        writeDouble(diameter);
     }
 
     @Override
-    public void write() {
-        writeDouble(diameter);
+    public void copy(WrapperPlayServerWorldBorderSize packet) {
+        diameter = packet.diameter;
     }
 
     public double getDiameter() {

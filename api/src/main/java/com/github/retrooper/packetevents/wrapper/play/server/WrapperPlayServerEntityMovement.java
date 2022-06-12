@@ -23,37 +23,37 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEntityMovement extends PacketWrapper<WrapperPlayServerEntityMovement> {
-  private int entityId;
+    private int entityId;
 
-  public WrapperPlayServerEntityMovement(PacketSendEvent event) {
-    super(event);
-  }
+    public WrapperPlayServerEntityMovement(PacketSendEvent event) {
+        super(event);
+    }
 
-  public WrapperPlayServerEntityMovement(int entityId) {
-    super(PacketType.Play.Server.ENTITY_MOVEMENT);
-    this.entityId = entityId;
-  }
+    public WrapperPlayServerEntityMovement(int entityId) {
+        super(PacketType.Play.Server.ENTITY_MOVEMENT);
+        this.entityId = entityId;
+    }
 
-  @Override
-  public void read() {
-    this.entityId = readVarInt();
-  }
+    @Override
+    public void read() {
+        this.entityId = readVarInt();
+    }
 
-  @Override
-  public void write() {
-    writeVarInt(this.entityId);
-  }
+    @Override
+    public void write() {
+        writeVarInt(this.entityId);
+    }
 
-  @Override
-  public void copy(WrapperPlayServerEntityMovement wrapper) {
-    this.entityId = wrapper.entityId;
-  }
+    @Override
+    public void copy(WrapperPlayServerEntityMovement wrapper) {
+        this.entityId = wrapper.entityId;
+    }
 
-  public int getEntityId() {
-    return entityId;
-  }
+    public int getEntityId() {
+        return entityId;
+    }
 
-  public void setEntityId(int entityId) {
-    this.entityId = entityId;
-  }
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
 }

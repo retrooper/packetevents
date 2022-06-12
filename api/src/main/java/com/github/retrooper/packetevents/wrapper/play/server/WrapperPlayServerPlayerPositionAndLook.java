@@ -5,7 +5,6 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.teleport.RelativeFlag;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import java.util.Set;
 
 /**
  * Teleporting a player directly with packets will cause issues on most server implementations and is discouraged!
@@ -44,7 +43,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         this.z = readDouble();
         this.yaw = readFloat();
         this.pitch = readFloat();
-        this.relativeMask = readByte();
+        this.relativeMask = (byte) readUnsignedByte();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             this.teleportId = readVarInt();
         }

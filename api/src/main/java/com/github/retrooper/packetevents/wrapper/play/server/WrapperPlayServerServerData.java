@@ -26,15 +26,15 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void read() {
-        readOptional(motd, component -> readComponent());
-        readOptional(icon, icon -> readString());
+        motd = readOptional(PacketWrapper::readComponent);
+        icon = readOptional(PacketWrapper::readString);
         previewsChat = readBoolean();
     }
 
     @Override
     public void write() {
-        writeOptional(motd, this::writeComponent);
-        writeOptional(icon, this::writeString);
+        writeOptional(motd, PacketWrapper::writeComponent);
+        writeOptional(icon, PacketWrapper::writeString);
         writeBoolean(previewsChat);
     }
 

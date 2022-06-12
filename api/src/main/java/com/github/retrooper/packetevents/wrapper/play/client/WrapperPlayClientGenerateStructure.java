@@ -50,17 +50,17 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void copy(WrapperPlayClientGenerateStructure wrapper) {
-        this.blockPosition = wrapper.blockPosition;
-        this.levels = wrapper.levels;
-        this.keepJigsaws = wrapper.keepJigsaws;
-    }
-
-    @Override
     public void write() {
         writeLong(this.blockPosition.getSerializedPosition());
         writeVarInt(this.levels);
         writeBoolean(this.keepJigsaws);
+    }
+
+    @Override
+    public void copy(WrapperPlayClientGenerateStructure wrapper) {
+        this.blockPosition = wrapper.blockPosition;
+        this.levels = wrapper.levels;
+        this.keepJigsaws = wrapper.keepJigsaws;
     }
 
     /**

@@ -59,8 +59,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
             transactionID = Optional.of(readVarInt());
             blockPosition = Optional.empty();
             text = readString(textLength);
-        }
-        else {
+        } else {
             textLength = 32767;
             text = readString(textLength);
             transactionID = Optional.empty();
@@ -68,22 +67,13 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
                 boolean hasPosition = readBoolean();
                 if (hasPosition) {
                     blockPosition = Optional.of(new Vector3i(readLong()));
-                }
-                else {
+                } else {
                     blockPosition = Optional.empty();
                 }
-            }
-            else {
+            } else {
                 blockPosition = Optional.empty();
             }
         }
-    }
-
-    @Override
-    public void copy(WrapperPlayClientTabComplete wrapper) {
-        text = wrapper.text;
-        transactionID = wrapper.transactionID;
-        blockPosition = wrapper.blockPosition;
     }
 
     @Override
@@ -100,8 +90,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
             }
             writeVarInt(transactionID.get());
             writeString(text, textLength);
-        }
-        else {
+        } else {
             textLength = 32767;
             writeString(text, textLength);
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
@@ -112,6 +101,13 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
                 }
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientTabComplete wrapper) {
+        text = wrapper.text;
+        transactionID = wrapper.transactionID;
+        blockPosition = wrapper.blockPosition;
     }
 
     public String getText() {
@@ -129,8 +125,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
     public void setTransactionId(@Nullable Integer transactionID) {
         if (transactionID != null) {
             this.transactionID = Optional.of(transactionID);
-        }
-        else {
+        } else {
             this.transactionID = Optional.empty();
         }
     }
@@ -142,8 +137,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
     public void setBlockPosition(@Nullable Vector3i blockPosition) {
         if (blockPosition != null) {
             this.blockPosition = Optional.of(blockPosition);
-        }
-        else {
+        } else {
             this.blockPosition = Optional.empty();
         }
     }

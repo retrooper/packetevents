@@ -40,7 +40,7 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
 
     @Override
     public void read() {
-        action = Action.VALUES[readVarInt()];
+        action = Action.getById(readVarInt());
         if (action == Action.OPENED_TAB) {
             String key = readString();
             tabID = Optional.of(key);
@@ -80,9 +80,12 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
     }
 
     public enum Action {
-        OPENED_TAB,
-        CLOSED_SCREEN;
+        OPENED_TAB, CLOSED_SCREEN;
 
-        public static final Action[] VALUES = values();
+        private static final Action[] VALUES = values();
+
+        public static Action getById(int id) {
+            return VALUES[id];
+        }
     }
 }

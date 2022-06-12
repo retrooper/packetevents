@@ -28,24 +28,21 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
 public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams> {
-
     private String teamName;
     private TeamMode teamMode;
     private Collection<String> players;
     private Optional<ScoreBoardTeamInfo> teamInfo;
 
     public enum OptionData {
-        NONE((byte) 0x00),
-        FRIENDLY_FIRE((byte) 0x01),
-        FRIENDLY_CAN_SEE_INVISIBLE((byte) 0x02),
-        ALL((byte) 0x03);
+        NONE((byte) 0x00), FRIENDLY_FIRE((byte) 0x01), FRIENDLY_CAN_SEE_INVISIBLE((byte) 0x02), ALL((byte) 0x03);
 
+        private static final OptionData[] VALUES = values();
         private final byte byteValue;
 
         OptionData(byte value) {
@@ -58,8 +55,8 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
 
         @Nullable
         public static OptionData fromValue(byte value) {
-            for(OptionData data : values()) {
-                if(data.getByteValue() == value) {
+            for (OptionData data : VALUES) {
+                if (data.getByteValue() == value) {
                     return data;
                 }
             }
@@ -68,10 +65,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     }
 
     public enum NameTagVisibility {
-        ALWAYS("always"),
-        NEVER("never"),
-        HIDE_FOR_OTHER_TEAMS("hideForOtherTeams"),
-        HIDE_FOR_OWN_TEAM("hideForOwnTeam");
+        ALWAYS("always"), NEVER("never"), HIDE_FOR_OTHER_TEAMS("hideForOtherTeams"), HIDE_FOR_OWN_TEAM("hideForOwnTeam");
 
         private final String id;
 
@@ -95,10 +89,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     }
 
     public enum CollisionRule {
-        ALWAYS("always"),
-        NEVER("never"),
-        PUSH_OTHER_TEAMS("pushOtherTeams"),
-        PUSH_OWN_TEAM("pushOwnTeam");
+        ALWAYS("always"), NEVER("never"), PUSH_OTHER_TEAMS("pushOtherTeams"), PUSH_OWN_TEAM("pushOwnTeam");
 
         private final String id;
 
@@ -123,11 +114,15 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     }
 
     public enum TeamMode {
-        CREATE,
-        REMOVE,
-        UPDATE,
-        ADD_ENTITIES,
-        REMOVE_ENTITIES;
+        CREATE, REMOVE, UPDATE, ADD_ENTITIES, REMOVE_ENTITIES;
+    }
+
+    public WrapperPlayServerTeams(PacketSendEvent event) {
+        super(event);
+    }
+
+    public WrapperPlayServerTeams(String teamName, TeamMode teamMode, Optional<ScoreBoardTeamInfo> teamInfo, String... entities) {
+        this(teamName, teamMode, teamInfo, Arrays.asList(entities));
     }
 
     public WrapperPlayServerTeams(String teamName, TeamMode teamMode, Optional<ScoreBoardTeamInfo> teamInfo, Collection<String> entities) {
@@ -136,14 +131,6 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         this.teamMode = teamMode;
         this.players = entities;
         this.teamInfo = teamInfo;
-    }
-
-    public WrapperPlayServerTeams(String teamName, TeamMode teamMode, Optional<ScoreBoardTeamInfo> teamInfo, String... entities) {
-        this(teamName, teamMode, teamInfo, Arrays.asList(entities));
-    }
-
-    public WrapperPlayServerTeams(PacketSendEvent event) {
-        super(event);
     }
 
     @Override
@@ -186,10 +173,11 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         players = new ArrayList<>();
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.ADD_ENTITIES || teamMode == TeamMode.REMOVE_ENTITIES) {
             int size;
-            if (serverVersion == ServerVersion.V_1_7_10)
+            if (serverVersion == ServerVersion.V_1_7_10) {
                 size = readShort();
-            else
+            } else {
                 size = readVarInt();
+            }
             for (int i = 0; i < size; i++) {
                 players.add(readString());
             }
@@ -197,20 +185,11 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     }
 
     @Override
-    public void copy(WrapperPlayServerTeams wrapper) {
-        teamName = wrapper.teamName;
-        teamMode = wrapper.teamMode;
-        players = wrapper.players;
-        teamInfo = wrapper.teamInfo;
-    }
-
-    @Override
     public void write() {
         writeString(teamName, 16);
         writeByte(teamMode.ordinal());
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
-            ScoreBoardTeamInfo info = teamInfo.orElse(new ScoreBoardTeamInfo(Component.empty(), Component.empty(), Component.empty(),
-                    NameTagVisibility.ALWAYS, CollisionRule.ALWAYS, NamedTextColor.WHITE, OptionData.NONE));
+            ScoreBoardTeamInfo info = teamInfo.orElse(new ScoreBoardTeamInfo(Component.empty(), Component.empty(), Component.empty(), NameTagVisibility.ALWAYS, CollisionRule.ALWAYS, NamedTextColor.WHITE, OptionData.NONE));
             if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
                 writeString(AdventureSerializer.asVanilla(info.displayName));
                 writeString(AdventureSerializer.asVanilla(info.prefix));
@@ -221,8 +200,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
                     writeByte(15);
                 } else {
                     writeString(info.tagVisibility.id);
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9))
-                        writeString(info.collisionRule.getId());
+                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) writeString(info.collisionRule.getId());
                     writeByte(ColorUtil.getId(info.color));
                 }
             } else {
@@ -237,14 +215,23 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         }
 
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.ADD_ENTITIES || teamMode == TeamMode.REMOVE_ENTITIES) {
-            if (serverVersion == ServerVersion.V_1_7_10)
+            if (serverVersion == ServerVersion.V_1_7_10) {
                 writeShort(players.size());
-            else
+            } else {
                 writeVarInt(players.size());
+            }
             for (String playerName : players) {
                 writeString(playerName);
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerTeams wrapper) {
+        teamName = wrapper.teamName;
+        teamMode = wrapper.teamMode;
+        players = wrapper.players;
+        teamInfo = wrapper.teamInfo;
     }
 
     public String getTeamName() {

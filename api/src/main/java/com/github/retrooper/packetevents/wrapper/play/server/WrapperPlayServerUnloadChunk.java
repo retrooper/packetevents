@@ -23,7 +23,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerUnloadChunk extends PacketWrapper<WrapperPlayServerUnloadChunk> {
-    private int chunkX, chunkZ;
+    private int chunkX;
+    private int chunkZ;
 
     public WrapperPlayServerUnloadChunk(PacketSendEvent event) {
         super(event);
@@ -42,15 +43,15 @@ public class WrapperPlayServerUnloadChunk extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void copy(WrapperPlayServerUnloadChunk wrapper) {
-        this.chunkX = wrapper.chunkX;
-        this.chunkZ = wrapper.chunkZ;
-    }
-
-    @Override
     public void write() {
         writeInt(chunkX);
         writeInt(chunkZ);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerUnloadChunk wrapper) {
+        this.chunkX = wrapper.chunkX;
+        this.chunkZ = wrapper.chunkZ;
     }
 
     public int getChunkX() {

@@ -25,8 +25,8 @@ import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUseItem> {
-    InteractionHand hand;
-    int sequence;
+    private InteractionHand hand;
+    private int sequence;
 
     public WrapperPlayClientUseItem(PacketReceiveEvent event) {
         super(event);
@@ -46,17 +46,17 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
     }
 
     @Override
-    public void copy(WrapperPlayClientUseItem packet) {
-        this.hand = packet.hand;
-        this.sequence = packet.sequence;
-    }
-
-    @Override
     public void write() {
         writeVarInt(hand.getId());
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeVarInt(sequence);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientUseItem packet) {
+        this.hand = packet.hand;
+        this.sequence = packet.sequence;
     }
 
     public InteractionHand getHand() {

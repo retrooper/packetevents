@@ -27,8 +27,7 @@ import org.jetbrains.annotations.Nullable;
 public class WrapperPlayServerFacePlayer extends PacketWrapper<WrapperPlayServerFacePlayer> {
     private EntitySection aimUnit;
     private Vector3d targetPosition;
-    @Nullable
-    private TargetEntity targetEntity;
+    private @Nullable TargetEntity targetEntity;
 
     public WrapperPlayServerFacePlayer(PacketSendEvent event) {
         super(event);
@@ -45,18 +44,7 @@ public class WrapperPlayServerFacePlayer extends PacketWrapper<WrapperPlayServer
     public void read() {
         aimUnit = EntitySection.getById(readVarInt());
         targetPosition = new Vector3d(readDouble(), readDouble(), readDouble());
-        if (readBoolean()) {
-            targetEntity = new TargetEntity(readVarInt(), EntitySection.getById(readVarInt()));
-        } else {
-            targetEntity = null;
-        }
-    }
-
-    @Override
-    public void copy(WrapperPlayServerFacePlayer wrapper) {
-        aimUnit = wrapper.aimUnit;
-        targetPosition = wrapper.targetPosition;
-        targetEntity = wrapper.targetEntity;
+        targetEntity = readOptional(reader -> new TargetEntity(reader.readVarInt(), EntitySection.getById(reader.readVarInt())));
     }
 
     @Override
@@ -65,13 +53,17 @@ public class WrapperPlayServerFacePlayer extends PacketWrapper<WrapperPlayServer
         writeDouble(targetPosition.getX());
         writeDouble(targetPosition.getY());
         writeDouble(targetPosition.getZ());
-        if (targetEntity != null) {
-            writeBoolean(true);
-            writeVarInt(targetEntity.getEntityId());
-            writeVarInt(targetEntity.getEntitySection().getId());
-        } else {
-            writeBoolean(false);
-        }
+        writeOptional(targetEntity, (packetWrapper, innerEntity) -> {
+            packetWrapper.writeVarInt(innerEntity.getEntityId());
+            packetWrapper.writeVarInt(innerEntity.getEntitySection().getId());
+        });
+    }
+
+    @Override
+    public void copy(WrapperPlayServerFacePlayer wrapper) {
+        aimUnit = wrapper.aimUnit;
+        targetPosition = wrapper.targetPosition;
+        targetEntity = wrapper.targetEntity;
     }
 
     public EntitySection getAimUnit() {

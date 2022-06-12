@@ -27,12 +27,14 @@ public enum ChatType {
     TEAM_MSG_COMMAND,
     EMOTE_COMMAND,
     TELLRAW_COMMAND;
-    
+
+    private static final ChatType[] VALUES = values();
+
     public int getId() {
         return ordinal();
     }
 
     public static ChatType getById(int id) {
-        return values()[id];
+        return VALUES[id];
     }
 }

@@ -52,10 +52,18 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
     public void read() {
         this.protocolVersion = readVarInt();
         this.clientVersion = ClientVersion.getById(protocolVersion);
-        this.serverAddress = readString();
+        this.serverAddress = readString(255);
         this.serverPort = readUnsignedShort();
         int nextStateIndex = readVarInt();
         this.nextConnectionState = ConnectionState.getById(nextStateIndex);
+    }
+
+    @Override
+    public void write() {
+        writeVarInt(protocolVersion);
+        writeString(serverAddress, 255);
+        writeShort(serverPort);
+        writeVarInt(nextConnectionState.ordinal());
     }
 
     @Override
@@ -65,14 +73,6 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
         this.serverAddress = wrapper.serverAddress;
         this.serverPort = wrapper.serverPort;
         this.nextConnectionState = wrapper.nextConnectionState;
-    }
-
-    @Override
-    public void write() {
-        writeVarInt(protocolVersion);
-        writeString(serverAddress);
-        writeShort(serverPort);
-        writeVarInt(nextConnectionState.ordinal());
     }
 
     /**

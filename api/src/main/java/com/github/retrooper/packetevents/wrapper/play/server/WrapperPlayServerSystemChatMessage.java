@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
-import com.github.retrooper.packetevents.protocol.chat.MessageSender;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -37,6 +36,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
     private ChatType type;
     private String messageJson;
     private Component message;
+
     public WrapperPlayServerSystemChatMessage(PacketSendEvent event) {
         super(event);
     }
@@ -64,19 +64,19 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void copy(WrapperPlayServerSystemChatMessage wrapper) {
-        this.messageJson = wrapper.messageJson;
-        this.message = wrapper.message;
-        this.type = wrapper.type;
-    }
-
-    @Override
     public void write() {
         if (HANDLE_JSON && message != null) {
             messageJson = AdventureSerializer.toJson(message);
         }
         writeString(messageJson, getMaxMessageLength());
         writeVarInt(type.getId());
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSystemChatMessage wrapper) {
+        this.messageJson = wrapper.messageJson;
+        this.message = wrapper.message;
+        this.type = wrapper.type;
     }
 
     public ChatType getType() {

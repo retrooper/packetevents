@@ -27,7 +27,7 @@ public class WrapperPlayClientChatPreview extends PacketWrapper<WrapperPlayClien
     @Override
     public void write() {
         writeInt(query);
-        writeString(message);
+        writeString(message, 256);
     }
 
     @Override

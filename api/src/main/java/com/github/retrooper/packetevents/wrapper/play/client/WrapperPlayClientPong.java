@@ -18,10 +18,10 @@
 
 package com.github.retrooper.packetevents.wrapper.play.client;
 
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPing;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPing;
 
 /**
  * A response to the ping packet.
@@ -48,13 +48,13 @@ public class WrapperPlayClientPong extends PacketWrapper<WrapperPlayClientPong> 
     }
 
     @Override
-    public void copy(WrapperPlayClientPong wrapper) {
-        this.id = wrapper.id;
+    public void write() {
+        writeInt(id);
     }
 
     @Override
-    public void write() {
-        writeInt(id);
+    public void copy(WrapperPlayClientPong wrapper) {
+        this.id = wrapper.id;
     }
 
     /**

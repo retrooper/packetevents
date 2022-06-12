@@ -28,6 +28,7 @@ public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlaySe
     private float yaw;
     private float pitch;
     private boolean onGround;
+
     public WrapperPlayServerEntityRotation(PacketSendEvent event) {
         super(event);
     }
@@ -43,7 +44,7 @@ public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlaySe
     @Override
     public void read() {
         entityID = readVarInt();
-        yaw = readByte()/ ROTATION_FACTOR;
+        yaw = readByte() / ROTATION_FACTOR;
         pitch = readByte() / ROTATION_FACTOR;
         onGround = readBoolean();
     }

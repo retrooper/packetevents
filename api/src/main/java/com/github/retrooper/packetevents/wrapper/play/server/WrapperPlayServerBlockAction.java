@@ -27,7 +27,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServerBlockAction> {
     private Vector3i blockPosition;
-    private int actionID, actionData;
+    private int actionID;
+    private int actionData;
     private int blockTypeID;
 
     public WrapperPlayServerBlockAction(PacketSendEvent event) {
@@ -49,8 +50,7 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
             int y = readShort();
             int z = readInt();
             blockPosition = new Vector3i(x, y, z);
-        }
-        else {
+        } else {
             this.blockPosition = readBlockPosition();
         }
         this.actionID = readUnsignedByte();
@@ -64,8 +64,7 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
             writeInt(blockPosition.x);
             writeShort(blockPosition.y);
             writeInt(blockPosition.z);
-        }
-        else {
+        } else {
             writeBlockPosition(blockPosition);
         }
         writeByte(actionID);

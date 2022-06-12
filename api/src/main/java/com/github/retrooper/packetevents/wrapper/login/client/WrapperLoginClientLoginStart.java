@@ -29,7 +29,8 @@ import java.util.Optional;
 
 public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClientLoginStart> {
     private String username;
-    private Optional<SignatureData> signatureData = Optional.empty();
+    private SignatureData signatureData;
+
     public WrapperLoginClientLoginStart(PacketReceiveEvent event) {
         super(event);
     }
@@ -42,15 +43,28 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     public WrapperLoginClientLoginStart(ClientVersion clientVersion, String username, SignatureData signatureData) {
         super(PacketType.Login.Client.LOGIN_START.getId(), clientVersion);
         this.username = username;
-        this.signatureData = Optional.of(signatureData);
+        this.signatureData = signatureData;
     }
 
     @Override
     public void read() {
         this.username = readString(16);
         if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19) && readBoolean()) {
-            SignatureData data = new SignatureData(readTimestamp(), readPublicKey(), readBytes(4096));
-            this.signatureData = Optional.of(data);
+            this.signatureData = new SignatureData(readTimestamp(), readPublicKey(), readBytes(4096));
+        }
+    }
+
+    @Override
+    public void write() {
+        writeString(username, 16);
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19)) {
+            writeBoolean(signatureData != null);
+            if (signatureData != null) {
+                SignatureData data = signatureData;
+                writeTimestamp(data.getTimestamp());
+                writePublicKey(data.getPublicKey());
+                writeBytes(data.getSignature());
+            }
         }
     }
 
@@ -58,20 +72,6 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     public void copy(WrapperLoginClientLoginStart wrapper) {
         this.username = wrapper.username;
         this.signatureData = wrapper.signatureData;
-    }
-
-    @Override
-    public void write() {
-        writeString(username, 16);
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19)) {
-            writeBoolean(signatureData.isPresent());
-            if (signatureData.isPresent()) {
-                SignatureData data = signatureData.get();
-                writeTimestamp(data.getTimestamp());
-                writePublicKey(data.getPublicKey());
-                writeBytes(data.getSignature());
-            }
-        }
     }
 
     public String getUsername() {
@@ -83,10 +83,10 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     }
 
     public Optional<SignatureData> getSignatureData() {
-        return signatureData;
+        return Optional.ofNullable(signatureData);
     }
 
     public void setSignatureData(@Nullable SignatureData signatureData) {
-        this.signatureData = Optional.ofNullable(signatureData);
+        this.signatureData = signatureData;
     }
 }

@@ -19,16 +19,13 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
 public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<WrapperPlayServerPlayerListHeaderAndFooter> {
     public static boolean HANDLE_JSON = true;
-    private static final int MODERN_MESSAGE_LENGTH = 262144;
-    private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private String headerJson;
     private String footerJson;
     private Component headerComponent;
@@ -61,14 +58,6 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
     }
 
     @Override
-    public void copy(WrapperPlayServerPlayerListHeaderAndFooter wrapper) {
-        headerJson = wrapper.headerJson;
-        footerJson = wrapper.footerJson;
-        headerComponent = wrapper.headerComponent;
-        footerComponent = wrapper.footerComponent;
-    }
-
-    @Override
     public void write() {
         if (HANDLE_JSON && headerComponent != null && footerComponent != null) {
             headerJson = AdventureSerializer.toJson(headerComponent);
@@ -76,6 +65,14 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
         }
         writeComponentJSON(headerJson);
         writeComponentJSON(footerJson);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerPlayerListHeaderAndFooter wrapper) {
+        headerJson = wrapper.headerJson;
+        footerJson = wrapper.footerJson;
+        headerComponent = wrapper.headerComponent;
+        footerComponent = wrapper.footerComponent;
     }
 
     public String getHeaderJson() {

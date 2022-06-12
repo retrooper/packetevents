@@ -25,13 +25,13 @@ public class WrapperPlayServerChatPreview extends PacketWrapper<WrapperPlayServe
     @Override
     public void read() {
         queryID = readInt();
-        readOptional(message, component -> readComponent());
+        message = readOptional(PacketWrapper::readComponent);
     }
 
     @Override
     public void write() {
         writeInt(queryID);
-        writeOptional(message, this::writeComponent);
+        writeOptional(message, PacketWrapper::writeComponent);
     }
 
     @Override

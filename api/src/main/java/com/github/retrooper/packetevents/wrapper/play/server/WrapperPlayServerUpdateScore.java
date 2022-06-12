@@ -58,32 +58,21 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
             if (action != Action.REMOVE_ITEM) {
                 objectiveName = readString(16);
                 value = Optional.of(readInt());
-            }
-            else {
+            } else {
                 objectiveName = "";
                 value = Optional.empty();
             }
-        }
-        else {
+        } else {
             entityName = readString(40);
             action = Action.VALUES[readByte()];
             objectiveName = readString(16);
             if (action != Action.REMOVE_ITEM) {
                 value = Optional.of(readVarInt());
-            }
-            else {
+            } else {
                 objectiveName = "";
                 value = Optional.empty();
             }
         }
-    }
-
-    @Override
-    public void copy(WrapperPlayServerUpdateScore wrapper) {
-        entityName = wrapper.entityName;
-        action = wrapper.action;
-        objectiveName = wrapper.objectiveName;
-        value = wrapper.value;
     }
 
     @Override
@@ -94,13 +83,11 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
             if (action != Action.REMOVE_ITEM) {
                 writeString(objectiveName, 16);
                 writeInt(value.orElse(-1));
-            }
-            else {
+            } else {
                 objectiveName = "";
                 value = Optional.empty();
             }
-        }
-        else {
+        } else {
             writeString(entityName, 40);
             writeByte(action.ordinal());
             writeString(objectiveName, 16);
@@ -109,6 +96,14 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
             }
         }
 
+    }
+
+    @Override
+    public void copy(WrapperPlayServerUpdateScore wrapper) {
+        entityName = wrapper.entityName;
+        action = wrapper.action;
+        objectiveName = wrapper.objectiveName;
+        value = wrapper.value;
     }
 
     public String getEntityName() {

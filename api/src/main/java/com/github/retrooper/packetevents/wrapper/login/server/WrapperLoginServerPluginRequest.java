@@ -47,17 +47,17 @@ public class WrapperLoginServerPluginRequest extends PacketWrapper<WrapperLoginS
     }
 
     @Override
-    public void copy(WrapperLoginServerPluginRequest wrapper) {
-        this.messageID = wrapper.messageID;
-        this.channelName = wrapper.channelName;
-        this.data = wrapper.data;
-    }
-
-    @Override
     public void write() {
         writeVarInt(messageID);
         writeString(channelName);
         writeByteArray(data);
+    }
+
+    @Override
+    public void copy(WrapperLoginServerPluginRequest wrapper) {
+        this.messageID = wrapper.messageID;
+        this.channelName = wrapper.channelName;
+        this.data = wrapper.data;
     }
 
     public int getMessageId() {

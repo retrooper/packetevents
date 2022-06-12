@@ -76,14 +76,6 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     }
 
     @Override
-    public void copy(WrapperPlayServerExplosion wrapper) {
-        position = wrapper.position;
-        strength = wrapper.strength;
-        records = wrapper.records;
-        playerMotion = wrapper.playerMotion;
-    }
-
-    @Override
     public void write() {
         writeFloat(position.x);
         writeFloat(position.y);
@@ -109,6 +101,14 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         writeFloat(playerMotion.x);
         writeFloat(playerMotion.y);
         writeFloat(playerMotion.z);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerExplosion wrapper) {
+        position = wrapper.position;
+        strength = wrapper.strength;
+        records = wrapper.records;
+        playerMotion = wrapper.playerMotion;
     }
 
     public Vector3f getPosition() {

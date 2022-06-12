@@ -23,63 +23,63 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientUpdateCommandBlockMinecart extends PacketWrapper<WrapperPlayClientUpdateCommandBlockMinecart> {
-  private int entityId;
-  private String command;
-  private boolean trackOutput;
+    private int entityId;
+    private String command;
+    private boolean trackOutput;
 
-  public WrapperPlayClientUpdateCommandBlockMinecart(PacketReceiveEvent event) {
-    super(event);
-  }
+    public WrapperPlayClientUpdateCommandBlockMinecart(PacketReceiveEvent event) {
+        super(event);
+    }
 
-  public WrapperPlayClientUpdateCommandBlockMinecart(int entityId, String command, boolean trackOutput) {
-    super(PacketType.Play.Client.UPDATE_COMMAND_BLOCK_MINECART);
-    this.entityId = entityId;
-    this.command = command;
-    this.trackOutput = trackOutput;
-  }
+    public WrapperPlayClientUpdateCommandBlockMinecart(int entityId, String command, boolean trackOutput) {
+        super(PacketType.Play.Client.UPDATE_COMMAND_BLOCK_MINECART);
+        this.entityId = entityId;
+        this.command = command;
+        this.trackOutput = trackOutput;
+    }
 
-  @Override
-  public void read() {
-    this.entityId = readVarInt();
-    this.command = readString();
-    this.trackOutput = readBoolean();
-  }
+    @Override
+    public void read() {
+        this.entityId = readVarInt();
+        this.command = readString();
+        this.trackOutput = readBoolean();
+    }
 
-  @Override
-  public void write() {
-    writeVarInt(this.entityId);
-    writeString(this.command);
-    writeBoolean(this.trackOutput);
-  }
+    @Override
+    public void write() {
+        writeVarInt(this.entityId);
+        writeString(this.command);
+        writeBoolean(this.trackOutput);
+    }
 
-  @Override
-  public void copy(WrapperPlayClientUpdateCommandBlockMinecart wrapper) {
-    this.entityId = wrapper.entityId;
-    this.command = wrapper.command;
-    this.trackOutput = wrapper.trackOutput;
-  }
+    @Override
+    public void copy(WrapperPlayClientUpdateCommandBlockMinecart wrapper) {
+        this.entityId = wrapper.entityId;
+        this.command = wrapper.command;
+        this.trackOutput = wrapper.trackOutput;
+    }
 
-  public int getEntityId() {
-    return entityId;
-  }
+    public int getEntityId() {
+        return entityId;
+    }
 
-  public void setEntityId(int entityId) {
-    this.entityId = entityId;
-  }
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
 
-  public String getCommand() {
-    return command;
-  }
+    public String getCommand() {
+        return command;
+    }
 
-  public void setCommand(String command) {
-    this.command = command;
-  }
+    public void setCommand(String command) {
+        this.command = command;
+    }
 
-  public boolean isTrackOutput() {
-    return trackOutput;
-  }
+    public boolean isTrackOutput() {
+        return trackOutput;
+    }
 
-  public void setTrackOutput(boolean trackOutput) {
-    this.trackOutput = trackOutput;
-  }
+    public void setTrackOutput(boolean trackOutput) {
+        this.trackOutput = trackOutput;
+    }
 }

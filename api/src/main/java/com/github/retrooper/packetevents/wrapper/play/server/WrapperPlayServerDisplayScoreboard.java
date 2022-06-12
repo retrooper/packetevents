@@ -38,20 +38,20 @@ public class WrapperPlayServerDisplayScoreboard extends PacketWrapper<WrapperPla
 
     @Override
     public void read() {
-        position= readByte();
+        position = readByte();
         scoreName = readString(16);
-    }
-
-    @Override
-    public void copy(WrapperPlayServerDisplayScoreboard wrapper) {
-        position = wrapper.position;
-        scoreName = wrapper.scoreName;
     }
 
     @Override
     public void write() {
         writeByte(position);
         writeString(scoreName, 16);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerDisplayScoreboard wrapper) {
+        position = wrapper.position;
+        scoreName = wrapper.scoreName;
     }
 
     public int getPosition() {
