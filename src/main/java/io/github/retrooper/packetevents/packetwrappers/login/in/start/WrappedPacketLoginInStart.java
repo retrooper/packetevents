@@ -24,6 +24,10 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
 
 public class WrappedPacketLoginInStart extends WrappedPacket {
     public WrappedPacketLoginInStart(NMSPacket packet) {
@@ -40,6 +44,26 @@ public class WrappedPacketLoginInStart extends WrappedPacket {
         Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName());
         write(NMSUtils.gameProfileClass, 0, gameProfile);
     }
+/*
+    public String getUsername() {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            return readString(0);
+        }
+        else {
+            return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass)).getName();
+        }
+    }
+
+    public void setUsername(String username, @Nullable UUID uuid) {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            writeString(0, username);
+        }
+        else {
+            Object gameProfile = GameProfileUtil.getGameProfile(uuid, username);
+            write(NMSUtils.gameProfileClass, 0, gameProfile);
+        }
+    }*/
+    //TODO WIP
 
     @Override
     public boolean isSupported() {
