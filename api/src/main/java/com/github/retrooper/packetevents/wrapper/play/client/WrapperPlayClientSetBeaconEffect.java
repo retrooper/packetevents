@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -38,20 +39,30 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
 
     @Override
     public void read() {
-        this.primaryEffect = readVarInt();
-        this.secondaryEffect = readVarInt();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            this.primaryEffect = readOptionalEffect();
+            this.secondaryEffect = readOptionalEffect();
+        } else {
+            this.primaryEffect = readVarInt();
+            this.secondaryEffect = readVarInt();
+        }
+    }
+
+    @Override
+    public void write() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            writeOptionalEffect(primaryEffect);
+            writeOptionalEffect(secondaryEffect);
+        } else {
+            writeVarInt(primaryEffect);
+            writeVarInt(secondaryEffect);
+        }
     }
 
     @Override
     public void copy(WrapperPlayClientSetBeaconEffect wrapper) {
         this.primaryEffect = wrapper.primaryEffect;
         this.secondaryEffect = wrapper.secondaryEffect;
-    }
-
-    @Override
-    public void write() {
-        writeVarInt(primaryEffect);
-        writeVarInt(secondaryEffect);
     }
 
     public int getPrimaryEffect() {
@@ -68,5 +79,19 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
 
     public void setSecondaryEffect(int secondaryEffect) {
         this.secondaryEffect = secondaryEffect;
+    }
+
+    private int readOptionalEffect() {
+        if (readBoolean()) {
+            return readVarInt();
+        }
+        return -1;
+    }
+
+    private void writeOptionalEffect(int effect) {
+        writeBoolean(effect != -1);
+        if (effect != -1) {
+            writeVarInt(effect);
+        }
     }
 }
