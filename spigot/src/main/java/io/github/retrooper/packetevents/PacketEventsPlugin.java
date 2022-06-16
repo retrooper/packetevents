@@ -28,7 +28,8 @@ import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.Location;
-import com.github.retrooper.packetevents.util.*;
+import com.github.retrooper.packetevents.util.TimeStampMode;
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerEncryptionRequest;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
@@ -67,10 +68,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                             PublicKey key = user.getPublicKey();
                             //user.sendMessage(ChatColor.RED + "Hello, world!");
                             //TODO Fix verifying!
-                            System.out.println("Verify this: " + chatMessage.verify(event.getUser().getUUID(), key));
+                            //System.out.println("Verify this: " + chatMessage.verify(event.getUser().getUUID(), key));
                         }
-                        event.setLastUsedWrapper(null);
-                         if (chatMessage.getMessage().equalsIgnoreCase("copium")) {
+                        if (chatMessage.getMessage().equalsIgnoreCase("copium")) {
                             /*new Thread(() -> {
                                 Component message = Component.text("Hi lmao");
                                 WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(ChatType.CHAT, message);

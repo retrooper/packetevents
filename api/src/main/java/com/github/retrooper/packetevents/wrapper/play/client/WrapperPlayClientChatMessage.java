@@ -43,7 +43,7 @@ import java.util.UUID;
  */
 public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClientChatMessage> {
     private String message;
-    private Optional<MessageSignData> messageSignData;
+    private Optional<MessageSignData> messageSignData = Optional.empty();
 
     public WrapperPlayClientChatMessage(PacketReceiveEvent event) {
         super(event);
@@ -114,7 +114,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         this.messageSignData = Optional.ofNullable(messageSignData);
     }
 
-    public boolean verify(UUID uuid, PublicKey key) {
+    protected boolean verify(UUID uuid, PublicKey key) {
         if (!messageSignData.isPresent()) {
             System.out.println("wait a minute!");
             return false;
