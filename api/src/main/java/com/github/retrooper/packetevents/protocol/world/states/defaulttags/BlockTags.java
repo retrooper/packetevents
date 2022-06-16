@@ -199,7 +199,7 @@ public class BlockTags {
         // TODO: this.tag(BlockTags.MANGROVE_LOGS).add(Blocks.MANGROVE_LOG, Blocks.MANGROVE_WOOD, Blocks.STRIPPED_MANGROVE_LOG, Blocks.STRIPPED_MANGROVE_WOOD);
         BlockTags.LOGS_THAT_BURN.addTag(BlockTags.DARK_OAK_LOGS).addTag(BlockTags.OAK_LOGS).addTag(BlockTags.ACACIA_LOGS).addTag(BlockTags.BIRCH_LOGS).addTag(BlockTags.JUNGLE_LOGS).addTag(BlockTags.SPRUCE_LOGS); // TODO: Add MANGROVE_LOGS tag to this
         // TODO:  this.tag(BlockTags.OVERWORLD_NATURAL_LOGS).add(Blocks.ACACIA_LOG).add(Blocks.BIRCH_LOG).add(Blocks.OAK_LOG).add(Blocks.JUNGLE_LOG).add(Blocks.SPRUCE_LOG).add(Blocks.DARK_OAK_LOG).add(Blocks.MANGROVE_LOG);
-        BlockTags.LOGS.addTag(BlockTags.LOGS_THAT_BURN).addTag(BlockTags.CRIMSON_STEMS).addTag(BlockTags.WARPED_STEMS);
+        BlockTags.LOGS.addTag(BlockTags.LOGS_THAT_BURN).addTag(BlockTags.CRIMSON_STEMS).addTag(BlockTags.WARPED_STEMS).add(StateTypes.MANGROVE_LOG, StateTypes.MANGROVE_WOOD, StateTypes.STRIPPED_MANGROVE_LOG, StateTypes.STRIPPED_MANGROVE_WOOD); // TODO: Add mangrove logs not manually
         BlockTags.ANVIL.add(StateTypes.ANVIL, StateTypes.CHIPPED_ANVIL, StateTypes.DAMAGED_ANVIL);
         BlockTags.SMALL_FLOWERS.add(StateTypes.DANDELION, StateTypes.POPPY, StateTypes.BLUE_ORCHID, StateTypes.ALLIUM, StateTypes.AZURE_BLUET, StateTypes.RED_TULIP, StateTypes.ORANGE_TULIP, StateTypes.WHITE_TULIP, StateTypes.PINK_TULIP, StateTypes.OXEYE_DAISY, StateTypes.CORNFLOWER, StateTypes.LILY_OF_THE_VALLEY, StateTypes.WITHER_ROSE);
         BlockTags.DIRT.add(StateTypes.DIRT, StateTypes.GRASS_BLOCK, StateTypes.PODZOL, StateTypes.COARSE_DIRT, StateTypes.MYCELIUM, StateTypes.ROOTED_DIRT, StateTypes.MOSS_BLOCK, StateTypes.MUD, StateTypes.MUDDY_MANGROVE_ROOTS);
