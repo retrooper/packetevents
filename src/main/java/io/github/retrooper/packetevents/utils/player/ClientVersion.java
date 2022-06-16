@@ -94,8 +94,11 @@ public enum ClientVersion {
 
     v_1_18_2(758),
 
+    v_1_19(759),
+    //TODO Update(checkpoint for things to look out for when updating)
+
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
-    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_18_2.protocolVersion + 1),
+    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_19.protocolVersion + 1),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
      * This constant assures you they are on a pre-release.
@@ -115,7 +118,7 @@ public enum ClientVersion {
     private static final Map<Integer, ClientVersion> CLIENT_VERSION_CACHE = new IdentityHashMap<>();
     private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
             340, 393, 401, 404, 477, 480, 485, 490, 498, 573,
-            575, 578, 735, 736, 751, 753, 754, 755, 756, 757, 758};
+            575, 578, 735, 736, 751, 753, 754, 755, 756, 757, 758, 759};
     private int protocolVersion;
 
     ClientVersion(int protocolVersion) {

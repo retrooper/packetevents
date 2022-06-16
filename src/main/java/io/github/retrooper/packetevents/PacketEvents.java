@@ -112,6 +112,7 @@ public final class PacketEvents implements Listener, EventManager {
             loading = true;
             //Resolve server version and cache
             ServerVersion version = ServerVersion.getVersion();
+            System.out.println("server vers: " + version);
             WrappedPacket.version = version;
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
