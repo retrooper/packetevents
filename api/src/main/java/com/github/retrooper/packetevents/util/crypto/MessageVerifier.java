@@ -28,6 +28,7 @@ import java.security.*;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+//TODO Fix MessageVerifier.
 public class MessageVerifier {
 
     public static boolean verify(UUID uuid, MessageSignData signData, PublicKey publicKey, Component component)
