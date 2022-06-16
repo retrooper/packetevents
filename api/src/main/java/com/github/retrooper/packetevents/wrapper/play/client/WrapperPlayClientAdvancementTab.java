@@ -21,18 +21,19 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
 public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayClientAdvancementTab> {
     private Action action;
-    private Optional<String> tabID;
+    private @Nullable String tabID;
 
     public WrapperPlayClientAdvancementTab(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientAdvancementTab(Action action, Optional<String> tabID) {
+    public WrapperPlayClientAdvancementTab(Action action, @Nullable String tabID) {
         super(PacketType.Play.Client.ADVANCEMENT_TAB);
         this.action = action;
         this.tabID = tabID;
@@ -42,10 +43,7 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
     public void read() {
         action = Action.getById(readVarInt());
         if (action == Action.OPENED_TAB) {
-            String key = readString();
-            tabID = Optional.of(key);
-        } else {
-            tabID = Optional.empty();
+            tabID = readString();
         }
     }
 
@@ -59,7 +57,7 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
     public void write() {
         writeVarInt(action.ordinal());
         if (action == Action.OPENED_TAB) {
-            writeString(tabID.get());
+            writeString(tabID);
         }
     }
 
@@ -72,10 +70,10 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
     }
 
     public Optional<String> getTabId() {
-        return tabID;
+        return Optional.ofNullable(tabID);
     }
 
-    public void setTabId(Optional<String> tabID) {
+    public void setTabId(String tabID) {
         this.tabID = tabID;
     }
 
