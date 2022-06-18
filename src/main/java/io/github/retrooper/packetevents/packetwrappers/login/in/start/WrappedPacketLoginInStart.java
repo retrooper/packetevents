@@ -27,6 +27,7 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class WrappedPacketLoginInStart extends WrappedPacket {
@@ -35,16 +36,24 @@ public class WrappedPacketLoginInStart extends WrappedPacket {
     }
 
     //TODO Allow accessing game profile property
-    public WrappedGameProfile getGameProfile() {
-        return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
+    public Optional<WrappedGameProfile> getGameProfile() {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            return Optional.empty();
+        }
+        return Optional.of(GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass)));
     }
 
     //TODO Add support for game profile property
     public void setGameProfile(WrappedGameProfile wrappedGameProfile) {
-        Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName());
-        write(NMSUtils.gameProfileClass, 0, gameProfile);
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            writeString(0, wrappedGameProfile.getName());
+        }
+        else {
+            Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName());
+            write(NMSUtils.gameProfileClass, 0, gameProfile);
+        }
     }
-/*
+
     public String getUsername() {
         if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
             return readString(0);
@@ -54,16 +63,14 @@ public class WrappedPacketLoginInStart extends WrappedPacket {
         }
     }
 
-    public void setUsername(String username, @Nullable UUID uuid) {
+    public void setUsername(String username) throws IllegalAccessException {
         if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
             writeString(0, username);
         }
         else {
-            Object gameProfile = GameProfileUtil.getGameProfile(uuid, username);
-            write(NMSUtils.gameProfileClass, 0, gameProfile);
+            throw new IllegalAccessException("Please use the setGameProfile method in the WrappedPacketLoginInStart wrapper to change the username!");
         }
-    }*/
-    //TODO WIP
+    }
 
     @Override
     public boolean isSupported() {

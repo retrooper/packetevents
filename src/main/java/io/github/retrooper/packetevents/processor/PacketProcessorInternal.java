@@ -93,8 +93,8 @@ public class PacketProcessorInternal {
                 PacketLoginReceiveEvent loginEvent = new PacketLoginReceiveEvent(channel, new NMSPacket(packet));//Cache the channel
                 if (loginEvent.getPacketId() == PacketType.Login.Client.START) {
                     WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(loginEvent.getNMSPacket());
-                    WrappedGameProfile gameProfile = startWrapper.getGameProfile();
-                    PacketEvents.get().getPlayerUtils().channels.put(gameProfile.getName(), channel);
+                    String username = startWrapper.getUsername();
+                    PacketEvents.get().getPlayerUtils().channels.put(username, channel);
                 }
                 PacketEvents.get().getEventManager().callEvent(loginEvent);
                 packet = loginEvent.getNMSPacket().getRawNMSPacket();

@@ -21,10 +21,36 @@ package io.github.retrooper.packetevents.packetwrappers.login.in.encryptionbegin
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.ConditionalValue;
+import io.github.retrooper.packetevents.utils.MojangEitherUtil;
+import io.github.retrooper.packetevents.utils.SaltSignature;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketLoginInEncryptionBegin extends WrappedPacket {
+    private static Class<?> VANILLA_SALT_SIGNATURE_CLASS;
+    private static Constructor<?> VANILLA_SALT_SIGNATURE_CONSTRUCTOR;
     public WrappedPacketLoginInEncryptionBegin(NMSPacket packet) {
         super(packet);
+    }
+
+    @Override
+    protected void load() {
+        Class<?> minecraftEncryptionClass = Reflection.getClassByNameWithoutException("net.minecraft.util.MinecraftEncryption");
+        if (minecraftEncryptionClass != null) {
+            VANILLA_SALT_SIGNATURE_CLASS = SubclassUtil.getSubClass(minecraftEncryptionClass, "b");
+            try {
+                VANILLA_SALT_SIGNATURE_CONSTRUCTOR = VANILLA_SALT_SIGNATURE_CLASS.getConstructor(long.class, byte[].class);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public byte[] getPublicKey() {
@@ -35,12 +61,46 @@ public class WrappedPacketLoginInEncryptionBegin extends WrappedPacket {
         writeByteArray(0, key);
     }
 
-    public byte[] getVerifyToken() {
-        return readByteArray(1);
+
+    public ConditionalValue<byte[], SaltSignature> getVerifyTokenOrSaltSignature() {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            ConditionalValue<byte[], Object> rawEither = readEither(0);
+            if (rawEither.left().isPresent()) {
+                return ConditionalValue.makeLeft(rawEither.left().get());
+            }
+            else {
+                Object rawRight = rawEither.right().get();
+                WrappedPacket rawRightWrapper = new WrappedPacket(new NMSPacket(rawRight));
+                SaltSignature ss = new SaltSignature(rawRightWrapper.readLong(0), rawRightWrapper.readByteArray(0));
+                return ConditionalValue.makeRight(ss);
+            }
+        }
+        else {
+            return ConditionalValue.makeLeft(readByteArray(1));
+        }
     }
 
-    public void setVerifyToken(byte[] token) {
-        writeByteArray(1, token);
+    public void setVerifyTokenOrSaltSignature(ConditionalValue<byte[], SaltSignature> value) {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            Object either;
+            if (value.left().isPresent()) {
+                either = MojangEitherUtil.makeLeft(value.left().get());
+            }
+            else {
+                SaltSignature ss = value.right().get();
+                Object rawSS = null;
+                try {
+                    rawSS = VANILLA_SALT_SIGNATURE_CONSTRUCTOR.newInstance(ss.getSalt(), ss.getSignature());
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                either = MojangEitherUtil.makeRight(rawSS);
+            }
+            write(NMSUtils.mojangEitherClass, 0, either);
+        }
+        else {
+            writeByteArray(1, value.left().get());
+        }
     }
 
     @Override

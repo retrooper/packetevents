@@ -38,6 +38,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,9 +55,9 @@ public final class NMSUtils {
             blockPosClass, sectionPositionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
             dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, iMaterialClass, movingObjectPositionBlockClass, boundingBoxClass,
-            tileEntityCommandClass;
+            tileEntityCommandClass, mojangEitherClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass, tileEntityCommandTypeClass;
-    public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
+    public static Method getBlockPosX, getBlockPosY, getBlockPosZ, mojangEitherLeft, mojangEitherRight;
     private static String nettyPrefix;
     private static Method getCraftPlayerHandle, getCraftEntityHandle, getCraftWorldHandle, asBukkitCopy,
             asNMSCopy, getMessageMethod, chatFromStringMethod, getMaterialFromNMSBlock, getNMSBlockFromMaterial,
@@ -231,6 +232,9 @@ public final class NMSUtils {
 
         tileEntityCommandTypeClass = SubclassUtil.getEnumSubClass(tileEntityCommandClass, 0);
 
+        //Isn't present on every version
+        mojangEitherClass = Reflection.getClassByNameWithoutException("com.mojang.datafixers.util.Either");
+
         vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");
         if (vec3DClass == null) {
             vec3DClass = getNMClassWithoutException("world.phys.Vec3D");
@@ -352,6 +356,11 @@ public final class NMSUtils {
             if (getBlockPosZ == null) {
                 getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass, "w", int.class);
             }
+        }
+
+        if (mojangEitherClass != null) {
+            mojangEitherLeft = Reflection.getMethod(mojangEitherClass, "left", Optional.class);
+            mojangEitherRight = Reflection.getMethod(mojangEitherClass, "right", Optional.class);
         }
         worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
         if (worldServerClass == null) {
@@ -818,6 +827,24 @@ public final class NMSUtils {
         try {
             return packetDataSerializerConstructor.newInstance(byteBuf);
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Optional<Object> getEitherLeft(Object either) {
+        try {
+            return (Optional<Object>) mojangEitherLeft.invoke(either);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Optional<Object> getEitherRight(Object either) {
+        try {
+            return (Optional<Object>) mojangEitherRight.invoke(either);
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;

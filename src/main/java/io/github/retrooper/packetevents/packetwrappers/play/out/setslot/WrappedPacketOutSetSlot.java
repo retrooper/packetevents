@@ -155,7 +155,7 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
     @Override
     public Object asNMSPacket() throws Exception {
         if (v_1_17_1) {
-            return packetConstructor.newInstance(getWindowId(), getStateId(), getSlot(), NMSUtils.toNMSItemStack(getItemStack()));
+            return packetConstructor.newInstance(getWindowId(), getStateId().get(), getSlot(), NMSUtils.toNMSItemStack(getItemStack()));
         }
         else {
             return packetConstructor.newInstance(getWindowId(), getSlot(), NMSUtils.toNMSItemStack(getItemStack()));
