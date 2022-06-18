@@ -326,7 +326,7 @@ public class PacketType {
                     ADD_VIBRATION_SIGNAL = 30, CLEAR_TITLES = 31, INITIALIZE_BORDER = 32, PLAYER_COMBAT_END = 33,
                     PLAYER_COMBAT_ENTER = 34, PLAYER_COMBAT_KILL = 35, SET_ACTIONBAR_TEXT = 36, SET_BORDER_CENTER = 37,
                     SET_BORDER_LERP_SIZE = 38, SET_BORDER_SIZE = 39, SET_BORDER_WARNING_DELAY = 40, SET_BORDER_WARNING_DISTANCE = 41,
-                    SET_SUBTITLE_TEXT = 42, SET_TITLES_ANIMATION = 43, SET_TITLE_TEXT = 44;
+                    SET_SUBTITLE_TEXT = 42, SET_TITLES_ANIMATION = 43, SET_TITLE_TEXT = 44, SYSTEM_CHAT = 45;
 
             private static void load() {
                 insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY, SPAWN_ENTITY);
@@ -440,6 +440,7 @@ public class PacketType {
                 insertPacketID(PacketTypeClasses.Play.Server.SET_SUBTITLE_TEXT, SET_SUBTITLE_TEXT);
                 insertPacketID(PacketTypeClasses.Play.Server.SET_TITLES_ANIMATION, SET_TITLES_ANIMATION);
                 insertPacketID(PacketTypeClasses.Play.Server.SET_TITLE_TEXT, SET_TITLE_TEXT);
+                insertPacketID(PacketTypeClasses.Play.Server.SYSTEM_CHAT, SYSTEM_CHAT);
             }
 
             /**
