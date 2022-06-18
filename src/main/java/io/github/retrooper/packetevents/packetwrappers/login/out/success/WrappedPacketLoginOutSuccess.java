@@ -28,28 +28,14 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.Constructor;
 
-public class WrappedPacketLoginOutSuccess extends WrappedPacket implements SendableWrapper {
-    private static Constructor<?> packetConstructor;
+public class WrappedPacketLoginOutSuccess extends WrappedPacket {
     private WrappedGameProfile wrappedGameProfile;
 
     public WrappedPacketLoginOutSuccess(final NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedPacketLoginOutSuccess(final WrappedGameProfile wrappedGameProfile) {
-        this.wrappedGameProfile = wrappedGameProfile;
-    }
-
-    @Override
-    protected void load() {
-        try {
-            packetConstructor = PacketTypeClasses.Login.Server.SUCCESS.getConstructors()[1];
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    //TODO Support property reading in wrapped game profile
+    //TODO Support property reading in wrapped game profile(NECESSARY IN 1.19!, PLEASE UPDATE TO 2.0 PACKETEVENTS)
     public WrappedGameProfile getGameProfile() {
         if (packet != null) {
             return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
@@ -58,7 +44,7 @@ public class WrappedPacketLoginOutSuccess extends WrappedPacket implements Senda
         }
     }
 
-    //TODO Support writing property in wrapped game profile
+    //TODO Support writing property in wrapped game profile(NECESSARY IN 1.19!, PLEASE UPDATE TO 2.0 PACKETEVENTS)
     public void setGameProfile(final WrappedGameProfile wrappedGameProfile) {
         if (packet != null) {
             final Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName());
@@ -66,13 +52,6 @@ public class WrappedPacketLoginOutSuccess extends WrappedPacket implements Senda
         } else {
             this.wrappedGameProfile = wrappedGameProfile;
         }
-    }
-
-    @Override
-    public Object asNMSPacket() throws Exception {
-        WrappedGameProfile gp = getGameProfile();
-        //TODO Support writing property in wrapped game profile
-        return packetConstructor.newInstance(GameProfileUtil.getGameProfile(gp.getId(), gp.getName()));
     }
 
     @Override

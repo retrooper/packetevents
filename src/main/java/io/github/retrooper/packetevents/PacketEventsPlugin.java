@@ -52,7 +52,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
                     System.out.println("Yes");
                     ItemStack stack = new ItemStack(Material.STICK);
-                    WrappedPacketOutSetSlot setSlot = new WrappedPacketOutSetSlot(0, 2, stack);
+                    WrappedPacketOutSetSlot setSlot = new WrappedPacketOutSetSlot(0, 37, stack);
                     PacketEvents.get().getPlayerUtils().sendPacket(event.getPlayer(), setSlot);
                 }
             }
