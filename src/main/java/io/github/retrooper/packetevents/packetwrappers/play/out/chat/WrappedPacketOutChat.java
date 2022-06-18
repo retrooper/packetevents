@@ -25,11 +25,13 @@ import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Optional;
 import java.util.UUID;
 
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
@@ -113,6 +115,9 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     @Override
     public Object asNMSPacket() throws Exception {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            throw new IllegalStateException("You are trying to send the WrappedPacketOutChat packet on 1.19 or above. Please update to packetevents 2.0, this is not supported.");
+        }
         byte chatPos = (byte) getChatPosition().ordinal();
         Enum<?> chatMessageTypeInstance = null;
         if (chatMessageTypeEnum != null) {
@@ -152,6 +157,24 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
             writeIChatBaseComponent(0, message);
         } else {
             this.message = message;
+        }
+    }
+
+    public Optional<String> getUnsignedMessage() {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            Optional<?> opt = readObject(0, Optional.class);
+            if (opt.isPresent()) {
+                Object iChatBaseComponent = opt.get();
+                return Optional.of(NMSUtils.readIChatBaseComponent(iChatBaseComponent));
+            }
+        }
+        return Optional.empty();
+    }
+
+    public void setUnsignedMessage(String unsignedMessage) {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(unsignedMessage);
+            write(Optional.class, 0, Optional.of(iChatBaseComponent));
         }
     }
 
@@ -213,6 +236,12 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     public enum ChatPosition {
         CHAT,
         SYSTEM_MESSAGE,
-        GAME_INFO;
-    }
+        GAME_INFO,
+        //Added in 1.19
+        SAY_COMMAND,
+        MSG_COMMAND,
+        TEAM_MSG_COMMAND,
+        EMOTE_COMMAND,
+        TELLRAW_COMMAND;
+        }
 }
