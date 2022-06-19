@@ -24,9 +24,6 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-import java.util.OptionalInt;
-
 public class WrapperPlayClientCraftRecipeRequest extends PacketWrapper<WrapperPlayClientCraftRecipeRequest> {
     private int windowId;
     private int recipeLegacy;
@@ -54,10 +51,10 @@ public class WrapperPlayClientCraftRecipeRequest extends PacketWrapper<WrapperPl
     @Override
     public void read() {
         this.windowId = readByte();
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-            this.recipeLegacy = readVarInt();
-        } else {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             this.recipeModern = readString();
+        } else {
+            this.recipeLegacy = readVarInt();
         }
         this.makeAll = readBoolean();
     }
@@ -65,10 +62,10 @@ public class WrapperPlayClientCraftRecipeRequest extends PacketWrapper<WrapperPl
     @Override
     public void write() {
         writeByte(this.windowId);
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-            writeVarInt(this.recipeLegacy);
-        } else {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             writeString(this.recipeModern);
+        } else {
+            writeVarInt(this.recipeLegacy);
         }
         writeBoolean(this.makeAll);
     }
@@ -89,20 +86,16 @@ public class WrapperPlayClientCraftRecipeRequest extends PacketWrapper<WrapperPl
         this.windowId = windowId;
     }
 
-    public OptionalInt getRecipeLegacy() {
-        return OptionalInt.of(recipeLegacy);
+    public <T> T getRecipe() {
+        return (T) (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? recipeModern : recipeLegacy);
     }
 
-    public void setRecipeLegacy(int recipeLegacy) {
-        this.recipeLegacy = recipeLegacy;
-    }
-
-    public Optional<String> getRecipeModern() {
-        return Optional.ofNullable(recipeModern);
-    }
-
-    public void setRecipeModern(@Nullable String recipeModern) {
-        this.recipeModern = recipeModern;
+    public <T> void setRecipe(T recipe) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            this.recipeModern = (String) recipe;
+        } else {
+            this.recipeLegacy = (Integer) recipe;
+        }
     }
 
     public boolean isMakeAll() {
