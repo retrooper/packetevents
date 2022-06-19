@@ -50,7 +50,7 @@ public class WrapperPlayServerStopSound extends PacketWrapper<WrapperPlayServerS
     public void read() {
         this.flags = readByte();
         if ((this.flags & FLAG_CATEGORY) != 0) {
-            category = SoundCategory.VALUES[readVarInt()];
+            category = SoundCategory.fromId(readVarInt());
         }
 
         if ((this.flags & FLAG_SOUND) != 0) {
