@@ -64,7 +64,7 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
     @Override
     public void write() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        if (HANDLE_JSON) {
+        if (HANDLE_JSON && reasonComponent != null) {
             reasonJson = AdventureSerializer.toJson(reasonComponent);
         }
         writeString(reasonJson, maxMessageLength);

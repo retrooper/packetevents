@@ -18,53 +18,37 @@
 
 package com.github.retrooper.packetevents.protocol.teleport;
 
-import java.util.HashSet;
-import java.util.Set;
+// This is an immutable container for a masking byte
+public final class RelativeFlag {
 
-public enum RelativeFlag {
-    X(0x01),
-    Y(0x02),
-    Z(0x04),
-    YAW(0x08),
-    PITCH(0x10);
+    public static final RelativeFlag X = new RelativeFlag(1 << 0);
+    public static final RelativeFlag Y = new RelativeFlag(1 << 1);
+    public static final RelativeFlag Z = new RelativeFlag(1 << 2);
+    public static final RelativeFlag YAW = new RelativeFlag(1 << 3);
+    public static final RelativeFlag PITCH = new RelativeFlag(1 << 4);
 
-    private final byte bit;
+    private final byte mask;
 
-    RelativeFlag(int bit) {
-        this.bit = (byte)bit;
+    public RelativeFlag(int mask) {
+        this.mask = (byte) mask;
     }
 
-    public byte getBit() {
-        return bit;
+    public RelativeFlag combine(RelativeFlag relativeFlag) { // FIXME: Should this be called append?
+        return new RelativeFlag(this.mask | relativeFlag.mask);
     }
 
-    public boolean isSet(byte mask) {
-        return (mask & bit) != 0;
-    }
-
-    public byte set(byte mask, boolean relative) {
-        if (relative) {
-            return (byte) (mask | bit);
-        } else {
-            return (byte) (mask & ~bit);
-        }
-    }
-
-    public static Set<RelativeFlag> getRelativeFlagsByMask(byte mask) {
-        Set<RelativeFlag> relativeFlags = new HashSet<>();
-        for (RelativeFlag relativeFlag : values()) {
-            if (relativeFlag.isSet(mask)) {
-                relativeFlags.add(relativeFlag);
-            }
-        }
-        return relativeFlags;
-    }
-
-    public static byte getMaskByRelativeFlags(Set<RelativeFlag> sections) {
-        byte mask = 0;
-        for (RelativeFlag relativeFlag : sections) {
-            mask |= relativeFlag.bit;
-        }
+    public byte getMask() {
         return mask;
+    }
+
+    public boolean isSet(byte flags) {
+        return (flags & mask) != 0;
+    }
+
+    public byte set(byte flags, boolean relative) {
+        if (relative) {
+            return (byte) (flags | mask);
+        }
+        return (byte) (flags & ~mask);
     }
 }

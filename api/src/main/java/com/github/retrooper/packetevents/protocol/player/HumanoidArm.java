@@ -26,7 +26,7 @@ public enum HumanoidArm {
         return this == RIGHT ? 0 : 1;
     }
 
-    public static final HumanoidArm[] VALUES = values();
+    public static final HumanoidArm[] VALUES = values(); // FIXME: it is illegal(unsafe) to expose this, make it private or eliminate it!
 
     public static HumanoidArm getById(int handValue) {
         return handValue == 0 ? RIGHT : LEFT;

@@ -38,25 +38,34 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.protocol.world.DimensionType;
+import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
+import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class PacketWrapper<T extends PacketWrapper> {
-    public final Object buffer;
+    @Nullable
+    public Object buffer;
+
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
     private int packetID;
-    private boolean hasPreparedForSending;
     // For sending chunk data packets, which need this data
     @Nullable
     protected User user;
@@ -64,10 +73,13 @@ public class PacketWrapper<T extends PacketWrapper> {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
 
-    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, Object buffer, int packetID) {
+    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, int packetID) {
+        if (packetID == -1) {
+            throw new IllegalArgumentException("Packet does not exist on this protocol version!");
+        }
         this.clientVersion = clientVersion;
         this.serverVersion = serverVersion;
-        this.buffer = buffer;
+        this.buffer = null;
         this.packetID = packetID;
     }
 
@@ -102,14 +114,13 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public PacketWrapper(int packetID, ClientVersion clientVersion) {
-        this(clientVersion, PacketEvents.getAPI().getServerManager().getVersion(),
-                UnpooledByteBufAllocationHelper.buffer(), packetID);
+        this(clientVersion, PacketEvents.getAPI().getServerManager().getVersion(), packetID);
     }
 
     public PacketWrapper(int packetID) {
         this(ClientVersion.UNKNOWN,
                 PacketEvents.getAPI().getServerManager().getVersion(),
-                UnpooledByteBufAllocationHelper.buffer(), packetID);
+                packetID);
     }
 
     public PacketWrapper(PacketTypeCommon packetType) {
@@ -117,20 +128,25 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public static PacketWrapper<?> createUniversalPacketWrapper(Object byteBuf) {
-        return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), byteBuf, -1);
+        PacketWrapper<?> wrapper = new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), -2);
+        wrapper.buffer = byteBuf;
+        return wrapper;
     }
-
     public final void prepareForSend() {
-        if (!hasPreparedForSending) {
-            writeVarInt(packetID);
-            write();
-            hasPreparedForSending = true;
+        // Null means the packet was manually created and wasn't sent by the server itself
+        // A reference count of 0 means that the packet was freed (it was already sent)
+        if (buffer == null || ByteBufHelper.refCnt(buffer) == 0) {
+            buffer = UnpooledByteBufAllocationHelper.buffer();
         }
+
+        writeVarInt(packetID);
+        write();
     }
 
     public void read() {
     }
 
+    //TODO Rename to copyFrom, as it copies data from the passed in wrapper.
     public void copy(T wrapper) {
 
     }
@@ -150,14 +166,6 @@ public class PacketWrapper<T extends PacketWrapper> {
             read();
         }
         event.setLastUsedWrapper(this);
-    }
-
-    public boolean hasPreparedForSending() {
-        return hasPreparedForSending;
-    }
-
-    public void setHasPrepareForSending(boolean hasPreparedForSending) {
-        this.hasPreparedForSending = hasPreparedForSending;
     }
 
     public ClientVersion getClientVersion() {
@@ -521,8 +529,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public byte[] readByteArray() {
-        int len = readVarInt();
-        return readBytes(len);
+        return readByteArray(ByteBufHelper.readableBytes(buffer));
     }
 
     public void writeByteArray(byte[] array) {
@@ -681,6 +688,73 @@ public class PacketWrapper<T extends PacketWrapper> {
                 entityData.getType().getDataSerializer().accept(this, entityData.getValue());
             }
             writeByte(127); // End of metadata array
+        }
+    }
+
+    public Dimension readDimension() {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            return new Dimension(DimensionType.getByName(readIdentifier().toString()));
+        }
+        else {
+            NBTCompound dimensionAttributes = readNBT();
+            return new Dimension(dimensionAttributes);
+        }
+    }
+
+    public void writeDimension(Dimension dimension) {
+        boolean v1_19 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19);
+        boolean v1_16_2 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2);
+        if (v1_19 || !v1_16_2) {
+            writeString(dimension.getDimensionName(), 32767);
+        } else {
+            writeNBT(dimension.getAttributes());
+        }
+    }
+
+    public SaltSignature readSaltSignature() {
+        return new SaltSignature(readLong(), readByteArray());
+    }
+
+    public void writeSaltSignature(SaltSignature signature) {
+        writeLong(signature.getSalt());
+        writeByteArray(signature.getSignature());
+    }
+
+    public PublicKey readPublicKey() {
+        return MinecraftEncryptionUtil.publicKey(readByteArray(512));
+    }
+
+    public void writePublicKey(PublicKey publicKey) {
+        writeByteArray(publicKey.getEncoded());
+    }
+
+    public Instant readTimestamp() {
+        return Instant.ofEpochMilli(readLong());
+    }
+
+    public void writeTimestamp(Instant timestamp) {
+        writeLong(timestamp.toEpochMilli());
+    }
+
+    public WorldBlockPosition readWorldBlockPosition() {
+        return new WorldBlockPosition(readIdentifier(), readBlockPosition());
+    }
+
+    public void writeWorldBlockPosition(WorldBlockPosition pos) {
+        writeIdentifier(pos.getWorld());
+        writeBlockPosition(pos.getBlockPosition());
+    }
+
+    public <S> void readOptional(S value, Consumer<S> writeValue) {
+        if (readBoolean()) {
+            writeValue.accept(value);
+        }
+    }
+
+    public <S> void writeOptional(S value, Consumer<S> writeValue) {
+        writeBoolean(value != null);
+        if (value != null) {
+            writeValue.accept(value);
         }
     }
 }

@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
+import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -39,10 +40,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class SpigotReflectionUtil {
@@ -54,6 +52,7 @@ public final class SpigotReflectionUtil {
     public static final String OBC_PACKAGE = "org.bukkit.craftbukkit." + MODIFIED_PACKAGE_NAME + ".";
     public static ServerVersion VERSION;
     //Booleans
+    public static boolean V_1_19_OR_HIGHER;
     public static boolean V_1_17_OR_HIGHER;
     public static boolean V_1_12_OR_HIGHER;
     //Minecraft classes
@@ -63,7 +62,7 @@ public final class SpigotReflectionUtil {
             MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, WORLD_SERVER_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
             GAME_PROFILE_CLASS, CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS,
             LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
-            BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS;
+            BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS, PROPERTY_MAP_CLASS;
 
     //Netty classes
     public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS, BYTE_TO_MESSAGE_DECODER, MESSAGE_TO_BYTE_ENCODER;
@@ -78,7 +77,7 @@ public final class SpigotReflectionUtil {
             CRAFT_ITEM_STACK_AS_BUKKIT_COPY, CRAFT_ITEM_STACK_AS_NMS_COPY,
             READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD,
             WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD, GET_COMBINED_ID,
-            GET_BY_COMBINED_ID, GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA;
+            GET_BY_COMBINED_ID, GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA, PROPERTY_MAP_GET_METHOD;
 
     //Constructors
     private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR;
@@ -106,14 +105,14 @@ public final class SpigotReflectionUtil {
         GET_CRAFT_PLAYER_HANDLE_METHOD = Reflection.getMethod(CRAFT_PLAYER_CLASS, "getHandle", 0);
         GET_CRAFT_ENTITY_HANDLE_METHOD = Reflection.getMethod(CRAFT_ENTITY_CLASS, "getHandle", 0);
         GET_CRAFT_WORLD_HANDLE_METHOD = Reflection.getMethod(CRAFT_WORLD_CLASS, "getHandle", 0);
-        GET_MOB_EFFECT_LIST_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, "getId", 0);
-        GET_MOB_EFFECT_LIST_BY_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, "fromId", 0);
-        GET_ITEM_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, "getId", 0);
-        GET_ITEM_BY_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, "getById", 0);
+        GET_MOB_EFFECT_LIST_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, V_1_19_OR_HIGHER ? "g" : "getId", 0);
+        GET_MOB_EFFECT_LIST_BY_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS,  V_1_19_OR_HIGHER ? "a" :"fromId", 0);
+        GET_ITEM_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, V_1_19_OR_HIGHER ? "g" : "getId", 0);
+        GET_ITEM_BY_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, NMS_ITEM_CLASS, 0);
         if (V_1_17_OR_HIGHER) {
             GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, Iterable.class, 0);
         }
-        String getEntityByIdMethodName = (VERSION.getProtocolVersion() == (short) 47)
+        String getEntityByIdMethodName = (VERSION.getProtocolVersion() == (short) 47 || V_1_19_OR_HIGHER) // Back to these stupid mappings, thanks MD_5
                 ? "a" : "getEntity";
         GET_ENTITY_BY_ID_METHOD = Reflection.getMethod(WORLD_SERVER_CLASS, getEntityByIdMethodName, NMS_ENTITY_CLASS, int.class);
         if (GET_ENTITY_BY_ID_METHOD == null) {
@@ -124,8 +123,8 @@ public final class SpigotReflectionUtil {
         CRAFT_ITEM_STACK_AS_NMS_COPY = Reflection.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", 0);
         READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS, 0);
         WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, 0, NMS_ITEM_STACK_CLASS);
-        GET_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, "getCombinedId", int.class, IBLOCK_DATA_CLASS);
-        GET_BY_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, "getByCombinedId", IBLOCK_DATA_CLASS, int.class);
+        GET_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, IBLOCK_DATA_CLASS, 0, int.class);
+        GET_BY_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, IBLOCK_DATA_CLASS, 0, int.class);
         if (CRAFT_BLOCK_DATA_CLASS != null) {
             GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA = Reflection.getMethod(CRAFT_BLOCK_DATA_CLASS, "fromData", CRAFT_BLOCK_DATA_CLASS, IBLOCK_DATA_CLASS);
         }
@@ -181,6 +180,7 @@ public final class SpigotReflectionUtil {
 
     public static void init() {
         VERSION = PacketEvents.getAPI().getServerManager().getVersion();
+        V_1_19_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_19);
         V_1_17_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_17);
         V_1_12_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_12);
 
@@ -312,6 +312,41 @@ public final class SpigotReflectionUtil {
         Object entityPlayer = getEntityPlayer(player);
         ReflectionObject entityHumanWrapper = new ReflectionObject(entityPlayer, SpigotReflectionUtil.ENTITY_HUMAN_CLASS);
         return entityHumanWrapper.readObject(0, SpigotReflectionUtil.GAME_PROFILE_CLASS);
+    }
+
+    public static List<TextureProperty> getUserProfile(Player player) {
+        if (PROPERTY_MAP_CLASS == null) {
+            PROPERTY_MAP_CLASS = Reflection.getClassByNameWithoutException("" +
+                    "com.mojang.authlib.properties.PropertyMap");
+            PROPERTY_MAP_GET_METHOD = Reflection.getMethod(PROPERTY_MAP_CLASS, "get", Collection.class, Object.class);
+        }
+
+        //Get the player's game profile in NMS
+        Object nmsGameProfile = SpigotReflectionUtil.getGameProfile(player);
+        ReflectionObject reflectGameProfile = new ReflectionObject(nmsGameProfile);
+        Object nmsPropertyMap = reflectGameProfile.readObject(0, PROPERTY_MAP_CLASS);
+        //Convert the nms property map into a java one to avoid direct GSON access.
+        Collection<Object> nmsProperties = null;
+
+        try {
+            nmsProperties = (Collection<Object>) PROPERTY_MAP_GET_METHOD.invoke(nmsPropertyMap, "textures");
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        List<TextureProperty> properties = new ArrayList<>();
+
+        for (Object nmsProperty : nmsProperties) {
+            //Read the NMS texture property data
+            ReflectionObject reflectProperty = new ReflectionObject(nmsProperty);
+            String name = "textures"; //Save us a reflection call :)
+            String value = reflectProperty.readString(1);
+            String signature = reflectProperty.readString(2);
+            TextureProperty textureProperty = new TextureProperty(name, value, signature);
+            //Add it to our profile.
+            properties.add(textureProperty);
+        }
+
+        return properties;
     }
 
     public static Object getNetworkManager(Player player) {

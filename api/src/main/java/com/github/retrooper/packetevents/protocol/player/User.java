@@ -22,7 +22,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.MessageSender;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
@@ -33,6 +34,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
+import java.security.PublicKey;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,6 +43,7 @@ public class User {
     private ConnectionState connectionState;
     private ClientVersion clientVersion;
     private final UserProfile profile;
+    private @Nullable PublicKey publicKey;
     private int entityId = -1;
     private int minWorldHeight = 0;
     private int totalWorldHeight = 256;
@@ -99,6 +102,14 @@ public class User {
         this.entityId = entityId;
     }
 
+    public @Nullable PublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(@Nullable PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
     public void sendPacket(Object buffer) {
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, buffer);
     }
@@ -119,11 +130,12 @@ public class User {
         ChannelHelper.close(channel);
     }
 
-    public void chat(String message) {
+    //Might be tough with the message signing
+   /* public void chat(String message) {
         //Fake an incoming chat packet
         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(message);
         PacketEvents.getAPI().getProtocolManager().receivePacket(channel, chatMessage);
-    }
+    }*/
 
     public void closeInventory() {
         WrapperPlayServerCloseWindow closeWindow = new WrapperPlayServerCloseWindow(0);
@@ -136,12 +148,19 @@ public class User {
     }
 
     public void sendMessage(Component component) {
-        sendMessage(component, ChatPosition.CHAT);
+        sendMessage(component, ChatType.CHAT);
     }
 
-    public void sendMessage(Component component, ChatPosition position) {
-        WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(component, position);
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatMessage);
+    public void sendMessage(Component component, ChatType type) {
+        PacketWrapper<?> chatPacket;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            chatPacket = new WrapperPlayServerSystemChatMessage(ChatType.CHAT, component);
+        }
+        else {
+            MessageSender sender = new MessageSender(getUUID(), null, null);
+            chatPacket = new WrapperPlayServerChatMessage(sender, type, component);
+        }
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatPacket);
     }
 
     public void sendTitle(String legacyTitle, String legacySubtitle,

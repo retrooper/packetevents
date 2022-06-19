@@ -24,50 +24,63 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
+import io.netty.buffer.ByteBuf;
 
 public abstract class ProtocolManagerAbstract implements ProtocolManager {
     @Override
     public abstract ProtocolVersion getPlatformVersion();
 
     @Override
-    public void sendPacket(Object channel, Object packet) {
+    public void sendPacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.writeAndFlush(channel, packet);
+            ChannelHelper.writeAndFlush(channel, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
-    public void sendPacketSilently(Object channel, Object packet) {
+    public void sendPacketSilently(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, packet);
+            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
-    public void writePacket(Object channel, Object packet) {
+    public void writePacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.write(channel, packet);
+            ChannelHelper.write(channel, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
-    public void writePacketSilently(Object channel, Object packet) {
+    public void writePacketSilently(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, packet);
+            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
-    public void receivePacket(Object channel, Object packet) {
+    public void receivePacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.fireChannelRead(channel, packet);
+            ChannelHelper.fireChannelRead(channel, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
-    public void receivePacketSilently(Object channel, Object packet) {
+    public void receivePacketSilently(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            ChannelHelper.fireChannelReadInContext(channel, PacketEvents.ENCODER_NAME, packet);
+            ChannelHelper.fireChannelReadInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 

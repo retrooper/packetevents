@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.util;
 
+import com.github.retrooper.packetevents.protocol.world.BlockFace;
+
 /**
  * 3D double Vector.
  * This vector can represent coordinates, angles, or anything you want.
@@ -135,6 +137,10 @@ public class Vector3d {
 
     public Vector3d add(Vector3d other) {
         return add(other.x, other.y, other.z);
+    }
+
+    public Vector3d offset(BlockFace face) {
+        return add(face.getModX(), face.getModY(), face.getModZ());
     }
 
     public Vector3d subtract(double x, double y, double z) {

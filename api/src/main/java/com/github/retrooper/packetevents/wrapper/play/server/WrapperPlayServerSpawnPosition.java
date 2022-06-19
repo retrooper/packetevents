@@ -27,74 +27,73 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import java.util.Optional;
 
 public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlayServerSpawnPosition> {
-  private Vector3i position;
-  private Optional<Float> angle;
+    private Vector3i position;
+    private float angle;
 
-  public WrapperPlayServerSpawnPosition(PacketSendEvent event) {
-    super(event);
-  }
-
-  public WrapperPlayServerSpawnPosition(Vector3i position) {
-    super(PacketType.Play.Server.SPAWN_POSITION);
-    this.position = position;
-  }
-
-  public WrapperPlayServerSpawnPosition(Vector3i position, Optional<Float> angle) {
-    super(PacketType.Play.Server.SPAWN_POSITION);
-    this.position = position;
-    this.angle = angle;
-  }
-
-  @Override
-  public void read() {
-    this.angle = Optional.empty();
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      this.position = new Vector3i(readLong());
-    } else {
-      int x = readInt();
-      int y = readShort();
-      int z = readInt();
-      this.position = new Vector3i(x, y, z);
+    public WrapperPlayServerSpawnPosition(PacketSendEvent event) {
+        super(event);
     }
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-      this.angle = Optional.of(readFloat());
+
+    public WrapperPlayServerSpawnPosition(Vector3i position) {
+        super(PacketType.Play.Server.SPAWN_POSITION);
+        this.position = position;
     }
-  }
 
-  @Override
-  public void write() {
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-      long positionVector = this.position.getSerializedPosition();
-      writeLong(positionVector);
-    } else {
-      writeInt(this.position.x);
-      writeShort(this.position.y);
-      writeInt(this.position.z);
+    public WrapperPlayServerSpawnPosition(Vector3i position, float angle) {
+        super(PacketType.Play.Server.SPAWN_POSITION);
+        this.position = position;
+        this.angle = angle;
     }
-    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-      writeFloat(this.angle.get());
+
+    @Override
+    public void read() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            this.position = new Vector3i(readLong());
+        } else {
+            int x = readInt();
+            int y = readShort();
+            int z = readInt();
+            this.position = new Vector3i(x, y, z);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            this.angle = readFloat();
+        }
     }
-  }
 
-  @Override
-  public void copy(WrapperPlayServerSpawnPosition wrapper) {
-    this.position = wrapper.position;
-    this.angle = wrapper.angle;
-  }
+    @Override
+    public void write() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            long positionVector = this.position.getSerializedPosition();
+            writeLong(positionVector);
+        } else {
+            writeInt(this.position.x);
+            writeShort(this.position.y);
+            writeInt(this.position.z);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            writeFloat(this.angle);
+        }
+    }
 
-  public Vector3i getPosition() {
-    return position;
-  }
+    @Override
+    public void copy(WrapperPlayServerSpawnPosition wrapper) {
+        this.position = wrapper.position;
+        this.angle = wrapper.angle;
+    }
 
-  public void setPosition(Vector3i position) {
-    this.position = position;
-  }
+    public Vector3i getPosition() {
+        return position;
+    }
 
-  public Optional<Float> getAngle() {
-    return angle;
-  }
+    public void setPosition(Vector3i position) {
+        this.position = position;
+    }
 
-  public void setAngle(Optional<Float> angle) {
-    this.angle = angle;
-  }
+    public Optional<Float> getAngle() {
+        return Optional.of(angle);
+    }
+
+    public void setAngle(float angle) {
+        this.angle = angle;
+    }
 }

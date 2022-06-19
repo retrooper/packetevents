@@ -29,9 +29,11 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 public class PacketEventsImplHelper {
     public static PacketSendEvent handleClientBoundPacket(Object channel, User user, Object player,
-                                               Object buffer, boolean autoProtocolTranslation, boolean runPostTasks) throws PacketProcessException {
+                                                          Object buffer, boolean autoProtocolTranslation, boolean runPostTasks) throws PacketProcessException {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer,
                 autoProtocolTranslation);
@@ -69,9 +71,9 @@ public class PacketEventsImplHelper {
     }
 
     public static PacketReceiveEvent handleServerBoundPacket(Object channel, User user,
-                                               Object player,
-                                               Object buffer,
-                                               boolean autoProtocolTranslation) throws PacketProcessException {
+                                                             Object player,
+                                                             Object buffer,
+                                                             boolean autoProtocolTranslation) throws PacketProcessException {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer,
                 autoProtocolTranslation);
@@ -103,16 +105,23 @@ public class PacketEventsImplHelper {
         return packetReceiveEvent;
     }
 
-    public static void handleDisconnection(Object channel, @Nullable String username) {
-        User user = ProtocolManager.USERS.get(channel);
-        if (user != null) {
-            UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
-            PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
-            ProtocolManager.USERS.remove(user.getChannel());
-        }
+    public static void handleDisconnection(Object channel, @Nullable UUID uuid) {
+        synchronized (channel) {
+            User user = ProtocolManager.USERS.get(channel);
 
-        if (username != null) {
-            ProtocolManager.CHANNELS.remove(username);
+            if (user != null) {
+                UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
+                PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
+                ProtocolManager.USERS.remove(user.getChannel());
+            }
+
+            if (uuid == null) {
+                // Only way to be sure of removing a channel
+                ProtocolManager.CHANNELS.entrySet().removeIf(pair -> pair.getValue() == channel);
+            } else {
+                // This is the efficient way that we should prefer
+                ProtocolManager.CHANNELS.remove(uuid);
+            }
         }
     }
 }

@@ -70,7 +70,7 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
 
     @Override
     public void write() {
-        if (HANDLE_JSON) {
+        if (HANDLE_JSON && headerComponent != null && footerComponent != null) {
             headerJson = AdventureSerializer.toJson(headerComponent);
             footerJson = AdventureSerializer.toJson(footerComponent);
         }

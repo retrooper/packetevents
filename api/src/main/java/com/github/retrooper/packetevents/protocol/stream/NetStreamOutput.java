@@ -57,8 +57,7 @@ public class NetStreamOutput extends FilterOutputStream {
 
 
     public void writeChar(int c) {
-        this.writeByte((byte) ((c >>> 8) & 0xFF));
-        this.writeByte((byte) ((c >>> 0) & 0xFF));
+        this.writeShort(c);
     }
 
 

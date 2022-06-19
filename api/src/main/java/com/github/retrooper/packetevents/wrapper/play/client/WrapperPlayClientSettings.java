@@ -20,12 +20,10 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.protocol.player.SkinSection;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-
-import java.util.Set;
 
 public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSettings> {
     private String locale;
@@ -78,7 +76,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
             //We use this for the skin sections
             boolean showCape = readBoolean();
             if (showCape) {
-                visibleSkinSectionMask = SkinSection.CAPE.getBit();
+                visibleSkinSectionMask = SkinSection.CAPE.getMask();
             }
         }
         else {
@@ -116,6 +114,8 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         visibleSkinSectionMask = wrapper.visibleSkinSectionMask;
         hand = wrapper.hand;
         textFilteringEnabled = wrapper.textFilteringEnabled;
+        allowServerListings = wrapper.allowServerListings;
+        ignoredDifficulty = wrapper.ignoredDifficulty;
     }
 
     @Override
@@ -193,13 +193,12 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         this.visibleSkinSectionMask = visibleSkinSectionMask;
     }
 
-    public Set<SkinSection> getVisibleSkinSections() {
-        byte mask = getVisibleSkinSectionMask();
-        return SkinSection.getSectionsByMask(mask);
+    public SkinSection getVisibleSkinSection() {
+        return new SkinSection(getVisibleSkinSectionMask());
     }
 
-    public void setVisibleSkinSections(Set<SkinSection> visibleSkinSections) {
-        this.visibleSkinSectionMask = SkinSection.getMaskBySections(visibleSkinSections);
+    public void setVisibleSkinSections(SkinSection visibleSkinSection) {
+        this.visibleSkinSectionMask = visibleSkinSection.getMask();
     }
 
     public boolean isSkinSectionVisible(SkinSection section) {
