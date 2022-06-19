@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.recipe.UnlockRecipesType;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,10 +40,10 @@ public class WrapperPlayServerUnlockRecipes extends PacketWrapper<WrapperPlaySer
     private boolean smokerRecipeBookFilterActive;
     private int elements;
     private int @Nullable [] recipeIdsLegacy;
-    private @Nullable String[] recipeIdsModern;
+    private @Nullable ResourceLocation[] recipeIdsModern;
     private int elementsInit;
     private int @Nullable [] recipeIdsLegacyInit;
-    private @Nullable String[] recipeIdsModernInit;
+    private @Nullable ResourceLocation[] recipeIdsModernInit;
 
     public WrapperPlayServerUnlockRecipes(PacketSendEvent event) {
         super(event);
@@ -61,8 +62,8 @@ public class WrapperPlayServerUnlockRecipes extends PacketWrapper<WrapperPlaySer
     }
 
     public WrapperPlayServerUnlockRecipes(UnlockRecipesType type, boolean craftingRecipeBookOpen, boolean craftingRecipeBookFilterActive, boolean smeltingRecipeBookOpen,
-                                          boolean smeltingRecipeBookFilterActive, int elements, String[] recipeIdsModern, int elementsInit,
-                                          String[] recipeIdsModernInit) {
+                                          boolean smeltingRecipeBookFilterActive, int elements, ResourceLocation[] recipeIdsModern, int elementsInit,
+                                          ResourceLocation[] recipeIdsModernInit) {
         super(PacketType.Play.Server.UNLOCK_RECIPES);
         this.type = type;
         this.craftingRecipeBookOpen = craftingRecipeBookOpen;
@@ -77,8 +78,8 @@ public class WrapperPlayServerUnlockRecipes extends PacketWrapper<WrapperPlaySer
 
     public WrapperPlayServerUnlockRecipes(UnlockRecipesType type, boolean craftingRecipeBookOpen, boolean craftingRecipeBookFilterActive, boolean smeltingRecipeBookOpen,
                                           boolean smeltingRecipeBookFilterActive, boolean blastFurnaceRecipeBookOpen, boolean blastFurnaceRecipeBookFilterActive,
-                                          boolean smokerRecipeBookOpen, boolean smokerRecipeBookFilterActive, int elements, String[] recipeIdsModern,
-                                          int elementsInit, String[] recipeIdsModernInit) {
+                                          boolean smokerRecipeBookOpen, boolean smokerRecipeBookFilterActive, int elements, ResourceLocation[] recipeIdsModern,
+                                          int elementsInit, ResourceLocation[] recipeIdsModernInit) {
         super(PacketType.Play.Server.UNLOCK_RECIPES);
         this.type = type;
         this.craftingRecipeBookOpen = craftingRecipeBookOpen;
@@ -116,9 +117,9 @@ public class WrapperPlayServerUnlockRecipes extends PacketWrapper<WrapperPlaySer
         }
         this.elements = readVarInt();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.recipeIdsModern = new String[this.elements];
+            this.recipeIdsModern = new ResourceLocation[this.elements];
             for (int i = 0; i < this.elements; i++) {
-                this.recipeIdsModern[i] = readString();
+                this.recipeIdsModern[i] = readIdentifier();
             }
         } else {
             this.recipeIdsLegacy = new int[this.elements];
@@ -130,9 +131,9 @@ public class WrapperPlayServerUnlockRecipes extends PacketWrapper<WrapperPlaySer
         if (type == UnlockRecipesType.INIT) {
             this.elementsInit = readVarInt();
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-                this.recipeIdsModernInit = new String[this.elementsInit];
+                this.recipeIdsModernInit = new ResourceLocation[this.elementsInit];
                 for (int i = 0; i < this.elementsInit; i++) {
-                    this.recipeIdsModernInit[i] = readString();
+                    this.recipeIdsModernInit[i] = readIdentifier();
                 }
             } else {
                 this.recipeIdsLegacyInit = new int[this.elementsInit];
@@ -164,14 +165,14 @@ public class WrapperPlayServerUnlockRecipes extends PacketWrapper<WrapperPlaySer
         }
         writeVarInt(this.elements);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            Arrays.stream(this.recipeIdsModern).forEach(this::writeString);
+            Arrays.stream(this.recipeIdsModern).forEach(this::writeIdentifier);
         } else {
             Arrays.stream(this.recipeIdsLegacy).forEach(this::writeVarInt);
         }
         if (type == UnlockRecipesType.INIT) {
             writeVarInt(this.elementsInit);
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-                Arrays.stream(this.recipeIdsModernInit).forEach(this::writeString);
+                Arrays.stream(this.recipeIdsModernInit).forEach(this::writeIdentifier);
             } else {
                 Arrays.stream(this.recipeIdsLegacyInit).forEach(this::writeVarInt);
             }
@@ -281,7 +282,7 @@ public class WrapperPlayServerUnlockRecipes extends PacketWrapper<WrapperPlaySer
 
     public <T> void setRecipeIds(T recipeIds) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.recipeIdsModern = (String[]) recipeIds;
+            this.recipeIdsModern = (ResourceLocation[]) recipeIds;
         } else {
             this.recipeIdsLegacy = (int[]) recipeIds;
         }
@@ -301,7 +302,7 @@ public class WrapperPlayServerUnlockRecipes extends PacketWrapper<WrapperPlaySer
 
     public <T> void setRecipeIdsInit(T recipeIds) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.recipeIdsModernInit = (String[]) recipeIds;
+            this.recipeIdsModernInit = (ResourceLocation[]) recipeIds;
         } else {
             this.recipeIdsLegacyInit = (int[]) recipeIds;
         }
