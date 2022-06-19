@@ -25,8 +25,6 @@ import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.util.OptionalLong;
-
 public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServerSoundEffect> {
     private int soundID;
     private SoundCategory soundCategory;
@@ -91,11 +89,11 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         seed = wrapper.seed;
     }
 
-    public int getSoundID() {
+    public int getSoundId() {
         return soundID;
     }
 
-    public void setSoundID(int soundID) {
+    public void setSoundId(int soundID) {
         this.soundID = soundID;
     }
 
@@ -131,10 +129,20 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         this.pitch = pitch;
     }
 
-    public OptionalLong getSeed() {
-        return OptionalLong.of(seed);
+    /**
+     * Seeds only exist in server version 1.19+
+     *
+     * @return the seed
+     */
+    public long getSeed() {
+        return seed;
     }
 
+    /**
+     * Seeds only exist in server version 1.19+
+     *
+     * @param seed the seed to set
+     */
     public void setSeed(long seed) {
         this.seed = seed;
     }
