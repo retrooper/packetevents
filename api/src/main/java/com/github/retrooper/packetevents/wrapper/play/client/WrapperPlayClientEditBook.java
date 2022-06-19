@@ -21,19 +21,20 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class WrapperPlayClientEditBook extends PacketWrapper<WrapperPlayClientEditBook> {
     private int slot;
     private List<String> pages;
-    private String title;
+    private @Nullable String title;
 
     public WrapperPlayClientEditBook(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientEditBook(int slot, List<String> pages, String title) {
+    public WrapperPlayClientEditBook(int slot, List<String> pages, @Nullable String title) {
         super(PacketType.Play.Client.EDIT_BOOK);
         this.slot = slot;
         this.pages = pages;
@@ -93,11 +94,11 @@ public class WrapperPlayClientEditBook extends PacketWrapper<WrapperPlayClientEd
         this.pages = pages;
     }
 
-    public String getTitle() {
+    public @Nullable String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@Nullable String title) {
         this.title = title;
     }
 }

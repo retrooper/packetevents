@@ -37,52 +37,35 @@ public enum ClientVersion {
     V_1_7_10(5),
 
     V_1_8(47),
-    V_1_9(107),
 
-    V_1_9_1(108),
-    V_1_9_2(109),
+    V_1_9(107), V_1_9_1(108), V_1_9_2(109),
     /**
      * 1.9.3 or 1.9.4 as they have the same protocol version.
      */
     V_1_9_3(110),
-
     V_1_10(210),
     V_1_11(315),
     /**
      * 1.11.1 or 1.11.2 as they have the same protocol version.
      */
     V_1_11_1(316),
+    V_1_12(335), V_1_12_1(338), V_1_12_2(340),
 
-    V_1_12(335),
-    V_1_12_1(338),
-    V_1_12_2(340),
+    V_1_13(393), V_1_13_1(401), V_1_13_2(404),
 
-    V_1_13(393),
-    V_1_13_1(401),
-    V_1_13_2(404),
+    V_1_14(477), V_1_14_1(480), V_1_14_2(485),
+    V_1_14_3(490), V_1_14_4(498),
 
-    V_1_14(477),
-    V_1_14_1(480),
-    V_1_14_2(485),
-    V_1_14_3(490),
-    V_1_14_4(498),
+    V_1_15(573), V_1_15_1(575), V_1_15_2(578),
 
-    V_1_15(573),
-    V_1_15_1(575),
-    V_1_15_2(578),
-
-    V_1_16(735),
-    V_1_16_1(736),
-    V_1_16_2(751),
+    V_1_16(735), V_1_16_1(736), V_1_16_2(751),
     V_1_16_3(753),
     /**
      * 1.16.4 or 1.16.5 as they have the same protocol version.
      */
     V_1_16_4(754),
 
-    V_1_17(755),
-
-    V_1_17_1(756),
+    V_1_17(755), V_1_17_1(756),
 
     /**
      * 1.18 or 1.18.1 as they have the same protocol version.
@@ -90,12 +73,17 @@ public enum ClientVersion {
     V_1_18(757),
     V_1_18_2(758),
 
+    V_1_19(759),
+
+    //TODO UPDATE Add new protocol version field
+
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
-    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_18_2.protocolVersion + 1, true),
+    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_19.protocolVersion + 1, true),
 
     UNKNOWN(-1, true);
 
+    private static final ClientVersion[] VALUES = values();
     private static final ClientVersion[] REVERSED_VALUES;
 
     static {
@@ -159,10 +147,6 @@ public enum ClientVersion {
         return name;
     }
 
-    public static ClientVersion[] reversedValues() {
-        return REVERSED_VALUES;
-    }
-
     /**
      * Get a ClientVersion enum by protocol version.
      *
@@ -176,7 +160,7 @@ public enum ClientVersion {
         } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
         } else {
-            for (ClientVersion version : values()) {
+            for (ClientVersion version : VALUES) {
                 if (version.protocolVersion > protocolVersion) {
                     break;
                 } else if (version.protocolVersion == protocolVersion) {
@@ -193,7 +177,7 @@ public enum ClientVersion {
     }
 
     public static ClientVersion getOldest() {
-        return values()[0];
+        return VALUES[0];
     }
 
     @Deprecated
@@ -234,7 +218,7 @@ public enum ClientVersion {
      * @return Is this client version newer than or equal to the compared client version.
      */
     public boolean isNewerThanOrEquals(ClientVersion target) {
-        return this == target || isNewerThan(target);
+        return this.protocolVersion >= target.protocolVersion;
     }
 
     /**
@@ -258,6 +242,6 @@ public enum ClientVersion {
      * @return Is this client version older than or equal to the compared client version.
      */
     public boolean isOlderThanOrEquals(ClientVersion target) {
-        return this == target || isOlderThan(target);
+        return this.protocolVersion <= target.protocolVersion;
     }
 }

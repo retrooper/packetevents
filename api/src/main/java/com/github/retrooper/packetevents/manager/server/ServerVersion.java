@@ -30,7 +30,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
  * @since 1.6.9
  */
 public enum ServerVersion {
-    //TODO Rename to PlatformVersion or LocalVersion or Version?
+    //TODO Rename to MinecraftVersion?
     V_1_7_10(5),
     V_1_8(47), V_1_8_3(47), V_1_8_8(47),
     V_1_9(107), V_1_9_2(109), V_1_9_4(110),
@@ -44,6 +44,7 @@ public enum ServerVersion {
     V_1_16(735), V_1_16_1(736), V_1_16_2(751), V_1_16_3(753), V_1_16_4(754), V_1_16_5(754),
     V_1_17(755), V_1_17_1(756),
     V_1_18(757), V_1_18_1(757), V_1_18_2(758),
+    V_1_19(759),
     //TODO UPDATE Add server version constant
     ERROR(-1, true);
 

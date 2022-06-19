@@ -22,9 +22,10 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -38,6 +39,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
     private Vector3d position;
     private float pitch;
     private float yaw;
+    private float headYaw;
     private int data;
     private Optional<Vector3d> velocity;
 
@@ -45,7 +47,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    public WrapperPlayServerSpawnEntity(int entityID, Optional<UUID> uuid, EntityType entityType, Vector3d position, float pitch, float yaw, int data, Optional<Vector3d> velocity) {
+    public WrapperPlayServerSpawnEntity(int entityID, Optional<UUID> uuid, EntityType entityType, Vector3d position, float pitch, float yaw, float headYaw, int data, Optional<Vector3d> velocity) {
         super(PacketType.Play.Server.SPAWN_ENTITY);
         this.entityID = entityID;
         this.uuid = uuid;
@@ -61,16 +63,16 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
     public void read() {
         entityID = readVarInt();
         boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
+        boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         if (v1_9) {
             uuid = Optional.of(readUUID());
-        }
-        else {
+        } else {
             uuid = Optional.empty();
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             entityType = EntityTypes.getById(serverVersion.toClientVersion(), readVarInt());
-        }
-        else {
+        } else {
             int id = readByte();
             entityType = EntityTypes.getByLegacyId(serverVersion.toClientVersion(), id);
             if (entityType == null) // Should not happen but anyway
@@ -83,16 +85,27 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             x = readDouble();
             y = readDouble();
             z = readDouble();
-        }
-        else {
+        } else {
             x = readInt() / 32.0;
             y = readInt() / 32.0;
             z = readInt() / 32.0;
         }
         position = new Vector3d(x, y, z);
-        yaw = readByte() / ROTATION_FACTOR;
-        pitch = readByte() / ROTATION_FACTOR;
-        data = readInt();
+
+        if (v1_15) {
+            pitch = readByte() / ROTATION_FACTOR;
+            yaw = readByte() / ROTATION_FACTOR;
+        } else {
+            yaw = readByte() / ROTATION_FACTOR;
+            pitch = readByte() / ROTATION_FACTOR;
+        }
+
+        if (v1_19) {
+            headYaw = readByte() / ROTATION_FACTOR;
+            data = readVarInt();
+        } else {
+            data = readInt();
+        }
 
         //On 1.8 check if data > 0 before reading, or it won't be in the packet
         if (v1_9 || data > 0) {
@@ -100,8 +113,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             double velY = readShort() / VELOCITY_FACTOR;
             double velZ = readShort() / VELOCITY_FACTOR;
             velocity = Optional.of(new Vector3d(velX, velY, velZ));
-        }
-        else {
+        } else {
             velocity = Optional.empty();
         }
     }
@@ -112,33 +124,25 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         uuid = wrapper.uuid;
         entityType = wrapper.entityType;
         position = wrapper.position;
-        yaw = wrapper.yaw;
         pitch = wrapper.pitch;
+        yaw = wrapper.yaw;
+        headYaw = wrapper.headYaw;
         data = wrapper.data;
         velocity = wrapper.velocity;
-    }
-
-    private int floor(double value) {
-        int temp = (int) value;
-        return value < (double) temp ? temp - 1 : temp;
-    }
-
-    private int floor(float value) {
-        int temp = (int) value;
-        return value < (float) temp ? temp - 1 : temp;
     }
 
     @Override
     public void write() {
         writeVarInt(entityID);
         boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
+        boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         if (v1_9) {
             writeUUID(uuid.orElse(new UUID(0L, 0L)));
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             writeVarInt(entityType.getId(serverVersion.toClientVersion()));
-        }
-        else {
+        } else {
             if (entityType.getLegacyId(serverVersion.toClientVersion()) != -1) { // Will always be true if they use correct EntityTypes for this packet
                 writeByte(entityType.getLegacyId(serverVersion.toClientVersion()));
             } else {
@@ -150,15 +154,26 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             writeDouble(position.x);
             writeDouble(position.y);
             writeDouble(position.z);
+        } else {
+            writeInt(MathUtil.floor(position.x * 32.0));
+            writeInt(MathUtil.floor(position.y * 32.0));
+            writeInt(MathUtil.floor(position.z * 32.0));
         }
-        else {
-            writeInt(floor(position.x * 32.0));
-            writeInt(floor(position.y * 32.0));
-            writeInt(floor(position.z * 32.0));
+
+        if (v1_15) {
+            writeByte(MathUtil.floor(pitch * ROTATION_FACTOR));
+            writeByte(MathUtil.floor(yaw * ROTATION_FACTOR));
+        } else {
+            writeByte(MathUtil.floor(yaw * ROTATION_FACTOR));
+            writeByte(MathUtil.floor(pitch * ROTATION_FACTOR));
         }
-        writeByte(floor(yaw * ROTATION_FACTOR));
-        writeByte(floor(pitch * ROTATION_FACTOR));
-        writeInt(data);
+
+        if (v1_19) {
+            writeByte(MathUtil.floor(headYaw * ROTATION_FACTOR));
+            writeVarInt(data);
+        } else {
+            writeInt(data);
+        }
 
         //On 1.8 check if data > 0 before reading, or it won't be in the packet
         if (v1_9 || data > 0) {

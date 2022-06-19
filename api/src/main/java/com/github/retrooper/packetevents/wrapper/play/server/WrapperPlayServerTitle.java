@@ -82,8 +82,7 @@ public class WrapperPlayServerTitle extends PacketWrapper<WrapperPlayServerTitle
         int id = readVarInt();
         if (modern) {
             action = TitleAction.fromId(id);
-        }
-        else {
+        } else {
             action = TitleAction.fromLegacyId(id);
         }
         switch (action) {
@@ -135,19 +134,19 @@ public class WrapperPlayServerTitle extends PacketWrapper<WrapperPlayServerTitle
         writeVarInt(id);
         switch (action) {
             case SET_TITLE:
-                if (HANDLE_JSON) {
+                if (HANDLE_JSON && title != null) {
                     titleJson = AdventureSerializer.toJson(title);
                 }
                 writeComponentJSON(titleJson);
                 break;
-                case SET_SUBTITLE:
-                if (HANDLE_JSON) {
+            case SET_SUBTITLE:
+                if (HANDLE_JSON && subtitle != null) {
                     subtitleJson = AdventureSerializer.toJson(subtitle);
                 }
                 writeComponentJSON(subtitleJson);
                 break;
             case SET_ACTION_BAR:
-                if (HANDLE_JSON) {
+                if (HANDLE_JSON && actionBar != null) {
                     actionBarJson = AdventureSerializer.toJson(actionBar);
                 }
                 writeComponentJSON(actionBarJson);

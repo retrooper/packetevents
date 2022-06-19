@@ -20,10 +20,10 @@ package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.util.adventure.GsonComponentSerializerExtended;
 import com.google.gson.JsonElement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.gson.legacyimpl.NBTLegacyHoverEventSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class AdventureSerializer {
@@ -42,12 +42,8 @@ public class AdventureSerializer {
     public static GsonComponentSerializer getGsonSerializer() {
         if (GSON == null) {
             ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
-            GsonComponentSerializer.Builder builder = GsonComponentSerializer.builder()
-                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get());
-            if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-                builder.downsampleColors();
-            }
-            GSON = builder.build();
+            GSON = new GsonComponentSerializerExtended(version.isOlderThan(ServerVersion.V_1_16),
+                    version.isOlderThanOrEquals(ServerVersion.V_1_12_2));
         }
         return GSON;
     }

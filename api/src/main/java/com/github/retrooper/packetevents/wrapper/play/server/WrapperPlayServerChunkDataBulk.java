@@ -47,6 +47,8 @@ public class WrapperPlayServerChunkDataBulk extends PacketWrapper<WrapperPlaySer
         super(event);
     }
 
+    //TODO Constructor?
+
     @Override
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {

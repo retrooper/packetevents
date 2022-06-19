@@ -51,6 +51,10 @@ public class TypesBuilder {
         return versionMapper.getIndex(rawVersion);
     }
 
+    public void unloadFileMappings() {
+        fileMappings = null;
+    }
+
     public TypesBuilderData defineFromArray(String key) {
         if (fileMappings == null) {
             fileMappings = MappingHelper.getJSONObject(mapPath);

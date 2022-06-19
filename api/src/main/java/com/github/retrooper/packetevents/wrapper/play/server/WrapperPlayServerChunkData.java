@@ -59,14 +59,14 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     // 1.18 only (lighting) - for writing data
     // TODO: Make accessible?? Include in chunk data?? What do we do with this?
     boolean trustEdges;
-    BitSet blockLightMask = new BitSet(0);
-    BitSet skyLightMask = new BitSet(0);
-    BitSet emptyBlockLightMask = new BitSet(0);
-    BitSet emptySkyLightMask = new BitSet(0);
+    BitSet blockLightMask;
+    BitSet skyLightMask;
+    BitSet emptyBlockLightMask;
+    BitSet emptySkyLightMask;
     int skyLightCount;
     int blockLightCount;
-    byte[][] skyLightArray = new byte[0][0];
-    byte[][] blockLightArray = new byte[0][0];
+    byte[][] skyLightArray;
+    byte[][] blockLightArray;
 
     public WrapperPlayServerChunkData(PacketSendEvent event) {
         super(event);
@@ -173,8 +173,9 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         byte[] data = readByteArray();
         data = deflate(data, chunkMask, fullChunk);
 
-        boolean hasBlocklight = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThan(ServerVersion.V_1_14);
-        boolean checkForSky = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
+        boolean hasBlocklight = (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThan(ServerVersion.V_1_14))
+                && !serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8);
+        boolean checkForSky = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8);
 
         // 1.7/1.8 don't use this NetStreamInput
         NetStreamInput dataIn = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? new NetStreamInput(new ByteArrayInputStream(data)) : null;
@@ -191,7 +192,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 for (int i = 0; i < biomeDataBytes.length; i++) {
                     biomeDataBytes[i] = dataIn.readByte();
                 }
-            } else if (data.length >= 256) { // some MCM jars don't send biome data always, unlike vanilla
+            } else {
                 biomeDataBytes = Arrays.copyOfRange(data, data.length - 256, data.length);
             }
         }

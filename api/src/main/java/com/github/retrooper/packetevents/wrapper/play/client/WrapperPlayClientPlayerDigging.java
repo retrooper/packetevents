@@ -30,16 +30,18 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
     private DiggingAction action;
     private Vector3i blockPosition;
     private BlockFace blockFace;
+    private int sequence;
 
     public WrapperPlayClientPlayerDigging(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPlayerDigging(DiggingAction action, Vector3i blockPosition, BlockFace blockFace) {
+    public WrapperPlayClientPlayerDigging(DiggingAction action, Vector3i blockPosition, BlockFace blockFace, int sequence) {
         super(PacketType.Play.Client.PLAYER_DIGGING);
         this.action = action;
         this.blockPosition = blockPosition;
         this.blockFace = blockFace;
+        this.sequence = sequence;
     }
 
     @Override
@@ -61,6 +63,10 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         }
         short face = readUnsignedByte();
         blockFace = BlockFace.getBlockFaceByValue(face);
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            sequence = readVarInt();
+        }
     }
 
     @Override
@@ -68,6 +74,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         action = wrapper.action;
         blockPosition = wrapper.blockPosition;
         blockFace = wrapper.blockFace;
+        sequence = wrapper.sequence;
     }
 
     @Override
@@ -82,6 +89,10 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
             writeInt(blockPosition.z);
         }
         writeByte(blockFace.getFaceValue());
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            writeVarInt(sequence);
+        }
     }
 
     public DiggingAction getAction() {
@@ -106,5 +117,21 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
 
     public void setFace(BlockFace blockFace) {
         this.blockFace = blockFace;
+    }
+
+    public BlockFace getBlockFace() {
+        return blockFace;
+    }
+
+    public void setBlockFace(BlockFace blockFace) {
+        this.blockFace = blockFace;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

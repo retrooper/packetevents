@@ -20,10 +20,14 @@ package com.github.retrooper.packetevents.protocol.world;
 
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated // This is a registry and cannot be hardcoded in modern versions
 public enum DimensionType {
     NETHER(-1, "minecraft:the_nether"),
     OVERWORLD(0, "minecraft:overworld"),
     END(1, "minecraft:the_end");
+
+    private static final DimensionType[] VALUES = values();
+
     private final int id;
     private final String name;
 
@@ -33,12 +37,12 @@ public enum DimensionType {
     }
 
     public static DimensionType getById(int id) {
-        return values()[id + 1];
+        return VALUES[id + 1];
     }
 
     @Nullable
     public static DimensionType getByName(String name) {
-        for (DimensionType type : values()) {
+        for (DimensionType type : VALUES) {
             if (type.name.equals(name)) {
                 return type;
             }
@@ -52,5 +56,13 @@ public enum DimensionType {
 
     public String getName() {
         return name;
+    }
+
+    public static boolean isFlat(String levelType) {
+        return WorldType.FLAT.getName().equals(levelType);
+    }
+
+    public static boolean isDebug(String levelType) {
+        return WorldType.DEBUG_ALL_BLOCK_STATES.getName().equals(levelType);
     }
 }

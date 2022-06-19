@@ -2,6 +2,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
@@ -18,6 +20,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     private int effectAmplifier;
     private int effectDurationTicks;
     private byte flags;
+    private NBTCompound factorData;
 
     public WrapperPlayServerEntityEffect(PacketSendEvent event) {
         super(event);
@@ -47,6 +50,11 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
             this.flags = readByte();
         }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            if (readBoolean()) {
+                factorData = readNBT();
+            }
+        }
     }
 
     @Override
@@ -61,6 +69,12 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         writeVarInt(effectDurationTicks);
         if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
             writeByte(flags);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            writeBoolean(factorData != null);
+            if (factorData != null) {
+                writeNBT(factorData);
+            }
         }
     }
 
@@ -112,6 +126,15 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     private void setFlags(byte flags) {
         this.flags = flags;
     }
+
+    public NBTCompound getFactorData() {
+        return factorData;
+    }
+
+    public void setFactorData(NBTCompound factorData) {
+        this.factorData = factorData;
+    }
+
 
     private byte constructFlags(boolean ambient, boolean visible, boolean icons) {
         BitSet bitSet = new BitSet(3);

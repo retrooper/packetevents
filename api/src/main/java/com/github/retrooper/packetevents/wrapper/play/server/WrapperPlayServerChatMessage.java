@@ -20,128 +20,213 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.MessageSender;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.AdventureSerializer;
+import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServerChatMessage> {
     public static boolean HANDLE_JSON = true;
-    private String chatComponentJson;
-    private Component chatComponent;
-    private ChatPosition position;
-    private UUID senderUUID;
+    private MessageSender sender;
+    private String messageJson;
+    private Component message;
+    private @Nullable String unsignedMessageJson;
+    private Optional<Component> unsignedMessage = Optional.empty();
+
+    private ChatType type;
+    private Optional<Instant> timestamp = Optional.empty();
+    private Optional<SaltSignature> saltSignature = Optional.empty();
 
     public WrapperPlayServerChatMessage(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerChatMessage(Component chatComponent, ChatPosition position) {
-        this(chatComponent, position, new UUID(0L, 0L));
+    public WrapperPlayServerChatMessage(ChatType type, Component message) {
+        this(new MessageSender(null, null), type, message);
     }
 
-    public WrapperPlayServerChatMessage(Component chatComponent, ChatPosition position, UUID senderUUID) {
+    public WrapperPlayServerChatMessage(MessageSender sender, ChatType type, Component message) {
         super(PacketType.Play.Server.CHAT_MESSAGE);
-        this.chatComponent = chatComponent;
-        this.position = position;
-        this.senderUUID = senderUUID;
+        this.sender = sender;
+        this.type = type;
+        this.message = message;
     }
 
-
-    public WrapperPlayServerChatMessage(String chatComponentJson, ChatPosition position) {
-        this(chatComponentJson, position, new UUID(0L, 0L));
+    public WrapperPlayServerChatMessage(ChatType type, String messageJson) {
+        this(new MessageSender(null, null), type, messageJson);
     }
 
-    public WrapperPlayServerChatMessage(String chatComponentJson, ChatPosition position, UUID senderUUID) {
+    public WrapperPlayServerChatMessage(MessageSender sender, ChatType type, String messageJson) {
         super(PacketType.Play.Server.CHAT_MESSAGE);
-        this.chatComponentJson = chatComponentJson;
-        this.position = position;
-        this.senderUUID = senderUUID;
+        this.sender = sender;
+        this.type = type;
+        this.messageJson = messageJson;
+    }
+
+    public WrapperPlayServerChatMessage(MessageSender sender, ChatType type, Component signedMessage, @Nullable Component unsignedMessage, @Nullable Instant timestamp, @Nullable SaltSignature saltSignature) {
+        super(PacketType.Play.Server.CHAT_MESSAGE);
+        this.sender = sender;
+        this.type = type;
+        this.message = signedMessage;
+        this.unsignedMessage = Optional.ofNullable(unsignedMessage);
+        this.timestamp = Optional.ofNullable(timestamp);
+        this.saltSignature = Optional.ofNullable(saltSignature);
+    }
+
+    public WrapperPlayServerChatMessage(MessageSender sender, ChatType type, String signedMessageJson, @Nullable String unsignedMessageJson, @Nullable Instant timestamp, @Nullable SaltSignature saltSignature) {
+        super(PacketType.Play.Server.CHAT_MESSAGE);
+        this.sender = sender;
+        this.type = type;
+        this.messageJson = signedMessageJson;
+        this.unsignedMessageJson = unsignedMessageJson;
+        this.timestamp = Optional.ofNullable(timestamp);
+        this.saltSignature = Optional.ofNullable(saltSignature);
     }
 
     @Override
     public void read() {
-        this.chatComponentJson = readString(getMaxMessageLength());
-
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
+        this.messageJson = readString(getMaxMessageLength());
+        if (v1_19 && readBoolean()) {
+            this.unsignedMessageJson = readString(getMaxMessageLength());
+        }
+        else {
+            this.unsignedMessageJson = null;
+        }
         //Parse JSON message
         if (HANDLE_JSON) {
-            chatComponent = AdventureSerializer.parseComponent(this.chatComponentJson);
+            message = AdventureSerializer.parseComponent(this.messageJson);
+            if (unsignedMessageJson != null) {
+                unsignedMessage = Optional.of(AdventureSerializer.parseComponent(this.unsignedMessageJson));
+            }
         }
 
         //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
-            byte positionIndex = readByte();
-            position = ChatPosition.getById(positionIndex);
+            int positionIndex;
+            if (v1_19) {
+                positionIndex = readVarInt();
+            } else {
+                positionIndex = readByte();
+            }
+            type = ChatType.getById(positionIndex);
         } else {
             //Always chat in 1.7.10 protocol.
-            position = ChatPosition.CHAT;
+            type = ChatType.CHAT;
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            this.senderUUID = readUUID();
+            //Read sender data.
+            this.sender = new MessageSender(readUUID(), null, null);
+            if (v1_19) {
+                this.sender.setDisplayName(readComponent());
+                if (readBoolean()) {
+                    this.sender.setTeamName(readComponent());
+                }
+
+                //Read timestamp
+                timestamp = Optional.of(readTimestamp());
+
+                saltSignature = Optional.of(readSaltSignature());
+            }
         } else {
-            this.senderUUID = new UUID(0L, 0L);
+            this.sender = new MessageSender(null, null);
         }
     }
 
     @Override
     public void copy(WrapperPlayServerChatMessage wrapper) {
-        this.chatComponentJson = wrapper.chatComponentJson;
-        this.chatComponent = wrapper.chatComponent;
-        this.position = wrapper.position;
-        this.senderUUID = wrapper.senderUUID;
+        this.messageJson = wrapper.messageJson;
+        this.message = wrapper.message;
+        this.type = wrapper.type;
+        this.sender = wrapper.sender; 
     }
 
     @Override
     public void write() {
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         if (HANDLE_JSON) {
-            chatComponentJson = AdventureSerializer.toJson(chatComponent);
+            if (message != null) {
+                messageJson = AdventureSerializer.toJson(message);
+            }
+            unsignedMessage.ifPresent(component -> unsignedMessageJson = AdventureSerializer.toJson(component));
         }
-        writeString(chatComponentJson, getMaxMessageLength());
+        writeString(messageJson, getMaxMessageLength());
+        if (v1_19) {
+            writeBoolean(unsignedMessageJson != null);
+            if (unsignedMessageJson != null) {
+                writeString(unsignedMessageJson, getMaxMessageLength());
+            }
+        }
 
         //Is the server 1.8+ or is the client 1.8+? (1.7.10 servers support 1.8 clients, and send the chat position for 1.8 clients)
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
-            writeByte(position.getId());
+            if (v1_19) {
+                writeVarInt(type.getId());
+            } else {
+                writeByte(type.getId());
+            }
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            writeUUID(senderUUID);
+            //UUID never null, if unspecified, it should be 0L, 0L
+            UUID uuid = sender.getUUID();
+            if (uuid == null) {
+                uuid = new UUID(0L, 0L);
+            }
+            writeUUID(uuid);
+            if (v1_19) {
+                writeComponent(this.sender.getDisplayName());
+                writeBoolean(this.sender.getTeamName() != null);
+                if (this.sender.getTeamName() != null) {
+                    writeComponent(this.sender.getTeamName());
+                }
+                writeTimestamp(this.timestamp.get());
+                writeSaltSignature(this.saltSignature.get());
+            }
         }
     }
 
-    public Component getChatComponent() {
-        return chatComponent;
+    public MessageSender getSender() {
+        return sender;
     }
 
-    public void setChatComponent(Component chatComponent) {
-        this.chatComponent = chatComponent;
+    public void setSender(MessageSender sender) {
+        this.sender = sender;
     }
 
-    public String getChatComponentJson() {
-        return chatComponentJson;
+    public Component getMessage() {
+        return message;
     }
 
-    public void setChatComponentJson(String chatComponentJson) {
-        this.chatComponentJson = chatComponentJson;
+    public void setMessage(Component chatComponent) {
+        this.message = chatComponent;
     }
 
-    public ChatPosition getPosition() {
-        return position;
+    public String getMessageJson() {
+        return messageJson;
     }
 
-    public void setPosition(ChatPosition position) {
-        this.position = position;
+    public void setMessageJson(String chatComponentJson) {
+        this.messageJson = chatComponentJson;
     }
 
-    public UUID getSenderUUID() {
-        return senderUUID;
+    public ChatType getType() {
+        return type;
     }
 
-    public void setSenderUUID(UUID senderUUID) {
-        this.senderUUID = senderUUID;
+    public void setType(ChatType type) {
+        this.type = type;
     }
+
+
 }

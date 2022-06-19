@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.protocol.world.Direction;
 import com.github.retrooper.packetevents.protocol.world.PaintingType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -33,7 +34,7 @@ import java.util.UUID;
 public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlayServerSpawnPainting> {
     private int entityId;
     private UUID uuid;
-    private PaintingType type;
+    private @Nullable PaintingType type;
     private Vector3i position;
     private Direction direction;
 
@@ -41,7 +42,15 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         super(event);
     }
 
-    public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, PaintingType type, Vector3i position, Direction direction) {
+    public WrapperPlayServerSpawnPainting(int entityId, Vector3i position, Direction direction) {
+        this(entityId, new UUID(0L, 0L), null, position, direction);
+    }
+
+    public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, Vector3i position, Direction direction) {
+        this(entityId, uuid, null, position, direction);
+    }
+
+    public WrapperPlayServerSpawnPainting(int entityId, UUID uuid, @Nullable PaintingType type, Vector3i position, Direction direction) {
         super(PacketType.Play.Server.SPAWN_PAINTING);
         this.entityId = entityId;
         this.uuid = uuid;
@@ -129,11 +138,11 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         this.uuid = uuid;
     }
 
-    public PaintingType getType() {
-        return type;
+    public Optional<PaintingType> getType() {
+        return Optional.ofNullable(type);
     }
 
-    public void setType(PaintingType type) {
+    public void setType(@Nullable PaintingType type) {
         this.type = type;
     }
 

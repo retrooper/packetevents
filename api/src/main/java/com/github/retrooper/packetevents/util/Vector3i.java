@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.world.BlockFace;
 
 /**
  * 3D int Vector.
@@ -64,11 +65,7 @@ public class Vector3i {
 
         // 1.14 method for this is storing X Z Y
         // 1.17 added support for negative values
-        // 1.15+ might all be the same but let's be safe with not producing negative values on 1.14-1.16...
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            y = (int) (val << 52 >> 52);
-            z = (int) (val << 26 >> 38);
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             y = (int) (val << 52 >> 52);
             z = (int) (val << 26 >> 38);
         } else {
@@ -191,6 +188,10 @@ public class Vector3i {
 
     public Vector3i add(Vector3i other) {
         return add(other.x, other.y, other.z);
+    }
+
+    public Vector3i offset(BlockFace face) {
+        return add(face.getModX(), face.getModY(), face.getModZ());
     }
 
     public Vector3i subtract(int x, int y, int z) {

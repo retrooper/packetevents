@@ -19,40 +19,53 @@
 package com.github.retrooper.packetevents.protocol.world;
 
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-
-import java.util.Optional;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 
 public class Dimension {
     private DimensionType type;
-    private Optional<NBTCompound> attributes;
+    private NBTCompound attributes;
 
     public Dimension(DimensionType type) {
         this.type = type;
-        this.attributes = Optional.empty();
     }
 
-    public Dimension(DimensionType type, NBTCompound attributes) {
-        this.type = type;
-        setAttributes(attributes);
+    public Dimension(NBTCompound attributes) {
+        this.attributes = attributes;
     }
 
+    public String getDimensionName() {
+        if (attributes == null) {
+            return type.getName();
+        }
+
+        return getAttributes().getStringTagValueOrDefault("effects", "");
+    }
+
+    public void setDimensionName(String name) {
+        if (attributes == null) {
+            setType(DimensionType.getByName(name));
+        }
+
+        NBTCompound compound = getAttributes();
+        compound.setTag("effects", new NBTString(name));
+        setAttributes(compound);
+    }
+
+    @Deprecated
     public DimensionType getType() {
         return type;
     }
 
+    @Deprecated
     public void setType(DimensionType type) {
         this.type = type;
     }
 
-    public Optional<NBTCompound> getAttributes() {
+    public NBTCompound getAttributes() {
         return attributes;
     }
 
     public void setAttributes(NBTCompound attributes) {
-        if (attributes == null) {
-            this.attributes = Optional.empty();
-            return;
-        }
-        this.attributes = Optional.of(attributes);
+        this.attributes = attributes;
     }
 }

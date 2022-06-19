@@ -24,11 +24,13 @@ public enum Difficulty {
     NORMAL,
     HARD;
 
+    private static final Difficulty[] VALUES = values();
+
     public int getId() {
         return ordinal();
     }
 
     public static Difficulty getById(int id) {
-        return values()[id];
+        return VALUES[id];
     }
 }

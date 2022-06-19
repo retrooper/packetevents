@@ -61,9 +61,8 @@ public class ItemStack {
         if (!this.cachedIsEmpty && this.getType().getMaxDurability() > 0) {
             NBTCompound tag = this.getNBT();
             return tag == null || !tag.getBoolean("Unbreakable");
-        } else {
-            return false;
         }
+        return false;
     }
 
     public boolean isDamaged() {
@@ -238,7 +237,7 @@ public class ItemStack {
         }
     }
 
-    private String getEnchantmentsTagName(ClientVersion version) {
+    public String getEnchantmentsTagName(ClientVersion version) {
         String tagName = version.isNewerThanOrEquals(ClientVersion.V_1_13) ? "Enchantments" : "ench";
         if (type == ItemTypes.ENCHANTED_BOOK) {
             tagName = "StoredEnchantments";
@@ -323,8 +322,7 @@ public class ItemStack {
         }
 
         public ItemStack build() {
-            ItemStack stack = new ItemStack(type, amount, nbt, legacyData);
-            return stack;
+            return new ItemStack(type, amount, nbt, legacyData);
         }
 
     }
