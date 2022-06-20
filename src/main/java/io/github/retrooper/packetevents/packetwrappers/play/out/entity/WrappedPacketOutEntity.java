@@ -95,7 +95,9 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
             pitchByteIndex = 4;
         } else if (dxField.equals(Reflection.getField(packetClass, int.class, 1))) {
             mode = 1;
-        } else if (dxField.equals(Reflection.getField(packetClass, short.class, 0))) {
+        } else if (dxField.equals(Reflection.getField(packetClass, short.class, 0))
+        //1.19 support
+                || dxField.equals(Reflection.getField(packetClass, short.class, 1))) {
             mode = 2;
         }
         if (mode == 0) {
