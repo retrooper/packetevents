@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents.packetwrappers.play.out;
+package io.github.retrooper.packetevents.packetwrappers.play.out.systemchat;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
