@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClientTabComplete> {
-    private int transactionID;
+    private int transactionId;
     private String text;
     private @Nullable Vector3i blockPosition;
 
@@ -38,9 +38,9 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
         super(event);
     }
 
-    public WrapperPlayClientTabComplete(int transactionID, String text, @Nullable Vector3i blockPosition) {
+    public WrapperPlayClientTabComplete(int transactionId, String text, @Nullable Vector3i blockPosition) {
         super(PacketType.Play.Client.TAB_COMPLETE);
-        this.transactionID = transactionID;
+        this.transactionId = transactionId;
         this.text = text;
         this.blockPosition = blockPosition;
     }
@@ -57,7 +57,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
                 //1.13 text length
                 textLength = 256;
             }
-            transactionID = readVarInt();
+            transactionId = readVarInt();
             text = readString(textLength);
         } else {
             textLength = 32767;
@@ -83,7 +83,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
                 //1.13 text length
                 textLength = 256;
             }
-            writeVarInt(transactionID);
+            writeVarInt(transactionId);
             writeString(text, textLength);
         } else {
             textLength = 32767;
@@ -101,7 +101,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
     @Override
     public void copy(WrapperPlayClientTabComplete wrapper) {
         text = wrapper.text;
-        transactionID = wrapper.transactionID;
+        transactionId = wrapper.transactionId;
         blockPosition = wrapper.blockPosition;
     }
 
@@ -114,12 +114,12 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
     }
 
     public OptionalInt getTransactionId() {
-        return OptionalInt.of(transactionID);
+        return OptionalInt.of(transactionId);
     }
 
-    public void setTransactionId(@Nullable Integer transactionID) {
-        if (transactionID != null) {
-            this.transactionID = transactionID;
+    public void setTransactionId(@Nullable Integer transactionId) {
+        if (transactionId != null) {
+            this.transactionId = transactionId;
         }
     }
 

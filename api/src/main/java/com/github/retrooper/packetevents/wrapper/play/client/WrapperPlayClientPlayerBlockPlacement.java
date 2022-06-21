@@ -27,42 +27,46 @@ import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+// This class still needs to be kind of recoded with our new generic methods, but we currently don't have any method
+// which fits the class needs
 public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<WrapperPlayClientPlayerBlockPlacement> {
     private InteractionHand interactionHand;
     private Vector3i blockPosition;
     private BlockFace face;
     private Vector3f cursorPosition;
-    private Optional<ItemStack> itemStack;
-    private Optional<Boolean> insideBlock;
-    int sequence;
+    private @Nullable ItemStack itemStack;
+    private boolean insideBlock;
+    private int sequence;
 
     public WrapperPlayClientPlayerBlockPlacement(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPlayerBlockPlacement(InteractionHand interactionHand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition, Optional<Boolean> insideBlock, int sequence) {
+    public WrapperPlayClientPlayerBlockPlacement(InteractionHand interactionHand, Vector3i blockPosition, BlockFace face,
+                                                 Vector3f cursorPosition, @Nullable ItemStack itemStack, boolean insideBlock,
+                                                 int sequence) {
         super(PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT);
         this.interactionHand = interactionHand;
         this.blockPosition = blockPosition;
         this.face = face;
         this.cursorPosition = cursorPosition;
+        this.itemStack = itemStack;
         this.insideBlock = insideBlock;
         this.sequence = sequence;
     }
 
     @Override
     public void read() {
-        itemStack = Optional.empty();
-        insideBlock = Optional.empty();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             interactionHand = InteractionHand.getById(readVarInt());
             blockPosition = readBlockPosition();
             face = BlockFace.getBlockFaceByValue(readVarInt());
             cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
-            insideBlock = Optional.of(readBoolean());
+            insideBlock = readBoolean();
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
                 sequence = readVarInt();
             }
@@ -78,7 +82,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
             } else {
                 face = BlockFace.getBlockFaceByValue(readUnsignedByte());
                 //Optional itemstack
-                itemStack = Optional.of(readItemStack());
+                itemStack = readItemStack();
                 interactionHand = InteractionHand.MAIN_HAND;
             }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
@@ -98,7 +102,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
             writeFloat(cursorPosition.x);
             writeFloat(cursorPosition.y);
             writeFloat(cursorPosition.z);
-            writeBoolean(insideBlock.orElse(false));
+            writeBoolean(insideBlock);
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
                 writeVarInt(sequence);
             }
@@ -115,8 +119,8 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
                 writeVarInt(interactionHand.getId());
             } else {
                 writeByte(face.getFaceValue());
-                writeItemStack(itemStack.orElse(ItemStack.EMPTY));
-                //Hand is always the main hand
+                writeItemStack(itemStack == null ? ItemStack.EMPTY : itemStack);
+                // Hand is always the main hand
             }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 writeFloat(cursorPosition.x);
@@ -174,18 +178,18 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
     }
 
     public Optional<ItemStack> getItemStack() {
-        return itemStack;
+        return Optional.ofNullable(itemStack);
     }
 
-    public void setItemStack(Optional<ItemStack> itemStack) {
+    public void setItemStack(@Nullable ItemStack itemStack) {
         this.itemStack = itemStack;
     }
 
-    public Optional<Boolean> getInsideBlock() {
+    public boolean getInsideBlock() {
         return insideBlock;
     }
 
-    public void setInsideBlock(Optional<Boolean> insideBlock) {
+    public void setInsideBlock(boolean insideBlock) {
         this.insideBlock = insideBlock;
     }
 

@@ -113,7 +113,7 @@ public class PlayerDataProvider extends LivingEntityDataProvider {
                     skinPartsMask = (byte) entityData.getValue();
                     break;
                 case 18:
-                    mainArm = HumanoidArm.VALUES[(byte) entityData.getValue()];
+                    mainArm = HumanoidArm.getById((byte) entityData.getValue());
                     break;
                 case 19:
                     leftShoulderNBT = (NBTCompound) entityData.getValue();

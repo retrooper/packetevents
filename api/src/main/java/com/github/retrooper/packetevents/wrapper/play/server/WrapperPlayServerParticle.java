@@ -103,7 +103,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
 
     @Override
     public void write() {
-        //TODO on 1.7 we get particle type by 64 len string
+        // TODO: on 1.7 we get particle type by 64 len string
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeString(particle.getType().getName().getKey(), 64);
         } else {

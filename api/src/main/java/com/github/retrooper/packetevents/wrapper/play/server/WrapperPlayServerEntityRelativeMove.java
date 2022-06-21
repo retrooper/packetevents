@@ -19,14 +19,15 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPlayServerEntityRelativeMove> {
-    //(Short.MAX_VALUE + 1) / 8.0
+    // (Short.MAX_VALUE + 1) / 8.0
     private static double MODERN_DELTA_DIVISOR = 4096.0;
-    //(Byte.MAX_VALUE + 1) / 4.0
+    // (Byte.MAX_VALUE + 1) / 4.0
     private static double LEGACY_DELTA_DIVISOR = 32.0;
     private int entityID;
     private double deltaX;
@@ -50,16 +51,16 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
     @Override
     public void read() {
         entityID = readVarInt();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            deltaX = readShort() / MODERN_DELTA_DIVISOR;
-            deltaY = readShort() / MODERN_DELTA_DIVISOR;
-            deltaZ = readShort() / MODERN_DELTA_DIVISOR;
-        }
-        else {
-            deltaX = readByte() / LEGACY_DELTA_DIVISOR;
-            deltaY = readByte() / LEGACY_DELTA_DIVISOR;
-            deltaZ = readByte() / LEGACY_DELTA_DIVISOR;
-        }
+        readMulti(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_9,
+                packetWrapper -> {
+                    deltaX = packetWrapper.readShort() / MODERN_DELTA_DIVISOR;
+                    deltaY = packetWrapper.readShort() / MODERN_DELTA_DIVISOR;
+                    deltaZ = packetWrapper.readShort() / MODERN_DELTA_DIVISOR;
+                }, packetWrapper -> {
+                    deltaX = packetWrapper.readByte() / LEGACY_DELTA_DIVISOR;
+                    deltaY = packetWrapper.readByte() / LEGACY_DELTA_DIVISOR;
+                    deltaZ = packetWrapper.readByte() / LEGACY_DELTA_DIVISOR;
+                });
         onGround = readBoolean();
     }
 
@@ -70,8 +71,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
             writeShort((short) (deltaX * MODERN_DELTA_DIVISOR));
             writeShort((short) (deltaY * MODERN_DELTA_DIVISOR));
             writeShort((short) (deltaZ * MODERN_DELTA_DIVISOR));
-        }
-        else {
+        } else {
             writeByte((byte) (deltaX * LEGACY_DELTA_DIVISOR));
             writeByte((byte) (deltaY * LEGACY_DELTA_DIVISOR));
             writeByte((byte) (deltaZ * LEGACY_DELTA_DIVISOR));

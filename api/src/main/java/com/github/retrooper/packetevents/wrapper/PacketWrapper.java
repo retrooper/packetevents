@@ -22,8 +22,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
+import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.manager.server.ServerVersion.MultiVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
@@ -749,6 +749,17 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     @Experimental
+    public void readMulti(MultiVersion version, ServerVersion target, Consumer<PacketWrapper<?>> first,
+                          Consumer<PacketWrapper<?>> second) {
+        if (serverVersion.is(version, target)) {
+            System.out.println("First");
+            first.accept(this);
+        } else {
+            System.out.println("Second");
+            second.accept(this);
+        }
+    }
+
     public <U, V, R> U readMultiVersional(MultiVersion version, ServerVersion target, Reader<V> first, Reader<R> second) {
         if (serverVersion.is(version, target)) {
             return (U) first.apply(this);
@@ -757,12 +768,47 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    @Experimental
+    // TODO: Rewrite this method to make it more dynamical
+    public <U, V, R, X> U readMultiVersional(MultiVersion version, ServerVersion target,
+                                             MultiVersion versionSecond, ServerVersion targetSecond,
+                                             Reader<V> first, Reader<R> second, Reader<X> third) {
+        if (serverVersion.is(version, target)) {
+            return (U) first.apply(this);
+        } else if (serverVersion.is(versionSecond, targetSecond)) {
+            return (U) second.apply(this);
+        } else {
+            return (U) third.apply(this);
+        }
+    }
+
     public <V> void writeMultiVersional(MultiVersion version, ServerVersion target, V value, Writer<V> first, Writer<V> second) {
         if (serverVersion.is(version, target)) {
             first.accept(this, value);
         } else {
             second.accept(this, value);
+        }
+    }
+
+    // TODO: Rewrite this method to make it more dynamical
+    public <V> void writeMultiVersional(MultiVersion version, ServerVersion target,
+                                        MultiVersion versionSecond, ServerVersion targetSecond, V value,
+                                        Writer<V> first, Writer<V> second, Writer<V> third) {
+        if (serverVersion.is(version, target)) {
+            first.accept(this, value);
+        } else if (serverVersion.is(versionSecond, targetSecond)) {
+            second.accept(this, value);
+        } else {
+            third.accept(this, value);
+        }
+    }
+
+    @Experimental
+    public void writeMulti(MultiVersion version, ServerVersion target, Consumer<PacketWrapper<?>> first,
+                          Consumer<PacketWrapper<?>> second) {
+        if (serverVersion.is(version, target)) {
+            first.accept(this);
+        } else {
+            second.accept(this);
         }
     }
 

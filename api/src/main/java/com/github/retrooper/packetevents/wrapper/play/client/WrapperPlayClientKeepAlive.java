@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -42,24 +43,18 @@ public class WrapperPlayClientKeepAlive extends PacketWrapper<WrapperPlayClientK
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
-            this.id = readLong();
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.id = readVarInt();
-        } else {
-            this.id = readInt();
-        }
+        this.id = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_12,
+                MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
+                PacketWrapper::readLong, PacketWrapper::readVarInt, PacketWrapper::readInt);
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
-            writeLong(id);
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            writeVarInt((int) id);
-        } else {
-            writeInt((int) id);
-        }
+        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_12,
+                MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, id,
+                PacketWrapper::writeLong,
+                (packetWrapper, aLong) -> packetWrapper.writeVarInt(Math.toIntExact(aLong)),
+                (packetWrapper, aLong) -> packetWrapper.writeInt(Math.toIntExact(aLong)));
     }
 
     @Override

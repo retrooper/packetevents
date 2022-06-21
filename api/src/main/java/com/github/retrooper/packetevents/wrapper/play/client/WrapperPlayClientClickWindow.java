@@ -22,33 +22,32 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.window.WindowClickType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClientClickWindow> {
-    private int windowID;
-    private Optional<Integer> stateID;
+    private int windowId;
+    private int stateId;
     private int slot;
     private int button;
-    private Optional<Integer> actionNumber;
+    private int actionNumber;
     private WindowClickType windowClickType;
-    private Optional<Map<Integer, ItemStack>> slots;
+    private Map<Integer, ItemStack> slots;
     private ItemStack carriedItemStack;
 
     public WrapperPlayClientClickWindow(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientClickWindow(int windowID, Optional<Integer> stateID, int slot, int button, Optional<Integer> actionNumber, WindowClickType windowClickType,
-                                        Optional<Map<Integer, ItemStack>> slots, ItemStack carriedItemStack) {
+    public WrapperPlayClientClickWindow(int windowId, int stateId, int slot, int button, int actionNumber, WindowClickType windowClickType,
+                                        Map<Integer, ItemStack> slots, ItemStack carriedItemStack) {
         super(PacketType.Play.Client.CLICK_WINDOW);
-        this.windowID = windowID;
-        this.stateID = stateID;
+        this.windowId = windowId;
+        this.stateId = stateId;
         this.slot = slot;
         this.button = button;
         this.actionNumber = actionNumber;
@@ -60,35 +59,50 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
     @Override
     public void read() {
         boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
-        this.windowID = readUnsignedByte();
+        this.windowId = readUnsignedByte();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
-            this.stateID = Optional.of(readVarInt());
-        } else {
-            this.stateID = Optional.empty();
+            this.stateId = readVarInt();
         }
         this.slot = readShort();
         this.button = readByte();
         if (!v1_17) {
-            this.actionNumber = Optional.of((int) readShort());
-        } else {
-            this.actionNumber = Optional.empty();
+            this.actionNumber = readShort();
         }
         int clickTypeIndex = readVarInt();
-        this.windowClickType = WindowClickType.VALUES[clickTypeIndex];
+        this.windowClickType = WindowClickType.getById(clickTypeIndex);
         if (v1_17) {
             Function<PacketWrapper<?>, Integer> slotReader = wrapper -> (int) wrapper.readShort();
             Function<PacketWrapper<?>, ItemStack> itemStackReader = PacketWrapper::readItemStack;
-            this.slots = Optional.of(readMap(slotReader, itemStackReader));
-        } else {
-            this.slots = Optional.empty();
+            this.slots = readMap(slotReader, itemStackReader);
         }
         this.carriedItemStack = readItemStack();
     }
 
     @Override
+    public void write() {
+        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
+        writeByte(windowId);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
+            writeVarInt(this.stateId);
+        }
+        writeShort(this.slot);
+        writeByte(this.button);
+        if (!v1_17) {
+            writeShort(this.actionNumber);
+        }
+        writeVarInt(windowClickType.ordinal());
+        if (v1_17) {
+            BiConsumer<PacketWrapper<?>, Integer> keyConsumer = PacketWrapper::writeShort;
+            BiConsumer<PacketWrapper<?>, ItemStack> valueConsumer = PacketWrapper::writeItemStack;
+            writeMap(slots, keyConsumer, valueConsumer);
+        }
+        writeItemStack(carriedItemStack);
+    }
+
+    @Override
     public void copy(WrapperPlayClientClickWindow wrapper) {
-        this.windowID = wrapper.windowID;
-        this.stateID = wrapper.stateID;
+        this.windowId = wrapper.windowId;
+        this.stateId = wrapper.stateId;
         this.slot = wrapper.slot;
         this.button = wrapper.button;
         this.actionNumber = wrapper.actionNumber;
@@ -97,41 +111,20 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         this.carriedItemStack = wrapper.carriedItemStack;
     }
 
-    @Override
-    public void write() {
-        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
-        writeByte(windowID);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
-            writeVarInt(this.stateID.orElse(-1));
-        }
-        writeShort(this.slot);
-        writeByte(this.button);
-        if (!v1_17) {
-            writeShort(this.actionNumber.orElse(-1));
-        }
-        writeVarInt(windowClickType.ordinal());
-        if (v1_17) {
-            BiConsumer<PacketWrapper<?>, Integer> keyConsumer = PacketWrapper::writeShort;
-            BiConsumer<PacketWrapper<?>, ItemStack> valueConsumer = PacketWrapper::writeItemStack;
-            writeMap(slots.orElse(new HashMap<>()), keyConsumer, valueConsumer);
-        }
-        writeItemStack(carriedItemStack);
-    }
-
     public int getWindowId() {
-        return windowID;
+        return windowId;
     }
 
-    public void setWindowId(int windowID) {
-        this.windowID = windowID;
+    public void setWindowId(int windowId) {
+        this.windowId = windowId;
     }
 
-    public Optional<Integer> getStateId() {
-        return stateID;
+    public int getStateId() {
+        return stateId;
     }
 
-    public void setStateID(Optional<Integer> stateID) {
-        this.stateID = stateID;
+    public void setStateId(int stateId) {
+        this.stateId = stateId;
     }
 
     public int getSlot() {
@@ -150,6 +143,14 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         this.button = button;
     }
 
+    public int getActionNumber() {
+        return actionNumber;
+    }
+
+    public void setActionNumber(int actionNumber) {
+        this.actionNumber = actionNumber;
+    }
+
     public WindowClickType getWindowClickType() {
         return windowClickType;
     }
@@ -158,11 +159,11 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         this.windowClickType = windowClickType;
     }
 
-    public Optional<Map<Integer, ItemStack>> getSlots() {
+    public Map<Integer, ItemStack> getSlots() {
         return slots;
     }
 
-    public void setSlots(Optional<Map<Integer, ItemStack>> slots) {
+    public void setSlots(Map<Integer, ItemStack> slots) {
         this.slots = slots;
     }
 
@@ -172,11 +173,5 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
 
     public void setCarriedItemStack(ItemStack carriedItemStack) {
         this.carriedItemStack = carriedItemStack;
-    }
-
-    public enum WindowClickType {
-        PICKUP, QUICK_MOVE, SWAP, CLONE, THROW, QUICK_CRAFT, PICKUP_ALL;
-
-        public static final WindowClickType[] VALUES = values();
     }
 }
