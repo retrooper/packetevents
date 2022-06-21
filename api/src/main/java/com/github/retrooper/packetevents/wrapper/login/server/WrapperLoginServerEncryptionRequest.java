@@ -18,17 +18,14 @@
 
 package com.github.retrooper.packetevents.wrapper.login.server;
 
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
-import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 
-import java.security.KeyFactory;
 import java.security.PublicKey;
-import java.security.spec.EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 
 /**
  * This packet is sent by the server to the client if the server is in online mode.
@@ -68,17 +65,17 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     }
 
     @Override
-    public void copy(WrapperLoginServerEncryptionRequest wrapper) {
-        this.serverID = wrapper.serverID;
-        this.publicKey = wrapper.publicKey;
-        this.verifyToken = wrapper.verifyToken;
-    }
-
-    @Override
     public void write() {
         writeString(serverID, 20);
         writePublicKey(publicKey);
         writeByteArray(verifyToken);
+    }
+
+    @Override
+    public void copy(WrapperLoginServerEncryptionRequest wrapper) {
+        this.serverID = wrapper.serverID;
+        this.publicKey = wrapper.publicKey;
+        this.verifyToken = wrapper.verifyToken;
     }
 
     /**

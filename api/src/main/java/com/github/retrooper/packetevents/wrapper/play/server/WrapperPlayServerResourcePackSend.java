@@ -26,6 +26,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlayServerResourcePackSend> {
+    public static final int MAX_HASH_LENGTH = 40;
     private String url;
     private String hash;
     private boolean required;
@@ -37,23 +38,38 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
 
     public WrapperPlayServerResourcePackSend(String url, String hash, boolean required, @Nullable Component prompt) {
         super(PacketType.Play.Server.RESOURCE_PACK_SEND);
-        this.url = url;
-        this.hash = hash;
-        this.required = required;
-        this.prompt = prompt;
+        if (hash.length() > MAX_HASH_LENGTH) {
+            throw new IllegalArgumentException("Hash is too long (max 40, was " + hash.length() + ")");
+        } else {
+            this.url = url;
+            this.hash = hash;
+            this.required = required;
+            this.prompt = prompt;
+        }
     }
 
     @Override
     public void read() {
         url = readString();
-        hash = readString(40);
-
+        hash = readString(MAX_HASH_LENGTH);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             required = readBoolean();
             boolean hasPrompt = readBoolean();
-
             if (hasPrompt) {
                 prompt = readComponent();
+            }
+        }
+    }
+
+    @Override
+    public void write() {
+        writeString(url);
+        writeString(hash, MAX_HASH_LENGTH);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+            writeBoolean(required);
+            writeBoolean(prompt != null);
+            if (prompt != null) {
+                writeComponent(prompt);
             }
         }
     }
@@ -64,20 +80,6 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
         hash = wrapper.hash;
         required = wrapper.required;
         prompt = wrapper.prompt;
-    }
-
-    @Override
-    public void write() {
-        writeString(url);
-        writeString(hash);
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            writeBoolean(required);
-            writeBoolean(prompt != null);
-            if (prompt != null) {
-                writeComponent(prompt);
-            }
-        }
     }
 
     public String getUrl() {

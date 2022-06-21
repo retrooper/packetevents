@@ -36,18 +36,17 @@ public class WrapperPlayClientSelectTrade extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void read() {
-        //1.13+ packet
         this.slot = readVarInt();
-    }
-
-    @Override
-    public void copy(WrapperPlayClientSelectTrade wrapper) {
-        this.slot = wrapper.slot;
     }
 
     @Override
     public void write() {
         writeVarInt(slot);
+    }
+
+    @Override
+    public void copy(WrapperPlayClientSelectTrade wrapper) {
+        this.slot = wrapper.slot;
     }
 
     public int getSlot() {

@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.world.Location;
@@ -83,14 +82,6 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
     }
 
     @Override
-    public void copy(WrapperPlayClientPlayerFlying wrapper) {
-        positionChanged = wrapper.positionChanged;
-        rotationChanged = wrapper.rotationChanged;
-        location = wrapper.location;
-        onGround = wrapper.onGround;
-    }
-
-    @Override
     public void write() {
         if (positionChanged) {
             writeDouble(location.getPosition().getX());
@@ -106,6 +97,14 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
             writeFloat(location.getPitch());
         }
         writeBoolean(onGround);
+    }
+
+    @Override
+    public void copy(WrapperPlayClientPlayerFlying wrapper) {
+        positionChanged = wrapper.positionChanged;
+        rotationChanged = wrapper.rotationChanged;
+        location = wrapper.location;
+        onGround = wrapper.onGround;
     }
 
     public Location getLocation() {

@@ -40,13 +40,13 @@ public class WrapperPlayClientCloseWindow extends PacketWrapper<WrapperPlayClien
     }
 
     @Override
-    public void copy(WrapperPlayClientCloseWindow wrapper) {
-        this.windowID = wrapper.windowID;
+    public void write() {
+        writeByte(this.windowID);
     }
 
     @Override
-    public void write() {
-        writeByte(this.windowID);
+    public void copy(WrapperPlayClientCloseWindow wrapper) {
+        this.windowID = wrapper.windowID;
     }
 
     public int getWindowId() {

@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServerTabComplete> {
-    private static final int MODERN_MESSAGE_LENGTH = 262144;
-    private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private Optional<Integer> transactionID;
     private Optional<CommandRange> commandRange;
     private List<CommandMatch> commandMatches;
@@ -68,13 +66,12 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             int matchLength = readVarInt();
             commandRange = Optional.of(new CommandRange(begin, begin + len));
             commandMatches = new ArrayList<>(matchLength);
-            int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
                 Component tooltip;
                 boolean hasTooltip = readBoolean();
                 if (hasTooltip) {
-                    String tooltipJson = readString(maxMessageLength);
+                    String tooltipJson = readString(getMaxMessageLength());
                     tooltip = AdventureSerializer.parseComponent(tooltipJson);
                 } else {
                     tooltip = null;
@@ -94,13 +91,6 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void copy(WrapperPlayServerTabComplete wrapper) {
-        transactionID = wrapper.transactionID;
-        commandRange = wrapper.commandRange;
-        commandMatches = wrapper.commandMatches;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             writeVarInt(transactionID.orElse(-1));
@@ -108,14 +98,13 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             writeVarInt(commandRange.getBegin());
             writeVarInt(commandRange.getLength());
             writeVarInt(commandMatches.size());
-            int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
             for (CommandMatch match : commandMatches) {
                 writeString(match.getText());
                 boolean hasTooltip = match.getTooltip().isPresent();
                 writeBoolean(hasTooltip);
                 if (hasTooltip) {
                     String tooltipJson = AdventureSerializer.toJson(match.getTooltip().get());
-                    writeString(tooltipJson, maxMessageLength);
+                    writeString(tooltipJson, getMaxMessageLength());
                 }
             }
         } else {
@@ -124,6 +113,13 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
                 writeString(match.getText());
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerTabComplete wrapper) {
+        transactionID = wrapper.transactionID;
+        commandRange = wrapper.commandRange;
+        commandMatches = wrapper.commandMatches;
     }
 
     public Optional<Integer> getTransactionId() {

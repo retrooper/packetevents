@@ -40,13 +40,13 @@ public class WrapperPlayClientLockDifficulty extends PacketWrapper<WrapperPlayCl
     }
 
     @Override
-    public void copy(WrapperPlayClientLockDifficulty wrapper) {
-        locked = wrapper.locked;
+    public void write() {
+        writeBoolean(locked);
     }
 
     @Override
-    public void write() {
-        writeBoolean(locked);
+    public void copy(WrapperPlayClientLockDifficulty wrapper) {
+        locked = wrapper.locked;
     }
 
     public boolean isLocked() {

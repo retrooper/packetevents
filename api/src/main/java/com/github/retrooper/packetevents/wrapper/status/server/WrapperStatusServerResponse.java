@@ -46,13 +46,13 @@ public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServ
     }
 
     @Override
-    public void copy(WrapperStatusServerResponse wrapper) {
-        componentJson = wrapper.componentJson;
+    public void write() {
+        writeString(componentJson);
     }
 
     @Override
-    public void write() {
-        writeString(componentJson);
+    public void copy(WrapperStatusServerResponse wrapper) {
+        componentJson = wrapper.componentJson;
     }
 
     public JsonObject getComponent() {

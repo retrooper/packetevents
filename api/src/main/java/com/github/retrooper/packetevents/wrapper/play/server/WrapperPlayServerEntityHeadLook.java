@@ -44,15 +44,15 @@ public class WrapperPlayServerEntityHeadLook extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void copy(WrapperPlayServerEntityHeadLook wrapper) {
-        entityID = wrapper.entityID;
-        headYaw = wrapper.headYaw;
-    }
-
-    @Override
     public void write() {
         writeVarInt(entityID);
         writeByte((int) (headYaw * ROTATION_FACTOR));
+    }
+
+    @Override
+    public void copy(WrapperPlayServerEntityHeadLook wrapper) {
+        entityID = wrapper.entityID;
+        headYaw = wrapper.headYaw;
     }
 
     public int getEntityId() {

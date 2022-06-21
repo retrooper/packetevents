@@ -40,13 +40,13 @@ public class WrapperPlayClientPickItem extends PacketWrapper<WrapperPlayClientPi
     }
 
     @Override
-    public void copy(WrapperPlayClientPickItem wrapper) {
-        slot = wrapper.slot;
+    public void write() {
+        writeVarInt(slot);
     }
 
     @Override
-    public void write() {
-        writeVarInt(slot);
+    public void copy(WrapperPlayClientPickItem wrapper) {
+        slot = wrapper.slot;
     }
 
     public int getSlot() {

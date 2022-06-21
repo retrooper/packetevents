@@ -35,7 +35,6 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-// TODO: 1.7 support
 // Credit to MCProtocolLib for this wrapper
 public class WrapperPlayServerChunkDataBulk extends PacketWrapper<WrapperPlayServerChunkDataBulk> {
     private int[] x;

@@ -42,8 +42,7 @@ public class WrapperPlayServerEntityVelocity extends PacketWrapper<WrapperPlaySe
     public void read() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             entityID = readInt();
-        }
-        else {
+        } else {
             entityID = readVarInt();
         }
         double velX = readShort() / 8000.0;
@@ -53,22 +52,21 @@ public class WrapperPlayServerEntityVelocity extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void copy(WrapperPlayServerEntityVelocity wrapper) {
-        entityID = wrapper.entityID;
-        velocity = wrapper.velocity;
-    }
-
-    @Override
     public void write() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeInt(entityID);
-        }
-        else {
+        } else {
             writeVarInt(entityID);
         }
-       writeShort((int) (velocity.x * 8000.0));
-       writeShort((int) (velocity.y * 8000.0));
-       writeShort((int) (velocity.z * 8000.0));
+        writeShort((int) (velocity.x * 8000.0));
+        writeShort((int) (velocity.y * 8000.0));
+        writeShort((int) (velocity.z * 8000.0));
+    }
+
+    @Override
+    public void copy(WrapperPlayServerEntityVelocity wrapper) {
+        entityID = wrapper.entityID;
+        velocity = wrapper.velocity;
     }
 
     public int getEntityId() {

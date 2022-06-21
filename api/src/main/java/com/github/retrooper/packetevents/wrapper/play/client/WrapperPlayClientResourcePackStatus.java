@@ -48,18 +48,11 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
         if (serverVersion.isOlderThan(ServerVersion.V_1_10)) {
             //For now ignore hash, maybe make optional
             this.hash = readString(40);
-        }
-        else {
+        } else {
             this.hash = "";
         }
         int resultIndex = readVarInt();
         this.result = Result.VALUES[resultIndex];
-    }
-
-    @Override
-    public void copy(WrapperPlayClientResourcePackStatus wrapper) {
-        this.hash = wrapper.hash;
-        this.result = wrapper.result;
     }
 
     @Override
@@ -68,6 +61,12 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
             writeString(hash, 40);
         }
         writeVarInt(result.ordinal());
+    }
+
+    @Override
+    public void copy(WrapperPlayClientResourcePackStatus wrapper) {
+        this.hash = wrapper.hash;
+        this.result = wrapper.result;
     }
 
     public Result getResult() {

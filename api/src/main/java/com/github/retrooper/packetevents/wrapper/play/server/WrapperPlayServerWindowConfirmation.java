@@ -38,9 +38,9 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientWi
  * @see WrapperPlayClientWindowConfirmation
  */
 public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPlayServerWindowConfirmation> {
-    int windowId;
-    short actionId;
-    boolean accepted;
+    private int windowId;
+    private short actionId;
+    private boolean accepted;
 
     public WrapperPlayServerWindowConfirmation(PacketSendEvent event) {
         super(event);

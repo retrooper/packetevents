@@ -23,9 +23,15 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WrapperPlayClientEditBook extends PacketWrapper<WrapperPlayClientEditBook> {
+    public static final int MAX_BYTES_PER_CHAR = 4;
+    private static final int TITLE_MAX_CHARS = 128;
+    private static final int PAGE_MAX_CHARS = 8192;
+    private static final int AVERAGE_PAGES = 8;
+
     private int slot;
     private List<String> pages;
     private @Nullable String title;
@@ -44,25 +50,12 @@ public class WrapperPlayClientEditBook extends PacketWrapper<WrapperPlayClientEd
     @Override
     public void read() {
         slot = readVarInt();
-
-        int size = readVarInt();
-        for (int i = 0; i < size; i++) {
-            pages.add(readString());
+        pages = new ArrayList<>(AVERAGE_PAGES);
+        int pagesSize = readVarInt();
+        for (int i = 0; i < pagesSize; i++) {
+            pages.add(readString(PAGE_MAX_CHARS));
         }
-
-        boolean hasTitle = readBoolean();
-        if (hasTitle) {
-            title = readString();
-        } else {
-            title = null;
-        }
-    }
-
-    @Override
-    public void copy(WrapperPlayClientEditBook wrapper) {
-        this.slot = wrapper.slot;
-        this.pages = wrapper.pages;
-        this.title = wrapper.title;
+        title = readOptional(reader -> reader.readString(TITLE_MAX_CHARS));
     }
 
     @Override
@@ -70,12 +63,16 @@ public class WrapperPlayClientEditBook extends PacketWrapper<WrapperPlayClientEd
         writeVarInt(slot);
         writeVarInt(pages.size());
         for (String page : pages) {
-            writeString(page);
+            writeString(page, PAGE_MAX_CHARS);
         }
-        writeBoolean(title != null);
-        if (title != null) {
-            writeString(title);
-        }
+        writeOptional(title, (writer, innerTitle) -> writer.writeString(innerTitle, TITLE_MAX_CHARS));
+    }
+
+    @Override
+    public void copy(WrapperPlayClientEditBook wrapper) {
+        this.slot = wrapper.slot;
+        this.pages = wrapper.pages;
+        this.title = wrapper.title;
     }
 
     public int getSlot() {

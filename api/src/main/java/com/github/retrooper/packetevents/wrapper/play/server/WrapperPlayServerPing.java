@@ -48,13 +48,13 @@ public class WrapperPlayServerPing extends PacketWrapper<WrapperPlayServerPing> 
     }
 
     @Override
-    public void copy(WrapperPlayServerPing wrapper) {
-        this.id = wrapper.id;
+    public void write() {
+        writeInt(id);
     }
 
     @Override
-    public void write() {
-        writeInt(id);
+    public void copy(WrapperPlayServerPing wrapper) {
+        this.id = wrapper.id;
     }
 
     public int getId() {

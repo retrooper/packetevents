@@ -5,7 +5,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerAcknowledgeBlockChanges extends PacketWrapper<WrapperPlayServerAcknowledgeBlockChanges> {
-    int sequence;
+    private int sequence;
 
     public WrapperPlayServerAcknowledgeBlockChanges(PacketSendEvent event) {
         super(event);
@@ -22,13 +22,13 @@ public class WrapperPlayServerAcknowledgeBlockChanges extends PacketWrapper<Wrap
     }
 
     @Override
-    public void copy(WrapperPlayServerAcknowledgeBlockChanges packet) {
-        this.sequence = packet.sequence;
+    public void write() {
+        writeVarInt(sequence);
     }
 
     @Override
-    public void write() {
-        writeVarInt(sequence);
+    public void copy(WrapperPlayServerAcknowledgeBlockChanges packet) {
+        this.sequence = packet.sequence;
     }
 
     public int getSequence() {

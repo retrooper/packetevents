@@ -30,6 +30,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     private Vector3i effectPosition;
     private float volume;
     private float pitch;
+
     public WrapperPlayServerSoundEffect(PacketSendEvent event) {
         super(event);
     }
@@ -37,7 +38,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     public WrapperPlayServerSoundEffect(int soundID, SoundCategory soundCategory,
                                         Vector3i effectPosition, float volume, float pitch) {
         super(PacketType.Play.Server.SOUND_EFFECT);
-        this.soundID= soundID;
+        this.soundID = soundID;
         this.soundCategory = soundCategory;
         this.effectPosition = effectPosition;
         this.volume = volume;
@@ -54,15 +55,6 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void copy(WrapperPlayServerSoundEffect wrapper) {
-        soundID = wrapper.soundID;
-        soundCategory = wrapper.soundCategory;
-        effectPosition = wrapper.effectPosition;
-        volume = wrapper.volume;
-        pitch = wrapper.pitch;
-    }
-
-    @Override
     public void write() {
         writeVarInt(soundID);
         writeVarInt(soundCategory.ordinal());
@@ -71,6 +63,15 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         writeInt(effectPosition.z);
         writeFloat(volume);
         writeFloat(pitch);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSoundEffect wrapper) {
+        soundID = wrapper.soundID;
+        soundCategory = wrapper.soundCategory;
+        effectPosition = wrapper.effectPosition;
+        volume = wrapper.volume;
+        pitch = wrapper.pitch;
     }
 
     public int getSoundId() {

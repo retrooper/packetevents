@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
 public class WrapperPlayServerSetSlot extends PacketWrapper<WrapperPlayServerSetSlot> {
     private int windowID;
     private int stateID;
@@ -52,14 +53,6 @@ public class WrapperPlayServerSetSlot extends PacketWrapper<WrapperPlayServerSet
     }
 
     @Override
-    public void copy(WrapperPlayServerSetSlot wrapper) {
-        windowID = wrapper.windowID;
-        stateID = wrapper.stateID;
-        slot = wrapper.slot;
-        item = wrapper.item;
-    }
-
-    @Override
     public void write() {
         writeByte(windowID);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
@@ -67,6 +60,14 @@ public class WrapperPlayServerSetSlot extends PacketWrapper<WrapperPlayServerSet
         }
         writeShort(slot);
         writeItemStack(item);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSetSlot wrapper) {
+        windowID = wrapper.windowID;
+        stateID = wrapper.stateID;
+        slot = wrapper.slot;
+        item = wrapper.item;
     }
 
     public int getWindowId() {

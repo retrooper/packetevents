@@ -119,19 +119,6 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void copy(WrapperPlayServerSpawnEntity wrapper) {
-        entityID = wrapper.entityID;
-        uuid = wrapper.uuid;
-        entityType = wrapper.entityType;
-        position = wrapper.position;
-        pitch = wrapper.pitch;
-        yaw = wrapper.yaw;
-        headYaw = wrapper.headYaw;
-        data = wrapper.data;
-        velocity = wrapper.velocity;
-    }
-
-    @Override
     public void write() {
         writeVarInt(entityID);
         boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
@@ -185,6 +172,19 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             writeShort(velY);
             writeShort(velZ);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSpawnEntity wrapper) {
+        entityID = wrapper.entityID;
+        uuid = wrapper.uuid;
+        entityType = wrapper.entityType;
+        position = wrapper.position;
+        pitch = wrapper.pitch;
+        yaw = wrapper.yaw;
+        headYaw = wrapper.headYaw;
+        data = wrapper.data;
+        velocity = wrapper.velocity;
     }
 
     public int getEntityId() {

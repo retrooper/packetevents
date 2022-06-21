@@ -52,13 +52,6 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
     }
 
     @Override
-    public void copy(WrapperPlayClientEntityAction wrapper) {
-        entityID = wrapper.entityID;
-        action = wrapper.action;
-        jumpBoost = wrapper.jumpBoost;
-    }
-
-    @Override
     public void write() {
         writeVarInt(entityID);
         int actionIndex = action.ordinal();
@@ -69,6 +62,13 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
         }
         writeVarInt(actionIndex);
         writeVarInt(jumpBoost);
+    }
+
+    @Override
+    public void copy(WrapperPlayClientEntityAction wrapper) {
+        entityID = wrapper.entityID;
+        action = wrapper.action;
+        jumpBoost = wrapper.jumpBoost;
     }
 
     public int getEntityId() {

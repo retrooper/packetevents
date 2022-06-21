@@ -18,12 +18,12 @@
 
 package com.github.retrooper.packetevents.wrapper.login.server;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.UUID;
@@ -48,26 +48,6 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
         this.userProfile = userProfile;
     }
 
-    private UUID readUUIDAsIntArray() {
-        long mostSignificantBits = (long) readInt() << 32L | readInt() & 0xFFFFFFFFL;
-        long leastSignificantBits = (long) readInt() << 32L | readInt() & 0xFFFFFFFFL;
-        return new UUID(mostSignificantBits, leastSignificantBits);
-    }
-
-    private void writeUUIDAsIntArray(UUID uuid) {
-        writeInt((int)(uuid.getMostSignificantBits() >> 32L));
-        writeInt((int)uuid.getMostSignificantBits());
-        writeInt((int)(uuid.getLeastSignificantBits() >> 32L));
-        writeInt((int)uuid.getLeastSignificantBits());
-    }
-
-    private UUID readUUIDAsString() {
-        return UUID.fromString(readString(36));
-    }
-
-    private void writeUUIDAsString(UUID uuid) {
-        writeString(uuid.toString(), 36);
-    }
     @Override
     public void read() {
         UUID uuid;
@@ -92,14 +72,9 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
     }
 
     @Override
-    public void copy(WrapperLoginServerLoginSuccess wrapper) {
-        this.userProfile = wrapper.userProfile;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-           writeUUIDAsIntArray(userProfile.getUUID());
+            writeUUIDAsIntArray(userProfile.getUUID());
         } else {
             writeUUIDAsString(userProfile.getUUID());
         }
@@ -119,11 +94,37 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
         }
     }
 
+    @Override
+    public void copy(WrapperLoginServerLoginSuccess wrapper) {
+        this.userProfile = wrapper.userProfile;
+    }
+
     public UserProfile getUserProfile() {
         return userProfile;
     }
 
     public void setUserProfile(UserProfile userProfile) {
         this.userProfile = userProfile;
+    }
+
+    private UUID readUUIDAsIntArray() {
+        long mostSignificantBits = (long) readInt() << 32L | readInt() & 0xFFFFFFFFL;
+        long leastSignificantBits = (long) readInt() << 32L | readInt() & 0xFFFFFFFFL;
+        return new UUID(mostSignificantBits, leastSignificantBits);
+    }
+
+    private void writeUUIDAsIntArray(UUID uuid) {
+        writeInt((int) (uuid.getMostSignificantBits() >> 32L));
+        writeInt((int) uuid.getMostSignificantBits());
+        writeInt((int) (uuid.getLeastSignificantBits() >> 32L));
+        writeInt((int) uuid.getLeastSignificantBits());
+    }
+
+    private UUID readUUIDAsString() {
+        return UUID.fromString(readString(36));
+    }
+
+    private void writeUUIDAsString(UUID uuid) {
+        writeString(uuid.toString(), 36);
     }
 }

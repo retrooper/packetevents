@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerUpdateSimulationDistance extends PacketWrapper<WrapperPlayServerUpdateSimulationDistance> {
     private int simulationDistance;
+
     public WrapperPlayServerUpdateSimulationDistance(PacketSendEvent event) {
         super(event);
     }
@@ -39,13 +40,13 @@ public class WrapperPlayServerUpdateSimulationDistance extends PacketWrapper<Wra
     }
 
     @Override
-    public void copy(WrapperPlayServerUpdateSimulationDistance wrapper) {
-        simulationDistance = wrapper.simulationDistance;
+    public void write() {
+        writeVarInt(simulationDistance);
     }
 
     @Override
-    public void write() {
-        writeVarInt(simulationDistance);
+    public void copy(WrapperPlayServerUpdateSimulationDistance wrapper) {
+        simulationDistance = wrapper.simulationDistance;
     }
 
     public int getSimulationDistance() {

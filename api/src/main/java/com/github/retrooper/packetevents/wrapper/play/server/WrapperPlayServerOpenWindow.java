@@ -27,7 +27,6 @@ import net.kyori.adventure.text.Component;
 
 // TODO: Test on outdated versions
 public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServerOpenWindow> {
-
     private int containerId; // All versions
 
     private int type; // 1.14+... also 1.7. Not 1.8-1.13 though.
@@ -111,18 +110,6 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void copy(WrapperPlayServerOpenWindow wrapper) {
-        this.containerId = wrapper.containerId;
-        this.type = wrapper.type;
-        this.legacyType = wrapper.legacyType;
-        this.legacySlots = wrapper.legacySlots;
-        this.horseId = wrapper.horseId;
-        this.title = wrapper.title;
-        this.titleAsComponent = wrapper.titleAsComponent;
-        this.useProvidedWindowTitle = wrapper.useProvidedWindowTitle;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
             writeByte(this.containerId);
@@ -164,6 +151,18 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
                 writeInt(this.horseId);
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerOpenWindow wrapper) {
+        this.containerId = wrapper.containerId;
+        this.type = wrapper.type;
+        this.legacyType = wrapper.legacyType;
+        this.legacySlots = wrapper.legacySlots;
+        this.horseId = wrapper.horseId;
+        this.title = wrapper.title;
+        this.titleAsComponent = wrapper.titleAsComponent;
+        this.useProvidedWindowTitle = wrapper.useProvidedWindowTitle;
     }
 
     public int getContainerId() {
