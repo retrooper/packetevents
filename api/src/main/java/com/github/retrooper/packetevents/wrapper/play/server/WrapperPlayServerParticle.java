@@ -30,7 +30,7 @@ import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 //Might be worthy to document
-//TODO Check changelog through out the versions
+//TODO: Check changelog through out the versions
 public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerParticle> {
     private Particle particle;
     private boolean longDistance;
@@ -87,11 +87,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
                 int count;
                 if (particleTypeId == 37 || particleTypeId == 38 || particleTypeId == 46) {
                     count = 1;
-                }
-                else if (particleTypeId == 36) {
+                } else if (particleTypeId == 36) {
                     count = 2;
-                }
-                else {
+                } else {
                     count = 0;
                 }
                 legacyData = new int[count];
@@ -101,17 +99,6 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             }
         }
         particle = new Particle(particleType, data);
-    }
-
-    @Override
-    public void copy(WrapperPlayServerParticle wrapper) {
-        particle = wrapper.particle;
-        longDistance = wrapper.longDistance;
-        position = wrapper.position;
-        offset = wrapper.offset;
-        particleData = wrapper.particleData;
-        particleCount = wrapper.particleCount;
-        legacyData = wrapper.legacyData;
     }
 
     @Override
@@ -146,11 +133,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
                         || particle.getType().getId(serverVersion.toClientVersion()) == 38 ||
                         particle.getType().getId(serverVersion.toClientVersion()) == 46) {
                     count = 1;
-                }
-                else if (particle.getType().getId(serverVersion.toClientVersion()) == 36) {
+                } else if (particle.getType().getId(serverVersion.toClientVersion()) == 36) {
                     count = 2;
-                }
-                else {
+                } else {
                     count = 0;
                 }
                 for (int i = 0; i < count; i++) {
@@ -158,6 +143,17 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
                 }
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerParticle wrapper) {
+        particle = wrapper.particle;
+        longDistance = wrapper.longDistance;
+        position = wrapper.position;
+        offset = wrapper.offset;
+        particleData = wrapper.particleData;
+        particleCount = wrapper.particleCount;
+        legacyData = wrapper.legacyData;
     }
 
     public Particle getParticle() {

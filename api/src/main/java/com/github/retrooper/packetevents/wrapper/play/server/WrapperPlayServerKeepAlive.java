@@ -52,11 +52,6 @@ public class WrapperPlayServerKeepAlive extends PacketWrapper<WrapperPlayServerK
     }
 
     @Override
-    public void copy(WrapperPlayServerKeepAlive wrapper) {
-        this.id = wrapper.id;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
             writeLong(id);
@@ -65,6 +60,11 @@ public class WrapperPlayServerKeepAlive extends PacketWrapper<WrapperPlayServerK
         } else {
             writeInt((int) id);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerKeepAlive wrapper) {
+        this.id = wrapper.id;
     }
 
     public long getId() {

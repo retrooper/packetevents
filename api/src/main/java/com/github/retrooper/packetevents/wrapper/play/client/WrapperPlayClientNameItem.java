@@ -40,13 +40,13 @@ public class WrapperPlayClientNameItem extends PacketWrapper<WrapperPlayClientNa
     }
 
     @Override
-    public void copy(WrapperPlayClientNameItem wrapper) {
-        this.itemName = wrapper.itemName;
+    public void write() {
+        writeString(itemName);
     }
 
     @Override
-    public void write() {
-        writeString(itemName);
+    public void copy(WrapperPlayClientNameItem wrapper) {
+        this.itemName = wrapper.itemName;
     }
 
     public String getItemName() {

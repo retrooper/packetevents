@@ -23,8 +23,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlayServerWindowProperty> {
-
-    private byte containerId;
+    private byte windowId;
     private int id;
     private int value;
 
@@ -32,40 +31,40 @@ public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlaySe
         super(event);
     }
 
-    public WrapperPlayServerWindowProperty(byte containerId, int id, int value) {
+    public WrapperPlayServerWindowProperty(byte windowId, int id, int value) {
         super(PacketType.Play.Server.WINDOW_PROPERTY);
-        this.containerId = containerId;
+        this.windowId = windowId;
         this.id = id;
         this.value = value;
     }
 
     @Override
     public void read() {
-        this.containerId = (byte) readUnsignedByte();
+        this.windowId = (byte) readUnsignedByte();
         this.id = readShort();
         this.value = readShort();
     }
 
     @Override
-    public void copy(WrapperPlayServerWindowProperty wrapper) {
-        this.containerId = wrapper.containerId;
-        this.id = wrapper.id;
-        this.value = wrapper.value;
-    }
-
-    @Override
     public void write() {
-        writeByte(this.containerId);
+        writeByte(this.windowId);
         writeShort(this.id);
         writeShort(this.value);
     }
 
-    public byte getContainerId() {
-        return containerId;
+    @Override
+    public void copy(WrapperPlayServerWindowProperty wrapper) {
+        this.windowId = wrapper.windowId;
+        this.id = wrapper.id;
+        this.value = wrapper.value;
     }
 
-    public void setContainerId(byte containerId) {
-        this.containerId = containerId;
+    public byte getWindowId() {
+        return windowId;
+    }
+
+    public void setWindowId(byte windowId) {
+        this.windowId = windowId;
     }
 
     public int getId() {
@@ -83,5 +82,4 @@ public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlaySe
     public void setValue(int value) {
         this.value = value;
     }
-
 }

@@ -90,17 +90,6 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
     }
 
     @Override
-    public void copy(WrapperPlayClientPlayerBlockPlacement wrapper) {
-        interactionHand = wrapper.interactionHand;
-        blockPosition = wrapper.blockPosition;
-        face = wrapper.face;
-        cursorPosition = wrapper.cursorPosition;
-        itemStack = wrapper.itemStack;
-        insideBlock = wrapper.insideBlock;
-        sequence = wrapper.sequence;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             writeVarInt(interactionHand.getId());
@@ -139,6 +128,17 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
                 writeByte((int) (cursorPosition.z * 16.0F));
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientPlayerBlockPlacement wrapper) {
+        interactionHand = wrapper.interactionHand;
+        blockPosition = wrapper.blockPosition;
+        face = wrapper.face;
+        cursorPosition = wrapper.cursorPosition;
+        itemStack = wrapper.itemStack;
+        insideBlock = wrapper.insideBlock;
+        sequence = wrapper.sequence;
     }
 
     public InteractionHand getHand() {

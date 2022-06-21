@@ -52,17 +52,17 @@ public class WrapperPlayServerSetTitleSubtitle extends PacketWrapper<WrapperPlay
     }
 
     @Override
-    public void copy(WrapperPlayServerSetTitleSubtitle wrapper) {
-        subtitleJson = wrapper.subtitleJson;
-        subtitle = wrapper.subtitle;
-    }
-
-    @Override
     public void write() {
         if (HANDLE_JSON && subtitle != null) {
             subtitleJson = AdventureSerializer.toJson(subtitle);
         }
         writeComponentJSON(subtitleJson);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSetTitleSubtitle wrapper) {
+        subtitleJson = wrapper.subtitleJson;
+        subtitle = wrapper.subtitle;
     }
 
     public Component getSubtitle() {

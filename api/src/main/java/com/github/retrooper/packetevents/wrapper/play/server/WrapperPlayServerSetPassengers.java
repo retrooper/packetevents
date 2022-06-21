@@ -23,8 +23,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerSetPassengers extends PacketWrapper<WrapperPlayServerSetPassengers> {
-    int entityId;
-    int[] passengers;
+    private int entityId;
+    private int[] passengers;
 
     public WrapperPlayServerSetPassengers(PacketSendEvent event) {
         super(event);

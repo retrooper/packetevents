@@ -56,7 +56,7 @@ public class WrapperPlayClientUpdateCommandBlock extends PacketWrapper<WrapperPl
     public void read() {
         this.position = new Vector3i(readLong());
         this.command = readString();
-        this.mode = CommandBlockMode.VALUES[readVarInt()];
+        this.mode = CommandBlockMode.getById(readVarInt());
         this.flags = readUnsignedByte();
         this.doesTrackOutput = (flags & FLAG_TRACK_OUTPUT) != 0;
         this.conditional = (flags & FLAG_CONDITIONAL) != 0;
@@ -148,10 +148,12 @@ public class WrapperPlayClientUpdateCommandBlock extends PacketWrapper<WrapperPl
     }
 
     public enum CommandBlockMode {
-        SEQUENCE,
-        AUTO,
-        REDSTONE;
+        SEQUENCE, AUTO, REDSTONE;
 
-        public static final CommandBlockMode[] VALUES = values();
+        private static final CommandBlockMode[] VALUES = values();
+
+        public static CommandBlockMode getById(int id) {
+            return VALUES[id];
+        }
     }
 }

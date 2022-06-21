@@ -50,6 +50,14 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
+    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, List<EntityData> entityMetadata) {
+        this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), entityMetadata);
+    }
+
+    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, EntityData... entityMetadata) {
+        this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), Arrays.asList(entityMetadata));
+    }
+
     public WrapperPlayServerSpawnPlayer(int entityID, UUID uuid, Vector3d position, float yaw, float pitch, List<EntityData> entityMetadata) {
         super(PacketType.Play.Server.SPAWN_PLAYER);
         this.entityID = entityID;
@@ -61,14 +69,6 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         this.item = ItemTypes.AIR;
     }
 
-    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, List<EntityData> entityMetadata) {
-        this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), entityMetadata);
-    }
-
-    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, EntityData... entityMetadata) {
-        this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), Arrays.asList(entityMetadata));
-    }
-
     @Override
     public void read() {
         entityID = readVarInt();
@@ -76,33 +76,21 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
         if (v1_9) {
             position = new Vector3d(readDouble(), readDouble(), readDouble());
-        }
-        else {
+        } else {
             position = new Vector3d(readInt() / 32.0, readInt() / 32.0, readInt() / 32.0);
         }
-        yaw = readByte() /  ROTATION_DIVISOR;
+        yaw = readByte() / ROTATION_DIVISOR;
         pitch = readByte() / ROTATION_DIVISOR;
         if (!v1_9) {
             item = ItemTypes.getById(serverVersion.toClientVersion(), readShort());
-        }
-        else {
+        } else {
             item = ItemTypes.AIR;
         }
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             entityMetadata = readEntityMetadata();
-        }
-        else {
+        } else {
             entityMetadata = new ArrayList<>();
         }
-    }
-
-    @Override
-    public void copy(WrapperPlayServerSpawnPlayer wrapper) {
-        entityID = wrapper.entityID;
-        uuid = wrapper.uuid;
-        position = wrapper.position;
-        yaw = wrapper.yaw;
-        pitch = wrapper.pitch;
     }
 
     @Override
@@ -114,8 +102,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
             writeDouble(position.getX());
             writeDouble(position.getY());
             writeDouble(position.getZ());
-        }
-        else {
+        } else {
             writeInt(MathUtil.floor(position.getX() * 32.0));
             writeInt(MathUtil.floor(position.getY() * 32.0));
             writeInt(MathUtil.floor(position.getZ() * 32.0));
@@ -128,6 +115,15 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             writeEntityMetadata(entityMetadata);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSpawnPlayer wrapper) {
+        entityID = wrapper.entityID;
+        uuid = wrapper.uuid;
+        position = wrapper.position;
+        yaw = wrapper.yaw;
+        pitch = wrapper.pitch;
     }
 
     public int getEntityId() {

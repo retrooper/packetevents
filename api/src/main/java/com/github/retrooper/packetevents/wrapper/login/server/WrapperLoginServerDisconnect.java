@@ -18,33 +18,36 @@
 
 package com.github.retrooper.packetevents.wrapper.login.server;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
 
 /**
  * This packet is used by the server to disconnect the client while in the {@link ConnectionState#LOGIN} connection state.
  */
 public class WrapperLoginServerDisconnect extends PacketWrapper<WrapperLoginServerDisconnect> {
-    private static final int MODERN_REASON_LENGTH = 262144;
-    private static final int LEGACY_REASON_LENGTH = 32767;
-    private String reason;
+    private Component reason;
 
     public WrapperLoginServerDisconnect(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperLoginServerDisconnect(String reason) {
+    public WrapperLoginServerDisconnect(Component reason) {
         super(PacketType.Login.Server.DISCONNECT);
         this.reason = reason;
     }
 
     @Override
     public void read() {
-        int reasonLength = clientVersion.isNewerThanOrEquals(ClientVersion.V_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
-        this.reason = readString(reasonLength);
+        this.reason = AdventureSerializer.parseComponent(readString(getMaxMessageLength()));
+    }
+
+    @Override
+    public void write() {
+        writeString(AdventureSerializer.toJson(reason), getMaxMessageLength());
     }
 
     @Override
@@ -52,22 +55,16 @@ public class WrapperLoginServerDisconnect extends PacketWrapper<WrapperLoginServ
         this.reason = wrapper.reason;
     }
 
-    @Override
-    public void write() {
-        int reasonLength = clientVersion.isNewerThanOrEquals(ClientVersion.V_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
-        writeString(reason, reasonLength);
-    }
-
     /**
      * The reason the server disconnected the client. (Specified by the server)
      *
      * @return Disconnection reason
      */
-    public String getReason() {
+    public Component getReason() {
         return reason;
     }
 
-    public void setReason(String reason) {
+    public void setReason(Component reason) {
         this.reason = reason;
     }
 }

@@ -19,6 +19,9 @@
 package com.github.retrooper.packetevents.manager.server;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Experimental;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Server Version.
@@ -114,6 +117,7 @@ public enum ServerVersion {
     /**
      * Get the release name of this server version.
      * For example, for the V_1_18 enum constant, it would return "1.18".
+     *
      * @return Release name
      */
     public String getReleaseName() {
@@ -220,5 +224,55 @@ public enum ServerVersion {
      */
     public boolean isOlderThanOrEquals(ServerVersion target) {
         return this == target || isOlderThan(target);
+    }
+
+    /**
+     * Is this server version newer than, older than or equal to the compared server version?
+     * This method simply checks if this server version's protocol version is greater than, less than or equal to
+     * the compared server version's protocol version.
+     *
+     * @param target  Compared server version.
+     * @param version Comparison type.
+     * @return Is this server version newer than, older than or equal to the compared server version.
+     * @see #isNewerThan(ServerVersion)
+     * @see #isNewerThanOrEquals(ServerVersion)
+     * @see #isOlderThan(ServerVersion)
+     * @see #isOlderThanOrEquals(ServerVersion)
+     */
+    @Experimental
+    public boolean is(@NotNull MultiVersion version, @NotNull ServerVersion target) {
+        switch (version) {
+            case NEWER_THAN:
+                return isNewerThan(target);
+            case NEWER_THAN_OR_EQUALS:
+                return isNewerThanOrEquals(target);
+            case OLDER_THAN:
+                return isOlderThan(target);
+            case OLDER_THAN_OR_EQUALS:
+                return isOlderThanOrEquals(target);
+        }
+        return false;
+    }
+
+    /**
+     * This enum contains all possible comparison types for server versions.
+     */
+    public enum MultiVersion {
+        /*
+        The server version is newer than the compared server version.
+         */
+        NEWER_THAN,
+        /*
+        The server version is newer than or equal to the compared server version.
+         */
+        NEWER_THAN_OR_EQUALS,
+        /*
+        The server version is older than the compared server version.
+         */
+        OLDER_THAN,
+        /*
+        The server version is older than or equal to the compared server version.
+         */
+        OLDER_THAN_OR_EQUALS;
     }
 }

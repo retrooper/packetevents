@@ -2,7 +2,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
@@ -15,6 +14,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     private static final int FLAG_AMBIENT = 1;
     private static final int FLAG_VISIBLE = 2;
     private static final int FLAG_SHOW_ICONS = 4;
+
     private int entityID;
     private PotionType potionType;
     private int effectAmplifier;
@@ -51,9 +51,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
             this.flags = readByte();
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            if (readBoolean()) {
-                factorData = readNBT();
-            }
+            factorData = readOptional(PacketWrapper::readNBT);
         }
     }
 
@@ -71,10 +69,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
             writeByte(flags);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeBoolean(factorData != null);
-            if (factorData != null) {
-                writeNBT(factorData);
-            }
+            writeOptional(factorData, PacketWrapper::writeNBT);
         }
     }
 

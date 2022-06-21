@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
 
+import java.util.Collections;
+
 public class PacketTransformationUtil {
     public static PacketWrapper<?>[] transform(PacketWrapper<?> wrapper) {
         if (wrapper instanceof WrapperPlayServerDestroyEntities) {
@@ -48,7 +50,7 @@ public class PacketTransformationUtil {
                 PacketWrapper<?>[] output = new PacketWrapper[len];
                 for (int i = 0; i < len; i++) {
                     Equipment equipment = entityEquipment.getEquipment().get(i);
-                    output[i] = new WrapperPlayServerEntityEquipment(entityEquipment.getEntityId(), equipment);
+                    output[i] = new WrapperPlayServerEntityEquipment(entityEquipment.getEntityId(), Collections.singletonList(equipment));
                 }
 
                 ByteBufHelper.release(entityEquipment.getBuffer());

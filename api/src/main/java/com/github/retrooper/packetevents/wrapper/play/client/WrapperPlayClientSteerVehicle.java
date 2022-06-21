@@ -24,9 +24,9 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * Not to be confused with {@link WrapperPlayClientSteerBoat}
- *
+ * <p>
  * This packet is for sending player inputs to the server
- *
+ * <p>
  * On 1.8 and older, vehicle control is server sided.  This packet includes inputs for movement.
  * On 1.9 and newer, plugins may use this packet to create vehicles out of ordinary entities.
  */
@@ -54,17 +54,17 @@ public class WrapperPlayClientSteerVehicle extends PacketWrapper<WrapperPlayClie
     }
 
     @Override
-    public void copy(WrapperPlayClientSteerVehicle wrapper) {
-        this.sideways = wrapper.sideways;
-        this.forward = wrapper.forward;
-        this.flags = wrapper.flags;
-    }
-
-    @Override
     public void write() {
         writeFloat(sideways);
         writeFloat(forward);
         writeByte(flags);
+    }
+
+    @Override
+    public void copy(WrapperPlayClientSteerVehicle wrapper) {
+        this.sideways = wrapper.sideways;
+        this.forward = wrapper.forward;
+        this.flags = wrapper.flags;
     }
 
     public float getSideways() {

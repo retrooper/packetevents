@@ -58,15 +58,15 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
     // 1.18 only (lighting) - for writing data
     // TODO: Make accessible?? Include in chunk data?? What do we do with this?
-    boolean trustEdges;
-    BitSet blockLightMask;
-    BitSet skyLightMask;
-    BitSet emptyBlockLightMask;
-    BitSet emptySkyLightMask;
-    int skyLightCount;
-    int blockLightCount;
-    byte[][] skyLightArray;
-    byte[][] blockLightArray;
+    private boolean trustEdges;
+    private BitSet blockLightMask;
+    private BitSet skyLightMask;
+    private BitSet emptyBlockLightMask;
+    private BitSet emptySkyLightMask;
+    private int skyLightCount;
+    private  int blockLightCount;
+    private byte[][] skyLightArray;
+    private byte[][] blockLightArray;
 
     public WrapperPlayServerChunkData(PacketSendEvent event) {
         super(event);
@@ -292,21 +292,6 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     }
 
     @Override
-    public void copy(WrapperPlayServerChunkData wrapper) {
-        this.column = wrapper.column;
-        this.ignoreOldData = wrapper.ignoreOldData;
-        this.trustEdges = wrapper.trustEdges;
-        this.blockLightMask = wrapper.blockLightMask;
-        this.skyLightMask = wrapper.skyLightMask;
-        this.emptyBlockLightMask = wrapper.emptyBlockLightMask;
-        this.emptySkyLightMask = wrapper.emptySkyLightMask;
-        this.skyLightCount = wrapper.skyLightCount;
-        this.blockLightCount = wrapper.blockLightCount;
-        this.skyLightArray = wrapper.skyLightArray;
-        this.blockLightArray = wrapper.blockLightArray;
-    }
-
-    @Override
     public void write() {
         writeInt(column.getX());
         writeInt(column.getZ());
@@ -465,6 +450,21 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 writeByteArray(blockLightArray[x]);
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerChunkData wrapper) {
+        this.column = wrapper.column;
+        this.ignoreOldData = wrapper.ignoreOldData;
+        this.trustEdges = wrapper.trustEdges;
+        this.blockLightMask = wrapper.blockLightMask;
+        this.skyLightMask = wrapper.skyLightMask;
+        this.emptyBlockLightMask = wrapper.emptyBlockLightMask;
+        this.emptySkyLightMask = wrapper.emptySkyLightMask;
+        this.skyLightCount = wrapper.skyLightCount;
+        this.blockLightCount = wrapper.blockLightCount;
+        this.skyLightArray = wrapper.skyLightArray;
+        this.blockLightArray = wrapper.blockLightArray;
     }
 
     public Column getColumn() {

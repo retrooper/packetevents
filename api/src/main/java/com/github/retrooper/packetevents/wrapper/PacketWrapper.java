@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.ServerVersion.MultiVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
@@ -32,9 +33,7 @@ import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -45,11 +44,12 @@ import com.github.retrooper.packetevents.protocol.world.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
-import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
-import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
+import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,6 +58,7 @@ import java.security.PublicKey;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class PacketWrapper<T extends PacketWrapper> {
@@ -129,10 +130,11 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public static PacketWrapper<?> createUniversalPacketWrapper(Object byteBuf) {
-        PacketWrapper<?> wrapper = new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), -2);
+        PacketWrapper<?> wrapper = new PacketWrapper<>(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), -2);
         wrapper.buffer = byteBuf;
         return wrapper;
     }
+
     public final void prepareForSend() {
         // Null means the packet was manually created and wasn't sent by the server itself
         // A reference count of 0 means that the packet was freed (it was already sent)
@@ -147,12 +149,12 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void read() {
     }
 
-    //TODO Rename to copyFrom, as it copies data from the passed in wrapper.
-    public void copy(T wrapper) {
+    public void write() {
 
     }
 
-    public void write() {
+    //TODO Rename to copyFrom, as it copies data from the passed in wrapper.
+    public void copy(T wrapper) {
 
     }
 
@@ -253,7 +255,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         while (true) {
             if ((value & ~0x7F) == 0) {
                 writeByte(value);
-                return;
+                break;
             }
             writeByte((value & 0x7F) | 0x80);
             value >>>= 7;
@@ -362,6 +364,7 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public String readString(int maxLen) {
         int j = readVarInt();
+        // TODO: Don't throw an exception if the string is too long (but still cut it off and probably kick the player)
         if (j > maxLen * 4) {
             throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + maxLen * 4 + ")");
         } else if (j < 0) {
@@ -695,10 +698,9 @@ public class PacketWrapper<T extends PacketWrapper> {
     public Dimension readDimension() {
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
             return new Dimension(DimensionType.getByName(readIdentifier().toString()));
-        }
-        else {
+        } else {
             NBTCompound dimensionAttributes = readNBT();
-            return new Dimension(DimensionType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", "")), dimensionAttributes);
+            return new Dimension(dimensionAttributes);
         }
     }
 
@@ -706,11 +708,9 @@ public class PacketWrapper<T extends PacketWrapper> {
         boolean v1_19 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19);
         boolean v1_16_2 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2);
         if (v1_19 || !v1_16_2) {
-            writeString(dimension.getType().getName(), 32767);
+            writeString(dimension.getDimensionName(), 32767);
         } else {
-            NBT tag = new NBTString(dimension.getType().getName());
-            dimension.getAttributes().orElse(new NBTCompound()).setTag("effects", tag);
-            writeNBT(dimension.getAttributes().get());
+            writeNBT(dimension.getAttributes());
         }
     }
 
@@ -746,5 +746,62 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void writeWorldBlockPosition(WorldBlockPosition pos) {
         writeIdentifier(pos.getWorld());
         writeBlockPosition(pos.getBlockPosition());
+    }
+
+    @Experimental
+    public <U, V, R> U readMultiVersional(MultiVersion version, ServerVersion target, Reader<V> first, Reader<R> second) {
+        if (serverVersion.is(version, target)) {
+            return (U) first.apply(this);
+        } else {
+            return (U) second.apply(this);
+        }
+    }
+
+    @Experimental
+    public <V> void writeMultiVersional(MultiVersion version, ServerVersion target, V value, Writer<V> first, Writer<V> second) {
+        if (serverVersion.is(version, target)) {
+            first.accept(this, value);
+        } else {
+            second.accept(this, value);
+        }
+    }
+
+    public <R> R readOptional(Reader<R> reader) {
+        return this.readBoolean() ? reader.apply(this) : null;
+    }
+
+    public <V> void writeOptional(V value, Writer<V> writer) {
+        if (value != null) {
+            this.writeBoolean(true);
+            writer.accept(this, value);
+        } else {
+            this.writeBoolean(false);
+        }
+    }
+
+    @Experimental
+    public <K> List<K> readVarIntList(K key) {
+        int size = readVarInt();
+        List<K> list = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            list.add(key);
+        }
+        return list;
+    }
+
+    @Experimental
+    public <K> void writeVarIntList(List<K> list, Consumer<K> writeValue) {
+        writeVarInt(list.size());
+        for (K key : list) {
+            writeValue.accept(key);
+        }
+    }
+
+    @FunctionalInterface
+    public interface Reader<T> extends Function<PacketWrapper, T> {
+    }
+
+    @FunctionalInterface
+    public interface Writer<T> extends BiConsumer<PacketWrapper, T> {
     }
 }

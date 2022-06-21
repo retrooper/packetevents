@@ -46,15 +46,15 @@ public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void copy(WrapperPlayClientClickWindowButton wrapper) {
-        this.windowID = wrapper.windowID;
-        this.buttonID = wrapper.buttonID;
-    }
-
-    @Override
     public void write() {
         writeByte(this.windowID);
         writeByte(this.buttonID);
+    }
+
+    @Override
+    public void copy(WrapperPlayClientClickWindowButton wrapper) {
+        this.windowID = wrapper.windowID;
+        this.buttonID = wrapper.buttonID;
     }
 
     /**

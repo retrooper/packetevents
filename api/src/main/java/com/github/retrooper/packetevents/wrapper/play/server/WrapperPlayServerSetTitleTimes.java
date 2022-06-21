@@ -26,6 +26,7 @@ public class WrapperPlayServerSetTitleTimes extends PacketWrapper<WrapperPlaySer
     private int fadeInTicks;
     private int stayTicks;
     private int fadeOutTicks;
+
     public WrapperPlayServerSetTitleTimes(PacketSendEvent event) {
         super(event);
     }
@@ -45,17 +46,17 @@ public class WrapperPlayServerSetTitleTimes extends PacketWrapper<WrapperPlaySer
     }
 
     @Override
-    public void copy(WrapperPlayServerSetTitleTimes wrapper) {
-        fadeInTicks = wrapper.fadeInTicks;
-        stayTicks = wrapper.stayTicks;
-        fadeOutTicks = wrapper.fadeOutTicks;
-    }
-
-    @Override
     public void write() {
         writeInt(fadeInTicks);
         writeInt(stayTicks);
         writeInt(fadeOutTicks);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSetTitleTimes wrapper) {
+        fadeInTicks = wrapper.fadeInTicks;
+        stayTicks = wrapper.stayTicks;
+        fadeOutTicks = wrapper.fadeOutTicks;
     }
 
     public int getFadeInTicks() {

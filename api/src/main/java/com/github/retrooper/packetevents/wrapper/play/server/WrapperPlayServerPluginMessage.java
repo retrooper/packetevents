@@ -21,6 +21,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -29,14 +31,21 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
  * These internal channels are in the minecraft namespace.
  */
 public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlayServerPluginMessage> {
-    private String channelName;
+    private String channelNameLegacy;
+    private ResourceLocation channelName;
     private byte[] data;
 
     public WrapperPlayServerPluginMessage(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerPluginMessage(String channelName, byte[] data) {
+    public WrapperPlayServerPluginMessage(String channelNameLegacy, byte[] data) {
+        super(PacketType.Play.Server.PLUGIN_MESSAGE);
+        this.channelNameLegacy = channelNameLegacy;
+        this.data = data;
+    }
+
+    public WrapperPlayServerPluginMessage(ResourceLocation channelName, byte[] data) {
         super(PacketType.Play.Server.PLUGIN_MESSAGE);
         this.channelName = channelName;
         this.data = data;
@@ -44,61 +53,82 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.channelName = readString(32767);
-        }
-        else {
-            this.channelName = readString(20);
-        }
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            //We ignore this, because it's not needed.
-            int legacyDataSize = readShort();
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13) && clientVersion.isOlderThan(ClientVersion.V_1_13)) {
+            this.channelNameLegacy = readString(20);
+        } else {
+            this.channelName = readIdentifier();
         }
         this.data = readRemainingBytes();
     }
 
     @Override
-    public void copy(WrapperPlayServerPluginMessage wrapper) {
-        this.channelName = wrapper.channelName;
-        this.data = wrapper.data;
-    }
-
-    @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeString(this.channelName, 32767);
-        }
-        else {
-            writeString(this.channelName, 20);
-        }
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeShort(data.length);
+        if (serverVersion.isOlderThan(ServerVersion.V_1_13) && clientVersion.isOlderThan(ClientVersion.V_1_13)) {
+            writeString(channelNameLegacy);
+        } else {
+            writeIdentifier(channelName);
         }
         writeBytes(data);
     }
 
+    @Override
+    public void copy(WrapperPlayServerPluginMessage wrapper) {
+        this.channelNameLegacy = wrapper.channelNameLegacy;
+        this.channelName = wrapper.channelName;
+        this.data = wrapper.data;
+    }
+
     /**
-     * Name of the plugin channel used to send the data.
+     * The channel name of the plugin message.
+     * <p>
+     * <b>IMPORTANT</b>
+     * <p>
+     * <h3>Modern Server and Client versions use {@code ResourceLocation} for the channel name.
+     * Older versions use {@code String} for the channel name.</h3>
      *
-     * @return Plugin channel name
+     * @param <T> The type of the channel name.
+     * @return The channel name.
      */
-    public String getChannelName() {
-        return channelName;
-    }
-
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
+    public <T> T getChannelName() {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_13) && clientVersion.isOlderThan(ClientVersion.V_1_13)) {
+            return (T) channelNameLegacy;
+        }
+        return (T) channelName;
     }
 
     /**
-     * Any data, depending on the channel.
+     * Sets the channel name of the plugin message.
+     * <p>
+     * <b>IMPORTANT</b>
+     * <p>
+     * <h3>Modern Server and Client versions use {@code ResourceLocation} for the channel name.
+     * Older versions use {@code String} for the channel name.</h3>
      *
-     * @return Data
+     * @param <T>         The type of the channel name.
+     * @param channelName The channel name.
+     */
+    public <T> void setChannelName(T channelName) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_13) && clientVersion.isOlderThan(ClientVersion.V_1_13)) {
+            this.channelNameLegacy = (String) channelName;
+        } else {
+            this.channelName = (ResourceLocation) channelName;
+        }
+    }
+
+    /**
+     * The data of the plugin message.
+     *
+     * @return The data.
      */
     public byte[] getData() {
         return data;
     }
 
+    /**
+     * Sets the data of the plugin message.
+     *
+     * @param data The data.
+     */
     public void setData(byte[] data) {
         this.data = data;
     }

@@ -19,11 +19,8 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientPlayerPositionAndRotation extends WrapperPlayClientPlayerFlying {
     public WrapperPlayClientPlayerPositionAndRotation(PacketReceiveEvent event) {

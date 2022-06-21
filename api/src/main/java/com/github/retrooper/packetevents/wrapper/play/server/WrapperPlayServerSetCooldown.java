@@ -25,8 +25,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerSetCooldown extends PacketWrapper<WrapperPlayServerSetCooldown> {
-    ItemType item;
-    int cooldownTicks;
+    private ItemType item;
+    private int cooldownTicks;
 
     public WrapperPlayServerSetCooldown(PacketSendEvent event) {
         super(event);
@@ -45,15 +45,15 @@ public class WrapperPlayServerSetCooldown extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void copy(WrapperPlayServerSetCooldown wrapper) {
-        item = wrapper.item;
-        cooldownTicks = wrapper.cooldownTicks;
-    }
-
-    @Override
     public void write() {
         writeVarInt(item.getId(serverVersion.toClientVersion()));
         writeVarInt(cooldownTicks);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSetCooldown wrapper) {
+        item = wrapper.item;
+        cooldownTicks = wrapper.cooldownTicks;
     }
 
     public ItemType getItem() {

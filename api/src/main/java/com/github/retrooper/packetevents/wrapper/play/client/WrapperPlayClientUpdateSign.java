@@ -28,8 +28,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
  * This message is sent from the client to the server when the "Done" button is pushed after placing a sign.
  */
 public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClientUpdateSign> {
-    private String[] textLines;
     private Vector3i blockPosition;
+    private String[] textLines;
 
     public WrapperPlayClientUpdateSign(PacketReceiveEvent event) {
         super(event);
@@ -58,12 +58,6 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
     }
 
     @Override
-    public void copy(WrapperPlayClientUpdateSign wrapper) {
-        this.blockPosition = wrapper.blockPosition;
-        this.textLines = wrapper.textLines;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             long positionVector = blockPosition.getSerializedPosition();
@@ -76,6 +70,12 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
         for (int i = 0; i < 4; i++) {
             writeString(textLines[i], 384);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientUpdateSign wrapper) {
+        this.blockPosition = wrapper.blockPosition;
+        this.textLines = wrapper.textLines;
     }
 
     /**

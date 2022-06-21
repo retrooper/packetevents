@@ -43,13 +43,13 @@ public class WrapperPlayClientHeldItemChange extends PacketWrapper<WrapperPlayCl
     }
 
     @Override
-    public void copy(WrapperPlayClientHeldItemChange wrapper) {
-        this.slot = wrapper.slot;
+    public void write() {
+        writeShort(slot);
     }
 
     @Override
-    public void write() {
-        writeShort(slot);
+    public void copy(WrapperPlayClientHeldItemChange wrapper) {
+        this.slot = wrapper.slot;
     }
 
     /**

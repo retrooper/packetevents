@@ -28,7 +28,6 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -155,10 +154,9 @@ public class User {
         PacketWrapper<?> chatPacket;
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
             chatPacket = new WrapperPlayServerSystemChatMessage(ChatType.CHAT, component);
-        }
-        else {
+        } else {
             MessageSender sender = new MessageSender(getUUID(), null, null);
-            chatPacket = new WrapperPlayServerChatMessage(sender, type, component);
+            chatPacket = new WrapperPlayServerChatMessage(component, type, sender);
         }
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatPacket);
     }
@@ -183,10 +181,9 @@ public class User {
             if (subtitle != null) {
                 setSubtitle = new WrapperPlayServerSetTitleSubtitle(subtitle);
             }
-        }
-        else {
+        } else {
             animation = new WrapperPlayServerTitle(WrapperPlayServerTitle.
-                    TitleAction.SET_TIMES_AND_DISPLAY, (Component)null, null, null,
+                    TitleAction.SET_TIMES_AND_DISPLAY, (Component) null, null, null,
                     fadeInTicks, stayTicks, fadeOutTicks);
             if (title != null) {
                 setTitle = new WrapperPlayServerTitle(WrapperPlayServerTitle.

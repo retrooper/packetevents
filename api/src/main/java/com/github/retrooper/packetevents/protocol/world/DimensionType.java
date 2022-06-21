@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.world;
 
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated // This is a registry and cannot be hardcoded in modern versions
 public enum DimensionType {
     NETHER(-1, "minecraft:the_nether"),
     OVERWORLD(0, "minecraft:overworld"),

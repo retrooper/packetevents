@@ -21,10 +21,9 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -152,12 +151,6 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void copy(WrapperPlayServerPlayerInfo wrapper) {
-        action = wrapper.action;
-        playerDataList = wrapper.playerDataList;
-    }
-
-    @Override
     public void write() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             //Only one player data can be sent
@@ -225,7 +218,12 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                 }
             }
         }
+    }
 
+    @Override
+    public void copy(WrapperPlayServerPlayerInfo wrapper) {
+        action = wrapper.action;
+        playerDataList = wrapper.playerDataList;
     }
 
     @Nullable

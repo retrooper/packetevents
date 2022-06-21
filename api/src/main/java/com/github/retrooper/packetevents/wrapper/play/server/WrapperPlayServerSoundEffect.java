@@ -89,6 +89,15 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         seed = wrapper.seed;
     }
 
+    @Override
+    public void copy(WrapperPlayServerSoundEffect wrapper) {
+        soundID = wrapper.soundID;
+        soundCategory = wrapper.soundCategory;
+        effectPosition = wrapper.effectPosition;
+        volume = wrapper.volume;
+        pitch = wrapper.pitch;
+    }
+
     public int getSoundId() {
         return soundID;
     }
