@@ -34,7 +34,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServerChatMessage> {
-    private Component signedChatContent;
+    private Component chatContent;
     private @Nullable Component unsignedChatContent;
     private ChatType type;
     private MessageSender sender;
@@ -44,14 +44,14 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    public WrapperPlayServerChatMessage(Component signedChatContent, ChatType type, MessageSender sender) {
-        this(signedChatContent, null, type, sender, null);
+    public WrapperPlayServerChatMessage(Component chatContent, ChatType type, MessageSender sender) {
+        this(chatContent, null, type, sender, null);
     }
 
-    public WrapperPlayServerChatMessage(Component signedChatContent, @Nullable Component unsignedChatContent, ChatType type,
+    public WrapperPlayServerChatMessage(Component chatContent, @Nullable Component unsignedChatContent, ChatType type,
                                         MessageSender sender, @Nullable MessageSignData messageSignData) {
         super(PacketType.Play.Server.CHAT_MESSAGE);
-        this.signedChatContent = signedChatContent;
+        this.chatContent = chatContent;
         this.unsignedChatContent = unsignedChatContent;
         this.type = type;
         this.sender = sender;
@@ -61,7 +61,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     @Override
     public void read() {
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        signedChatContent = AdventureSerializer.parseComponent(readString(getMaxMessageLength()));
+        chatContent = AdventureSerializer.parseComponent(readString(getMaxMessageLength()));
         if (v1_19) {
             unsignedChatContent = readOptional(reader -> {
                 String json = readString(getMaxMessageLength());
@@ -92,7 +92,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     @Override
     public void write() {
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        writeString(AdventureSerializer.toJson(signedChatContent), getMaxMessageLength());
+        writeString(AdventureSerializer.toJson(chatContent), getMaxMessageLength());
         if (v1_19) {
             writeOptional(unsignedChatContent, (writer, innerComponent) -> {
                 if (innerComponent != null) {
@@ -124,19 +124,24 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void copy(WrapperPlayServerChatMessage wrapper) {
-        this.signedChatContent = wrapper.signedChatContent;
+        this.chatContent = wrapper.chatContent;
         this.unsignedChatContent = wrapper.unsignedChatContent;
         this.type = wrapper.type;
         this.sender = wrapper.sender;
         this.messageSignData = wrapper.messageSignData;
     }
 
-    public Component getSignedChatContent() {
-        return signedChatContent;
+    /**
+     * Get the chat content.
+     * On server versions higher than 1.19 it's signed chat content
+     * @return The chat content.
+     */
+    public Component getChatContent() {
+        return chatContent;
     }
 
-    public void setSignedChatContent(Component signedChatContent) {
-        this.signedChatContent = signedChatContent;
+    public void setChatContent(Component chatContent) {
+        this.chatContent = chatContent;
     }
 
     public Optional<Component> getUnsignedChatContent() {
