@@ -20,51 +20,40 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.command.CommandMatch;
+import com.github.retrooper.packetevents.protocol.command.CommandRange;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServerTabComplete> {
-    private Optional<Integer> transactionID;
-    private Optional<CommandRange> commandRange;
+    private int transactionId;
+    private CommandRange commandRange;
     private List<CommandMatch> commandMatches;
 
     public WrapperPlayServerTabComplete(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerTabComplete(@Nullable Integer transactionID, @NotNull CommandRange commandRange, List<CommandMatch> commandMatches) {
+    public WrapperPlayServerTabComplete(int transactionId, CommandRange commandRange, List<CommandMatch> commandMatches) {
         super(PacketType.Play.Server.TAB_COMPLETE);
-        setTransactionId(transactionID);
-        setCommandRange(commandRange);
+        this.transactionId = transactionId;
+        this.commandRange = commandRange;
         this.commandMatches = commandMatches;
     }
-/*
-    public WrapperPlayServerTabComplete(UUID uuid, List<CommandMatch> commandMatches) {
-        super(PacketType.Play.Server.TAB_COMPLETE);
-        TabCompleteAttribute tabCompleteAttribute = PacketEvents.getAPI()
-                .getPlayerManager().getAttributeOrDefault(uuid, TabCompleteAttribute.class, new TabCompleteAttribute());
-        setTransactionId(tabCompleteAttribute.getTransactionId());
-        int len = tabCompleteAttribute.getInput().length();
-        setCommandRange(new CommandRange(len, len));
-        this.commandMatches = commandMatches;
-    }*/
 
     @Override
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            transactionID = Optional.of(readVarInt());
+            this.transactionId = readVarInt();
             int begin = readVarInt();
             int len = readVarInt();
             int matchLength = readVarInt();
-            commandRange = Optional.of(new CommandRange(begin, begin + len));
+            commandRange = new CommandRange(begin, begin + len);
             commandMatches = new ArrayList<>(matchLength);
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
@@ -84,7 +73,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             commandMatches = new ArrayList<>(matchLength);
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
-                CommandMatch commandMatch = new CommandMatch(text, (Component) null);
+                CommandMatch commandMatch = new CommandMatch(text, null);
                 commandMatches.add(commandMatch);
             }
         }
@@ -93,10 +82,10 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
     @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeVarInt(transactionID.orElse(-1));
-            CommandRange commandRange = this.commandRange.get();
-            writeVarInt(commandRange.getBegin());
-            writeVarInt(commandRange.getLength());
+            writeVarInt(transactionId);
+            CommandRange range = this.commandRange;
+            writeVarInt(range.getBegin());
+            writeVarInt(range.getLength());
             writeVarInt(commandMatches.size());
             for (CommandMatch match : commandMatches) {
                 writeString(match.getText());
@@ -117,33 +106,25 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void copy(WrapperPlayServerTabComplete wrapper) {
-        transactionID = wrapper.transactionID;
+        transactionId = wrapper.transactionId;
         commandRange = wrapper.commandRange;
         commandMatches = wrapper.commandMatches;
     }
 
-    public Optional<Integer> getTransactionId() {
-        return transactionID;
+    public int getTransactionId() {
+        return transactionId;
     }
 
-    public void setTransactionId(Integer transactionID) {
-        if (transactionID != null) {
-            this.transactionID = Optional.of(transactionID);
-        } else {
-            this.transactionID = Optional.empty();
-        }
+    public void setTransactionId(int transactionId) {
+        this.transactionId = transactionId;
     }
 
-    public Optional<CommandRange> getCommandRange() {
+    public CommandRange getCommandRange() {
         return commandRange;
     }
 
-    public void setCommandRange(@Nullable CommandRange commandRange) {
-        if (commandRange != null) {
-            this.commandRange = Optional.of(commandRange);
-        } else {
-            this.commandRange = Optional.empty();
-        }
+    public void setCommandRange(CommandRange commandRange) {
+        this.commandRange = commandRange;
     }
 
     public List<CommandMatch> getCommandMatches() {
@@ -152,70 +133,5 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
 
     public void setCommandMatches(List<CommandMatch> commandMatches) {
         this.commandMatches = commandMatches;
-    }
-
-    public static class CommandMatch {
-        private String text;
-        private Optional<Component> tooltip;
-
-        public CommandMatch(String text, @Nullable Component tooltip) {
-            this.text = text;
-            setTooltip(tooltip);
-        }
-
-        public CommandMatch(String text) {
-            this.text = text;
-            tooltip = Optional.empty();
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public void setText(String text) {
-            this.text = text;
-        }
-
-        public Optional<Component> getTooltip() {
-            return tooltip;
-        }
-
-        public void setTooltip(@Nullable Component tooltip) {
-            if (tooltip != null) {
-                this.tooltip = Optional.of(tooltip);
-            } else {
-                this.tooltip = Optional.empty();
-            }
-        }
-    }
-
-    public static class CommandRange {
-        private int begin;
-        private int end;
-
-        public CommandRange(int begin, int end) {
-            this.begin = begin;
-            this.end = end;
-        }
-
-        public int getBegin() {
-            return begin;
-        }
-
-        public void setBegin(int begin) {
-            this.begin = begin;
-        }
-
-        public int getEnd() {
-            return end;
-        }
-
-        public void setEnd(int end) {
-            this.end = end;
-        }
-
-        public int getLength() {
-            return end - begin;
-        }
     }
 }
