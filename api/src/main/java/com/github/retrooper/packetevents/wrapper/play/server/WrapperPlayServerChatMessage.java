@@ -72,13 +72,11 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
             });
         }
 
-        multiOptional(type, chatType -> {
-            if (v1_19) {
-                type = ChatType.getById(readVarInt());
-            } else {
-                type = ChatType.getById(readByte());
-            }
-        });
+        if (v1_19) {
+            type = ChatType.getById(readVarInt());
+        } else {
+            type = ChatType.getById(readByte());
+        }
 
         sender = new MessageSender(null, null);
         if (v1_19) {
@@ -103,13 +101,11 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
             });
         }
 
-        multiOptional(type, chatType -> {
-            if (v1_19) {
-                writeVarInt(chatType.getId());
-            } else {
-                writeByte(chatType.getId());
-            }
-        });
+        if (v1_19) {
+            writeVarInt(type.getId());
+        } else {
+            writeByte(type.getId());
+        }
 
         writeUUID(sender.getUUID());
         if (v1_19) {

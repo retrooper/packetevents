@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.ServerVersion.MultiVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -37,20 +38,13 @@ public class WrapperPlayWorldBorderWarningDelay extends PacketWrapper<WrapperPla
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            delay = readVarInt();
-        } else {
-            delay = readVarLong();
-        }
+        this.delay = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_19, PacketWrapper::readVarInt, PacketWrapper::readVarLong);
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeVarInt((int) delay);
-        } else {
-            writeVarLong(delay);
-        }
+        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_19, this.delay,
+                (packetWrapper, aLong) -> packetWrapper.writeVarInt(Math.toIntExact(aLong)), PacketWrapper::writeVarLong);
     }
 
     @Override

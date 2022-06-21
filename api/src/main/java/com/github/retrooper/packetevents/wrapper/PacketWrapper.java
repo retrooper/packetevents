@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.ServerVersion.MultiVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
@@ -129,7 +130,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public static PacketWrapper<?> createUniversalPacketWrapper(Object byteBuf) {
-        PacketWrapper<?> wrapper = new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), -2);
+        PacketWrapper<?> wrapper = new PacketWrapper<>(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), -2);
         wrapper.buffer = byteBuf;
         return wrapper;
     }
@@ -254,7 +255,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         while (true) {
             if ((value & ~0x7F) == 0) {
                 writeByte(value);
-                return;
+                break;
             }
             writeByte((value & 0x7F) | 0x80);
             value >>>= 7;
@@ -747,6 +748,24 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeBlockPosition(pos.getBlockPosition());
     }
 
+    @Experimental
+    public <U, V, R> U readMultiVersional(MultiVersion version, ServerVersion target, Reader<V> first, Reader<R> second) {
+        if (serverVersion.is(version, target)) {
+            return (U) first.apply(this);
+        } else {
+            return (U) second.apply(this);
+        }
+    }
+
+    @Experimental
+    public <V> void writeMultiVersional(MultiVersion version, ServerVersion target, V value, Writer<V> first, Writer<V> second) {
+        if (serverVersion.is(version, target)) {
+            first.accept(this, value);
+        } else {
+            second.accept(this, value);
+        }
+    }
+
     public <R> R readOptional(Reader<R> reader) {
         return this.readBoolean() ? reader.apply(this) : null;
     }
@@ -758,11 +777,6 @@ public class PacketWrapper<T extends PacketWrapper> {
         } else {
             this.writeBoolean(false);
         }
-    }
-
-    @Experimental
-    public <U> void multiOptional(U value, Consumer<U> multiValue) {
-        multiValue.accept(value);
     }
 
     @Experimental
