@@ -149,7 +149,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public int getAmplifier() {
         if (packet != null) {
-            return readByte((v_1_18_2 && !v_1_19) ? 0 : 1);
+            return readByte(v_1_18_2 ? 0 : 1);
         } else {
             return amplifier;
         }
@@ -157,7 +157,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public void setAmplifier(int amplifier) {
         if (packet != null) {
-            writeByte((v_1_18_2 && !v_1_19) ? 0 : 1, (byte) amplifier);
+            writeByte(v_1_18_2 ? 0 : 1, (byte) amplifier);
         } else {
             this.amplifier = amplifier;
         }
@@ -165,10 +165,11 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public int getDuration() {
         if (packet != null) {
-            //1.7 and only 1.7
+            //1.7 and only 1.7(below 1.8)
             if (v_1_7_10) {
                 return readShort(1);
-            } else if (v_1_19) {
+            }
+            else if (v_1_19) {
                 return readInt(4);
             }
             //1.18.2+
