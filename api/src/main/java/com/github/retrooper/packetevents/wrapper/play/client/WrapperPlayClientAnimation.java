@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -42,7 +43,7 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
 
     @Override
     public void read() {
-        this.interactionHand = readMultiVersional(ServerVersion.MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_9,
+        this.interactionHand = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_9,
                 packetWrapper -> InteractionHand.getById(packetWrapper.readVarInt()),
                 packetWrapper -> InteractionHand.MAIN_HAND);
     }

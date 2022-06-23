@@ -1,13 +1,13 @@
 package com.github.retrooper.packetevents.protocol.entity;
 
-public enum InteractAction {
+public enum EntityInteractAction {
     INTERACT,
     ATTACK,
     INTERACT_AT;
 
-    private static final InteractAction[] VALUES = values();
+    private static final EntityInteractAction[] VALUES = values();
 
-    public static InteractAction getById(int index) {
+    public static EntityInteractAction getById(int index) {
         return VALUES[index];
     }
 }
