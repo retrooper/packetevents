@@ -9,23 +9,23 @@ public enum CollisionRule {
     PUSH_OWN_TEAM("pushOwnTeam");
 
     private static final CollisionRule[] VALUES = CollisionRule.values();
-    private final String id;
+    private final String name;
 
-    CollisionRule(String id) {
-        this.id = id;
+    CollisionRule(String name) {
+        this.name = name;
     }
 
     @Nullable
-    public static CollisionRule getById(String id) {
+    public static CollisionRule getByName(String name) {
         for (CollisionRule value : VALUES) {
-            if (value.id.equalsIgnoreCase(id)) {
+            if (value.name.equalsIgnoreCase(name)) {
                 return value;
             }
         }
         return null;
     }
 
-    public String getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 }

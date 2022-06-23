@@ -372,7 +372,7 @@ public class NPC {
 
     private WrapperPlayServerTeams generateTeamsData() {
         return new WrapperPlayServerTeams("custom_name_team",
-                TeamMode.CREATE,
+                TeamMode.ADD,
                 new TeamInfo(
                         Component.text("custom_name_team"),
                         prefixName,

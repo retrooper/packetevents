@@ -1,11 +1,11 @@
 package com.github.retrooper.packetevents.protocol.scoreboard;
 
 public enum TeamMode {
-    CREATE,
+    ADD,
     REMOVE,
-    UPDATE,
-    ADD_ENTITIES,
-    REMOVE_ENTITIES;
+    CHANGE,
+    JOIN,
+    LEAVE;
 
     private static final TeamMode[] VALUES = values();
 

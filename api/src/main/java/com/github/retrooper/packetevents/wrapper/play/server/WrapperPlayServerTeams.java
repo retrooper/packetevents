@@ -67,14 +67,14 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     public void read() {
         teamName = readString(16);
         teamMode = TeamMode.getById(readByte());
-        AtomicReference<TeamInfo> info = null;
-        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
+        AtomicReference<TeamInfo> info = new AtomicReference<>();
+        if (teamMode == TeamMode.ADD || teamMode == TeamMode.CHANGE) {
             readMulti(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_13,
                     packetWrapper -> {
                         Component displayName = readComponent();
                         OptionData optionData = OptionData.fromValue(readByte());
-                        NameTagVisibility nameTagVisibility = NameTagVisibility.getById(readString());
-                        CollisionRule collisionRule = CollisionRule.getById(readString());
+                        NameTagVisibility nameTagVisibility = NameTagVisibility.getByName(readString());
+                        CollisionRule collisionRule = CollisionRule.getByName(readString());
                         NamedTextColor color = ColorUtil.fromId(readByte());
                         Component prefix = readComponent();
                         Component suffix = readComponent();
@@ -92,9 +92,9 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
                             nameTagVisibility = NameTagVisibility.ALWAYS;
                             color = NamedTextColor.WHITE;
                         } else {
-                            nameTagVisibility = NameTagVisibility.getById(readString());
+                            nameTagVisibility = NameTagVisibility.getByName(readString());
                             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                                collisionRule = CollisionRule.getById(readString());
+                                collisionRule = CollisionRule.getByName(readString());
                             }
                             color = ColorUtil.fromId(readByte());
                         }
@@ -105,7 +105,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
 
         teamInfo = info.get();
         players = new ArrayList<>();
-        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.ADD_ENTITIES || teamMode == TeamMode.REMOVE_ENTITIES) {
+        if (teamMode == TeamMode.ADD || teamMode == TeamMode.JOIN || teamMode == TeamMode.LEAVE) {
             int size = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
                     PacketWrapper::readVarInt,
                     PacketWrapper::readShort);
@@ -119,7 +119,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     public void write() {
         writeString(teamName, 16);
         writeByte(teamMode.ordinal());
-        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
+        if (teamMode == TeamMode.ADD || teamMode == TeamMode.CHANGE) {
             TeamInfo info = teamInfo == null ? new TeamInfo(null, null, null,
                     NameTagVisibility.ALWAYS, CollisionRule.ALWAYS, NamedTextColor.WHITE, OptionData.NONE) : teamInfo;
             if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
@@ -128,25 +128,25 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
                 writeString(AdventureSerializer.asVanilla(info.getSuffix()));
                 writeByte(info.getOptionData().ordinal());
                 if (serverVersion == ServerVersion.V_1_7_10) {
-                    writeString(NameTagVisibility.ALWAYS.getId());
+                    writeString(NameTagVisibility.ALWAYS.getName());
                     writeByte(15);
                 } else {
-                    writeString(info.getTagVisibility().getId());
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) writeString(info.getCollisionRule().getId());
+                    writeString(info.getTagVisibility().getName());
+                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) writeString(info.getCollisionRule().getName());
                     writeByte(ColorUtil.getId(info.getColor()));
                 }
             } else {
                 writeComponent(info.getDisplayName());
                 writeByte(info.getOptionData().getByteValue());
-                writeString(info.getTagVisibility().getId());
-                writeString(info.getCollisionRule().getId());
+                writeString(info.getTagVisibility().getName());
+                writeString(info.getCollisionRule().getName());
                 writeByte(ColorUtil.getId(info.getColor()));
                 writeComponent(info.getPrefix());
                 writeComponent(info.getSuffix());
             }
         }
 
-        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.ADD_ENTITIES || teamMode == TeamMode.REMOVE_ENTITIES) {
+        if (teamMode == TeamMode.ADD || teamMode == TeamMode.JOIN || teamMode == TeamMode.LEAVE) {
             if (serverVersion == ServerVersion.V_1_7_10) {
                 writeShort(players.size());
             } else {

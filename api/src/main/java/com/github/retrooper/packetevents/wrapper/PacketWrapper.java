@@ -789,7 +789,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    // TODO: Rewrite this method to make it more dynamical
+    // TODO: Rewrite this method with a more dynamic way of handling infinite versions
     public <V> void writeMultiVersional(MultiVersion version, ServerVersion target,
                                         MultiVersion versionSecond, ServerVersion targetSecond, V value,
                                         Writer<V> first, Writer<V> second, Writer<V> third) {
@@ -801,6 +801,20 @@ public class PacketWrapper<T extends PacketWrapper> {
             third.accept(this, value);
         }
     }
+
+    public <V> void writeMultiVersionals(List<MultiVersion> versions, List<ServerVersion> targetVersions,
+                                    V value, List<Writer<V>> writers) {
+        if (versions.size() != targetVersions.size() || versions.size() != writers.size()) {
+            throw new IllegalArgumentException("The lists of versions, targets, and writers must be the same length");
+        }
+
+        for (int i = 0; i < versions.size(); i++) {
+            if (serverVersion.is(versions.get(i), targetVersions.get(i))) {
+                writers.get(i).accept(this, value);
+            }
+        }
+    }
+
 
     @Experimental
     public void writeMulti(MultiVersion version, ServerVersion target, Consumer<PacketWrapper<?>> first,

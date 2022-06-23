@@ -9,23 +9,23 @@ public enum NameTagVisibility {
     HIDE_FOR_OWN_TEAM("hideForOwnTeam");
 
     private static final NameTagVisibility[] VALUES = NameTagVisibility.values();
-    private final String id;
+    private final String name;
 
-    NameTagVisibility(String id) {
-        this.id = id;
+    NameTagVisibility(String name) {
+        this.name = name;
     }
 
     @Nullable
-    public static NameTagVisibility getById(String id) {
+    public static NameTagVisibility getByName(String name) {
         for (NameTagVisibility value : VALUES) {
-            if (value.id.equalsIgnoreCase(id)) {
+            if (value.name.equalsIgnoreCase(name)) {
                 return value;
             }
         }
         return null;
     }
 
-    public String getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 }
