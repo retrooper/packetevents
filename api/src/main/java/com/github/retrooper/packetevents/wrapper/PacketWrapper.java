@@ -372,8 +372,8 @@ public class PacketWrapper<T extends PacketWrapper> {
         } else {
             String s = ByteBufHelper.toString(buffer, ByteBufHelper.readerIndex(buffer), j, StandardCharsets.UTF_8);
             ByteBufHelper.readerIndex(buffer, ByteBufHelper.readerIndex(buffer) + j);
-            if (s.length() > maxLen) {
-                throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + maxLen + ")");
+            if (s.length() > maxLen * 4) {
+                throw new RuntimeException("The received string length is longer than maximum allowed (" + s.length() + " > " + maxLen + ")");
             } else {
                 return s;
             }
