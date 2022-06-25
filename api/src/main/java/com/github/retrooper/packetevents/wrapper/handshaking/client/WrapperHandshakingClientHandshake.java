@@ -52,7 +52,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
     public void read() {
         this.protocolVersion = readVarInt();
         this.clientVersion = ClientVersion.getById(protocolVersion);
-        this.serverAddress = readString(1300); // Velocity's legacy player-info-forwarding-mode increases this past default value of 255.
+        this.serverAddress = readString(1500); // Velocity's legacy player-info-forwarding-mode increases this past default value of 255.
         this.serverPort = readUnsignedShort();
         int nextStateIndex = readVarInt();
         this.nextConnectionState = ConnectionState.getById(nextStateIndex);
@@ -61,7 +61,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
     @Override
     public void write() {
         writeVarInt(protocolVersion);
-        writeString(serverAddress, 1300); // Velocity's legacy player-info-forwarding-mode increases this past default value of 255.
+        writeString(serverAddress, 1500); // Velocity's legacy player-info-forwarding-mode increases this past default value of 255.
         writeShort(serverPort);
         writeVarInt(nextConnectionState.ordinal());
     }
