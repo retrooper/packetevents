@@ -27,38 +27,38 @@ import java.util.Optional;
 
 public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayClientAdvancementTab> {
     private Action action;
-    private @Nullable String tabID;
+    private @Nullable String tabId;
 
     public WrapperPlayClientAdvancementTab(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientAdvancementTab(Action action, @Nullable String tabID) {
+    public WrapperPlayClientAdvancementTab(Action action, @Nullable String tabId) {
         super(PacketType.Play.Client.ADVANCEMENT_TAB);
         this.action = action;
-        this.tabID = tabID;
+        this.tabId = tabId;
     }
 
     @Override
     public void read() {
         action = Action.getById(readVarInt());
         if (action == Action.OPENED_TAB) {
-            tabID = readString();
+            tabId = readString();
         }
-    }
-
-    @Override
-    public void copy(WrapperPlayClientAdvancementTab wrapper) {
-        action = wrapper.action;
-        tabID = wrapper.tabID;
     }
 
     @Override
     public void write() {
         writeVarInt(action.ordinal());
         if (action == Action.OPENED_TAB) {
-            writeString(tabID);
+            writeString(tabId);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientAdvancementTab wrapper) {
+        action = wrapper.action;
+        tabId = wrapper.tabId;
     }
 
     public Action getAction() {
@@ -70,15 +70,16 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
     }
 
     public Optional<String> getTabId() {
-        return Optional.ofNullable(tabID);
+        return Optional.ofNullable(tabId);
     }
 
-    public void setTabId(String tabID) {
-        this.tabID = tabID;
+    public void setTabId(@Nullable String tabId) {
+        this.tabId = tabId;
     }
 
     public enum Action {
-        OPENED_TAB, CLOSED_SCREEN;
+        OPENED_TAB,
+        CLOSED_SCREEN;
 
         private static final Action[] VALUES = values();
 
