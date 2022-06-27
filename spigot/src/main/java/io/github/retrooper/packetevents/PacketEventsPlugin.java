@@ -161,15 +161,6 @@ public class PacketEventsPlugin extends JavaPlugin {
             }
 
             @Override
-            public void onPacketLoginSend(PacketLoginSendEvent event) {
-                if (event.getPacketType() == PacketType.Login.Server.ENCRYPTION_REQUEST) {
-                    WrapperLoginServerEncryptionRequest request = new WrapperLoginServerEncryptionRequest(event);
-                    System.out.println("Request: " + request.getPublicKey().getAlgorithm());
-                    event.getUser().setPublicKey(request.getPublicKey());
-                }
-            }
-
-            @Override
             public void onUserConnect(UserConnectEvent event) {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " connected...");
             }
@@ -185,7 +176,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
