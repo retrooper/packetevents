@@ -60,7 +60,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
                 Component tooltip;
                 boolean hasTooltip = readBoolean();
                 if (hasTooltip) {
-                    String tooltipJson = readString(getMaxMessageLength());
+                    String tooltipJson = readComponentJSON();
                     tooltip = AdventureSerializer.parseComponent(tooltipJson);
                 } else {
                     tooltip = null;
@@ -93,7 +93,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
                 writeBoolean(hasTooltip);
                 if (hasTooltip) {
                     String tooltipJson = AdventureSerializer.toJson(match.getTooltip().get());
-                    writeString(tooltipJson, getMaxMessageLength());
+                    writeComponentJSON(tooltipJson);
                 }
             }
         } else {

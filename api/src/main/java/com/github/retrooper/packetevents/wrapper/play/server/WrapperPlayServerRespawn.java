@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.*;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,9 +49,10 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     public WrapperPlayServerRespawn(PacketSendEvent event) {
         super(event);
     }
-
-    public WrapperPlayServerRespawn(Dimension dimension, @Nullable String worldName, Difficulty difficulty, long hashedSeed,
-                                    GameMode gameMode, @Nullable GameMode previousGameMode, boolean worldDebug, boolean worldFlat, boolean keepingAllPlayerData) {
+    
+    public WrapperPlayServerRespawn(Dimension dimension, @Nullable String worldName, Difficulty difficulty, long hashedSeed, GameMode gameMode,
+                                    @Nullable GameMode previousGameMode, boolean worldDebug, boolean worldFlat, boolean keepingAllPlayerData,
+                                    @Nullable ResourceLocation deathDimensionName, @Nullable WorldBlockPosition lastDeathPosition) {
         super(PacketType.Play.Server.RESPAWN);
         this.dimension = dimension;
         setWorldName(worldName);
@@ -61,6 +63,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         this.worldDebug = worldDebug;
         this.worldFlat = worldFlat;
         this.keepingAllPlayerData = keepingAllPlayerData;
+        this.lastDeathPosition = lastDeathPosition;
     }
 
     @Override
@@ -78,8 +81,8 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             worldDebug = readBoolean();
             worldFlat = readBoolean();
             keepingAllPlayerData = readBoolean();
-            if (v1_19 && readBoolean()) {
-                lastDeathPosition = readWorldBlockPosition();
+            if (v1_19) {
+                lastDeathPosition = readOptional(PacketWrapper::readWorldBlockPosition);
             }
         } else {
             DimensionType dimensionType = DimensionType.getById(readInt());
@@ -118,10 +121,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             writeBoolean(worldFlat);
             writeBoolean(keepingAllPlayerData);
             if (v1_19) {
-                writeBoolean(lastDeathPosition != null);
-                if (lastDeathPosition != null) {
-                    writeWorldBlockPosition(lastDeathPosition);
-                }
+                writeOptional(lastDeathPosition, PacketWrapper::writeWorldBlockPosition);
             }
         } else {
             writeInt(dimension.getType().getId());
@@ -235,5 +235,13 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     public void setKeepingAllPlayerData(boolean keepAllPlayerData) {
         this.keepingAllPlayerData = keepAllPlayerData;
+    }
+
+    public @Nullable WorldBlockPosition getLastDeathPosition() {
+        return lastDeathPosition;
+    }
+
+    public void setLastDeathPosition(@Nullable WorldBlockPosition lastDeathPosition) {
+        this.lastDeathPosition = lastDeathPosition;
     }
 }

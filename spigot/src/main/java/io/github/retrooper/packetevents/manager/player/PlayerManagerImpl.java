@@ -61,7 +61,7 @@ public class PlayerManagerImpl implements PlayerManager {
             int protocolVersion;
             if (ProtocolSupportUtil.isAvailable()) {
                 protocolVersion = ProtocolSupportUtil.getProtocolVersion(user.getAddress());
-                PacketEvents.getAPI().getLogManager().debug("Requested ProtocolSupport for user " + user.getAddress().getHostName() + "'s protocol version. Protocol version: " + protocolVersion);
+                PacketEvents.getAPI().getLogManager().debug("Requested ProtocolSupport for user " + user.getName() + "'s protocol version. Protocol version: " + protocolVersion);
             } else if (ViaVersionUtil.isAvailable()) {
                 protocolVersion = ViaVersionUtil.getProtocolVersion(player);
                 PacketEvents.getAPI().getLogManager().debug("Requested ViaVersion for " + player.getName() + "'s protocol version. Protocol version: " + protocolVersion);
@@ -69,7 +69,7 @@ public class PlayerManagerImpl implements PlayerManager {
             } else {
                 //No protocol translation plugins available, the client must be the same version as the server.
                 protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
-                PacketEvents.getAPI().getLogManager().debug("No protocol translation plugins are available. We will assume " + user.getAddress().getHostName() + "'s protocol version is the same as the server's protocol version. Protocol version: " + protocolVersion);
+                PacketEvents.getAPI().getLogManager().debug("No protocol translation plugins are available. We will assume " + user.getName() + "'s protocol version is the same as the server's protocol version. Protocol version: " + protocolVersion);
             }
             ClientVersion version = ClientVersion.getById(protocolVersion);
             user.setClientVersion(version);
