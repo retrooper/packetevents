@@ -43,7 +43,6 @@ import java.util.UUID;
  */
 public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClientChatMessage> {
     private String message;
-    // 1.19+
     private @Nullable MessageSignData messageSignData;
 
     public WrapperPlayClientChatMessage(PacketReceiveEvent event) {

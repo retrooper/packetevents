@@ -63,13 +63,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         chatContent = readComponent();
         if (v1_19) {
-            unsignedChatContent = readOptional(reader -> {
-                String json = readComponentJSON();
-                if (json != null) {
-                    return AdventureSerializer.parseComponent(json);
-                }
-                return null;
-            });
+            unsignedChatContent = readOptional(PacketWrapper::readComponent);
         }
 
         if (v1_19) {
@@ -94,11 +88,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         writeComponent(chatContent);
         if (v1_19) {
-            writeOptional(unsignedChatContent, (writer, innerComponent) -> {
-                if (innerComponent != null) {
-                    writeComponentJSON(AdventureSerializer.toJson(innerComponent));
-                }
-            });
+            writeOptional(unsignedChatContent, PacketWrapper::writeComponent);
         }
 
         if (v1_19) {

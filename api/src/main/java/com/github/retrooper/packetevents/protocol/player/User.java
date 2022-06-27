@@ -153,7 +153,7 @@ public class User {
     public void sendMessage(Component component, ChatType type) {
         PacketWrapper<?> chatPacket;
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            chatPacket = new WrapperPlayServerSystemChatMessage(ChatType.CHAT, component);
+            chatPacket = new WrapperPlayServerSystemChatMessage(ChatType.SYSTEM, component);
         } else {
             MessageSender sender = new MessageSender(getUUID(), null, null);
             chatPacket = new WrapperPlayServerChatMessage(component, type, sender);
