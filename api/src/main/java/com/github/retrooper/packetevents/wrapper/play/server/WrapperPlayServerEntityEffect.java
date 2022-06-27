@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.BitSet;
 
@@ -122,11 +123,11 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         this.flags = flags;
     }
 
-    public NBTCompound getFactorData() {
+    public @Nullable NBTCompound getFactorData() {
         return factorData;
     }
 
-    public void setFactorData(NBTCompound factorData) {
+    public void setFactorData(@Nullable NBTCompound factorData) {
         this.factorData = factorData;
     }
 

@@ -39,6 +39,10 @@ public class MessageSender {
         this(new UUID(0L, 0L), displayName, teamName);
     }
 
+    public MessageSender() {
+        this(null, null);
+    }
+
     public UUID getUUID() {
         return uuid;
     }

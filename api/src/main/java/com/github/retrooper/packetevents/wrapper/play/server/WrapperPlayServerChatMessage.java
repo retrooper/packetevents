@@ -61,10 +61,10 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     @Override
     public void read() {
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        chatContent = AdventureSerializer.parseComponent(readString(getMaxMessageLength()));
+        chatContent = readComponent();
         if (v1_19) {
             unsignedChatContent = readOptional(reader -> {
-                String json = readString(getMaxMessageLength());
+                String json = readComponentJSON();
                 if (json != null) {
                     return AdventureSerializer.parseComponent(json);
                 }
@@ -78,7 +78,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
             type = ChatType.getById(readByte());
         }
 
-        sender = new MessageSender(null, null);
+        sender = new MessageSender();
         if (v1_19) {
             sender.setUUID(readUUID());
             sender.setDisplayName(readComponent());
@@ -92,11 +92,11 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     @Override
     public void write() {
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        writeString(AdventureSerializer.toJson(chatContent), getMaxMessageLength());
+        writeComponent(chatContent);
         if (v1_19) {
             writeOptional(unsignedChatContent, (writer, innerComponent) -> {
                 if (innerComponent != null) {
-                    writeString(AdventureSerializer.toJson(innerComponent), getMaxMessageLength());
+                    writeComponentJSON(AdventureSerializer.toJson(innerComponent));
                 }
             });
         }

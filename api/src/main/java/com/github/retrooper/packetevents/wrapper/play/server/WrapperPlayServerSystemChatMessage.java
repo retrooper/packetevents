@@ -55,7 +55,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
 
     @Override
     public void read() {
-        this.messageJson = readString(getMaxMessageLength());
+        this.messageJson = readComponentJSON();
         //Parse JSON message
         if (HANDLE_JSON) {
             message = AdventureSerializer.parseComponent(this.messageJson);
@@ -68,7 +68,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         if (HANDLE_JSON && message != null) {
             messageJson = AdventureSerializer.toJson(message);
         }
-        writeString(messageJson, getMaxMessageLength());
+        writeComponentJSON(messageJson);
         writeVarInt(type.getId());
     }
 
