@@ -387,11 +387,11 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         this.isFlat = isFlat;
     }
 
-    public WorldBlockPosition getLastDeathPosition() {
+    public @Nullable WorldBlockPosition getLastDeathPosition() {
         return lastDeathPosition;
     }
 
-    public void setLastDeathPosition(WorldBlockPosition lastDeathPosition) {
+    public void setLastDeathPosition(@Nullable WorldBlockPosition lastDeathPosition) {
         this.lastDeathPosition = lastDeathPosition;
     }
 }
