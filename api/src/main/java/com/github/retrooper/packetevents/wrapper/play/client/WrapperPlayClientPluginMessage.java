@@ -62,6 +62,7 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
             //It is ignored, because we don't need it
             int legacyDataSize = readShort();
         }
+        this.data = readRemainingBytes();
     }
 
     @Override
