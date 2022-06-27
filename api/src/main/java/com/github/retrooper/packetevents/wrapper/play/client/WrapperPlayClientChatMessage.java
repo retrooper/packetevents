@@ -43,7 +43,7 @@ import java.util.UUID;
  */
 public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClientChatMessage> {
     private String message;
-    private Optional<MessageSignData> messageSignData = Optional.empty();
+    private Optional<MessageSignData> messageSignData;
 
     public WrapperPlayClientChatMessage(PacketReceiveEvent event) {
         super(event);
@@ -64,6 +64,9 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
             SaltSignature saltSignature = readSaltSignature();
             boolean signedPreview = readBoolean();
             this.messageSignData = Optional.of(new MessageSignData(saltSignature, timestamp, signedPreview));
+        }
+        else {
+            this.messageSignData = Optional.empty();
         }
     }
 
