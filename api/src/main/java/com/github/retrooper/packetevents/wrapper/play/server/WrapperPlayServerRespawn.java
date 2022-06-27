@@ -80,8 +80,8 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             worldDebug = readBoolean();
             worldFlat = readBoolean();
             keepingAllPlayerData = readBoolean();
-            if (v1_19 && readBoolean()) {
-                lastDeathPosition = readWorldBlockPosition();
+            if (v1_19) {
+                lastDeathPosition = readOptional(PacketWrapper::readWorldBlockPosition);
             }
         } else {
             DimensionType dimensionType = DimensionType.getById(readInt());
@@ -121,10 +121,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             writeBoolean(worldFlat);
             writeBoolean(keepingAllPlayerData);
             if (v1_19) {
-                writeBoolean(lastDeathPosition != null);
-                if (lastDeathPosition != null) {
-                    writeWorldBlockPosition(lastDeathPosition);
-                }
+                writeOptional(lastDeathPosition, PacketWrapper::writeWorldBlockPosition);
             }
         } else {
             writeInt(dimension.getType().getId());

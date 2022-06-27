@@ -23,10 +23,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.world.Difficulty;
-import com.github.retrooper.packetevents.protocol.world.Dimension;
-import com.github.retrooper.packetevents.protocol.world.DimensionType;
-import com.github.retrooper.packetevents.protocol.world.WorldType;
+import com.github.retrooper.packetevents.protocol.world.*;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -55,7 +52,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     private boolean enableRespawnScreen;
     private boolean isDebug;
     private boolean isFlat;
-    private Vector3i lastDeathPosition;
+    private WorldBlockPosition lastDeathPosition;
 
     public WrapperPlayServerJoinGame(PacketSendEvent event) {
         super(event);
@@ -67,7 +64,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                                      Difficulty difficulty, String worldName, long hashedSeed,
                                      int maxPlayers, int viewDistance, int simulationDistance,
                                      boolean reducedDebugInfo, boolean enableRespawnScreen,
-                                     boolean isDebug, boolean isFlat, Vector3i lastDeathPosition) {
+                                     boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition) {
         super(PacketType.Play.Server.JOIN_GAME);
         this.entityID = entityID;
         this.hardcore = hardcore;
@@ -149,7 +146,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             }
         }
         if (v1_19) {
-            lastDeathPosition = readOptional(PacketWrapper::readBlockPosition);
+            lastDeathPosition = readOptional(PacketWrapper::readWorldBlockPosition);
         }
     }
 
@@ -226,7 +223,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             }
         }
         if (v1_19) {
-            writeOptional(lastDeathPosition, PacketWrapper::writeBlockPosition);
+            writeOptional(lastDeathPosition, PacketWrapper::writeWorldBlockPosition);
         }
     }
 
@@ -390,11 +387,11 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         this.isFlat = isFlat;
     }
 
-    public Vector3i getLastDeathPosition() {
+    public WorldBlockPosition getLastDeathPosition() {
         return lastDeathPosition;
     }
 
-    public void setLastDeathPosition(Vector3i lastDeathPosition) {
+    public void setLastDeathPosition(WorldBlockPosition lastDeathPosition) {
         this.lastDeathPosition = lastDeathPosition;
     }
 }
