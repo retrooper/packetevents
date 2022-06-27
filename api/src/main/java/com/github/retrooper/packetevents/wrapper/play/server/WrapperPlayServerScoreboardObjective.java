@@ -52,11 +52,10 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
             displayName = Component.empty();
             renderType = RenderType.INTEGER;
         } else {
+            displayName = readComponent();
             if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-                displayName = AdventureSerializer.parseComponent(readComponentJSON());
                 renderType = RenderType.getByName(readString());
             } else {
-                displayName = readComponent();
                 renderType = RenderType.getById(readVarInt());
             }
         }

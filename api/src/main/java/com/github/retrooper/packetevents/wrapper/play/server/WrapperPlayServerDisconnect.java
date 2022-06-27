@@ -38,12 +38,12 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void read() {
-        reason = AdventureSerializer.parseComponent(readString(getMaxMessageLength()));
+        reason = readComponent();
     }
 
     @Override
     public void write() {
-        writeString(AdventureSerializer.toJson(reason), getMaxMessageLength());
+        writeComponent(reason);
     }
 
     @Override

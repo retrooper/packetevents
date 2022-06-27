@@ -33,6 +33,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerEncryptionRequest;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
@@ -81,9 +82,8 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
         // Join game can be used to update world height, and sets dimension data
 
-        if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
+        else if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
             WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
-            event.setLastUsedWrapper(null);
             user.setEntityId(joinGame.getEntityId());
             if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
@@ -100,17 +100,21 @@ public class InternalPacketListener extends PacketListenerAbstract {
         }
 
         // Respawn is used to switch dimensions
-        if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
+        else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
             if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
             }
 
             WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
-            event.setLastUsedWrapper(null);
 
             NBTCompound worldNBT = user.getWorldNBT(respawn.getDimension().getDimensionName()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
             user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
             user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+        }
+        //Link the public key with the user for us to be able to verify messages.
+        else if (event.getPacketType() == PacketType.Login.Server.ENCRYPTION_REQUEST) {
+            WrapperLoginServerEncryptionRequest request = new WrapperLoginServerEncryptionRequest(event);
+            event.getUser().setPublicKey(request.getPublicKey());
         }
     }
 
@@ -120,14 +124,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
             Object channel = event.getChannel();
             InetSocketAddress address = event.getSocketAddress();
-            WrapperHandshakingClientHandshake handshake;
-            try {
-                handshake = new WrapperHandshakingClientHandshake(event);
-            } catch (ArrayIndexOutOfBoundsException exception) {
-                user.closeConnection();
-                PacketEvents.getAPI().getLogManager().debug("Disconnected " + address.getHostString() + ":" + address.getPort() + " for sending an invalid handshaking packet. They might be on an outdated client.");
-                return;
-            }
+            WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
             ConnectionState nextState = handshake.getNextConnectionState();
             ClientVersion clientVersion = handshake.getClientVersion();
 

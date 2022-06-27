@@ -31,88 +31,74 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
  * These internal channels are in the minecraft namespace.
  */
 public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayClientPluginMessage> {
-    private String channelNameLegacy;
-    private ResourceLocation channelName;
+    private String channelName;
     private byte[] data;
 
     public WrapperPlayClientPluginMessage(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPluginMessage(String channelNameLegacy, byte[] data) {
-        super(PacketType.Play.Client.PLUGIN_MESSAGE);
-        this.channelNameLegacy = channelNameLegacy;
-        this.data = data;
-    }
-
-    public WrapperPlayClientPluginMessage(ResourceLocation channelName, byte[] data) {
+    public WrapperPlayClientPluginMessage(String channelName, byte[] data) {
         super(PacketType.Play.Client.PLUGIN_MESSAGE);
         this.channelName = channelName;
         this.data = data;
     }
 
+    public WrapperPlayClientPluginMessage(ResourceLocation channelName, byte[] data) {
+        super(PacketType.Play.Client.PLUGIN_MESSAGE);
+        this.channelName = channelName.toString();
+        this.data = data;
+    }
+
     @Override
     public void read() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13) && clientVersion.isOlderThan(ClientVersion.V_1_13)) {
-            this.channelNameLegacy = readString(20);
-        } else {
-            this.channelName = readIdentifier();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            this.channelName = readString();
+        }
+        else {
+            this.channelName = readString(20);
+        }
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            //It is ignored, because we don't need it
+            int legacyDataSize = readShort();
         }
         this.data = readRemainingBytes();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_13) && clientVersion.isOlderThan(ClientVersion.V_1_13)) {
-            writeString(channelNameLegacy);
-        } else {
-            writeIdentifier(channelName);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            writeString(this.channelName);
         }
-        writeBytes(data);
+        else {
+            writeString(this.channelName, 20);
+        }
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            writeShort(this.data.length);
+        }
+        writeBytes(this.data);
     }
 
     @Override
     public void copy(WrapperPlayClientPluginMessage wrapper) {
-        this.channelNameLegacy = wrapper.channelNameLegacy;
         this.channelName = wrapper.channelName;
         this.data = wrapper.data;
     }
 
     /**
      * The channel name of the plugin message.
-     * <p>
-     * <b>IMPORTANT</b>
-     * <p>
-     * <h3>Modern Server and Client versions use {@code ResourceLocation} for the channel name.
-     * Older versions use {@code String} for the channel name.</h3>
-     *
-     * @param <T> The type of the channel name.
      * @return The channel name.
      */
-    public <T> T getChannelName() {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_13) && clientVersion.isOlderThan(ClientVersion.V_1_13)) {
-            return (T) channelNameLegacy;
-        }
-        return (T) channelName;
+    public String getChannelName() {
+        return channelName;
     }
 
     /**
      * Sets the channel name of the plugin message.
-     * <p>
-     * <b>IMPORTANT</b>
-     * <p>
-     * <h3>Modern Server and Client versions use {@code ResourceLocation} for the channel name.
-     * Older versions use {@code String} for the channel name.</h3>
-     *
-     * @param <T>         The type of the channel name.
      * @param channelName The channel name.
      */
-    public <T> void setChannelName(T channelName) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_13) && clientVersion.isOlderThan(ClientVersion.V_1_13)) {
-            this.channelNameLegacy = (String) channelName;
-        } else {
-            this.channelName = (ResourceLocation) channelName;
-        }
+    public void setChannelName(String channelName) {
+        this.channelName = channelName;
     }
 
     /**
