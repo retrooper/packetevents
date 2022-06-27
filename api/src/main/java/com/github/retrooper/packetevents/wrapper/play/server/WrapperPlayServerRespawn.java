@@ -40,7 +40,6 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     private boolean worldDebug;
     private boolean worldFlat;
     private boolean keepingAllPlayerData;
-    private ResourceLocation deathDimensionName;
     private WorldBlockPosition lastDeathPosition;
 
     //This should not be accessed
@@ -63,7 +62,6 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         this.worldDebug = worldDebug;
         this.worldFlat = worldFlat;
         this.keepingAllPlayerData = keepingAllPlayerData;
-        this.deathDimensionName = deathDimensionName;
         this.lastDeathPosition = lastDeathPosition;
     }
 
@@ -83,7 +81,6 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             worldFlat = readBoolean();
             keepingAllPlayerData = readBoolean();
             if (v1_19 && readBoolean()) {
-                deathDimensionName = readIdentifier();
                 lastDeathPosition = readWorldBlockPosition();
             }
         } else {
@@ -124,10 +121,8 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             writeBoolean(worldFlat);
             writeBoolean(keepingAllPlayerData);
             if (v1_19) {
-                boolean deathData = lastDeathPosition != null && deathDimensionName != null;
-                writeBoolean(deathData);
-                if (deathData) {
-                    writeIdentifier(deathDimensionName);
+                writeBoolean(lastDeathPosition != null);
+                if (lastDeathPosition != null) {
                     writeWorldBlockPosition(lastDeathPosition);
                 }
             }
@@ -247,15 +242,6 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     public void setKeepingAllPlayerData(boolean keepAllPlayerData) {
         this.keepingAllPlayerData = keepAllPlayerData;
-    }
-
-    @Nullable
-    public ResourceLocation getDeathDimensionName() {
-        return deathDimensionName;
-    }
-
-    public void setDeathDimensionName(@Nullable ResourceLocation deathDimensionName) {
-        this.deathDimensionName = deathDimensionName;
     }
 
     public @Nullable WorldBlockPosition getLastDeathPosition() {
