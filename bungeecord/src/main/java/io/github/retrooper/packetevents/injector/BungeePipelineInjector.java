@@ -62,7 +62,7 @@ public class BungeePipelineInjector implements ChannelInjector {
 
     @Override
     public void changeConnectionState(Object channel, @Nullable ConnectionState connectionState) {
-        //No adjustments to the pipeline necessary on bungee.
+        // No adjustments to the pipeline necessary on bungee.
         getUser(channel).setConnectionState(connectionState);
     }
 
@@ -115,8 +115,8 @@ public class BungeePipelineInjector implements ChannelInjector {
         for (Channel channel : connectionChannels) {
             channel.pipeline().remove(PacketEvents.CONNECTION_HANDLER_NAME);
         }
-        //Set<Channel> listeners = (Set<Channel>) LISTENERS_FIELD.get(ProxyServer.getInstance());
-        //TODO Unwrap the listeners
+        // Set<Channel> listeners = (Set<Channel>) LISTENERS_FIELD.get(ProxyServer.getInstance());
+        // TODO: Unwrap the listeners
     }
 
     @Override
@@ -140,12 +140,10 @@ public class BungeePipelineInjector implements ChannelInjector {
         encoder.user = user;
     }
 
-
     @Override
     public boolean hasPlayer(Object player) {
         Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player);
         PacketEventsDecoder decoder = (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-        return decoder != null
-                && decoder.player != null;
+        return decoder != null && decoder.player != null;
     }
 }

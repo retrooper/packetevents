@@ -23,10 +23,6 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 import io.github.retrooper.packetevents.bungee.factory.BungeePacketEventsBuilder;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -40,8 +36,7 @@ public final class PacketEventsPlugin extends Plugin {
 
     @Override
     public void onEnable() {
-
-        //Register your listeners
+        // Register your listeners
         PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
@@ -61,7 +56,6 @@ public final class PacketEventsPlugin extends Plugin {
         });
         PacketEvents.getAPI().init();
     }
-
 
     @Override
     public void onDisable() {
