@@ -752,10 +752,8 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void readMulti(MultiVersion version, ServerVersion target, Consumer<PacketWrapper<?>> first,
                           Consumer<PacketWrapper<?>> second) {
         if (serverVersion.is(version, target)) {
-            System.out.println("First");
             first.accept(this);
         } else {
-            System.out.println("Second");
             second.accept(this);
         }
     }
