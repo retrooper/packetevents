@@ -27,11 +27,11 @@ import org.jetbrains.annotations.Range;
 import java.util.*;
 
 public enum EquipmentSlot {
-    MAINHAND(0),
-    OFFHAND(0),
+    MAIN_HAND(0),
+    OFF_HAND(0),
     BOOTS(1),
     LEGGINGS(2),
-    CHESTPLATE(3),
+    CHEST_PLATE(3),
     HELMET(4);
 
     private static final EquipmentSlot[] VALUES;
