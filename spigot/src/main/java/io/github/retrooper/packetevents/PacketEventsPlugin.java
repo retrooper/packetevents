@@ -47,7 +47,6 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().load();
-        //TODO for 1.19 respawn, item thing
     }
 
     @Override
