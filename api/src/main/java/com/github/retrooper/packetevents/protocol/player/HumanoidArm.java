@@ -22,13 +22,13 @@ public enum HumanoidArm {
     LEFT,
     RIGHT;
 
+    private static final HumanoidArm[] VALUES = values();
+
     public int getId() {
         return this == RIGHT ? 0 : 1;
     }
 
-    public static final HumanoidArm[] VALUES = values(); // FIXME: it is illegal(unsafe) to expose this, make it private or eliminate it!
-
-    public static HumanoidArm getById(int handValue) {
-        return handValue == 0 ? RIGHT : LEFT;
+    public static HumanoidArm getById(int index) {
+        return VALUES[index];
     }
 }

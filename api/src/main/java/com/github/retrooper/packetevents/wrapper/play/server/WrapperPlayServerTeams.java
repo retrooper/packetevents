@@ -19,8 +19,10 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.scoreboard.*;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.ColorUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -32,100 +34,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
+// TODO: This also needs a whole recode
 public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams> {
     private String teamName;
     private TeamMode teamMode;
+    private @Nullable TeamInfo teamInfo;
     private Collection<String> players;
-    private Optional<ScoreBoardTeamInfo> teamInfo;
-
-    public enum OptionData {
-        NONE((byte) 0x00), FRIENDLY_FIRE((byte) 0x01), FRIENDLY_CAN_SEE_INVISIBLE((byte) 0x02), ALL((byte) 0x03);
-
-        private static final OptionData[] VALUES = values();
-        private final byte byteValue;
-
-        OptionData(byte value) {
-            byteValue = value;
-        }
-
-        public byte getByteValue() {
-            return byteValue;
-        }
-
-        @Nullable
-        public static OptionData fromValue(byte value) {
-            for (OptionData data : VALUES) {
-                if (data.getByteValue() == value) {
-                    return data;
-                }
-            }
-            return null;
-        }
-    }
-
-    public enum NameTagVisibility {
-        ALWAYS("always"), NEVER("never"), HIDE_FOR_OTHER_TEAMS("hideForOtherTeams"), HIDE_FOR_OWN_TEAM("hideForOwnTeam");
-
-        private final String id;
-
-        NameTagVisibility(String id) {
-            this.id = id;
-        }
-
-        @Nullable
-        public static NameTagVisibility fromID(String id) {
-            for (NameTagVisibility value : NameTagVisibility.values()) {
-                if (value.id.equalsIgnoreCase(id)) {
-                    return value;
-                }
-            }
-            return null;
-        }
-
-        public String getId() {
-            return id;
-        }
-    }
-
-    public enum CollisionRule {
-        ALWAYS("always"), NEVER("never"), PUSH_OTHER_TEAMS("pushOtherTeams"), PUSH_OWN_TEAM("pushOwnTeam");
-
-        private final String id;
-
-        CollisionRule(String id) {
-            this.id = id;
-        }
-
-        @Nullable
-        public static CollisionRule fromID(String id) {
-            for (CollisionRule value : CollisionRule.values()) {
-                if (value.id.equalsIgnoreCase(id)) {
-                    return value;
-                }
-            }
-            return null;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-    }
-
-    public enum TeamMode {
-        CREATE, REMOVE, UPDATE, ADD_ENTITIES, REMOVE_ENTITIES;
-    }
 
     public WrapperPlayServerTeams(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerTeams(String teamName, TeamMode teamMode, Optional<ScoreBoardTeamInfo> teamInfo, String... entities) {
+    public WrapperPlayServerTeams(String teamName, TeamMode teamMode, String... entities) {
+        this(teamName, teamMode, null, Arrays.asList(entities));
+    }
+
+    public WrapperPlayServerTeams(String teamName, TeamMode teamMode, @Nullable TeamInfo teamInfo, String... entities) {
         this(teamName, teamMode, teamInfo, Arrays.asList(entities));
     }
 
-    public WrapperPlayServerTeams(String teamName, TeamMode teamMode, Optional<ScoreBoardTeamInfo> teamInfo, Collection<String> entities) {
+    public WrapperPlayServerTeams(String teamName, TeamMode teamMode, @Nullable TeamInfo teamInfo, Collection<String> entities) {
         super(PacketType.Play.Server.TEAMS);
         this.teamName = teamName;
         this.teamMode = teamMode;
@@ -136,48 +66,49 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     @Override
     public void read() {
         teamName = readString(16);
-        teamMode = TeamMode.values()[readByte()];
-        ScoreBoardTeamInfo info = null;
-        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
-            Component displayName, prefix, suffix;
-            OptionData optionData;
-            NameTagVisibility nameTagVisibility;
-            CollisionRule collisionRule = null;
-            NamedTextColor color;
-            if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-                displayName = AdventureSerializer.fromLegacyFormat(readString());
-                prefix = AdventureSerializer.fromLegacyFormat(readString());
-                suffix = AdventureSerializer.fromLegacyFormat(readString());
-                optionData = OptionData.values()[readByte()];
-                if (serverVersion == ServerVersion.V_1_7_10) {
-                    nameTagVisibility = NameTagVisibility.ALWAYS;
-                    color = NamedTextColor.WHITE;
-                } else {
-                    nameTagVisibility = NameTagVisibility.fromID(readString());
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9))
-                        collisionRule = CollisionRule.fromID(readString());
-                    color = ColorUtil.fromId(readByte());
-                }
-            } else {
-                displayName = readComponent();
-                optionData = OptionData.fromValue(readByte());
-                nameTagVisibility = NameTagVisibility.fromID(readString());
-                collisionRule = CollisionRule.fromID(readString());
-                color = ColorUtil.fromId(readByte());
-                prefix = readComponent();
-                suffix = readComponent();
-            }
-            info = new ScoreBoardTeamInfo(displayName, prefix, suffix, nameTagVisibility, collisionRule == null ? CollisionRule.ALWAYS : collisionRule, color, optionData);
+        teamMode = TeamMode.getById(readByte());
+        AtomicReference<TeamInfo> info = new AtomicReference<>();
+        if (teamMode == TeamMode.ADD || teamMode == TeamMode.CHANGE) {
+            readMulti(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_13,
+                    packetWrapper -> {
+                        Component displayName = readComponent();
+                        OptionData optionData = OptionData.fromValue(readByte());
+                        NameTagVisibility nameTagVisibility = NameTagVisibility.getByName(readString());
+                        CollisionRule collisionRule = CollisionRule.getByName(readString());
+                        NamedTextColor color = ColorUtil.fromId(readByte());
+                        Component prefix = readComponent();
+                        Component suffix = readComponent();
+                        info.set(new TeamInfo(displayName, prefix, suffix, nameTagVisibility,
+                                collisionRule == null ? CollisionRule.ALWAYS : collisionRule, color, optionData));
+                    }, packetWrapper -> {
+                        Component displayName = AdventureSerializer.fromLegacyFormat(readString());
+                        Component prefix = AdventureSerializer.fromLegacyFormat(readString());
+                        Component suffix = AdventureSerializer.fromLegacyFormat(readString());
+                        OptionData optionData = OptionData.fromValue(readByte());
+                        NameTagVisibility nameTagVisibility;
+                        NamedTextColor color;
+                        CollisionRule collisionRule = null;
+                        if (serverVersion == ServerVersion.V_1_7_10) {
+                            nameTagVisibility = NameTagVisibility.ALWAYS;
+                            color = NamedTextColor.WHITE;
+                        } else {
+                            nameTagVisibility = NameTagVisibility.getByName(readString());
+                            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                                collisionRule = CollisionRule.getByName(readString());
+                            }
+                            color = ColorUtil.fromId(readByte());
+                        }
+                        info.set(new TeamInfo(displayName, prefix, suffix, nameTagVisibility,
+                                collisionRule == null ? CollisionRule.ALWAYS : collisionRule, color, optionData));
+                    });
         }
-        teamInfo = Optional.ofNullable(info);
+
+        teamInfo = info.get();
         players = new ArrayList<>();
-        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.ADD_ENTITIES || teamMode == TeamMode.REMOVE_ENTITIES) {
-            int size;
-            if (serverVersion == ServerVersion.V_1_7_10) {
-                size = readShort();
-            } else {
-                size = readVarInt();
-            }
+        if (teamMode == TeamMode.ADD || teamMode == TeamMode.JOIN || teamMode == TeamMode.LEAVE) {
+            int size = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
+                    PacketWrapper::readVarInt,
+                    PacketWrapper::readShort);
             for (int i = 0; i < size; i++) {
                 players.add(readString());
             }
@@ -188,33 +119,34 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     public void write() {
         writeString(teamName, 16);
         writeByte(teamMode.ordinal());
-        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
-            ScoreBoardTeamInfo info = teamInfo.orElse(new ScoreBoardTeamInfo(Component.empty(), Component.empty(), Component.empty(), NameTagVisibility.ALWAYS, CollisionRule.ALWAYS, NamedTextColor.WHITE, OptionData.NONE));
+        if (teamMode == TeamMode.ADD || teamMode == TeamMode.CHANGE) {
+            TeamInfo info = teamInfo == null ? new TeamInfo(null, null, null,
+                    NameTagVisibility.ALWAYS, CollisionRule.ALWAYS, NamedTextColor.WHITE, OptionData.NONE) : teamInfo;
             if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-                writeString(AdventureSerializer.asVanilla(info.displayName));
-                writeString(AdventureSerializer.asVanilla(info.prefix));
-                writeString(AdventureSerializer.asVanilla(info.suffix));
-                writeByte(info.optionData.ordinal());
+                writeString(AdventureSerializer.asVanilla(info.getDisplayName()));
+                writeString(AdventureSerializer.asVanilla(info.getPrefix()));
+                writeString(AdventureSerializer.asVanilla(info.getSuffix()));
+                writeByte(info.getOptionData().ordinal());
                 if (serverVersion == ServerVersion.V_1_7_10) {
-                    writeString(NameTagVisibility.ALWAYS.getId());
+                    writeString(NameTagVisibility.ALWAYS.getName());
                     writeByte(15);
                 } else {
-                    writeString(info.tagVisibility.id);
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) writeString(info.collisionRule.getId());
-                    writeByte(ColorUtil.getId(info.color));
+                    writeString(info.getTagVisibility().getName());
+                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) writeString(info.getCollisionRule().getName());
+                    writeByte(ColorUtil.getId(info.getColor()));
                 }
             } else {
-                writeComponent(info.displayName);
-                writeByte(info.optionData.getByteValue());
-                writeString(info.tagVisibility.id);
-                writeString(info.collisionRule.getId());
-                writeByte(ColorUtil.getId(info.color));
-                writeComponent(info.prefix);
-                writeComponent(info.suffix);
+                writeComponent(info.getDisplayName());
+                writeByte(info.getOptionData().getByteValue());
+                writeString(info.getTagVisibility().getName());
+                writeString(info.getCollisionRule().getName());
+                writeByte(ColorUtil.getId(info.getColor()));
+                writeComponent(info.getPrefix());
+                writeComponent(info.getSuffix());
             }
         }
 
-        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.ADD_ENTITIES || teamMode == TeamMode.REMOVE_ENTITIES) {
+        if (teamMode == TeamMode.ADD || teamMode == TeamMode.JOIN || teamMode == TeamMode.LEAVE) {
             if (serverVersion == ServerVersion.V_1_7_10) {
                 writeShort(players.size());
             } else {
@@ -230,14 +162,13 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     public void copy(WrapperPlayServerTeams wrapper) {
         teamName = wrapper.teamName;
         teamMode = wrapper.teamMode;
-        players = wrapper.players;
         teamInfo = wrapper.teamInfo;
+        players = wrapper.players;
     }
 
     public String getTeamName() {
         return teamName;
     }
-
 
     public void setTeamName(String teamName) {
         this.teamName = teamName;
@@ -259,96 +190,11 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         this.players = players;
     }
 
-    public Optional<ScoreBoardTeamInfo> getTeamInfo() {
-        return teamInfo;
+    public Optional<TeamInfo> getTeamInfo() {
+        return Optional.ofNullable(teamInfo);
     }
 
-    public void setTeamInfo(Optional<ScoreBoardTeamInfo> teamInfo) {
+    public void setTeamInfo(@Nullable TeamInfo teamInfo) {
         this.teamInfo = teamInfo;
     }
-
-    public static class ScoreBoardTeamInfo {
-
-        private Component displayName;
-        private Component prefix;
-        private Component suffix;
-        private NameTagVisibility tagVisibility;
-        private CollisionRule collisionRule;
-        private NamedTextColor color;
-        private OptionData optionData;
-
-        public ScoreBoardTeamInfo(Component displayName, @Nullable Component prefix, @Nullable Component suffix, NameTagVisibility tagVisibility, CollisionRule collisionRule, NamedTextColor color, OptionData optionData) {
-            this.displayName = displayName;
-            if (prefix == null) {
-                prefix = Component.empty();
-            }
-            if (suffix == null) {
-                suffix = Component.empty();
-            }
-            this.prefix = prefix;
-            this.suffix = suffix;
-            this.tagVisibility = tagVisibility;
-            this.collisionRule = collisionRule;
-            this.color = color;
-            this.optionData = optionData;
-        }
-
-        public Component getDisplayName() {
-            return displayName;
-        }
-
-        public void setDisplayName(Component displayName) {
-            this.displayName = displayName;
-        }
-
-        public Component getPrefix() {
-            return prefix;
-        }
-
-        public void setPrefix(Component prefix) {
-            this.prefix = prefix;
-        }
-
-        public Component getSuffix() {
-            return suffix;
-        }
-
-        public void setSuffix(Component suffix) {
-            this.suffix = suffix;
-        }
-
-        public NameTagVisibility getTagVisibility() {
-            return tagVisibility;
-        }
-
-        public void setTagVisibility(NameTagVisibility tagVisibility) {
-            this.tagVisibility = tagVisibility;
-        }
-
-        public CollisionRule getCollisionRule() {
-            return collisionRule;
-        }
-
-        public void setCollisionRule(CollisionRule collisionRule) {
-            this.collisionRule = collisionRule;
-        }
-
-        public NamedTextColor getColor() {
-            return color;
-        }
-
-        public void setColor(NamedTextColor color) {
-            this.color = color;
-        }
-
-        public OptionData getOptionData() {
-            return optionData;
-        }
-
-        public void setOptionData(OptionData optionData) {
-            this.optionData = optionData;
-        }
-
-    }
-
 }

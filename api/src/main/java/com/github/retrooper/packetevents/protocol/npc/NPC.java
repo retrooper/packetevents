@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.player.*;
+import com.github.retrooper.packetevents.protocol.scoreboard.*;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.kyori.adventure.text.Component;
@@ -71,7 +72,9 @@ public class NPC {
     }
 
     public void spawn(Object channel) {
-        if (hasSpawned(channel)) return;
+        if (hasSpawned(channel)) {
+            return;
+        }
         WrapperPlayServerPlayerInfo playerInfoPacket =
                 new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getPlayerInfoData());
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoPacket);
@@ -91,8 +94,10 @@ public class NPC {
     }
 
     public void despawn(Object channel) {
-        if (!hasSpawned(channel)) return;
-        //TODO Confirm if we need to destroy the team too
+        if (!hasSpawned(channel)) {
+            return;
+        }
+        // TODO: Confirm if we need to destroy the team too
         WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
         channels.remove(channel);
@@ -213,9 +218,7 @@ public class NPC {
         for (Object channel : channels) {
             //Destroy team
             WrapperPlayServerTeams removeTeam =
-                    new WrapperPlayServerTeams("custom_name_team",
-                            WrapperPlayServerTeams.TeamMode.REMOVE,
-                            Optional.empty());
+                    new WrapperPlayServerTeams("custom_name_team", TeamMode.REMOVE, "");
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, removeTeam);
 
             if (npc.getNameColor() != null || npc.getPrefixName() != null
@@ -369,17 +372,16 @@ public class NPC {
 
     private WrapperPlayServerTeams generateTeamsData() {
         return new WrapperPlayServerTeams("custom_name_team",
-                WrapperPlayServerTeams.TeamMode.CREATE,
-                Optional.of(
-                        new WrapperPlayServerTeams.ScoreBoardTeamInfo(
-                                Component.text("custom_name_team"),
-                                prefixName,
-                                suffixName,
-                                WrapperPlayServerTeams.NameTagVisibility.ALWAYS,
-                                WrapperPlayServerTeams.CollisionRule.ALWAYS,
-                                nameColor,
-                                WrapperPlayServerTeams.OptionData.NONE
-                        )),
+                TeamMode.ADD,
+                new TeamInfo(
+                        Component.text("custom_name_team"),
+                        prefixName,
+                        suffixName,
+                        NameTagVisibility.ALWAYS,
+                        CollisionRule.ALWAYS,
+                        nameColor,
+                        OptionData.NONE
+                ),
                 getProfile().getName());
     }
 

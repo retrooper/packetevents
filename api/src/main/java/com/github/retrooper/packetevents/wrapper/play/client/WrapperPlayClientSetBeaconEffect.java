@@ -40,8 +40,8 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
     @Override
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            this.primaryEffect = readOptionalEffect();
-            this.secondaryEffect = readOptionalEffect();
+            this.primaryEffect = readOptional(PacketWrapper::readVarInt);
+            this.secondaryEffect = readOptional(PacketWrapper::readVarInt);
         } else {
             this.primaryEffect = readVarInt();
             this.secondaryEffect = readVarInt();
@@ -51,8 +51,8 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
     @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeOptionalEffect(primaryEffect);
-            writeOptionalEffect(secondaryEffect);
+            writeOptional(primaryEffect, PacketWrapper::writeVarInt);
+            writeOptional(secondaryEffect, PacketWrapper::writeVarInt);
         } else {
             writeVarInt(primaryEffect);
             writeVarInt(secondaryEffect);
@@ -79,19 +79,5 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
 
     public void setSecondaryEffect(int secondaryEffect) {
         this.secondaryEffect = secondaryEffect;
-    }
-
-    private int readOptionalEffect() {
-        if (readBoolean()) {
-            return readVarInt();
-        }
-        return -1;
-    }
-
-    private void writeOptionalEffect(int effect) {
-        writeBoolean(effect != -1);
-        if (effect != -1) {
-            writeVarInt(effect);
-        }
     }
 }

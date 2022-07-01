@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
@@ -43,27 +44,25 @@ public class WrapperPlayServerBlockBreakAnimation extends PacketWrapper<WrapperP
     @Override
     public void read() {
         entityID = readVarInt();
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            int x = readInt();
-            int y = readInt();
-            int z = readInt();
-            blockPosition = new Vector3i(x, y, z);
-        } else {
-            blockPosition = readBlockPosition();
-        }
+        blockPosition = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, PacketWrapper::readBlockPosition, packetWrapper -> {
+            int x = packetWrapper.readInt();
+            int y = packetWrapper.readInt();
+            int z = packetWrapper.readInt();
+            return new Vector3i(x, y, z);
+        });
         destroyStage = (byte) readUnsignedByte();
     }
 
     @Override
     public void write() {
         writeVarInt(entityID);
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeInt(blockPosition.x);
-            writeInt(blockPosition.y);
-            writeInt(blockPosition.z);
-        } else {
-            writeBlockPosition(blockPosition);
-        }
+        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, blockPosition,
+                PacketWrapper::writeBlockPosition,
+                (packetWrapper, vector3i) -> {
+                    packetWrapper.writeInt(blockPosition.x);
+                    packetWrapper.writeInt(blockPosition.y);
+                    packetWrapper.writeInt(blockPosition.z);
+                });
         writeByte(destroyStage);
     }
 

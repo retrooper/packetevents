@@ -21,23 +21,26 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.resourcepack.ResourcePacketResult;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPlayClientResourcePackStatus> {
-    private String hash;
-    private Result result;
+    private @Nullable String hash;
+    private ResourcePacketResult result;
 
     public WrapperPlayClientResourcePackStatus(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientResourcePackStatus(Result result) {
-        super(PacketType.Play.Client.RESOURCE_PACK_STATUS);
-        this.result = result;
+    public WrapperPlayClientResourcePackStatus(ResourcePacketResult result) {
+        this(null, result);
     }
 
     @Deprecated
-    public WrapperPlayClientResourcePackStatus(String hash, Result result) {
+    public WrapperPlayClientResourcePackStatus(@Nullable String hash, ResourcePacketResult result) {
         super(PacketType.Play.Client.RESOURCE_PACK_STATUS);
         this.hash = hash;
         this.result = result;
@@ -46,13 +49,9 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
     @Override
     public void read() {
         if (serverVersion.isOlderThan(ServerVersion.V_1_10)) {
-            //For now ignore hash, maybe make optional
             this.hash = readString(40);
-        } else {
-            this.hash = "";
         }
-        int resultIndex = readVarInt();
-        this.result = Result.VALUES[resultIndex];
+        this.result = ResourcePacketResult.getById(readVarInt());
     }
 
     @Override
@@ -69,28 +68,19 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
         this.result = wrapper.result;
     }
 
-    public Result getResult() {
+    public ResourcePacketResult getResult() {
         return result;
     }
 
-    public void setResult(Result result) {
+    public void setResult(ResourcePacketResult result) {
         this.result = result;
     }
 
-    public String getHash() {
-        return hash;
+    public Optional<String> getHash() {
+        return Optional.ofNullable(hash);
     }
 
-    public void setHash(String hash) {
+    public void setHash(@Nullable String hash) {
         this.hash = hash;
-    }
-
-    public enum Result {
-        SUCCESSFULLY_LOADED,
-        DECLINED,
-        FAILED_DOWNLOAD,
-        ACCEPTED;
-
-        public static final Result[] VALUES = values();
     }
 }

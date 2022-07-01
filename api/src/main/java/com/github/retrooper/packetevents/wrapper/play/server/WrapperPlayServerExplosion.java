@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.MathUtil;
@@ -32,7 +33,7 @@ import java.util.List;
 public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerExplosion> {
     private Vector3f position;
     private float strength;
-    //Chunk posiitons?
+    // Chunk posiitons?
     private List<Vector3i> records;
     private Vector3f playerMotion;
 
@@ -55,7 +56,9 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         float z = readFloat();
         position = new Vector3f(x, y, z);
         strength = readFloat();
-        int recordsLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? readVarInt() : readInt();
+        int recordsLength = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_17,
+                PacketWrapper::readVarInt,
+                PacketWrapper::readInt);
         records = new ArrayList<>(recordsLength);
 
         int floorX = (int) Math.floor(position.x);
@@ -82,20 +85,18 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         writeFloat(position.z);
         writeFloat(strength);
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            writeVarInt(records.size());
-        } else {
-            writeInt(records.size());
-        }
+        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_17, records.size(),
+                PacketWrapper::writeVarInt,
+                PacketWrapper::writeInt);
 
         int floorX = MathUtil.floor(position.x);
         int floorY = MathUtil.floor(position.y);
         int floorZ = MathUtil.floor(position.z);
 
-        for (Vector3i record : records) {
-            writeByte(record.x - floorX);
-            writeByte(record.y - floorY);
-            writeByte(record.z - floorZ);
+        for (Vector3i vector3i : records) {
+            writeByte(vector3i.x - floorX);
+            writeByte(vector3i.y - floorY);
+            writeByte(vector3i.z - floorZ);
         }
 
         writeFloat(playerMotion.x);

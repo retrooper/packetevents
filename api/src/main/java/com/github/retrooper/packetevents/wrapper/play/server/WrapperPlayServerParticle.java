@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
@@ -59,14 +60,12 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     @Override
     public void read() {
         int particleTypeId = 0;
-        ParticleType particleType;
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            String particleName = readString(64);
-            particleType = ParticleTypes.getByName("minecraft:" + particleName);
-        } else {
-            particleTypeId = readInt();
-            particleType = ParticleTypes.getById(serverVersion.toClientVersion(), particleTypeId);
-        }
+        ParticleType particleType = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_19,
+                MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
+                packetWrapper -> ParticleTypes.getById(serverVersion.toClientVersion(), packetWrapper.readVarInt()),
+                packetWrapper -> ParticleTypes.getById(serverVersion.toClientVersion(), packetWrapper.readInt()),
+                packetWrapper -> ParticleTypes.getByName("minecraft:" + packetWrapper.readString(64)));
+
         longDistance = readBoolean();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
             position = new Vector3d(readDouble(), readDouble(), readDouble());
@@ -103,12 +102,11 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
 
     @Override
     public void write() {
-        //TODO on 1.7 we get particle type by 64 len string
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeString(particle.getType().getName().getKey(), 64);
-        } else {
-            writeInt(particle.getType().getId(serverVersion.toClientVersion()));
-        }
+        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_19,
+                MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, particle.getType(),
+                (packetWrapper, particleType) -> packetWrapper.writeVarInt(particleType.getId(serverVersion.toClientVersion())),
+                (packetWrapper, particleType) -> packetWrapper.writeInt(particleType.getId(serverVersion.toClientVersion())),
+                (packetWrapper, particleType) -> packetWrapper.writeString(particleType.getName().getKey(), 64));
         writeBoolean(longDistance);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
             writeDouble(position.getX());
