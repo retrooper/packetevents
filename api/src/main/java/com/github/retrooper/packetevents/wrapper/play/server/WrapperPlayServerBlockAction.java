@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
@@ -28,57 +27,57 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServerBlockAction> {
     private Vector3i blockPosition;
-    private int actionId;
+    private int actionID;
     private int actionData;
-    private int blockTypeId;
+    private int blockTypeID;
 
     public WrapperPlayServerBlockAction(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerBlockAction(Vector3i blockPosition, int actionId, int actionParam, int blockTypeId) {
+    public WrapperPlayServerBlockAction(Vector3i blockPosition, int actionID, int actionParam, int blockTypeID) {
         super(PacketType.Play.Server.BLOCK_ACTION);
         this.blockPosition = blockPosition;
-        this.actionId = actionId;
+        this.actionID = actionID;
         this.actionData = actionParam;
-        this.blockTypeId = blockTypeId;
+        this.blockTypeID = blockTypeID;
     }
 
     @Override
     public void read() {
-        this.blockPosition = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
-                PacketWrapper::readBlockPosition,
-                packetWrapper -> {
-                    int x = packetWrapper.readInt();
-                    int y = packetWrapper.readShort();
-                    int z = packetWrapper.readInt();
-                    return new Vector3i(x, y, z);
-                });
-        this.actionId = readUnsignedByte();
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            int x = readInt();
+            int y = readShort();
+            int z = readInt();
+            blockPosition = new Vector3i(x, y, z);
+        } else {
+            this.blockPosition = readBlockPosition();
+        }
+        this.actionID = readUnsignedByte();
         this.actionData = readUnsignedByte();
-        this.blockTypeId = readVarInt();
+        this.blockTypeID = readVarInt();
     }
 
     @Override
     public void write() {
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, blockPosition,
-                PacketWrapper::writeBlockPosition,
-                (packetWrapper, vector3i) -> {
-                    packetWrapper.writeInt(blockPosition.x);
-                    packetWrapper.writeShort(blockPosition.y);
-                    packetWrapper.writeInt(blockPosition.z);
-                });
-        writeByte(actionId);
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            writeInt(blockPosition.x);
+            writeShort(blockPosition.y);
+            writeInt(blockPosition.z);
+        } else {
+            writeBlockPosition(blockPosition);
+        }
+        writeByte(actionID);
         writeByte(actionData);
-        writeVarInt(blockTypeId);
+        writeVarInt(blockTypeID);
     }
 
     @Override
     public void copy(WrapperPlayServerBlockAction wrapper) {
         this.blockPosition = wrapper.blockPosition;
-        this.actionId = wrapper.actionId;
+        this.actionID = wrapper.actionID;
         this.actionData = wrapper.actionData;
-        this.blockTypeId = wrapper.blockTypeId;
+        this.blockTypeID = wrapper.blockTypeID;
     }
 
     public Vector3i getBlockPosition() {
@@ -90,11 +89,11 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
     }
 
     public int getActionId() {
-        return actionId;
+        return actionID;
     }
 
     public void setActionId(int actionID) {
-        this.actionId = actionID;
+        this.actionID = actionID;
     }
 
     public int getActionData() {
@@ -106,18 +105,18 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
     }
 
     public int getBlockTypeId() {
-        return blockTypeId;
+        return blockTypeID;
     }
 
     public void setBlockTypeId(int blockTypeID) {
-        this.blockTypeId = blockTypeID;
+        this.blockTypeID = blockTypeID;
     }
 
     public WrappedBlockState getBlockType() {
-        return WrappedBlockState.getByGlobalId(serverVersion.toClientVersion(), blockTypeId);
+        return WrappedBlockState.getByGlobalId(serverVersion.toClientVersion(), blockTypeID);
     }
 
     public void setBlockType(WrappedBlockState blockType) {
-        this.blockTypeId = blockType.getGlobalId();
+        this.blockTypeID = blockType.getGlobalId();
     }
 }

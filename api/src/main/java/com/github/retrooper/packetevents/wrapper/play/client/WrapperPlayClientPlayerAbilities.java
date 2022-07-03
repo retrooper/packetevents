@@ -19,28 +19,27 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.Optional;
+
 public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayClientPlayerAbilities> {
     private boolean flying;
-    private boolean godMode;
-    private boolean flightAllowed;
-    private boolean creativeMode;
-    private float flySpeed;
-    private float walkSpeed;
+    private Optional<Boolean> godMode;
+    private Optional<Boolean> flightAllowed;
+    private Optional<Boolean> creativeMode;
+    private Optional<Float> flySpeed;
+    private Optional<Float> walkSpeed;
 
     public WrapperPlayClientPlayerAbilities(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPlayerAbilities(boolean flying) {
-        this(flying, false, false, false, 0.0F, 0.0F);
-    }
-
-    public WrapperPlayClientPlayerAbilities(boolean flying, boolean godMode, boolean flightAllowed, boolean creativeMode, float flySpeed, float walkSpeed) {
+    public WrapperPlayClientPlayerAbilities(boolean flying, Optional<Boolean> godMode, Optional<Boolean> flightAllowed,
+                                            Optional<Boolean> creativeMode,
+                                            Optional<Float> flySpeed, Optional<Float> walkSpeed) {
         super(PacketType.Play.Client.PLAYER_ABILITIES);
         this.flying = flying;
         this.godMode = godMode;
@@ -50,47 +49,58 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
         this.walkSpeed = walkSpeed;
     }
 
+    public WrapperPlayClientPlayerAbilities(boolean flying) {
+        this(flying, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+    }
+
     @Override
     public void read() {
         byte mask = readByte();
-        readMulti(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_16, packetWrapper -> flying = (mask & 0x02) != 0, packetWrapper -> {
-            godMode = (mask & 0x01) != 0;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             flying = (mask & 0x02) != 0;
-            flightAllowed = (mask & 0x04) != 0;
-            creativeMode = (mask & 0x08) != 0;
-            flySpeed = readFloat();
-            walkSpeed = readFloat();
-        });
+            godMode = Optional.empty();
+            flightAllowed = Optional.empty();
+            creativeMode = Optional.empty();
+            flySpeed = Optional.empty();
+            walkSpeed = Optional.empty();
+        } else {
+            godMode = Optional.of((mask & 0x01) != 0);
+            flying = (mask & 0x02) != 0;
+            flightAllowed = Optional.of((mask & 0x04) != 0);
+            creativeMode = Optional.of((mask & 0x08) != 0);
+            flySpeed = Optional.of(readFloat());
+            walkSpeed = Optional.of(readFloat());
+        }
+
     }
 
     @Override
     public void write() {
-        byte mask = (byte) (flying ? 0x02 : 0x00);
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_16, mask,
-                (packetWrapper, aByte) -> writeByte(aByte),
-                (packetWrapper, aByte) -> {
-                    byte maskNew = aByte.byteValue();
-                    maskNew = 0x00;
-                    if (godMode) {
-                        maskNew |= 0x01;
-                    }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+            byte mask = (byte) (flying ? 0x02 : 0x00);
+            writeByte(mask);
+        } else {
+            byte mask = 0x00;
+            if (godMode.orElse(false)) {
+                mask |= 0x01;
+            }
 
-                    if (flying) {
-                        maskNew |= 0x02;
-                    }
+            if (flying) {
+                mask |= 0x02;
+            }
 
-                    if (flightAllowed) {
-                        maskNew |= 0x04;
-                    }
+            if (flightAllowed.orElse(false)) {
+                mask |= 0x04;
+            }
 
-                    if (creativeMode) {
-                        maskNew |= 0x08;
-                    }
-                    writeByte(maskNew);
-                    // These are my guesses of default values, don't cry, just pass in the fly/walk speed next time :0
-                    writeFloat(flySpeed == 0.0F ? 0.1F : flySpeed);
-                    writeFloat(walkSpeed == 0.0F ? 0.2F : walkSpeed);
-                });
+            if (creativeMode.orElse(false)) {
+                mask |= 0x08;
+            }
+            writeByte(mask);
+            //These are my guesses of default values, don't cry, just pass in the fly/walk speed next time :0
+            writeFloat(flySpeed.orElse(0.1f));
+            writeFloat(walkSpeed.orElse(0.2f));
+        }
     }
 
     @Override
@@ -111,43 +121,43 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
         this.flying = flying;
     }
 
-    public boolean isInGodMode() {
+    public Optional<Boolean> isInGodMode() {
         return godMode;
     }
 
-    public void setInGodMode(boolean godMode) {
+    public void setInGodMode(Optional<Boolean> godMode) {
         this.godMode = godMode;
     }
 
-    public boolean isFlightAllowed() {
+    public Optional<Boolean> isFlightAllowed() {
         return flightAllowed;
     }
 
-    public void setFlightAllowed(boolean flightAllowed) {
+    public void setFlightAllowed(Optional<Boolean> flightAllowed) {
         this.flightAllowed = flightAllowed;
     }
 
-    public boolean isInCreativeMode() {
+    public Optional<Boolean> isInCreativeMode() {
         return creativeMode;
     }
 
-    public void setCreativeMode(boolean creativeMode) {
+    public void setCreativeMode(Optional<Boolean> creativeMode) {
         this.creativeMode = creativeMode;
     }
 
-    public float getFlySpeed() {
+    public Optional<Float> getFlySpeed() {
         return flySpeed;
     }
 
-    public void setFlySpeed(float flySpeed) {
+    public void setFlySpeed(Optional<Float> flySpeed) {
         this.flySpeed = flySpeed;
     }
 
-    public float getWalkSpeed() {
+    public Optional<Float> getWalkSpeed() {
         return walkSpeed;
     }
 
-    public void setWalkSpeed(float walkSpeed) {
+    public void setWalkSpeed(Optional<Float> walkSpeed) {
         this.walkSpeed = walkSpeed;
     }
 }

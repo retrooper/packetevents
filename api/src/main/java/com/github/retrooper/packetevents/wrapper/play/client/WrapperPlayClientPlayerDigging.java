@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
@@ -47,20 +46,23 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
 
     @Override
     public void read() {
-        action = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_9,
-                packetWrapper -> DiggingAction.getById(readVarInt()),
-                packetWrapper -> DiggingAction.getById(readByte()));
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            action = DiggingAction.getById(readVarInt());
+        } else {
+            action = DiggingAction.getById(readByte());
+        }
 
-        blockPosition = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
-                PacketWrapper::readBlockPosition,
-                packetWrapper -> {
-                    int x = readInt();
-                    int y = readUnsignedByte();
-                    int z = readInt();
-                    return new Vector3i(x, y, z);
-                });
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            blockPosition = readBlockPosition();
+        } else {
+            int x = readInt();
+            int y = readUnsignedByte();
+            int z = readInt();
+            blockPosition = new Vector3i(x, y, z);
+        }
+        short face = readUnsignedByte();
+        blockFace = BlockFace.getBlockFaceByValue(face);
 
-        blockFace = BlockFace.getBlockFaceByValue(readUnsignedByte());
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             sequence = readVarInt();
         }
@@ -68,19 +70,17 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
 
     @Override
     public void write() {
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, action.getId(),
-                PacketWrapper::writeVarInt,
-                PacketWrapper::writeByte);
-
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, blockPosition,
-                PacketWrapper::writeBlockPosition,
-                (packetWrapper, vector3i) -> {
-                    packetWrapper.writeInt(vector3i.x);
-                    packetWrapper.writeByte(vector3i.y);
-                    packetWrapper.writeInt(vector3i.z);
-                });
-
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            writeVarInt(action.getId());
+            writeBlockPosition(blockPosition);
+        } else {
+            writeByte(action.getId());
+            writeInt(blockPosition.x);
+            writeByte(blockPosition.y);
+            writeInt(blockPosition.z);
+        }
         writeByte(blockFace.getFaceValue());
+
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeVarInt(sequence);
         }

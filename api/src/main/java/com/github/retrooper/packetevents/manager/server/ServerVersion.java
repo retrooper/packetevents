@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.manager.server;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 
@@ -241,8 +242,6 @@ public enum ServerVersion {
     @Experimental
     public boolean is(@NotNull MultiVersion version, @NotNull ServerVersion target) {
         switch (version) {
-            case EQUALS:
-                return protocolVersion == target.protocolVersion;
             case NEWER_THAN:
                 return isNewerThan(target);
             case NEWER_THAN_OR_EQUALS:
@@ -253,5 +252,27 @@ public enum ServerVersion {
                 return isOlderThanOrEquals(target);
         }
         return false;
+    }
+
+    /**
+     * This enum contains all possible comparison types for server versions.
+     */
+    public enum MultiVersion {
+        /*
+        The server version is newer than the compared server version.
+         */
+        NEWER_THAN,
+        /*
+        The server version is newer than or equal to the compared server version.
+         */
+        NEWER_THAN_OR_EQUALS,
+        /*
+        The server version is older than the compared server version.
+         */
+        OLDER_THAN,
+        /*
+        The server version is older than or equal to the compared server version.
+         */
+        OLDER_THAN_OR_EQUALS;
     }
 }

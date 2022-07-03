@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
@@ -76,9 +75,11 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void read() {
-        this.containerId = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_14,
-                PacketWrapper::readVarInt,
-                PacketWrapper::readUnsignedByte);
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
+            this.containerId = readUnsignedByte();
+        } else {
+            this.containerId = readVarInt();
+        }
 
         // 1.7 has a very different packet format
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
@@ -94,26 +95,27 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         }
 
         // Known to be 1.8 or above
-        readMulti(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_14,
-                packetWrapper -> {
-                    this.type = packetWrapper.readVarInt();
-                    this.title = packetWrapper.readComponentJSON();
-                }, packetWrapper -> {
-                    this.legacyType = packetWrapper.readString();
-                    this.title = packetWrapper.readComponentJSON();
-                    this.legacySlots = packetWrapper.readUnsignedByte();
-                    // This is only sent for horses
-                    if (legacyType.equals("EntityHorse")) {
-                        this.horseId = packetWrapper.readInt();
-                    }
-                });
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+            this.type = readVarInt();
+            this.title = readComponentJSON();
+        } else {
+            this.legacyType = readString();
+            this.title = readComponentJSON();
+            this.legacySlots = readUnsignedByte();
+            // This is only sent for horses
+            if (legacyType.equals("EntityHorse")) {
+                this.horseId = readInt();
+            }
+        }
     }
 
     @Override
     public void write() {
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_14, containerId,
-                PacketWrapper::writeVarInt,
-                PacketWrapper::writeByte);
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
+            writeByte(this.containerId);
+        } else {
+            writeVarInt(this.containerId);
+        }
 
         // 1.7 has a very different packet format
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
@@ -204,10 +206,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
     }
 
     public Component getTitle() {
-        // TODO: That doesn't make any sense somehow?
-        if (titleAsComponent != null) {
-            return titleAsComponent;
-        }
+        if (titleAsComponent != null) return titleAsComponent;
         return titleAsComponent = AdventureSerializer.parseComponent(title);
     }
 

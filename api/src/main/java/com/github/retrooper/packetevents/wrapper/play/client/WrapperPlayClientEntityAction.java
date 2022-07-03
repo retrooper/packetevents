@@ -20,42 +20,45 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.entity.EntityAction;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClientEntityAction> {
-    private int entityId;
-    private EntityAction action;
+    private int entityID;
+    private Action action;
     private int jumpBoost;
 
     public WrapperPlayClientEntityAction(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientEntityAction(int entityId, EntityAction action, int jumpBoost) {
+    public WrapperPlayClientEntityAction(int entityID, Action action, int jumpBoost) {
         super(PacketType.Play.Client.ENTITY_ACTION);
-        this.entityId = entityId;
+        this.entityID = entityID;
         this.action = action;
         this.jumpBoost = jumpBoost;
     }
 
     @Override
     public void read() {
-        entityId = readVarInt();
-        action = EntityAction.LEAVE_BED.getById(readVarInt());
-        if (serverVersion.isOlderThan(ServerVersion.V_1_9) && action == EntityAction.STOP_JUMPING_WITH_HORSE) {
-            action = EntityAction.OPEN_HORSE_INVENTORY;
+        entityID = readVarInt();
+        action = Action.VALUES[readVarInt()];
+        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
+            if (action == Action.STOP_JUMPING_WITH_HORSE) {
+                action = Action.OPEN_HORSE_INVENTORY;
+            }
         }
         jumpBoost = readVarInt();
     }
 
     @Override
     public void write() {
-        writeVarInt(entityId);
+        writeVarInt(entityID);
         int actionIndex = action.ordinal();
-        if (serverVersion.isOlderThan(ServerVersion.V_1_9) && action == EntityAction.OPEN_HORSE_INVENTORY) {
-            actionIndex--;
+        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
+            if (action == Action.OPEN_HORSE_INVENTORY) {
+                actionIndex--;
+            }
         }
         writeVarInt(actionIndex);
         writeVarInt(jumpBoost);
@@ -63,24 +66,24 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
 
     @Override
     public void copy(WrapperPlayClientEntityAction wrapper) {
-        entityId = wrapper.entityId;
+        entityID = wrapper.entityID;
         action = wrapper.action;
         jumpBoost = wrapper.jumpBoost;
     }
 
     public int getEntityId() {
-        return entityId;
+        return entityID;
     }
 
-    public void setEntityId(int entityId) {
-        this.entityId = entityId;
+    public void setEntityId(int entityID) {
+        this.entityID = entityID;
     }
 
-    public EntityAction getAction() {
+    public Action getAction() {
         return action;
     }
 
-    public void setAction(EntityAction action) {
+    public void setAction(Action action) {
         this.action = action;
     }
 
@@ -90,5 +93,19 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
 
     public void setJumpBoost(int jumpBoost) {
         this.jumpBoost = jumpBoost;
+    }
+
+    public enum Action {
+        START_SNEAKING,
+        STOP_SNEAKING,
+        LEAVE_BED,
+        START_SPRINTING,
+        STOP_SPRINTING,
+        START_JUMPING_WITH_HORSE,
+        STOP_JUMPING_WITH_HORSE,
+        OPEN_HORSE_INVENTORY,
+        START_FLYING_WITH_ELYTRA;
+
+        public static final Action[] VALUES = values();
     }
 }

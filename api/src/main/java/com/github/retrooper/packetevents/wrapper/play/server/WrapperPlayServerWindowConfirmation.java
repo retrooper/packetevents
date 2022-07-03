@@ -86,16 +86,16 @@ public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPl
         return windowId;
     }
 
-    public void setWindowId(int windowId) {
-        this.windowId = windowId;
+    public void setWindowId(int windowID) {
+        this.windowId = windowID;
     }
 
     public short getActionId() {
         return actionId;
     }
 
-    public void setActionId(short actionId) {
-        this.actionId = actionId;
+    public void setActionId(short actionID) {
+        this.actionId = actionID;
     }
 
     public boolean isAccepted() {

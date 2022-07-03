@@ -23,37 +23,37 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientCloseWindow extends PacketWrapper<WrapperPlayClientCloseWindow> {
-    private int windowId;
+    private int windowID;
 
     public WrapperPlayClientCloseWindow(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientCloseWindow(int windowId) {
+    public WrapperPlayClientCloseWindow(int windowID) {
         super(PacketType.Play.Client.CLOSE_WINDOW);
-        this.windowId = windowId;
+        this.windowID = windowID;
     }
 
     @Override
     public void read() {
-        this.windowId = readUnsignedByte();
+        this.windowID = readUnsignedByte();
     }
 
     @Override
     public void write() {
-        writeByte(this.windowId);
+        writeByte(this.windowID);
     }
 
     @Override
     public void copy(WrapperPlayClientCloseWindow wrapper) {
-        this.windowId = wrapper.windowId;
+        this.windowID = wrapper.windowID;
     }
 
     public int getWindowId() {
-        return windowId;
+        return windowID;
     }
 
-    public void setWindowId(int windowId) {
-        this.windowId = windowId;
+    public void setWindowId(int windowID) {
+        this.windowID = windowID;
     }
 }

@@ -26,35 +26,35 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
  * This packet is used when clicking on window buttons. Until 1.14, this was only used by enchantment tables.
  */
 public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPlayClientClickWindowButton> {
-    private int windowId;
-    private int buttonId;
+    private int windowID;
+    private int buttonID;
 
     public WrapperPlayClientClickWindowButton(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientClickWindowButton(int windowId, int buttonId) {
+    public WrapperPlayClientClickWindowButton(int windowID, int buttonID) {
         super(PacketType.Play.Client.CLICK_WINDOW_BUTTON);
-        this.windowId = windowId;
-        this.buttonId = buttonId;
+        this.windowID = windowID;
+        this.buttonID = buttonID;
     }
 
     @Override
     public void read() {
-        this.windowId = readByte();
-        this.buttonId = readByte();
+        this.windowID = readByte();
+        this.buttonID = readByte();
     }
 
     @Override
     public void write() {
-        writeByte(this.windowId);
-        writeByte(this.buttonId);
+        writeByte(this.windowID);
+        writeByte(this.buttonID);
     }
 
     @Override
     public void copy(WrapperPlayClientClickWindowButton wrapper) {
-        this.windowId = wrapper.windowId;
-        this.buttonId = wrapper.buttonId;
+        this.windowID = wrapper.windowID;
+        this.buttonID = wrapper.buttonID;
     }
 
     /**
@@ -63,16 +63,16 @@ public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPla
      * @return Window ID
      */
     public int getWindowId() {
-        return windowId;
+        return windowID;
     }
 
     /**
      * Modify the ID of the window.
      *
-     * @param windowId Window ID
+     * @param windowID Window ID
      */
-    public void setWindowId(int windowId) {
-        this.windowId = windowId;
+    public void setWindowId(int windowID) {
+        this.windowID = windowID;
     }
 
     /**
@@ -82,16 +82,16 @@ public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPla
      * @return Button ID
      */
     public int getButtonId() {
-        return buttonId;
+        return buttonID;
     }
 
     /**
      * Modify the meaning.
      * Learn more on wiki.vg/Protocol.
      *
-     * @param buttonId Button ID
+     * @param buttonID Button ID
      */
-    public void setButtonId(int buttonId) {
-        this.buttonId = buttonId;
+    public void setButtonId(int buttonID) {
+        this.buttonID = buttonID;
     }
 }

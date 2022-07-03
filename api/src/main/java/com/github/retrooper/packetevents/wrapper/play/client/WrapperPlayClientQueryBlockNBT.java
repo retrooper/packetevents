@@ -24,43 +24,43 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientQueryBlockNBT extends PacketWrapper<WrapperPlayClientQueryBlockNBT> {
-    private int transactionId;
+    private int transactionID;
     private Vector3i blockPosition;
 
     public WrapperPlayClientQueryBlockNBT(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientQueryBlockNBT(int transactionId, Vector3i blockPosition) {
+    public WrapperPlayClientQueryBlockNBT(int transactionID, Vector3i blockPosition) {
         super(PacketType.Play.Client.QUERY_BLOCK_NBT);
-        this.transactionId = transactionId;
+        this.transactionID = transactionID;
         this.blockPosition = blockPosition;
     }
 
     @Override
     public void read() {
-        transactionId = readVarInt();
+        transactionID = readVarInt();
         blockPosition = readBlockPosition();
     }
 
     @Override
     public void write() {
-        writeVarInt(transactionId);
+        writeVarInt(transactionID);
         writeBlockPosition(blockPosition);
     }
 
     @Override
     public void copy(WrapperPlayClientQueryBlockNBT wrapper) {
-        transactionId = wrapper.transactionId;
+        transactionID = wrapper.transactionID;
         blockPosition = wrapper.blockPosition;
     }
 
     public int getTransactionId() {
-        return transactionId;
+        return transactionID;
     }
 
-    public void setTransactionId(int transactionId) {
-        this.transactionId = transactionId;
+    public void setTransactionId(int transactionID) {
+        this.transactionID = transactionID;
     }
 
     public Vector3i getBlockPosition() {

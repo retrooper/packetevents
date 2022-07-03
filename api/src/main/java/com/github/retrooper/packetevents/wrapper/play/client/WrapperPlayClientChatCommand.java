@@ -6,24 +6,18 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.crypto.MessageSignData;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
 public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClientChatCommand> {
     private String command;
-    // 1.19+
-    private @Nullable MessageSignData messageSignData;
+    private MessageSignData messageSignData;
 
     public WrapperPlayClientChatCommand(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatCommand(String command) {
-        this(command, null);
-    }
-
-    public WrapperPlayClientChatCommand(String command, @Nullable MessageSignData messageSignData) {
+    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData) {
         super(PacketType.Play.Client.CHAT_COMMAND);
         this.command = command;
         this.messageSignData = messageSignData;
@@ -65,11 +59,11 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
         this.command = command;
     }
 
-    public @Nullable MessageSignData getMessageSignData() {
+    public MessageSignData getMessageSignData() {
         return messageSignData;
     }
 
-    public void setMessageSignData(@Nullable MessageSignData messageSignData) {
+    public void setMessageSignData(MessageSignData messageSignData) {
         this.messageSignData = messageSignData;
     }
 }
