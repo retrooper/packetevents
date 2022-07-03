@@ -30,34 +30,29 @@ import java.util.List;
 import java.util.Optional;
 
 public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServerWindowItems> {
-    private int windowId;
-    private int stateId;
+    private int windowID;
+    private int stateID;
     private List<ItemStack> items;
-    private @Nullable ItemStack carriedItem;
+    private Optional<ItemStack> carriedItem;
 
     public WrapperPlayServerWindowItems(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerWindowItems(int windowId, int stateId, List<ItemStack> items) {
-        this(windowId, stateId, items, null);
-    }
-
-    public WrapperPlayServerWindowItems(int windowId, int stateId, List<ItemStack> items, @Nullable ItemStack carriedItem) {
+    public WrapperPlayServerWindowItems(int windowID, int stateID, List<ItemStack> items, @Nullable ItemStack carriedItem) {
         super(PacketType.Play.Server.WINDOW_ITEMS);
-        this.windowId = windowId;
-        this.stateId = stateId;
+        this.windowID = windowID;
+        this.stateID = stateID;
         this.items = items;
-        this.carriedItem = carriedItem;
+        this.carriedItem = Optional.ofNullable(carriedItem);
     }
 
     @Override
     public void read() {
+        windowID = readUnsignedByte();
         boolean v1_17_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1);
-
-        windowId = readUnsignedByte();
         if (v1_17_1) {
-            stateId = readVarInt();
+            stateID = readVarInt();
         }
 
         int count = v1_17_1 ? readVarInt() : readShort();
@@ -66,18 +61,21 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
             items.add(readItemStack());
         }
 
-        if (v1_17_1) {
-            carriedItem = readItemStack();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
+            carriedItem = Optional.of(readItemStack());
+        } else {
+            carriedItem = Optional.empty();
         }
     }
 
     @Override
     public void write() {
+        writeByte(windowID);
         boolean v1_17_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1);
-
-        writeByte(windowId);
         if (v1_17_1) {
-            writeVarInt(stateId);
+            writeVarInt(stateID);
+        }
+        if (v1_17_1) {
             writeVarInt(items.size());
         } else {
             writeShort(items.size());
@@ -86,32 +84,32 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
             writeItemStack(item);
         }
         if (v1_17_1) {
-            writeItemStack(carriedItem == null ? ItemStack.EMPTY : carriedItem);
+            writeItemStack(carriedItem.orElse(ItemStack.EMPTY));
         }
     }
 
     @Override
     public void copy(WrapperPlayServerWindowItems wrapper) {
-        windowId = wrapper.windowId;
-        stateId = wrapper.stateId;
+        windowID = wrapper.windowID;
+        stateID = wrapper.stateID;
         items = wrapper.items;
         carriedItem = wrapper.carriedItem;
     }
 
     public int getWindowId() {
-        return windowId;
+        return windowID;
     }
 
-    public void setWindowId(int windowId) {
-        this.windowId = windowId;
+    public void setWindowId(int windowID) {
+        this.windowID = windowID;
     }
 
     public int getStateId() {
-        return stateId;
+        return stateID;
     }
 
-    public void setStateId(int stateId) {
-        this.stateId = stateId;
+    public void setStateId(int stateID) {
+        this.stateID = stateID;
     }
 
     public List<ItemStack> getItems() {
@@ -123,10 +121,10 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
     }
 
     public Optional<ItemStack> getCarriedItem() {
-        return Optional.ofNullable(carriedItem);
+        return carriedItem;
     }
 
     public void setCarriedItem(@Nullable ItemStack carriedItem) {
-        this.carriedItem = carriedItem;
+        this.carriedItem = Optional.ofNullable(carriedItem);
     }
 }

@@ -19,13 +19,11 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * This packet is sent when the client swings their arm.
@@ -44,9 +42,16 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
 
     @Override
     public void read() {
-        this.interactionHand = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_9,
-                packetWrapper -> InteractionHand.getById(packetWrapper.readVarInt()),
-                packetWrapper -> InteractionHand.MAIN_HAND);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            this.interactionHand = InteractionHand.getById(readVarInt());
+        } else {
+            this.interactionHand = InteractionHand.MAIN_HAND;
+        }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientAnimation wrapper) {
+        this.interactionHand = wrapper.interactionHand;
     }
 
     @Override
@@ -56,15 +61,10 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
         }
     }
 
-    @Override
-    public void copy(WrapperPlayClientAnimation wrapper) {
-        this.interactionHand = wrapper.interactionHand;
-    }
-
     /**
-     * Hand used for the animation.<p>
-     * On {@link ClientVersion#V_1_9}, an {@link InteractionHand#OFF_HAND} was introduced and specifies which arm has been swung.</p>
-     * For {@link ClientVersion#V_1_8} and {@link ClientVersion#V_1_7_10} clients only have a {@link InteractionHand#MAIN_HAND}.
+     * Hand used for the animation.
+     * On {@link ClientVersion#V_1_9}, an off-hand was introduced and specifies which arm has been swung.
+     * For {@link ClientVersion#V_1_8} and {@link ClientVersion#V_1_7_10} clients only have a main hand.
      *
      * @return Hand
      */
@@ -73,15 +73,14 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
     }
 
     /**
-     * Modify the hand used for the animation.<p>
-     * On {@link ClientVersion#V_1_9}, an {@link InteractionHand#OFF_HAND} was introduced and specifies which arm has been swung.</p>
-     * For {@link ClientVersion#V_1_8} and {@link ClientVersion#V_1_7_10} clients only have a {@link InteractionHand#MAIN_HAND}.<p>
-     * </p>
-     * <b>Modifying the hand on 1.8 and 1.7 clients is redundant.</b>
+     * Modify the hand used for the animation.
+     * On {@link ClientVersion#V_1_9}, an off-hand was introduced and specifies which arm has been swung.
+     * For {@link ClientVersion#V_1_8} and {@link ClientVersion#V_1_7_10} clients only have a main hand.
+     * Modifying the hand on 1.8 and 1.7 clients is redundant.
      *
      * @param interactionHand Hand used for the animation
      */
-    public void setHand(@NotNull InteractionHand interactionHand) {
+    public void setHand(InteractionHand interactionHand) {
         this.interactionHand = interactionHand;
     }
 }

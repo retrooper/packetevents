@@ -19,14 +19,11 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.entity.InteractAction;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -36,20 +33,19 @@ import java.util.Optional;
  * Please note that this packet is NOT sent whenever the client middle-clicks, the {@link WrapperPlayClientCreativeInventoryAction} packet is sent instead.
  */
 public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayClientInteractEntity> {
-    private int entityId;
+    private int entityID;
     private InteractAction interactAction;
-    private @Nullable Vector3f target;
+    private Optional<Vector3f> target;
     private InteractionHand interactionHand;
-    private boolean sneaking;
+    private Optional<Boolean> sneaking;
 
     public WrapperPlayClientInteractEntity(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientInteractEntity(int entityId, InteractAction interactAction, InteractionHand interactionHand,
-                                           @Nullable Vector3f target, boolean sneaking) {
+    public WrapperPlayClientInteractEntity(int entityID, InteractAction interactAction, InteractionHand interactionHand, Optional<Vector3f> target, Optional<Boolean> sneaking) {
         super(PacketType.Play.Client.INTERACT_ENTITY);
-        this.entityId = entityId;
+        this.entityID = entityID;
         this.interactAction = interactAction;
         this.interactionHand = interactionHand;
         this.target = target;
@@ -58,72 +54,69 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
 
     @Override
     public void read() {
-        this.entityId = readMultiVersional(MultiVersion.EQUALS, ServerVersion.V_1_7_10,
-                PacketWrapper::readInt,
-                PacketWrapper::readVarInt);
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            this.entityID = readInt();
+            byte typeIndex = readByte();
+            this.interactAction = InteractAction.VALUES[typeIndex];
+            this.target = Optional.empty();
+            this.interactionHand = InteractionHand.MAIN_HAND;
+            this.sneaking = Optional.empty();
+        } else {
+            this.entityID = readVarInt();
+            int typeIndex = readVarInt();
+            this.interactAction = InteractAction.VALUES[typeIndex];
+            if (interactAction == InteractAction.INTERACT_AT) {
+                float x = readFloat();
+                float y = readFloat();
+                float z = readFloat();
+                this.target = Optional.of(new Vector3f(x, y, z));
+            } else {
+                this.target = Optional.empty();
+            }
 
-        // Haven't tested this method yet
-        readMulti(MultiVersion.EQUALS, ServerVersion.V_1_7_10,
-                wrapper -> {
-                    this.entityId = wrapper.readInt();
-                    this.interactAction = InteractAction.getById(wrapper.readByte());
-                    this.interactionHand = InteractionHand.MAIN_HAND;
-                }, wrapper -> {
-                    this.entityId = wrapper.readVarInt();
-                    this.interactAction = InteractAction.getById(wrapper.readVarInt());
-                    if (interactAction == InteractAction.INTERACT_AT) {
-                        float x = wrapper.readFloat();
-                        float y = wrapper.readFloat();
-                        float z = wrapper.readFloat();
-                        this.target = new Vector3f(x, y, z);
-                    }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
+                int handID = readVarInt();
+                this.interactionHand = InteractionHand.getById(handID);
+            } else {
+                this.interactionHand = InteractionHand.MAIN_HAND;
+            }
 
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)
-                            && (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
-                        this.interactionHand = InteractionHand.getById(wrapper.readVarInt());
-                    } else {
-                        this.interactionHand = InteractionHand.MAIN_HAND;
-                    }
-
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-                        this.sneaking = wrapper.readBoolean();
-                    }
-                });
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+                this.sneaking = Optional.of(readBoolean());
+            } else {
+                this.sneaking = Optional.empty();
+            }
+        }
     }
 
     @Override
     public void write() {
-        writeMultiVersional(MultiVersion.EQUALS, ServerVersion.V_1_7_10, entityId,
-                PacketWrapper::writeInt,
-                PacketWrapper::writeVarInt);
-        writeMultiVersional(MultiVersion.EQUALS, ServerVersion.V_1_7_10, interactAction.ordinal(),
-                PacketWrapper::writeByte,
-                (packetWrapper, integer) -> {
-                    packetWrapper.writeVarInt(integer);
-                    if (interactAction == InteractAction.INTERACT_AT) {
-                        if (target == null) {
-                            target = new Vector3f(0.0F, 0.0F, 0.0F);
-                        }
-                        Vector3f targetVec = target;
-                        writeFloat(targetVec.x);
-                        writeFloat(targetVec.y);
-                        writeFloat(targetVec.z);
-                    }
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            writeInt(entityID);
+            writeByte(interactAction.ordinal());
+        } else {
+            writeVarInt(entityID);
+            writeVarInt(interactAction.ordinal());
+            if (interactAction == InteractAction.INTERACT_AT) {
+                Vector3f targetVec = target.orElse(new Vector3f(0.0F, 0.0F, 0.0F));
+                writeFloat(targetVec.x);
+                writeFloat(targetVec.y);
+                writeFloat(targetVec.z);
+            }
 
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) &&
-                            (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
-                        writeVarInt(interactionHand.getId());
-                    }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
+                writeVarInt(interactionHand.getId());
+            }
 
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-                        writeBoolean(sneaking);
-                    }
-                });
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+                writeBoolean(sneaking.orElse(false));
+            }
+        }
     }
 
     @Override
     public void copy(WrapperPlayClientInteractEntity wrapper) {
-        this.entityId = wrapper.entityId;
+        this.entityID = wrapper.entityID;
         this.interactAction = wrapper.interactAction;
         this.target = wrapper.target;
         this.interactionHand = wrapper.interactionHand;
@@ -131,42 +124,47 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
     }
 
     public int getEntityId() {
-        return entityId;
+        return entityID;
     }
 
-    public void setEntityId(int entityId) {
-        this.entityId = entityId;
+    public void setEntityId(int entityID) {
+        this.entityID = entityID;
     }
 
-    public InteractAction getInteractAction() {
+    public InteractAction getAction() {
         return interactAction;
     }
 
-    public void setInteractAction(InteractAction interactAction) {
+    public void setAction(InteractAction interactAction) {
         this.interactAction = interactAction;
     }
 
-    public Optional<Vector3f> getTarget() {
-        return Optional.ofNullable(target);
-    }
-
-    public void setTarget(@Nullable Vector3f target) {
-        this.target = target;
-    }
-
-    public InteractionHand getInteractionHand() {
+    public InteractionHand getHand() {
         return interactionHand;
     }
 
-    public void setInteractionHand(InteractionHand interactionHand) {
+    public void setHand(InteractionHand interactionHand) {
         this.interactionHand = interactionHand;
     }
 
-    public boolean isSneaking() {
+    public Optional<Vector3f> getTarget() {
+        return target;
+    }
+
+    public void setTarget(Optional<Vector3f> target) {
+        this.target = target;
+    }
+
+    public Optional<Boolean> isSneaking() {
         return sneaking;
     }
 
-    public void setSneaking(boolean sneaking) {
+    public void setSneaking(Optional<Boolean> sneaking) {
         this.sneaking = sneaking;
+    }
+
+    public enum InteractAction {
+        INTERACT, ATTACK, INTERACT_AT;
+        public static final InteractAction[] VALUES = values();
     }
 }

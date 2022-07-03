@@ -30,10 +30,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-// TODO: A whole recode is NEEDED
 public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRespawn> {
     private Dimension dimension;
-    private @Nullable String worldName;
+    private Optional<String> worldName;
     private Difficulty difficulty;
     private long hashedSeed;
     private GameMode gameMode;
@@ -43,13 +42,13 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     private boolean keepingAllPlayerData;
     private WorldBlockPosition lastDeathPosition;
 
-    // This should not be accessed
+    //This should not be accessed
     private String levelType;
 
     public WrapperPlayServerRespawn(PacketSendEvent event) {
         super(event);
     }
-    
+
     public WrapperPlayServerRespawn(Dimension dimension, @Nullable String worldName, Difficulty difficulty, long hashedSeed, GameMode gameMode,
                                     @Nullable GameMode previousGameMode, boolean worldDebug, boolean worldFlat, boolean keepingAllPlayerData,
                                     @Nullable ResourceLocation deathDimensionName, @Nullable WorldBlockPosition lastDeathPosition) {
@@ -73,7 +72,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
         if (v1_15_0) {
             dimension = readDimension();
-            worldName = readString();
+            worldName = Optional.of(readString());
             hashedSeed = readLong();
             gameMode = GameMode.getById(readUnsignedByte());
             int previousMode = readByte();
@@ -94,6 +93,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
                 difficulty = Difficulty.NORMAL;
             }
 
+            worldName = Optional.empty();
             hashedSeed = 0L;
 
             //Note: SPECTATOR will not be expected from a 1.7 client.
@@ -113,7 +113,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
         if (v1_16_0) {
             writeDimension(dimension);
-            writeString(worldName);
+            writeString(worldName.orElse(""));
             writeLong(hashedSeed);
             writeByte(gameMode.ordinal());
             writeByte(previousGameMode == null ? -1 : previousGameMode.ordinal());
@@ -126,7 +126,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         } else {
             writeInt(dimension.getType().getId());
             if (v1_15_0) {
-                writeString(worldName);
+                writeString(worldName.orElse(""));
                 writeLong(hashedSeed);
             } else {
                 if (!v1_14) {
@@ -138,7 +138,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
                 }
             }
 
-            // Note: SPECTATOR will not be expected from a 1.7 client.
+            //Note: SPECTATOR will not be expected from a 1.7 client.
             writeByte(gameMode.ordinal());
 
             if (worldFlat) {
@@ -173,11 +173,15 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     }
 
     public Optional<String> getWorldName() {
-        return Optional.ofNullable(worldName);
+        return worldName;
     }
 
     public void setWorldName(@Nullable String worldName) {
-        this.worldName = worldName;
+        if (worldName == null) {
+            this.worldName = Optional.empty();
+        } else {
+            this.worldName = Optional.of(worldName);
+        }
     }
 
     public Difficulty getDifficulty() {

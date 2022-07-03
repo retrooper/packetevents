@@ -35,7 +35,7 @@ import java.security.PublicKey;
  * @see WrapperLoginClientEncryptionResponse
  */
 public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLoginServerEncryptionRequest> {
-    private String serverId;
+    private String serverID;
     private PublicKey publicKey;
     private byte[] verifyToken;
 
@@ -43,37 +43,37 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
         super(event);
     }
 
-    public WrapperLoginServerEncryptionRequest(String serverId, byte[] publicKeyBytes, byte[] verifyToken) {
+    public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken) {
         super(PacketType.Login.Server.ENCRYPTION_REQUEST);
-        this.serverId = serverId;
+        this.serverID = serverID;
         this.publicKey = MinecraftEncryptionUtil.publicKey(publicKeyBytes);
         this.verifyToken = verifyToken;
     }
 
-    public WrapperLoginServerEncryptionRequest(String serverId, PublicKey publicKey, byte[] verifyToken) {
+    public WrapperLoginServerEncryptionRequest(String serverID, PublicKey publicKey, byte[] verifyToken) {
         super(PacketType.Login.Server.ENCRYPTION_REQUEST);
-        this.serverId = serverId;
+        this.serverID = serverID;
         this.publicKey = publicKey;
         this.verifyToken = verifyToken;
     }
 
     @Override
     public void read() {
-        this.serverId = readString(20);
+        this.serverID = readString(20);
         this.publicKey = readPublicKey();
         this.verifyToken = readByteArray(ByteBufHelper.readableBytes(buffer));
     }
 
     @Override
     public void write() {
-        writeString(serverId, 20);
+        writeString(serverID, 20);
         writePublicKey(publicKey);
         writeByteArray(verifyToken);
     }
 
     @Override
     public void copy(WrapperLoginServerEncryptionRequest wrapper) {
-        this.serverId = wrapper.serverId;
+        this.serverID = wrapper.serverID;
         this.publicKey = wrapper.publicKey;
         this.verifyToken = wrapper.verifyToken;
     }
@@ -84,11 +84,11 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
      * @return Server ID
      */
     public String getServerId() {
-        return serverId;
+        return serverID;
     }
 
-    public void setServerId(String serverId) {
-        this.serverId = serverId;
+    public void setServerId(String serverID) {
+        this.serverID = serverID;
     }
 
     /**

@@ -45,7 +45,7 @@ public class WrapperPlayServerDifficulty extends PacketWrapper<WrapperPlayServer
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             locked = readBoolean();
         }
-        // TODO: On 1.8 locked theoretically is true? Confirm
+        //TODO: On 1.8 locked theoretically is true? Confirm
     }
 
     @Override

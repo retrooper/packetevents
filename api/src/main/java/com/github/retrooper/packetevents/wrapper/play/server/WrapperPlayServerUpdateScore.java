@@ -19,23 +19,30 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.scoreboard.UpdateScore;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
+import java.util.Optional;
 
 public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServerUpdateScore> {
     private String entityName;
-    private UpdateScore action;
+    private Action action;
     private String objectiveName;
-    private int value = -1;
+    private Optional<Integer> value;
+
+    public enum Action {
+        CREATE_OR_UPDATE_ITEM,
+        REMOVE_ITEM;
+
+        public static final Action[] VALUES = values();
+    }
 
     public WrapperPlayServerUpdateScore(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerUpdateScore(String entityName, UpdateScore action, String objectiveName, int value) {
+    public WrapperPlayServerUpdateScore(String entityName, Action action, String objectiveName, Optional<Integer> value) {
         super(PacketType.Play.Server.UPDATE_SCORE);
         this.entityName = entityName;
         this.action = action;
@@ -45,48 +52,50 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        readMulti(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
-                packetWrapper -> {
-                    entityName = packetWrapper.readString(40);
-                    action = UpdateScore.getById(packetWrapper.readByte());
-                    objectiveName = packetWrapper.readString(16);
-                    if (action != UpdateScore.REMOVE_ITEM) {
-                        value = packetWrapper.readVarInt();
-                    } else {
-                        objectiveName = "";
-                    }
-                }, packetWrapper -> {
-                    entityName = packetWrapper.readString(16);
-                    action = UpdateScore.getById(packetWrapper.readByte());
-                    if (action != UpdateScore.REMOVE_ITEM) {
-                        objectiveName = packetWrapper.readString(16);
-                        value = packetWrapper.readInt();
-                    } else {
-                        objectiveName = "";
-                    }
-                });
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            entityName = readString(16);
+            action = Action.VALUES[readByte()];
+            if (action != Action.REMOVE_ITEM) {
+                objectiveName = readString(16);
+                value = Optional.of(readInt());
+            } else {
+                objectiveName = "";
+                value = Optional.empty();
+            }
+        } else {
+            entityName = readString(40);
+            action = Action.VALUES[readByte()];
+            objectiveName = readString(16);
+            if (action != Action.REMOVE_ITEM) {
+                value = Optional.of(readVarInt());
+            } else {
+                objectiveName = "";
+                value = Optional.empty();
+            }
+        }
     }
 
     @Override
     public void write() {
-        writeMulti(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
-                packetWrapper -> {
-                    packetWrapper.writeString(entityName, 40);
-                    packetWrapper.writeByte(action.ordinal());
-                    packetWrapper.writeString(objectiveName, 16);
-                    if (action != UpdateScore.REMOVE_ITEM) {
-                        packetWrapper.writeVarInt(value);
-                    }
-                }, packetWrapper -> {
-                    packetWrapper.writeString(entityName, 16);
-                    packetWrapper.writeByte(action.ordinal());
-                    if (action != UpdateScore.REMOVE_ITEM) {
-                        packetWrapper.writeString(objectiveName, 16);
-                        packetWrapper.writeInt(value);
-                    } else {
-                        objectiveName = "";
-                    }
-                });
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            writeString(entityName, 16);
+            writeByte(action.ordinal());
+            if (action != Action.REMOVE_ITEM) {
+                writeString(objectiveName, 16);
+                writeInt(value.orElse(-1));
+            } else {
+                objectiveName = "";
+                value = Optional.empty();
+            }
+        } else {
+            writeString(entityName, 40);
+            writeByte(action.ordinal());
+            writeString(objectiveName, 16);
+            if (action != Action.REMOVE_ITEM) {
+                writeVarInt(value.orElse(-1));
+            }
+        }
+
     }
 
     @Override
@@ -105,11 +114,11 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
         this.entityName = entityName;
     }
 
-    public UpdateScore getAction() {
+    public Action getAction() {
         return action;
     }
 
-    public void setAction(UpdateScore action) {
+    public void setAction(Action action) {
         this.action = action;
     }
 
@@ -121,11 +130,11 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
         this.objectiveName = objectiveName;
     }
 
-    public int getValue() {
+    public Optional<Integer> getValue() {
         return value;
     }
 
-    public void setValue(int value) {
+    public void setValue(Optional<Integer> value) {
         this.value = value;
     }
 }

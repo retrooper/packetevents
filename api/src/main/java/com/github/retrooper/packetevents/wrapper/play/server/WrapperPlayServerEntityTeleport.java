@@ -19,13 +19,11 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
-import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -35,23 +33,22 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlayServerEntityTeleport> {
     private static final float ROTATION_FACTOR = 256.0F / 360.0F;
 
-    private int entityId;
+    private int entityID;
     private Vector3d position;
-    private float yaw;
-    private float pitch;
+    private float yaw, pitch;
     private boolean onGround;
 
     public WrapperPlayServerEntityTeleport(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityTeleport(int entityId, Location location, boolean onGround) {
-        this(entityId, location.getPosition(), location.getYaw(), location.getPitch(), onGround);
+    public WrapperPlayServerEntityTeleport(int entityID, Location location, boolean onGround) {
+        this(entityID, location.getPosition(), location.getYaw(), location.getPitch(), onGround);
     }
 
-    public WrapperPlayServerEntityTeleport(int entityId, Vector3d position, float yaw, float pitch, boolean onGround) {
+    public WrapperPlayServerEntityTeleport(int entityID, Vector3d position, float yaw, float pitch, boolean onGround) {
         super(PacketType.Play.Server.ENTITY_TELEPORT);
-        this.entityId = entityId;
+        this.entityID = entityID;
         this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;
@@ -60,43 +57,41 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void read() {
-        entityId = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
-                PacketWrapper::readVarInt,
-                PacketWrapper::readInt);
-        position = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_9,
-                packetWrapper -> {
-                    double x = readDouble();
-                    double y = readDouble();
-                    double z = readDouble();
-                    return new Vector3d(x, y, z);
-                }, packetWrapper -> {
-                    double x = readInt() / 32.0;
-                    double y = readInt() / 32.0;
-                    double z = readInt() / 32.0;
-                    return new Vector3d(x, y, z);
-                });
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            entityID = readInt();
+        } else {
+            entityID = readVarInt();
+        }
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
+            position = new Vector3d((readInt() / 32.0), (readInt() / 32.0), (readInt() / 32.0));
+        } else {
+            position = new Vector3d(readDouble(), readDouble(), readDouble());
+        }
         yaw = readByte() / ROTATION_FACTOR;
         pitch = readByte() / ROTATION_FACTOR;
-        onGround = readMultiVersional(MultiVersion.EQUALS, ServerVersion.V_1_7_10,
-                packetWrapper -> onGround = false,
-                PacketWrapper::readBoolean);
+        if (serverVersion != ServerVersion.V_1_7_10) {
+            onGround = readBoolean();
+        } else {
+            onGround = false;
+        }
     }
 
     @Override
     public void write() {
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, entityId,
-                PacketWrapper::writeVarInt,
-                PacketWrapper::writeInt);
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_9, position,
-                (packetWrapper, vector3d) -> {
-                    packetWrapper.writeDouble(position.x);
-                    packetWrapper.writeDouble(position.y);
-                    packetWrapper.writeDouble(position.z);
-                }, (packetWrapper, vector3d) -> {
-                    packetWrapper.writeInt(MathUtil.floor(position.x * 32.0));
-                    packetWrapper.writeInt(MathUtil.floor(position.y * 32.0));
-                    packetWrapper.writeInt(MathUtil.floor(position.z * 32.0));
-                });
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            writeInt(entityID);
+        } else {
+            writeVarInt(entityID);
+        }
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
+            writeInt(MathUtil.floor(position.x * 32.0));
+            writeInt(MathUtil.floor(position.y * 32.0));
+            writeInt(MathUtil.floor(position.z * 32.0));
+        } else {
+            writeDouble(position.x);
+            writeDouble(position.y);
+            writeDouble(position.z);
+        }
         writeByte((int) (yaw * ROTATION_FACTOR));
         writeByte((int) (pitch * ROTATION_FACTOR));
         if (serverVersion != ServerVersion.V_1_7_10) {
@@ -106,7 +101,7 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void copy(WrapperPlayServerEntityTeleport wrapper) {
-        entityId = wrapper.entityId;
+        entityID = wrapper.entityID;
         position = wrapper.position;
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
@@ -114,11 +109,11 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
     }
 
     public int getEntityId() {
-        return entityId;
+        return entityID;
     }
 
     public void setEntityId(int entityID) {
-        this.entityId = entityID;
+        this.entityID = entityID;
     }
 
     public Vector3d getPosition() {

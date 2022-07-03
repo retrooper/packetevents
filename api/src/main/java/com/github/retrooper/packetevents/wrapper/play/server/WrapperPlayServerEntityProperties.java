@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -29,43 +28,52 @@ import java.util.List;
 import java.util.UUID;
 
 public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlayServerEntityProperties> {
-    private int entityId;
+    private int entityID;
     private List<Property> properties;
 
     public WrapperPlayServerEntityProperties(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityProperties(int entityId, List<Property> properties) {
+    public WrapperPlayServerEntityProperties(int entityID, List<Property> properties) {
         super(PacketType.Play.Server.ENTITY_PROPERTIES);
-        this.entityId = entityId;
+        this.entityID = entityID;
         this.properties = properties;
     }
 
     @Override
     public void read() {
-        entityId = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
-                PacketWrapper::readVarInt,
-                PacketWrapper::readInt);
-        int propertyCount = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_17,
-                PacketWrapper::readVarInt,
-                PacketWrapper::readInt);
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            entityID = readInt();
+        } else {
+            entityID = readVarInt();
+        }
+
+        int propertyCount;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            propertyCount = readVarInt();
+        } else {
+            propertyCount = readInt();
+        }
         properties = new ArrayList<>(propertyCount);
         for (int i = 0; i < propertyCount; i++) {
             int maxKeyLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
             String key = readString(maxKeyLength);
             double value = readDouble();
-            int modifiersLength = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
-                    PacketWrapper::readVarInt,
-                    PacketWrapper::readShort);
+            int modifiersLength;
+            if (serverVersion == ServerVersion.V_1_7_10) {
+                modifiersLength = readShort();
+            } else {
+                modifiersLength = readVarInt();
+            }
             List<PropertyModifier> modifiers = new ArrayList<>(modifiersLength);
             for (int j = 0; j < modifiersLength; j++) {
                 UUID uuid = readUUID();
-                // Name always had this value, and was never part of the protocol, so why include it?
-                // String name = "Unknown synced attribute modifier";
+                //Name always had this value, and was never part of the protocol, so why include it?
+                //String name = "Unknown synced attribute modifier";
                 double amount = readDouble();
                 byte operationIndex = readByte();
-                PropertyModifier.Operation operation = PropertyModifier.Operation.getById(operationIndex);
+                PropertyModifier.Operation operation = PropertyModifier.Operation.VALUES[operationIndex];
                 modifiers.add(new PropertyModifier(uuid, amount, operation));
             }
             properties.add(new Property(key, value, modifiers));
@@ -74,19 +82,26 @@ public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlay
 
     @Override
     public void write() {
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, entityId,
-                PacketWrapper::writeVarInt,
-                PacketWrapper::writeInt);
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_17, properties.size(),
-                PacketWrapper::writeVarInt,
-                PacketWrapper::writeInt);
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            writeInt(entityID);
+        } else {
+            writeVarInt(entityID);
+        }
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            writeVarInt(properties.size());
+        } else {
+            writeInt(properties.size());
+        }
         for (Property property : properties) {
             int maxKeyLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
             writeString(property.key, maxKeyLength);
             writeDouble(property.value);
-            writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, property.modifiers.size(),
-                    PacketWrapper::writeVarInt,
-                    PacketWrapper::writeShort);
+            if (serverVersion == ServerVersion.V_1_7_10) {
+                writeShort(property.modifiers.size());
+            } else {
+                writeVarInt(property.modifiers.size());
+            }
             for (PropertyModifier modifier : property.modifiers) {
                 writeUUID(modifier.uuid);
                 writeDouble(modifier.amount);
@@ -97,16 +112,16 @@ public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlay
 
     @Override
     public void copy(WrapperPlayServerEntityProperties wrapper) {
-        entityId = wrapper.entityId;
+        entityID = wrapper.entityID;
         properties = wrapper.properties;
     }
 
     public int getEntityId() {
-        return entityId;
+        return entityID;
     }
 
     public void setEntityId(int entityID) {
-        this.entityId = entityID;
+        this.entityID = entityID;
     }
 
     public List<Property> getProperties() {
@@ -123,11 +138,7 @@ public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlay
             MULTIPLY_BASE,
             MULTIPLY_TOTAL;
 
-            private static final Operation[] VALUES = values();
-
-            public static Operation getById(int index) {
-                return VALUES[index];
-            }
+            public static final Operation[] VALUES = values();
         }
 
         private UUID uuid;

@@ -34,7 +34,7 @@ public enum InteractionHand {
         return ordinal();
     }
 
-    public static InteractionHand getById(int index) {
-        return VALUES[index];
+    public static InteractionHand getById(int id) {
+        return VALUES[id];
     }
 }

@@ -27,38 +27,38 @@ import java.util.Optional;
 
 public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayClientAdvancementTab> {
     private Action action;
-    private @Nullable String tabId;
+    private @Nullable String tabID;
 
     public WrapperPlayClientAdvancementTab(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientAdvancementTab(Action action, @Nullable String tabId) {
+    public WrapperPlayClientAdvancementTab(Action action, @Nullable String tabID) {
         super(PacketType.Play.Client.ADVANCEMENT_TAB);
         this.action = action;
-        this.tabId = tabId;
+        this.tabID = tabID;
     }
 
     @Override
     public void read() {
         action = Action.getById(readVarInt());
         if (action == Action.OPENED_TAB) {
-            tabId = readString();
-        }
-    }
-
-    @Override
-    public void write() {
-        writeVarInt(action.ordinal());
-        if (action == Action.OPENED_TAB) {
-            writeString(tabId);
+            tabID = readString();
         }
     }
 
     @Override
     public void copy(WrapperPlayClientAdvancementTab wrapper) {
         action = wrapper.action;
-        tabId = wrapper.tabId;
+        tabID = wrapper.tabID;
+    }
+
+    @Override
+    public void write() {
+        writeVarInt(action.ordinal());
+        if (action == Action.OPENED_TAB) {
+            writeString(tabID);
+        }
     }
 
     public Action getAction() {
@@ -70,16 +70,15 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
     }
 
     public Optional<String> getTabId() {
-        return Optional.ofNullable(tabId);
+        return Optional.ofNullable(tabID);
     }
 
-    public void setTabId(@Nullable String tabId) {
-        this.tabId = tabId;
+    public void setTabId(String tabID) {
+        this.tabID = tabID;
     }
 
     public enum Action {
-        OPENED_TAB,
-        CLOSED_SCREEN;
+        OPENED_TAB, CLOSED_SCREEN;
 
         private static final Action[] VALUES = values();
 

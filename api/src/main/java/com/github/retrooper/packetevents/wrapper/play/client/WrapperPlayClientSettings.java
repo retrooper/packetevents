@@ -19,9 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.ChatVisibility;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.protocol.player.SkinSection;
@@ -37,8 +35,14 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
     private boolean textFilteringEnabled;
     private boolean allowServerListings;
 
-    // Not accessible, only for 1.7
+    //Not accessible, only for 1.7
     private byte ignoredDifficulty;
+
+    public enum ChatVisibility {
+        FULL, SYSTEM, HIDDEN;
+
+        public static final ChatVisibility[] VALUES = values();
+    }
 
     public WrapperPlayClientSettings(PacketReceiveEvent event) {
         super(event);
@@ -63,9 +67,8 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         int localeLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12) ? 16 : 7;
         locale = readString(localeLength);
         viewDistance = readByte();
-        visibility = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_9,
-                packetWrapper -> ChatVisibility.getById(packetWrapper.readVarInt()),
-                packetWrapper -> ChatVisibility.getById(packetWrapper.readByte()));
+        int visibilityIndex = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? readVarInt() : readByte();
+        visibility = ChatVisibility.VALUES[visibilityIndex];
         chatColorable = readBoolean();
         if (serverVersion == ServerVersion.V_1_7_10) {
             //Ignored
@@ -80,7 +83,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            hand = HumanoidArm.getById(readVarInt());
+            hand = HumanoidArm.VALUES[readVarInt()];
         } else {
             hand = HumanoidArm.RIGHT;
         }
@@ -103,9 +106,11 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         int localeLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12) ? 16 : 7;
         writeString(locale, localeLength);
         writeByte(viewDistance);
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_9, visibility.ordinal(),
-                PacketWrapper::writeVarInt,
-                PacketWrapper::writeByte);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            writeVarInt(visibility.ordinal());
+        } else {
+            writeByte(visibility.ordinal());
+        }
         writeBoolean(chatColorable);
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeByte(ignoredDifficulty);
