@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.manager.server;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,8 +46,8 @@ public enum ServerVersion {
     V_1_16(735), V_1_16_1(736), V_1_16_2(751), V_1_16_3(753), V_1_16_4(754), V_1_16_5(754),
     V_1_17(755), V_1_17_1(756),
     V_1_18(757), V_1_18_1(757), V_1_18_2(758),
-    V_1_19(759),
-    //TODO UPDATE Add server version constant
+    V_1_19(759), V_1_19_1(760),
+    // TODO: UPDATE Add server version constant
     ERROR(-1, true);
 
     private static final ServerVersion[] VALUES = values();

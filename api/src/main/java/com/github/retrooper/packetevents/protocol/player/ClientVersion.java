@@ -74,6 +74,7 @@ public enum ClientVersion {
     V_1_18_2(758),
 
     V_1_19(759),
+    V_1_19_1(760),
 
     //TODO UPDATE Add new protocol version field
 
