@@ -149,7 +149,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         this.message = message;
     }
 
-    public boolean overlay() {
+    public boolean isOverlay() {
         return overlay;
     }
 
