@@ -80,7 +80,6 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         this.type = overlay ? ChatType.GAME_INFO : ChatType.SYSTEM;
     }
 
-
     @Override
     public void read() {
         this.messageJson = readComponentJSON();
@@ -90,8 +89,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
             overlay = readBoolean();
-        }
-        else {
+        } else {
             type = ChatType.getById(readVarInt());
         }
     }
@@ -103,17 +101,15 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         }
         writeComponentJSON(messageJson);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-           writeBoolean(overlay);
+            writeBoolean(overlay);
         } else {
             if (type == null) {
                 if (overlay) {
                     writeVarInt(ChatType.GAME_INFO.getId());
-                }
-                else {
+                } else {
                     writeVarInt(ChatType.SYSTEM.getId());
                 }
-            }
-            else {
+            } else {
                 writeVarInt(type.getId());
             }
         }
