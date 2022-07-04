@@ -28,8 +28,15 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayServerEntityEquipment> {
+    private static final IndexOutOfBoundsException OUT_OF_BOUNDS_EXCEPTION;
+
+    static {
+        OUT_OF_BOUNDS_EXCEPTION = new IndexOutOfBoundsException("Index of EquipmentSlot is out of bounds");
+    }
+
     private int entityId;
     private List<Equipment> equipment;
 
@@ -55,18 +62,25 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
             byte value;
             do {
                 value = readByte();
-                EquipmentSlot equipmentSlot = EquipmentSlot.getById(serverVersion, value & Byte.MAX_VALUE);
+                Optional<EquipmentSlot> equipmentSlot = EquipmentSlot.byId(value & Byte.MAX_VALUE);
+                if (!equipmentSlot.isPresent()) {
+                    throw OUT_OF_BOUNDS_EXCEPTION;
+                }
                 ItemStack itemStack = readItemStack();
-                equipment.add(new Equipment(equipmentSlot, itemStack));
+                equipment.add(new Equipment(equipmentSlot.get(), itemStack));
             } while ((value & Byte.MIN_VALUE) != 0);
         } else {
-            EquipmentSlot slot;
+            Optional<EquipmentSlot> equipmentSlot;
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                slot = EquipmentSlot.getById(serverVersion, readVarInt());
+                equipmentSlot = EquipmentSlot.byId(readVarInt());
             } else {
-                slot = EquipmentSlot.getById(serverVersion, readShort());
+                equipmentSlot = EquipmentSlot.byId(readShort());
             }
-            equipment.add(new Equipment(slot, readItemStack()));
+
+            if (!equipmentSlot.isPresent()) {
+                throw OUT_OF_BOUNDS_EXCEPTION;
+            }
+            equipment.add(new Equipment(equipmentSlot.get(), readItemStack()));
         }
     }
 
