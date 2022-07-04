@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
@@ -56,7 +57,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
     @Override
     public void read() {
         this.messageJson = readComponentJSON();
-        //Parse JSON message
+        // Parse JSON message
         if (HANDLE_JSON) {
             message = AdventureSerializer.parseComponent(this.messageJson);
         }
@@ -69,7 +70,20 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
             messageJson = AdventureSerializer.toJson(message);
         }
         writeComponentJSON(messageJson);
-        writeVarInt(type.getId());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+            switch (type) {
+                case SYSTEM:
+                    writeBoolean(false);
+                    break;
+                case GAME_INFO:
+                    writeBoolean(true);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid chat type");
+            }
+        } else {
+            writeVarInt(type.getId());
+        }
     }
 
     @Override
