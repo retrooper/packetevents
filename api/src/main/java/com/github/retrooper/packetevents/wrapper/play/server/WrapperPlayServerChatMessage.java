@@ -66,11 +66,13 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
             unsignedChatContent = readOptional(PacketWrapper::readComponent);
         }
 
+        int id;
         if (v1_19) {
-            type = ChatType.getById(readVarInt());
+            id = readVarInt();
         } else {
-            type = ChatType.getById(readByte());
+            id = readByte();
         }
+        type = ChatType.getById(serverVersion, id);
 
         sender = new MessageSender();
         if (v1_19) {
@@ -91,10 +93,14 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
             writeOptional(unsignedChatContent, PacketWrapper::writeComponent);
         }
 
+        int id = type.getId(serverVersion);
+        if (id == -1) {
+            throw new IllegalStateException("ChatType " + type.name() + " is not supported on this minecraft version. Did you mean to use ChatType.CHAT?");
+        }
         if (v1_19) {
-            writeVarInt(type.getId());
+            writeVarInt(id);
         } else {
-            writeByte(type.getId());
+            writeByte(id);
         }
 
         writeUUID(sender.getUUID());

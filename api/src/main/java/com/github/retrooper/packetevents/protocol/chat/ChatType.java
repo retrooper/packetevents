@@ -18,23 +18,59 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public enum ChatType {
-    CHAT,
-    SYSTEM,
-    GAME_INFO,
-    SAY_COMMAND,
-    MSG_COMMAND,
-    TEAM_MSG_COMMAND,
-    EMOTE_COMMAND,
-    TELLRAW_COMMAND;
+    CHAT(0),
+    
+    @Deprecated
+    SYSTEM(-1),
+    @Deprecated
+    GAME_INFO(-1),
+
+    SAY_COMMAND(1),
+    MSG_COMMAND(2),
+    TEAM_MSG_COMMAND(3),
+    EMOTE_COMMAND(4),
+
+    @Deprecated
+    TELLRAW_COMMAND(-1);
+
+    final byte modernId;
+
+    ChatType(int modernId) {
+        this.modernId = (byte)modernId;
+    }
+
+    private static final Map<Byte, ChatType> MODERN_CHAT_TYPE_MAP = new HashMap<>();
+
+    static {
+        MODERN_CHAT_TYPE_MAP.put((byte)0, CHAT);
+        MODERN_CHAT_TYPE_MAP.put((byte)1, SAY_COMMAND);
+        MODERN_CHAT_TYPE_MAP.put((byte)2, MSG_COMMAND);
+        MODERN_CHAT_TYPE_MAP.put((byte)3, TEAM_MSG_COMMAND);
+        MODERN_CHAT_TYPE_MAP.put((byte)4, EMOTE_COMMAND);
+    }
 
     private static final ChatType[] VALUES = values();
 
-    public int getId() {
+    public int getId(ServerVersion version) {
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+            return modernId;
+        }
         return ordinal();
     }
 
-    public static ChatType getById(int id) {
-        return VALUES[id];
+    @Nullable
+    public static ChatType getById(ServerVersion version, int id) {
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+            return MODERN_CHAT_TYPE_MAP.get((byte) id);
+        } else {
+            return VALUES[id];
+        }
     }
 }
