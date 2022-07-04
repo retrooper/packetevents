@@ -56,10 +56,11 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     @Override
     public void read() {
         this.username = readString(16);
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19) && readBoolean()) {
-            this.signatureData = new SignatureData(readTimestamp(), readPublicKey(), readBytes(4096));
-            if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19_1) && readBoolean()) {
-                this.playerUUID = readUUID();
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19)) {
+            this.signatureData = readOptional(packetWrapper ->
+                    new SignatureData(packetWrapper.readTimestamp(), packetWrapper.readPublicKey(), packetWrapper.readBytes(4096)));
+            if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19_1)) {
+                this.playerUUID = readOptional(PacketWrapper::readUUID);
             }
         }
     }
@@ -68,18 +69,13 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     public void write() {
         writeString(username, 16);
         if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19)) {
-            writeBoolean(signatureData != null);
-            if (signatureData != null) {
-                SignatureData data = signatureData;
-                writeTimestamp(data.getTimestamp());
-                writePublicKey(data.getPublicKey());
-                writeBytes(data.getSignature());
-            }
+            writeOptional(signatureData, (packetWrapper, signatureData1) -> {
+                packetWrapper.writeTimestamp(signatureData1.getTimestamp());
+                packetWrapper.writePublicKey(signatureData1.getPublicKey());
+                packetWrapper.writeBytes(signatureData1.getSignature());
+            });
             if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19_1)) {
-                writeBoolean(playerUUID != null);
-                if (playerUUID != null) {
-                    writeUUID(playerUUID);
-                }
+                writeOptional(playerUUID, PacketWrapper::writeUUID);
             }
         }
     }
