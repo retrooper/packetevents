@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Introduced in 1.19.
@@ -34,7 +36,8 @@ import net.kyori.adventure.text.Component;
  */
 public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPlayServerSystemChatMessage> {
     public static boolean HANDLE_JSON = true;
-    private ChatType type;
+    private @Nullable ChatType type;
+    private boolean overlay;
     private String messageJson;
     private Component message;
 
@@ -42,17 +45,41 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         super(event);
     }
 
-    public WrapperPlayServerSystemChatMessage(ChatType type, Component message) {
+    @Deprecated
+    public WrapperPlayServerSystemChatMessage(@NotNull ChatType type, Component message) {
         super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
         this.type = type;
+        if (type == ChatType.GAME_INFO) {
+            this.overlay = true;
+        }
         this.message = message;
     }
 
-    public WrapperPlayServerSystemChatMessage(ChatType type, String messageJson) {
+    @Deprecated
+    public WrapperPlayServerSystemChatMessage(@NotNull ChatType type, String messageJson) {
         super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
         this.messageJson = messageJson;
         this.type = type;
+        if (type == ChatType.GAME_INFO) {
+            this.overlay = true;
+        }
     }
+
+    public WrapperPlayServerSystemChatMessage(boolean overlay, Component message) {
+        super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
+        this.message = message;
+        this.overlay = overlay;
+        this.type = overlay ? ChatType.GAME_INFO : ChatType.SYSTEM;
+    }
+
+    @Deprecated
+    public WrapperPlayServerSystemChatMessage(boolean overlay, String messageJson) {
+        super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
+        this.messageJson = messageJson;
+        this.overlay = overlay;
+        this.type = overlay ? ChatType.GAME_INFO : ChatType.SYSTEM;
+    }
+
 
     @Override
     public void read() {
@@ -61,7 +88,12 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         if (HANDLE_JSON) {
             message = AdventureSerializer.parseComponent(this.messageJson);
         }
-        type = ChatType.getById(readVarInt());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+            overlay = readBoolean();
+        }
+        else {
+            type = ChatType.getById(readVarInt());
+        }
     }
 
     @Override
@@ -71,18 +103,19 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         }
         writeComponentJSON(messageJson);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-            switch (type) {
-                case SYSTEM:
-                    writeBoolean(false);
-                    break;
-                case GAME_INFO:
-                    writeBoolean(true);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid chat type");
-            }
+           writeBoolean(overlay);
         } else {
-            writeVarInt(type.getId());
+            if (type == null) {
+                if (overlay) {
+                    writeVarInt(ChatType.GAME_INFO.getId());
+                }
+                else {
+                    writeVarInt(ChatType.SYSTEM.getId());
+                }
+            }
+            else {
+                writeVarInt(type.getId());
+            }
         }
     }
 
@@ -91,13 +124,16 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         this.messageJson = wrapper.messageJson;
         this.message = wrapper.message;
         this.type = wrapper.type;
+        this.overlay = wrapper.overlay;
     }
 
-    public ChatType getType() {
+    @Deprecated
+    public @Nullable ChatType getType() {
         return type;
     }
 
-    public void setType(ChatType type) {
+    @Deprecated
+    public void setType(@Nullable ChatType type) {
         this.type = type;
     }
 
@@ -115,5 +151,13 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
 
     public void setMessage(Component message) {
         this.message = message;
+    }
+
+    public boolean overlay() {
+        return overlay;
+    }
+
+    public void setOverlay(boolean overlay) {
+        this.overlay = overlay;
     }
 }

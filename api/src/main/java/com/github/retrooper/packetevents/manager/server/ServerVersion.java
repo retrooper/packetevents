@@ -47,7 +47,7 @@ public enum ServerVersion {
     V_1_17(755), V_1_17_1(756),
     V_1_18(757), V_1_18_1(757), V_1_18_2(758),
     V_1_19(759), V_1_19_1(760),
-    // TODO: UPDATE Add server version constant
+    //TODO UPDATE Add server version constant
     ERROR(-1, true);
 
     private static final ServerVersion[] VALUES = values();
