@@ -18,7 +18,6 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -67,10 +66,12 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     @Override
     public void read() {
+        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         boolean v1_15_0 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
+        boolean v1_16_0 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
 
-        if (v1_15_0) {
+        if (v1_16_0) {
             dimension = readDimension();
             worldName = Optional.of(readString());
             hashedSeed = readLong();
@@ -87,14 +88,13 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             DimensionType dimensionType = DimensionType.getById(readInt());
             dimension = new Dimension(dimensionType);
 
-            if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-                difficulty = Difficulty.getById(readByte());
-            } else {
-                difficulty = Difficulty.NORMAL;
-            }
-
             worldName = Optional.empty();
             hashedSeed = 0L;
+            if (v1_15_0) {
+                hashedSeed = readLong();
+            } else if (!v1_14) {
+                difficulty = Difficulty.getById(readByte());
+            }
 
             //Note: SPECTATOR will not be expected from a 1.7 client.
             gameMode = GameMode.getById(readByte());
@@ -126,16 +126,11 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         } else {
             writeInt(dimension.getType().getId());
             if (v1_15_0) {
-                writeString(worldName.orElse(""));
                 writeLong(hashedSeed);
-            } else {
-                if (!v1_14) {
-                    //Handle 1.13.2 and below
-                    if (difficulty == null) {
-                        difficulty = Difficulty.NORMAL;
-                    }
-                    writeByte(difficulty.getId());
-                }
+            } else if (!v1_14) {
+                //Handle 1.13.2 and below
+                int id = difficulty == null ? Difficulty.NORMAL.getId() : difficulty.getId();
+                writeByte(id);
             }
 
             //Note: SPECTATOR will not be expected from a 1.7 client.
@@ -162,6 +157,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         worldDebug = wrapper.worldDebug;
         worldFlat = wrapper.worldFlat;
         keepingAllPlayerData = wrapper.keepingAllPlayerData;
+        lastDeathPosition = wrapper.lastDeathPosition;
     }
 
     public Dimension getDimension() {
@@ -177,14 +173,10 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     }
 
     public void setWorldName(@Nullable String worldName) {
-        if (worldName == null) {
-            this.worldName = Optional.empty();
-        } else {
-            this.worldName = Optional.of(worldName);
-        }
+        this.worldName = Optional.ofNullable(worldName);
     }
 
-    public Difficulty getDifficulty() {
+    public @Nullable Difficulty getDifficulty() {
         return difficulty;
     }
 
