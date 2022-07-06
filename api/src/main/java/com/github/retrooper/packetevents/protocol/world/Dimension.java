@@ -25,6 +25,7 @@ public class Dimension {
     private DimensionType type;
     private NBTCompound attributes;
 
+    @Deprecated
     public Dimension(DimensionType type) {
         this.type = type;
     }
