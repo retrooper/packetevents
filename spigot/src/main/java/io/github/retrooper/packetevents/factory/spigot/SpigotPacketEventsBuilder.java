@@ -104,6 +104,10 @@ public class SpigotPacketEventsBuilder {
                         throw new IllegalStateException(ex);
                     }
 
+                    if (!PacketType.isPrepared()) {
+                        PacketType.prepare();
+                    }
+
                     //Server hasn't bound to the port yet.
                     lateBind = !injector.isServerBound();
                     //If late-bind is enabled, we will inject a bit later.
@@ -138,17 +142,13 @@ public class SpigotPacketEventsBuilder {
                             return getVersion().toString() + "-beta";//TODO Cut off "-beta" once 2.0 releases
                         }));
                     }
-                    if (!PacketType.isPrepared()) {
-                        PacketType.prepare();
-                    }
                     Bukkit.getPluginManager().registerEvents(new InternalBukkitListener(),
                             plugin);
-                    //TODO Clean up and remove redundant post inject task
+                    //TODO Clean up and remove redundant post inject task? or is it?
                     Runnable postInjectTask = () -> {
                         /*for (final Player p : Bukkit.getOnlinePlayers()) {
                             try {
                                 Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(p);
-                                System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
                                 User user = PacketEvents.getAPI().getPlayerManager().getUser(p);
                                 injector.updatePlayer(user, p);
                                 getEventManager().callEvent(new UserLoginEvent(user, p));
