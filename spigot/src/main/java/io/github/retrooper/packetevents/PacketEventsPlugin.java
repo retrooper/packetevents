@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.*;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleDustData;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
@@ -94,7 +96,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     // still needs magnolia colors
                                     particle, true,
                                     new Vector3d(player.getLocation().getX(), player.getLocation().getY() + 1, player.getLocation().getZ()),
-                                    new Vector3f(0.65F, 0, 0.65F), 0, 100));
+                                    new Vector3f(0.65F, 0, 0.65F), 1, 100));
+                            user.sendMessage("Sent!");
                         }
                         break;
                     case PLAYER_FLYING:
@@ -143,7 +146,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             public void onPacketPlaySend(PacketPlaySendEvent event) {
                 Player player = (Player) event.getPlayer();
                 User user = event.getUser();
-                /*if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
+                if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
                     if (player != null) {
                         player.sendMessage("Hii " + player.getName());
                         user.sendMessage(ChatColor.GREEN + "Hi pt TWOOO");
