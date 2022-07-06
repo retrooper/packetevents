@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 
+import java.util.Objects;
+
 /**
  * 3D int Vector.
  * This vector can represent coordinates, angles, or anything you want.
@@ -176,6 +178,11 @@ public class Vector3i {
             return x == vec.x && y == vec.y && z == vec.z;
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
     }
 
     public Vector3d toVector3d() {
