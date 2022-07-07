@@ -682,7 +682,7 @@ public final class SpigotReflectionUtil {
 
     public static Object readNmsNbtFromStream(DataInputStream in) {
         try {
-            READ_NBT_FROM_STREAM_METHOD.invoke(null, in);
+            return READ_NBT_FROM_STREAM_METHOD.invoke(null, in);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
