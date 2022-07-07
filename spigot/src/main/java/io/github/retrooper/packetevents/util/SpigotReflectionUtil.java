@@ -36,6 +36,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.DataInputStream;
+import java.io.DataOutput;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -59,16 +61,18 @@ public final class SpigotReflectionUtil {
     public static Class<?> MINECRAFT_SERVER_CLASS, NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS,
             NMS_IMATERIAL_CLASS, NMS_ENTITY_CLASS, ENTITY_PLAYER_CLASS, BOUNDING_BOX_CLASS,
             ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS,
-            MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, WORLD_SERVER_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
+            MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, NMS_WORLD_CLASS, WORLD_SERVER_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
             GAME_PROFILE_CLASS, CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS,
             LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
-            BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS, PROPERTY_MAP_CLASS;
+            BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS, PROPERTY_MAP_CLASS, DIMENSION_MANAGER_CLASS, MOJANG_ENCODER_CLASS, DATA_RESULT_CLASS,
+            DYNAMIC_NBT_OPS_CLASS, NMS_NBT_COMPOUND_CLASS, NBT_COMPRESSION_STREAM_TOOLS_CLASS;
 
     //Netty classes
     public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS, BYTE_TO_MESSAGE_DECODER, MESSAGE_TO_BYTE_ENCODER;
 
     //Fields
-    public static Field ENTITY_PLAYER_PING_FIELD, ENTITY_BOUNDING_BOX_FIELD, BYTE_BUF_IN_PACKET_DATA_SERIALIZER;
+    public static Field ENTITY_PLAYER_PING_FIELD, ENTITY_BOUNDING_BOX_FIELD, BYTE_BUF_IN_PACKET_DATA_SERIALIZER, DIMENSION_CODEC_FIELD,
+            DYNAMIC_NBT_OPS_INSTANCE_FIELD;
 
     //Methods
     public static Method IS_DEBUGGING, GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
@@ -77,7 +81,9 @@ public final class SpigotReflectionUtil {
             CRAFT_ITEM_STACK_AS_BUKKIT_COPY, CRAFT_ITEM_STACK_AS_NMS_COPY,
             READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD,
             WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD, GET_COMBINED_ID,
-            GET_BY_COMBINED_ID, GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA, PROPERTY_MAP_GET_METHOD;
+            GET_BY_COMBINED_ID, GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA, PROPERTY_MAP_GET_METHOD,
+            GET_DIMENSION_MANAGER, CODEC_ENCODE_METHOD, DATA_RESULT_GET_METHOD, DYNAMIC_NBT_OPS_EMPTY_METHOD,
+            READ_NBT_FROM_STREAM_METHOD, WRITE_NBT_TO_STREAM_METHOD;
 
     //Constructors
     private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR;
@@ -111,6 +117,10 @@ public final class SpigotReflectionUtil {
         GET_ITEM_BY_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, NMS_ITEM_CLASS, 0);
         if (V_1_17_OR_HIGHER) {
             GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, Iterable.class, 0);
+            GET_DIMENSION_MANAGER = Reflection.getMethod(NMS_WORLD_CLASS, "getDimensionManager", 0);
+            CODEC_ENCODE_METHOD = Reflection.getMethod(MOJANG_ENCODER_CLASS, "encode", 0);
+            DATA_RESULT_GET_METHOD = Reflection.getMethod(DATA_RESULT_CLASS, "result", 0);
+            DYNAMIC_NBT_OPS_EMPTY_METHOD = Reflection.getMethod(DYNAMIC_NBT_OPS_CLASS, "empty", 0);
         }
         String getEntityByIdMethodName = (VERSION.getProtocolVersion() == (short) 47 || V_1_19_OR_HIGHER) // Back to these stupid mappings, thanks MD_5
                 ? "a" : "getEntity";
@@ -128,12 +138,19 @@ public final class SpigotReflectionUtil {
         if (CRAFT_BLOCK_DATA_CLASS != null) {
             GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA = Reflection.getMethod(CRAFT_BLOCK_DATA_CLASS, "fromData", CRAFT_BLOCK_DATA_CLASS, IBLOCK_DATA_CLASS);
         }
+
+        READ_NBT_FROM_STREAM_METHOD = Reflection.getMethod(NBT_COMPRESSION_STREAM_TOOLS_CLASS, 1, DataInputStream.class);
+        WRITE_NBT_TO_STREAM_METHOD = Reflection.getMethod(NBT_COMPRESSION_STREAM_TOOLS_CLASS, 1, NMS_NBT_COMPOUND_CLASS, DataOutput.class);
     }
 
     private static void initFields() {
         ENTITY_BOUNDING_BOX_FIELD = Reflection.getField(NMS_ENTITY_CLASS, BOUNDING_BOX_CLASS, 0, true);
         ENTITY_PLAYER_PING_FIELD = Reflection.getField(ENTITY_PLAYER_CLASS, "ping");
         BYTE_BUF_IN_PACKET_DATA_SERIALIZER = Reflection.getField(NMS_PACKET_DATA_SERIALIZER_CLASS, BYTE_BUF_CLASS, 0, true);
+        if (V_1_17_OR_HIGHER) {
+            DIMENSION_CODEC_FIELD = Reflection.getField(DIMENSION_MANAGER_CLASS, "DIRECT_CODEC");
+            DYNAMIC_NBT_OPS_INSTANCE_FIELD = Reflection.getField(DYNAMIC_NBT_OPS_CLASS, "INSTANCE");
+        }
     }
 
     private static void initClasses() {
@@ -151,11 +168,16 @@ public final class SpigotReflectionUtil {
         MOB_EFFECT_LIST_CLASS = getServerClass("world.effect.MobEffectList", "MobEffectList");
         NMS_ITEM_CLASS = getServerClass("world.item.Item", "Item");
         DEDICATED_SERVER_CLASS = getServerClass("server.dedicated.DedicatedServer", "DedicatedServer");
+        NMS_WORLD_CLASS = getServerClass("world.level.World", "World");
         WORLD_SERVER_CLASS = getServerClass("server.level.WorldServer", "WorldServer");
         ENUM_PROTOCOL_DIRECTION_CLASS = getServerClass("network.protocol.EnumProtocolDirection", "EnumProtocolDirection");
         if (V_1_17_OR_HIGHER) {
             LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
             PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
+            DIMENSION_MANAGER_CLASS = getServerClass("world.level.dimension.DimensionManager", "");
+            MOJANG_ENCODER_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Encoder");
+            DATA_RESULT_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.DataResult");
+            DYNAMIC_NBT_OPS_CLASS = getServerClass("nbt.DynamicOpsNBT", "");
         }
 
         CRAFT_MAGIC_NUMBERS_CLASS = getOBCClass("util.CraftMagicNumbers");
@@ -176,6 +198,8 @@ public final class SpigotReflectionUtil {
         BYTE_BUF_CLASS = getNettyClass("buffer.ByteBuf");
         BYTE_TO_MESSAGE_DECODER = getNettyClass("handler.codec.ByteToMessageDecoder");
         MESSAGE_TO_BYTE_ENCODER = getNettyClass("handler.codec.MessageToByteEncoder");
+        NMS_NBT_COMPOUND_CLASS = getServerClass("nbt.NBTTagCompound", "NBTTagCompound");
+        NBT_COMPRESSION_STREAM_TOOLS_CLASS = getServerClass("nbt.NBTCompressedStreamTools", "NBTCompressedStreamTools");
     }
 
     public static void init() {
@@ -435,6 +459,19 @@ public final class SpigotReflectionUtil {
         return null;
     }
 
+    public static Object convertWorldServerDimensionToNmsNbt(Object worldServer) {
+        try {
+            Object dimension = GET_DIMENSION_MANAGER.invoke(worldServer);
+            Object dynamicNbtOps = DYNAMIC_NBT_OPS_INSTANCE_FIELD.get(null);
+            Object dataResult = CODEC_ENCODE_METHOD.invoke(DIMENSION_CODEC_FIELD.get(null), dimension, dynamicNbtOps, DYNAMIC_NBT_OPS_EMPTY_METHOD.invoke(dynamicNbtOps));
+            Optional<?> optional = (Optional<?>) DATA_RESULT_GET_METHOD.invoke(dataResult);
+            return optional.orElse(null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static String fromStringToJSON(String message) {
         if (message == null) {
             return null;
@@ -629,6 +666,23 @@ public final class SpigotReflectionUtil {
     public static Object writeNMSItemStackPacketDataSerializer(Object packetDataSerializer, Object nmsItemStack) {
         try {
             return WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD.invoke(packetDataSerializer, nmsItemStack);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void writeNmsNbtToStream(Object compound, DataOutput out) {
+        try {
+            WRITE_NBT_TO_STREAM_METHOD.invoke(null, compound, out);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Object readNmsNbtFromStream(DataInputStream in) {
+        try {
+            READ_NBT_FROM_STREAM_METHOD.invoke(null, in);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
