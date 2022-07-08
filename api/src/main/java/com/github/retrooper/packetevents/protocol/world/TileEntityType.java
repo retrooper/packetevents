@@ -33,7 +33,7 @@ public enum TileEntityType {
     JIGSAW,
     CAMPFIRE,
     BEEHIVE,
-    UNKNOWN;
+    UNKNOWN
     ;
 
     public static final TileEntityType[] VALUES = values();
