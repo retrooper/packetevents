@@ -33,9 +33,16 @@ public enum ChatType {
     GAME_INFO(-1),
 
     SAY_COMMAND(1),
-    MSG_COMMAND(2),
-    TEAM_MSG_COMMAND(3),
-    EMOTE_COMMAND(4),
+
+
+    @Deprecated
+    MSG_COMMAND(-1),
+
+    MSG_COMMAND_INCOMING(2),
+    MSG_COMMAND_OUTGOING(3),
+
+    TEAM_MSG_COMMAND(4),
+    EMOTE_COMMAND(5),
 
     @Deprecated
     TELLRAW_COMMAND(-1);
@@ -51,9 +58,10 @@ public enum ChatType {
     static {
         MODERN_CHAT_TYPE_MAP.put((byte)0, CHAT);
         MODERN_CHAT_TYPE_MAP.put((byte)1, SAY_COMMAND);
-        MODERN_CHAT_TYPE_MAP.put((byte)2, MSG_COMMAND);
-        MODERN_CHAT_TYPE_MAP.put((byte)3, TEAM_MSG_COMMAND);
-        MODERN_CHAT_TYPE_MAP.put((byte)4, EMOTE_COMMAND);
+        MODERN_CHAT_TYPE_MAP.put((byte)2, MSG_COMMAND_INCOMING);
+        MODERN_CHAT_TYPE_MAP.put((byte)3, MSG_COMMAND_OUTGOING);
+        MODERN_CHAT_TYPE_MAP.put((byte)4, TEAM_MSG_COMMAND);
+        MODERN_CHAT_TYPE_MAP.put((byte)5, EMOTE_COMMAND);
     }
 
     private static final ChatType[] VALUES = values();

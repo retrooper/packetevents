@@ -336,7 +336,9 @@ public final class PacketType {
             USE_ITEM,
             //Added in 1.19
             CHAT_COMMAND,
-            CHAT_PREVIEW;
+            CHAT_PREVIEW,
+            //Added in 1.19.1
+            CUSTOM_CHAT_COMPLETIONS;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -353,8 +355,8 @@ public final class PacketType {
                     PacketType.prepare();
                 }
                 int index = SERVERBOUND_PLAY_VERSION_MAPPER.getIndex(version);
-               Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte)index, k -> new HashMap<>());
-               return packetIdMap.get(packetId);
+                Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte)index, k -> new HashMap<>());
+                return packetIdMap.get(packetId);
             }
 
             private static void loadPacketIds(Enum<?>[] enumConstants) {
@@ -580,6 +582,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_17.values());
                 loadPacketIds(ClientboundPacketType_1_18.values());
                 loadPacketIds(ClientboundPacketType_1_19.values());
+                loadPacketIds(ClientboundPacketType_1_19_1.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }
