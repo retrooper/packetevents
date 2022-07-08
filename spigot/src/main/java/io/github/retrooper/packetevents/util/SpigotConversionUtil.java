@@ -119,39 +119,6 @@ public class SpigotConversionUtil {
         return SpigotReflectionUtil.encodeBukkitItemStack(itemStack);
     }
 
-    public static NBTCompound fromNmsNbt(Object nbtCompound) {
-        byte[] bytes;
-        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-             DataOutputStream stream = new DataOutputStream(byteStream)) {
-            SpigotReflectionUtil.writeNmsNbtToStream(nbtCompound, stream);
-            bytes = byteStream.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        Object buffer = UnpooledByteBufAllocationHelper.wrappedBuffer(bytes);
-        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
-        NBTCompound nbt = wrapper.readNBT();
-        ByteBufHelper.release(buffer);
-        return nbt;
-    }
-
-    public static Object toNmsNbt(NBTCompound nbtCompound) {
-        Object buffer = UnpooledByteBufAllocationHelper.buffer();
-        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
-        wrapper.writeNBT(nbtCompound);
-        byte[] bytes = ByteBufHelper.copyBytes(buffer);
-        ByteBufHelper.release(buffer);
-        try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
-             DataInputStream stream = new DataInputStream(byteStream)) {
-            return SpigotReflectionUtil.readNmsNbtFromStream(stream);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public static Dimension fromBukkitWorld(World world) {
         boolean v1_19 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19);
         boolean v1_16_2 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2);
@@ -160,7 +127,7 @@ public class SpigotConversionUtil {
         } else {
             Object worldServer = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
             Object nbt = SpigotReflectionUtil.convertWorldServerDimensionToNmsNbt(worldServer);
-            return new Dimension(fromNmsNbt(nbt));
+            return new Dimension(SpigotReflectionUtil.fromNmsNbt(nbt));
         }
     }
 }

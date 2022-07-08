@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
@@ -36,8 +37,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.DataInputStream;
-import java.io.DataOutput;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -670,6 +670,39 @@ public final class SpigotReflectionUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static NBTCompound fromNmsNbt(Object nbtCompound) {
+        byte[] bytes;
+        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+             DataOutputStream stream = new DataOutputStream(byteStream)) {
+            writeNmsNbtToStream(nbtCompound, stream);
+            bytes = byteStream.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        Object buffer = UnpooledByteBufAllocationHelper.wrappedBuffer(bytes);
+        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
+        NBTCompound nbt = wrapper.readNBT();
+        ByteBufHelper.release(buffer);
+        return nbt;
+    }
+
+    public static Object toNmsNbt(NBTCompound nbtCompound) {
+        Object buffer = UnpooledByteBufAllocationHelper.buffer();
+        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
+        wrapper.writeNBT(nbtCompound);
+        byte[] bytes = ByteBufHelper.copyBytes(buffer);
+        ByteBufHelper.release(buffer);
+        try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
+             DataInputStream stream = new DataInputStream(byteStream)) {
+            return readNmsNbtFromStream(stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static void writeNmsNbtToStream(Object compound, DataOutput out) {
