@@ -23,7 +23,6 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.MessageSender;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MessageSignData;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;

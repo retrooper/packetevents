@@ -63,6 +63,10 @@ public enum ClientboundPacketType_1_19_1 {
 
     PLUGIN_MESSAGE,
     NAMED_SOUND_EFFECT,
+
+    //Added in 1.19.1
+    DELETE_CHAT,
+
     DISCONNECT,
     ENTITY_STATUS,
     EXPLOSION,
@@ -93,6 +97,9 @@ public enum ClientboundPacketType_1_19_1 {
     //Interesting changes in 1.19. This is used by vanilla to broadcast messages sent by clients to all connected clients.
     //TODO Cryptography.
     CHAT_MESSAGE,
+
+    //Added in 1.19.1
+    PLAYER_CHAT_HEADER,
 
     END_COMBAT_EVENT,
     ENTER_COMBAT_EVENT,
