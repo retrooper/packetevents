@@ -23,15 +23,18 @@ import com.github.retrooper.packetevents.protocol.chat.ChatCompletionAction;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class WrapperPlayClientCustomChatCompletions extends PacketWrapper<WrapperPlayClientCustomChatCompletions> {
     private ChatCompletionAction action;
-    private String[] entries;
+    private List<String> entries;
 
     public WrapperPlayClientCustomChatCompletions(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientCustomChatCompletions(ChatCompletionAction action, String[] entries) {
+    public WrapperPlayClientCustomChatCompletions(ChatCompletionAction action, List<String> entries) {
         super(PacketType.Play.Client.CUSTOM_CHAT_COMPLETIONS);
         this.action = action;
         this.entries = entries;
@@ -40,16 +43,16 @@ public class WrapperPlayClientCustomChatCompletions extends PacketWrapper<Wrappe
     @Override
     public void read() {
         this.action = ChatCompletionAction.fromId(readVarInt());
-        this.entries = new String[readVarInt()];
-        for (int i = 0; i < entries.length; i++) {
-            entries[i] = readString();
+        this.entries = new ArrayList<>();
+        for (int i = 0; i < readVarInt(); i++) {
+            entries.add(readString());
         }
     }
 
     @Override
     public void write() {
         writeVarInt(action.ordinal());
-        writeVarInt(entries.length);
+        writeVarInt(entries.size());
         for (String entry : entries) {
             writeString(entry);
         }
@@ -69,11 +72,11 @@ public class WrapperPlayClientCustomChatCompletions extends PacketWrapper<Wrappe
         this.action = action;
     }
 
-    public String[] getEntries() {
+    public List<String> getEntries() {
         return entries;
     }
 
-    public void setEntries(String[] entries) {
+    public void setEntries(List<String> entries) {
         this.entries = entries;
     }
 }
