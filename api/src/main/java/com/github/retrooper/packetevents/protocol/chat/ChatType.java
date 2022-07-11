@@ -34,7 +34,6 @@ public enum ChatType {
 
     SAY_COMMAND(1),
 
-
     @Deprecated
     MSG_COMMAND(-1),
 
@@ -50,18 +49,18 @@ public enum ChatType {
     final byte modernId;
 
     ChatType(int modernId) {
-        this.modernId = (byte)modernId;
+        this.modernId = (byte) modernId;
     }
 
     private static final Map<Byte, ChatType> MODERN_CHAT_TYPE_MAP = new HashMap<>();
 
     static {
-        MODERN_CHAT_TYPE_MAP.put((byte)0, CHAT);
-        MODERN_CHAT_TYPE_MAP.put((byte)1, SAY_COMMAND);
-        MODERN_CHAT_TYPE_MAP.put((byte)2, MSG_COMMAND_INCOMING);
-        MODERN_CHAT_TYPE_MAP.put((byte)3, MSG_COMMAND_OUTGOING);
-        MODERN_CHAT_TYPE_MAP.put((byte)4, TEAM_MSG_COMMAND);
-        MODERN_CHAT_TYPE_MAP.put((byte)5, EMOTE_COMMAND);
+        MODERN_CHAT_TYPE_MAP.put((byte) 0, CHAT);
+        MODERN_CHAT_TYPE_MAP.put((byte) 1, SAY_COMMAND);
+        MODERN_CHAT_TYPE_MAP.put((byte) 2, MSG_COMMAND_INCOMING);
+        MODERN_CHAT_TYPE_MAP.put((byte) 3, MSG_COMMAND_OUTGOING);
+        MODERN_CHAT_TYPE_MAP.put((byte) 4, TEAM_MSG_COMMAND);
+        MODERN_CHAT_TYPE_MAP.put((byte) 5, EMOTE_COMMAND);
     }
 
     private static final ChatType[] VALUES = values();
