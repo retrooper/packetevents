@@ -46,7 +46,7 @@ public enum ChatType {
     @Deprecated
     TELLRAW_COMMAND(-1);
 
-    final byte modernId;
+    private final byte modernId;
 
     ChatType(int modernId) {
         this.modernId = (byte) modernId;
