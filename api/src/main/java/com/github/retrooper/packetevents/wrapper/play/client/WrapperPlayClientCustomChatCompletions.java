@@ -42,13 +42,13 @@ public class WrapperPlayClientCustomChatCompletions extends PacketWrapper<Wrappe
     @Override
     public void read() {
         this.action = ChatCompletionAction.fromId(readVarInt());
-        this.entries = readList(readString());
+        this.entries = readList(PacketWrapper::readString);
     }
 
     @Override
     public void write() {
         writeVarInt(action.ordinal());
-        writeList(entries, this::writeString);
+        writeList(entries, PacketWrapper::writeString);
     }
 
     @Override

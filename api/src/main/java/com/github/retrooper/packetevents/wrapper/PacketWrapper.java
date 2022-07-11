@@ -779,19 +779,19 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    public <K> List<K> readList(K key) {
+    public <K> List<K> readList(Reader<K> reader) {
         int size = readVarInt();
         List<K> list = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            list.add(key);
+            list.add(reader.apply(this));
         }
         return list;
     }
 
-    public <K> void writeList(List<K> list, Consumer<K> writeValue) {
+    public <K> void writeList(List<K> list, Writer<K> writer) {
         writeVarInt(list.size());
         for (K key : list) {
-            writeValue.accept(key);
+            writer.accept(this, key);
         }
     }
 
