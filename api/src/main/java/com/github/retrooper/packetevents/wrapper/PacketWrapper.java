@@ -779,8 +779,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    @Experimental
-    public <K> List<K> readVarIntList(K key) {
+    public <K> List<K> readList(K key) {
         int size = readVarInt();
         List<K> list = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
@@ -789,8 +788,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         return list;
     }
 
-    @Experimental
-    public <K> void writeVarIntList(List<K> list, Consumer<K> writeValue) {
+    public <K> void writeList(List<K> list, Consumer<K> writeValue) {
         writeVarInt(list.size());
         for (K key : list) {
             writeValue.accept(key);

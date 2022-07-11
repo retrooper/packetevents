@@ -23,7 +23,6 @@ import com.github.retrooper.packetevents.protocol.chat.ChatCompletionAction;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class WrapperPlayClientCustomChatCompletions extends PacketWrapper<WrapperPlayClientCustomChatCompletions> {
@@ -43,19 +42,13 @@ public class WrapperPlayClientCustomChatCompletions extends PacketWrapper<Wrappe
     @Override
     public void read() {
         this.action = ChatCompletionAction.fromId(readVarInt());
-        this.entries = new ArrayList<>();
-        for (int i = 0; i < readVarInt(); i++) {
-            entries.add(readString());
-        }
+        this.entries = readList(readString());
     }
 
     @Override
     public void write() {
         writeVarInt(action.ordinal());
-        writeVarInt(entries.size());
-        for (String entry : entries) {
-            writeString(entry);
-        }
+        writeList(entries, this::writeString);
     }
 
     @Override
