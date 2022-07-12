@@ -58,7 +58,6 @@ import java.security.PublicKey;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class PacketWrapper<T extends PacketWrapper> {
@@ -262,7 +261,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    public <K, V> Map<K, V> readMap(Function<PacketWrapper<?>, K> keyFunction, Function<PacketWrapper<?>, V> valueFunction) {
+    public <K, V> Map<K, V> readMap(Reader<K> keyFunction, Reader<V> valueFunction) {
         int size = readVarInt();
         Map<K, V> map = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
@@ -273,10 +272,11 @@ public class PacketWrapper<T extends PacketWrapper> {
         return map;
     }
 
-    public <K, V> void writeMap(Map<K, V> map, BiConsumer<PacketWrapper<?>, K> keyConsumer, BiConsumer<PacketWrapper<?>, V> valueConsumer) {
+    public <K, V> void writeMap(Map<K, V> map, Writer<K> keyConsumer, Writer<V> valueConsumer) {
         writeVarInt(map.size());
-        for (K key : map.keySet()) {
-            V value = map.get(key);
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            K key = entry.getKey();
+            V value = entry.getValue();
             keyConsumer.accept(this, key);
             valueConsumer.accept(this, value);
         }
