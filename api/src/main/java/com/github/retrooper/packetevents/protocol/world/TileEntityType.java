@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.protocol.world;
 
 public enum TileEntityType {
-
     MOB_SPAWNER,
     COMMAND_BLOCK,
     BEACON,
@@ -33,8 +32,7 @@ public enum TileEntityType {
     JIGSAW,
     CAMPFIRE,
     BEEHIVE,
-    UNKNOWN
-    ;
+    UNKNOWN;
 
     public static final TileEntityType[] VALUES = values();
 

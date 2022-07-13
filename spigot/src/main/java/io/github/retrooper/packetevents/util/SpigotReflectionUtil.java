@@ -459,7 +459,7 @@ public final class SpigotReflectionUtil {
         return null;
     }
 
-    public static Object convertWorldServerDimensionToNmsNbt(Object worldServer) {
+    public static Object convertWorldServerDimensionToNMSNbt(Object worldServer) {
         try {
             Object dimension = GET_DIMENSION_MANAGER.invoke(worldServer);
             Object dynamicNbtOps = DYNAMIC_NBT_OPS_INSTANCE_FIELD.get(null);
@@ -672,7 +672,7 @@ public final class SpigotReflectionUtil {
         return null;
     }
 
-    public static NBTCompound fromNmsNbt(Object nbtCompound) {
+    public static NBTCompound fromMinecraftNBT(Object nbtCompound) {
         byte[] bytes;
         try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
              DataOutputStream stream = new DataOutputStream(byteStream)) {
@@ -690,7 +690,7 @@ public final class SpigotReflectionUtil {
         return nbt;
     }
 
-    public static Object toNmsNbt(NBTCompound nbtCompound) {
+    public static Object toMinecraftNBT(NBTCompound nbtCompound) {
         Object buffer = UnpooledByteBufAllocationHelper.buffer();
         PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
         wrapper.writeNBT(nbtCompound);

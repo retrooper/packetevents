@@ -91,11 +91,11 @@ public class WrapperPlayServerBlockEntityData extends PacketWrapper<WrapperPlayS
         this.type = type.getId();
     }
 
-    public NBTCompound getNbt() {
+    public NBTCompound getNBT() {
         return nbt;
     }
 
-    public void setNbt(NBTCompound nbt) {
+    public void setNBT(NBTCompound nbt) {
         this.nbt = nbt;
     }
 

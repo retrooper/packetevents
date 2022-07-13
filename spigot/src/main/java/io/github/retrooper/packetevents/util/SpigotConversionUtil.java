@@ -20,13 +20,10 @@ package io.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
@@ -34,10 +31,7 @@ import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.World;
-
-import java.io.*;
 
 public class SpigotConversionUtil {
     public static Location fromBukkitLocation(org.bukkit.Location location) {
@@ -126,8 +120,8 @@ public class SpigotConversionUtil {
             return new Dimension(DimensionType.getById(world.getEnvironment().getId()));
         } else {
             Object worldServer = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
-            Object nbt = SpigotReflectionUtil.convertWorldServerDimensionToNmsNbt(worldServer);
-            return new Dimension(SpigotReflectionUtil.fromNmsNbt(nbt));
+            Object nbt = SpigotReflectionUtil.convertWorldServerDimensionToNMSNbt(worldServer);
+            return new Dimension(SpigotReflectionUtil.fromMinecraftNBT(nbt));
         }
     }
 }
