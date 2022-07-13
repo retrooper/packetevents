@@ -49,7 +49,8 @@ public final class PacketType {
             ClientVersion.V_1_16_2,
             ClientVersion.V_1_17,
             ClientVersion.V_1_18,
-            ClientVersion.V_1_19);
+            ClientVersion.V_1_19,
+            ClientVersion.V_1_19_1);
 
     //TODO UPDATE Update packet type mappings (serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
