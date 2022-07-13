@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.wrapper.play.client;
+package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.chat.ChatCompletionAction;
@@ -25,16 +25,16 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.List;
 
-public class WrapperPlayClientCustomChatCompletions extends PacketWrapper<WrapperPlayClientCustomChatCompletions> {
+public class WrapperPlayServerCustomChatCompletions extends PacketWrapper<WrapperPlayServerCustomChatCompletions> {
     private ChatCompletionAction action;
     private List<String> entries;
 
-    public WrapperPlayClientCustomChatCompletions(PacketReceiveEvent event) {
+    public WrapperPlayServerCustomChatCompletions(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientCustomChatCompletions(ChatCompletionAction action, List<String> entries) {
-        super(PacketType.Play.Client.CUSTOM_CHAT_COMPLETIONS);
+    public WrapperPlayServerCustomChatCompletions(ChatCompletionAction action, List<String> entries) {
+        super(PacketType.Play.Server.CUSTOM_CHAT_COMPLETIONS);
         this.action = action;
         this.entries = entries;
     }
@@ -52,7 +52,7 @@ public class WrapperPlayClientCustomChatCompletions extends PacketWrapper<Wrappe
     }
 
     @Override
-    public void copy(WrapperPlayClientCustomChatCompletions wrapper) {
+    public void copy(WrapperPlayServerCustomChatCompletions wrapper) {
         this.action = wrapper.action;
         this.entries = wrapper.entries;
     }
