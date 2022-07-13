@@ -524,7 +524,7 @@ public final class PacketType {
             DISPLAY_CHAT_PREVIEW,
             SYSTEM_CHAT_MESSAGE,
 
-            //Added in 1.19
+            //Added in 1.19.1
             DELETE_CHAT,
             PLAYER_CHAT_HEADER,
             CUSTOM_CHAT_COMPLETIONS;
