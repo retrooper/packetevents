@@ -339,8 +339,7 @@ public final class PacketType {
             CHAT_COMMAND,
             CHAT_PREVIEW,
             //Added in 1.19.1
-            CUSTOM_CHAT_COMPLETIONS,
-            PLAYER_CHAT_HEADER;
+            CUSTOM_CHAT_COMPLETIONS;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -528,7 +527,8 @@ public final class PacketType {
             SYSTEM_CHAT_MESSAGE,
 
             //Added in 1.19
-            DELETE_CHAT;
+            DELETE_CHAT,
+            PLAYER_CHAT_HEADER;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.wrapper.play.client;
+package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -26,18 +26,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public class WrapperPlayClientPlayerChatHeader extends PacketWrapper<WrapperPlayClientPlayerChatHeader> {
+public class WrapperPlayServerPlayerChatHeader extends PacketWrapper<WrapperPlayServerPlayerChatHeader> {
     private byte @Nullable [] previousSignature;
     private UUID playerUUID;
     private byte[] signature;
+    //AKA message digest
     private byte[] hash;
 
-    public WrapperPlayClientPlayerChatHeader(PacketReceiveEvent event) {
+    public WrapperPlayServerPlayerChatHeader(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPlayerChatHeader(byte @Nullable [] previousSignature, UUID playerUUID, byte[] signature, byte[] hash) {
-        super(PacketType.Play.Client.PLAYER_CHAT_HEADER);
+    public WrapperPlayServerPlayerChatHeader(byte @Nullable [] previousSignature, UUID playerUUID, byte[] signature, byte[] hash) {
+        super(PacketType.Play.Server.PLAYER_CHAT_HEADER);
         this.previousSignature = previousSignature;
         this.playerUUID = playerUUID;
         this.signature = signature;
@@ -46,10 +47,7 @@ public class WrapperPlayClientPlayerChatHeader extends PacketWrapper<WrapperPlay
 
     @Override
     public void read() {
-        // Do we only read this when the signature is null?
-        if (signature == null) {
-            previousSignature = readByteArray();
-        }
+        previousSignature = readOptional(PacketWrapper::readByteArray);
         playerUUID = readUUID();
         signature = readByteArray();
         hash = readByteArray();
@@ -57,17 +55,18 @@ public class WrapperPlayClientPlayerChatHeader extends PacketWrapper<WrapperPlay
 
     @Override
     public void write() {
-        if (previousSignature != null) {
-            writeByteArray(previousSignature);
-        }
+        writeOptional(previousSignature, PacketWrapper::writeByteArray);
         writeUUID(playerUUID);
         writeByteArray(signature);
         writeByteArray(hash);
     }
 
     @Override
-    public void copy(WrapperPlayClientPlayerChatHeader wrapper) {
+    public void copy(WrapperPlayServerPlayerChatHeader wrapper) {
+        previousSignature = wrapper.previousSignature;
+        playerUUID = wrapper.playerUUID;
         signature = wrapper.signature;
+        hash = wrapper.hash;
     }
 
     /**
@@ -129,7 +128,7 @@ public class WrapperPlayClientPlayerChatHeader extends PacketWrapper<WrapperPlay
     }
 
     /**
-     * Set the hash of the chat message.
+     * Set message digest.
      *
      * @param hash the hash of the chat message.
      */

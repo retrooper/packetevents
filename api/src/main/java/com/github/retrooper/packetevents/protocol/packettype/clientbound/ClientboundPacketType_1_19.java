@@ -87,7 +87,6 @@ public enum ClientboundPacketType_1_19 {
     PLAYER_ABILITIES,
 
     //Interesting changes in 1.19. This is used by vanilla to broadcast messages sent by clients to all connected clients.
-    //TODO Cryptography.
     CHAT_MESSAGE,
 
     END_COMBAT_EVENT,
