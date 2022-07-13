@@ -48,6 +48,7 @@ import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
+import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
@@ -737,6 +738,16 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeTimestamp(Instant timestamp) {
         writeLong(timestamp.toEpochMilli());
+    }
+
+    public SignatureData readSignatureData() {
+        return new SignatureData(readTimestamp(), readPublicKey(), readByteArray(4096));
+    }
+
+    public void writeSignatureData(SignatureData signatureData) {
+        writeTimestamp(signatureData.getTimestamp());
+        writePublicKey(signatureData.getPublicKey());
+        writeByteArray(signatureData.getSignature());
     }
 
     public WorldBlockPosition readWorldBlockPosition() {

@@ -57,8 +57,7 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     public void read() {
         this.username = readString(16);
         if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19)) {
-            this.signatureData = readOptional(wrapper ->
-                    new SignatureData(wrapper.readTimestamp(), wrapper.readPublicKey(), wrapper.readByteArray(4096)));
+            this.signatureData = readOptional(PacketWrapper::readSignatureData);
             if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19_1)) {
                 this.playerUUID = readOptional(PacketWrapper::readUUID);
             }
@@ -69,11 +68,7 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     public void write() {
         writeString(username, 16);
         if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19)) {
-            writeOptional(signatureData, (wrapper, data) -> {
-                wrapper.writeTimestamp(data.getTimestamp());
-                wrapper.writePublicKey(data.getPublicKey());
-                wrapper.writeByteArray(data.getSignature());
-            });
+            writeOptional(signatureData, PacketWrapper::writeSignatureData);
             if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19_1)) {
                 writeOptional(playerUUID, PacketWrapper::writeUUID);
             }
