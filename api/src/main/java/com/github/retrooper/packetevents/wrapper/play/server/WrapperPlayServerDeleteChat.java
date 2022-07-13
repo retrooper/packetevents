@@ -16,27 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.wrapper.play.client;
+package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayClientDeleteChat extends PacketWrapper<WrapperPlayClientDeleteChat> {
+public class WrapperPlayServerDeleteChat extends PacketWrapper<WrapperPlayServerDeleteChat> {
     private byte[] signature;
 
-    public WrapperPlayClientDeleteChat(PacketReceiveEvent event) {
+    public WrapperPlayServerDeleteChat(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientDeleteChat(byte[] signature) {
-        super(PacketType.Play.Client.DELETE_CHAT);
+    public WrapperPlayServerDeleteChat(byte[] signature) {
+        super(PacketType.Play.Server.DELETE_CHAT);
         this.signature = signature;
     }
 
     @Override
     public void read() {
-        // Can we probably use the SaltSignature class for this packet?
         signature = readByteArray();
     }
 
@@ -46,7 +45,7 @@ public class WrapperPlayClientDeleteChat extends PacketWrapper<WrapperPlayClient
     }
 
     @Override
-    public void copy(WrapperPlayClientDeleteChat wrapper) {
+    public void copy(WrapperPlayServerDeleteChat wrapper) {
         signature = wrapper.signature;
     }
 
