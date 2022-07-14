@@ -53,9 +53,9 @@ public class WrapperPlayServerFacePlayer extends PacketWrapper<WrapperPlayServer
         writeDouble(targetPosition.getX());
         writeDouble(targetPosition.getY());
         writeDouble(targetPosition.getZ());
-        writeOptional(targetEntity, (packetWrapper, innerEntity) -> {
-            packetWrapper.writeVarInt(innerEntity.getEntityId());
-            packetWrapper.writeVarInt(innerEntity.getEntitySection().getId());
+        writeOptional(targetEntity, (wrapper, innerEntity) -> {
+            wrapper.writeVarInt(innerEntity.getEntityId());
+            wrapper.writeVarInt(innerEntity.getEntitySection().getId());
         });
     }
 

@@ -105,11 +105,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         writeUUID(sender.getUUID());
         if (v1_19) {
             writeComponent(sender.getDisplayName());
-            writeOptional(sender.getTeamName(), (writer, component) -> {
-                if (component != null) {
-                    writeComponent(component);
-                }
-            });
+            writeOptional(sender.getTeamName(), PacketWrapper::writeComponent);
             if (messageSignData != null) {
                 writeTimestamp(messageSignData.getTimestamp());
                 writeSaltSignature(messageSignData.getSaltSignature());
