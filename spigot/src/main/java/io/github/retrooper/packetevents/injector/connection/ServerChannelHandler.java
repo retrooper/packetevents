@@ -32,23 +32,29 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     public static boolean CHECKED_NETTY_VERSION;
     public static PEVersion NETTY_VERSION;
     public static final PEVersion MODERN_NETTY_VERSION = new PEVersion(4, 1, 24);
+
+    private static PEVersion resolveNettyVersion() {
+        Map<String, Version> nettyArtifacts = Version.identify();
+        Version version = nettyArtifacts.getOrDefault("netty-common", nettyArtifacts.get("netty-all"));
+        if (version != null) {
+            String stringVersion = version.artifactVersion();
+            //Let us remove the ".Final" from the version by just removing any words (non numbers or dots)
+            stringVersion = stringVersion.replaceAll("[^\\d.]", "");
+            if (stringVersion.endsWith(".")) {
+                //Remove "." at the end.
+                stringVersion = stringVersion.substring(0, stringVersion.length() - 1);
+            }
+            return new PEVersion(stringVersion);
+        }
+        return null;
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = (Channel) msg;
         //Resolve netty version only once.
         if (NETTY_VERSION == null && !CHECKED_NETTY_VERSION) {
-            Map<String, Version> nettyArtifacts = Version.identify();
-            Version version = nettyArtifacts.getOrDefault("netty-common", nettyArtifacts.get("netty-all"));
-            if (version != null) {
-                String stringVersion = version.artifactVersion();
-                //Let us remove the ".Final" from the version by just removing any words (non numbers or dots)
-                stringVersion = stringVersion.replaceAll("[^\\d.]", "");
-                if (stringVersion.endsWith(".")) {
-                    //Remove "." at the end.
-                    stringVersion = stringVersion.substring(0, stringVersion.length() - 1);
-                }
-                NETTY_VERSION = new PEVersion(stringVersion);
-            }
+            NETTY_VERSION = resolveNettyVersion();
             CHECKED_NETTY_VERSION = true;
         }
 

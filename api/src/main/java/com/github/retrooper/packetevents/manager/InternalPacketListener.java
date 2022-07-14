@@ -127,7 +127,9 @@ public class InternalPacketListener extends PacketListenerAbstract {
             WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
             ConnectionState nextState = handshake.getNextConnectionState();
             ClientVersion clientVersion = handshake.getClientVersion();
-
+            if (clientVersion == ClientVersion.UNKNOWN) {
+                return;
+            }
             //Update client version for this event call(and user)
             user.setClientVersion(clientVersion);
             PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());
