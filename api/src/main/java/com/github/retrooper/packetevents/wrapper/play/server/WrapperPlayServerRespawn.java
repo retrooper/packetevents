@@ -85,8 +85,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
                 lastDeathPosition = readOptional(PacketWrapper::readWorldBlockPosition);
             }
         } else {
-            DimensionType dimensionType = DimensionType.getById(readInt());
-            dimension = new Dimension(dimensionType);
+            dimension = new Dimension(readInt());
 
             worldName = Optional.empty();
             hashedSeed = 0L;
@@ -124,7 +123,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
                 writeOptional(lastDeathPosition, PacketWrapper::writeWorldBlockPosition);
             }
         } else {
-            writeInt(dimension.getType().getId());
+            writeInt(dimension.getId());
             if (v1_15_0) {
                 writeLong(hashedSeed);
             } else if (!v1_14) {

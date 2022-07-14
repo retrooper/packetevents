@@ -82,7 +82,7 @@ public final class SpigotReflectionUtil {
             READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD,
             WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD, GET_COMBINED_ID,
             GET_BY_COMBINED_ID, GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA, PROPERTY_MAP_GET_METHOD,
-            GET_DIMENSION_MANAGER, CODEC_ENCODE_METHOD, DATA_RESULT_GET_METHOD,
+            GET_DIMENSION_MANAGER, GET_DIMENSION_ID, GET_DIMENSION_KEY, CODEC_ENCODE_METHOD, DATA_RESULT_GET_METHOD,
             READ_NBT_FROM_STREAM_METHOD, WRITE_NBT_TO_STREAM_METHOD;
 
     //Constructors
@@ -118,8 +118,15 @@ public final class SpigotReflectionUtil {
         if (V_1_17_OR_HIGHER) {
             GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, Iterable.class, 0);
         }
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
+        if (DIMENSION_MANAGER_CLASS != null) {
+            if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16
+                || PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16_1) {
+                GET_DIMENSION_KEY = Reflection.getMethod(NMS_WORLD_CLASS, "getTypeKey", 0);
+            }
             GET_DIMENSION_MANAGER = Reflection.getMethod(NMS_WORLD_CLASS, DIMENSION_MANAGER_CLASS, 0);
+            GET_DIMENSION_ID = Reflection.getMethod(DIMENSION_MANAGER_CLASS, int.class, 0);
+        }
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
             CODEC_ENCODE_METHOD = Reflection.getMethod(MOJANG_ENCODER_CLASS, "encodeStart", 0);
             DATA_RESULT_GET_METHOD = Reflection.getMethod(DATA_RESULT_CLASS, "result", 0);
         }
@@ -179,8 +186,8 @@ public final class SpigotReflectionUtil {
             LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
             PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
         }
+        DIMENSION_MANAGER_CLASS = getServerClass("world.level.dimension.DimensionManager", "DimensionManager");
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
-            DIMENSION_MANAGER_CLASS = getServerClass("world.level.dimension.DimensionManager", "DimensionManager");
             MOJANG_CODEC_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Codec");
             MOJANG_ENCODER_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Encoder");
             DATA_RESULT_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.DataResult");
@@ -473,6 +480,25 @@ public final class SpigotReflectionUtil {
             Object dataResult = CODEC_ENCODE_METHOD.invoke(DIMENSION_CODEC_FIELD.get(null), dynamicNbtOps, dimension);
             Optional<?> optional = (Optional<?>) DATA_RESULT_GET_METHOD.invoke(dataResult);
             return optional.orElse(null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static int getDimensionId(Object worldServer) {
+        try {
+            Object dimension = GET_DIMENSION_MANAGER.invoke(worldServer);
+            return (int) GET_DIMENSION_ID.invoke(dimension);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public static String getDimensionKey(Object worldServer) {
+        try {
+            return GET_DIMENSION_KEY.invoke(worldServer).toString();
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

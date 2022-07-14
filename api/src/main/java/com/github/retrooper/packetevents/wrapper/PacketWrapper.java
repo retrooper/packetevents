@@ -697,10 +697,11 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public Dimension readDimension() {
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            return new Dimension(DimensionType.getByName(readIdentifier().toString()));
+            Dimension dimension = new Dimension(new NBTCompound());
+            dimension.setDimensionName(readIdentifier().toString());
+            return dimension;
         } else {
-            NBTCompound dimensionAttributes = readNBT();
-            return new Dimension(dimensionAttributes);
+            return new Dimension(readNBT());
         }
     }
 
