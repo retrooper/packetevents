@@ -27,7 +27,7 @@ dependencies {
     compileOnly 'org.github.spigot:1.8.8:1.8.8'*/
     //All these dependencies are only enabled when developing wrappers for quick access to spigot source
 
-    //compileOnly 'org.github.spigot:1.17:1.17'
+    compileOnly 'org.github.spigot:1.17:1.17'
     compileOnly 'org.github.spigot:1.16.2:1.16.2'
     compileOnly 'org.github.spigot:1.16.1:1.16.1'
     compileOnly 'org.github.spigot:1.15.2:1.15.2'
