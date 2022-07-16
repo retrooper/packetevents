@@ -9,43 +9,43 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class WrapperPlayServerChatPreview extends PacketWrapper<WrapperPlayServerChatPreview> {
-    private int queryID;
+    private int queryId;
     private @Nullable Component message;
 
     public WrapperPlayServerChatPreview(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerChatPreview(int queryID, @Nullable Component message) {
+    public WrapperPlayServerChatPreview(int queryId, @Nullable Component message) {
         super(PacketType.Play.Server.CHAT_PREVIEW_PACKET);
-        this.queryID = queryID;
+        this.queryId = queryId;
         this.message = message;
     }
 
     @Override
     public void read() {
-        queryID = readInt();
+        queryId = readInt();
         message = readOptional(PacketWrapper::readComponent);
     }
 
     @Override
     public void write() {
-        writeInt(queryID);
+        writeInt(queryId);
         writeOptional(message, PacketWrapper::writeComponent);
     }
 
     @Override
     public void copy(WrapperPlayServerChatPreview wrapper) {
-        queryID = wrapper.queryID;
+        queryId = wrapper.queryId;
         message = wrapper.message;
     }
 
-    public int getQueryID() {
-        return queryID;
+    public int getQueryId() {
+        return queryId;
     }
 
-    public void setQueryID(int queryID) {
-        this.queryID = queryID;
+    public void setQueryId(int queryId) {
+        this.queryId = queryId;
     }
 
     public Optional<Component> getMessage() {
