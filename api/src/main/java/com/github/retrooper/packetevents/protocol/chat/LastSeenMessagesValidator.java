@@ -18,8 +18,8 @@ public class LastSeenMessagesValidator {
     }
 
     private boolean hasDuplicateProfiles(LastSeenMessages lastSeenMessages) {
-        Set<UUID> set = new HashSet<UUID>(lastSeenMessages.entries().size());
-        for (LastSeenMessages.Entry entry : lastSeenMessages.entries()) {
+        Set<UUID> set = new HashSet<>(lastSeenMessages.getEntries().size());
+        for (LastSeenMessages.Entry entry : lastSeenMessages.getEntries()) {
             if (set.add(entry.getUuid())) {
                 continue;
             }
@@ -30,7 +30,7 @@ public class LastSeenMessagesValidator {
 
     private int calculateIndices(List<LastSeenMessages.Entry> entries, int[] ints, @Nullable LastSeenMessages.Entry entry) {
         Arrays.fill(ints, Integer.MIN_VALUE);
-        List<LastSeenMessages.Entry> entryCopyList = this.lastSeenMessages.entries();
+        List<LastSeenMessages.Entry> entryCopyList = this.lastSeenMessages.getEntries();
         int size = entryCopyList.size();
         for (int i = size - 1; i >= 0; --i) {
             int index = entries.indexOf(entryCopyList.get(i));
@@ -58,10 +58,10 @@ public class LastSeenMessagesValidator {
 
     public Set<ErrorCondition> validateAndUpdate(LastSeenMessages.Update update) {
         Set<ErrorCondition> errorConditions = EnumSet.noneOf(ErrorCondition.class);
-        LastSeenMessages lastSeen = update.lastSeen();
+        LastSeenMessages lastSeen = update.getLastSeenMessages();
         LastSeenMessages.Entry entry = update.getLastReceived();
-        List<LastSeenMessages.Entry> entries = lastSeen.entries();
-        int size = this.lastSeenMessages.entries().size();
+        List<LastSeenMessages.Entry> entries = lastSeen.getEntries();
+        int size = this.lastSeenMessages.getEntries().size();
         int minValue = Integer.MIN_VALUE;
         int entriesSize = entries.size();
         if (entriesSize < size) {
@@ -89,7 +89,8 @@ public class LastSeenMessagesValidator {
             }
         }
         if (minValue >= 0) {
-            this.pendingEntries.removeElements(0, minValue + 1);
+            // FIXME: What is this method? Can't find anything about it in the docs.
+            // this.pendingEntries.removeElements(0, minValue + 1);
         }
         if (this.hasDuplicateProfiles(lastSeen)) {
             errorConditions.add(ErrorCondition.DUPLICATED_PROFILES);
@@ -98,7 +99,7 @@ public class LastSeenMessagesValidator {
         return errorConditions;
     }
 
-    public static enum ErrorCondition {
+    public enum ErrorCondition {
         OUT_OF_ORDER("messages received out of order"),
         DUPLICATED_PROFILES("multiple entries for single profile"),
         UNKNOWN_MESSAGES("unknown message"),
@@ -106,7 +107,7 @@ public class LastSeenMessagesValidator {
 
         private final String message;
 
-        private ErrorCondition(String message) {
+        ErrorCondition(String message) {
             this.message = message;
         }
 

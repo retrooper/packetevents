@@ -39,6 +39,10 @@ public class LastSeenMessages {
         }
     }
 
+    public List<Entry> getEntries() {
+        return entries;
+    }
+
     public static class Entry {
         private final UUID uuid;
         private final MessageVerifier lastVerifier; // Should be MessageSignature
