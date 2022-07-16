@@ -60,6 +60,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class PacketWrapper<T extends PacketWrapper> {
     @Nullable
@@ -748,6 +749,15 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeTimestamp(signatureData.getTimestamp());
         writePublicKey(signatureData.getPublicKey());
         writeByteArray(signatureData.getSignature());
+    }
+
+    public static <T> IntFunction<T> limitValue(IntFunction<T> function, int limit) {
+        return i -> {
+            if (i > limit) {
+                throw new RuntimeException("Value " + i + " is larger than limit " + limit);
+            }
+            return function.apply(i);
+        };
     }
 
     public WorldBlockPosition readWorldBlockPosition() {

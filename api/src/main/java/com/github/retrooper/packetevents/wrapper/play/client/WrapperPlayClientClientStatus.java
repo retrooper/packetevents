@@ -39,16 +39,16 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
     @Override
     public void read() {
         this.action = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
-                packetWrapper -> Action.getById(packetWrapper.readVarInt()), packetWrapper -> Action.getById(packetWrapper.readByte()));
+                wrapper -> Action.getById(wrapper.readVarInt()), packetWrapper -> Action.getById(packetWrapper.readByte()));
     }
 
     @Override
     public void write() {
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, action.ordinal(), (packetWrapper, integer) -> {
+        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, action.ordinal(), (wrapper, integer) -> {
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) && integer == 2) {
                 throw new IllegalStateException("The WrapperGameClientClientStatus.Action.OPEN_INVENTORY_ACTION enum constant is not supported on 1.16+ servers!");
             }
-            packetWrapper.writeVarInt(integer);
+            wrapper.writeVarInt(integer);
         }, PacketWrapper::writeByte);
     }
 

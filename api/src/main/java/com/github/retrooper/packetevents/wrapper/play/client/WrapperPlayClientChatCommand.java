@@ -9,6 +9,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.time.Instant;
 
+// TODO: Class needs to be finished due to pre-5 changes
 public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClientChatCommand> {
     private String command;
     private MessageSignData messageSignData;
