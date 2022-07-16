@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
@@ -43,16 +44,18 @@ import java.util.UUID;
  */
 public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClientChatMessage> {
     private String message;
-    private Optional<MessageSignData> messageSignData;
+    private MessageSignData messageSignData;
+    private LastSeenMessages.Update lastSeenMessages;
 
     public WrapperPlayClientChatMessage(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatMessage(String message, @Nullable MessageSignData messageSignData) {
+    public WrapperPlayClientChatMessage(String message, @Nullable MessageSignData messageSignData, @Nullable LastSeenMessages.Update lastSeenMessages) {
         super(PacketType.Play.Client.CHAT_MESSAGE);
         this.message = message;
-        this.messageSignData = Optional.ofNullable(messageSignData);
+        this.messageSignData = messageSignData;
+        this.lastSeenMessages = lastSeenMessages;
     }
 
     @Override
@@ -63,17 +66,11 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
             Instant timestamp = readTimestamp();
             SaltSignature saltSignature = readSaltSignature();
             boolean signedPreview = readBoolean();
-            this.messageSignData = Optional.of(new MessageSignData(saltSignature, timestamp, signedPreview));
+            this.messageSignData = new MessageSignData(saltSignature, timestamp, signedPreview);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+                this.lastSeenMessages = new LastSeenMessages.Update(this);
+            }
         }
-        else {
-            this.messageSignData = Optional.empty();
-        }
-    }
-
-    @Override
-    public void copy(WrapperPlayClientChatMessage wrapper) {
-        this.message = wrapper.message;
-        this.messageSignData = wrapper.messageSignData;
     }
 
     @Override
@@ -81,10 +78,20 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
         writeString(this.message, maxMessageLength);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeTimestamp(messageSignData.get().getTimestamp());
-            writeSaltSignature(messageSignData.get().getSaltSignature());
-            writeBoolean(messageSignData.get().isSignedPreview());
+            writeTimestamp(messageSignData.getTimestamp());
+            writeSaltSignature(messageSignData.getSaltSignature());
+            writeBoolean(messageSignData.isSignedPreview());
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+                lastSeenMessages.write(this);
+            }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientChatMessage wrapper) {
+        this.message = wrapper.message;
+        this.messageSignData = wrapper.messageSignData;
+        this.lastSeenMessages = wrapper.lastSeenMessages;
     }
 
     /**
@@ -110,22 +117,22 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
     }
 
     public Optional<MessageSignData> getMessageSignData() {
-        return messageSignData;
+        return Optional.ofNullable(messageSignData);
     }
 
     public void setMessageSignData(@Nullable MessageSignData messageSignData) {
-        this.messageSignData = Optional.ofNullable(messageSignData);
+        this.messageSignData = messageSignData;
     }
 
     protected boolean verify(UUID uuid, PublicKey key) {
-        if (!messageSignData.isPresent()) {
+        if (messageSignData == null) {
             System.out.println("wait a minute!");
             return false;
         }
         Component component = Component.text(message);
         System.out.println("str: " + AdventureSerializer.toJson(component));
         try {
-            return MessageVerifier.verify(uuid, messageSignData.get(), key, String.format("{\"text\":\"%s\"}", message));
+            return MessageVerifier.verify(uuid, messageSignData, key, String.format("{\"text\":\"%s\"}", message));
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
             e.printStackTrace();
         }

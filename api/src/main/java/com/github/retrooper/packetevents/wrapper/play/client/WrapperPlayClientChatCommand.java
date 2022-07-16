@@ -2,6 +2,7 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.crypto.MessageSignData;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
@@ -13,15 +14,17 @@ import java.time.Instant;
 public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClientChatCommand> {
     private String command;
     private MessageSignData messageSignData;
+    private LastSeenMessages.Update lastSeenMessages;
 
     public WrapperPlayClientChatCommand(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData) {
+    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData, LastSeenMessages.Update lastSeenMessages) {
         super(PacketType.Play.Client.CHAT_COMMAND);
         this.command = command;
         this.messageSignData = messageSignData;
+        this.lastSeenMessages = lastSeenMessages;
     }
 
     @Override
@@ -33,6 +36,9 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
             SaltSignature saltSignature = readSaltSignature();
             boolean signedPreview = readBoolean();
             this.messageSignData = new MessageSignData(saltSignature, timestamp, signedPreview);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+                this.lastSeenMessages = new LastSeenMessages.Update(this);
+            }
         }
     }
 
@@ -43,6 +49,9 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
             writeTimestamp(messageSignData.getTimestamp());
             writeSaltSignature(messageSignData.getSaltSignature());
             writeBoolean(messageSignData.isSignedPreview());
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+                this.lastSeenMessages.write(this);
+            }
         }
     }
 
@@ -50,6 +59,7 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
     public void copy(WrapperPlayClientChatCommand wrapper) {
         this.command = wrapper.command;
         this.messageSignData = wrapper.messageSignData;
+        this.lastSeenMessages = wrapper.lastSeenMessages;
     }
 
     public String getCommand() {
@@ -66,5 +76,13 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
 
     public void setMessageSignData(MessageSignData messageSignData) {
         this.messageSignData = messageSignData;
+    }
+
+    public LastSeenMessages.Update getLastSeenMessages() {
+        return lastSeenMessages;
+    }
+
+    public void setLastSeenMessages(LastSeenMessages.Update lastSeenMessages) {
+        this.lastSeenMessages = lastSeenMessages;
     }
 }

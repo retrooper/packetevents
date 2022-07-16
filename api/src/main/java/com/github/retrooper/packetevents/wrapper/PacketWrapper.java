@@ -751,7 +751,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeByteArray(signatureData.getSignature());
     }
 
-    public static <T> IntFunction<T> limitValue(IntFunction<T> function, int limit) {
+    public static <K> IntFunction<K> limitValue(IntFunction<K> function, int limit) {
         return i -> {
             if (i > limit) {
                 throw new RuntimeException("Value " + i + " is larger than limit " + limit);
@@ -800,13 +800,25 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    public <K> List<K> readList(Reader<K> reader) {
-        int size = readVarInt();
-        List<K> list = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            list.add(reader.apply(this));
+
+    public <K, C extends Collection<K>> C readCollection(IntFunction<C> function, Reader<K> reader) {
+        int size = this.readVarInt();
+        Collection collection = function.apply(size);
+        for (int i = 0; i < size; ++i) {
+            collection.add(reader.apply(this));
         }
-        return list;
+        return (C) collection;
+    }
+
+    public <K> void writeCollection(Collection<K> collection, Writer<K> writer) {
+        this.writeVarInt(collection.size());
+        for (K key : collection) {
+            writer.accept(this, key);
+        }
+    }
+
+    public <K> List<K> readList(Reader<K> reader) {
+        return this.readCollection(ArrayList::new, reader);
     }
 
     public <K> void writeList(List<K> list, Writer<K> writer) {

@@ -19,34 +19,42 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientChatAck extends PacketWrapper<WrapperPlayClientChatAck> {
-    // Collection of Update Entries in format:
-    //   UUID of sender
-    //   Last message header signature (byte array)
-    // Optional last received message
-    //   UUID of sender
-    //   Last message header signature (byte array)
+    private LastSeenMessages.Update lastSeenMessages;
 
     public WrapperPlayClientChatAck(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatAck() {
+    public WrapperPlayClientChatAck(LastSeenMessages.Update lastSeenMessages) {
         super(PacketType.Play.Client.CHAT_ACK);
+        this.lastSeenMessages = lastSeenMessages;
     }
 
     @Override
     public void read() {
+        this.lastSeenMessages = new LastSeenMessages.Update(this);
     }
 
     @Override
     public void write() {
+        this.lastSeenMessages.write(this);
     }
 
     @Override
     public void copy(WrapperPlayClientChatAck wrapper) {
+        this.lastSeenMessages = wrapper.lastSeenMessages;
+    }
+
+    public LastSeenMessages.Update getLastSeenMessages() {
+        return lastSeenMessages;
+    }
+
+    public void setLastSeenMessages(LastSeenMessages.Update lastSeenMessages) {
+        this.lastSeenMessages = lastSeenMessages;
     }
 }
