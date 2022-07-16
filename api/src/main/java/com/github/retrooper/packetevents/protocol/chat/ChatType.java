@@ -21,12 +21,13 @@ package com.github.retrooper.packetevents.protocol.chat;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public enum ChatType {
     CHAT(0),
-    
+
     @Deprecated
     SYSTEM(-1),
     @Deprecated
@@ -56,19 +57,17 @@ public enum ChatType {
         this.modernId = (byte) modernId;
     }
 
-    private static final Map<Byte, ChatType> MODERN_CHAT_TYPE_MAP = new HashMap<>();
+    private static final ChatType[] VALUES;
+    private static final Map<Byte, ChatType> MODERN_CHAT_TYPE_MAP;
 
     static {
-        MODERN_CHAT_TYPE_MAP.put((byte) 0, CHAT);
-        MODERN_CHAT_TYPE_MAP.put((byte) 1, SAY_COMMAND);
-        MODERN_CHAT_TYPE_MAP.put((byte) 2, MSG_COMMAND_INCOMING);
-        MODERN_CHAT_TYPE_MAP.put((byte) 3, MSG_COMMAND_OUTGOING);
-        MODERN_CHAT_TYPE_MAP.put((byte) 4, TEAM_MSG_COMMAND_INCOMING);
-        MODERN_CHAT_TYPE_MAP.put((byte) 5, TEAM_MSG_COMMAND_OUTGOING);
-        MODERN_CHAT_TYPE_MAP.put((byte) 6, EMOTE_COMMAND);
-    }
+        VALUES = values();
+        MODERN_CHAT_TYPE_MAP = new HashMap<>();
 
-    private static final ChatType[] VALUES = values();
+        Arrays.stream(VALUES)
+                .filter(chatType -> chatType.modernId != -1)
+                .forEach(chatType -> MODERN_CHAT_TYPE_MAP.put(chatType.modernId, chatType));
+    }
 
     public int getId(ServerVersion version) {
         if (version.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
