@@ -21,9 +21,8 @@ package io.github.retrooper.packetevents.injector.modern.late;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.LateInjector;
 import io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerModern;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.netty.channel.Channel;
-import io.netty.channel.epoll.EpollSocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import org.bukkit.entity.Player;
 
 public class LateChannelInjectorModern implements LateInjector {
@@ -42,10 +41,10 @@ public class LateChannelInjectorModern implements LateInjector {
         PlayerChannelHandlerModern playerChannelHandlerModern = new PlayerChannelHandlerModern();
         playerChannelHandlerModern.player = player;
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
-        if (channel.getClass().equals(NioSocketChannel.class) ||
-                channel.getClass().equals(EpollSocketChannel.class)) {
-            channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerModern);
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+            return;
         }
+        channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerModern);
     }
 
     @Override

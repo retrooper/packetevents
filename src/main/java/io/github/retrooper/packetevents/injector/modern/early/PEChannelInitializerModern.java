@@ -20,11 +20,10 @@ package io.github.retrooper.packetevents.injector.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerModern;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.epoll.EpollSocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.lang.reflect.Method;
 
@@ -38,17 +37,17 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     }
 
     public static void postInitChannel(Channel channel) {
-        if (channel.getClass().equals(NioSocketChannel.class)
-                || channel.getClass().equals(EpollSocketChannel.class)) {
-            PlayerChannelHandlerModern channelHandler = new PlayerChannelHandlerModern();
-            if (channel.pipeline().get("packet_handler") != null) {
-                String handlerName = PacketEvents.get().getHandlerName();
-                if (channel.pipeline().get(handlerName) != null) {
-                    //Just ignore this to support latest ProtocolLib snapshots.
-                    //PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a channel twice!");
-                } else {
-                    channel.pipeline().addBefore("packet_handler", handlerName, channelHandler);
-                }
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+            return;
+        }
+        PlayerChannelHandlerModern channelHandler = new PlayerChannelHandlerModern();
+        if (channel.pipeline().get("packet_handler") != null) {
+            String handlerName = PacketEvents.get().getHandlerName();
+            if (channel.pipeline().get(handlerName) != null) {
+                //Just ignore this to support latest ProtocolLib snapshots.
+                //PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a channel twice!");
+            } else {
+                channel.pipeline().addBefore("packet_handler", handlerName, channelHandler);
             }
         }
     }

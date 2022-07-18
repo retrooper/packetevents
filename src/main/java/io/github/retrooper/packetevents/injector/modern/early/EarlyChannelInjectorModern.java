@@ -25,12 +25,11 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.epoll.EpollSocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -132,9 +131,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             for (Object networkManager : networkManagers) {
                 WrappedPacket networkManagerWrapper = new WrappedPacket(new NMSPacket(networkManager), NMSUtils.networkManagerClass);
                 Channel channel = (Channel) networkManagerWrapper.readObject(0, NMSUtils.nettyChannelClass);
-                if (channel == null ||
-                        (!(channel.getClass().equals(NioSocketChannel.class))) &&
-                                !(channel.getClass().equals(EpollSocketChannel.class))) {
+                if (channel == null || ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
                     continue;
                 }
 
