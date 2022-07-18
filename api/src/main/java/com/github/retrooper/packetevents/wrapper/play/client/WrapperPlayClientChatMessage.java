@@ -25,7 +25,6 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MessageSignData;
-import com.github.retrooper.packetevents.util.crypto.MessageVerifier;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -45,7 +44,7 @@ import java.util.UUID;
 public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClientChatMessage> {
     private String message;
     private MessageSignData messageSignData;
-    private LastSeenMessages.Update lastSeenMessages;
+    private @Nullable LastSeenMessages.Update lastSeenMessages;
 
     public WrapperPlayClientChatMessage(PacketReceiveEvent event) {
         super(event);
@@ -68,7 +67,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
             boolean signedPreview = readBoolean();
             this.messageSignData = new MessageSignData(saltSignature, timestamp, signedPreview);
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-                this.lastSeenMessages = new LastSeenMessages.Update(this);
+                this.lastSeenMessages = readLastSeenMessages();
             }
         }
     }
@@ -82,7 +81,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
             writeSaltSignature(messageSignData.getSaltSignature());
             writeBoolean(messageSignData.isSignedPreview());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-                lastSeenMessages.write(this);
+                writeLastSeenMessages(lastSeenMessages);
             }
         }
     }
@@ -92,6 +91,14 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         this.message = wrapper.message;
         this.messageSignData = wrapper.messageSignData;
         this.lastSeenMessages = wrapper.lastSeenMessages;
+    }
+
+    public @Nullable LastSeenMessages.Update getLastSeenMessages() {
+        return lastSeenMessages;
+    }
+
+    public void setLastSeenMessages(LastSeenMessages.Update lastSeenMessages) {
+        this.lastSeenMessages = lastSeenMessages;
     }
 
     /**
@@ -124,7 +131,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         this.messageSignData = messageSignData;
     }
 
-    protected boolean verify(UUID uuid, PublicKey key) {
+    /*protected boolean verify(UUID uuid, PublicKey key) {
         if (messageSignData == null) {
             System.out.println("wait a minute!");
             return false;
@@ -132,10 +139,10 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         Component component = Component.text(message);
         System.out.println("str: " + AdventureSerializer.toJson(component));
         try {
-            return MessageVerifier.verify(uuid, messageSignData, key, String.format("{\"text\":\"%s\"}", message));
+            return MessageVerifierHelper.verify(uuid, messageSignData, key, String.format("{\"text\":\"%s\"}", message));
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
             e.printStackTrace();
         }
         return false;
-    }
+    }*/
 }

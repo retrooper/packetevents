@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion.MultiVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
+import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -767,6 +768,28 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void writeWorldBlockPosition(WorldBlockPosition pos) {
         writeIdentifier(pos.getWorld());
         writeBlockPosition(pos.getBlockPosition());
+    }
+
+    public LastSeenMessages.Entry readLastSeenMessagesEntry() {
+        return new LastSeenMessages.Entry(readUUID(), readByteArray());
+    }
+
+    public void writeLastMessagesEntry(LastSeenMessages.Entry entry) {
+        writeUUID(entry.getUUID());
+        writeByteArray(entry.getLastVerifier());
+    }
+
+    public LastSeenMessages.Update readLastSeenMessages() {
+        List<LastSeenMessages.Entry> entries =
+                readCollection((IntFunction<List<LastSeenMessages.Entry>>) value -> new ArrayList<>(),
+                        PacketWrapper::readLastSeenMessagesEntry);
+        LastSeenMessages.Entry lastReceived = readOptional(PacketWrapper::readLastSeenMessagesEntry);
+        return new LastSeenMessages.Update(new LastSeenMessages(entries), lastReceived);
+    }
+
+    public void writeLastSeenMessages(LastSeenMessages.Update update) {
+        writeCollection(update.getLastSeenMessages().getEntries(), PacketWrapper::writeLastMessagesEntry);
+        writeOptional(update.getLastReceived(), PacketWrapper::writeLastMessagesEntry);
     }
 
     @Experimental

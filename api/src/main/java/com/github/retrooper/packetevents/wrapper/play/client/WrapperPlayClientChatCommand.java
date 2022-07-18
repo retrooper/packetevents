@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.crypto.MessageSignData;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -14,13 +15,13 @@ import java.time.Instant;
 public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClientChatCommand> {
     private String command;
     private MessageSignData messageSignData;
-    private LastSeenMessages.Update lastSeenMessages;
+    private @Nullable LastSeenMessages.Update lastSeenMessages;
 
     public WrapperPlayClientChatCommand(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData, LastSeenMessages.Update lastSeenMessages) {
+    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData, LastSeenMessages.@Nullable Update lastSeenMessages) {
         super(PacketType.Play.Client.CHAT_COMMAND);
         this.command = command;
         this.messageSignData = messageSignData;
@@ -37,7 +38,7 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
             boolean signedPreview = readBoolean();
             this.messageSignData = new MessageSignData(saltSignature, timestamp, signedPreview);
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-                this.lastSeenMessages = new LastSeenMessages.Update(this);
+                this.lastSeenMessages = readLastSeenMessages();
             }
         }
     }
@@ -50,7 +51,7 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
             writeSaltSignature(messageSignData.getSaltSignature());
             writeBoolean(messageSignData.isSignedPreview());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-                this.lastSeenMessages.write(this);
+                writeLastSeenMessages(lastSeenMessages);
             }
         }
     }
@@ -78,7 +79,7 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
         this.messageSignData = messageSignData;
     }
 
-    public LastSeenMessages.Update getLastSeenMessages() {
+    public @Nullable LastSeenMessages.Update getLastSeenMessages() {
         return lastSeenMessages;
     }
 

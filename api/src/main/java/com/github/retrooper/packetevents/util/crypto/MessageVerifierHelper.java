@@ -26,10 +26,9 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 //TODO Fix MessageVerifier.
-public class MessageVerifier {
+class MessageVerifierHelper {
 
     public static boolean verify(UUID uuid, MessageSignData signData, PublicKey publicKey, Component component)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
