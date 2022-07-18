@@ -36,7 +36,7 @@ import java.security.PublicKey;
  */
 public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLoginServerEncryptionRequest> {
     private String serverID;
-    private PublicKey publicKey;
+    private byte[] publicKeyBytes;
     private byte[] verifyToken;
 
     public WrapperLoginServerEncryptionRequest(PacketSendEvent event) {
@@ -46,35 +46,35 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken) {
         super(PacketType.Login.Server.ENCRYPTION_REQUEST);
         this.serverID = serverID;
-        this.publicKey = MinecraftEncryptionUtil.publicKey(publicKeyBytes);
+        this.publicKeyBytes = publicKeyBytes;
         this.verifyToken = verifyToken;
     }
 
     public WrapperLoginServerEncryptionRequest(String serverID, PublicKey publicKey, byte[] verifyToken) {
         super(PacketType.Login.Server.ENCRYPTION_REQUEST);
         this.serverID = serverID;
-        this.publicKey = publicKey;
+        this.publicKeyBytes = publicKey.getEncoded();
         this.verifyToken = verifyToken;
     }
 
     @Override
     public void read() {
         this.serverID = readString(20);
-        this.publicKey = readPublicKey();
+        this.publicKeyBytes = readByteArray(512);
         this.verifyToken = readByteArray(ByteBufHelper.readableBytes(buffer));
     }
 
     @Override
     public void write() {
         writeString(serverID, 20);
-        writePublicKey(publicKey);
+        writeByteArray(this.publicKeyBytes);
         writeByteArray(verifyToken);
     }
 
     @Override
     public void copy(WrapperLoginServerEncryptionRequest wrapper) {
         this.serverID = wrapper.serverID;
-        this.publicKey = wrapper.publicKey;
+        this.publicKeyBytes = wrapper.publicKeyBytes;
         this.verifyToken = wrapper.verifyToken;
     }
 
@@ -91,6 +91,14 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
         this.serverID = serverID;
     }
 
+    public byte[] getPublicKeyBytes() {
+        return publicKeyBytes;
+    }
+
+    public void setPublicKeyBytes(byte[] publicKeyBytes) {
+        this.publicKeyBytes = publicKeyBytes;
+    }
+
     /**
      * The public key is in DER encoding format.
      * More technically, it is in ASN.1 format.
@@ -100,11 +108,11 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
      * @return Public key
      */
     public PublicKey getPublicKey() {
-        return publicKey;
+        return MinecraftEncryptionUtil.publicKey(publicKeyBytes);
     }
 
     public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
+        this.publicKeyBytes = publicKey.getEncoded();
     }
 
     /**

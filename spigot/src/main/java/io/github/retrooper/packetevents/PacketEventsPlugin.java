@@ -69,7 +69,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     case CHAT_MESSAGE:
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                         if (chatMessage.getMessage().equalsIgnoreCase("!verify")) {
-                            PublicKey key = user.getPublicKey();
+                            //PublicKey key = user.getPublicKey();
                             //user.sendMessage(ChatColor.RED + "Hello, world!");
                             //TODO Fix verifying!
                             //System.out.println("Verify this: " + chatMessage.verify(event.getUser().getUUID(), key));

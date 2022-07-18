@@ -33,7 +33,6 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
-import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerEncryptionRequest;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
@@ -110,11 +109,6 @@ public class InternalPacketListener extends PacketListenerAbstract {
             NBTCompound worldNBT = user.getWorldNBT(respawn.getDimension().getDimensionName()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
             user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
             user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
-        }
-        //Link the public key with the user for us to be able to verify messages.
-        else if (event.getPacketType() == PacketType.Login.Server.ENCRYPTION_REQUEST) {
-            WrapperLoginServerEncryptionRequest request = new WrapperLoginServerEncryptionRequest(event);
-            event.getUser().setPublicKey(request.getPublicKey());
         }
     }
 
