@@ -73,6 +73,9 @@ public class ServerConnectionInitializer {
 
     public static void initChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+            return;
+        }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
 
         synchronized (channel) {
@@ -111,7 +114,9 @@ public class ServerConnectionInitializer {
 
     public static void destroyChannel(Object ch) {
         Channel channel = (Channel) ch;
-
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+            return;
+        }
         synchronized (channel) {
             User user = ProtocolManager.USERS.get(channel);
             if (user == null) {
