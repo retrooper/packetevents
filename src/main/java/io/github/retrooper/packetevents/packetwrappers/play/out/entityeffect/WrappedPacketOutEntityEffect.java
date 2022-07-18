@@ -33,7 +33,7 @@ import java.lang.reflect.Constructor;
 import java.util.Optional;
 
 public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction implements SendableWrapper {
-    private static boolean v_1_7_10, v_1_17, v_1_18_2;
+    private static boolean v_1_7_10, v_1_17, v_1_18_2, v_1_19;
     private static Constructor<?> packetConstructor;
     private int effectID;
     private int amplifier;
@@ -105,6 +105,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
         v_1_7_10 = version.isOlderThan(ServerVersion.v_1_8);
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         v_1_18_2 = version.isNewerThanOrEquals(ServerVersion.v_1_18_2);
+        v_1_19 = version.isNewerThanOrEquals(ServerVersion.v_1_19);
         try {
             if (v_1_17) {
                 packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EFFECT.getConstructor(NMSUtils.packetDataSerializerClass);
@@ -118,10 +119,12 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public int getEffectId() {
         if (packet != null) {
-            if (v_1_18_2) {
+            if (v_1_19) {
+                Object mobEffectList = readObject(0, NMSUtils.mobEffectListClass);
+                return NMSUtils.getEffectId(mobEffectList);
+            } else if (v_1_18_2) {
                 return readInt(4);
-            }
-            else {
+            } else {
                 return readByte(0);
             }
         } else {
@@ -131,10 +134,12 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public void setEffectId(int effectID) {
         if (packet != null) {
-            if (v_1_18_2) {
+            if (v_1_19) {
+                Object mobEffectList = NMSUtils.getMobEffectListById(effectID);
+                write(NMSUtils.mobEffectListClass, 0, mobEffectList);
+            } else if (v_1_18_2) {
                 writeInt(4, effectID);
-            }
-            else {
+            } else {
                 writeByte(0, (byte) effectID);
             }
         } else {
@@ -160,9 +165,12 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public int getDuration() {
         if (packet != null) {
-            //1.7 and only 1.7
+            //1.7 and only 1.7(below 1.8)
             if (v_1_7_10) {
                 return readShort(1);
+            }
+            else if (v_1_19) {
+                return readInt(4);
             }
             //1.18.2+
             else if (v_1_18_2) {
@@ -187,11 +195,11 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
                     duration = Short.MIN_VALUE;
                 }
                 writeShort(0, (short) duration);
-            }
-            else if (v_1_18_2) {
+            } else if (v_1_19) {
+                writeInt(4, duration);
+            } else if (v_1_18_2) {
                 writeInt(5, duration);
-            }
-            else {
+            } else {
                 writeInt(v_1_17 ? 4 : 1, duration);
             }
         } else {

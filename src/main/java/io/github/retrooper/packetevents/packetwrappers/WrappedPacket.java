@@ -24,6 +24,8 @@ import io.github.retrooper.packetevents.exceptions.WrapperUnsupportedUsageExcept
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
 import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter;
+import io.github.retrooper.packetevents.utils.ConditionalValue;
+import io.github.retrooper.packetevents.utils.MojangEitherUtil;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.GameMode;
@@ -43,11 +45,9 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
@@ -540,6 +540,34 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     public void writeList(int index, List<Object> list) {
         write(List.class, index, list);
+    }
+
+    public <T, K> ConditionalValue<T, K> readEither(int index) {
+        Object either = readObject(index, NMSUtils.mojangEitherClass);
+        Optional<T> left = MojangEitherUtil.getLeft(either);
+        if (left.isPresent()) {
+            return ConditionalValue.makeLeft(left.get());
+        }
+        else {
+            Optional<K> right = MojangEitherUtil.getRight(either);
+            try {
+                return ConditionalValue.makeRight(right.orElseThrow((Supplier<Throwable>) () -> new IllegalStateException("Conditional value has no values. Atleast one side must have a value!")));
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public <T, K> void writeEither(int index, ConditionalValue<T, K> conditionalValue) {
+        Object either;
+        if (conditionalValue.left().isPresent()) {
+            either = MojangEitherUtil.makeLeft(conditionalValue.left().get());
+        }
+        else {
+            either = MojangEitherUtil.makeRight(conditionalValue.right().get());
+        }
+        write(NMSUtils.mojangEitherClass, index, either);
     }
 
     private Field getField(Class<?> type, int index) {

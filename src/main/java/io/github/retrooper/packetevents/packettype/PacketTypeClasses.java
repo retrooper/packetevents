@@ -267,7 +267,8 @@ public class PacketTypeClasses {
                     ENTITY_EFFECT, RECIPE_UPDATE, TAGS, MAP_CHUNK_BULK, NAMED_ENTITY_SPAWN, PING, ADD_VIBRATION_SIGNAL,
                     CLEAR_TITLES, INITIALIZE_BORDER, PLAYER_COMBAT_END, PLAYER_COMBAT_ENTER, PLAYER_COMBAT_KILL,
                     SET_ACTIONBAR_TEXT, SET_BORDER_CENTER, SET_BORDER_LERP_SIZE, SET_BORDER_SIZE, SET_BORDER_WARNING_DELAY,
-                    SET_BORDER_WARNING_DISTANCE, SET_SUBTITLE_TEXT, SET_TITLES_ANIMATION, SET_TITLE_TEXT;
+                    SET_BORDER_WARNING_DISTANCE, SET_SUBTITLE_TEXT, SET_TITLES_ANIMATION, SET_TITLE_TEXT,
+                    SYSTEM_CHAT;
 
             /**
              * Initiate all client-bound packet classes.
@@ -296,6 +297,9 @@ public class PacketTypeClasses {
                 BOSS = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Boss");
                 SERVER_DIFFICULTY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ServerDifficulty");
                 CHAT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Chat");
+                if (CHAT == null) {
+                    CHAT = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundPlayerChatPacket");
+                }
                 MULTI_BLOCK_CHANGE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "MultiBlockChange");
                 TAB_COMPLETE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "TabComplete");
                 COMMANDS = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Commands");
@@ -399,6 +403,7 @@ public class PacketTypeClasses {
                 SET_SUBTITLE_TEXT = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetSubtitleTextPacket");
                 SET_TITLES_ANIMATION = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetTitlesAnimationPacket");
                 SET_TITLE_TEXT = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetTitleTextPacket");
+                SYSTEM_CHAT = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSystemChatPacket");
 
                 // 1.18+ only, doesn't follow the naming convention
                 if (MAP_CHUNK == null) {

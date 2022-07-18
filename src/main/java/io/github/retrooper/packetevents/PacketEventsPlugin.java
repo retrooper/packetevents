@@ -19,8 +19,13 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketLoginReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.login.in.encryptionbegin.WrappedPacketLoginInEncryptionBegin;
+import io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity;
+import io.github.retrooper.packetevents.packetwrappers.play.out.entityeffect.WrappedPacketOutEntityEffect;
 import io.github.retrooper.packetevents.packetwrappers.play.out.setslot.WrappedPacketOutSetSlot;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -28,13 +33,14 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
+
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         PacketEventsSettings settings = PacketEvents.create(this).getSettings();
         settings
                 .fallbackServerVersion(ServerVersion.getLatest())
-                .compatInjector(false)
                 .checkForUpdates(true)
                 .bStats(true);
         PacketEvents.get().loadAsyncNewThread();
@@ -47,12 +53,36 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
                 if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
+                    System.out.println("Yes");
                     ItemStack stack = new ItemStack(Material.STICK);
-                    WrappedPacketOutSetSlot setSlot = new WrappedPacketOutSetSlot(0, 2, stack);
+                    WrappedPacketOutSetSlot setSlot = new WrappedPacketOutSetSlot(0, 37, stack);
                     PacketEvents.get().getPlayerUtils().sendPacket(event.getPlayer(), setSlot);
                 }
             }
+
+            @Override
+            public void onPacketPlaySend(PacketPlaySendEvent event) {
+                if (PacketType.Play.Server.Util.isInstanceOfEntity(event.getPacketId())) {
+                    WrappedPacketOutEntity entity = new WrappedPacketOutEntity(event.getNMSPacket());
+                    System.out.println("en: " + entity.getEntityId() + ", delta x: " + entity.getDeltaX()
+                            + ", delta y: " + entity.getDeltaY() +  ", delta z: " + entity.getDeltaZ());
+                }
+                else if (event.getPacketId() == PacketType.Play.Server.ENTITY_EFFECT) {
+                    WrappedPacketOutEntityEffect eff = new WrappedPacketOutEntityEffect(event.getNMSPacket());
+                    System.out.println("eff: " + eff.getEffectId() + ", ampl: " + eff.getAmplifier() + ", dur:" + eff.getDuration());
+
+                }
+            }
+
+            @Override
+            public void onPacketLoginReceive(PacketLoginReceiveEvent event) {
+                if (event.getPacketId() == PacketType.Login.Client.ENCRYPTION_BEGIN) {
+                    WrappedPacketLoginInEncryptionBegin encryptionBegin = new WrappedPacketLoginInEncryptionBegin(event.getNMSPacket());
+                    System.out.println("pub key: " + Arrays.toString(encryptionBegin.getPublicKey()) + ", Verify token or ss: " + encryptionBegin.getVerifyTokenOrSaltSignature().toString());
+                }
+            }
         });*/
+
         PacketEvents.get().init();
     }
 
