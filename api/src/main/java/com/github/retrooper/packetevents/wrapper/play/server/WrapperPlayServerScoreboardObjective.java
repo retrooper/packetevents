@@ -52,10 +52,11 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
             displayName = Component.empty();
             renderType = RenderType.INTEGER;
         } else {
-            displayName = readComponent();
             if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
+                displayName = AdventureSerializer.fromLegacyFormat(readString(32));
                 renderType = RenderType.getByName(readString());
             } else {
+                displayName = readComponent();
                 renderType = RenderType.getById(readVarInt());
             }
         }
@@ -67,7 +68,7 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
         writeByte((byte) mode.ordinal());
         if (this.mode == ObjectiveMode.CREATE || this.mode == ObjectiveMode.UPDATE) {
             if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-                writeString(AdventureSerializer.toJson(displayName), getMaxMessageLength());
+                writeString(AdventureSerializer.asVanilla(displayName));
                 if (renderType != null) {
                     writeString(renderType.name().toLowerCase());
                 } else {
