@@ -24,7 +24,7 @@ public class LastSeenMessages {
             output.writeByte(70);
             output.writeLong(uuid.getMostSignificantBits());
             output.writeLong(uuid.getLeastSignificantBits());
-             output.write(lastVerifier);
+            output.write(lastVerifier);
         }
     }
 
