@@ -117,10 +117,10 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
 
     @Override
     public void copy(WrapperPlayServerSystemChatMessage wrapper) {
-        this.messageJson = wrapper.messageJson;
-        this.message = wrapper.message;
         this.type = wrapper.type;
         this.overlay = wrapper.overlay;
+        this.messageJson = wrapper.messageJson;
+        this.message = wrapper.message;
     }
 
     @Deprecated
