@@ -125,12 +125,19 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     /**
      * Get the chat content.
      * On server versions higher than 1.19 it's signed chat content
+     *
      * @return The chat content.
      */
     public Component getChatContent() {
         return chatContent;
     }
 
+    /**
+     * Set the chat content.
+     * On server versions higher than 1.19 it's signed chat content
+     *
+     * @param chatContent The chat content.
+     */
     public void setChatContent(Component chatContent) {
         this.chatContent = chatContent;
     }
