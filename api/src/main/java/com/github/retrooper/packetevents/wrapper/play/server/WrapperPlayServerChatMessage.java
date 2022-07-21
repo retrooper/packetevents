@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.MessageSender;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MessageSignData;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -60,7 +61,11 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     @Override
     public void read() {
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        chatContent = readComponent();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+            chatContent = Component.text(readString(256));
+        } else {
+            chatContent = readComponent();
+        }
         if (v1_19) {
             unsignedChatContent = readOptional(PacketWrapper::readComponent);
         }
@@ -87,7 +92,11 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     @Override
     public void write() {
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        writeComponent(chatContent);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+            writeString(AdventureSerializer.asVanilla(chatContent), 256);
+        } else {
+            writeComponent(chatContent);
+        }
         if (v1_19) {
             writeOptional(unsignedChatContent, PacketWrapper::writeComponent);
         }
