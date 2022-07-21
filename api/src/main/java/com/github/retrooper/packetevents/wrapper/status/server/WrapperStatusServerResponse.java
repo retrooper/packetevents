@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.status.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -27,42 +26,33 @@ import com.google.gson.JsonObject;
 
 public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServerResponse> {
     private String componentJson;
-    private boolean enforceSecureChat;
 
     public WrapperStatusServerResponse(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperStatusServerResponse(JsonObject component, boolean enforceSecureChat) {
-        this(component.toString(), enforceSecureChat);
+    public WrapperStatusServerResponse(JsonObject component) {
+        this(component.toString());
     }
 
-    public WrapperStatusServerResponse(String componentJson, boolean enforceSecureChat) {
+    public WrapperStatusServerResponse(String componentJson) {
         super(PacketType.Status.Server.RESPONSE);
         this.componentJson = componentJson;
-        this.enforceSecureChat = enforceSecureChat;
     }
 
     @Override
     public void read() {
         componentJson = readString();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-            enforceSecureChat = readBoolean();
-        }
     }
 
     @Override
     public void write() {
         writeString(componentJson);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-            writeBoolean(enforceSecureChat);
-        }
     }
 
     @Override
     public void copy(WrapperStatusServerResponse wrapper) {
         componentJson = wrapper.componentJson;
-        enforceSecureChat = wrapper.enforceSecureChat;
     }
 
     public JsonObject getComponent() {
@@ -79,14 +69,6 @@ public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServ
 
     public void setComponentJson(String componentJson) {
         this.componentJson = componentJson;
-    }
-
-    public boolean isEnforceSecureChat() {
-        return enforceSecureChat;
-    }
-
-    public void setEnforceSecureChat(boolean enforceSecureChat) {
-        this.enforceSecureChat = enforceSecureChat;
     }
 }
 
