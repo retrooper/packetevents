@@ -45,9 +45,9 @@ public class WrapperPlayServerEntityVelocity extends PacketWrapper<WrapperPlaySe
         } else {
             entityID = readVarInt();
         }
-        double velX = readShort() / 8000.0;
-        double velY = readShort() / 8000.0;
-        double velZ = readShort() / 8000.0;
+        double velX = (double) readShort() / 8000.0;
+        double velY = (double) readShort() / 8000.0;
+        double velZ = (double) readShort() / 8000.0;
         velocity = new Vector3d(velX, velY, velZ);
     }
 
