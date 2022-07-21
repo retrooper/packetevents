@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
-// TODO: Class needs to be finished due to pre-5 changes
 public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClientChatCommand> {
     private String command;
     private MessageSignData messageSignData;
@@ -21,7 +20,7 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
         super(event);
     }
 
-    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData, LastSeenMessages.@Nullable Update lastSeenMessages) {
+    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData, @Nullable LastSeenMessages.Update lastSeenMessages) {
         super(PacketType.Play.Client.CHAT_COMMAND);
         this.command = command;
         this.messageSignData = messageSignData;
@@ -83,7 +82,7 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
         return lastSeenMessages;
     }
 
-    public void setLastSeenMessages(LastSeenMessages.Update lastSeenMessages) {
+    public void setLastSeenMessages(@Nullable LastSeenMessages.Update lastSeenMessages) {
         this.lastSeenMessages = lastSeenMessages;
     }
 }
