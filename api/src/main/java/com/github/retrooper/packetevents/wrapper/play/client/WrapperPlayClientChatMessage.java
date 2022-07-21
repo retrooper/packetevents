@@ -23,20 +23,13 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MessageSignData;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SignatureException;
 import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * This packet is used to send a chat message to the server.
@@ -93,14 +86,6 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         this.lastSeenMessages = wrapper.lastSeenMessages;
     }
 
-    public @Nullable LastSeenMessages.Update getLastSeenMessages() {
-        return lastSeenMessages;
-    }
-
-    public void setLastSeenMessages(LastSeenMessages.Update lastSeenMessages) {
-        this.lastSeenMessages = lastSeenMessages;
-    }
-
     /**
      * The message.
      * On {@link ClientVersion#V_1_10} and older clients, the message should never exceed 100 characters.
@@ -129,6 +114,14 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
 
     public void setMessageSignData(@Nullable MessageSignData messageSignData) {
         this.messageSignData = messageSignData;
+    }
+
+    public @Nullable LastSeenMessages.Update getLastSeenMessages() {
+        return lastSeenMessages;
+    }
+
+    public void setLastSeenMessages(@Nullable LastSeenMessages.Update lastSeenMessages) {
+        this.lastSeenMessages = lastSeenMessages;
     }
 
     /*protected boolean verify(UUID uuid, PublicKey key) {
