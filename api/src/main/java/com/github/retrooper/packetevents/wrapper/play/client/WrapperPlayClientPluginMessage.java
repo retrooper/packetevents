@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -54,14 +54,16 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             this.channelName = readString();
-        }
-        else {
+        } else {
             this.channelName = readString(20);
         }
+
         if (serverVersion == ServerVersion.V_1_7_10) {
             //It is ignored, because we don't need it
             int legacyDataSize = readShort();
         }
+
+        if (ByteBufHelper.readableBytes(buffer) > 32767) throw new RuntimeException("Payload may not be larger than 32767 bytes");
         this.data = readRemainingBytes();
     }
 
