@@ -826,7 +826,7 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public <K, C extends Collection<K>> C readCollection(IntFunction<C> function, Reader<K> reader) {
         int size = this.readVarInt();
-        Collection collection = function.apply(size);
+        Collection<K> collection = function.apply(size);
         for (int i = 0; i < size; ++i) {
             collection.add(reader.apply(this));
         }
@@ -852,10 +852,10 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     @FunctionalInterface
-    public interface Reader<T> extends Function<PacketWrapper, T> {
+    public interface Reader<T> extends Function<PacketWrapper<?>, T> {
     }
 
     @FunctionalInterface
-    public interface Writer<T> extends BiConsumer<PacketWrapper, T> {
+    public interface Writer<T> extends BiConsumer<PacketWrapper<?>, T> {
     }
 }
