@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
+// TODO: This wrapper needs Signature data @retrooper
 public class WrappedPacketLoginInStart extends WrappedPacket {
     public WrappedPacketLoginInStart(NMSPacket packet) {
         super(packet);
@@ -69,6 +70,24 @@ public class WrappedPacketLoginInStart extends WrappedPacket {
         }
         else {
             throw new IllegalAccessException("Please use the setGameProfile method in the WrappedPacketLoginInStart wrapper to change the username!");
+        }
+    }
+
+    public @Nullable UUID getPlayerUUID() {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+            return readObject(0, UUID.class);
+        }
+        else {
+            return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass)).getId();
+        }
+    }
+
+    public void setPlayerUUID(UUID playerUUID) throws IllegalAccessException {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+            writeObject(0, playerUUID);
+        }
+        else {
+            throw new IllegalAccessException("Please use the setGameProfile method in the WrappedPacketLoginInStart wrapper to change the uuid!");
         }
     }
 
