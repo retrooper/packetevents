@@ -229,26 +229,26 @@ public enum ServerVersion {
      * This method simply checks if this server version's protocol version is greater than, less than or equal to
      * the compared server version's protocol version.
      *
-     * @param target  Compared server version.
-     * @param version Comparison type.
+     * @param comparison    Comparison type.
+     * @param targetVersion Compared server version.
      * @return true or false, based on the comparison type.
      * @see #isNewerThan(ServerVersion)
      * @see #isNewerThanOrEquals(ServerVersion)
      * @see #isOlderThan(ServerVersion)
      * @see #isOlderThanOrEquals(ServerVersion)
      */
-    public boolean is(@NotNull MultiVersion version, @NotNull ServerVersion target) {
-        switch (version) {
+    public boolean is(@NotNull MultiVersion comparison, @NotNull ServerVersion targetVersion) {
+        switch (comparison) {
             case EQUALS:
-                return protocolVersion == target.protocolVersion;
+                return protocolVersion == targetVersion.protocolVersion;
             case NEWER_THAN:
-                return isNewerThan(target);
+                return isNewerThan(targetVersion);
             case NEWER_THAN_OR_EQUALS:
-                return isNewerThanOrEquals(target);
+                return isNewerThanOrEquals(targetVersion);
             case OLDER_THAN:
-                return isOlderThan(target);
+                return isOlderThan(targetVersion);
             case OLDER_THAN_OR_EQUALS:
-                return isOlderThanOrEquals(target);
+                return isOlderThanOrEquals(targetVersion);
             default:
                 return false;
         }
