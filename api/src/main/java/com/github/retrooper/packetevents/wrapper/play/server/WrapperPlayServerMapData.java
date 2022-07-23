@@ -114,7 +114,6 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
 
     @Override
     public void copy(WrapperPlayServerMapData wrapper) {
-        super.copy(wrapper);
         this.data = wrapper.data;
         this.scale = wrapper.scale;
         this.icons = new ArrayList<>(wrapper.icons.size());
