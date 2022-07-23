@@ -118,7 +118,7 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
         this.scale = wrapper.scale;
         this.icons = new ArrayList<>(wrapper.icons.size());
         wrapper.icons.forEach(icon -> this.icons.add(icon.clone()));
-        this.buffer = wrapper.buffer.clone();
+        this.buffer = wrapper.buffer;
         this.column = wrapper.column;
         this.rows = wrapper.rows;
         this.x = wrapper.x;
