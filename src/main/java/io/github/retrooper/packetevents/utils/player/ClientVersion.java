@@ -94,11 +94,11 @@ public enum ClientVersion {
 
     v_1_18_2(758),
 
-    v_1_19(759),
+    v_1_19(759), v_1_19_1(760),
     //TODO Update(checkpoint for things to look out for when updating)
 
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
-    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_19.protocolVersion + 1),
+    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_19_1.protocolVersion + 1),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
      * This constant assures you they are on a pre-release.
