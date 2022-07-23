@@ -87,17 +87,17 @@ public enum ServerVersion {
     }
 
     public static ServerVersion getLatest() {
-        return reversedValues()[1];
+        return REVERSED_VALUES[1];
     }
 
     public static ServerVersion getOldest() {
-        return values()[0];
+        return VALUES[0];
     }
 
     //TODO Optimize
     @Deprecated
     public static ServerVersion getById(int protocolVersion) {
-        for (ServerVersion version : values()) {
+        for (ServerVersion version : VALUES) {
             if (version.protocolVersion == protocolVersion) {
                 return version;
             }
@@ -149,7 +149,6 @@ public enum ServerVersion {
         if (target.protocolVersion != protocolVersion || this == target) {
             return protocolVersion > target.protocolVersion;
         }
-
         /*
          * The server versions unfortunately have the same protocol version.
          * We need to look at this "reversedValues" variable.
@@ -160,10 +159,10 @@ public enum ServerVersion {
         for (ServerVersion version : reversedValues()) {
             if (version == target) {
                 return false;
+            } else if (version == this) {
+                return true;
             }
-            if (version == this) return true;
         }
-
         return false;
     }
 
