@@ -5,6 +5,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
 
@@ -12,6 +13,7 @@ public class WrappedPacketOutSystemChat extends WrappedPacket implements Sendabl
     private static Constructor<?> packetConstructor;
     private String message;
     private WrappedPacketOutChat.ChatPosition position;
+
     public WrappedPacketOutSystemChat(final NMSPacket packet) {
         super(packet);
     }
@@ -49,7 +51,7 @@ public class WrappedPacketOutSystemChat extends WrappedPacket implements Sendabl
 
     public WrappedPacketOutChat.ChatPosition getPosition() {
         if (packet != null) {
-            return WrappedPacketOutChat.ChatPosition.values()[readInt(0)];
+            return WrappedPacketOutChat.ChatPosition.getById(version, readInt(0));
         }
         else {
             return position;

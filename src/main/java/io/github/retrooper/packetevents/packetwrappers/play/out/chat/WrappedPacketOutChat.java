@@ -28,11 +28,11 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> chatClassConstructor;
@@ -233,15 +233,65 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         }
     }
 
+    // TODO: Add support to every single Wrapper usage
     public enum ChatPosition {
-        CHAT,
-        SYSTEM_MESSAGE,
-        GAME_INFO,
-        //Added in 1.19
-        SAY_COMMAND,
-        MSG_COMMAND,
-        TEAM_MSG_COMMAND,
-        EMOTE_COMMAND,
-        TELLRAW_COMMAND;
+        CHAT(0),
+
+        @Deprecated
+        SYSTEM(-1),
+        @Deprecated
+        GAME_INFO(-1),
+
+        SAY_COMMAND(1),
+
+        @Deprecated
+        MSG_COMMAND(-1),
+
+        MSG_COMMAND_INCOMING(2),
+        MSG_COMMAND_OUTGOING(3),
+
+        @Deprecated
+        TEAM_MSG_COMMAND(-1),
+
+        TEAM_MSG_COMMAND_INCOMING(4),
+        TEAM_MSG_COMMAND_OUTGOING(5),
+        EMOTE_COMMAND(6),
+
+        @Deprecated
+        TELLRAW_COMMAND(-1);
+
+        private final byte modernId;
+
+        ChatPosition(int modernId) {
+            this.modernId = (byte) modernId;
         }
+
+        private static final ChatPosition[] VALUES;
+        private static final Map<Byte, ChatPosition> MODERN_CHAT_TYPE_MAP;
+
+        static {
+            VALUES = values();
+            MODERN_CHAT_TYPE_MAP = new HashMap<>();
+
+            Arrays.stream(VALUES)
+                    .filter(chatType -> chatType.modernId != -1)
+                    .forEach(chatType -> MODERN_CHAT_TYPE_MAP.put(chatType.modernId, chatType));
+        }
+
+        public int getId(ServerVersion version) {
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+                return modernId;
+            }
+            return ordinal();
+        }
+
+        @Nullable
+        public static ChatPosition getById(ServerVersion version, int id) {
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+                return MODERN_CHAT_TYPE_MAP.get((byte) id);
+            } else {
+                return VALUES[id];
+            }
+        }
+    }
 }
