@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
+import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import org.jetbrains.annotations.NotNull;
 
@@ -244,5 +245,35 @@ public enum ClientVersion {
      */
     public boolean isOlderThanOrEquals(ClientVersion target) {
         return this.protocolVersion <= target.protocolVersion;
+    }
+
+    /**
+     * Is this client version newer than, older than or equal to the compared client version?
+     * This method simply checks if this client version's protocol version is greater than, less than or equal to
+     * the compared client version's protocol version.
+     *
+     * @param target  Compared client version.
+     * @param version Comparison type.
+     * @return true or false, based on the comparison type.
+     * @see #isNewerThan(ClientVersion)
+     * @see #isNewerThanOrEquals(ClientVersion)
+     * @see #isOlderThan(ClientVersion)
+     * @see #isOlderThanOrEquals(ClientVersion)
+     */
+    public boolean is(@NotNull MultiVersion version, @NotNull ClientVersion target) {
+        switch (version) {
+            case EQUALS:
+                return protocolVersion == target.protocolVersion;
+            case NEWER_THAN:
+                return isNewerThan(target);
+            case NEWER_THAN_OR_EQUALS:
+                return isNewerThanOrEquals(target);
+            case OLDER_THAN:
+                return isOlderThan(target);
+            case OLDER_THAN_OR_EQUALS:
+                return isOlderThanOrEquals(target);
+            default:
+                return false;
+        }
     }
 }

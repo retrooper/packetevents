@@ -231,7 +231,7 @@ public enum ServerVersion {
      *
      * @param target  Compared server version.
      * @param version Comparison type.
-     * @return Is this server version newer than, older than or equal to the compared server version.
+     * @return true or false, based on the comparison type.
      * @see #isNewerThan(ServerVersion)
      * @see #isNewerThanOrEquals(ServerVersion)
      * @see #isOlderThan(ServerVersion)
@@ -249,7 +249,8 @@ public enum ServerVersion {
                 return isOlderThan(target);
             case OLDER_THAN_OR_EQUALS:
                 return isOlderThanOrEquals(target);
+            default:
+                return false;
         }
-        return false;
     }
 }
