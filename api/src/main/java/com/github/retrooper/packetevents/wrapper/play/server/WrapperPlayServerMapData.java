@@ -1,6 +1,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.map.MapIcon;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -14,7 +15,7 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
     private int data;
     private int scale;
     private boolean locked;
-    private Collection<Icon> icons;
+    private Collection<MapIcon> icons;
     private byte[] buffer;
     private int column;
     private int rows;
@@ -25,13 +26,7 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
         super(event);
     }
 
-    public WrapperPlayServerMapData(int data,
-                                    int scale,
-                                    boolean locked,
-                                    @Nullable Collection<Icon> icons,
-                                    byte[] buffer,
-                                    int x, int z,
-                                    int column, int rows) {
+    public WrapperPlayServerMapData(int data, int scale, boolean locked, @Nullable Collection<MapIcon> icons, byte[] buffer, int x, int z, int column, int rows) {
         super(PacketType.Play.Server.MAP_DATA);
         this.data = data;
         this.scale = scale;
@@ -64,7 +59,7 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
             int iconCount = this.readVarInt();
             this.icons = new ArrayList<>(iconCount);
             for (int i = 0; i < iconCount; i++) {
-                this.icons.add(new Icon(this));
+                this.icons.add(new MapIcon(this));
             }
         }
 
@@ -122,54 +117,5 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
         this.rows = wrapper.rows;
         this.x = wrapper.x;
         this.z = wrapper.z;
-    }
-
-    public static class Icon implements Cloneable {
-
-        private final byte type;
-        private final byte x;
-        private final byte y;
-        private final byte rotation;
-
-        public Icon(byte type, byte x, byte y, byte rotation) {
-            this.type = type;
-            this.x = x;
-            this.y = y;
-            this.rotation = rotation;
-        }
-
-        public Icon(PacketWrapper<WrapperPlayServerMapData> packetWrapper) {
-            short s = packetWrapper.readByte();
-
-            this.type = (byte)(s >> 4 & 15);
-            this.x = packetWrapper.readByte();
-            this.y = packetWrapper.readByte();
-            this.rotation = (byte) (s & 15);
-        }
-
-        @Override
-        public Icon clone() {
-            try {
-                return (Icon) super.clone();
-            } catch (CloneNotSupportedException e) {
-                throw new AssertionError();
-            }
-        }
-
-        public byte getType() {
-            return type;
-        }
-
-        public byte getX() {
-            return x;
-        }
-
-        public byte getY() {
-            return y;
-        }
-
-        public byte getRotation() {
-            return rotation;
-        }
     }
 }
