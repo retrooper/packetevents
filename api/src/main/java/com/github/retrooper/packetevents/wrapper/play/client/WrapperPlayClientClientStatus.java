@@ -19,8 +19,8 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -38,13 +38,13 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
 
     @Override
     public void read() {
-        this.action = readMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
+        this.action = readMultiVersional(VersionComparison.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
                 wrapper -> Action.getById(wrapper.readVarInt()), packetWrapper -> Action.getById(packetWrapper.readByte()));
     }
 
     @Override
     public void write() {
-        writeMultiVersional(MultiVersion.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, action.ordinal(), (wrapper, integer) -> {
+        writeMultiVersional(VersionComparison.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, action.ordinal(), (wrapper, integer) -> {
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) && integer == 2) {
                 throw new IllegalStateException("The WrapperGameClientClientStatus.Action.OPEN_INVENTORY_ACTION enum constant is not supported on 1.16+ servers!");
             }

@@ -21,7 +21,7 @@ package com.github.retrooper.packetevents.manager.server;
 /**
  * This enum contains all possible comparison types for server versions.
  */
-public enum MultiVersion {
+public enum VersionComparison {
     /*
     The server version equals the compared server version.
      */

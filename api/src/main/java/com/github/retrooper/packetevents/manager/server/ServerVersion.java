@@ -236,7 +236,7 @@ public enum ServerVersion {
      * @see #isOlderThan(ServerVersion)
      * @see #isOlderThanOrEquals(ServerVersion)
      */
-    public boolean is(@NotNull MultiVersion comparison, @NotNull ServerVersion targetVersion) {
+    public boolean is(@NotNull VersionComparison comparison, @NotNull ServerVersion targetVersion) {
         switch (comparison) {
             case EQUALS:
                 return protocolVersion == targetVersion.protocolVersion;

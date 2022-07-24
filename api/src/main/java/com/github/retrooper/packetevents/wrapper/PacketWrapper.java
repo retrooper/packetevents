@@ -22,8 +22,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
@@ -793,7 +793,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     @Experimental
-    public <U, V, R> U readMultiVersional(MultiVersion version, ServerVersion target, Reader<V> first, Reader<R> second) {
+    public <U, V, R> U readMultiVersional(VersionComparison version, ServerVersion target, Reader<V> first, Reader<R> second) {
         if (serverVersion.is(version, target)) {
             return (U) first.apply(this);
         } else {
@@ -802,7 +802,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     @Experimental
-    public <V> void writeMultiVersional(MultiVersion version, ServerVersion target, V value, Writer<V> first, Writer<V> second) {
+    public <V> void writeMultiVersional(VersionComparison version, ServerVersion target, V value, Writer<V> first, Writer<V> second) {
         if (serverVersion.is(version, target)) {
             first.accept(this, value);
         } else {

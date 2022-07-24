@@ -18,8 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
-import com.github.retrooper.packetevents.manager.server.MultiVersion;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -260,7 +260,7 @@ public enum ClientVersion {
      * @see #isOlderThan(ClientVersion)
      * @see #isOlderThanOrEquals(ClientVersion)
      */
-    public boolean is(@NotNull MultiVersion comparison, @NotNull ClientVersion targetVersion) {
+    public boolean is(@NotNull VersionComparison comparison, @NotNull ClientVersion targetVersion) {
         switch (comparison) {
             case EQUALS:
                 return protocolVersion == targetVersion.protocolVersion;
