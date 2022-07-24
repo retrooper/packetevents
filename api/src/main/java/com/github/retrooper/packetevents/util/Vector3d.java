@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 
+import java.util.Objects;
+
 /**
  * 3D double Vector.
  * This vector can represent coordinates, angles, or anything you want.
@@ -129,6 +131,11 @@ public class Vector3d {
             return x == (double) vec.x && y == (double) vec.y && z == (double) vec.z;
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
     }
 
     public Vector3d add(double x, double y, double z) {

@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 
+import java.util.Objects;
+
 /**
  * 3D float Vector.
  * This vector can represent coordinates, angles, or anything you want.
@@ -129,6 +131,11 @@ public class Vector3f {
             return x == (double) vec.x && y == (double) vec.y && z == (double) vec.z;
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
     }
 
     public Vector3f add(float x, float y, float z) {
