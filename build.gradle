@@ -31,6 +31,26 @@ subprojects {
         mavenLocal()
         mavenCentral()
         maven { url = 'https://oss.sonatype.org/content/groups/public/' }
+
+        maven {
+            //TODO UPDATE isRelease boolean to publish to correct repository, for now we publish all to snapshots url
+            boolean isRelease = false
+            def snapshotUrl = "https://repo.codemc.io/repository/maven-snapshots/"
+            def releaseUrl = "https://repo.codemc.io/repository/maven-releases/"
+
+            // Check which URL should be used
+            url = isRelease ? releaseUrl : snapshotUrl
+
+            def mavenUsername = System.getenv("retrooper_username") ? System.getenv("retrooper_username") : null
+            def mavenPassword = System.getenv("retrooper_password") ? System.getenv("retrooper_password") : null
+
+            if(mavenUsername != null && mavenPassword != null) {
+                credentials {
+                    username = mavenUsername
+                    password = mavenPassword
+                }
+            }
+        }
     }
 
     dependencies {
@@ -71,6 +91,14 @@ subprojects {
                 groupId = 'com.github.retrooper.packetevents'
                 artifactId = project.name
                 version = project.version
+                from components.java
+            }
+
+            mavenJava(MavenPublication) {
+                groupId = group
+                artifactId = project.name
+                version = project.version
+
                 from components.java
             }
         }
