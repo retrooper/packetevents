@@ -17,26 +17,26 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
     private boolean locked;
     private Collection<MapIcon> icons;
     private byte[] buffer;
-    private int column;
-    private int rows;
     private int x;
     private int z;
+    private int width;
+    private int height;
 
     public WrapperPlayServerMapData(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerMapData(int data, int scale, boolean locked, @Nullable Collection<MapIcon> icons, byte[] buffer, int x, int z, int column, int rows) {
+    public WrapperPlayServerMapData(int data, int scale, boolean locked, @Nullable Collection<MapIcon> icons, byte[] buffer, int x, int z, int width, int height) {
         super(PacketType.Play.Server.MAP_DATA);
         this.data = data;
         this.scale = scale;
         this.locked = locked;
         this.icons = icons;
         this.buffer = buffer;
-        this.column = column;
-        this.rows = rows;
         this.x = x;
         this.z = z;
+        this.width = width;
+        this.height = height;
     }
 
     @Override
@@ -63,9 +63,9 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
             }
         }
 
-        this.column = this.readUnsignedByte();
-        if (this.column > 0) {
-            this.rows = this.readUnsignedByte();
+        this.width = this.readUnsignedByte();
+        if (this.width > 0) {
+            this.height = this.readUnsignedByte();
             this.x = this.readUnsignedByte();
             this.z = this.readUnsignedByte();
             this.buffer = this.readByteArray();
@@ -92,15 +92,15 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
         if (writeIcons || this.clientVersion.isOlderThan(ClientVersion.V_1_17)) {
             this.writeVarInt(this.icons.size());
             this.icons.forEach(icon -> {
-                this.writeByte((icon.getType() & 15) << 4 | icon.getRotation() & 15);
+                this.writeByte((icon.getType().getId() & 15) << 4 | icon.getRotation() & 15);
                 this.writeByte(icon.getX());
                 this.writeByte(icon.getY());
             });
         }
 
-        this.writeByte(this.column);
-        if (this.column > 0) {
-            this.writeByte(this.rows);
+        this.writeByte(this.width);
+        if (this.width > 0) {
+            this.writeByte(this.height);
             this.writeByte(this.x);
             this.writeByte(this.z);
             this.writeByteArray(this.buffer);
@@ -113,9 +113,82 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
         this.scale = wrapper.scale;
         this.icons = new ArrayList<>(wrapper.icons.size());
         wrapper.icons.forEach(icon -> this.icons.add(icon.clone()));
-        this.column = wrapper.column;
-        this.rows = wrapper.rows;
+        this.width = wrapper.width;
+        this.height = wrapper.height;
         this.x = wrapper.x;
         this.z = wrapper.z;
+    }
+
+    public int getData() {
+        return data;
+    }
+
+    public void setData(int data) {
+        this.data = data;
+    }
+
+    public int getScale() {
+        return scale;
+    }
+
+    public void setScale(int scale) {
+        this.scale = scale;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    public Collection<MapIcon> getIcons() {
+        return icons;
+    }
+
+    public void setIcons(Collection<MapIcon> icons) {
+        this.icons = icons;
+    }
+
+    @Override
+    public byte[] getBuffer() {
+        return buffer;
+    }
+
+    public void setBuffer(byte[] buffer) {
+        this.buffer = buffer;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getZ() {
+        return z;
+    }
+
+    public void setZ(int z) {
+        this.z = z;
     }
 }
