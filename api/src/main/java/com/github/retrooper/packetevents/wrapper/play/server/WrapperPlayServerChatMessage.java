@@ -73,8 +73,10 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         }
 
         sender = new MessageSender();
-        if (v1_19) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             sender.setUUID(readUUID());
+        }
+        if (v1_19) {
             sender.setDisplayName(readComponent());
             sender.setTeamName(readOptional(PacketWrapper::readComponent));
             Instant timestamp = readTimestamp();
@@ -97,7 +99,9 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
             writeByte(type.getId());
         }
 
-        writeUUID(sender.getUUID());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+            writeUUID(sender.getUUID());
+        }
         if (v1_19) {
             writeComponent(sender.getDisplayName());
             writeOptional(sender.getTeamName(), (writer, component) -> {
