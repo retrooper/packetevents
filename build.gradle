@@ -42,7 +42,6 @@ subprojects {
 
         shadowJar {
             archiveFileName.set("packetevents-${project.name}-${project.version}.jar")
-            //minimize()
         }
 
         build {
