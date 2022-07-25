@@ -16,7 +16,7 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
     private int scale;
     private boolean locked;
     private Collection<MapIcon> icons;
-    private byte[] buffer;
+    private byte[] colors;
     private int x;
     private int z;
     private int width;
@@ -26,13 +26,13 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
         super(event);
     }
 
-    public WrapperPlayServerMapData(int data, int scale, boolean locked, @Nullable Collection<MapIcon> icons, byte[] buffer, int x, int z, int width, int height) {
+    public WrapperPlayServerMapData(int data, int scale, boolean locked, @Nullable Collection<MapIcon> icons, byte[] colors, int x, int z, int width, int height) {
         super(PacketType.Play.Server.MAP_DATA);
         this.data = data;
         this.scale = scale;
         this.locked = locked;
         this.icons = icons;
-        this.buffer = buffer;
+        this.colors = colors;
         this.x = x;
         this.z = z;
         this.width = width;
@@ -103,7 +103,7 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
             this.writeByte(this.height);
             this.writeByte(this.x);
             this.writeByte(this.z);
-            this.writeByteArray(this.buffer);
+            this.writeByteArray(this.colors);
         }
     }
 
@@ -151,13 +151,12 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
         this.icons = icons;
     }
 
-    @Override
-    public byte[] getBuffer() {
-        return buffer;
+    public byte[] getColors() {
+        return colors;
     }
 
-    public void setBuffer(byte[] buffer) {
-        this.buffer = buffer;
+    public void setColors(byte[] colors) {
+        this.colors = colors;
     }
 
     public int getWidth() {
