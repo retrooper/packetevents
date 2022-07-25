@@ -35,8 +35,6 @@ import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.epoll.EpollSocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 
@@ -75,10 +73,9 @@ public class ServerConnectionInitializer {
 
     public static void initChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-        if (!(channel instanceof EpollSocketChannel) && !(channel instanceof NioSocketChannel)) {
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
             return;
         }
-
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
 
         synchronized (channel) {
@@ -117,11 +114,9 @@ public class ServerConnectionInitializer {
 
     public static void destroyChannel(Object ch) {
         Channel channel = (Channel) ch;
-        if (!(channel instanceof EpollSocketChannel) &&
-                !(channel instanceof NioSocketChannel)) {
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
             return;
         }
-
         synchronized (channel) {
             User user = ProtocolManager.USERS.get(channel);
             if (user == null) {

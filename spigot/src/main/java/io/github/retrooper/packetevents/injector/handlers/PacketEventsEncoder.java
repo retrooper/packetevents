@@ -27,7 +27,6 @@ import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -64,9 +63,14 @@ public class PacketEventsEncoder extends MessageToByteEncoder<Object> {
             if (!in.isReadable()) return;
             out.writeBytes(in);
         }
-        PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out, true, false);
-        if (sendEvent.hasPostTasks()) {
-            queuedPostTasks.addAll(sendEvent.getPostTasks());
+        try {
+            PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out, true, false);
+            if (sendEvent.hasPostTasks()) {
+                queuedPostTasks.addAll(sendEvent.getPostTasks());
+            }
+        }
+        catch (Exception ex) {
+            throw new PacketProcessException("Failed to process outgoing packet", ex);
         }
     }
 
@@ -121,6 +125,7 @@ public class PacketEventsEncoder extends MessageToByteEncoder<Object> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
         //Check if the minecraft server will already print our exception for us.
+        //Don't print errors during handshake
         if (ExceptionUtil.isException(cause, PacketProcessException.class) && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
                 && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();

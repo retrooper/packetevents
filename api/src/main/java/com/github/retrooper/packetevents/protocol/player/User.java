@@ -42,7 +42,6 @@ public class User {
     private ConnectionState connectionState;
     private ClientVersion clientVersion;
     private final UserProfile profile;
-    private @Nullable PublicKey publicKey;
     private int entityId = -1;
     private int minWorldHeight = 0;
     private int totalWorldHeight = 256;
@@ -99,14 +98,6 @@ public class User {
 
     public void setEntityId(int entityId) {
         this.entityId = entityId;
-    }
-
-    public @Nullable PublicKey getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(@Nullable PublicKey publicKey) {
-        this.publicKey = publicKey;
     }
 
     public void sendPacket(Object buffer) {
