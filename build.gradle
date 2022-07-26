@@ -74,8 +74,8 @@ subprojects {
             }*/
 
             mavenJava(MavenPublication) {
-                groupId = group
-                artifactId = "packetevents"
+                groupId = "com.github.retrooper.packetevents"
+                artifactId = project.name
                 version = project.version
 
                 from components.java
