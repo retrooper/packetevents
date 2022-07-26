@@ -235,6 +235,8 @@ public class SpigotPacketEventsBuilder {
                     //Uninject the injector if needed(depends on the injector implementation)
                     injector.uninject();
                 }
+                //Unregister all listeners. Because if we attempt to reload, we will end up with duplicate listeners.
+                getEventManager().unregisterAllListeners();
             }
 
             @Override
