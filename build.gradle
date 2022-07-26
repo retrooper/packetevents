@@ -65,12 +65,13 @@ subprojects {
 
     publishing {
         publications {
+            /*
             maven(MavenPublication) {
                 groupId = 'com.github.retrooper.packetevents'
                 artifactId = project.name
                 version = project.version
                 from components.java
-            }
+            }*/
 
             mavenJava(MavenPublication) {
                 groupId = "com.github.retrooper.packetevents"
