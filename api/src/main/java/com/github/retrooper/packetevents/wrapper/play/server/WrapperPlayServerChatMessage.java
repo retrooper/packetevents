@@ -34,6 +34,9 @@ import java.time.Instant;
 import java.util.Optional;
 
 public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServerChatMessage> {
+    private byte @Nullable[] previousSignature;
+    private byte @Nullable[] headerSignature;
+    private @Nullable String plainContent;
     private Component chatContent;
     private @Nullable Component unsignedChatContent;
     private ChatType type;
@@ -44,25 +47,34 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    public WrapperPlayServerChatMessage(Component chatContent, ChatType type, MessageSender sender) {
-        this(chatContent, null, type, sender, null);
-    }
-
-    public WrapperPlayServerChatMessage(Component chatContent, @Nullable Component unsignedChatContent, ChatType type,
-                                        MessageSender sender, @Nullable MessageSignData messageSignData) {
+    //This is going to be the constructor for legacy versions trying to send the chat packet.
+    //Server "spoofing" this packet isn't possible in 1.19 and above.
+    public WrapperPlayServerChatMessage(Component chatContent, ChatType type,
+                                        MessageSender sender) {
         super(PacketType.Play.Server.CHAT_MESSAGE);
         this.chatContent = chatContent;
-        this.unsignedChatContent = unsignedChatContent;
         this.type = type;
         this.sender = sender;
-        this.messageSignData = messageSignData;
     }
 
     @Override
     public void read() {
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-            chatContent = Component.text(readString(256));
+        boolean v1_19_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1);
+        sender = new MessageSender();
+        if (v1_19_1) {
+            previousSignature = readOptional(PacketWrapper::readByteArray);
+            sender.setUUID(readUUID());
+            byte[] headerSignature = readByteArray();
+            plainContent = readString(256);
+            chatContent = readOptional(PacketWrapper::readComponent);
+            if (chatContent == null) {
+                chatContent = Component.text(plainContent);
+            }
+            Instant timestamp = readTimestamp();
+            long salt = readLong();
+            MessageSignData sd = new MessageSignData(new SaltSignature(salt, headerSignature),
+                    timestamp, true);
         } else {
             chatContent = readComponent();
         }
@@ -78,8 +90,8 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         }
         type = ChatType.getById(serverVersion, id);
 
-        sender = new MessageSender();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)
+        && serverVersion.isOlderThan(ServerVersion.V_1_19_1)) {
             sender.setUUID(readUUID());
         }
         if (v1_19) {
@@ -133,6 +145,14 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         this.type = wrapper.type;
         this.sender = wrapper.sender;
         this.messageSignData = wrapper.messageSignData;
+    }
+
+    public boolean isChatContentDecorated() {
+        if (plainContent == null) {
+            //Assuming it's a legacy minecraft version (older than 1.19.1)
+            return true;
+        }
+        return chatContent.equals(Component.text(plainContent));
     }
 
     /**
