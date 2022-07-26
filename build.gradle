@@ -85,7 +85,7 @@ subprojects {
         repositories {
             maven {
                 //TODO UPDATE isRelease boolean to publish to correct repository, for now we publish all to snapshots url
-                boolean isRelease = false
+                boolean isRelease = true
                 def snapshotUrl = "https://repo.codemc.io/repository/maven-snapshots/"
                 def releaseUrl = "https://repo.codemc.io/repository/maven-releases/"
 
