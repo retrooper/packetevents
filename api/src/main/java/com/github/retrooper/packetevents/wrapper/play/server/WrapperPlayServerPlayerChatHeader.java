@@ -78,6 +78,11 @@ public class WrapperPlayServerPlayerChatHeader extends PacketWrapper<WrapperPlay
         return Optional.ofNullable(previousSignature);
     }
 
+    /**
+     * Set the previous message signature.
+     *
+     * @param previousSignature the previous message signature.
+     */
     public void setPreviousSignature(byte @Nullable [] previousSignature) {
         this.previousSignature = previousSignature;
     }
