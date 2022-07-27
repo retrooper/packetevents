@@ -33,6 +33,7 @@ public class ChatMessage_v1_19 extends ChatMessage {
     private Instant timestamp;
     private long salt;
     private byte[] signature;
+
     public ChatMessage_v1_19(Component chatContent, @Nullable Component unsignedChatContent, ChatType type,
                              UUID senderUUID, Component senderDisplayName, @Nullable Component teamName, Instant timestamp,
                              long salt, byte[] signature) {

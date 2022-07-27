@@ -24,7 +24,7 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
-import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_Legacy;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
@@ -151,9 +151,8 @@ public class User {
             ChatMessage message;
             if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
                 message = new ChatMessage_v1_16(component, type, new UUID(0L, 0L));
-            }
-            else {
-                message = new ChatMessage_Legacy(component, type);
+            } else {
+                message = new ChatMessageLegacy(component, type);
             }
             chatPacket = new WrapperPlayServerChatMessage(message);
         }

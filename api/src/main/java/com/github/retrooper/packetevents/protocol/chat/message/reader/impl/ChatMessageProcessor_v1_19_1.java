@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,23 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.chat.message.reader;
+package com.github.retrooper.packetevents.protocol.chat.message.reader.impl;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
+import com.github.retrooper.packetevents.protocol.chat.message.reader.ChatMessageProcessor;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.UUID;
 
 public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
     @Override
-    public ChatMessage readChatMessage(PacketWrapper<?> wrapper) {
-        ServerVersion serverVersion = wrapper.getServerVersion();
+    public ChatMessage readChatMessage(@NotNull PacketWrapper<?> wrapper) {
         byte[] previousSignature = wrapper.readOptional(PacketWrapper::readByteArray);
         UUID senderUUID = wrapper.readUUID();
         byte[] signature = wrapper.readByteArray();
@@ -46,30 +46,28 @@ public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
         LastSeenMessages lastSeenMessages = wrapper.readLastSeenMessages();
         Component unsignedChatContent = wrapper.readOptional(PacketWrapper::readComponent);
         int id = wrapper.readVarInt();
-        ChatType type = ChatType.getById(serverVersion, id);
+        ChatType type = ChatType.getById(wrapper.getServerVersion(), id);
         Component name = wrapper.readComponent();
         Component targetName = wrapper.readOptional(PacketWrapper::readComponent);
-        ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType =
-                new ChatMessage_v1_19_1.ChatTypeBoundNetwork(type, name, targetName);
-        return new ChatMessage_v1_19_1(plainContent, chatContent, unsignedChatContent,
-                senderUUID, chatType, previousSignature, signature, timestamp, salt, lastSeenMessages);
+        ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType = new ChatMessage_v1_19_1.ChatTypeBoundNetwork(type, name, targetName);
+        return new ChatMessage_v1_19_1(plainContent, chatContent, unsignedChatContent, senderUUID, chatType,
+                previousSignature, signature, timestamp, salt, lastSeenMessages);
     }
 
     @Override
-    public void writeChatMessage(PacketWrapper<?> wrapper, ChatMessage d) {
-        ServerVersion serverVersion = wrapper.getServerVersion();
-        ChatMessage_v1_19_1 data = (ChatMessage_v1_19_1) d;
-        wrapper.writeOptional(data.getPreviousSignature(), PacketWrapper::writeByteArray);
-        wrapper.writeUUID(data.getSenderUUID());
-        wrapper.writeByteArray(data.getSignature());
-        wrapper.writeString(data.getPlainContent(), 256);
-        wrapper.writeOptional(data.getChatContent(), PacketWrapper::writeComponent);
-        wrapper.writeTimestamp(data.getTimestamp());
-        wrapper.writeLong(data.getSalt());
-        wrapper.writeLastSeenMessages(data.getLastSeenMessages());
-        wrapper.writeOptional(data.getUnsignedChatContent(), PacketWrapper::writeComponent);
-        wrapper.writeVarInt(data.getChatType().getType().getId(serverVersion));
-        wrapper.writeComponent(data.getChatType().getName());
-        wrapper.writeOptional(data.getChatType().getTargetName(), PacketWrapper::writeComponent);
+    public void writeChatMessage(@NotNull PacketWrapper<?> wrapper, @NotNull ChatMessage data) {
+        ChatMessage_v1_19_1 newData = (ChatMessage_v1_19_1) data;
+        wrapper.writeOptional(newData.getPreviousSignature(), PacketWrapper::writeByteArray);
+        wrapper.writeUUID(newData.getSenderUUID());
+        wrapper.writeByteArray(newData.getSignature());
+        wrapper.writeString(newData.getPlainContent(), 256);
+        wrapper.writeOptional(newData.getChatContent(), PacketWrapper::writeComponent);
+        wrapper.writeTimestamp(newData.getTimestamp());
+        wrapper.writeLong(newData.getSalt());
+        wrapper.writeLastSeenMessages(newData.getLastSeenMessages());
+        wrapper.writeOptional(newData.getUnsignedChatContent(), PacketWrapper::writeComponent);
+        wrapper.writeVarInt(newData.getChatType().getType().getId(wrapper.getServerVersion()));
+        wrapper.writeComponent(newData.getChatType().getName());
+        wrapper.writeOptional(newData.getChatType().getTargetName(), PacketWrapper::writeComponent);
     }
 }

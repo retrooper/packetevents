@@ -36,6 +36,7 @@ public class ChatMessage_v1_19_1 extends ChatMessage {
     private Instant timestamp;
     private long salt;
     private LastSeenMessages lastSeenMessages;
+
     public ChatMessage_v1_19_1(String plainContent, Component decoratedChatContent,
                                @Nullable Component unsignedChatContent,
                                UUID senderUUID, ChatTypeBoundNetwork chatType,
@@ -80,18 +81,6 @@ public class ChatMessage_v1_19_1 extends ChatMessage {
 
     public void setSenderUUID(UUID senderUUID) {
         this.senderUUID = senderUUID;
-    }
-
-    @Deprecated
-    @Override
-    public ChatType getType() {
-        return chatType.getType();
-    }
-
-    @Deprecated
-    @Override
-    public void setType(ChatType type) {
-        this.chatType.setType(type);
     }
 
     public ChatTypeBoundNetwork getChatType() {

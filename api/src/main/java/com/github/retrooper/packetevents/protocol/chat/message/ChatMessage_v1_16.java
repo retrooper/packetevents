@@ -25,6 +25,7 @@ import java.util.UUID;
 
 public class ChatMessage_v1_16 extends ChatMessage {
     private UUID senderUUID;
+
     public ChatMessage_v1_16(Component chatContent, ChatType type, UUID senderUUID) {
         super(chatContent, type);
         this.senderUUID = senderUUID;
