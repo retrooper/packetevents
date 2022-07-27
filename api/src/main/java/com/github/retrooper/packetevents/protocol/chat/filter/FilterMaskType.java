@@ -24,4 +24,12 @@ public enum FilterMaskType {
     PARTIALLY_FILTERED;
 
     public static final FilterMaskType[] VALUES = values();
+
+    public int getId() {
+        return ordinal();
+    }
+
+    public static FilterMaskType getById(int id) {
+        return VALUES[id];
+    }
 }

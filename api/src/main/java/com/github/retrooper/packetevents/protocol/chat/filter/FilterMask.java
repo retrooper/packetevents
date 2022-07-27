@@ -21,8 +21,13 @@ package com.github.retrooper.packetevents.protocol.chat.filter;
 import java.util.BitSet;
 
 public class FilterMask {
-    public static final FilterMask FULLY_FILTERED = new FilterMask(new BitSet(0), FilterMaskType.FULLY_FILTERED);
-    public static final FilterMask PASS_THROUGH = new FilterMask(new BitSet(0), FilterMaskType.PASS_THROUGH);
+    public static final FilterMask FULLY_FILTERED;
+    public static final FilterMask PASS_THROUGH;
+
+    static {
+        FULLY_FILTERED = new FilterMask(new BitSet(0), FilterMaskType.FULLY_FILTERED);
+        PASS_THROUGH = new FilterMask(new BitSet(0), FilterMaskType.PASS_THROUGH);
+    }
 
     private final BitSet mask;
     private final FilterMaskType type;

@@ -811,7 +811,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public FilterMask readFilterMask() {
-        FilterMaskType type = FilterMaskType.VALUES[readVarInt()];
+        FilterMaskType type = FilterMaskType.getById(readVarInt());
         switch (type) {
             case PARTIALLY_FILTERED:
                 return new FilterMask(readBitSet());
@@ -825,7 +825,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeFilterMask(FilterMask filterMask) {
-        writeVarInt(filterMask.getType().ordinal());
+        writeVarInt(filterMask.getType().getId());
         if (filterMask.getType() == FilterMaskType.PARTIALLY_FILTERED) {
             writeBitSet(filterMask.getMask());
         }
