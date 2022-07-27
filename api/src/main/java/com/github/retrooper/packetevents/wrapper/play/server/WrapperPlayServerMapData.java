@@ -1,9 +1,9 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.map.MapIcon;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,8 +45,8 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
         this.scale = this.readByte();
 
         boolean readIcons = true;
-        if (this.clientVersion.isNewerThanOrEquals(ClientVersion.V_1_9)) {
-            if (this.clientVersion.isOlderThan(ClientVersion.V_1_17)) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            if (this.serverVersion.isOlderThan(ServerVersion.V_1_17)) {
                 readIcons = this.readBoolean();
                 this.locked = this.readBoolean();
             } else {
@@ -55,7 +55,7 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
             }
         }
 
-        if (readIcons || this.clientVersion.isOlderThan(ClientVersion.V_1_17)) {
+        if (readIcons || this.serverVersion.isOlderThan(ServerVersion.V_1_17)) {
             int iconCount = this.readVarInt();
             this.icons = new ArrayList<>(iconCount);
             for (int i = 0; i < iconCount; i++) {
@@ -78,9 +78,9 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
         this.writeByte(this.scale);
 
         boolean writeIcons = true;
-        if (this.clientVersion.isNewerThanOrEquals(ClientVersion.V_1_9)) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeIcons = this.icons != null;
-            if (this.clientVersion.isOlderThan(ClientVersion.V_1_17)) {
+            if (this.serverVersion.isOlderThan(ServerVersion.V_1_17)) {
                 this.writeBoolean(writeIcons);
                 this.writeBoolean(this.locked);
             } else {
@@ -89,7 +89,7 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
             }
         }
 
-        if (writeIcons || this.clientVersion.isOlderThan(ClientVersion.V_1_17)) {
+        if (writeIcons || this.serverVersion.isOlderThan(ServerVersion.V_1_17)) {
             this.writeVarInt(this.icons.size());
             this.icons.forEach(icon -> {
                 this.writeByte((icon.getType().getId() & 15) << 4 | icon.getRotation() & 15);
