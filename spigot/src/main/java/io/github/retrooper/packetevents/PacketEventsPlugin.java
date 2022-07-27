@@ -68,27 +68,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                 switch (event.getPacketType()) {
                     case CHAT_MESSAGE:
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
-                        if (chatMessage.getMessage().equalsIgnoreCase("!verify")) {
-                            //PublicKey key = user.getPublicKey();
-                            //user.sendMessage(ChatColor.RED + "Hello, world!");
-                            //TODO Fix verifying!
-                            //System.out.println("Verify this: " + chatMessage.verify(event.getUser().getUUID(), key));
-                        }
-                        if (chatMessage.getMessage().equalsIgnoreCase("copium")) {
-                            /*new Thread(() -> {
-                                Component message = Component.text("Hi lmao");
-                                WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(ChatType.CHAT, message);
-                                for (int i = 0; i < 10; i++) {
-                                    System.out.println("Sent!");
-                                    user.sendPacket(cm);
-                                    try {
-                                        Thread.sleep(1000L);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }).start();*/
-                        }
                         if (chatMessage.getMessage().equalsIgnoreCase("!test")) {
                             final Particle particle = new Particle(ParticleTypes.DUST, new ParticleDustData(0.5F,
                                     new Vector3f(0, 1, 0)));
