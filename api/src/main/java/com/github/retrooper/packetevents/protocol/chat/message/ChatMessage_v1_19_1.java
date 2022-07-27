@@ -83,6 +83,16 @@ public class ChatMessage_v1_19_1 extends ChatMessage {
         this.senderUUID = senderUUID;
     }
 
+    @Override
+    public ChatType getType() {
+        return chatType.getType();
+    }
+
+    @Override
+    public void setType(ChatType type) {
+        chatType.setType(type);
+    }
+
     public ChatTypeBoundNetwork getChatType() {
         return chatType;
     }
