@@ -20,153 +20,73 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.ChatType;
-import com.github.retrooper.packetevents.protocol.chat.MessageSender;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
+import com.github.retrooper.packetevents.protocol.chat.message.reader.ChatMessageProcessor;
+import com.github.retrooper.packetevents.protocol.chat.message.reader.impl.ChatMessageProcessorLegacy;
+import com.github.retrooper.packetevents.protocol.chat.message.reader.impl.ChatMessageProcessor_v1_16;
+import com.github.retrooper.packetevents.protocol.chat.message.reader.impl.ChatMessageProcessor_v1_19;
+import com.github.retrooper.packetevents.protocol.chat.message.reader.impl.ChatMessageProcessor_v1_19_1;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
-import com.github.retrooper.packetevents.util.crypto.MessageSignData;
-import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Nullable;
-
-import java.time.Instant;
-import java.util.Optional;
+import org.jetbrains.annotations.ApiStatus.Internal;
 
 public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServerChatMessage> {
-    private Component chatContent;
-    private @Nullable Component unsignedChatContent;
-    private ChatType type;
-    private MessageSender sender;
-    private @Nullable MessageSignData messageSignData;
+    private static final ChatMessageProcessor CHAT_LEGACY_PROCESSOR;
+    private static final ChatMessageProcessor CHAT_V1_16_PROCESSOR;
+    private static final ChatMessageProcessor CHAT_V1_19_PROCESSOR;
+    private static final ChatMessageProcessor CHAT_V1_19_1_PROCESSOR;
+
+    static {
+        CHAT_LEGACY_PROCESSOR = new ChatMessageProcessorLegacy();
+        CHAT_V1_16_PROCESSOR = new ChatMessageProcessor_v1_16();
+        CHAT_V1_19_PROCESSOR = new ChatMessageProcessor_v1_19();
+        CHAT_V1_19_1_PROCESSOR = new ChatMessageProcessor_v1_19_1();
+    }
+
+    private ChatMessage message;
 
     public WrapperPlayServerChatMessage(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerChatMessage(Component chatContent, ChatType type, MessageSender sender) {
-        this(chatContent, null, type, sender, null);
-    }
-
-    public WrapperPlayServerChatMessage(Component chatContent, @Nullable Component unsignedChatContent, ChatType type,
-                                        MessageSender sender, @Nullable MessageSignData messageSignData) {
+    public WrapperPlayServerChatMessage(ChatMessage message) {
         super(PacketType.Play.Server.CHAT_MESSAGE);
-        this.chatContent = chatContent;
-        this.unsignedChatContent = unsignedChatContent;
-        this.type = type;
-        this.sender = sender;
-        this.messageSignData = messageSignData;
+        this.message = message;
     }
 
     @Override
     public void read() {
-        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        chatContent = readComponent();
-        if (v1_19) {
-            unsignedChatContent = readOptional(PacketWrapper::readComponent);
-        }
-
-        if (v1_19) {
-            type = ChatType.getById(readVarInt());
-        } else {
-            type = ChatType.getById(readByte());
-        }
-
-        sender = new MessageSender();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            sender.setUUID(readUUID());
-        }
-        if (v1_19) {
-            sender.setDisplayName(readComponent());
-            sender.setTeamName(readOptional(PacketWrapper::readComponent));
-            Instant timestamp = readTimestamp();
-            SaltSignature saltSignature = readSaltSignature();
-            messageSignData = new MessageSignData(saltSignature, timestamp, true);
-        }
+        this.message = this.getProcessor().readChatMessage(this);
     }
 
     @Override
     public void write() {
-        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        writeComponent(chatContent);
-        if (v1_19) {
-            writeOptional(unsignedChatContent, PacketWrapper::writeComponent);
-        }
-
-        if (v1_19) {
-            writeVarInt(type.getId());
-        } else {
-            writeByte(type.getId());
-        }
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            writeUUID(sender.getUUID());
-        }
-        if (v1_19) {
-            writeComponent(sender.getDisplayName());
-            writeOptional(sender.getTeamName(), (writer, component) -> {
-                if (component != null) {
-                    writeComponent(component);
-                }
-            });
-            if (messageSignData != null) {
-                writeTimestamp(messageSignData.getTimestamp());
-                writeSaltSignature(messageSignData.getSaltSignature());
-            }
-        }
+        this.getProcessor().writeChatMessage(this, this.message);
     }
 
     @Override
     public void copy(WrapperPlayServerChatMessage wrapper) {
-        this.chatContent = wrapper.chatContent;
-        this.unsignedChatContent = wrapper.unsignedChatContent;
-        this.type = wrapper.type;
-        this.sender = wrapper.sender;
-        this.messageSignData = wrapper.messageSignData;
+        this.message = wrapper.message;
     }
 
-    /**
-     * Get the chat content.
-     * On server versions higher than 1.19 it's signed chat content
-     * @return The chat content.
-     */
-    public Component getChatContent() {
-        return chatContent;
+    public ChatMessage getMessage() {
+        return message;
     }
 
-    public void setChatContent(Component chatContent) {
-        this.chatContent = chatContent;
+    public void setMessage(ChatMessage message) {
+        this.message = message;
     }
 
-    public Optional<Component> getUnsignedChatContent() {
-        return Optional.ofNullable(unsignedChatContent);
-    }
-
-    public void setUnsignedChatContent(@Nullable Component unsignedChatContent) {
-        this.unsignedChatContent = unsignedChatContent;
-    }
-
-    public ChatType getType() {
-        return type;
-    }
-
-    public void setType(ChatType type) {
-        this.type = type;
-    }
-
-    public MessageSender getSender() {
-        return sender;
-    }
-
-    public void setSender(MessageSender sender) {
-        this.sender = sender;
-    }
-
-    public Optional<MessageSignData> getMessageSignData() {
-        return Optional.ofNullable(messageSignData);
-    }
-
-    public void setMessageSignData(@Nullable MessageSignData messageSignData) {
-        this.messageSignData = messageSignData;
+    @Internal
+    protected ChatMessageProcessor getProcessor() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+            return CHAT_V1_19_1_PROCESSOR;
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            return CHAT_V1_19_PROCESSOR;
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+            return CHAT_V1_16_PROCESSOR;
+        } else {
+            return CHAT_LEGACY_PROCESSOR;
+        }
     }
 }

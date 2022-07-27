@@ -26,31 +26,41 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClientLoginStart> {
     private String username;
-    private SignatureData signatureData;
+    private @Nullable SignatureData signatureData;
+    private @Nullable UUID playerUUID;
 
     public WrapperLoginClientLoginStart(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperLoginClientLoginStart(ClientVersion clientVersion, String username) {
-        super(PacketType.Login.Client.LOGIN_START.getId(), clientVersion);
-        this.username = username;
+        this(clientVersion, username, null, null);
     }
 
-    public WrapperLoginClientLoginStart(ClientVersion clientVersion, String username, SignatureData signatureData) {
+    public WrapperLoginClientLoginStart(ClientVersion clientVersion, String username, @Nullable SignatureData signatureData) {
+        this(clientVersion, username, signatureData, null);
+    }
+
+    public WrapperLoginClientLoginStart(ClientVersion clientVersion, String username, @Nullable SignatureData signatureData,
+                                        @Nullable UUID playerUUID) {
         super(PacketType.Login.Client.LOGIN_START.getId(), clientVersion);
         this.username = username;
         this.signatureData = signatureData;
+        this.playerUUID = playerUUID;
     }
 
     @Override
     public void read() {
         this.username = readString(16);
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19) && readBoolean()) {
-            this.signatureData = new SignatureData(readTimestamp(), readPublicKey(), readBytes(4096));
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19)) {
+            this.signatureData = readOptional(PacketWrapper::readSignatureData);
+            if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19_1)) {
+                this.playerUUID = readOptional(PacketWrapper::readUUID);
+            }
         }
     }
 
@@ -58,12 +68,9 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     public void write() {
         writeString(username, 16);
         if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19)) {
-            writeBoolean(signatureData != null);
-            if (signatureData != null) {
-                SignatureData data = signatureData;
-                writeTimestamp(data.getTimestamp());
-                writePublicKey(data.getPublicKey());
-                writeBytes(data.getSignature());
+            writeOptional(signatureData, PacketWrapper::writeSignatureData);
+            if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19_1)) {
+                writeOptional(playerUUID, PacketWrapper::writeUUID);
             }
         }
     }
@@ -72,6 +79,7 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     public void copy(WrapperLoginClientLoginStart wrapper) {
         this.username = wrapper.username;
         this.signatureData = wrapper.signatureData;
+        this.playerUUID = wrapper.playerUUID;
     }
 
     public String getUsername() {
@@ -88,5 +96,13 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
 
     public void setSignatureData(@Nullable SignatureData signatureData) {
         this.signatureData = signatureData;
+    }
+
+    public Optional<UUID> getPlayerUUID() {
+        return Optional.ofNullable(playerUUID);
+    }
+
+    public void setPlayerUUID(@Nullable UUID playerUUID) {
+        this.playerUUID = playerUUID;
     }
 }

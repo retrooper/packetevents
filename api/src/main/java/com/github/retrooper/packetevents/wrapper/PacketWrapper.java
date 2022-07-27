@@ -23,9 +23,12 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.manager.server.ServerVersion.MultiVersion;
+import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
+import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
+import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
+import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -48,6 +51,7 @@ import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
+import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
@@ -58,8 +62,8 @@ import java.security.PublicKey;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class PacketWrapper<T extends PacketWrapper> {
     @Nullable
@@ -262,7 +266,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    public <K, V> Map<K, V> readMap(Function<PacketWrapper<?>, K> keyFunction, Function<PacketWrapper<?>, V> valueFunction) {
+    public <K, V> Map<K, V> readMap(Reader<K> keyFunction, Reader<V> valueFunction) {
         int size = readVarInt();
         Map<K, V> map = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
@@ -273,10 +277,11 @@ public class PacketWrapper<T extends PacketWrapper> {
         return map;
     }
 
-    public <K, V> void writeMap(Map<K, V> map, BiConsumer<PacketWrapper<?>, K> keyConsumer, BiConsumer<PacketWrapper<?>, V> valueConsumer) {
+    public <K, V> void writeMap(Map<K, V> map, Writer<K> keyConsumer, Writer<V> valueConsumer) {
         writeVarInt(map.size());
-        for (K key : map.keySet()) {
-            V value = map.get(key);
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            K key = entry.getKey();
+            V value = entry.getValue();
             keyConsumer.accept(this, key);
             valueConsumer.accept(this, value);
         }
@@ -739,6 +744,25 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeLong(timestamp.toEpochMilli());
     }
 
+    public SignatureData readSignatureData() {
+        return new SignatureData(readTimestamp(), readPublicKey(), readByteArray(4096));
+    }
+
+    public void writeSignatureData(SignatureData signatureData) {
+        writeTimestamp(signatureData.getTimestamp());
+        writePublicKey(signatureData.getPublicKey());
+        writeByteArray(signatureData.getSignature());
+    }
+
+    public static <K> IntFunction<K> limitValue(IntFunction<K> function, int limit) {
+        return i -> {
+            if (i > limit) {
+                throw new RuntimeException("Value " + i + " is larger than limit " + limit);
+            }
+            return function.apply(i);
+        };
+    }
+
     public WorldBlockPosition readWorldBlockPosition() {
         return new WorldBlockPosition(readIdentifier(), readBlockPosition());
     }
@@ -748,8 +772,67 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeBlockPosition(pos.getBlockPosition());
     }
 
+    public LastSeenMessages.Entry readLastSeenMessagesEntry() {
+        return new LastSeenMessages.Entry(readUUID(), readByteArray());
+    }
+
+    public void writeLastMessagesEntry(LastSeenMessages.Entry entry) {
+        writeUUID(entry.getUUID());
+        writeByteArray(entry.getLastVerifier());
+    }
+
+    public LastSeenMessages.Update readLastSeenMessagesUpdate() {
+       LastSeenMessages lastSeenMessages = readLastSeenMessages();
+        LastSeenMessages.Entry lastReceived = readOptional(PacketWrapper::readLastSeenMessagesEntry);
+        return new LastSeenMessages.Update(lastSeenMessages, lastReceived);
+    }
+
+    public void writeLastSeenMessagesUpdate(LastSeenMessages.Update update) {
+        writeLastSeenMessages(update.getLastSeenMessages());
+        writeOptional(update.getLastReceived(), PacketWrapper::writeLastMessagesEntry);
+    }
+
+    public LastSeenMessages readLastSeenMessages() {
+        List<LastSeenMessages.Entry> entries = readCollection(limitValue(ArrayList::new, 5),
+                PacketWrapper::readLastSeenMessagesEntry);
+        return new LastSeenMessages(entries);
+    }
+
+    public void writeLastSeenMessages(LastSeenMessages lastSeenMessages) {
+        writeCollection(lastSeenMessages.getEntries(), PacketWrapper::writeLastMessagesEntry);
+    }
+
+    public BitSet readBitSet() {
+        return BitSet.valueOf(readLongArray());
+    }
+
+    public void writeBitSet(BitSet bitSet) {
+        writeLongArray(bitSet.toLongArray());
+    }
+
+    public FilterMask readFilterMask() {
+        FilterMaskType type = FilterMaskType.getById(readVarInt());
+        switch (type) {
+            case PARTIALLY_FILTERED:
+                return new FilterMask(readBitSet());
+            case PASS_THROUGH:
+                return FilterMask.PASS_THROUGH;
+            case FULLY_FILTERED:
+                return FilterMask.FULLY_FILTERED;
+            default:
+                return null;
+        }
+    }
+
+    public void writeFilterMask(FilterMask filterMask) {
+        writeVarInt(filterMask.getType().getId());
+        if (filterMask.getType() == FilterMaskType.PARTIALLY_FILTERED) {
+            writeBitSet(filterMask.getMask());
+        }
+    }
+
     @Experimental
-    public <U, V, R> U readMultiVersional(MultiVersion version, ServerVersion target, Reader<V> first, Reader<R> second) {
+    public <U, V, R> U readMultiVersional(VersionComparison version, ServerVersion target, Reader<V> first, Reader<R> second) {
         if (serverVersion.is(version, target)) {
             return (U) first.apply(this);
         } else {
@@ -758,7 +841,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     @Experimental
-    public <V> void writeMultiVersional(MultiVersion version, ServerVersion target, V value, Writer<V> first, Writer<V> second) {
+    public <V> void writeMultiVersional(VersionComparison version, ServerVersion target, V value, Writer<V> first, Writer<V> second) {
         if (serverVersion.is(version, target)) {
             first.accept(this, value);
         } else {
@@ -779,29 +862,39 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    @Experimental
-    public <K> List<K> readVarIntList(K key) {
-        int size = readVarInt();
-        List<K> list = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            list.add(key);
+
+    public <K, C extends Collection<K>> C readCollection(IntFunction<C> function, Reader<K> reader) {
+        int size = this.readVarInt();
+        Collection<K> collection = function.apply(size);
+        for (int i = 0; i < size; ++i) {
+            collection.add(reader.apply(this));
         }
-        return list;
+        return (C) collection;
     }
 
-    @Experimental
-    public <K> void writeVarIntList(List<K> list, Consumer<K> writeValue) {
+    public <K> void writeCollection(Collection<K> collection, Writer<K> writer) {
+        this.writeVarInt(collection.size());
+        for (K key : collection) {
+            writer.accept(this, key);
+        }
+    }
+
+    public <K> List<K> readList(Reader<K> reader) {
+        return this.readCollection(ArrayList::new, reader);
+    }
+
+    public <K> void writeList(List<K> list, Writer<K> writer) {
         writeVarInt(list.size());
         for (K key : list) {
-            writeValue.accept(key);
+            writer.accept(this, key);
         }
     }
 
     @FunctionalInterface
-    public interface Reader<T> extends Function<PacketWrapper, T> {
+    public interface Reader<T> extends Function<PacketWrapper<?>, T> {
     }
 
     @FunctionalInterface
-    public interface Writer<T> extends BiConsumer<PacketWrapper, T> {
+    public interface Writer<T> extends BiConsumer<PacketWrapper<?>, T> {
     }
 }

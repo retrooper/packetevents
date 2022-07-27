@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -74,12 +75,13 @@ public enum ClientVersion {
     V_1_18_2(758),
 
     V_1_19(759),
+    V_1_19_1(760),
 
     //TODO UPDATE Add new protocol version field
 
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
-    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_19.protocolVersion + 1, true),
+    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_19_1.protocolVersion + 1, true),
 
     UNKNOWN(-1, true);
 
@@ -243,5 +245,35 @@ public enum ClientVersion {
      */
     public boolean isOlderThanOrEquals(ClientVersion target) {
         return this.protocolVersion <= target.protocolVersion;
+    }
+
+    /**
+     * Is this client version newer than, older than or equal to the compared client version?
+     * This method simply checks if this client version's protocol version is greater than, less than or equal to
+     * the compared client version's protocol version.
+     *
+     * @param comparison    Comparison type.
+     * @param targetVersion Compared client version.
+     * @return true or false, based on the comparison type.
+     * @see #isNewerThan(ClientVersion)
+     * @see #isNewerThanOrEquals(ClientVersion)
+     * @see #isOlderThan(ClientVersion)
+     * @see #isOlderThanOrEquals(ClientVersion)
+     */
+    public boolean is(@NotNull VersionComparison comparison, @NotNull ClientVersion targetVersion) {
+        switch (comparison) {
+            case EQUALS:
+                return protocolVersion == targetVersion.protocolVersion;
+            case NEWER_THAN:
+                return isNewerThan(targetVersion);
+            case NEWER_THAN_OR_EQUALS:
+                return isNewerThanOrEquals(targetVersion);
+            case OLDER_THAN:
+                return isOlderThan(targetVersion);
+            case OLDER_THAN_OR_EQUALS:
+                return isOlderThanOrEquals(targetVersion);
+            default:
+                return false;
+        }
     }
 }

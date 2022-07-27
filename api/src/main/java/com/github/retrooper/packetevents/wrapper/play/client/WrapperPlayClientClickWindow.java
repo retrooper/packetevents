@@ -27,8 +27,6 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClientClickWindow> {
     private int windowID;
@@ -76,9 +74,10 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         int clickTypeIndex = readVarInt();
         this.windowClickType = WindowClickType.VALUES[clickTypeIndex];
         if (v1_17) {
-            Function<PacketWrapper<?>, Integer> slotReader = wrapper -> (int) wrapper.readShort();
-            Function<PacketWrapper<?>, ItemStack> itemStackReader = PacketWrapper::readItemStack;
-            this.slots = Optional.of(readMap(slotReader, itemStackReader));
+            this.slots = Optional.of(readMap(
+                    packetWrapper -> Math.toIntExact(packetWrapper.readShort()),
+                    PacketWrapper::readItemStack
+            ));
         } else {
             this.slots = Optional.empty();
         }
@@ -111,9 +110,7 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         }
         writeVarInt(windowClickType.ordinal());
         if (v1_17) {
-            BiConsumer<PacketWrapper<?>, Integer> keyConsumer = PacketWrapper::writeShort;
-            BiConsumer<PacketWrapper<?>, ItemStack> valueConsumer = PacketWrapper::writeItemStack;
-            writeMap(slots.orElse(new HashMap<>()), keyConsumer, valueConsumer);
+            writeMap(slots.orElse(new HashMap<>()), PacketWrapper::writeShort, PacketWrapper::writeItemStack);
         }
         writeItemStack(carriedItemStack);
     }

@@ -19,8 +19,6 @@
 package com.github.retrooper.packetevents.manager.server;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -47,7 +45,7 @@ public enum ServerVersion {
     V_1_16(735), V_1_16_1(736), V_1_16_2(751), V_1_16_3(753), V_1_16_4(754), V_1_16_5(754),
     V_1_17(755), V_1_17_1(756),
     V_1_18(757), V_1_18_1(757), V_1_18_2(758),
-    V_1_19(759),
+    V_1_19(759), V_1_19_1(760),
     //TODO UPDATE Add server version constant
     ERROR(-1, true);
 
@@ -89,17 +87,17 @@ public enum ServerVersion {
     }
 
     public static ServerVersion getLatest() {
-        return reversedValues()[1];
+        return REVERSED_VALUES[1];
     }
 
     public static ServerVersion getOldest() {
-        return values()[0];
+        return VALUES[0];
     }
 
     //TODO Optimize
     @Deprecated
     public static ServerVersion getById(int protocolVersion) {
-        for (ServerVersion version : values()) {
+        for (ServerVersion version : VALUES) {
             if (version.protocolVersion == protocolVersion) {
                 return version;
             }
@@ -151,7 +149,6 @@ public enum ServerVersion {
         if (target.protocolVersion != protocolVersion || this == target) {
             return protocolVersion > target.protocolVersion;
         }
-
         /*
          * The server versions unfortunately have the same protocol version.
          * We need to look at this "reversedValues" variable.
@@ -162,10 +159,10 @@ public enum ServerVersion {
         for (ServerVersion version : reversedValues()) {
             if (version == target) {
                 return false;
+            } else if (version == this) {
+                return true;
             }
-            if (version == this) return true;
         }
-
         return false;
     }
 
@@ -231,48 +228,28 @@ public enum ServerVersion {
      * This method simply checks if this server version's protocol version is greater than, less than or equal to
      * the compared server version's protocol version.
      *
-     * @param target  Compared server version.
-     * @param version Comparison type.
-     * @return Is this server version newer than, older than or equal to the compared server version.
+     * @param comparison    Comparison type.
+     * @param targetVersion Compared server version.
+     * @return true or false, based on the comparison type.
      * @see #isNewerThan(ServerVersion)
      * @see #isNewerThanOrEquals(ServerVersion)
      * @see #isOlderThan(ServerVersion)
      * @see #isOlderThanOrEquals(ServerVersion)
      */
-    @Experimental
-    public boolean is(@NotNull MultiVersion version, @NotNull ServerVersion target) {
-        switch (version) {
+    public boolean is(@NotNull VersionComparison comparison, @NotNull ServerVersion targetVersion) {
+        switch (comparison) {
+            case EQUALS:
+                return protocolVersion == targetVersion.protocolVersion;
             case NEWER_THAN:
-                return isNewerThan(target);
+                return isNewerThan(targetVersion);
             case NEWER_THAN_OR_EQUALS:
-                return isNewerThanOrEquals(target);
+                return isNewerThanOrEquals(targetVersion);
             case OLDER_THAN:
-                return isOlderThan(target);
+                return isOlderThan(targetVersion);
             case OLDER_THAN_OR_EQUALS:
-                return isOlderThanOrEquals(target);
+                return isOlderThanOrEquals(targetVersion);
+            default:
+                return false;
         }
-        return false;
-    }
-
-    /**
-     * This enum contains all possible comparison types for server versions.
-     */
-    public enum MultiVersion {
-        /*
-        The server version is newer than the compared server version.
-         */
-        NEWER_THAN,
-        /*
-        The server version is newer than or equal to the compared server version.
-         */
-        NEWER_THAN_OR_EQUALS,
-        /*
-        The server version is older than the compared server version.
-         */
-        OLDER_THAN,
-        /*
-        The server version is older than or equal to the compared server version.
-         */
-        OLDER_THAN_OR_EQUALS;
     }
 }

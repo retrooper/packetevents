@@ -19,36 +19,41 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayWorldBorderWarningDelay extends PacketWrapper<WrapperPlayWorldBorderWarningDelay> {
-    private long delay;
+public class WrapperPlayServerDeleteChat extends PacketWrapper<WrapperPlayServerDeleteChat> {
+    private byte[] signature;
 
-    public WrapperPlayWorldBorderWarningDelay(long delay) {
-        super(PacketType.Play.Server.WORLD_BORDER_WARNING_DELAY);
-        this.delay = delay;
+    public WrapperPlayServerDeleteChat(PacketSendEvent event) {
+        super(event);
     }
 
-    public WrapperPlayWorldBorderWarningDelay(PacketSendEvent event) {
-        super(event);
+    public WrapperPlayServerDeleteChat(byte[] signature) {
+        super(PacketType.Play.Server.DELETE_CHAT);
+        this.signature = signature;
     }
 
     @Override
     public void read() {
-        this.delay = readMultiVersional(VersionComparison.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_19, PacketWrapper::readVarInt, PacketWrapper::readVarLong);
+        signature = readByteArray();
     }
 
     @Override
     public void write() {
-        writeMultiVersional(VersionComparison.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_19, this.delay,
-                (packetWrapper, aLong) -> packetWrapper.writeVarInt(Math.toIntExact(aLong)), PacketWrapper::writeVarLong);
+        writeByteArray(signature);
     }
 
     @Override
-    public void copy(WrapperPlayWorldBorderWarningDelay packet) {
-        delay = packet.delay;
+    public void copy(WrapperPlayServerDeleteChat wrapper) {
+        signature = wrapper.signature;
+    }
+
+    public byte[] getSignature() {
+        return signature;
+    }
+
+    public void setSignature(byte[] signature) {
+        this.signature = signature;
     }
 }
