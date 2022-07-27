@@ -79,6 +79,7 @@ public class MapIcon implements Cloneable {
         BANNER_BLACK(25),
         RED_X(26);
 
+        private static final Type[] VALUES = values();
         private final byte id;
 
         Type(int value) {
@@ -90,7 +91,7 @@ public class MapIcon implements Cloneable {
         }
 
         public static Type getById(byte value) {
-            for (Type t : values()) {
+            for (Type t : VALUES) {
                 if (t.id == value) return t;
             }
             return null;
