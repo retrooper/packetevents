@@ -77,11 +77,11 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
         enforceSecureChat = wrapper.enforceSecureChat;
     }
 
-    public Optional<Component> getMotd() {
-        return Optional.ofNullable(motd);
+    public @Nullable Component getMOTD() {
+        return motd;
     }
 
-    public void setMotd(@Nullable Component motd) {
+    public void setMOTD(@Nullable Component motd) {
         this.motd = motd;
     }
 
