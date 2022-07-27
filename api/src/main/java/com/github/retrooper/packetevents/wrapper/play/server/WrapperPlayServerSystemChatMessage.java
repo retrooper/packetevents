@@ -37,6 +37,8 @@ import org.jetbrains.annotations.Nullable;
 public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPlayServerSystemChatMessage> {
     public static boolean HANDLE_JSON = true;
     private @Nullable ChatType type;
+    //Overlay is a replacement for the chat type field. If overlay is true, the message will appear above your hot bar.
+    //If not, it will appear in the normal chat.
     private boolean overlay;
     private String messageJson;
     private Component message;
