@@ -779,17 +779,25 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeByteArray(entry.getLastVerifier());
     }
 
-    public LastSeenMessages.Update readLastSeenMessages() {
-        List<LastSeenMessages.Entry> entries =
-                readCollection((IntFunction<List<LastSeenMessages.Entry>>) value -> new ArrayList<>(),
-                        PacketWrapper::readLastSeenMessagesEntry);
+    public LastSeenMessages.Update readLastSeenMessagesUpdate() {
+       LastSeenMessages lastSeenMessages = readLastSeenMessages();
         LastSeenMessages.Entry lastReceived = readOptional(PacketWrapper::readLastSeenMessagesEntry);
-        return new LastSeenMessages.Update(new LastSeenMessages(entries), lastReceived);
+        return new LastSeenMessages.Update(lastSeenMessages, lastReceived);
     }
 
-    public void writeLastSeenMessages(LastSeenMessages.Update update) {
-        writeCollection(update.getLastSeenMessages().getEntries(), PacketWrapper::writeLastMessagesEntry);
+    public void writeLastSeenMessagesUpdate(LastSeenMessages.Update update) {
+        writeLastSeenMessages(update.getLastSeenMessages());
         writeOptional(update.getLastReceived(), PacketWrapper::writeLastMessagesEntry);
+    }
+
+    public LastSeenMessages readLastSeenMessages() {
+        List<LastSeenMessages.Entry> entries = readCollection(limitValue(ArrayList::new, 5),
+                PacketWrapper::readLastSeenMessagesEntry);
+        return new LastSeenMessages(entries);
+    }
+
+    public void writeLastSeenMessages(LastSeenMessages lastSeenMessages) {
+        writeCollection(lastSeenMessages.getEntries(), PacketWrapper::writeLastMessagesEntry);
     }
 
     @Experimental

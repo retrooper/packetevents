@@ -37,12 +37,12 @@ public class WrapperPlayClientChatAck extends PacketWrapper<WrapperPlayClientCha
 
     @Override
     public void read() {
-        lastSeenMessages = readLastSeenMessages();
+        lastSeenMessages = readLastSeenMessagesUpdate();
     }
 
     @Override
     public void write() {
-        writeLastSeenMessages(lastSeenMessages);
+        writeLastSeenMessagesUpdate(lastSeenMessages);
     }
 
     @Override

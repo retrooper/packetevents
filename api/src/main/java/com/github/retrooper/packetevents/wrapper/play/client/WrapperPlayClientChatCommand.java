@@ -37,7 +37,7 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
             boolean signedPreview = readBoolean();
             this.messageSignData = new MessageSignData(saltSignature, timestamp, signedPreview);
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-                this.lastSeenMessages = readLastSeenMessages();
+                this.lastSeenMessages = readLastSeenMessagesUpdate();
             }
         }
     }
@@ -50,7 +50,7 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
             writeSaltSignature(messageSignData.getSaltSignature());
             writeBoolean(messageSignData.isSignedPreview());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-                writeLastSeenMessages(lastSeenMessages);
+                writeLastSeenMessagesUpdate(lastSeenMessages);
             }
         }
     }

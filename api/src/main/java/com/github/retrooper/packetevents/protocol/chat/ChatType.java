@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+//TODO Convert ChatType into a registry like we did with PotionTypes and other things.
 public enum ChatType {
     CHAT(0),
 
