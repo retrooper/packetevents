@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.chat.message;
 
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
+import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,13 +37,15 @@ public class ChatMessage_v1_19_1 extends ChatMessage {
     private Instant timestamp;
     private long salt;
     private LastSeenMessages lastSeenMessages;
+    private FilterMask filterMask;
 
     public ChatMessage_v1_19_1(String plainContent, Component decoratedChatContent,
                                @Nullable Component unsignedChatContent,
                                UUID senderUUID, ChatTypeBoundNetwork chatType,
                                byte @Nullable [] previousSignature, byte[] signature,
                                Instant timestamp, long salt,
-                               LastSeenMessages lastSeenMessages) {
+                               LastSeenMessages lastSeenMessages,
+                               FilterMask filterMask) {
         super(decoratedChatContent, chatType.getType());
         this.plainContent = plainContent;
         this.unsignedChatContent = unsignedChatContent;
@@ -53,6 +56,7 @@ public class ChatMessage_v1_19_1 extends ChatMessage {
         this.timestamp = timestamp;
         this.salt = salt;
         this.lastSeenMessages = lastSeenMessages;
+        this.filterMask = filterMask;
     }
 
     public String getPlainContent() {
@@ -139,6 +143,14 @@ public class ChatMessage_v1_19_1 extends ChatMessage {
 
     public void setLastSeenMessages(LastSeenMessages lastSeenMessages) {
         this.lastSeenMessages = lastSeenMessages;
+    }
+
+    public FilterMask getFilterMask() {
+        return filterMask;
+    }
+
+    public void setFilterMask(FilterMask filterMask) {
+        this.filterMask = filterMask;
     }
 
     public static class ChatTypeBoundNetwork {

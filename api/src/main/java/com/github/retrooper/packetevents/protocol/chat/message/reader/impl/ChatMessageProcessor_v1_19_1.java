@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.chat.message.reader.impl;
 
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
+import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
 import com.github.retrooper.packetevents.protocol.chat.message.reader.ChatMessageProcessor;
@@ -45,13 +46,16 @@ public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
         long salt = wrapper.readLong();
         LastSeenMessages lastSeenMessages = wrapper.readLastSeenMessages();
         Component unsignedChatContent = wrapper.readOptional(PacketWrapper::readComponent);
+        FilterMask filterMask = wrapper.readFilterMask();
+
         int id = wrapper.readVarInt();
         ChatType type = ChatType.getById(wrapper.getServerVersion(), id);
         Component name = wrapper.readComponent();
         Component targetName = wrapper.readOptional(PacketWrapper::readComponent);
         ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType = new ChatMessage_v1_19_1.ChatTypeBoundNetwork(type, name, targetName);
+
         return new ChatMessage_v1_19_1(plainContent, chatContent, unsignedChatContent, senderUUID, chatType,
-                previousSignature, signature, timestamp, salt, lastSeenMessages);
+                previousSignature, signature, timestamp, salt, lastSeenMessages, filterMask);
     }
 
     @Override
@@ -66,6 +70,7 @@ public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
         wrapper.writeLong(newData.getSalt());
         wrapper.writeLastSeenMessages(newData.getLastSeenMessages());
         wrapper.writeOptional(newData.getUnsignedChatContent(), PacketWrapper::writeComponent);
+        wrapper.writeFilterMask(newData.getFilterMask());
         wrapper.writeVarInt(newData.getChatType().getType().getId(wrapper.getServerVersion()));
         wrapper.writeComponent(newData.getChatType().getName());
         wrapper.writeOptional(newData.getChatType().getTargetName(), PacketWrapper::writeComponent);

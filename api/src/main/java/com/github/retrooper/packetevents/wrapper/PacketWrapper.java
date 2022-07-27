@@ -27,6 +27,8 @@ import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
+import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
+import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -798,6 +800,35 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeLastSeenMessages(LastSeenMessages lastSeenMessages) {
         writeCollection(lastSeenMessages.getEntries(), PacketWrapper::writeLastMessagesEntry);
+    }
+
+    public BitSet readBitSet() {
+        return BitSet.valueOf(readLongArray());
+    }
+
+    public void writeBitSet(BitSet bitSet) {
+        writeLongArray(bitSet.toLongArray());
+    }
+
+    public FilterMask readFilterMask() {
+        FilterMaskType type = FilterMaskType.VALUES[readVarInt()];
+        switch (type) {
+            case PARTIALLY_FILTERED:
+                return new FilterMask(readBitSet());
+            case PASS_THROUGH:
+                return FilterMask.PASS_THROUGH;
+            case FULLY_FILTERED:
+                return FilterMask.FULLY_FILTERED;
+            default:
+                return null;
+        }
+    }
+
+    public void writeFilterMask(FilterMask filterMask) {
+        writeVarInt(filterMask.getType().ordinal());
+        if (filterMask.getType() == FilterMaskType.PARTIALLY_FILTERED) {
+            writeBitSet(filterMask.getMask());
+        }
     }
 
     @Experimental
