@@ -13,7 +13,7 @@ public enum JointType {
 
     private final String name;
 
-    private JointType(String name) {
+    JointType(String name) {
         this.name = name;
     }
 

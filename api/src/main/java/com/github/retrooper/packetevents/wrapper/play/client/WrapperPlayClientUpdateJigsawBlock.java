@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+//Packet added in 1.14
 public class WrapperPlayClientUpdateJigsawBlock extends PacketWrapper<WrapperPlayClientUpdateJigsawBlock> {
     private Vector3i position;
     private ResourceLocation name;
@@ -58,14 +59,7 @@ public class WrapperPlayClientUpdateJigsawBlock extends PacketWrapper<WrapperPla
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.position = new Vector3i(readLong());
-        } else {
-            int x = readInt();
-            int y = readShort();
-            int z = readInt();
-            this.position = new Vector3i(x, y, z);
-        }
+        this.position = readBlockPosition();
         this.name = readIdentifier();
         if (this.v1_16()) {
             this.target = readIdentifier();
@@ -79,14 +73,7 @@ public class WrapperPlayClientUpdateJigsawBlock extends PacketWrapper<WrapperPla
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            long positionVector = this.position.getSerializedPosition();
-            writeLong(positionVector);
-        } else {
-            writeInt(this.position.x);
-            writeShort(this.position.y);
-            writeInt(this.position.z);
-        }
+        writeBlockPosition(this.position);
         writeIdentifier(this.name);
         if (this.v1_16()) {
             writeIdentifier(this.target);
