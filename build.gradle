@@ -21,7 +21,7 @@ subprojects {
 
     group = 'com.github.retrooper'
     description = project.name
-    version = '2.0.0'
+    version = '2.0.0-SNAPSHOT'
 
     project.ext.nettyVersion = '4.1.72.Final'
     project.ext.adventureVersion = '4.10.1'
@@ -65,14 +65,6 @@ subprojects {
 
     publishing {
         publications {
-            /*
-            maven(MavenPublication) {
-                groupId = 'com.github.retrooper.packetevents'
-                artifactId = project.name
-                version = project.version
-                from components.java
-            }*/
-
             mavenJava(MavenPublication) {
                 groupId = "com.github.retrooper.packetevents"
                 artifactId = project.name
@@ -85,7 +77,7 @@ subprojects {
         repositories {
             maven {
                 //TODO UPDATE isRelease boolean to publish to correct repository, for now we publish all to snapshots url
-                boolean isRelease = true
+                boolean isRelease = false
                 def snapshotUrl = "https://repo.codemc.io/repository/maven-snapshots/"
                 def releaseUrl = "https://repo.codemc.io/repository/maven-releases/"
 
