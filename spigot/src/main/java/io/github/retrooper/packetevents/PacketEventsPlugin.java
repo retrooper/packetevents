@@ -45,7 +45,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.charset.StandardCharsets;
-import java.security.PublicKey;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -89,12 +88,14 @@ public class PacketEventsPlugin extends JavaPlugin {
                     case PLAYER_DIGGING:
                         WrapperPlayClientPlayerDigging digging = new WrapperPlayClientPlayerDigging(event);
                         DiggingAction action = digging.getAction();
+                        BlockFace face = digging.getFace();
+                        event.getUser().sendMessage("action: " + action + ", face: " + face);
                         break;
                     case PLAYER_BLOCK_PLACEMENT:
                         WrapperPlayClientPlayerBlockPlacement blockPlacement = new WrapperPlayClientPlayerBlockPlacement(event);
-                        BlockFace face = blockPlacement.getFace();
+                        BlockFace frace = blockPlacement.getFace();
                         Vector3i bp = blockPlacement.getBlockPosition();
-                        user.sendMessage(ChatColor.GOLD + "Face: " + face + ", bp: " + bp);
+                        user.sendMessage(ChatColor.GOLD + "Face: " + frace + ", bp: " + bp);
                         break;
                     case PLUGIN_MESSAGE:
                         WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
@@ -169,7 +170,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
