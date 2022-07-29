@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +33,7 @@ public class WrapperPlayServerPlayerChatHeader extends PacketWrapper<WrapperPlay
     //AKA message digest
     private byte[] hash;
 
-    public WrapperPlayServerPlayerChatHeader(PacketReceiveEvent event) {
+    public WrapperPlayServerPlayerChatHeader(PacketSendEvent event) {
         super(event);
     }
 

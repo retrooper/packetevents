@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.chat.ChatCompletionAction;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -29,7 +29,7 @@ public class WrapperPlayServerCustomChatCompletions extends PacketWrapper<Wrappe
     private ChatCompletionAction action;
     private List<String> entries;
 
-    public WrapperPlayServerCustomChatCompletions(PacketReceiveEvent event) {
+    public WrapperPlayServerCustomChatCompletions(PacketSendEvent event) {
         super(event);
     }
 
