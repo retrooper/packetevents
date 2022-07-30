@@ -33,7 +33,8 @@ import java.util.UUID;
 
 public class PacketEventsImplHelper {
     public static PacketSendEvent handleClientBoundPacket(Object channel, User user, Object player,
-                                                          Object buffer, boolean autoProtocolTranslation, boolean runPostTasks) throws PacketProcessException {
+                                                          Object buffer, boolean autoProtocolTranslation,
+                                                          boolean runPostTasks) throws Exception {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer,
                 autoProtocolTranslation);
@@ -73,7 +74,7 @@ public class PacketEventsImplHelper {
     public static PacketReceiveEvent handleServerBoundPacket(Object channel, User user,
                                                              Object player,
                                                              Object buffer,
-                                                             boolean autoProtocolTranslation) throws PacketProcessException {
+                                                             boolean autoProtocolTranslation) throws Exception {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer,
                 autoProtocolTranslation);
