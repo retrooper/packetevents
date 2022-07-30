@@ -63,14 +63,9 @@ public class PacketEventsEncoder extends MessageToByteEncoder<Object> {
             if (!in.isReadable()) return;
             out.writeBytes(in);
         }
-        try {
-            PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out, true, false);
-            if (sendEvent.hasPostTasks()) {
-                queuedPostTasks.addAll(sendEvent.getPostTasks());
-            }
-        }
-        catch (Exception ex) {
-            throw new PacketProcessException("Failed to process outgoing packet", ex);
+        PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out, true, false);
+        if (sendEvent.hasPostTasks()) {
+            queuedPostTasks.addAll(sendEvent.getPostTasks());
         }
     }
 
@@ -126,8 +121,9 @@ public class PacketEventsEncoder extends MessageToByteEncoder<Object> {
         super.exceptionCaught(ctx, cause);
         //Check if the minecraft server will already print our exception for us.
         //Don't print errors during handshake
-        if (ExceptionUtil.isException(cause, PacketProcessException.class) && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
-                && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
+        if (ExceptionUtil.isException(cause, PacketProcessException.class)
+                && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
+                && (user != null && user.getConnectionState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();
         }
     }

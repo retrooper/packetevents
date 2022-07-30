@@ -64,12 +64,7 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
         try {
             boolean doRecompression =
                     handleCompression(ctx, outputBuffer);
-            try {
-                PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer, true);
-            }
-            catch (Exception ex) {
-                throw new PacketProcessException("Failed to process incoming packet", ex);
-            }
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer, true);
             if (outputBuffer.isReadable()) {
                 if (doRecompression) {
                     ByteBuf temp = ctx.alloc().buffer();
@@ -120,8 +115,9 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
         super.exceptionCaught(ctx, cause);
         //Check if the minecraft server will already print our exception for us.
         //Don't print errors during handshake
-        if (ExceptionUtil.isException(cause, PacketProcessException.class) && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
-                && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
+        if (ExceptionUtil.isException(cause, PacketProcessException.class)
+                && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
+                && (user != null && user.getConnectionState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();
         }
     }

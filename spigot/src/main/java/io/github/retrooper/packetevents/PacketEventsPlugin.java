@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.*;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleDustData;
@@ -36,6 +37,7 @@ import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import net.kyori.adventure.text.Component;
@@ -134,7 +136,13 @@ public class PacketEventsPlugin extends JavaPlugin {
                         user.sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
                     System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
-                }/* else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
+                }
+                else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                    WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
+                    ChatMessage_v1_19_1 message = (ChatMessage_v1_19_1) cm.getMessage();
+                    System.out.println("He said: " + message.getPlainContent());
+                }
+                /* else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
                     WrapperPlayServerEntityEffect effect = new WrapperPlayServerEntityEffect(event);
                     System.out.println("type: " + effect.getPotionType().getName() + ", type id: " + effect.getPotionType().getId());
                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
@@ -170,7 +178,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
