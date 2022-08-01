@@ -23,7 +23,6 @@ import com.github.retrooper.packetevents.event.*;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
-import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleDustData;
@@ -32,6 +31,7 @@ import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.TimeStampMode;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
@@ -39,6 +39,7 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSelectAdvancementsTab;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -67,6 +68,13 @@ public class PacketEventsPlugin extends JavaPlugin {
                 User user = event.getUser();
                 Player player = (Player) event.getPlayer();
                 switch (event.getPacketType()) {
+                    case INTERACT_ENTITY:
+                        ResourceLocation identifier = new ResourceLocation("minecraft:adventure/root");
+                        WrapperPlayServerSelectAdvancementsTab selectAdvancementsTab =
+                                new WrapperPlayServerSelectAdvancementsTab(identifier);
+                        user.sendPacket(selectAdvancementsTab);
+                        user.sendMessage("sent it!");
+                        break;
                     case CHAT_MESSAGE:
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                         if (chatMessage.getMessage().equalsIgnoreCase("!test")) {
@@ -136,11 +144,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                         user.sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
                     System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
-                }
-                else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
-                    ChatMessage_v1_19_1 message = (ChatMessage_v1_19_1) cm.getMessage();
-                    System.out.println("He said: " + message.getPlainContent());
+                    System.out.println("He said: " + cm.getMessage().getChatContent() + ", type: " + cm.getMessage().getType());
                 }
                 /* else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
                     WrapperPlayServerEntityEffect effect = new WrapperPlayServerEntityEffect(event);

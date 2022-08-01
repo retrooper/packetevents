@@ -24,44 +24,35 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-
-public class WrapperPlayServerSelectAdvancementTab extends PacketWrapper<WrapperPlayServerSelectAdvancementTab> {
+public class WrapperPlayServerSelectAdvancementsTab extends PacketWrapper<WrapperPlayServerSelectAdvancementsTab> {
     private @Nullable ResourceLocation identifier;
 
-    public WrapperPlayServerSelectAdvancementTab(PacketSendEvent event) {
+    public WrapperPlayServerSelectAdvancementsTab(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerSelectAdvancementTab(@Nullable ResourceLocation identifier) {
-        super(PacketType.Play.Server.SELECT_ADVANCEMENT_TAB);
+    public WrapperPlayServerSelectAdvancementsTab(@Nullable ResourceLocation identifier) {
+        super(PacketType.Play.Server.SELECT_ADVANCEMENTS_TAB);
         this.identifier = identifier;
     }
 
     @Override
     public void read() {
-        boolean hasId = readBoolean();
-        if (hasId) {
-            identifier = readIdentifier();
-        }
+        identifier = readOptional(PacketWrapper::readIdentifier);
     }
 
     @Override
     public void write() {
-        boolean hasTitle = identifier != null;
-        writeBoolean(hasTitle);
-        if (hasTitle) {
-            writeIdentifier(identifier);
-        }
+        writeOptional(identifier, PacketWrapper::writeIdentifier);
     }
 
     @Override
-    public void copy(WrapperPlayServerSelectAdvancementTab wrapper) {
+    public void copy(WrapperPlayServerSelectAdvancementsTab wrapper) {
         this.identifier = wrapper.identifier;
     }
 
-    public Optional<ResourceLocation> getIdentifier() {
-        return Optional.ofNullable(identifier);
+    public @Nullable ResourceLocation getIdentifier() {
+        return identifier;
     }
 
     public void setIdentifier(@Nullable ResourceLocation identifier) {

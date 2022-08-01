@@ -78,7 +78,7 @@ public enum ClientboundPacketType_1_12 {
     ENTITY_HEAD_LOOK,
 
     //This packet was added
-    SELECT_ADVANCEMENT_TAB,
+    SELECT_ADVANCEMENTS_TAB,
 
     WORLD_BORDER,
     CAMERA,
@@ -103,7 +103,7 @@ public enum ClientboundPacketType_1_12 {
     ENTITY_TELEPORT,
 
     //This packet was added
-    ADVANCEMENTS,
+    UPDATE_ADVANCEMENTS,
 
     ENTITY_PROPERTIES,
     ENTITY_EFFECT

@@ -115,7 +115,7 @@ public enum ClientboundPacketType_1_19_1 {
     RESPAWN,
     ENTITY_HEAD_LOOK,
     MULTI_BLOCK_CHANGE,
-    SELECT_ADVANCEMENT_TAB,
+    SELECT_ADVANCEMENTS_TAB,
 
     //Added in 1.19. Relating preview chat message packet?
     SERVER_DATA,
@@ -162,7 +162,7 @@ public enum ClientboundPacketType_1_19_1 {
     NBT_QUERY_RESPONSE,
     COLLECT_ITEM,
     ENTITY_TELEPORT,
-    ADVANCEMENTS,
+    UPDATE_ADVANCEMENTS,
     ENTITY_PROPERTIES,
     ENTITY_EFFECT,
     DECLARE_RECIPES,
