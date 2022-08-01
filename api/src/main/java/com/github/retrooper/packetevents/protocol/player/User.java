@@ -109,6 +109,10 @@ public class User {
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, wrapper);
     }
 
+    public void sendPacketSilently(PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getProtocolManager().sendPacketSilently(channel, wrapper);
+    }
+
     public void writePacket(PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().writePacket(channel, wrapper);
     }

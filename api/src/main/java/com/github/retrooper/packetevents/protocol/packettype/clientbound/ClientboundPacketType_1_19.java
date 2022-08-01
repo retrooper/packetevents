@@ -106,7 +106,7 @@ public enum ClientboundPacketType_1_19 {
     MULTI_BLOCK_CHANGE,
     SELECT_ADVANCEMENTS_TAB,
 
-    //Added in 1.19. Relating preview chat message packet?
+    //Added in 1.19.
     SERVER_DATA,
 
     ACTION_BAR,

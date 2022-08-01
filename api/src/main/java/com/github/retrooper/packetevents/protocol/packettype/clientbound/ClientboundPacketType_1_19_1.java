@@ -117,7 +117,7 @@ public enum ClientboundPacketType_1_19_1 {
     MULTI_BLOCK_CHANGE,
     SELECT_ADVANCEMENTS_TAB,
 
-    //Added in 1.19. Relating preview chat message packet?
+    //Added in 1.19. Seems like cancelling it surpresses the warning of messages not being verified on the client.
     SERVER_DATA,
 
     ACTION_BAR,
