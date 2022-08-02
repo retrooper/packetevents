@@ -71,13 +71,17 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             soundId = readVarInt();
+            soundCategory = SoundCategory.fromId(readVarInt());
         } else {
             soundName = readString();
         }
-        soundCategory = SoundCategory.fromId(readVarInt());
         effectPosition = new Vector3i(readInt(), readInt(), readInt());
         volume = readFloat();
-        pitch = readFloat();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            pitch = readFloat();
+        } else {
+            pitch = readUnsignedByte();
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             this.seed = readLong();
         }
@@ -87,15 +91,19 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeVarInt(soundId);
+            writeVarInt(soundCategory.ordinal());
         } else {
             writeString(soundName);
         }
-        writeVarInt(soundCategory.ordinal());
         writeInt(effectPosition.x);
         writeInt(effectPosition.y);
         writeInt(effectPosition.z);
         writeFloat(volume);
-        writeFloat(pitch);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            writeFloat(pitch);
+        } else {
+            writeByte((byte) pitch);
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeLong(seed);
         }
