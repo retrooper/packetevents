@@ -114,6 +114,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
         }
     }
 
+    //TODO Technically we would need to support profile signiture data for complete 1.19.1 support.
     public PlayerInfo[] getPlayerInfo() {
         if (packet != null) {
             PlayerInfo[] playerInfoArray = new PlayerInfo[1];

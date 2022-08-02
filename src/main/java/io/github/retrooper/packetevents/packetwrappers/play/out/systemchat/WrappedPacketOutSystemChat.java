@@ -5,6 +5,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
 
@@ -12,6 +13,7 @@ public class WrappedPacketOutSystemChat extends WrappedPacket implements Sendabl
     private static Constructor<?> packetConstructor;
     private String message;
     private WrappedPacketOutChat.ChatPosition position;
+
     public WrappedPacketOutSystemChat(final NMSPacket packet) {
         super(packet);
     }
@@ -24,7 +26,12 @@ public class WrappedPacketOutSystemChat extends WrappedPacket implements Sendabl
     @Override
     protected void load() {
         try {
-            packetConstructor = PacketTypeClasses.Play.Server.SYSTEM_CHAT.getConstructor(String.class, int.class);
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+                packetConstructor = PacketTypeClasses.Play.Server.SYSTEM_CHAT.getConstructor(String.class, boolean.class);
+            }
+            else {
+                packetConstructor = PacketTypeClasses.Play.Server.SYSTEM_CHAT.getConstructor(String.class, int.class);
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -49,7 +56,10 @@ public class WrappedPacketOutSystemChat extends WrappedPacket implements Sendabl
 
     public WrappedPacketOutChat.ChatPosition getPosition() {
         if (packet != null) {
-            return WrappedPacketOutChat.ChatPosition.values()[readInt(0)];
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+                return readBoolean(1) ? WrappedPacketOutChat.ChatPosition.GAME_INFO : WrappedPacketOutChat.ChatPosition.SYSTEM;
+            }
+            return WrappedPacketOutChat.ChatPosition.getById(version, readInt(0));
         }
         else {
             return position;
@@ -58,6 +68,10 @@ public class WrappedPacketOutSystemChat extends WrappedPacket implements Sendabl
 
     public void setPosition(WrappedPacketOutChat.ChatPosition position) {
         if (packet != null) {
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+                writeBoolean(1, position == WrappedPacketOutChat.ChatPosition.GAME_INFO);
+                return;
+            }
             writeInt(0, position.ordinal());
         }
         else {
@@ -67,6 +81,12 @@ public class WrappedPacketOutSystemChat extends WrappedPacket implements Sendabl
 
     @Override
     public Object asNMSPacket() throws Exception {
-        return packetConstructor.newInstance(getMessageJSON(), getPosition().ordinal());
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+            return packetConstructor.newInstance(getMessageJSON(), getPosition() == WrappedPacketOutChat.ChatPosition.GAME_INFO);
+
+        }
+        else {
+            return packetConstructor.newInstance(getMessageJSON(), getPosition().ordinal());
+        }
     }
 }
