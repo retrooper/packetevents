@@ -74,11 +74,6 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     @Override
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.CHAT;
-        chatMessageTypeEnum = NMSUtils.getNMSEnumClassWithoutException("ChatMessageType");
-        if (chatMessageTypeEnum == null) {
-            chatMessageTypeEnum = NMSUtils.getNMEnumClassWithoutException("network.chat.ChatMessageType");
-        }
-
         if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
             if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
                 PLAYER_CHAT_MESSAGE_CLASS = NMSUtils.getNMClassWithoutException("network.chat.PlayerChatMessage");
@@ -89,45 +84,49 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
             }
             //Cause we read getChatPosition using constructor mode
             constructorMode = 4;
-            return;
         }
-
-        if (chatMessageTypeEnum != null) {
-            try {
-                chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, chatMessageTypeEnum);
-                constructorMode = 2;
-            } catch (NoSuchMethodException e) {
-                //Just a much newer version(1.16.x and above right now)
-                try {
-                    chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, chatMessageTypeEnum, UUID.class);
-                    constructorMode = 3;
-                } catch (NoSuchMethodException e2) {
-                    //Failed to resolve the constructor
-                    e2.printStackTrace();
-                }
+        else {
+            chatMessageTypeEnum = NMSUtils.getNMSEnumClassWithoutException("ChatMessageType");
+            if (chatMessageTypeEnum == null) {
+                chatMessageTypeEnum = NMSUtils.getNMEnumClassWithoutException("network.chat.ChatMessageType");
             }
-        } else {
-            try {
-                chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, byte.class);
-                constructorMode = 0;
-            } catch (NoSuchMethodException e) {
-                //That is fine, they are most likely on an older version.
+
+            if (chatMessageTypeEnum != null) {
                 try {
-                    chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, int.class);
-                    constructorMode = 1;
-                } catch (NoSuchMethodException e2) {
+                    chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, chatMessageTypeEnum);
+                    constructorMode = 2;
+                } catch (NoSuchMethodException e) {
+                    //Just a much newer version(1.16.x and above right now)
                     try {
-                        //Some weird 1.7.10 spigots remove that int parameter for no reason, I won't keep adding support for any more spigots and might stop
-                        //accepting pull requests for support for spigots breaking things that normal spigot has.
-                        chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass);
-                        constructorMode = -1;
-                    } catch (NoSuchMethodException e3) {
-                        e3.printStackTrace();
+                        chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, chatMessageTypeEnum, UUID.class);
+                        constructorMode = 3;
+                    } catch (NoSuchMethodException e2) {
+                        //Failed to resolve the constructor
+                        e2.printStackTrace();
+                    }
+                }
+            } else {
+                try {
+                    chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, byte.class);
+                    constructorMode = 0;
+                } catch (NoSuchMethodException e) {
+                    //That is fine, they are most likely on an older version.
+                    try {
+                        chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, int.class);
+                        constructorMode = 1;
+                    } catch (NoSuchMethodException e2) {
+                        try {
+                            //Some weird 1.7.10 spigots remove that int parameter for no reason, I won't keep adding support for any more spigots and might stop
+                            //accepting pull requests for support for spigots breaking things that normal spigot has.
+                            chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass);
+                            constructorMode = -1;
+                        } catch (NoSuchMethodException e3) {
+                            e3.printStackTrace();
+                        }
                     }
                 }
             }
         }
-
     }
 
     @Override
