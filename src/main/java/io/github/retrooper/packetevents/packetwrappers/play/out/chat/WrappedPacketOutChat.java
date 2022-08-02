@@ -25,6 +25,7 @@ import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -37,6 +38,8 @@ import java.util.*;
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> chatClassConstructor;
     private static Class<? extends Enum<?>> chatMessageTypeEnum;
+    private static Class<?> PLAYER_CHAT_MESSAGE_CLASS, SIGNED_MESSAGE_BODY_CLASS,
+            CHAT_MESSAGE_CONTENT_CLASS, CHAT_MESSAGE_TYPE_CLASS, NETWORK_BOUND_CHAT_TYPE_CLASS;
     //0 = IChatBaseComponent, Byte
     //1 = IChatBaseComponent, Int
     //2 = IChatBaseComponent, ChatMessageType
@@ -75,6 +78,20 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         if (chatMessageTypeEnum == null) {
             chatMessageTypeEnum = NMSUtils.getNMEnumClassWithoutException("network.chat.ChatMessageType");
         }
+
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+                PLAYER_CHAT_MESSAGE_CLASS = NMSUtils.getNMClassWithoutException("network.chat.PlayerChatMessage");
+                SIGNED_MESSAGE_BODY_CLASS = NMSUtils.getNMClassWithoutException("network.chat.SignedMessageBody");
+                CHAT_MESSAGE_CONTENT_CLASS = NMSUtils.getNMClassWithoutException("network.chat.ChatMessageContent");
+                CHAT_MESSAGE_TYPE_CLASS = NMSUtils.getNMClassWithoutException("network.chat.ChatMessageType");
+                NETWORK_BOUND_CHAT_TYPE_CLASS = SubclassUtil.getSubClass(CHAT_MESSAGE_TYPE_CLASS, 1);
+            }
+            //Cause we read getChatPosition using constructor mode
+            constructorMode = 4;
+            return;
+        }
+
         if (chatMessageTypeEnum != null) {
             try {
                 chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, chatMessageTypeEnum);
@@ -146,6 +163,15 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
      */
     public String getMessage() {
         if (packet != null) {
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+                Object playerChatMessage = readObject(0, PLAYER_CHAT_MESSAGE_CLASS);
+                WrappedPacket playerChatMessageWrapper = new WrappedPacket(new NMSPacket(playerChatMessage));
+                Object signedMessageBody = playerChatMessageWrapper.readObject(0, SIGNED_MESSAGE_BODY_CLASS);
+                WrappedPacket wrappedSignedMessageBody = new WrappedPacket(new NMSPacket(signedMessageBody));
+                Object chatMessageContent = wrappedSignedMessageBody.readObject(0, CHAT_MESSAGE_CONTENT_CLASS);
+                WrappedPacket wrappedChatMessage = new WrappedPacket(new NMSPacket(chatMessageContent));
+                return wrappedChatMessage.readIChatBaseComponent(0);
+            }
             return readIChatBaseComponent(0);
         } else {
             return message;
@@ -154,6 +180,16 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     public void setMessage(String message) {
         if (packet != null) {
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+                Object playerChatMessage = readObject(0, PLAYER_CHAT_MESSAGE_CLASS);
+                WrappedPacket playerChatMessageWrapper = new WrappedPacket(new NMSPacket(playerChatMessage));
+                Object signedMessageBody = playerChatMessageWrapper.readObject(0, SIGNED_MESSAGE_BODY_CLASS);
+                WrappedPacket wrappedSignedMessageBody = new WrappedPacket(new NMSPacket(signedMessageBody));
+                Object chatMessageContent = wrappedSignedMessageBody.readObject(0, CHAT_MESSAGE_CONTENT_CLASS);
+                WrappedPacket wrappedChatMessage = new WrappedPacket(new NMSPacket(chatMessageContent));
+                wrappedChatMessage.writeIChatBaseComponent(0, message);
+                return;
+            }
             writeIChatBaseComponent(0, message);
         } else {
             this.message = message;
@@ -161,20 +197,35 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
     public Optional<String> getUnsignedMessage() {
-        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+            Object playerChatMessage = readObject(0, PLAYER_CHAT_MESSAGE_CLASS);
+            WrappedPacket playerChatMessageWrapper = new WrappedPacket(new NMSPacket(playerChatMessage));
+            Optional<?> opt = playerChatMessageWrapper.readObject(0, Optional.class);
+            if (opt.isPresent()) {
+                Object iChatBaseComponent = opt.get();
+                return Optional.ofNullable(NMSUtils.readIChatBaseComponent(iChatBaseComponent));
+            }
+        }
+        else if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
             Optional<?> opt = readObject(0, Optional.class);
             if (opt.isPresent()) {
                 Object iChatBaseComponent = opt.get();
-                return Optional.of(NMSUtils.readIChatBaseComponent(iChatBaseComponent));
+                return Optional.ofNullable(NMSUtils.readIChatBaseComponent(iChatBaseComponent));
             }
         }
         return Optional.empty();
     }
 
     public void setUnsignedMessage(String unsignedMessage) {
-        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19_1)) {
+            Object playerChatMessage = readObject(0, PLAYER_CHAT_MESSAGE_CLASS);
+            WrappedPacket playerChatMessageWrapper = new WrappedPacket(new NMSPacket(playerChatMessage));
             Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(unsignedMessage);
-            write(Optional.class, 0, Optional.of(iChatBaseComponent));
+           playerChatMessageWrapper.write(Optional.class, 0, Optional.ofNullable(iChatBaseComponent));
+        }
+        else if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(unsignedMessage);
+            write(Optional.class, 0, Optional.ofNullable(iChatBaseComponent));
         }
     }
 
@@ -191,7 +242,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
             byte chatPositionValue;
             switch (constructorMode) {
                 case -1:
-                    chatPositionValue = (byte) ChatPosition.CHAT.ordinal();
+                    chatPositionValue = (byte) ChatPosition.CHAT.getId(version);
                     break;
                 case 0:
                     chatPositionValue = readByte(0);
@@ -203,11 +254,16 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
                 case 3:
                     Enum<?> chatTypeEnumInstance = readEnumConstant(0, chatMessageTypeEnum);
                     return ChatPosition.values()[chatTypeEnumInstance.ordinal()];
+                case 4:
+                    Object chatMsgType = readObject(0, NETWORK_BOUND_CHAT_TYPE_CLASS);
+                    WrappedPacket chatMsgTypeWrapper = new WrappedPacket(new NMSPacket(chatMsgType));
+                    chatPositionValue = (byte) chatMsgTypeWrapper.readInt(0);
+                    break;
                 default:
                     chatPositionValue = 0;
                     break;
             }
-            return ChatPosition.values()[chatPositionValue];
+            return ChatPosition.getById(version, chatPositionValue);
         } else {
             return chatPosition;
         }
@@ -217,15 +273,21 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         if (packet != null) {
             switch (constructorMode) {
                 case 0:
-                    writeByte(0, (byte) chatPosition.ordinal());
+                    writeByte(0, (byte) chatPosition.getId(version));
                     break;
                 case 1:
-                    writeInt(0, chatPosition.ordinal());
+                    writeInt(0, chatPosition.getId(version));
                     break;
                 case 2:
                 case 3:
-                    Enum<?> chatTypeEnumInstance = EnumUtil.valueByIndex(chatMessageTypeEnum, chatPosition.ordinal());
+                    Enum<?> chatTypeEnumInstance = EnumUtil.valueByIndex(chatMessageTypeEnum,
+                            chatPosition.getId(version));
                     writeEnumConstant(0, chatTypeEnumInstance);
+                    break;
+                case 4:
+                    Object chatMsgType = readObject(0, NETWORK_BOUND_CHAT_TYPE_CLASS);
+                    WrappedPacket chatMsgTypeWrapper = new WrappedPacket(new NMSPacket(chatMsgType));
+                    chatMsgTypeWrapper.writeInt(0, chatPosition.getId(version));
                     break;
             }
         } else {
