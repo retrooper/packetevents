@@ -103,7 +103,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void copy(WrapperPlayServerSoundEffect wrapper) {
-        this.soundName = wrapper.soundName;
+        soundName = wrapper.soundName;
         soundId = wrapper.soundId;
         soundCategory = wrapper.soundCategory;
         effectPosition = wrapper.effectPosition;
