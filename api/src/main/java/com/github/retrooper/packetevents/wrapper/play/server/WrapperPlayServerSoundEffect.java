@@ -24,9 +24,11 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServerSoundEffect> {
-    private int soundID;
+    private @Nullable String soundName;
+    private int soundId;
     private SoundCategory soundCategory;
     private Vector3i effectPosition;
     private float volume;
@@ -37,15 +39,27 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    public WrapperPlayServerSoundEffect(int soundID, SoundCategory soundCategory,
+    public WrapperPlayServerSoundEffect(int soundId, SoundCategory soundCategory,
                                         Vector3i effectPosition, float volume, float pitch) {
-        this(soundID, soundCategory, effectPosition, volume, pitch, -1);
+        this(soundId, soundCategory, effectPosition, volume, pitch, -1);
     }
 
-    public WrapperPlayServerSoundEffect(int soundID, SoundCategory soundCategory,
+    @Deprecated
+    public WrapperPlayServerSoundEffect(@Nullable String soundName, SoundCategory soundCategory,
                                         Vector3i effectPosition, float volume, float pitch, long seed) {
         super(PacketType.Play.Server.SOUND_EFFECT);
-        this.soundID = soundID;
+        this.soundName = soundName;
+        this.soundCategory = soundCategory;
+        this.effectPosition = effectPosition;
+        this.volume = volume;
+        this.pitch = pitch;
+        this.seed = seed;
+    }
+
+    public WrapperPlayServerSoundEffect(int soundId, SoundCategory soundCategory,
+                                        Vector3i effectPosition, float volume, float pitch, long seed) {
+        super(PacketType.Play.Server.SOUND_EFFECT);
+        this.soundId = soundId;
         this.soundCategory = soundCategory;
         this.effectPosition = effectPosition;
         this.volume = volume;
@@ -55,7 +69,11 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        soundID = readVarInt();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            soundId = readVarInt();
+        } else {
+            soundName = readString();
+        }
         soundCategory = SoundCategory.fromId(readVarInt());
         effectPosition = new Vector3i(readInt(), readInt(), readInt());
         volume = readFloat();
@@ -67,7 +85,11 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
-        writeVarInt(soundID);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            writeVarInt(soundId);
+        } else {
+            writeString(soundName);
+        }
         writeVarInt(soundCategory.ordinal());
         writeInt(effectPosition.x);
         writeInt(effectPosition.y);
@@ -81,7 +103,8 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void copy(WrapperPlayServerSoundEffect wrapper) {
-        soundID = wrapper.soundID;
+        this.soundName = wrapper.soundName;
+        soundId = wrapper.soundId;
         soundCategory = wrapper.soundCategory;
         effectPosition = wrapper.effectPosition;
         volume = wrapper.volume;
@@ -89,12 +112,36 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         seed = wrapper.seed;
     }
 
+    /**
+     * On server versions equals or older than 1.8, this is the sound name.
+     * On server versions newer than 1.8, this is the {@link #getSoundId()}.
+     *
+     * @return the sound name
+     * @deprecated use {@link #getSoundId()} instead on modern versions
+     */
+    @Deprecated
+    public @Nullable String getSoundName() {
+        return soundName;
+    }
+
+    /**
+     * On server versions equals or older than 1.8, this is the sound name.
+     * On server versions newer than 1.8, this is the {@link #setSoundId(int)}.
+     *
+     * @param soundName the sound name
+     * @deprecated use {@link #setSoundId(int)} instead on modern versions
+     */
+    @Deprecated
+    public void setSoundName(@Nullable String soundName) {
+        this.soundName = soundName;
+    }
+
     public int getSoundId() {
-        return soundID;
+        return soundId;
     }
 
     public void setSoundId(int soundID) {
-        this.soundID = soundID;
+        this.soundId = soundID;
     }
 
     public SoundCategory getSoundCategory() {
