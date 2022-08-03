@@ -92,7 +92,7 @@
     "optional_block_position",
     "block_face",
     "optional_uuid",
-    "optional_block_state"s
+    "optional_block_state"
   ],
   "V_1_8": [
     "byte",
