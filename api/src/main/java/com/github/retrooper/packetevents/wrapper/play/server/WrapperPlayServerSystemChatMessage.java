@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -51,7 +52,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
     public WrapperPlayServerSystemChatMessage(@NotNull ChatType type, Component message) {
         super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
         this.type = type;
-        if (type == ChatType.GAME_INFO) {
+        if (type == ChatTypes.GAME_INFO) {
             this.overlay = true;
         }
         this.message = message;
@@ -62,7 +63,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
         this.messageJson = messageJson;
         this.type = type;
-        if (type == ChatType.GAME_INFO) {
+        if (type == ChatTypes.GAME_INFO) {
             this.overlay = true;
         }
     }
@@ -71,7 +72,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
         this.message = message;
         this.overlay = overlay;
-        this.type = overlay ? ChatType.GAME_INFO : ChatType.SYSTEM;
+        this.type = overlay ? ChatTypes.GAME_INFO : ChatTypes.SYSTEM;
     }
 
     @Deprecated
@@ -79,7 +80,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
         this.messageJson = messageJson;
         this.overlay = overlay;
-        this.type = overlay ? ChatType.GAME_INFO : ChatType.SYSTEM;
+        this.type = overlay ? ChatTypes.GAME_INFO : ChatTypes.SYSTEM;
     }
 
     @Override
@@ -92,7 +93,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
             overlay = readBoolean();
         } else {
-            type = ChatType.getById(serverVersion, readVarInt());
+            type = ChatTypes.getById(serverVersion.toClientVersion(), readVarInt());
         }
     }
 
@@ -107,12 +108,12 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         } else {
             if (type == null) {
                 if (overlay) {
-                    writeVarInt(ChatType.GAME_INFO.getId(serverVersion));
+                    writeVarInt(ChatTypes.GAME_INFO.getId(serverVersion.toClientVersion()));
                 } else {
-                    writeVarInt(ChatType.SYSTEM.getId(serverVersion));
+                    writeVarInt(ChatTypes.SYSTEM.getId(serverVersion.toClientVersion()));
                 }
             } else {
-                writeVarInt(type.getId(serverVersion));
+                writeVarInt(type.getId(serverVersion.toClientVersion()));
             }
         }
     }

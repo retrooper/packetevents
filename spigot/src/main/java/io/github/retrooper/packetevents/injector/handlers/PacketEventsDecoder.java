@@ -56,7 +56,7 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
-        ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(input);
+        ByteBuf outputBuffer = ctx.alloc().buffer(input.readableBytes()).writeBytes(input);
         try {
             boolean doRecompression =
                     handleCompression(ctx, outputBuffer);

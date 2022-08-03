@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.chat.message.reader.impl;
 
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
@@ -49,7 +50,7 @@ public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
         FilterMask filterMask = wrapper.readFilterMask();
 
         int id = wrapper.readVarInt();
-        ChatType type = ChatType.getById(wrapper.getServerVersion(), id);
+        ChatType type = ChatTypes.getById(wrapper.getServerVersion().toClientVersion(), id);
         Component name = wrapper.readComponent();
         Component targetName = wrapper.readOptional(PacketWrapper::readComponent);
         ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType = new ChatMessage_v1_19_1.ChatTypeBoundNetwork(type, name, targetName);
@@ -71,7 +72,7 @@ public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
         wrapper.writeLastSeenMessages(newData.getLastSeenMessages());
         wrapper.writeOptional(newData.getUnsignedChatContent(), PacketWrapper::writeComponent);
         wrapper.writeFilterMask(newData.getFilterMask());
-        wrapper.writeVarInt(newData.getChatType().getType().getId(wrapper.getServerVersion()));
+        wrapper.writeVarInt(newData.getChatType().getType().getId(wrapper.getServerVersion().toClientVersion()));
         wrapper.writeComponent(newData.getChatType().getName());
         wrapper.writeOptional(newData.getChatType().getTargetName(), PacketWrapper::writeComponent);
     }

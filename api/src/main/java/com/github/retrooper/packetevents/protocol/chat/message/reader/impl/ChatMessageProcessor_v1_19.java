@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.chat.message.reader.impl;
 
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19;
 import com.github.retrooper.packetevents.protocol.chat.message.reader.ChatMessageProcessor;
@@ -36,7 +37,7 @@ public class ChatMessageProcessor_v1_19 implements ChatMessageProcessor {
         Component chatContent = wrapper.readComponent();
         Component unsignedChatContent = wrapper.readOptional(PacketWrapper::readComponent);
         int id = wrapper.readVarInt();
-        ChatType type = ChatType.getById(wrapper.getServerVersion(), id);
+        ChatType type = ChatTypes.getById(wrapper.getServerVersion().toClientVersion(), id);
         UUID senderUUID = wrapper.readUUID();
         Component senderDisplayName = wrapper.readComponent();
         @Nullable Component teamName = wrapper.readOptional(PacketWrapper::readComponent);
@@ -52,7 +53,7 @@ public class ChatMessageProcessor_v1_19 implements ChatMessageProcessor {
         ChatMessage_v1_19 newData = (ChatMessage_v1_19) data;
         wrapper.writeComponent(newData.getChatContent());
         wrapper.writeOptional(newData.getUnsignedChatContent(), PacketWrapper::writeComponent);
-        wrapper.writeVarInt(newData.getType().getId(wrapper.getServerVersion()));
+        wrapper.writeVarInt(newData.getType().getId(wrapper.getServerVersion().toClientVersion()));
         wrapper.writeUUID(newData.getSenderUUID());
         wrapper.writeComponent(newData.getSenderDisplayName());
         wrapper.writeOptional(newData.getTeamName(), PacketWrapper::writeComponent);

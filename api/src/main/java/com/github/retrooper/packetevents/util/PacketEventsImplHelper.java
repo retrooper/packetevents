@@ -22,7 +22,6 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
-import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -48,12 +47,8 @@ public class PacketEventsImplHelper {
                 ByteBufHelper.clear(buffer);
                 int packetId = packetSendEvent.getPacketId();
                 packetSendEvent.getLastUsedWrapper().writeVarInt(packetId);
-                try {
-                    packetSendEvent.getLastUsedWrapper().write();
-                } catch (Exception e) {
-                    throw new PacketProcessException("PacketEvents failed to re-encode an outgoing packet with its packet wrapper. Packet ID: " + packetId
-                            + ". Failed to encode " + wrapper.getClass().getSimpleName() + ".", e);
-                }
+
+                packetSendEvent.getLastUsedWrapper().write();
             }
             ByteBufHelper.readerIndex(buffer, preProcessIndex);
         } else {
