@@ -56,10 +56,6 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
-        if (skipDoubleTransform) {
-            skipDoubleTransform = false;
-            out.add(input.retain());
-        }
         ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(input);
         try {
             boolean doRecompression =
@@ -85,6 +81,11 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
 
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
+        if (skipDoubleTransform) {
+            skipDoubleTransform = false;
+            out.add(buffer.retain());
+            return;
+        }
         if (buffer.isReadable()) {
             read(ctx, buffer, out);
             for (ByteToMessageDecoder decoder : decoders) {
