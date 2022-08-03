@@ -27,7 +27,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServerSoundEffect> {
-    private @Nullable String soundName;
+    private String soundName;
     private int soundId;
     private SoundCategory soundCategory;
     private Vector3i effectPosition;
@@ -39,17 +39,14 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    public WrapperPlayServerSoundEffect(int soundId, SoundCategory soundCategory,
-                                        Vector3i effectPosition, float volume, float pitch) {
+    public WrapperPlayServerSoundEffect(int soundId, SoundCategory soundCategory, Vector3i effectPosition, float volume, float pitch) {
         this(soundId, soundCategory, effectPosition, volume, pitch, -1);
     }
 
     @Deprecated
-    public WrapperPlayServerSoundEffect(@Nullable String soundName, SoundCategory soundCategory,
-                                        Vector3i effectPosition, float volume, float pitch, long seed) {
+    public WrapperPlayServerSoundEffect(String soundName, Vector3i effectPosition, float volume, float pitch, long seed) {
         super(PacketType.Play.Server.SOUND_EFFECT);
         this.soundName = soundName;
-        this.soundCategory = soundCategory;
         this.effectPosition = effectPosition;
         this.volume = volume;
         this.pitch = pitch;
@@ -152,11 +149,21 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         this.soundId = soundID;
     }
 
-    public SoundCategory getSoundCategory() {
+    /**
+     * The {@link SoundCategory} only exists on versions newer than 1.8.
+     *
+     * @return the sound category
+     */
+    public @Nullable SoundCategory getSoundCategory() {
         return soundCategory;
     }
 
-    public void setSoundCategory(SoundCategory soundCategory) {
+    /**
+     * The {@link SoundCategory} only exists on versions newer than 1.8.
+     *
+     * @param soundCategory the sound category
+     */
+    public void setSoundCategory(@Nullable SoundCategory soundCategory) {
         this.soundCategory = soundCategory;
     }
 
