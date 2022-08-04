@@ -45,7 +45,7 @@ public enum ServerVersion {
     v_1_17(755), v_1_17_1(756),
     v_1_18(757), v_1_18_1(757), v_1_18_2(758),
     //TODO Update (checkpoint)
-    v_1_19(759), v_1_19_1(760),
+    v_1_19(759), v_1_19_1(760), v_1_19_2(761),
     ERROR(-1);
 
     private static final String NMS_VERSION_SUFFIX = Bukkit.getServer().getClass().getPackage().getName()
