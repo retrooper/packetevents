@@ -44,7 +44,9 @@ public class LateChannelInjectorLegacy implements LateInjector {
         if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
             return;
         }
-        channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerLegacy);
+        channel.eventLoop().execute(() -> {
+            channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerLegacy);
+        });
     }
 
     @Override
