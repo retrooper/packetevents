@@ -73,7 +73,24 @@ public class EntityDataTypes {
                 wrapper.writeFloat(value.y);
                 wrapper.writeFloat(value.z);
             });
-    public static final EntityDataType<Vector3i> BLOCK_POSITION = define("block_position", readBlockPositionDeserializer(), writeBlockPositionSerializer());
+    public static final EntityDataType<Vector3i> BLOCK_POSITION = define("block_position", (PacketWrapper<?> wrapper) -> {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            return wrapper.readBlockPosition();
+        } else {
+            int x = wrapper.readInt();
+            int y = wrapper.readInt();
+            int z = wrapper.readInt();
+            return new Vector3i(x, y, z);
+        }
+    }, (wrapper, blockPosition) -> {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            wrapper.writeBlockPosition(blockPosition);
+        } else {
+            wrapper.writeInt(blockPosition.getX());
+            wrapper.writeInt(blockPosition.getY());
+            wrapper.writeInt(blockPosition.getZ());
+        }
+    });
     public static final EntityDataType<Optional<Vector3i>> OPTIONAL_BLOCK_POSITION = define("optional_block_position", readOptionalBlockPositionDeserializer(), writeOptionalBlockPositionSerializer());
     public static final EntityDataType<BlockFace> BLOCK_FACE = define("block_face", (PacketWrapper<?> wrapper) -> {
                 int id = wrapper.readVarInt();
@@ -81,21 +98,10 @@ public class EntityDataTypes {
             },
             (PacketWrapper<?> wrapper, BlockFace value) -> wrapper.writeVarInt(value.getFaceValue()));
 
-    public static final EntityDataType<Optional<UUID>> OPTIONAL_UUID = define("optional_uuid", (PacketWrapper<?> wrapper) -> {
-                if (wrapper.readBoolean()) {
-                    return Optional.of(wrapper.readUUID());
-                } else {
-                    return Optional.empty();
-                }
-            },
-            (PacketWrapper<?> wrapper, Optional<UUID> value) -> {
-                if (value.isPresent()) {
-                    wrapper.writeBoolean(true);
-                    wrapper.writeUUID(value.get());
-                } else {
-                    wrapper.writeBoolean(false);
-                }
-            });
+    public static final EntityDataType<Optional<UUID>> OPTIONAL_UUID = define("optional_uuid",
+            (PacketWrapper<?> wrapper) -> Optional.ofNullable(wrapper.readOptional(PacketWrapper::readUUID)),
+            (PacketWrapper<?> wrapper, Optional<UUID> value) ->
+                    wrapper.writeOptional(value.orElse(null), PacketWrapper::writeUUID));
 
     public static final EntityDataType<NBTCompound> NBT = define("nbt", PacketWrapper::readNBT, PacketWrapper::writeNBT);
     public static final EntityDataType<VillagerData> VILLAGER_DATA = define("villager_data", PacketWrapper::readVillagerData, PacketWrapper::writeVillagerData);
@@ -114,21 +120,10 @@ public class EntityDataTypes {
     public static final EntityDataType<Integer> CAT_VARIANT = define("cat_variant_type", readIntDeserializer(), writeIntSerializer());
     public static final EntityDataType<Integer> FROG_VARIANT = define("frog_variant_type", readIntDeserializer(), writeIntSerializer());
 
-    public static final EntityDataType<Optional<Vector3i>> OPTIONAL_GLOBAL_POSITION = define("optional_global_position", (PacketWrapper<?> wrapper) -> {
-                if (wrapper.readBoolean()) {
-                    return Optional.of(wrapper.readBlockPosition());
-                } else {
-                    return Optional.empty();
-                }
-            },
-            (PacketWrapper<?> wrapper, Optional<Vector3i> value) -> {
-                if (value.isPresent()) {
-                    wrapper.writeBoolean(true);
-                    wrapper.writeBlockPosition(value.get());
-                } else {
-                    wrapper.writeBoolean(false);
-                }
-            });
+    public static final EntityDataType<Optional<Vector3i>> OPTIONAL_GLOBAL_POSITION = define("optional_global_position",
+            (PacketWrapper<?> wrapper) -> Optional.ofNullable(wrapper.readOptional(PacketWrapper::readBlockPosition)),
+            (PacketWrapper<?> wrapper, Optional<Vector3i> value) ->
+                    wrapper.writeOptional(value.orElse(null), PacketWrapper::writeBlockPosition));
 
     public static final EntityDataType<Integer> PAINTING_VARIANT_TYPE = define("painting_variant_type", readIntDeserializer(), writeIntSerializer());
 
@@ -212,34 +207,6 @@ public class EntityDataTypes {
                 wrapper.writeBoolean(false);
             }
         };
-    }
-
-    private static <T> Function<PacketWrapper<?>, T> readBlockPositionDeserializer() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            return (PacketWrapper<?> wrapper) -> (T) wrapper.readBlockPosition();
-        } else {
-            return (PacketWrapper<?> wrapper) -> {
-                int x = wrapper.readInt();
-                int y = wrapper.readInt();
-                int z = wrapper.readInt();
-                return (T) new Vector3i(x, y, z);
-            };
-        }
-    }
-
-    private static <T> BiConsumer<PacketWrapper<?>, T> writeBlockPositionSerializer() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            return (PacketWrapper<?> wrapper, T value) -> {
-                wrapper.writeBlockPosition((Vector3i) value);
-            };
-        } else {
-            return (PacketWrapper<?> wrapper, T value) -> {
-                Vector3i position = (Vector3i) value;
-                wrapper.writeInt(position.getX());
-                wrapper.writeInt(position.getY());
-                wrapper.writeInt(position.getZ());
-            };
-        }
     }
 
     private static <T> Function<PacketWrapper<?>, T> readOptionalBlockPositionDeserializer() {
