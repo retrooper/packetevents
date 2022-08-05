@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
@@ -143,7 +144,7 @@ public class User {
     }
 
     public void sendMessage(Component component) {
-        sendMessage(component, ChatType.CHAT);
+        sendMessage(component, ChatTypes.CHAT);
     }
 
     public void sendMessage(Component component, ChatType type) {

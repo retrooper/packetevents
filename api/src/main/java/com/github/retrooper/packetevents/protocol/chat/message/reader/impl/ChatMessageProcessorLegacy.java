@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.chat.message.reader.impl;
 
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
 import com.github.retrooper.packetevents.protocol.chat.message.reader.ChatMessageProcessor;
@@ -31,13 +32,13 @@ public class ChatMessageProcessorLegacy implements ChatMessageProcessor {
     public ChatMessage readChatMessage(@NotNull PacketWrapper<?> wrapper) {
         Component chatContent = wrapper.readComponent();
         int id = wrapper.readByte();
-        ChatType type = ChatType.getById(wrapper.getServerVersion(), id);
+        ChatType type = ChatTypes.getById(wrapper.getServerVersion().toClientVersion(), id);
         return new ChatMessageLegacy(chatContent, type);
     }
 
     @Override
     public void writeChatMessage(@NotNull PacketWrapper<?> wrapper, @NotNull ChatMessage data) {
         wrapper.writeComponent(data.getChatContent());
-        wrapper.writeByte(data.getType().getId(wrapper.getServerVersion()));
+        wrapper.writeByte(data.getType().getId(wrapper.getServerVersion().toClientVersion()));
     }
 }

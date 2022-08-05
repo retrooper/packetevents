@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 public class EventManager {
     private final Map<Byte, HashSet<PacketListenerCommon>> listenersMap = new ConcurrentHashMap<>();
@@ -46,7 +47,11 @@ public class EventManager {
             HashSet<PacketListenerCommon> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerCommon listener : listeners) {
-                    event.call(listener);
+                    try {
+                        event.call(listener);
+                    } catch (Throwable t) {
+                        PacketEvents.getAPI().getLogger().log(Level.WARNING, "PacketEvents caught an unhandled exception while calling your listener.", t);
+                    }
                     if (postCallListenerAction != null) {
                         postCallListenerAction.run();
                     }

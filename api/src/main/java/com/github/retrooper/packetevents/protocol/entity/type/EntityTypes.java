@@ -52,6 +52,12 @@ public class EntityTypes {
             ClientVersion.V_1_12,
             ClientVersion.V_1_13);
 
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
+        LEGACY_TYPES_BUILDER.unloadFileMappings();
+    }
+
     public static EntityType define(String key, @Nullable EntityType parent) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
         TypesBuilderData legacyData = LEGACY_TYPES_BUILDER.define(key);
@@ -292,9 +298,4 @@ public class EntityTypes {
     public static final EntityType MINECART_TNT = define("minecart_tnt", MINECART_ABSTRACT);
     public static final EntityType MINECART_HOPPER = define("minecart_hopper", MINECART_ABSTRACT);
     public static final EntityType MINECART_MOB_SPAWNER = define("minecart_mob_spawner", MINECART_ABSTRACT);
-
-    static {
-        TYPES_BUILDER.unloadFileMappings();
-        LEGACY_TYPES_BUILDER.unloadFileMappings();
-    }
 }

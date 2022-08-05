@@ -76,7 +76,6 @@ public enum ClientVersion {
 
     V_1_19(759),
     V_1_19_1(760),
-
     //TODO UPDATE Add new protocol version field
 
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
