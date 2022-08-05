@@ -157,7 +157,7 @@ public class EntityDataTypes {
     }
 
     public static <T> EntityDataType<T> define(String name, Function<PacketWrapper<?>, T> deserializer, BiConsumer<PacketWrapper<?>, T> serializer) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(name);
+        TypesBuilderData data = TYPES_BUILDER.define(name);
         EntityDataType<T> type = new EntityDataType<>(name, data.getData(), deserializer,
                 (BiConsumer<PacketWrapper<?>, Object>) serializer);
         ENTITY_DATA_TYPE_MAP.put(type.getName(), type);

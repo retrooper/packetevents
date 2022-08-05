@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleDustData;
@@ -38,10 +39,7 @@ import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEffect;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSelectAdvancementsTab;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -150,33 +148,36 @@ public class PacketEventsPlugin extends JavaPlugin {
                     System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                 } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
-                    user.sendMessage("He said:" + cm.getMessage().getChatContent() + ", type: " + cm.getMessage().getType());
+                    System.out.println("He said:" + cm.getMessage().getChatContent() + ", type: " + cm.getMessage().getType());
                     if (cm.getMessage() instanceof ChatMessage_v1_19_1) {
                         UUID uuid = ((ChatMessage_v1_19_1)cm.getMessage()).getSenderUUID();
-                        user.sendMessage("uuid: " + uuid + ", type: " + cm.getMessage().getType().getName());
+                        System.out.println("uuid: " + uuid + ", type: " + cm.getMessage().getType().getName());
                     }
                 }
                 else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
                     System.out.println("sent sissysystemmessage!");
                 }
-                 else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
+                else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
                     WrapperPlayServerEntityEffect effect = new WrapperPlayServerEntityEffect(event);
                     System.out.println("type: " + effect.getPotionType().getName() + ", type id: " + effect.getPotionType().getId());
-                } /*else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     EntityType type = spawnLivingEntity.getEntityType();
+                    System.out.println("Spawn living: " + type.getName());
                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_PAINTING) {
                     WrapperPlayServerSpawnPainting spawnPainting = new WrapperPlayServerSpawnPainting(event);
-                    //System.out.println("Painting: " + spawnPainting.getEntityId() + ", " + spawnPainting.getType().name() + ", " + spawnPainting.getPosition().toString() + ", " + spawnPainting.getDirection().name() + ", " + spawnPainting.getUUID().toString());
-                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_ENTITY) {
-                    WrapperPlayServerSpawnEntity spawnEntity = new WrapperPlayServerSpawnEntity(event);
-                    System.out.println("Spawning a new entity of type: " + spawnEntity.getEntityType());
+                    System.out.println("Painting: " + spawnPainting.getEntityId() + ", " + spawnPainting.getType().toString() + ", "
+                            + spawnPainting.getPosition().toString() + ", " + spawnPainting.getDirection().name() + ", " + spawnPainting.getUUID().toString());
+
+                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_ENTITY) {
+                   // WrapperPlayServerSpawnEntity spawnEntity = new WrapperPlayServerSpawnEntity(event);
+                    //System.out.println("Spawning a new entity of type: " + spawnEntity.getEntityType());
                 } else if (event.getPacketType() == PacketType.Play.Server.BLOCK_CHANGE) {
                     WrapperPlayServerBlockChange change = new WrapperPlayServerBlockChange(event);
                     Bukkit.broadcastMessage(change.getBlockState().toString());
                 } else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
                     WrapperPlayServerChunkData data = new WrapperPlayServerChunkData(event);
-                }*/
+                }
             }
 
             @Override
