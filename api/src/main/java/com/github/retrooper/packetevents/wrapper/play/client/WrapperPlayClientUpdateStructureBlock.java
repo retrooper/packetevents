@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Mirror;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Mode;
@@ -27,8 +26,6 @@ import com.github.retrooper.packetevents.protocol.world.states.enums.Rotation;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Range;
-
-import java.util.Optional;
 
 public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<WrapperPlayClientUpdateStructureBlock> {
     private static final int IGNORE_ENTITIES = 0x01;
@@ -49,7 +46,7 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
     private Rotation rotation;
     private String metadata;
     private float integrity;
-    private float seed;
+    private long seed;
     private boolean ignoreEntities;
     private boolean showAir;
     private boolean showBoundingBox;
@@ -63,34 +60,8 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
                                                  @Range(from = -32, to = 32) byte offsetX, @Range(from = -32, to = 32) byte offsetY,
                                                  @Range(from = -32, to = 32) byte offsetZ, @Range(from = -32, to = 32) byte sizeX,
                                                  @Range(from = -32, to = 32) byte sizeY, @Range(from = -32, to = 32) byte sizeZ,
-                                                 Mirror mirror, Rotation rotation, String metadata, boolean ignoreEntities,
-                                                 boolean showAir, boolean showBoundingBox, short flags) {
-        super(PacketType.Play.Client.UPDATE_STRUCTURE_BLOCK);
-        this.position = position;
-        this.action = action;
-        this.mode = mode;
-        this.name = name;
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.offsetZ = offsetZ;
-        this.sizeX = sizeX;
-        this.sizeY = sizeY;
-        this.sizeZ = sizeZ;
-        this.mirror = mirror;
-        this.rotation = rotation;
-        this.metadata = metadata;
-        this.ignoreEntities = ignoreEntities;
-        this.showAir = showAir;
-        this.showBoundingBox = showBoundingBox;
-        this.flags = flags;
-    }
-
-    public WrapperPlayClientUpdateStructureBlock(Vector3i position, Action action, Mode mode, String name,
-                                                 @Range(from = -32, to = 32) byte offsetX, @Range(from = -32, to = 32) byte offsetY,
-                                                 @Range(from = -32, to = 32) byte offsetZ, @Range(from = -32, to = 32) byte sizeX,
-                                                 @Range(from = -32, to = 32) byte sizeY, @Range(from = -32, to = 32) byte sizeZ,
-                                                 Mirror mirror, Rotation rotation, String metadata, float integrity,
-                                                 float seed, boolean ignoreEntities, boolean showAir, boolean showBoundingBox, short flags) {
+                                                 Mirror mirror, Rotation rotation, String metadata, @Range(from = 0, to = 1) float integrity,
+                                                 long seed, boolean ignoreEntities, boolean showAir, boolean showBoundingBox, short flags) {
         super(PacketType.Play.Client.UPDATE_STRUCTURE_BLOCK);
         this.position = position;
         this.action = action;
@@ -115,14 +86,7 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.position = new Vector3i(readLong());
-        } else {
-            int x = readInt();
-            int y = readShort();
-            int z = readInt();
-            this.position = new Vector3i(x, y, z);
-        }
+        this.position = new Vector3i(readLong());
         this.action = Action.getById(readVarInt());
         this.mode = Mode.getById(readVarInt());
         this.name = readString();
@@ -135,11 +99,10 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
         this.mirror = Mirror.getById(readVarInt());
         this.rotation = Rotation.getById(readVarInt());
         this.metadata = readString();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
-            this.integrity = readFloat();
-            this.seed = readVarLong();
-        }
+        this.integrity = readFloat();
+        this.seed = readVarLong();
         this.flags = readUnsignedByte();
+
         this.ignoreEntities = (flags & IGNORE_ENTITIES) != 0;
         this.showAir = (flags & SHOW_AIR) != 0;
         this.showBoundingBox = (flags & SHOW_BOUNDING_BOX) != 0;
@@ -147,14 +110,7 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            long positionVector = this.position.getSerializedPosition();
-            writeLong(positionVector);
-        } else {
-            writeInt(this.position.x);
-            writeShort(this.position.y);
-            writeInt(this.position.z);
-        }
+        writeLong(this.position.getSerializedPosition());
         writeVarInt(this.action.ordinal());
         writeVarInt(this.mode.ordinal());
         writeString(this.name);
@@ -167,10 +123,8 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
         writeVarInt(this.mirror.ordinal());
         writeVarInt(this.rotation.ordinal());
         writeString(this.metadata);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
-            writeFloat(this.integrity);
-            writeVarLong((long) this.seed);
-        }
+        writeFloat(this.integrity);
+        writeVarLong(this.seed);
 
         if (this.ignoreEntities) {
             this.flags |= IGNORE_ENTITIES;
@@ -314,19 +268,19 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
         this.metadata = metadata;
     }
 
-    public Optional<Float> getIntegrity() {
-        return Optional.of(integrity);
+    public float getIntegrity() {
+        return integrity;
     }
 
     public void setIntegrity(float integrity) {
         this.integrity = integrity;
     }
 
-    public Optional<Float> getSeed() {
-        return Optional.of(seed);
+    public long getSeed() {
+        return seed;
     }
 
-    public void setSeed(float seed) {
+    public void setSeed(long seed) {
         this.seed = seed;
     }
 
