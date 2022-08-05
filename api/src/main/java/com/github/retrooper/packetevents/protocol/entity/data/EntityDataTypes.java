@@ -57,13 +57,28 @@ public class EntityDataTypes {
             ClientVersion.V_1_19);
 
     public static final EntityDataType<Byte> BYTE = define("byte", PacketWrapper::readByte, PacketWrapper::writeByte);
-    public static final EntityDataType<Integer> INT = define("int", readIntDeserializer(), writeIntSerializer());
+    public static final EntityDataType<Integer> INT = define("int", wrapper -> {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            return wrapper.readVarInt();
+        } else {
+            return wrapper.readInt();
+        }
+    }, (wrapper, value) -> {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            wrapper.writeVarInt(value);
+        }
+        else {
+            wrapper.writeInt(value);
+        }
+    });
     public static final EntityDataType<Float> FLOAT = define("float", PacketWrapper::readFloat, PacketWrapper::writeFloat);
     public static final EntityDataType<String> STRING = define("string", PacketWrapper::readString, PacketWrapper::writeString);
     public static final EntityDataType<Component> COMPONENT = define("component", PacketWrapper::readComponent, PacketWrapper::writeComponent);
     public static final EntityDataType<Optional<Component>> OPTIONAL_COMPONENT = define("optional_component", readOptionalComponentDeserializer(), writeOptionalComponentSerializer());
     public static final EntityDataType<ItemStack> ITEMSTACK = define("itemstack", PacketWrapper::readItemStack, PacketWrapper::writeItemStack);
-    public static final EntityDataType<Optional<Object>> OPTIONAL_BLOCK_STATE = define("optional_block_state", readIntDeserializer(), writeIntSerializer());
+    public static final EntityDataType<Optional<Integer>> OPTIONAL_BLOCK_STATE =
+            define("optional_block_state", wrapper -> Optional.ofNullable(wrapper.readOptional(PacketWrapper::readVarInt)),
+                    (wrapper, value) -> wrapper.writeOptional(value.orElse(null), PacketWrapper::writeVarInt));
     public static final EntityDataType<Boolean> BOOLEAN = define("boolean", PacketWrapper::readBoolean, PacketWrapper::writeBoolean);
     public static final EntityDataType<Integer> PARTICLE = define("particle", PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
     public static final EntityDataType<Vector3f> ROTATION = define("rotation",
@@ -91,7 +106,8 @@ public class EntityDataTypes {
             wrapper.writeInt(blockPosition.getZ());
         }
     });
-    public static final EntityDataType<Optional<Vector3i>> OPTIONAL_BLOCK_POSITION = define("optional_block_position", readOptionalBlockPositionDeserializer(), writeOptionalBlockPositionSerializer());
+    public static final EntityDataType<Optional<Vector3i>> OPTIONAL_BLOCK_POSITION = define("optional_block_position",
+            readOptionalBlockPositionDeserializer(), writeOptionalBlockPositionSerializer());
     public static final EntityDataType<BlockFace> BLOCK_FACE = define("block_face", (PacketWrapper<?> wrapper) -> {
                 int id = wrapper.readVarInt();
                 return BlockFace.getBlockFaceByValue(id);
