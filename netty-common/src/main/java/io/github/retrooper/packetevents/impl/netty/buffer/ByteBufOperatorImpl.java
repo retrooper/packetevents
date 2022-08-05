@@ -25,6 +25,16 @@ import java.nio.charset.Charset;
 
 public class ByteBufOperatorImpl implements ByteBufOperator {
     @Override
+    public int capacity(Object buffer) {
+        return ((ByteBuf)buffer).capacity();
+    }
+
+    @Override
+    public Object capacity(Object buffer, int capacity) {
+        return ((ByteBuf)buffer).capacity(capacity);
+    }
+
+    @Override
     public int readerIndex(Object buffer) {
         return ((ByteBuf)buffer).readerIndex();
     }

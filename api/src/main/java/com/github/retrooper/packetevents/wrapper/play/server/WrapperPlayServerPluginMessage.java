@@ -21,6 +21,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -42,10 +44,16 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
         this.data = data;
     }
 
+    public WrapperPlayServerPluginMessage(ResourceLocation channelName, byte[] data) {
+        super(PacketType.Play.Server.PLUGIN_MESSAGE);
+        this.channelName = channelName.toString();
+        this.data = data;
+    }
+
     @Override
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.channelName = readString(32767);
+            this.channelName = readString();
         }
         else {
             this.channelName = readString(20);
@@ -58,15 +66,9 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
     }
 
     @Override
-    public void copy(WrapperPlayServerPluginMessage wrapper) {
-        this.channelName = wrapper.channelName;
-        this.data = wrapper.data;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeString(this.channelName, 32767);
+            writeString(this.channelName);
         }
         else {
             writeString(this.channelName, 20);
@@ -77,28 +79,42 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
         writeBytes(data);
     }
 
+    @Override
+    public void copy(WrapperPlayServerPluginMessage wrapper) {
+        this.channelName = wrapper.channelName;
+        this.data = wrapper.data;
+    }
+
     /**
-     * Name of the plugin channel used to send the data.
-     *
-     * @return Plugin channel name
+     * The channel name of the plugin message.
+     * @return The channel name.
      */
     public String getChannelName() {
         return channelName;
     }
 
+    /**
+     * Sets the channel name of the plugin message.
+     * @param channelName The channel name.
+     */
     public void setChannelName(String channelName) {
-        this.channelName = channelName;
+       this.channelName = channelName;
     }
 
     /**
-     * Any data, depending on the channel.
+     * The data of the plugin message.
      *
-     * @return Data
+     * @return The data.
      */
     public byte[] getData() {
         return data;
     }
 
+    /**
+     * Sets the data of the plugin message.
+     *
+     * @param data The data.
+     */
     public void setData(byte[] data) {
         this.data = data;
     }

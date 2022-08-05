@@ -22,12 +22,14 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import org.jetbrains.annotations.Nullable;
 
 public enum EquipmentSlot {
-    MAINHAND(0),
-    OFFHAND(0),
+    MAIN_HAND(0),
+    OFF_HAND(0),
     BOOTS(1),
     LEGGINGS(2),
-    CHESTPLATE(3),
+    CHEST_PLATE(3),
     HELMET(4);
+
+    private static final EquipmentSlot[] VALUES = values();
 
     private final byte legacyId;
 
@@ -46,7 +48,8 @@ public enum EquipmentSlot {
 
     @Nullable
     public static EquipmentSlot getById(ServerVersion version, int id) {
-        for (EquipmentSlot slot : values()) {
+        // FIXME: try making this O(1)
+        for (EquipmentSlot slot : VALUES) {
             if (slot.getId(version) == id) {
                 return slot;
             }

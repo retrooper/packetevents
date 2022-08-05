@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperPlayClientQueryEntityNBT extends PacketWrapper<WrapperPlayClientQueryEntityNBT> {
     private int transactionID;
     private int entityID;
+
     public WrapperPlayClientQueryEntityNBT(PacketReceiveEvent event) {
         super(event);
     }
@@ -42,15 +43,15 @@ public class WrapperPlayClientQueryEntityNBT extends PacketWrapper<WrapperPlayCl
     }
 
     @Override
-    public void copy(WrapperPlayClientQueryEntityNBT wrapper) {
-        transactionID = wrapper.transactionID;
-        entityID = wrapper.entityID;
-    }
-
-    @Override
     public void write() {
         writeVarInt(transactionID);
         writeVarInt(entityID);
+    }
+
+    @Override
+    public void copy(WrapperPlayClientQueryEntityNBT wrapper) {
+        transactionID = wrapper.transactionID;
+        entityID = wrapper.entityID;
     }
 
     public int getTransactionId() {

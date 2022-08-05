@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.protocol.mapper;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
-public interface StaticMappedEntity extends MappedEntity{
+public interface StaticMappedEntity extends MappedEntity {
     int getId();
 
     default int getId(ClientVersion version) {

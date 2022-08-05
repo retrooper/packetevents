@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.processor;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -34,6 +35,7 @@ public class InternalBungeeProcessor implements Listener {
         Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         PacketEvents.getAPI().getInjector().setPlayer(channel, player);
         User user = PacketEvents.getAPI().getPlayerManager().getUser(event.getPlayer());
+        if (user == null) return;
         UserLoginEvent loginEvent = new UserLoginEvent(user, player);
         PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
     }

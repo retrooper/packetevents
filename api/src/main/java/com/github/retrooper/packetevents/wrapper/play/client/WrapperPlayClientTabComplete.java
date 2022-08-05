@@ -27,17 +27,18 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 
 public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClientTabComplete> {
+    private int transactionID;
     private String text;
-    private Optional<Integer> transactionID;
-    private Optional<Vector3i> blockPosition;
+    private @Nullable Vector3i blockPosition;
 
     public WrapperPlayClientTabComplete(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientTabComplete(Optional<Integer> transactionID, String text, Optional<Vector3i> blockPosition) {
+    public WrapperPlayClientTabComplete(int transactionID, String text, @Nullable Vector3i blockPosition) {
         super(PacketType.Play.Client.TAB_COMPLETE);
         this.transactionID = transactionID;
         this.text = text;
@@ -56,34 +57,18 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
                 //1.13 text length
                 textLength = 256;
             }
-            transactionID = Optional.of(readVarInt());
-            blockPosition = Optional.empty();
+            transactionID = readVarInt();
             text = readString(textLength);
-        }
-        else {
+        } else {
             textLength = 32767;
             text = readString(textLength);
-            transactionID = Optional.empty();
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
                 boolean hasPosition = readBoolean();
                 if (hasPosition) {
-                    blockPosition = Optional.of(new Vector3i(readLong()));
+                    blockPosition = new Vector3i(readLong());
                 }
-                else {
-                    blockPosition = Optional.empty();
-                }
-            }
-            else {
-                blockPosition = Optional.empty();
             }
         }
-    }
-
-    @Override
-    public void copy(WrapperPlayClientTabComplete wrapper) {
-        text = wrapper.text;
-        transactionID = wrapper.transactionID;
-        blockPosition = wrapper.blockPosition;
     }
 
     @Override
@@ -98,20 +83,26 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
                 //1.13 text length
                 textLength = 256;
             }
-            writeVarInt(transactionID.get());
+            writeVarInt(transactionID);
             writeString(text, textLength);
-        }
-        else {
+        } else {
             textLength = 32767;
             writeString(text, textLength);
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
-                boolean hasPosition = blockPosition.isPresent();
+                boolean hasPosition = blockPosition != null;
                 writeBoolean(hasPosition);
                 if (hasPosition) {
-                    writeLong(blockPosition.get().getSerializedPosition());
+                    writeLong(blockPosition.getSerializedPosition());
                 }
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientTabComplete wrapper) {
+        text = wrapper.text;
+        transactionID = wrapper.transactionID;
+        blockPosition = wrapper.blockPosition;
     }
 
     public String getText() {
@@ -122,29 +113,23 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
         this.text = text;
     }
 
-    public Optional<Integer> getTransactionId() {
-        return transactionID;
+    public OptionalInt getTransactionId() {
+        return OptionalInt.of(transactionID);
     }
 
     public void setTransactionId(@Nullable Integer transactionID) {
         if (transactionID != null) {
-            this.transactionID = Optional.of(transactionID);
-        }
-        else {
-            this.transactionID = Optional.empty();
+            this.transactionID = transactionID;
         }
     }
 
     public Optional<Vector3i> getBlockPosition() {
-        return blockPosition;
+        return Optional.ofNullable(blockPosition);
     }
 
     public void setBlockPosition(@Nullable Vector3i blockPosition) {
         if (blockPosition != null) {
-            this.blockPosition = Optional.of(blockPosition);
-        }
-        else {
-            this.blockPosition = Optional.empty();
+            this.blockPosition = blockPosition;
         }
     }
 }

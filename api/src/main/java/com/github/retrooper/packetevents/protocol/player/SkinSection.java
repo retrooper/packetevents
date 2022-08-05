@@ -18,74 +18,43 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+// This is an immutable container for a masking byte
+public final class SkinSection {
 
-public enum SkinSection {
-    CAPE(0x01),
+    public static final SkinSection CAPE = new SkinSection(1 << 0);
+    public static final SkinSection JACKET = new SkinSection(1 << 1);
+    public static final SkinSection LEFT_SLEEVE = new SkinSection(1 << 2);
+    public static final SkinSection RIGHT_SLEEVE = new SkinSection(1 << 3);
+    public static final SkinSection LEFT_PANTS = new SkinSection(1 << 4);
+    public static final SkinSection RIGHT_PANTS = new SkinSection(1 << 5);
+    public static final SkinSection HAT = new SkinSection(1 << 6);
 
-    JACKET(0x02),
+    public static final SkinSection ALL = CAPE.combine(JACKET).combine(LEFT_SLEEVE).combine(RIGHT_SLEEVE).combine(LEFT_PANTS).combine(RIGHT_PANTS).combine(HAT);
 
-    LEFT_SLEEVE(0x04),
+    private final byte mask;
 
-    RIGHT_SLEEVE(0x08),
-
-    LEFT_PANTS(0x10),
-
-    RIGHT_PANTS(0x20),
-
-    HAT(0x40);
-
-    private static final Set<SkinSection> SECTIONS;
-
-    static {
-        SECTIONS = new HashSet<>(values().length);
-        SECTIONS.addAll(Arrays.asList(values()));
+    public SkinSection(int mask) {
+        this.mask = (byte) mask;
     }
 
-    private final byte bit;
-
-    SkinSection(int bit) {
-        this.bit = (byte) bit;
+    public SkinSection combine(SkinSection skinSection) { // FIXME: Should this be called append?
+        return new SkinSection(this.mask | skinSection.mask);
     }
 
-    public byte getBit() {
-        return bit;
+    public byte getMask() {
+        return mask;
     }
 
-    public boolean isSet(byte mask) {
-        return (mask & bit) != 0;
+    public boolean isSet(byte skinParts) {
+        return (skinParts & this.mask) != 0;
     }
 
-    public byte set(byte mask, boolean present) {
+    public byte set(byte skinParts, boolean present) {
         if (present) {
-            mask |= bit;
+            skinParts |= mask;
         } else {
-            mask &= ~bit;
+            skinParts &= ~mask;
         }
-        return mask;
-    }
-
-    public static Set<SkinSection> getAllSections() {
-        return SECTIONS;
-    }
-
-    public static Set<SkinSection> getSectionsByMask(byte mask) {
-        Set<SkinSection> visibleSkinSections = new HashSet<>();
-        for (SkinSection skinSection : values()) {
-            if (skinSection.isSet(mask)) {
-                visibleSkinSections.add(skinSection);
-            }
-        }
-        return visibleSkinSections;
-    }
-
-    public static byte getMaskBySections(Set<SkinSection> sections) {
-        byte mask = 0;
-        for (SkinSection section : sections) {
-            mask |= section.bit;
-        }
-        return mask;
+        return skinParts;
     }
 }

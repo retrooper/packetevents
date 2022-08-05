@@ -41,13 +41,13 @@ public class WrapperStatusClientPing extends PacketWrapper<WrapperStatusClientPi
     }
 
     @Override
-    public void copy(WrapperStatusClientPing wrapper) {
-        this.time = wrapper.time;
+    public void write() {
+        writeLong(time);
     }
 
     @Override
-    public void write() {
-        writeLong(time);
+    public void copy(WrapperStatusClientPing wrapper) {
+        this.time = wrapper.time;
     }
 
     public long getTime() {

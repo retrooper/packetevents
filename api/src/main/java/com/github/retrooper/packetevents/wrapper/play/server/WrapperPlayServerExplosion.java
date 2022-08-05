@@ -57,14 +57,12 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         int recordsLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? readVarInt() : readInt();
         records = new ArrayList<>(recordsLength);
 
-        int floorX = (int) Math.floor(position.x);
-        int floorY = (int) Math.floor(position.y);
-        int floorZ = (int) Math.floor(position.z);
+        Vector3i floor = toFloor(position);
 
         for (int i = 0; i < recordsLength; i++) {
-            int chunkPosX = readByte() + floorX;
-            int chunkPosY = readByte() + floorY;
-            int chunkPosZ = readByte() + floorZ;
+            int chunkPosX = readByte() + floor.getX();
+            int chunkPosY = readByte() + floor.getY();
+            int chunkPosZ = readByte() + floor.getZ();
             records.add(new Vector3i(chunkPosX, chunkPosY, chunkPosZ));
         }
 
@@ -72,14 +70,6 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         float motY = readFloat();
         float motZ = readFloat();
         playerMotion = new Vector3f(motX, motY, motZ);
-    }
-
-    @Override
-    public void copy(WrapperPlayServerExplosion wrapper) {
-        position = wrapper.position;
-        strength = wrapper.strength;
-        records = wrapper.records;
-        playerMotion = wrapper.playerMotion;
     }
 
     @Override
@@ -95,19 +85,41 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
             writeInt(records.size());
         }
 
-        int floorX = (int) Math.floor(position.x);
-        int floorY = (int) Math.floor(position.y);
-        int floorZ = (int) Math.floor(position.z);
+        Vector3i floor = toFloor(position);
 
         for (Vector3i record : records) {
-            writeByte(record.x - floorX);
-            writeByte(record.y - floorY);
-            writeByte(record.z - floorZ);
+            writeByte(record.x - floor.getX());
+            writeByte(record.y - floor.getY());
+            writeByte(record.z - floor.getZ());
         }
 
         writeFloat(playerMotion.x);
         writeFloat(playerMotion.y);
         writeFloat(playerMotion.z);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerExplosion wrapper) {
+        position = wrapper.position;
+        strength = wrapper.strength;
+        records = wrapper.records;
+        playerMotion = wrapper.playerMotion;
+    }
+
+    private Vector3i toFloor(Vector3f position) {
+        int floorX;
+        int floorY;
+        int floorZ;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+            floorX = (int) Math.floor(position.x);
+            floorY = (int) Math.floor(position.y);
+            floorZ = (int) Math.floor(position.z);
+        } else { // pre-1.14 does this weird way to round
+            floorX = (int) position.x;
+            floorY = (int) position.y;
+            floorZ = (int) position.z;
+        }
+        return new Vector3i(floorX, floorY, floorZ);
     }
 
     public Vector3f getPosition() {

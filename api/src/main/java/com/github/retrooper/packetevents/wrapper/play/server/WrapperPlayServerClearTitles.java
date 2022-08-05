@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerClearTitles extends PacketWrapper<WrapperPlayServerClearTitles> {
     private boolean reset;
+
     public WrapperPlayServerClearTitles(PacketSendEvent event) {
         super(event);
     }

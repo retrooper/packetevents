@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
@@ -44,11 +45,17 @@ public final class PacketEventsPlugin extends Plugin {
         PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
+                System.out.println("in sv: " + event.getServerVersion());
+                System.out.println("in sv: " + event.getClientVersion());
+                System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                 System.out.println("In type: " + event.getPacketType().getName());
             }
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
+                System.out.println("out sv: " + event.getServerVersion());
+                System.out.println("out sv: " + event.getClientVersion());
+                System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                 System.out.println("Out type: " + event.getPacketType().getName());
             }
         });

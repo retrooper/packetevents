@@ -20,40 +20,70 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.crypto.MessageSignData;
+import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
+
+import java.time.Instant;
+import java.util.Optional;
 
 /**
  * This packet is used to send a chat message to the server.
  */
 public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClientChatMessage> {
     private String message;
+    private MessageSignData messageSignData;
+    private @Nullable LastSeenMessages.Update lastSeenMessages;
 
     public WrapperPlayClientChatMessage(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatMessage(String message) {
+    public WrapperPlayClientChatMessage(String message, @Nullable MessageSignData messageSignData, @Nullable LastSeenMessages.Update lastSeenMessages) {
         super(PacketType.Play.Client.CHAT_MESSAGE);
         this.message = message;
+        this.messageSignData = messageSignData;
+        this.lastSeenMessages = lastSeenMessages;
     }
 
     @Override
     public void read() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
         this.message = readString(maxMessageLength);
-    }
-
-    @Override
-    public void copy(WrapperPlayClientChatMessage wrapper) {
-        this.message = wrapper.message;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            Instant timestamp = readTimestamp();
+            SaltSignature saltSignature = readSaltSignature();
+            boolean signedPreview = readBoolean();
+            this.messageSignData = new MessageSignData(saltSignature, timestamp, signedPreview);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+                this.lastSeenMessages = readLastSeenMessagesUpdate();
+            }
+        }
     }
 
     @Override
     public void write() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
         writeString(this.message, maxMessageLength);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            writeTimestamp(messageSignData.getTimestamp());
+            writeSaltSignature(messageSignData.getSaltSignature());
+            writeBoolean(messageSignData.isSignedPreview());
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+                writeLastSeenMessagesUpdate(lastSeenMessages);
+            }
+        }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientChatMessage wrapper) {
+        this.message = wrapper.message;
+        this.messageSignData = wrapper.messageSignData;
+        this.lastSeenMessages = wrapper.lastSeenMessages;
     }
 
     /**
@@ -77,4 +107,35 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
     public void setMessage(String message) {
         this.message = message;
     }
+
+    public Optional<MessageSignData> getMessageSignData() {
+        return Optional.ofNullable(messageSignData);
+    }
+
+    public void setMessageSignData(@Nullable MessageSignData messageSignData) {
+        this.messageSignData = messageSignData;
+    }
+
+    public @Nullable LastSeenMessages.Update getLastSeenMessages() {
+        return lastSeenMessages;
+    }
+
+    public void setLastSeenMessages(@Nullable LastSeenMessages.Update lastSeenMessages) {
+        this.lastSeenMessages = lastSeenMessages;
+    }
+
+    /*protected boolean verify(UUID uuid, PublicKey key) {
+        if (messageSignData == null) {
+            System.out.println("wait a minute!");
+            return false;
+        }
+        Component component = Component.text(message);
+        System.out.println("str: " + AdventureSerializer.toJson(component));
+        try {
+            return MessageVerifierHelper.verify(uuid, messageSignData, key, String.format("{\"text\":\"%s\"}", message));
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }*/
 }

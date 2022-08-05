@@ -24,9 +24,9 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerAttachEntity extends PacketWrapper<WrapperPlayServerAttachEntity> {
-    int attachedId;
-    int holdingId;
-    boolean leash;
+    private int attachedId;
+    private int holdingId;
+    private boolean leash;
 
     public WrapperPlayServerAttachEntity(PacketSendEvent event) {
         super(event);

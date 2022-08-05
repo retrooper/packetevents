@@ -19,22 +19,12 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEntityAnimation extends PacketWrapper<WrapperPlayServerEntityAnimation> {
     private int entityID;
     private EntityAnimationType type;
-    public enum EntityAnimationType {
-        SWING_MAIN_ARM,
-        TAKE_DAMAGE,
-        LEAVE_BED,
-        SWING_OFFHAND,
-        CRITICAL_EFFECT,
-        MAGIC_CRITICAL_EFFECT;
-
-        public static final EntityAnimationType[] VALUES = values();
-    }
 
     public WrapperPlayServerEntityAnimation(PacketSendEvent event) {
         super(event);
@@ -49,19 +39,19 @@ public class WrapperPlayServerEntityAnimation extends PacketWrapper<WrapperPlayS
     @Override
     public void read() {
         entityID = readVarInt();
-        type = EntityAnimationType.VALUES[readByte()];
-    }
-
-    @Override
-    public void copy(WrapperPlayServerEntityAnimation wrapper) {
-        entityID = wrapper.entityID;
-        type = wrapper.type;
+        type = EntityAnimationType.getById(readUnsignedByte());
     }
 
     @Override
     public void write() {
         writeVarInt(entityID);
         writeByte(type.ordinal());
+    }
+
+    @Override
+    public void copy(WrapperPlayServerEntityAnimation wrapper) {
+        entityID = wrapper.entityID;
+        type = wrapper.type;
     }
 
     public int getEntityId() {
@@ -78,5 +68,20 @@ public class WrapperPlayServerEntityAnimation extends PacketWrapper<WrapperPlayS
 
     public void setType(EntityAnimationType type) {
         this.type = type;
+    }
+
+    public enum EntityAnimationType {
+        SWING_MAIN_ARM,
+        HURT,
+        WAKE_UP,
+        SWING_OFF_HAND,
+        CRITICAL_HIT,
+        MAGIC_CRITICAL_HIT;
+
+        private static final EntityAnimationType[] VALUES = values();
+
+        public static EntityAnimationType getById(int id) {
+            return VALUES[id];
+        }
     }
 }

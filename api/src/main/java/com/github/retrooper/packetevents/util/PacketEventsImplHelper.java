@@ -22,16 +22,18 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
-import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 public class PacketEventsImplHelper {
     public static PacketSendEvent handleClientBoundPacket(Object channel, User user, Object player,
-                                               Object buffer, boolean autoProtocolTranslation, boolean runPostTasks) throws PacketProcessException {
+                                                          Object buffer, boolean autoProtocolTranslation,
+                                                          boolean runPostTasks) throws Exception {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer,
                 autoProtocolTranslation);
@@ -45,12 +47,8 @@ public class PacketEventsImplHelper {
                 ByteBufHelper.clear(buffer);
                 int packetId = packetSendEvent.getPacketId();
                 packetSendEvent.getLastUsedWrapper().writeVarInt(packetId);
-                try {
-                    packetSendEvent.getLastUsedWrapper().write();
-                } catch (Exception e) {
-                    throw new PacketProcessException("PacketEvents failed to re-encode an outgoing packet with its packet wrapper. Packet ID: " + packetId
-                            + ". Failed to encode " + wrapper.getClass().getSimpleName() + ".", e);
-                }
+
+                packetSendEvent.getLastUsedWrapper().write();
             }
             ByteBufHelper.readerIndex(buffer, preProcessIndex);
         } else {
@@ -69,9 +67,9 @@ public class PacketEventsImplHelper {
     }
 
     public static PacketReceiveEvent handleServerBoundPacket(Object channel, User user,
-                                               Object player,
-                                               Object buffer,
-                                               boolean autoProtocolTranslation) throws PacketProcessException {
+                                                             Object player,
+                                                             Object buffer,
+                                                             boolean autoProtocolTranslation) throws Exception {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer,
                 autoProtocolTranslation);
@@ -103,16 +101,23 @@ public class PacketEventsImplHelper {
         return packetReceiveEvent;
     }
 
-    public static void handleDisconnection(Object channel, @Nullable String username) {
-        User user = ProtocolManager.USERS.get(channel);
-        if (user != null) {
-            UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
-            PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
-            ProtocolManager.USERS.remove(user.getChannel());
-        }
+    public static void handleDisconnection(Object channel, @Nullable UUID uuid) {
+        synchronized (channel) {
+            User user = ProtocolManager.USERS.get(channel);
 
-        if (username != null) {
-            ProtocolManager.CHANNELS.remove(username);
+            if (user != null) {
+                UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
+                PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
+                ProtocolManager.USERS.remove(user.getChannel());
+            }
+
+            if (uuid == null) {
+                // Only way to be sure of removing a channel
+                ProtocolManager.CHANNELS.entrySet().removeIf(pair -> pair.getValue() == channel);
+            } else {
+                // This is the efficient way that we should prefer
+                ProtocolManager.CHANNELS.remove(uuid);
+            }
         }
     }
 }

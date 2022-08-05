@@ -61,10 +61,15 @@ public class InternalPacketListener extends PacketListenerAbstract {
             //Update user profile
             user.getProfile().setUUID(profile.getUUID());
             user.getProfile().setName(profile.getName());
+            //Texture properties are passed in login success on 1.19
+            user.getProfile().setTextureProperties(profile.getTextureProperties());
 
             //Map username with channel
-            ProtocolManager.CHANNELS.put(profile.getName(), channel);
-            PacketEvents.getAPI().getLogManager().debug("Mapped player username with their channel.");
+            synchronized (channel) {
+                ProtocolManager.CHANNELS.put(profile.getUUID(), channel);
+            }
+
+            PacketEvents.getAPI().getLogManager().debug("Mapped player UUID with their channel.");
 
             //Update connection state(injectors might do some adjustments when we transition into PLAY state)
             //This also updates it for the user instance
@@ -76,32 +81,32 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
         // Join game can be used to update world height, and sets dimension data
 
-        if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
+        else if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
             WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
             user.setEntityId(joinGame.getEntityId());
             if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
             }
+
             // Store world height
-            NBTList<NBTCompound> list = joinGame.getDimensionCodec()
-                    .getCompoundTagOrNull("minecraft:dimension_type").getCompoundListTagOrNull("value");
+            NBTList<NBTCompound> list = joinGame.getDimensionCodec().getCompoundTagOrNull("minecraft:dimension_type").getCompoundListTagOrNull("value");
             user.setWorldNBT(list);
 
             // Update world height
-            NBTCompound worldNBT = user.getWorldNBT(joinGame.getDimension().getType().getName()).getCompoundTagOrNull("element");
+            NBTCompound worldNBT = user.getWorldNBT(joinGame.getDimension().getDimensionName()).getCompoundTagOrNull("element");
             user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
             user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
         }
 
         // Respawn is used to switch dimensions
-        if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
-            if (event.getServerVersion()
-                    .isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
+        else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
+            if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
             }
+
             WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
 
-            NBTCompound worldNBT = user.getWorldNBT(respawn.getDimension().getType().getName()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
+            NBTCompound worldNBT = user.getWorldNBT(respawn.getDimension().getDimensionName()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
             user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
             user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
         }
@@ -113,17 +118,12 @@ public class InternalPacketListener extends PacketListenerAbstract {
         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
             Object channel = event.getChannel();
             InetSocketAddress address = event.getSocketAddress();
-            WrapperHandshakingClientHandshake handshake;
-            try {
-                handshake = new WrapperHandshakingClientHandshake(event);
-            } catch (ArrayIndexOutOfBoundsException exception) {
-                user.closeConnection();
-                PacketEvents.getAPI().getLogManager().debug("Disconnected " + address.getHostString() + ":" + address.getPort() + " for sending an invalid handshaking packet. They might be on an outdated client.");
-                return;
-            }
+            WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
             ConnectionState nextState = handshake.getNextConnectionState();
             ClientVersion clientVersion = handshake.getClientVersion();
-
+            if (clientVersion == ClientVersion.UNKNOWN) {
+                return;
+            }
             //Update client version for this event call(and user)
             user.setClientVersion(clientVersion);
             PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());

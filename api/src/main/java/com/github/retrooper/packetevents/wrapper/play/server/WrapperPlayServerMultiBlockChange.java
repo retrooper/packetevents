@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
@@ -29,9 +28,9 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 // Inspired heavily by MCProtocolLib
 public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlayServerMultiBlockChange> {
-    Vector3i chunkPosition;
-    boolean trustEdges;
-    EncodedBlock[] blockData;
+    private Vector3i chunkPosition;
+    private boolean trustEdges;
+    private EncodedBlock[] blockData;
 
     public WrapperPlayServerMultiBlockChange(PacketSendEvent event) {
         super(event);
@@ -79,13 +78,6 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
     }
 
     @Override
-    public void copy(WrapperPlayServerMultiBlockChange wrapper) {
-        chunkPosition = wrapper.chunkPosition;
-        trustEdges = wrapper.trustEdges;
-        blockData = wrapper.blockData;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             long encodedPos = 0;
@@ -111,6 +103,13 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
                 writeVarInt(record.getBlockId());
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerMultiBlockChange wrapper) {
+        chunkPosition = wrapper.chunkPosition;
+        trustEdges = wrapper.trustEdges;
+        blockData = wrapper.blockData;
     }
 
     public Vector3i getChunkPosition() {

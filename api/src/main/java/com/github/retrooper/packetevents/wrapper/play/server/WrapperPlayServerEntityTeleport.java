@@ -42,6 +42,10 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
         super(event);
     }
 
+    public WrapperPlayServerEntityTeleport(int entityID, Location location, boolean onGround) {
+        this(entityID, location.getPosition(), location.getYaw(), location.getPitch(), onGround);
+    }
+
     public WrapperPlayServerEntityTeleport(int entityID, Vector3d position, float yaw, float pitch, boolean onGround) {
         super(PacketType.Play.Server.ENTITY_TELEPORT);
         this.entityID = entityID;
@@ -51,46 +55,34 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
         this.onGround = onGround;
     }
 
-    public WrapperPlayServerEntityTeleport(int entityID, Location location, boolean onGround) {
-        this(entityID, location.getPosition(), location.getYaw(), location.getPitch(), onGround);
-    }
-
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10)
+        if (serverVersion == ServerVersion.V_1_7_10) {
             entityID = readInt();
-        else
+        } else {
             entityID = readVarInt();
-
+        }
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
             position = new Vector3d((readInt() / 32.0), (readInt() / 32.0), (readInt() / 32.0));
         } else {
             position = new Vector3d(readDouble(), readDouble(), readDouble());
         }
-
         yaw = readByte() / ROTATION_FACTOR;
         pitch = readByte() / ROTATION_FACTOR;
-        if (serverVersion != ServerVersion.V_1_7_10)
+        if (serverVersion != ServerVersion.V_1_7_10) {
             onGround = readBoolean();
-        else
+        } else {
             onGround = false;
-    }
-
-    @Override
-    public void copy(WrapperPlayServerEntityTeleport wrapper) {
-        entityID = wrapper.entityID;
-        position = wrapper.position;
-        yaw = wrapper.yaw;
-        pitch = wrapper.pitch;
-        onGround = wrapper.onGround;
+        }
     }
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10)
+        if (serverVersion == ServerVersion.V_1_7_10) {
             writeInt(entityID);
-        else
+        } else {
             writeVarInt(entityID);
+        }
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
             writeInt(MathUtil.floor(position.x * 32.0));
             writeInt(MathUtil.floor(position.y * 32.0));
@@ -102,8 +94,18 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
         }
         writeByte((int) (yaw * ROTATION_FACTOR));
         writeByte((int) (pitch * ROTATION_FACTOR));
-        if (serverVersion != ServerVersion.V_1_7_10)
+        if (serverVersion != ServerVersion.V_1_7_10) {
             writeBoolean(onGround);
+        }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerEntityTeleport wrapper) {
+        entityID = wrapper.entityID;
+        position = wrapper.position;
+        yaw = wrapper.yaw;
+        pitch = wrapper.pitch;
+        onGround = wrapper.onGround;
     }
 
     public int getEntityId() {

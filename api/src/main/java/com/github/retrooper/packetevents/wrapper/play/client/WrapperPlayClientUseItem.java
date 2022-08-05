@@ -19,12 +19,14 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUseItem> {
-    InteractionHand hand;
+    private InteractionHand hand;
+    private int sequence;
 
     public WrapperPlayClientUseItem(PacketReceiveEvent event) {
         super(event);
@@ -38,16 +40,23 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
     @Override
     public void read() {
         hand = InteractionHand.getById(readVarInt());
-    }
-
-    @Override
-    public void copy(WrapperPlayClientUseItem packet) {
-        this.hand = packet.hand;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            sequence = readVarInt();
+        }
     }
 
     @Override
     public void write() {
         writeVarInt(hand.getId());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            writeVarInt(sequence);
+        }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientUseItem packet) {
+        this.hand = packet.hand;
+        this.sequence = packet.sequence;
     }
 
     public InteractionHand getHand() {
@@ -56,5 +65,13 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
 
     public void setHand(InteractionHand hand) {
         this.hand = hand;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

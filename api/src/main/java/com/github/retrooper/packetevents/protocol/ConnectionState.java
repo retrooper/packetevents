@@ -26,6 +26,9 @@ public enum ConnectionState {
     HANDSHAKING, STATUS, LOGIN, PLAY;
 
     public static ConnectionState getById(int id) {
+        if (id >= values().length || id < 0) {
+            return null;
+        }
         return values()[id];
     }
 }

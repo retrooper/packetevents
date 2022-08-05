@@ -41,17 +41,11 @@ public class WrapperPlayServerDifficulty extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void read() {
-        difficulty = Difficulty.getById(readByte());
+        difficulty = Difficulty.getById(readUnsignedByte());
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             locked = readBoolean();
         }
-        //TODO On 1.8 locked theoretically is true? Confirm
-    }
-
-    @Override
-    public void copy(WrapperPlayServerDifficulty wrapper) {
-        difficulty = wrapper.difficulty;
-        locked = wrapper.locked;
+        //TODO: On 1.8 locked theoretically is true? Confirm
     }
 
     @Override
@@ -60,6 +54,12 @@ public class WrapperPlayServerDifficulty extends PacketWrapper<WrapperPlayServer
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             writeBoolean(locked);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerDifficulty wrapper) {
+        difficulty = wrapper.difficulty;
+        locked = wrapper.locked;
     }
 
     public Difficulty getDifficulty() {

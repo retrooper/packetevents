@@ -61,17 +61,17 @@ public class WrapperPlayClientWindowConfirmation extends PacketWrapper<WrapperPl
     }
 
     @Override
-    public void copy(WrapperPlayClientWindowConfirmation wrapper) {
-        windowId = wrapper.windowId;
-        actionId = wrapper.actionId;
-        accepted = wrapper.accepted;
-    }
-
-    @Override
     public void write() {
         writeByte(windowId);
         writeShort(actionId);
         writeBoolean(accepted);
+    }
+
+    @Override
+    public void copy(WrapperPlayClientWindowConfirmation wrapper) {
+        windowId = wrapper.windowId;
+        actionId = wrapper.actionId;
+        accepted = wrapper.accepted;
     }
 
     public int getWindowId() {

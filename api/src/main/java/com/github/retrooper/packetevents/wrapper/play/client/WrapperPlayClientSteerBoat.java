@@ -24,11 +24,11 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * Not to be confused with {@link WrapperPlayClientSteerVehicle}
- *
+ * <p>
  * This packet determines whether the boat will have its paddles turning
  * Right paddle with left or forward button
  * Left paddle with right or forward button
- *
+ * <p>
  * It is unclear why this is needed when WrapperPlayClientSteerVehicle already gives the correct information
  */
 public class WrapperPlayClientSteerBoat extends PacketWrapper<WrapperPlayClientSteerBoat> {
@@ -52,15 +52,15 @@ public class WrapperPlayClientSteerBoat extends PacketWrapper<WrapperPlayClientS
     }
 
     @Override
-    public void copy(WrapperPlayClientSteerBoat wrapper) {
-        this.leftPaddleTurning = wrapper.leftPaddleTurning;
-        this.rightPaddleTurning = wrapper.rightPaddleTurning;
-    }
-
-    @Override
     public void write() {
         writeBoolean(leftPaddleTurning);
         writeBoolean(rightPaddleTurning);
+    }
+
+    @Override
+    public void copy(WrapperPlayClientSteerBoat wrapper) {
+        this.leftPaddleTurning = wrapper.leftPaddleTurning;
+        this.rightPaddleTurning = wrapper.rightPaddleTurning;
     }
 
     public boolean isLeftPaddleTurning() {

@@ -61,8 +61,8 @@ public enum BlockFace {
      */
     OTHER((short) 255, -1, -1, -1);
 
-    public static final BlockFace[] VALUES = values();
-    public static final BlockFace[] CARTESIAN_VALUES = new BlockFace[]{DOWN, UP, NORTH, SOUTH, WEST, EAST};
+    private static final BlockFace[] VALUES = values();
+    private static final BlockFace[] CARTESIAN_VALUES = new BlockFace[]{DOWN, UP, NORTH, SOUTH, WEST, EAST}; // FIXME: remove this or use this somewhere
 
     final short faceValue;
     final int modX;
@@ -84,7 +84,9 @@ public enum BlockFace {
     }
 
     public static BlockFace getBlockFaceByValue(int face) {
-        if (face == 255) {
+        if (face == 255
+        || face == 127) { //I guess this fixes something?
+            // Got some error report for "127" oob
             return OTHER;
         }
         return VALUES[face];
@@ -154,4 +156,5 @@ public enum BlockFace {
     public short getFaceValue() {
         return faceValue;
     }
+
 }

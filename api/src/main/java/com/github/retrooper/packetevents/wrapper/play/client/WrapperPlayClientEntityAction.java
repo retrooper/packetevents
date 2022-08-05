@@ -41,14 +41,27 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
 
     @Override
     public void read() {
-        entityID = readVarInt();
-        action = Action.VALUES[readVarInt()];
-        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
-            if (action == Action.STOP_JUMPING_WITH_HORSE) {
-                action = Action.OPEN_HORSE_INVENTORY;
-            }
+        boolean v1_8 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8);
+        entityID = v1_8 ? readVarInt() : readInt();
+        int id = v1_8 ? readVarInt() : readByte();
+        action = Action.getById(serverVersion, id);
+        jumpBoost = v1_8 ? readVarInt() : readInt();
+    }
+
+    @Override
+    public void write() {
+        boolean v1_8 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8);
+        if (v1_8) {
+            writeVarInt(entityID);
+            int actionIndex = action.getId(serverVersion);
+            writeVarInt(actionIndex);
+            writeVarInt(jumpBoost);
+        } else {
+            writeInt(entityID);
+            int actionIndex = action.getId(serverVersion);
+            writeByte(actionIndex);
+            writeInt(jumpBoost);
         }
-        jumpBoost = readVarInt();
     }
 
     @Override
@@ -56,19 +69,6 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
         entityID = wrapper.entityID;
         action = wrapper.action;
         jumpBoost = wrapper.jumpBoost;
-    }
-
-    @Override
-    public void write() {
-        writeVarInt(entityID);
-        int actionIndex = action.ordinal();
-        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
-            if (action == Action.OPEN_HORSE_INVENTORY) {
-                actionIndex--;
-            }
-        }
-        writeVarInt(actionIndex);
-        writeVarInt(jumpBoost);
     }
 
     public int getEntityId() {
@@ -106,6 +106,29 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
         OPEN_HORSE_INVENTORY,
         START_FLYING_WITH_ELYTRA;
 
-        public static final Action[] VALUES = values();
+        private static final Action[] VALUES = values();
+
+        public int getId(ServerVersion serverVersion) {
+            int actionIndex = ordinal();
+            if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
+                if (this == OPEN_HORSE_INVENTORY) {
+                    actionIndex--;
+                }
+            }
+            return actionIndex;
+        }
+
+        public static Action getById(ServerVersion serverVersion, int id) {
+            if (id >= VALUES.length || id < 0) {
+                throw new IllegalStateException("EntityAction action out of bounds: " + id);
+            }
+            Action action = Action.VALUES[id];
+            if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
+                if (action == Action.STOP_JUMPING_WITH_HORSE) {
+                    action = Action.OPEN_HORSE_INVENTORY;
+                }
+            }
+            return action;
+        }
     }
 }

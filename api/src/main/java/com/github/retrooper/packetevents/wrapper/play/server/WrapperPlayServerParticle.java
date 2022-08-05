@@ -30,13 +30,13 @@ import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 //Might be worthy to document
-//TODO Check changelog through out the versions
+//TODO: Check changelog through out the versions
 public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerParticle> {
     private Particle particle;
     private boolean longDistance;
     private Vector3d position;
     private Vector3f offset;
-    private float particleData;
+    private float maxSpeed;
     private int particleCount;
     private int[] legacyData;
 
@@ -45,13 +45,13 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     }
 
     public WrapperPlayServerParticle(Particle particle, boolean longDistance, Vector3d position, Vector3f offset,
-                                     float particleData, int particleCount, int... legacyData) {
+                                     float maxSpeed, int particleCount, int... legacyData) {
         super(PacketType.Play.Server.PARTICLE);
         this.particle = particle;
         this.longDistance = longDistance;
         this.position = position;
         this.offset = offset;
-        this.particleData = particleData;
+        this.maxSpeed = maxSpeed;
         this.particleCount = particleCount;
         this.legacyData = legacyData;
     }
@@ -64,7 +64,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             String particleName = readString(64);
             particleType = ParticleTypes.getByName("minecraft:" + particleName);
         } else {
-            particleTypeId = readInt();
+            particleTypeId = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19) ? readVarInt() : readInt();
             particleType = ParticleTypes.getById(serverVersion.toClientVersion(), particleTypeId);
         }
         longDistance = readBoolean();
@@ -74,7 +74,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             position = new Vector3d(readFloat(), readFloat(), readFloat());
         }
         offset = new Vector3f(readFloat(), readFloat(), readFloat());
-        particleData = readFloat();
+        maxSpeed = readFloat();
         particleCount = readInt();
         ParticleData data;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
@@ -87,11 +87,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
                 int count;
                 if (particleTypeId == 37 || particleTypeId == 38 || particleTypeId == 46) {
                     count = 1;
-                }
-                else if (particleTypeId == 36) {
+                } else if (particleTypeId == 36) {
                     count = 2;
-                }
-                else {
+                } else {
                     count = 0;
                 }
                 legacyData = new int[count];
@@ -104,23 +102,18 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     }
 
     @Override
-    public void copy(WrapperPlayServerParticle wrapper) {
-        particle = wrapper.particle;
-        longDistance = wrapper.longDistance;
-        position = wrapper.position;
-        offset = wrapper.offset;
-        particleData = wrapper.particleData;
-        particleCount = wrapper.particleCount;
-        legacyData = wrapper.legacyData;
-    }
-
-    @Override
     public void write() {
         //TODO on 1.7 we get particle type by 64 len string
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeString(particle.getType().getName().getKey(), 64);
         } else {
-            writeInt(particle.getType().getId(serverVersion.toClientVersion()));
+            int id = particle.getType().getId(serverVersion.toClientVersion());
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+                writeVarInt(id);
+            }
+            else {
+                writeInt(id);
+            }
         }
         writeBoolean(longDistance);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
@@ -135,7 +128,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         writeFloat(offset.getX());
         writeFloat(offset.getY());
         writeFloat(offset.getZ());
-        writeFloat(particleData);
+        writeFloat(maxSpeed);
         writeInt(particleCount);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             particle.getType().writeDataFunction().accept(this, particle.getData());
@@ -146,11 +139,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
                         || particle.getType().getId(serverVersion.toClientVersion()) == 38 ||
                         particle.getType().getId(serverVersion.toClientVersion()) == 46) {
                     count = 1;
-                }
-                else if (particle.getType().getId(serverVersion.toClientVersion()) == 36) {
+                } else if (particle.getType().getId(serverVersion.toClientVersion()) == 36) {
                     count = 2;
-                }
-                else {
+                } else {
                     count = 0;
                 }
                 for (int i = 0; i < count; i++) {
@@ -158,6 +149,17 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
                 }
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerParticle wrapper) {
+        particle = wrapper.particle;
+        longDistance = wrapper.longDistance;
+        position = wrapper.position;
+        offset = wrapper.offset;
+        maxSpeed = wrapper.maxSpeed;
+        particleCount = wrapper.particleCount;
+        legacyData = wrapper.legacyData;
     }
 
     public Particle getParticle() {
@@ -192,12 +194,12 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this.offset = offset;
     }
 
-    public float getParticleData() {
-        return particleData;
+    public float getMaxSpeed() {
+        return maxSpeed;
     }
 
-    public void setParticleData(float particleData) {
-        this.particleData = particleData;
+    public void setMaxSpeed(float maxSpeed) {
+        this.maxSpeed = maxSpeed;
     }
 
     public int getParticleCount() {

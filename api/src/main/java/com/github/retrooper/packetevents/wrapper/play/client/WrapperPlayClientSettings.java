@@ -20,12 +20,10 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.protocol.player.SkinSection;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-
-import java.util.Set;
 
 public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSettings> {
     private String locale;
@@ -78,44 +76,29 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
             //We use this for the skin sections
             boolean showCape = readBoolean();
             if (showCape) {
-                visibleSkinSectionMask = SkinSection.CAPE.getBit();
+                visibleSkinSectionMask = SkinSection.CAPE.getMask();
             }
-        }
-        else {
-            visibleSkinSectionMask = readByte();
+        } else {
+            visibleSkinSectionMask = (byte) readUnsignedByte();
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             hand = HumanoidArm.VALUES[readVarInt()];
-        }
-        else {
+        } else {
             hand = HumanoidArm.RIGHT;
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             textFilteringEnabled = readBoolean();
-        }
-        else {
+        } else {
             textFilteringEnabled = false;
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
             allowServerListings = readBoolean();
-        }
-        else {
+        } else {
             allowServerListings = true;
         }
-    }
-
-    @Override
-    public void copy(WrapperPlayClientSettings wrapper) {
-        locale = wrapper.locale;
-        viewDistance = wrapper.viewDistance;
-        visibility = wrapper.visibility;
-        chatColorable = wrapper.chatColorable;
-        visibleSkinSectionMask = wrapper.visibleSkinSectionMask;
-        hand = wrapper.hand;
-        textFilteringEnabled = wrapper.textFilteringEnabled;
     }
 
     @Override
@@ -125,8 +108,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         writeByte(viewDistance);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeVarInt(visibility.ordinal());
-        }
-        else {
+        } else {
             writeByte(visibility.ordinal());
         }
         writeBoolean(chatColorable);
@@ -135,8 +117,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
             //Show cape
             boolean showCape = SkinSection.CAPE.isSet(visibleSkinSectionMask);
             writeBoolean(showCape);
-        }
-        else {
+        } else {
             writeByte(visibleSkinSectionMask);
         }
 
@@ -151,6 +132,19 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
             writeBoolean(allowServerListings);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientSettings wrapper) {
+        locale = wrapper.locale;
+        viewDistance = wrapper.viewDistance;
+        visibility = wrapper.visibility;
+        chatColorable = wrapper.chatColorable;
+        visibleSkinSectionMask = wrapper.visibleSkinSectionMask;
+        hand = wrapper.hand;
+        textFilteringEnabled = wrapper.textFilteringEnabled;
+        allowServerListings = wrapper.allowServerListings;
+        ignoredDifficulty = wrapper.ignoredDifficulty;
     }
 
     public String getLocale() {
@@ -193,13 +187,12 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         this.visibleSkinSectionMask = visibleSkinSectionMask;
     }
 
-    public Set<SkinSection> getVisibleSkinSections() {
-        byte mask = getVisibleSkinSectionMask();
-        return SkinSection.getSectionsByMask(mask);
+    public SkinSection getVisibleSkinSection() {
+        return new SkinSection(getVisibleSkinSectionMask());
     }
 
-    public void setVisibleSkinSections(Set<SkinSection> visibleSkinSections) {
-        this.visibleSkinSectionMask = SkinSection.getMaskBySections(visibleSkinSections);
+    public void setVisibleSkinSections(SkinSection visibleSkinSection) {
+        this.visibleSkinSectionMask = visibleSkinSection.getMask();
     }
 
     public boolean isSkinSectionVisible(SkinSection section) {

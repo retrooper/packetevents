@@ -20,7 +20,9 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -42,32 +44,33 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
         this.data = data;
     }
 
+    public WrapperPlayClientPluginMessage(ResourceLocation channelName, byte[] data) {
+        super(PacketType.Play.Client.PLUGIN_MESSAGE);
+        this.channelName = channelName.toString();
+        this.data = data;
+    }
+
     @Override
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.channelName = readString(32767);
-        }
-        else {
+            this.channelName = readString();
+        } else {
             this.channelName = readString(20);
         }
+
         if (serverVersion == ServerVersion.V_1_7_10) {
             //It is ignored, because we don't need it
             int legacyDataSize = readShort();
         }
-        //We just read the remaining bytes
-        this.data = readRemainingBytes();
-    }
 
-    @Override
-    public void copy(WrapperPlayClientPluginMessage wrapper) {
-        this.channelName = wrapper.channelName;
-        this.data = wrapper.data;
+        if (ByteBufHelper.readableBytes(buffer) > 32767) throw new RuntimeException("Payload may not be larger than 32767 bytes");
+        this.data = readRemainingBytes();
     }
 
     @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeString(this.channelName, 32767);
+            writeString(this.channelName);
         }
         else {
             writeString(this.channelName, 20);
@@ -78,28 +81,42 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
         writeBytes(this.data);
     }
 
+    @Override
+    public void copy(WrapperPlayClientPluginMessage wrapper) {
+        this.channelName = wrapper.channelName;
+        this.data = wrapper.data;
+    }
+
     /**
-     * Name of the plugin channel used to send the data.
-     *
-     * @return Plugin channel name
+     * The channel name of the plugin message.
+     * @return The channel name.
      */
     public String getChannelName() {
         return channelName;
     }
 
+    /**
+     * Sets the channel name of the plugin message.
+     * @param channelName The channel name.
+     */
     public void setChannelName(String channelName) {
         this.channelName = channelName;
     }
 
     /**
-     * Any data, depending on the channel.
+     * The data of the plugin message.
      *
-     * @return Data
+     * @return The data.
      */
     public byte[] getData() {
         return data;
     }
 
+    /**
+     * Sets the data of the plugin message.
+     *
+     * @param data The data.
+     */
     public void setData(byte[] data) {
         this.data = data;
     }

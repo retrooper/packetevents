@@ -90,15 +90,6 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
     }
 
     @Override
-    public void copy(WrapperPlayClientInteractEntity wrapper) {
-        this.entityID = wrapper.entityID;
-        this.interactAction = wrapper.interactAction;
-        this.target = wrapper.target;
-        this.interactionHand = wrapper.interactionHand;
-        this.sneaking = wrapper.sneaking;
-    }
-
-    @Override
     public void write() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeInt(entityID);
@@ -121,6 +112,15 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
                 writeBoolean(sneaking.orElse(false));
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientInteractEntity wrapper) {
+        this.entityID = wrapper.entityID;
+        this.interactAction = wrapper.interactAction;
+        this.target = wrapper.target;
+        this.interactionHand = wrapper.interactionHand;
+        this.sneaking = wrapper.sneaking;
     }
 
     public int getEntityId() {

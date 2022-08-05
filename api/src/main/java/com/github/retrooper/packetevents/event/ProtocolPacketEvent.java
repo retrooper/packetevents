@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
@@ -59,8 +60,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.player = player;
         if (autoProtocolTranslation || user.getClientVersion() == null) {
             this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
-        }
-        else {
+        } else {
             //TODO Optimize
             this.serverVersion = user.getClientVersion().toServerVersion();
         }
@@ -79,7 +79,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.packetType = PacketType.getById(packetSide, user.getConnectionState(),
                 version, packetID);
         if (this.packetType == null) {
-            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Bound: " + packetSide.getOpposite() +  ", Connection state: " + user.getConnectionState() +  ", Server version: " + serverVersion.getReleaseName());
+            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Bound: " + packetSide.getOpposite() + ", Connection state: " + user.getConnectionState() + ", Server version: " + serverVersion.getReleaseName());
         }
         this.connectionState = user.getConnectionState();
     }
@@ -205,5 +205,13 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         if (isClone()) {
             ByteBufHelper.release(byteBuf);
         }
+    }
+
+    public Object getFullBufferClone() {
+        byte[] data = ByteBufHelper.copyBytes(getByteBuf());
+        Object buffer = UnpooledByteBufAllocationHelper.buffer();
+        ByteBufHelper.writeVarInt(buffer, getPacketId());
+        ByteBufHelper.writeBytes(buffer, data);
+        return buffer;
     }
 }
