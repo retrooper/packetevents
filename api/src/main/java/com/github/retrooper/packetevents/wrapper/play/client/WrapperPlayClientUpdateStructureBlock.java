@@ -196,6 +196,10 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
         this.name = name;
     }
 
+    public Vector3i getOffset() {
+        return new Vector3i(offsetX, offsetY, offsetZ);
+    }
+
     public @Range(from = -32, to = 32) byte getOffsetX() {
         return offsetX;
     }
@@ -218,6 +222,10 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
 
     public void setOffsetZ(@Range(from = -32, to = 32) byte offsetZ) {
         this.offsetZ = offsetZ;
+    }
+
+    public Vector3i getSize() {
+        return new Vector3i(sizeX, sizeY, sizeZ);
     }
 
     public @Range(from = -32, to = 32) byte getSizeX() {
