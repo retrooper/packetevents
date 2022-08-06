@@ -141,30 +141,7 @@ public enum ServerVersion {
      * @return Is this server version newer than the compared server version.
      */
     public boolean isNewerThan(ServerVersion target) {
-        /*
-         * Some server versions have the same protocol version in the minecraft protocol.
-         * We still need this method to work in such cases.
-         * We first check if this is the case, if the protocol versions aren't the same, we can just use the protocol versions
-         * to compare the server versions.
-         */
-        if (target.protocolVersion != protocolVersion || this == target) {
-            return protocolVersion > target.protocolVersion;
-        }
-        /*
-         * The server versions unfortunately have the same protocol version.
-         * We need to look at this "reversedValues" variable.
-         * The reversed values variable is an array containing all enum constants in this enum but in a reversed order.
-         * I already made this variable a while ago for a different usage, you can check that out.
-         * The first one we find in the array is the newer version.
-         */
-        for (ServerVersion version : reversedValues()) {
-            if (version == target) {
-                return false;
-            } else if (version == this) {
-                return true;
-            }
-        }
-        return false;
+        return this.ordinal() > target.ordinal();
     }
 
     /**
@@ -176,28 +153,7 @@ public enum ServerVersion {
      * @return Is this server version older than the compared server version.
      */
     public boolean isOlderThan(ServerVersion target) {
-        /*
-         * Some server versions have the same protocol version in the minecraft protocol.
-         * We still need this method to work in such cases.
-         * We first check if this is the case, if the protocol versions aren't the same, we can just use the protocol versions
-         * to compare the server versions.
-         */
-        if (target.protocolVersion != protocolVersion || this == target) {
-            return protocolVersion < target.protocolVersion;
-        }
-        /*
-         * The server versions unfortunately have the same protocol version.
-         * We look at all enum constants in the ServerVersion enum in the order they have been defined in.
-         * The first one we find in the array is the newer version.
-         */
-        for (ServerVersion version : VALUES) {
-            if (version == this) {
-                return true;
-            } else if (version == target) {
-                return false;
-            }
-        }
-        return false;
+        return this.ordinal() < target.ordinal();
     }
 
     /**
@@ -209,7 +165,7 @@ public enum ServerVersion {
      * @return Is this server version newer than or equal to the compared server version.
      */
     public boolean isNewerThanOrEquals(ServerVersion target) {
-        return this == target || isNewerThan(target);
+        return this.ordinal() >= target.ordinal();
     }
 
     /**
@@ -221,7 +177,7 @@ public enum ServerVersion {
      * @return Is this server version older than or equal to the compared server version.
      */
     public boolean isOlderThanOrEquals(ServerVersion target) {
-        return this == target || isOlderThan(target);
+        return this.ordinal() <= target.ordinal();
     }
 
     /**
