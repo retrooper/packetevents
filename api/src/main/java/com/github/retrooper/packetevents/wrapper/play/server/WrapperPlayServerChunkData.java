@@ -58,15 +58,15 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
     // 1.18 only (lighting) - for writing data
     // TODO: Make accessible?? Include in chunk data?? What do we do with this?
-    boolean trustEdges;
-    BitSet blockLightMask = new BitSet(0);
-    BitSet skyLightMask = new BitSet(0);
-    BitSet emptyBlockLightMask = new BitSet(0);
-    BitSet emptySkyLightMask = new BitSet(0);
-    int skyLightCount;
-    int blockLightCount;
-    byte[][] skyLightArray = new byte[0][0];
-    byte[][] blockLightArray = new byte[0][0];
+    private boolean trustEdges;
+    private BitSet blockLightMask;
+    private BitSet skyLightMask;
+    private BitSet emptyBlockLightMask;
+    private BitSet emptySkyLightMask;
+    private int skyLightCount;
+    private  int blockLightCount;
+    private byte[][] skyLightArray;
+    private byte[][] blockLightArray;
 
     public WrapperPlayServerChunkData(PacketSendEvent event) {
         super(event);
@@ -173,8 +173,9 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         byte[] data = readByteArray();
         data = deflate(data, chunkMask, fullChunk);
 
-        boolean hasBlocklight = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThan(ServerVersion.V_1_14);
-        boolean checkForSky = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
+        boolean hasBlocklight = (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThan(ServerVersion.V_1_14))
+                && !serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8);
+        boolean checkForSky = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8);
 
         // 1.7/1.8 don't use this NetStreamInput
         NetStreamInput dataIn = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? new NetStreamInput(new ByteArrayInputStream(data)) : null;
@@ -191,7 +192,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 for (int i = 0; i < biomeDataBytes.length; i++) {
                     biomeDataBytes[i] = dataIn.readByte();
                 }
-            } else if (data.length >= 256) { // some MCM jars don't send biome data always, unlike vanilla
+            } else {
                 biomeDataBytes = Arrays.copyOfRange(data, data.length - 256, data.length);
             }
         }
@@ -288,21 +289,6 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
         return data;
-    }
-
-    @Override
-    public void copy(WrapperPlayServerChunkData wrapper) {
-        this.column = wrapper.column;
-        this.ignoreOldData = wrapper.ignoreOldData;
-        this.trustEdges = wrapper.trustEdges;
-        this.blockLightMask = wrapper.blockLightMask;
-        this.skyLightMask = wrapper.skyLightMask;
-        this.emptyBlockLightMask = wrapper.emptyBlockLightMask;
-        this.emptySkyLightMask = wrapper.emptySkyLightMask;
-        this.skyLightCount = wrapper.skyLightCount;
-        this.blockLightCount = wrapper.blockLightCount;
-        this.skyLightArray = wrapper.skyLightArray;
-        this.blockLightArray = wrapper.blockLightArray;
     }
 
     @Override
@@ -464,6 +450,21 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 writeByteArray(blockLightArray[x]);
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerChunkData wrapper) {
+        this.column = wrapper.column;
+        this.ignoreOldData = wrapper.ignoreOldData;
+        this.trustEdges = wrapper.trustEdges;
+        this.blockLightMask = wrapper.blockLightMask;
+        this.skyLightMask = wrapper.skyLightMask;
+        this.emptyBlockLightMask = wrapper.emptyBlockLightMask;
+        this.emptySkyLightMask = wrapper.emptySkyLightMask;
+        this.skyLightCount = wrapper.skyLightCount;
+        this.blockLightCount = wrapper.blockLightCount;
+        this.skyLightArray = wrapper.skyLightArray;
+        this.blockLightArray = wrapper.blockLightArray;
     }
 
     public Column getColumn() {

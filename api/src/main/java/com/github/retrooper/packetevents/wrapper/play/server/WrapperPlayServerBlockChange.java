@@ -53,12 +53,6 @@ public class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void copy(WrapperPlayServerBlockChange wrapper) {
-        blockPosition = wrapper.blockPosition;
-        blockID = wrapper.blockID;
-    }
-
-    @Override
     public void write() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeInt(blockPosition.getX());
@@ -70,6 +64,12 @@ public class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServe
             writeBlockPosition(blockPosition);
             writeVarInt(blockID);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerBlockChange wrapper) {
+        blockPosition = wrapper.blockPosition;
+        blockID = wrapper.blockID;
     }
 
     public Vector3i getBlockPosition() {

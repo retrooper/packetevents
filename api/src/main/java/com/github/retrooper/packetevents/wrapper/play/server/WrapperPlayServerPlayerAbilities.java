@@ -56,16 +56,6 @@ public class WrapperPlayServerPlayerAbilities extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void copy(WrapperPlayServerPlayerAbilities wrapper) {
-        godMode = wrapper.godMode;
-        flying = wrapper.flying;
-        flightAllowed = wrapper.flightAllowed;
-        creativeMode = wrapper.creativeMode;
-        flySpeed = wrapper.flySpeed;
-        fovModifier = wrapper.fovModifier;
-    }
-
-    @Override
     public void write() {
         byte mask = 0x00;
         if (godMode) {
@@ -86,6 +76,16 @@ public class WrapperPlayServerPlayerAbilities extends PacketWrapper<WrapperPlayS
         writeByte(mask);
         writeFloat(flySpeed);
         writeFloat(fovModifier);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerPlayerAbilities wrapper) {
+        godMode = wrapper.godMode;
+        flying = wrapper.flying;
+        flightAllowed = wrapper.flightAllowed;
+        creativeMode = wrapper.creativeMode;
+        flySpeed = wrapper.flySpeed;
+        fovModifier = wrapper.fovModifier;
     }
 
     public boolean isInGodMode() {

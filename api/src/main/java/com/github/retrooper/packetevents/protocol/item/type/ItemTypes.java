@@ -43,7 +43,8 @@ public class ItemTypes {
             ClientVersion.V_1_16,
             ClientVersion.V_1_16_2,
             ClientVersion.V_1_17,
-            ClientVersion.V_1_18);
+            ClientVersion.V_1_18,
+            ClientVersion.V_1_19);
 
     public static final ItemType GILDED_BLACKSTONE = builder("gilded_blackstone").setMaxAmount(64).setPlacedType(StateTypes.GILDED_BLACKSTONE).build();
     public static final ItemType NETHER_BRICK_SLAB = builder("nether_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.NETHER_BRICK_SLAB).build();
@@ -1146,6 +1147,57 @@ public class ItemTypes {
     public static final ItemType PINK_CONCRETE = builder("pink_concrete").setMaxAmount(64).setPlacedType(StateTypes.PINK_CONCRETE).build();
     public static final ItemType CARROT = builder("carrot").setMaxAmount(64).setAttributes(ItemAttribute.EDIBLE).setPlacedType(StateTypes.CARROTS).build();
     public static final ItemType MUSIC_DISC_OTHERSIDE = builder("music_disc_otherside").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).build();
+    // 1.19 items
+    public static final ItemType MUD = builder("mud").setMaxAmount(64).setPlacedType(StateTypes.MUD).build();
+    public static final ItemType MANGROVE_PLANKS = builder("mangrove_planks").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_PLANKS).build();
+    public static final ItemType MANGROVE_PROPAGULE = builder("mangrove_propagule").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_PROPAGULE).build();
+    public static final ItemType MANGROVE_LOG = builder("mangrove_log").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_LOG).build();
+    public static final ItemType MANGROVE_ROOTS = builder("mangrove_roots").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_ROOTS).build();
+    public static final ItemType MUDDY_MANGROVE_ROOTS = builder("muddy_mangrove_roots").setMaxAmount(64).setPlacedType(StateTypes.MUDDY_MANGROVE_ROOTS).build();
+    public static final ItemType STRIPPED_MANGROVE_LOG = builder("stripped_mangrove_log").setMaxAmount(64).setPlacedType(StateTypes.STRIPPED_MANGROVE_LOG).build();
+    public static final ItemType STRIPPED_MANGROVE_WOOD = builder("stripped_mangrove_wood").setMaxAmount(64).setPlacedType(StateTypes.STRIPPED_MANGROVE_WOOD).build();
+    public static final ItemType MANGROVE_WOOD = builder("mangrove_wood").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_WOOD).build();
+    public static final ItemType MANGROVE_LEAVES = builder("mangrove_leaves").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_LEAVES).build();
+    public static final ItemType MANGROVE_SLAB = builder("mangrove_slab").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_SLAB).build();
+    public static final ItemType MUD_BRICK_SLAB = builder("mud_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.MUD_BRICK_SLAB).build();
+    public static final ItemType MANGROVE_FENCE = builder("mangrove_fence").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_FENCE).build();
+    public static final ItemType PACKED_MUD = builder("packed_mud").setMaxAmount(64).setPlacedType(StateTypes.PACKED_MUD).build();
+    public static final ItemType MUD_BRICKS = builder("mud_bricks").setMaxAmount(64).setPlacedType(StateTypes.MUD_BRICKS).build();
+    public static final ItemType REINFORCED_DEEPSLATE = builder("reinforced_deepslate").setMaxAmount(64).setPlacedType(StateTypes.REINFORCED_DEEPSLATE).build();
+    public static final ItemType MUD_BRICK_STAIRS = builder("mud_brick_stairs").setMaxAmount(64).setPlacedType(StateTypes.MUD_BRICK_STAIRS).build();
+    public static final ItemType SCULK = builder("sculk").setMaxAmount(64).setPlacedType(StateTypes.SCULK).build();
+    public static final ItemType SCULK_VEIN = builder("sculk_vein").setMaxAmount(64).setPlacedType(StateTypes.SCULK_VEIN).build();
+    public static final ItemType SCULK_CATALYST = builder("sculk_catalyst").setMaxAmount(64).setPlacedType(StateTypes.SCULK_CATALYST).build();
+    public static final ItemType SCULK_SHRIEKER = builder("sculk_shrieker").setMaxAmount(64).setPlacedType(StateTypes.SCULK_SHRIEKER).build();
+    public static final ItemType MUD_BRICK_WALL = builder("mud_brick_wall").setMaxAmount(64).setPlacedType(StateTypes.MUD_BRICK_WALL).build();
+    public static final ItemType MANGROVE_BUTTON = builder("mangrove_button").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_BUTTON).build();
+    public static final ItemType MANGROVE_PRESSURE_PLATE = builder("mangrove_pressure_plate").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_PRESSURE_PLATE).build();
+    public static final ItemType MANGROVE_DOOR = builder("mangrove_door").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_DOOR).build();
+    public static final ItemType MANGROVE_TRAPDOOR = builder("mangrove_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_TRAPDOOR).build();
+    public static final ItemType MANGROVE_FENCE_GATE = builder("mangrove_fence_gate").setMaxAmount(64).setPlacedType(StateTypes.MANGROVE_FENCE_GATE).build();
+    public static final ItemType MANGROVE_SIGN = builder("mangrove_sign").setMaxAmount(16).setPlacedType(StateTypes.MANGROVE_SIGN).build();
+    public static final ItemType TADPOLE_BUCKET = builder("tadpole_bucket").setMaxAmount(1).build();
+    public static final ItemType RECOVERY_COMPASS = builder("recovery_compass").setMaxAmount(64).build();
+    public static final ItemType ALLAY_SPAWN_EGG = builder("allay_spawn_egg").setMaxAmount(64).build();
+    public static final ItemType FROG_SPAWN_EGG = builder("frog_spawn_egg").setMaxAmount(64).build();
+    public static final ItemType TADPOLE_SPAWN_EGG = builder("tadpole_spawn_egg").setMaxAmount(64).build();
+    public static final ItemType WARDEN_SPAWN_EGG = builder("warden_spawn_egg").setMaxAmount(64).build();
+    public static final ItemType MUSIC_DISC_5 = builder("music_disc_5").setMaxAmount(1).build();
+    public static final ItemType DISC_FRAGMENT_5 = builder("disc_fragment_5").setMaxAmount(64).build();
+    public static final ItemType OCHRE_FROGLIGHT = builder("ochre_froglight").setMaxAmount(64).setPlacedType(StateTypes.OCHRE_FROGLIGHT).build();
+    public static final ItemType VERDANT_FROGLIGHT = builder("verdant_froglight").setMaxAmount(64).setPlacedType(StateTypes.VERDANT_FROGLIGHT).build();
+    public static final ItemType PEARLESCENT_FROGLIGHT = builder("pearlescent_froglight").setMaxAmount(64).setPlacedType(StateTypes.PEARLESCENT_FROGLIGHT).build();
+    public static final ItemType FROGSPAWN = builder("frogspawn").setMaxAmount(64).setPlacedType(StateTypes.FROGSPAWN).build();
+    public static final ItemType ECHO_SHARD = builder("echo_shard").setMaxAmount(64).build();
+    public static final ItemType GOAT_HORN = builder("goat_horn").setMaxAmount(1).build();
+    public static final ItemType OAK_CHEST_BOAT = builder("oak_chest_boat").setMaxAmount(1).build();
+    public static final ItemType SPRUCE_CHEST_BOAT = builder("spruce_chest_boat").setMaxAmount(1).build();
+    public static final ItemType BIRCH_CHEST_BOAT = builder("birch_chest_boat").setMaxAmount(1).build();
+    public static final ItemType JUNGLE_CHEST_BOAT = builder("jungle_chest_boat").setMaxAmount(1).build();
+    public static final ItemType ACACIA_CHEST_BOAT = builder("acacia_chest_boat").setMaxAmount(1).build();
+    public static final ItemType DARK_OAK_CHEST_BOAT = builder("dark_oak_chest_boat").setMaxAmount(1).build();
+    public static final ItemType MANGROVE_BOAT = builder("mangrove_boat").setMaxAmount(1).build();
+    public static final ItemType MANGROVE_CHEST_BOAT = builder("mangrove_chest_boat").setMaxAmount(1).build();
     /**
      * @deprecated Burning furnace shows up as a missing texture, removed in 1.9
      */
@@ -1178,7 +1230,6 @@ public class ItemTypes {
                 Collections.unmodifiableSet(new HashSet<>(attributesArr));
 
         TypesBuilderData data = TYPES_BUILDER.define(key);
-        boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
 
         ItemType type = new ItemType() {
             private final int[] ids = data.getData();
@@ -1206,7 +1257,7 @@ public class ItemTypes {
 
             @Override
             public boolean isMusicDisc() {
-                return musicDisc;
+                return getAttributes().contains(ItemAttribute.MUSIC_DISC);
             }
 
             @Override
@@ -1312,5 +1363,9 @@ public class ItemTypes {
             placedType = type;
             return this;
         }
+    }
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
     }
 }

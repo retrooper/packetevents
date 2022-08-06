@@ -21,7 +21,7 @@ package com.github.retrooper.packetevents.wrapper.status.client;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-//No fields
+
 public class WrapperStatusClientRequest extends PacketWrapper<WrapperStatusClientRequest> {
     public WrapperStatusClientRequest(PacketSendEvent event) {
         super(event);
@@ -36,10 +36,10 @@ public class WrapperStatusClientRequest extends PacketWrapper<WrapperStatusClien
     }
 
     @Override
-    public void copy(WrapperStatusClientRequest wrapper) {
+    public void write() {
     }
 
     @Override
-    public void write() {
+    public void copy(WrapperStatusClientRequest wrapper) {
     }
 }

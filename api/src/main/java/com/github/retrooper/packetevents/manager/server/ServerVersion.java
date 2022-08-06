@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.manager.server;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Server Version.
@@ -30,7 +31,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
  * @since 1.6.9
  */
 public enum ServerVersion {
-    //TODO Rename to PlatformVersion or LocalVersion or Version?
+    //TODO Rename to MinecraftVersion?
     V_1_7_10(5),
     V_1_8(47), V_1_8_3(47), V_1_8_8(47),
     V_1_9(107), V_1_9_2(109), V_1_9_4(110),
@@ -44,6 +45,7 @@ public enum ServerVersion {
     V_1_16(735), V_1_16_1(736), V_1_16_2(751), V_1_16_3(753), V_1_16_4(754), V_1_16_5(754),
     V_1_17(755), V_1_17_1(756),
     V_1_18(757), V_1_18_1(757), V_1_18_2(758),
+    V_1_19(759), V_1_19_1(760),
     //TODO UPDATE Add server version constant
     ERROR(-1, true);
 
@@ -85,17 +87,17 @@ public enum ServerVersion {
     }
 
     public static ServerVersion getLatest() {
-        return reversedValues()[1];
+        return REVERSED_VALUES[1];
     }
 
     public static ServerVersion getOldest() {
-        return values()[0];
+        return VALUES[0];
     }
 
     //TODO Optimize
     @Deprecated
     public static ServerVersion getById(int protocolVersion) {
-        for (ServerVersion version : values()) {
+        for (ServerVersion version : VALUES) {
             if (version.protocolVersion == protocolVersion) {
                 return version;
             }
@@ -113,6 +115,7 @@ public enum ServerVersion {
     /**
      * Get the release name of this server version.
      * For example, for the V_1_18 enum constant, it would return "1.18".
+     *
      * @return Release name
      */
     public String getReleaseName() {
@@ -146,7 +149,6 @@ public enum ServerVersion {
         if (target.protocolVersion != protocolVersion || this == target) {
             return protocolVersion > target.protocolVersion;
         }
-
         /*
          * The server versions unfortunately have the same protocol version.
          * We need to look at this "reversedValues" variable.
@@ -157,10 +159,10 @@ public enum ServerVersion {
         for (ServerVersion version : reversedValues()) {
             if (version == target) {
                 return false;
+            } else if (version == this) {
+                return true;
             }
-            if (version == this) return true;
         }
-
         return false;
     }
 
@@ -219,5 +221,35 @@ public enum ServerVersion {
      */
     public boolean isOlderThanOrEquals(ServerVersion target) {
         return this == target || isOlderThan(target);
+    }
+
+    /**
+     * Is this server version newer than, older than or equal to the compared server version?
+     * This method simply checks if this server version's protocol version is greater than, less than or equal to
+     * the compared server version's protocol version.
+     *
+     * @param comparison    Comparison type.
+     * @param targetVersion Compared server version.
+     * @return true or false, based on the comparison type.
+     * @see #isNewerThan(ServerVersion)
+     * @see #isNewerThanOrEquals(ServerVersion)
+     * @see #isOlderThan(ServerVersion)
+     * @see #isOlderThanOrEquals(ServerVersion)
+     */
+    public boolean is(@NotNull VersionComparison comparison, @NotNull ServerVersion targetVersion) {
+        switch (comparison) {
+            case EQUALS:
+                return protocolVersion == targetVersion.protocolVersion;
+            case NEWER_THAN:
+                return isNewerThan(targetVersion);
+            case NEWER_THAN_OR_EQUALS:
+                return isNewerThanOrEquals(targetVersion);
+            case OLDER_THAN:
+                return isOlderThan(targetVersion);
+            case OLDER_THAN_OR_EQUALS:
+                return isOlderThanOrEquals(targetVersion);
+            default:
+                return false;
+        }
     }
 }

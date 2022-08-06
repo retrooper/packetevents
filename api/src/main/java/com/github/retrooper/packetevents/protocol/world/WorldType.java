@@ -30,6 +30,7 @@ public enum WorldType {
     DEBUG_ALL_BLOCK_STATES("debug_all_block_states"),
     DEFAULT_1_1("default_1_1");
 
+    private static final WorldType[] VALUES = values();
     private final String name;
 
     WorldType(String name) {
@@ -42,7 +43,7 @@ public enum WorldType {
 
     @Nullable
     public static WorldType getByName(String name) {
-        for (WorldType type : values()) {
+        for (WorldType type : VALUES) {
             if (type.name.equals(name)) {
                 return type;
             }

@@ -232,14 +232,14 @@ public class NPC {
             if (handItem == null) {
                 handItem = ItemStack.EMPTY;
             }
-            equipmentList.add(new Equipment(EquipmentSlot.MAINHAND,
+            equipmentList.add(new Equipment(EquipmentSlot.MAIN_HAND,
                     handItem));
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
                 ItemStack offHandItem = getOffHand();
                 if (offHandItem == null) {
                     offHandItem = ItemStack.EMPTY;
                 }
-                equipmentList.add(new Equipment(EquipmentSlot.OFFHAND,
+                equipmentList.add(new Equipment(EquipmentSlot.OFF_HAND,
                         offHandItem));
             }
             ItemStack helmetItem = getHelmet();
@@ -253,7 +253,7 @@ public class NPC {
             if (chestPlateItem == null) {
                 chestPlateItem = ItemStack.EMPTY;
             }
-            equipmentList.add(new Equipment(EquipmentSlot.CHESTPLATE,
+            equipmentList.add(new Equipment(EquipmentSlot.CHEST_PLATE,
                     chestPlateItem));
             ItemStack leggingsItem = getLeggings();
             if (leggingsItem == null) {

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> {
-    HashMap<String, List<Tag>> tags;
+    private Map<String, List<Tag>> tags;
 
     public WrapperPlayServerTags(PacketSendEvent event) {
         super(event);
@@ -42,7 +42,7 @@ public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> 
             String resourceName = readString();
             int elements = readVarInt(); // Number of tags in this resource tag
 
-            ArrayList<Tag> tagList = new ArrayList<>(elements);
+            List<Tag> tagList = new ArrayList<>(elements);
 
             for (int valueIter = 0; valueIter < elements; valueIter++) {
                 String tagName = readString(); // The actual tag name
@@ -58,11 +58,6 @@ public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> 
 
             tags.put(resourceName, tagList);
         }
-    }
-
-    @Override
-    public void copy(WrapperPlayServerTags wrapper) {
-        this.tags = wrapper.tags;
     }
 
     @Override
@@ -82,6 +77,11 @@ public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> 
                 }
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerTags wrapper) {
+        this.tags = wrapper.tags;
     }
 
     public Map<String, List<Tag>> getTags() {

@@ -24,7 +24,7 @@ import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerOpenBook extends PacketWrapper<WrapperPlayServerOpenBook> {
-    InteractionHand hand;
+    private InteractionHand hand;
 
     public WrapperPlayServerOpenBook(PacketSendEvent event) {
         super(event);
@@ -41,13 +41,13 @@ public class WrapperPlayServerOpenBook extends PacketWrapper<WrapperPlayServerOp
     }
 
     @Override
-    public void copy(WrapperPlayServerOpenBook wrapper) {
-        hand = wrapper.hand;
+    public void write() {
+        writeVarInt(hand.ordinal());
     }
 
     @Override
-    public void write() {
-        writeVarInt(hand.ordinal());
+    public void copy(WrapperPlayServerOpenBook wrapper) {
+        hand = wrapper.hand;
     }
 
     public InteractionHand getHand() {

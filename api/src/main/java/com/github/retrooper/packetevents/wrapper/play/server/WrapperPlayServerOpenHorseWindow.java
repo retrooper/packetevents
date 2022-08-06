@@ -23,9 +23,9 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayServerOpenHorseWindow> {
-    int windowId;
-    int slotCount;
-    int entityId;
+    private int windowId;
+    private int slotCount;
+    private int entityId;
 
     public WrapperPlayServerOpenHorseWindow(PacketSendEvent event) {
         super(event);
@@ -46,17 +46,17 @@ public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void copy(WrapperPlayServerOpenHorseWindow other) {
-        this.windowId = other.windowId;
-        this.slotCount = other.slotCount;
-        this.entityId = other.entityId;
-    }
-
-    @Override
     public void write() {
         writeByte(windowId);
         writeVarInt(slotCount);
         writeInt(entityId);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerOpenHorseWindow other) {
+        this.windowId = other.windowId;
+        this.slotCount = other.slotCount;
+        this.entityId = other.entityId;
     }
 
     public int getWindowId() {

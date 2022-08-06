@@ -69,14 +69,6 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void copy(WrapperPlayServerWindowItems wrapper) {
-        windowID = wrapper.windowID;
-        stateID = wrapper.stateID;
-        items = wrapper.items;
-        carriedItem = wrapper.carriedItem;
-    }
-
-    @Override
     public void write() {
         writeByte(windowID);
         boolean v1_17_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1);
@@ -94,6 +86,14 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
         if (v1_17_1) {
             writeItemStack(carriedItem.orElse(ItemStack.EMPTY));
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerWindowItems wrapper) {
+        windowID = wrapper.windowID;
+        stateID = wrapper.stateID;
+        items = wrapper.items;
+        carriedItem = wrapper.carriedItem;
     }
 
     public int getWindowId() {

@@ -52,13 +52,6 @@ public class WrapperPlayServerSetExperience extends PacketWrapper<WrapperPlaySer
     }
 
     @Override
-    public void copy(WrapperPlayServerSetExperience wrapper) {
-        experienceBar = wrapper.experienceBar;
-        level = wrapper.level;
-        totalExperience = wrapper.totalExperience;
-    }
-
-    @Override
     public void write() {
         writeFloat(experienceBar);
         if (serverVersion == ServerVersion.V_1_7_10) {
@@ -68,6 +61,13 @@ public class WrapperPlayServerSetExperience extends PacketWrapper<WrapperPlaySer
             writeVarInt(level);
             writeVarInt(totalExperience);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSetExperience wrapper) {
+        experienceBar = wrapper.experienceBar;
+        level = wrapper.level;
+        totalExperience = wrapper.totalExperience;
     }
 
     public float getExperienceBar() {

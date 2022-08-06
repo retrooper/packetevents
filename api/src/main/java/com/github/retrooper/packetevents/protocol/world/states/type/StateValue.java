@@ -1,3 +1,21 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.github.retrooper.packetevents.protocol.world.states.type;
 
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
@@ -13,8 +31,10 @@ public enum StateValue {
     AXIS("axis", Axis::valueOf),
     BERRIES("berries", Boolean::parseBoolean),
     BITES("bites", Integer::parseInt),
+    BLOOM("bloom", Boolean::parseBoolean),
     BOTTOM("bottom", Boolean::parseBoolean),
     CANDLES("candles", Integer::parseInt),
+    CAN_SUMMON("can_summon", Boolean::parseBoolean),
     CHARGES("charges", Integer::parseInt),
     CONDITIONAL("conditional", Boolean::parseBoolean),
     DELAY("delay", Integer::parseInt),
@@ -63,6 +83,7 @@ public enum StateValue {
     SCULK_SENSOR_PHASE("sculk_sensor_phase", SculkSensorPhase::valueOf),
     SHAPE("shape", Shape::valueOf),
     SHORT("short", Boolean::parseBoolean),
+    SHRIEKING("shrieking", Boolean::parseBoolean),
     SIGNAL_FIRE("signal_fire", Boolean::parseBoolean),
     SNOWY("snowy", Boolean::parseBoolean),
     STAGE("stage", Integer::parseInt),

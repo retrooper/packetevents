@@ -27,8 +27,6 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClientClickWindow> {
     private int windowID;
@@ -38,14 +36,14 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
     private Optional<Integer> actionNumber;
     private WindowClickType windowClickType;
     private Optional<Map<Integer, ItemStack>> slots;
-    private ItemStack clickedItemStack;
+    private ItemStack carriedItemStack;
 
     public WrapperPlayClientClickWindow(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperPlayClientClickWindow(int windowID, Optional<Integer> stateID, int slot, int button, Optional<Integer> actionNumber, WindowClickType windowClickType,
-                                        Optional<Map<Integer, ItemStack>> slots, ItemStack clickedItemStack) {
+                                        Optional<Map<Integer, ItemStack>> slots, ItemStack carriedItemStack) {
         super(PacketType.Play.Client.CLICK_WINDOW);
         this.windowID = windowID;
         this.stateID = stateID;
@@ -54,7 +52,7 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         this.actionNumber = actionNumber;
         this.windowClickType = windowClickType;
         this.slots = slots;
-        this.clickedItemStack = clickedItemStack;
+        this.carriedItemStack = carriedItemStack;
     }
 
     @Override
@@ -76,13 +74,14 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         int clickTypeIndex = readVarInt();
         this.windowClickType = WindowClickType.VALUES[clickTypeIndex];
         if (v1_17) {
-            Function<PacketWrapper<?>, Integer> slotReader = wrapper -> (int) wrapper.readShort();
-            Function<PacketWrapper<?>, ItemStack> itemStackReader = PacketWrapper::readItemStack;
-            this.slots = Optional.of(readMap(slotReader, itemStackReader));
+            this.slots = Optional.of(readMap(
+                    packetWrapper -> Math.toIntExact(packetWrapper.readShort()),
+                    PacketWrapper::readItemStack
+            ));
         } else {
             this.slots = Optional.empty();
         }
-        this.clickedItemStack = readItemStack();
+        this.carriedItemStack = readItemStack();
     }
 
     @Override
@@ -94,7 +93,7 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         this.actionNumber = wrapper.actionNumber;
         this.windowClickType = wrapper.windowClickType;
         this.slots = wrapper.slots;
-        this.clickedItemStack = wrapper.clickedItemStack;
+        this.carriedItemStack = wrapper.carriedItemStack;
     }
 
     @Override
@@ -111,11 +110,9 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         }
         writeVarInt(windowClickType.ordinal());
         if (v1_17) {
-            BiConsumer<PacketWrapper<?>, Integer> keyConsumer = PacketWrapper::writeShort;
-            BiConsumer<PacketWrapper<?>, ItemStack> valueConsumer = PacketWrapper::writeItemStack;
-            writeMap(slots.orElse(new HashMap<>()), keyConsumer, valueConsumer);
+            writeMap(slots.orElse(new HashMap<>()), PacketWrapper::writeShort, PacketWrapper::writeItemStack);
         }
-        writeItemStack(clickedItemStack);
+        writeItemStack(carriedItemStack);
     }
 
     public int getWindowId() {
@@ -166,12 +163,12 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         this.slots = slots;
     }
 
-    public ItemStack getClickedItemStack() {
-        return clickedItemStack;
+    public ItemStack getCarriedItemStack() {
+        return carriedItemStack;
     }
 
-    public void setClickedItemStack(ItemStack clickedItemStack) {
-        this.clickedItemStack = clickedItemStack;
+    public void setCarriedItemStack(ItemStack carriedItemStack) {
+        this.carriedItemStack = carriedItemStack;
     }
 
     public enum WindowClickType {

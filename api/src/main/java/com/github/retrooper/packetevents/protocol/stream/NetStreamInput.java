@@ -79,9 +79,7 @@ public class NetStreamInput extends FilterInputStream {
 
 
     public char readChar() {
-        int ch1 = this.readUnsignedByte();
-        int ch2 = this.readUnsignedByte();
-        return (char) ((ch1 << 8) + (ch2));
+        return (char) this.readUnsignedShort();
     }
 
 

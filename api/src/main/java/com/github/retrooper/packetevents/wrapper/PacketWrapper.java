@@ -23,8 +23,12 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
+import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
+import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
+import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -38,25 +42,36 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.protocol.world.DimensionType;
+import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
+import com.github.retrooper.packetevents.util.crypto.SaltSignature;
+import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class PacketWrapper<T extends PacketWrapper> {
-    public final Object buffer;
+    @Nullable
+    public Object buffer;
+
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
     private int packetID;
-    private boolean hasPreparedForSending;
     // For sending chunk data packets, which need this data
     @Nullable
     protected User user;
@@ -64,10 +79,13 @@ public class PacketWrapper<T extends PacketWrapper> {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
 
-    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, Object buffer, int packetID) {
+    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, int packetID) {
+        if (packetID == -1) {
+            throw new IllegalArgumentException("Packet does not exist on this protocol version!");
+        }
         this.clientVersion = clientVersion;
         this.serverVersion = serverVersion;
-        this.buffer = buffer;
+        this.buffer = null;
         this.packetID = packetID;
     }
 
@@ -102,14 +120,13 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public PacketWrapper(int packetID, ClientVersion clientVersion) {
-        this(clientVersion, PacketEvents.getAPI().getServerManager().getVersion(),
-                UnpooledByteBufAllocationHelper.buffer(), packetID);
+        this(clientVersion, PacketEvents.getAPI().getServerManager().getVersion(), packetID);
     }
 
     public PacketWrapper(int packetID) {
         this(ClientVersion.UNKNOWN,
                 PacketEvents.getAPI().getServerManager().getVersion(),
-                UnpooledByteBufAllocationHelper.buffer(), packetID);
+                packetID);
     }
 
     public PacketWrapper(PacketTypeCommon packetType) {
@@ -117,25 +134,31 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public static PacketWrapper<?> createUniversalPacketWrapper(Object byteBuf) {
-        return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), byteBuf, -1);
+        PacketWrapper<?> wrapper = new PacketWrapper<>(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), -2);
+        wrapper.buffer = byteBuf;
+        return wrapper;
     }
 
     public final void prepareForSend() {
-        if (!hasPreparedForSending) {
-            writeVarInt(packetID);
-            write();
-            hasPreparedForSending = true;
+        // Null means the packet was manually created and wasn't sent by the server itself
+        // A reference count of 0 means that the packet was freed (it was already sent)
+        if (buffer == null || ByteBufHelper.refCnt(buffer) == 0) {
+            buffer = UnpooledByteBufAllocationHelper.buffer();
         }
+
+        writeVarInt(packetID);
+        write();
     }
 
     public void read() {
     }
 
-    public void copy(T wrapper) {
+    public void write() {
 
     }
 
-    public void write() {
+    //TODO Rename to copyFrom, as it copies data from the passed in wrapper.
+    public void copy(T wrapper) {
 
     }
 
@@ -150,14 +173,6 @@ public class PacketWrapper<T extends PacketWrapper> {
             read();
         }
         event.setLastUsedWrapper(this);
-    }
-
-    public boolean hasPreparedForSending() {
-        return hasPreparedForSending;
-    }
-
-    public void setHasPrepareForSending(boolean hasPreparedForSending) {
-        this.hasPreparedForSending = hasPreparedForSending;
     }
 
     public ClientVersion getClientVersion() {
@@ -244,14 +259,14 @@ public class PacketWrapper<T extends PacketWrapper> {
         while (true) {
             if ((value & ~0x7F) == 0) {
                 writeByte(value);
-                return;
+                break;
             }
             writeByte((value & 0x7F) | 0x80);
             value >>>= 7;
         }
     }
 
-    public <K, V> Map<K, V> readMap(Function<PacketWrapper<?>, K> keyFunction, Function<PacketWrapper<?>, V> valueFunction) {
+    public <K, V> Map<K, V> readMap(Reader<K> keyFunction, Reader<V> valueFunction) {
         int size = readVarInt();
         Map<K, V> map = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
@@ -262,10 +277,11 @@ public class PacketWrapper<T extends PacketWrapper> {
         return map;
     }
 
-    public <K, V> void writeMap(Map<K, V> map, BiConsumer<PacketWrapper<?>, K> keyConsumer, BiConsumer<PacketWrapper<?>, V> valueConsumer) {
+    public <K, V> void writeMap(Map<K, V> map, Writer<K> keyConsumer, Writer<V> valueConsumer) {
         writeVarInt(map.size());
-        for (K key : map.keySet()) {
-            V value = map.get(key);
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            K key = entry.getKey();
+            V value = entry.getValue();
             keyConsumer.accept(this, key);
             valueConsumer.accept(this, value);
         }
@@ -353,6 +369,7 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public String readString(int maxLen) {
         int j = readVarInt();
+        // TODO: Don't throw an exception if the string is too long (but still cut it off and probably kick the player)
         if (j > maxLen * 4) {
             throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + maxLen * 4 + ")");
         } else if (j < 0) {
@@ -521,8 +538,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public byte[] readByteArray() {
-        int len = readVarInt();
-        return readBytes(len);
+        return readByteArray(ByteBufHelper.readableBytes(buffer));
     }
 
     public void writeByteArray(byte[] array) {
@@ -682,5 +698,203 @@ public class PacketWrapper<T extends PacketWrapper> {
             }
             writeByte(127); // End of metadata array
         }
+    }
+
+    public Dimension readDimension() {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            return new Dimension(DimensionType.getByName(readIdentifier().toString()));
+        } else {
+            NBTCompound dimensionAttributes = readNBT();
+            return new Dimension(dimensionAttributes);
+        }
+    }
+
+    public void writeDimension(Dimension dimension) {
+        boolean v1_19 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19);
+        boolean v1_16_2 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2);
+        if (v1_19 || !v1_16_2) {
+            writeString(dimension.getDimensionName(), 32767);
+        } else {
+            writeNBT(dimension.getAttributes());
+        }
+    }
+
+    public SaltSignature readSaltSignature() {
+        return new SaltSignature(readLong(), readByteArray());
+    }
+
+    public void writeSaltSignature(SaltSignature signature) {
+        writeLong(signature.getSalt());
+        writeByteArray(signature.getSignature());
+    }
+
+    public PublicKey readPublicKey() {
+        return MinecraftEncryptionUtil.publicKey(readByteArray(512));
+    }
+
+    public void writePublicKey(PublicKey publicKey) {
+        writeByteArray(publicKey.getEncoded());
+    }
+
+    public Instant readTimestamp() {
+        return Instant.ofEpochMilli(readLong());
+    }
+
+    public void writeTimestamp(Instant timestamp) {
+        writeLong(timestamp.toEpochMilli());
+    }
+
+    public SignatureData readSignatureData() {
+        return new SignatureData(readTimestamp(), readPublicKey(), readByteArray(4096));
+    }
+
+    public void writeSignatureData(SignatureData signatureData) {
+        writeTimestamp(signatureData.getTimestamp());
+        writePublicKey(signatureData.getPublicKey());
+        writeByteArray(signatureData.getSignature());
+    }
+
+    public static <K> IntFunction<K> limitValue(IntFunction<K> function, int limit) {
+        return i -> {
+            if (i > limit) {
+                throw new RuntimeException("Value " + i + " is larger than limit " + limit);
+            }
+            return function.apply(i);
+        };
+    }
+
+    public WorldBlockPosition readWorldBlockPosition() {
+        return new WorldBlockPosition(readIdentifier(), readBlockPosition());
+    }
+
+    public void writeWorldBlockPosition(WorldBlockPosition pos) {
+        writeIdentifier(pos.getWorld());
+        writeBlockPosition(pos.getBlockPosition());
+    }
+
+    public LastSeenMessages.Entry readLastSeenMessagesEntry() {
+        return new LastSeenMessages.Entry(readUUID(), readByteArray());
+    }
+
+    public void writeLastMessagesEntry(LastSeenMessages.Entry entry) {
+        writeUUID(entry.getUUID());
+        writeByteArray(entry.getLastVerifier());
+    }
+
+    public LastSeenMessages.Update readLastSeenMessagesUpdate() {
+       LastSeenMessages lastSeenMessages = readLastSeenMessages();
+        LastSeenMessages.Entry lastReceived = readOptional(PacketWrapper::readLastSeenMessagesEntry);
+        return new LastSeenMessages.Update(lastSeenMessages, lastReceived);
+    }
+
+    public void writeLastSeenMessagesUpdate(LastSeenMessages.Update update) {
+        writeLastSeenMessages(update.getLastSeenMessages());
+        writeOptional(update.getLastReceived(), PacketWrapper::writeLastMessagesEntry);
+    }
+
+    public LastSeenMessages readLastSeenMessages() {
+        List<LastSeenMessages.Entry> entries = readCollection(limitValue(ArrayList::new, 5),
+                PacketWrapper::readLastSeenMessagesEntry);
+        return new LastSeenMessages(entries);
+    }
+
+    public void writeLastSeenMessages(LastSeenMessages lastSeenMessages) {
+        writeCollection(lastSeenMessages.getEntries(), PacketWrapper::writeLastMessagesEntry);
+    }
+
+    public BitSet readBitSet() {
+        return BitSet.valueOf(readLongArray());
+    }
+
+    public void writeBitSet(BitSet bitSet) {
+        writeLongArray(bitSet.toLongArray());
+    }
+
+    public FilterMask readFilterMask() {
+        FilterMaskType type = FilterMaskType.getById(readVarInt());
+        switch (type) {
+            case PARTIALLY_FILTERED:
+                return new FilterMask(readBitSet());
+            case PASS_THROUGH:
+                return FilterMask.PASS_THROUGH;
+            case FULLY_FILTERED:
+                return FilterMask.FULLY_FILTERED;
+            default:
+                return null;
+        }
+    }
+
+    public void writeFilterMask(FilterMask filterMask) {
+        writeVarInt(filterMask.getType().getId());
+        if (filterMask.getType() == FilterMaskType.PARTIALLY_FILTERED) {
+            writeBitSet(filterMask.getMask());
+        }
+    }
+
+    @Experimental
+    public <U, V, R> U readMultiVersional(VersionComparison version, ServerVersion target, Reader<V> first, Reader<R> second) {
+        if (serverVersion.is(version, target)) {
+            return (U) first.apply(this);
+        } else {
+            return (U) second.apply(this);
+        }
+    }
+
+    @Experimental
+    public <V> void writeMultiVersional(VersionComparison version, ServerVersion target, V value, Writer<V> first, Writer<V> second) {
+        if (serverVersion.is(version, target)) {
+            first.accept(this, value);
+        } else {
+            second.accept(this, value);
+        }
+    }
+
+    public <R> R readOptional(Reader<R> reader) {
+        return this.readBoolean() ? reader.apply(this) : null;
+    }
+
+    public <V> void writeOptional(V value, Writer<V> writer) {
+        if (value != null) {
+            this.writeBoolean(true);
+            writer.accept(this, value);
+        } else {
+            this.writeBoolean(false);
+        }
+    }
+
+
+    public <K, C extends Collection<K>> C readCollection(IntFunction<C> function, Reader<K> reader) {
+        int size = this.readVarInt();
+        Collection<K> collection = function.apply(size);
+        for (int i = 0; i < size; ++i) {
+            collection.add(reader.apply(this));
+        }
+        return (C) collection;
+    }
+
+    public <K> void writeCollection(Collection<K> collection, Writer<K> writer) {
+        this.writeVarInt(collection.size());
+        for (K key : collection) {
+            writer.accept(this, key);
+        }
+    }
+
+    public <K> List<K> readList(Reader<K> reader) {
+        return this.readCollection(ArrayList::new, reader);
+    }
+
+    public <K> void writeList(List<K> list, Writer<K> writer) {
+        writeVarInt(list.size());
+        for (K key : list) {
+            writer.accept(this, key);
+        }
+    }
+
+    @FunctionalInterface
+    public interface Reader<T> extends Function<PacketWrapper<?>, T> {
+    }
+
+    @FunctionalInterface
+    public interface Writer<T> extends BiConsumer<PacketWrapper<?>, T> {
     }
 }

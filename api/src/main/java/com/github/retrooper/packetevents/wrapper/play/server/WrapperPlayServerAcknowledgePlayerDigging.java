@@ -20,15 +20,16 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
-//Added in 1.15
+import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
 public class WrapperPlayServerAcknowledgePlayerDigging extends PacketWrapper<WrapperPlayServerAcknowledgePlayerDigging> {
     private DiggingAction action;
     private boolean successful;
     private Vector3i blockPosition;
     private int blockID;
+
     public WrapperPlayServerAcknowledgePlayerDigging(PacketSendEvent event) {
         super(event);
     }
@@ -50,19 +51,19 @@ public class WrapperPlayServerAcknowledgePlayerDigging extends PacketWrapper<Wra
     }
 
     @Override
-    public void copy(WrapperPlayServerAcknowledgePlayerDigging wrapper) {
-        action = wrapper.action;
-        successful = wrapper.successful;
-        blockPosition = wrapper.blockPosition;
-        blockID = wrapper.blockID;
-    }
-
-    @Override
     public void write() {
         writeBlockPosition(blockPosition);
         writeVarInt(blockID);
         writeVarInt(action.getId());
         writeBoolean(successful);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerAcknowledgePlayerDigging wrapper) {
+        action = wrapper.action;
+        successful = wrapper.successful;
+        blockPosition = wrapper.blockPosition;
+        blockID = wrapper.blockID;
     }
 
     public DiggingAction getAction() {

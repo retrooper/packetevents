@@ -34,23 +34,19 @@ public class WrapperPlayServerCloseWindow extends PacketWrapper<WrapperPlayServe
         this.windowId = id;
     }
 
-    public WrapperPlayServerCloseWindow() {
-        this(0);
-    }
-
     @Override
     public void read() {
         this.windowId = readUnsignedByte();
     }
 
     @Override
-    public void copy(WrapperPlayServerCloseWindow wrapper) {
-        this.windowId = wrapper.windowId;
+    public void write() {
+        writeByte(windowId);
     }
 
     @Override
-    public void write() {
-        writeByte(windowId);
+    public void copy(WrapperPlayServerCloseWindow wrapper) {
+        this.windowId = wrapper.windowId;
     }
 
     /**

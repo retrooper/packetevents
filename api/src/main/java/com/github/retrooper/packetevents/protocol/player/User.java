@@ -22,12 +22,14 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -119,11 +121,12 @@ public class User {
         ChannelHelper.close(channel);
     }
 
-    public void chat(String message) {
+    //Might be tough with the message signing
+   /* public void chat(String message) {
         //Fake an incoming chat packet
         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(message);
         PacketEvents.getAPI().getProtocolManager().receivePacket(channel, chatMessage);
-    }
+    }*/
 
     public void closeInventory() {
         WrapperPlayServerCloseWindow closeWindow = new WrapperPlayServerCloseWindow(0);
@@ -136,12 +139,24 @@ public class User {
     }
 
     public void sendMessage(Component component) {
-        sendMessage(component, ChatPosition.CHAT);
+        sendMessage(component, ChatType.CHAT);
     }
 
-    public void sendMessage(Component component, ChatPosition position) {
-        WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(component, position);
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatMessage);
+    public void sendMessage(Component component, ChatType type) {
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        PacketWrapper<?> chatPacket;
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            chatPacket = new WrapperPlayServerSystemChatMessage(false, component);
+        } else {
+            ChatMessage message;
+            if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+                message = new ChatMessage_v1_16(component, type, new UUID(0L, 0L));
+            } else {
+                message = new ChatMessageLegacy(component, type);
+            }
+            chatPacket = new WrapperPlayServerChatMessage(message);
+        }
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatPacket);
     }
 
     public void sendTitle(String legacyTitle, String legacySubtitle,
@@ -164,10 +179,9 @@ public class User {
             if (subtitle != null) {
                 setSubtitle = new WrapperPlayServerSetTitleSubtitle(subtitle);
             }
-        }
-        else {
+        } else {
             animation = new WrapperPlayServerTitle(WrapperPlayServerTitle.
-                    TitleAction.SET_TIMES_AND_DISPLAY, (Component)null, null, null,
+                    TitleAction.SET_TIMES_AND_DISPLAY, (Component) null, null, null,
                     fadeInTicks, stayTicks, fadeOutTicks);
             if (title != null) {
                 setTitle = new WrapperPlayServerTitle(WrapperPlayServerTitle.

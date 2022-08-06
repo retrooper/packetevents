@@ -23,16 +23,20 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
-import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
-import com.github.retrooper.packetevents.util.*;
+import com.github.retrooper.packetevents.util.TypesBuilder;
+import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.Vector3f;
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.google.gson.JsonObject;
 import net.kyori.adventure.text.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -48,8 +52,9 @@ public class EntityDataTypes {
             ClientVersion.V_1_8,
             ClientVersion.V_1_9,
             ClientVersion.V_1_11,
-            ClientVersion.V_1_13, //Fix? Why did we not acknoledge 1.13
-            ClientVersion.V_1_16);
+            ClientVersion.V_1_13,
+            ClientVersion.V_1_14,
+            ClientVersion.V_1_19);
 
     public static final EntityDataType<Byte> BYTE = define("byte", PacketWrapper::readByte, PacketWrapper::writeByte);
     public static final EntityDataType<Integer> INT = define("int", readIntDeserializer(), writeIntSerializer());
@@ -106,12 +111,33 @@ public class EntityDataTypes {
         return EntityPose.getById(wrapper.getServerVersion().toClientVersion(), id);
     }, (PacketWrapper<?> wrapper, EntityPose value) -> wrapper.writeVarInt(value.getId(wrapper.getServerVersion().toClientVersion())));
 
+    public static final EntityDataType<Integer> CAT_VARIANT = define("cat_variant_type", readIntDeserializer(), writeIntSerializer());
+    public static final EntityDataType<Integer> FROG_VARIANT = define("frog_variant_type", readIntDeserializer(), writeIntSerializer());
+
+    public static final EntityDataType<Optional<Vector3i>> OPTIONAL_GLOBAL_POSITION = define("optional_global_position", (PacketWrapper<?> wrapper) -> {
+                if (wrapper.readBoolean()) {
+                    return Optional.of(wrapper.readBlockPosition());
+                } else {
+                    return Optional.empty();
+                }
+            },
+            (PacketWrapper<?> wrapper, Optional<Vector3i> value) -> {
+                if (value.isPresent()) {
+                    wrapper.writeBoolean(true);
+                    wrapper.writeBlockPosition(value.get());
+                } else {
+                    wrapper.writeBoolean(false);
+                }
+            });
+
+    public static final EntityDataType<Integer> PAINTING_VARIANT_TYPE = define("painting_variant_type", readIntDeserializer(), writeIntSerializer());
+
     @Deprecated
     public static final EntityDataType<Short> SHORT = define("short", PacketWrapper::readShort, PacketWrapper::writeShort);
 
     public static EntityDataType<?> getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, EntityDataType<?>> typeIdMap = ENTITY_DATA_TYPE_ID_MAP.get((byte)index);
+        Map<Integer, EntityDataType<?>> typeIdMap = ENTITY_DATA_TYPE_ID_MAP.get((byte) index);
         return typeIdMap.get(id);
     }
 

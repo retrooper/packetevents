@@ -100,25 +100,10 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.velocity = new Vector3d(velX, velY, velZ);
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             this.entityMetadata = readEntityMetadata();
-        }
-        else {
+        } else {
             this.entityMetadata = new ArrayList<>();
         }
     }
-
-    @Override
-    public void copy(WrapperPlayServerSpawnLivingEntity wrapper) {
-        this.entityID = wrapper.entityID;
-        this.entityUUID = wrapper.entityUUID;
-        this.entityType = wrapper.entityType;
-        this.position = wrapper.position;
-        this.yaw = wrapper.yaw;
-        this.pitch = wrapper.pitch;
-        this.headPitch = wrapper.headPitch;
-        this.velocity = wrapper.velocity;
-        this.entityMetadata = wrapper.entityMetadata;
-    }
-
 
     @Override
     public void write() {
@@ -149,6 +134,19 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             writeEntityMetadata(entityMetadata);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSpawnLivingEntity wrapper) {
+        this.entityID = wrapper.entityID;
+        this.entityUUID = wrapper.entityUUID;
+        this.entityType = wrapper.entityType;
+        this.position = wrapper.position;
+        this.yaw = wrapper.yaw;
+        this.pitch = wrapper.pitch;
+        this.headPitch = wrapper.headPitch;
+        this.velocity = wrapper.velocity;
+        this.entityMetadata = wrapper.entityMetadata;
     }
 
     public int getEntityId() {

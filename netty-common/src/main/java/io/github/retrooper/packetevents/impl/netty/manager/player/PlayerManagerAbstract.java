@@ -37,7 +37,7 @@ public abstract class PlayerManagerAbstract implements PlayerManager {
     }
 
     @Override
-    public @NotNull User getUser(@NotNull Object player) {
+    public User getUser(@NotNull Object player) {
         Object channel = getChannel(player);
         return PacketEvents.getAPI().getProtocolManager().getUser(channel);
     }

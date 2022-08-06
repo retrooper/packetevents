@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerUpdateViewDistance extends PacketWrapper<WrapperPlayServerUpdateViewDistance> {
     private int viewDistance;
+
     public WrapperPlayServerUpdateViewDistance(PacketSendEvent event) {
         super(event);
     }
@@ -39,13 +40,13 @@ public class WrapperPlayServerUpdateViewDistance extends PacketWrapper<WrapperPl
     }
 
     @Override
-    public void copy(WrapperPlayServerUpdateViewDistance wrapper) {
-        viewDistance = wrapper.viewDistance;
+    public void write() {
+        writeVarInt(viewDistance);
     }
 
     @Override
-    public void write() {
-        writeVarInt(viewDistance);
+    public void copy(WrapperPlayServerUpdateViewDistance wrapper) {
+        viewDistance = wrapper.viewDistance;
     }
 
     public int getViewDistance() {

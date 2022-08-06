@@ -27,6 +27,7 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
     private static final float ROTATION_FACTOR = 256.0F / 360.0F;
     private static final double MODERN_DELTA_DIVISOR = 4096.0;
     private static final double LEGACY_DELTA_DIVISOR = 32.0;
+
     private int entityID;
     private double deltaX;
     private double deltaY;
@@ -34,6 +35,7 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
     private float yaw;
     private float pitch;
     private boolean onGround;
+
     public WrapperPlayServerEntityRelativeMoveAndRotation(PacketSendEvent event) {
         super(event);
     }
@@ -57,8 +59,7 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
             deltaX = readShort() / MODERN_DELTA_DIVISOR;
             deltaY = readShort() / MODERN_DELTA_DIVISOR;
             deltaZ = readShort() / MODERN_DELTA_DIVISOR;
-        }
-        else {
+        } else {
             deltaX = readByte() / LEGACY_DELTA_DIVISOR;
             deltaY = readByte() / LEGACY_DELTA_DIVISOR;
             deltaZ = readByte() / LEGACY_DELTA_DIVISOR;
@@ -66,6 +67,23 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
         yaw = readByte() / ROTATION_FACTOR;
         pitch = readByte() / ROTATION_FACTOR;
         onGround = readBoolean();
+    }
+
+    @Override
+    public void write() {
+        writeVarInt(entityID);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            writeShort((short) (deltaX * MODERN_DELTA_DIVISOR));
+            writeShort((short) (deltaY * MODERN_DELTA_DIVISOR));
+            writeShort((short) (deltaZ * MODERN_DELTA_DIVISOR));
+        } else {
+            writeByte((byte) (deltaX * LEGACY_DELTA_DIVISOR));
+            writeByte((byte) (deltaY * LEGACY_DELTA_DIVISOR));
+            writeByte((byte) (deltaZ * LEGACY_DELTA_DIVISOR));
+        }
+        writeByte((int) (yaw * ROTATION_FACTOR));
+        writeByte((int) (pitch * ROTATION_FACTOR));
+        writeBoolean(onGround);
     }
 
     @Override
@@ -77,24 +95,6 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
         onGround = wrapper.onGround;
-    }
-
-    @Override
-    public void write() {
-        writeVarInt(entityID);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            writeShort((short) (deltaX * MODERN_DELTA_DIVISOR));
-            writeShort((short) (deltaY * MODERN_DELTA_DIVISOR));
-            writeShort((short) (deltaZ * MODERN_DELTA_DIVISOR));
-        }
-        else {
-            writeByte((byte) (deltaX * LEGACY_DELTA_DIVISOR));
-            writeByte((byte) (deltaY * LEGACY_DELTA_DIVISOR));
-            writeByte((byte) (deltaZ * LEGACY_DELTA_DIVISOR));
-        }
-        writeByte((int)(yaw * ROTATION_FACTOR));
-        writeByte((int)(pitch * ROTATION_FACTOR));
-        writeBoolean(onGround);
     }
 
     public int getEntityId() {

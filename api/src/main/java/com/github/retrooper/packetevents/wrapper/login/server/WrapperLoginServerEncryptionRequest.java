@@ -18,16 +18,14 @@
 
 package com.github.retrooper.packetevents.wrapper.login.server;
 
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 
-import java.security.KeyFactory;
 import java.security.PublicKey;
-import java.security.spec.EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 
 /**
  * This packet is sent by the server to the client if the server is in online mode.
@@ -38,7 +36,7 @@ import java.security.spec.X509EncodedKeySpec;
  */
 public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLoginServerEncryptionRequest> {
     private String serverID;
-    private PublicKey publicKey;
+    private byte[] publicKeyBytes;
     private byte[] verifyToken;
 
     public WrapperLoginServerEncryptionRequest(PacketSendEvent event) {
@@ -48,38 +46,36 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken) {
         super(PacketType.Login.Server.ENCRYPTION_REQUEST);
         this.serverID = serverID;
-        this.publicKey = encrypt(publicKeyBytes);
+        this.publicKeyBytes = publicKeyBytes;
         this.verifyToken = verifyToken;
     }
 
     public WrapperLoginServerEncryptionRequest(String serverID, PublicKey publicKey, byte[] verifyToken) {
         super(PacketType.Login.Server.ENCRYPTION_REQUEST);
         this.serverID = serverID;
-        this.publicKey = publicKey;
+        this.publicKeyBytes = publicKey.getEncoded();
         this.verifyToken = verifyToken;
     }
 
     @Override
     public void read() {
         this.serverID = readString(20);
-        byte[] publicKeyBytes = readByteArray(ByteBufHelper.readableBytes(buffer));
-        this.publicKey = encrypt(publicKeyBytes);
+        this.publicKeyBytes = readByteArray(512);
         this.verifyToken = readByteArray(ByteBufHelper.readableBytes(buffer));
-    }
-
-    @Override
-    public void copy(WrapperLoginServerEncryptionRequest wrapper) {
-        this.serverID = wrapper.serverID;
-        this.publicKey = wrapper.publicKey;
-        this.verifyToken = wrapper.verifyToken;
     }
 
     @Override
     public void write() {
         writeString(serverID, 20);
-        byte[] encoded = publicKey.getEncoded();
-        writeByteArray(encoded);
+        writeByteArray(this.publicKeyBytes);
         writeByteArray(verifyToken);
+    }
+
+    @Override
+    public void copy(WrapperLoginServerEncryptionRequest wrapper) {
+        this.serverID = wrapper.serverID;
+        this.publicKeyBytes = wrapper.publicKeyBytes;
+        this.verifyToken = wrapper.verifyToken;
     }
 
     /**
@@ -95,6 +91,14 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
         this.serverID = serverID;
     }
 
+    public byte[] getPublicKeyBytes() {
+        return publicKeyBytes;
+    }
+
+    public void setPublicKeyBytes(byte[] publicKeyBytes) {
+        this.publicKeyBytes = publicKeyBytes;
+    }
+
     /**
      * The public key is in DER encoding format.
      * More technically, it is in ASN.1 format.
@@ -104,11 +108,11 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
      * @return Public key
      */
     public PublicKey getPublicKey() {
-        return publicKey;
+        return MinecraftEncryptionUtil.publicKey(publicKeyBytes);
     }
 
     public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
+        this.publicKeyBytes = publicKey.getEncoded();
     }
 
     /**
@@ -123,16 +127,5 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
 
     public void setVerifyToken(byte[] verifyToken) {
         this.verifyToken = verifyToken;
-    }
-
-    private PublicKey encrypt(byte[] bytes) {
-        try {
-            EncodedKeySpec encodedKeySpec = new X509EncodedKeySpec(bytes);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            return keyFactory.generatePublic(encodedKeySpec);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }
     }
 }

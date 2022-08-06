@@ -203,8 +203,7 @@ public class NBTCompound extends NBT {
     public boolean getBoolean(String string) {
         NBTByte nbtByte = this.getTagOfTypeOrNull(string, NBTByte.class);
         // Empty byte tags are considered 0
-        byte byteValue = nbtByte == null ? 0 : nbtByte.getAsByte();
-        return byteValue != 0;
+        return nbtByte != null && nbtByte.getAsByte() != 0;
     }
 
     @Override

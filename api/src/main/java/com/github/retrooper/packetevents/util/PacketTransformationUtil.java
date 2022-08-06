@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
 
+import java.util.Collections;
+
 public class PacketTransformationUtil {
     public static PacketWrapper<?>[] transform(PacketWrapper<?> wrapper) {
         if (wrapper instanceof WrapperPlayServerDestroyEntities) {
@@ -37,21 +39,18 @@ public class PacketTransformationUtil {
                     int entityId = destroyEntities.getEntityIds()[i];
                     output[i] = new WrapperPlayServerDestroyEntities(entityId);
                 }
-                ByteBufHelper.release(destroyEntities.getBuffer());
                 return output;
             }
         } else if (wrapper instanceof WrapperPlayServerEntityEquipment) {
             WrapperPlayServerEntityEquipment entityEquipment = (WrapperPlayServerEntityEquipment) wrapper;
             int len = entityEquipment.getEquipment().size();
             if (entityEquipment.getServerVersion().isOlderThan(ServerVersion.V_1_16) && len > 1) {
-                //Transform into multiple packets
+                //Transform into multiple packets. Actually a mistake on the user's end.
                 PacketWrapper<?>[] output = new PacketWrapper[len];
                 for (int i = 0; i < len; i++) {
                     Equipment equipment = entityEquipment.getEquipment().get(i);
-                    output[i] = new WrapperPlayServerEntityEquipment(entityEquipment.getEntityId(), equipment);
+                    output[i] = new WrapperPlayServerEntityEquipment(entityEquipment.getEntityId(), Collections.singletonList(equipment));
                 }
-
-                ByteBufHelper.release(entityEquipment.getBuffer());
                 return output;
             }
         }

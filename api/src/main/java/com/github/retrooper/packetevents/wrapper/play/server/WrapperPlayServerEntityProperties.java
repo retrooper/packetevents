@@ -81,12 +81,6 @@ public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlay
     }
 
     @Override
-    public void copy(WrapperPlayServerEntityProperties wrapper) {
-        entityID = wrapper.entityID;
-        properties = wrapper.properties;
-    }
-
-    @Override
     public void write() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeInt(entityID);
@@ -114,6 +108,12 @@ public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlay
                 writeByte(modifier.operation.ordinal());
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerEntityProperties wrapper) {
+        entityID = wrapper.entityID;
+        properties = wrapper.properties;
     }
 
     public int getEntityId() {

@@ -29,9 +29,9 @@ import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
+import com.github.retrooper.packetevents.util.PEVersion;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
-import io.github.retrooper.packetevents.injector.PaperChannelInjector;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.protocol.ProtocolManagerImpl;
@@ -80,7 +80,7 @@ public class SpigotPacketEventsBuilder {
             private final ServerManager serverManager = new ServerManagerImpl();
             private final PlayerManager playerManager = new PlayerManagerImpl();
             private final NettyManager nettyManager = new NettyManagerImpl();
-            private final SpigotChannelInjector injector = PaperChannelInjector.canBeUsed() ? new PaperChannelInjector() : new SpigotChannelInjector();
+            private final SpigotChannelInjector injector = new SpigotChannelInjector();
             private final LogManager logManager = new BukkitLogManager();
             private final AtomicBoolean loaded = new AtomicBoolean(false);
             private final AtomicBoolean initialized = new AtomicBoolean(false);
@@ -102,6 +102,10 @@ public class SpigotPacketEventsBuilder {
                         CustomPipelineUtil.init();
                     } catch (Exception ex) {
                         throw new IllegalStateException(ex);
+                    }
+
+                    if (!PacketType.isPrepared()) {
+                        PacketType.prepare();
                     }
 
                     //Server hasn't bound to the port yet.
@@ -138,17 +142,13 @@ public class SpigotPacketEventsBuilder {
                             return getVersion().toString() + "-beta";//TODO Cut off "-beta" once 2.0 releases
                         }));
                     }
-                    if (PacketType.isPrepared()) {
-                        PacketType.prepare();
-                    }
                     Bukkit.getPluginManager().registerEvents(new InternalBukkitListener(),
                             plugin);
-                    //TODO Clean up and remove redundant post inject task
+                    //TODO Clean up and remove redundant post inject task? or is it?
                     Runnable postInjectTask = () -> {
                         /*for (final Player p : Bukkit.getOnlinePlayers()) {
                             try {
                                 Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(p);
-                                System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
                                 User user = PacketEvents.getAPI().getPlayerManager().getUser(p);
                                 injector.updatePlayer(user, p);
                                 getEventManager().callEvent(new UserLoginEvent(user, p));
@@ -180,7 +180,35 @@ public class SpigotPacketEventsBuilder {
                 // PacketEvents is now enabled, we can now check
                 ViaVersionUtil.checkIfViaIsPresent();
                 ProtocolSupportUtil.checkIfProtocolSupportIsPresent();
-                //If ProtocolLib is present, it needs to be v5.0.0
+                //If ProtocolSupport is present, it needs to be x or newer
+                Plugin protocolSupportPlugin = Bukkit.getPluginManager().getPlugin("ProtocolSupport");
+                if (protocolSupportPlugin != null) {
+                    String psVersionString = protocolSupportPlugin.getDescription().getVersion().split("-")[0];
+                    PEVersion psVersion;
+                    try {
+                        psVersion = new PEVersion(psVersionString);
+                    }
+                    catch (Exception ex) {
+                        PacketEvents.getAPI().getLogManager().severe("You are attempting to combine 2.0 PacketEvents with a " +
+                                "ProtocolSupport version older than v1.18.1-1. (Failed to parse the ProtocolSupport version)" +
+                                "This is no longer works, please update to a newer build. " +
+                                "https://ci.dmulloy2.net/job/ProtocolLib/lastBuild/");
+                        Plugin ourPlugin = getPlugin();
+                        Bukkit.getPluginManager().disablePlugin(ourPlugin);
+                        throw new IllegalStateException("ProtocolSupport incompatibility! Update to v1.18.1-1 or newer!");
+                    }
+                    PEVersion minimumPSVersion = new PEVersion(1, 18, 1);
+                    if (psVersion.isOlderThan(minimumPSVersion)) {
+                        PacketEvents.getAPI().getLogManager().severe("You are attempting to combine 2.0 PacketEvents with a " +
+                                "ProtocolSupport version older than v1.18.1-1. (" + psVersion.toString() + ") " +
+                                "This is no longer works, please update to a newer build. " +
+                                "https://ci.dmulloy2.net/job/ProtocolLib/lastBuild/");
+                        Plugin ourPlugin = getPlugin();
+                        Bukkit.getPluginManager().disablePlugin(ourPlugin);
+                        throw new IllegalStateException("ProtocolSupport incompatibility! Update to v1.18.1-1 or newer!");
+                    }
+                }
+                //If ProtocolLib is present, it needs to be v5.0.0 or newer
                 Plugin protocolLibPlugin = Bukkit.getPluginManager().getPlugin("ProtocolLib");
                 if (protocolLibPlugin != null) {
                     int majorVersion = Integer.parseInt(protocolLibPlugin.getDescription().getVersion().split("\\.", 2)[0]);
@@ -191,7 +219,7 @@ public class SpigotPacketEventsBuilder {
                                 "https://ci.dmulloy2.net/job/ProtocolLib/lastBuild/");
                         Plugin ourPlugin = getPlugin();
                         Bukkit.getPluginManager().disablePlugin(ourPlugin);
-                        throw new IllegalStateException("ProtocolLib incompatibility! Update to v5.0.0!");
+                        throw new IllegalStateException("ProtocolLib incompatibility! Update to v5.0.0 or newer!");
                     }
                 }
             }
@@ -206,6 +234,8 @@ public class SpigotPacketEventsBuilder {
                 if (initialized.getAndSet(false)) {
                     //Uninject the injector if needed(depends on the injector implementation)
                     injector.uninject();
+                    //Unregister all listeners. Because if we attempt to reload, we will end up with duplicate listeners.
+                    getEventManager().unregisterAllListeners();
                 }
             }
 

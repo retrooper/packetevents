@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -30,7 +31,6 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
         super(event);
     }
 
-
     public WrapperPlayClientClientStatus(Action action) {
         super(PacketType.Play.Client.CLIENT_STATUS);
         this.action = action;
@@ -38,33 +38,23 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
 
     @Override
     public void read() {
-        int index;
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            index = readVarInt();
-        } else {
-            index = readByte();
-        }
-        this.action = Action.VALUES[index];
+        this.action = readMultiVersional(VersionComparison.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
+                wrapper -> Action.getById(wrapper.readVarInt()), packetWrapper -> Action.getById(packetWrapper.readByte()));
+    }
+
+    @Override
+    public void write() {
+        writeMultiVersional(VersionComparison.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, action.ordinal(), (wrapper, integer) -> {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) && integer == 2) {
+                throw new IllegalStateException("The WrapperGameClientClientStatus.Action.OPEN_INVENTORY_ACTION enum constant is not supported on 1.16+ servers!");
+            }
+            wrapper.writeVarInt(integer);
+        }, PacketWrapper::writeByte);
     }
 
     @Override
     public void copy(WrapperPlayClientClientStatus wrapper) {
         this.action = wrapper.action;
-    }
-
-    @Override
-    public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            int index = action.ordinal();
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-                if (index == 2) {
-                    throw new IllegalStateException("The WrapperGameClientClientStatus.Action.OPEN_INVENTORY_ACTION enum constant is not supported on 1.16+ servers!");
-                }
-            }
-            writeVarInt(action.ordinal());
-        } else {
-            writeByte(action.ordinal());
-        }
     }
 
     public Action getAction() {
@@ -79,9 +69,13 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
         PERFORM_RESPAWN,
         REQUEST_STATS,
 
-        //This only exists on 1.7.10 -> 1.15.2
+        // This only exists on 1.7.10 -> 1.15.2
         OPEN_INVENTORY_ACHIEVEMENT;
 
-        public static final Action[] VALUES = values();
+        private static final Action[] VALUES = values();
+
+        public static Action getById(int index) {
+            return VALUES[index];
+        }
     }
 }

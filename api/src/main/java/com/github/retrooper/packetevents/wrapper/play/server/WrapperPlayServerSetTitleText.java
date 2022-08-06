@@ -28,6 +28,7 @@ public class WrapperPlayServerSetTitleText extends PacketWrapper<WrapperPlayServ
     public static boolean HANDLE_JSON = true;
     private String titleJson;
     private Component title;
+
     public WrapperPlayServerSetTitleText(PacketSendEvent event) {
         super(event);
     }
@@ -51,17 +52,17 @@ public class WrapperPlayServerSetTitleText extends PacketWrapper<WrapperPlayServ
     }
 
     @Override
-    public void copy(WrapperPlayServerSetTitleText wrapper) {
-        titleJson = wrapper.titleJson;
-        title = wrapper.title;
-    }
-
-    @Override
     public void write() {
-        if (HANDLE_JSON) {
+        if (HANDLE_JSON && title != null) {
             titleJson = AdventureSerializer.toJson(title);
         }
         writeComponentJSON(titleJson);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSetTitleText wrapper) {
+        titleJson = wrapper.titleJson;
+        title = wrapper.title;
     }
 
     public Component getTitle() {

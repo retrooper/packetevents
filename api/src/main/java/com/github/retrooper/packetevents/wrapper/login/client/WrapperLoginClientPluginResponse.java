@@ -52,19 +52,19 @@ public class WrapperLoginClientPluginResponse extends PacketWrapper<WrapperLogin
     }
 
     @Override
-    public void copy(WrapperLoginClientPluginResponse wrapper) {
-        this.messageID = wrapper.messageID;
-        this.successful = wrapper.successful;
-        this.data = wrapper.data;
-    }
-
-    @Override
     public void write() {
         writeVarInt(messageID);
         writeBoolean(successful);
         if (successful) {
             writeByteArray(data);
         }
+    }
+
+    @Override
+    public void copy(WrapperLoginClientPluginResponse wrapper) {
+        this.messageID = wrapper.messageID;
+        this.successful = wrapper.successful;
+        this.data = wrapper.data;
     }
 
     public int getMessageId() {

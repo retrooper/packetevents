@@ -19,20 +19,25 @@
 package com.github.retrooper.packetevents.wrapper.login.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.util.MinecraftEncryptionUtil;
+import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
+import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
-import javax.crypto.*;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Optional;
 
 public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperLoginClientEncryptionResponse> {
     private byte[] encryptedSharedSecret;
     private byte[] encryptedVerifyToken;
+    private SaltSignature saltSignature;
 
     public WrapperLoginClientEncryptionResponse(PacketReceiveEvent event) {
         super(event);
@@ -44,22 +49,37 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
         this.encryptedVerifyToken = encryptedVerifyToken;
     }
 
+    public WrapperLoginClientEncryptionResponse(ClientVersion clientVersion, SaltSignature saltSignature) {
+        super(PacketType.Login.Client.ENCRYPTION_RESPONSE.getId(), clientVersion);
+        this.saltSignature = saltSignature;
+    }
+
     @Override
     public void read() {
         this.encryptedSharedSecret = readByteArray(ByteBufHelper.readableBytes(buffer));
-        this.encryptedVerifyToken = readByteArray(ByteBufHelper.readableBytes(buffer));
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19) && !readBoolean()) {
+            this.saltSignature = readSaltSignature();
+        } else {
+            this.encryptedVerifyToken = readByteArray();
+        }
+    }
+
+    @Override
+    public void write() {
+        writeByteArray(encryptedSharedSecret);
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19) && saltSignature != null) {
+            writeBoolean(false);
+            writeSaltSignature(saltSignature);
+        } else {
+            writeByteArray(encryptedVerifyToken);
+        }
     }
 
     @Override
     public void copy(WrapperLoginClientEncryptionResponse wrapper) {
         this.encryptedSharedSecret = wrapper.encryptedSharedSecret;
         this.encryptedVerifyToken = wrapper.encryptedVerifyToken;
-    }
-
-    @Override
-    public void write() {
-        writeByteArray(encryptedSharedSecret);
-        writeByteArray(encryptedVerifyToken);
+        this.saltSignature = wrapper.saltSignature;
     }
 
     public byte[] getEncryptedSharedSecret() {
@@ -75,23 +95,29 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
         byte[] decryptedData = MinecraftEncryptionUtil.decrypt(key.getAlgorithm(), key, data);
         if (decryptedData != null) {
             return new SecretKeySpec(decryptedData, "AES");
-        }
-        else {
+        } else {
             return null;
         }
     }
 
-    //TODO Confirm is this is correct
+    //TODO: Confirm is this is correct
     public void setSharedKey(SecretKey key, PublicKey publicKey) {
         this.encryptedSharedSecret = MinecraftEncryptionUtil.encrypt(publicKey.getAlgorithm(), publicKey, key.getEncoded());
     }
 
-
-    public byte[] getEncryptedVerifyToken() {
-        return this.encryptedVerifyToken;
+    public Optional<byte[]> getEncryptedVerifyToken() {
+        return Optional.ofNullable(this.encryptedVerifyToken);
     }
 
     public void setEncryptedVerifyToken(byte[] encryptedVerifyToken) {
         this.encryptedVerifyToken = encryptedVerifyToken;
+    }
+
+    public Optional<SaltSignature> getSaltSignature() {
+        return Optional.ofNullable(this.saltSignature);
+    }
+
+    public void setSaltSignature(@Nullable SaltSignature saltSignature) {
+        this.saltSignature = saltSignature;
     }
 }

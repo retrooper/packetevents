@@ -29,4 +29,11 @@ public enum SoundCategory {
     PLAYER,
     AMBIENT,
     VOICE;
+
+    private static final SoundCategory[] VALUES = values();
+
+    public static SoundCategory fromId(int id) {
+        return VALUES[id];
+    }
+
 }

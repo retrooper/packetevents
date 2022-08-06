@@ -19,11 +19,13 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayWorldBorderWarningDelay extends PacketWrapper<WrapperPlayWorldBorderWarningDelay> {
-    long delay;
+    private long delay;
 
     public WrapperPlayWorldBorderWarningDelay(long delay) {
         super(PacketType.Play.Server.WORLD_BORDER_WARNING_DELAY);
@@ -36,16 +38,17 @@ public class WrapperPlayWorldBorderWarningDelay extends PacketWrapper<WrapperPla
 
     @Override
     public void read() {
-        delay = readVarLong();
+        this.delay = readMultiVersional(VersionComparison.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_19, PacketWrapper::readVarInt, PacketWrapper::readVarLong);
+    }
+
+    @Override
+    public void write() {
+        writeMultiVersional(VersionComparison.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_19, this.delay,
+                (packetWrapper, aLong) -> packetWrapper.writeVarInt(Math.toIntExact(aLong)), PacketWrapper::writeVarLong);
     }
 
     @Override
     public void copy(WrapperPlayWorldBorderWarningDelay packet) {
         delay = packet.delay;
-    }
-
-    @Override
-    public void write() {
-        writeVarLong(delay);
     }
 }

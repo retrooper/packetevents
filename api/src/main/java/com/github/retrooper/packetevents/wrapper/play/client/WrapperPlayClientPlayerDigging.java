@@ -20,9 +20,9 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -30,24 +30,25 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
     private DiggingAction action;
     private Vector3i blockPosition;
     private BlockFace blockFace;
+    private int sequence;
 
     public WrapperPlayClientPlayerDigging(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPlayerDigging(DiggingAction action, Vector3i blockPosition, BlockFace blockFace) {
+    public WrapperPlayClientPlayerDigging(DiggingAction action, Vector3i blockPosition, BlockFace blockFace, int sequence) {
         super(PacketType.Play.Client.PLAYER_DIGGING);
         this.action = action;
         this.blockPosition = blockPosition;
         this.blockFace = blockFace;
+        this.sequence = sequence;
     }
 
     @Override
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             action = DiggingAction.getById(readVarInt());
-        }
-        else {
+        } else {
             action = DiggingAction.getById(readByte());
         }
 
@@ -61,13 +62,10 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         }
         short face = readUnsignedByte();
         blockFace = BlockFace.getBlockFaceByValue(face);
-    }
 
-    @Override
-    public void copy(WrapperPlayClientPlayerDigging wrapper) {
-        action = wrapper.action;
-        blockPosition = wrapper.blockPosition;
-        blockFace = wrapper.blockFace;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            sequence = readVarInt();
+        }
     }
 
     @Override
@@ -82,6 +80,18 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
             writeInt(blockPosition.z);
         }
         writeByte(blockFace.getFaceValue());
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            writeVarInt(sequence);
+        }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientPlayerDigging wrapper) {
+        action = wrapper.action;
+        blockPosition = wrapper.blockPosition;
+        blockFace = wrapper.blockFace;
+        sequence = wrapper.sequence;
     }
 
     public DiggingAction getAction() {
@@ -106,5 +116,21 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
 
     public void setFace(BlockFace blockFace) {
         this.blockFace = blockFace;
+    }
+
+    public BlockFace getBlockFace() {
+        return blockFace;
+    }
+
+    public void setBlockFace(BlockFace blockFace) {
+        this.blockFace = blockFace;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

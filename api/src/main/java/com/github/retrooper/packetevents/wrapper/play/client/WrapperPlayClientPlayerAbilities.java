@@ -75,16 +75,6 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
     }
 
     @Override
-    public void copy(WrapperPlayClientPlayerAbilities wrapper) {
-        godMode = wrapper.godMode;
-        flying = wrapper.flying;
-        flightAllowed = wrapper.flightAllowed;
-        creativeMode = wrapper.creativeMode;
-        flySpeed = wrapper.flySpeed;
-        walkSpeed = wrapper.walkSpeed;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             byte mask = (byte) (flying ? 0x02 : 0x00);
@@ -111,6 +101,16 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
             writeFloat(flySpeed.orElse(0.1f));
             writeFloat(walkSpeed.orElse(0.2f));
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientPlayerAbilities wrapper) {
+        godMode = wrapper.godMode;
+        flying = wrapper.flying;
+        flightAllowed = wrapper.flightAllowed;
+        creativeMode = wrapper.creativeMode;
+        flySpeed = wrapper.flySpeed;
+        walkSpeed = wrapper.walkSpeed;
     }
 
     public boolean isFlying() {
