@@ -76,9 +76,7 @@ public class EntityDataTypes {
     public static final EntityDataType<Component> COMPONENT = define("component", PacketWrapper::readComponent, PacketWrapper::writeComponent);
     public static final EntityDataType<Optional<Component>> OPTIONAL_COMPONENT = define("optional_component", readOptionalComponentDeserializer(), writeOptionalComponentSerializer());
     public static final EntityDataType<ItemStack> ITEMSTACK = define("itemstack", PacketWrapper::readItemStack, PacketWrapper::writeItemStack);
-    public static final EntityDataType<Optional<Integer>> OPTIONAL_BLOCK_STATE =
-            define("optional_block_state", wrapper -> Optional.ofNullable(wrapper.readOptional(PacketWrapper::readVarInt)),
-                    (wrapper, value) -> wrapper.writeOptional(value.orElse(null), PacketWrapper::writeVarInt));
+    public static final EntityDataType<Integer> OPTIONAL_BLOCK_STATE = define("optional_block_state", readIntDeserializer(), writeIntSerializer());
     public static final EntityDataType<Boolean> BOOLEAN = define("boolean", PacketWrapper::readBoolean, PacketWrapper::writeBoolean);
     public static final EntityDataType<Integer> PARTICLE = define("particle", PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
     public static final EntityDataType<Vector3f> ROTATION = define("rotation",
