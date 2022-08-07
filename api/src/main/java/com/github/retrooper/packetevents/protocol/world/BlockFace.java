@@ -83,13 +83,13 @@ public enum BlockFace {
         this.modZ = modZ;
     }
 
+    public static BlockFace getLegacyBlockFaceByValue(int face) {
+        if (face == 255) return OTHER;
+        return VALUES[face % VALUES.length];
+    }
+
     public static BlockFace getBlockFaceByValue(int face) {
-        if (face == 255
-        || face == 127) { //I guess this fixes something?
-            // Got some error report for "127" oob
-            return OTHER;
-        }
-        return VALUES[face];
+        return VALUES[face % VALUES.length];
     }
 
     public int getModX() {

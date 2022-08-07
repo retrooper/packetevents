@@ -60,7 +60,8 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
             int z = readInt();
             blockPosition = new Vector3i(x, y, z);
         }
-        short face = readByte();
+        short face = readUnsignedByte();
+        // Vanilla 1.8 doesn't seem to care about BlockFace of OTHER in this packet... just leave it as 1.9+
         blockFace = BlockFace.getBlockFaceByValue(face);
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {

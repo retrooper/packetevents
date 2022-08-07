@@ -76,7 +76,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
                 face = BlockFace.getBlockFaceByValue(readVarInt());
                 interactionHand = InteractionHand.getById(readVarInt());
             } else {
-                face = BlockFace.getBlockFaceByValue(readUnsignedByte());
+                face = BlockFace.getLegacyBlockFaceByValue(readUnsignedByte());
                 //Optional itemstack
                 itemStack = Optional.of(readItemStack());
                 interactionHand = InteractionHand.MAIN_HAND;
