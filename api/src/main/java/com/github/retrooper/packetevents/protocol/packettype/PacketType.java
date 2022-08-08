@@ -49,7 +49,8 @@ public final class PacketType {
             ClientVersion.V_1_16_2,
             ClientVersion.V_1_17,
             ClientVersion.V_1_18,
-            ClientVersion.V_1_19);
+            ClientVersion.V_1_19,
+            ClientVersion.V_1_19_1);
 
     //TODO UPDATE Update packet type mappings (serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
@@ -64,7 +65,8 @@ public final class PacketType {
             ClientVersion.V_1_16,
             ClientVersion.V_1_16_2,
             ClientVersion.V_1_17,
-            ClientVersion.V_1_19);
+            ClientVersion.V_1_19,
+            ClientVersion.V_1_19_1);
 
     public static void prepare() {
         PacketType.Play.Client.load();
@@ -336,7 +338,9 @@ public final class PacketType {
             USE_ITEM,
             //Added in 1.19
             CHAT_COMMAND,
-            CHAT_PREVIEW;
+            CHAT_PREVIEW,
+            //Added in 1.19.1
+            CHAT_ACK;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -353,8 +357,8 @@ public final class PacketType {
                     PacketType.prepare();
                 }
                 int index = SERVERBOUND_PLAY_VERSION_MAPPER.getIndex(version);
-               Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte)index, k -> new HashMap<>());
-               return packetIdMap.get(packetId);
+                Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte)index, k -> new HashMap<>());
+                return packetIdMap.get(packetId);
             }
 
             private static void loadPacketIds(Enum<?>[] enumConstants) {
@@ -384,6 +388,7 @@ public final class PacketType {
                 loadPacketIds(ServerboundPacketType_1_16_2.values());
                 loadPacketIds(ServerboundPacketType_1_17.values());
                 loadPacketIds(ServerboundPacketType_1_19.values());
+                loadPacketIds(ServerboundPacketType_1_19_1.values());
                 //TODO UPDATE Update packet type mappings (serverbound pt. 2)
             }
 
@@ -474,7 +479,7 @@ public final class PacketType {
             RESOURCE_PACK_SEND,
             RESPAWN,
             ENTITY_HEAD_LOOK,
-            SELECT_ADVANCEMENT_TAB,
+            SELECT_ADVANCEMENTS_TAB,
             ACTION_BAR,
             WORLD_BORDER_CENTER,
             WORLD_BORDER_LERP_SIZE,
@@ -509,7 +514,7 @@ public final class PacketType {
             NBT_QUERY_RESPONSE,
             COLLECT_ITEM,
             ENTITY_TELEPORT,
-            ADVANCEMENTS,
+            UPDATE_ADVANCEMENTS,
             ENTITY_PROPERTIES,
             ENTITY_EFFECT,
             DECLARE_RECIPES,
@@ -521,7 +526,12 @@ public final class PacketType {
             CHAT_PREVIEW_PACKET,
             SERVER_DATA,
             DISPLAY_CHAT_PREVIEW,
-            SYSTEM_CHAT_MESSAGE;
+            SYSTEM_CHAT_MESSAGE,
+
+            //Added in 1.19.1
+            DELETE_CHAT,
+            PLAYER_CHAT_HEADER,
+            CUSTOM_CHAT_COMPLETIONS;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -580,6 +590,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_17.values());
                 loadPacketIds(ClientboundPacketType_1_18.values());
                 loadPacketIds(ClientboundPacketType_1_19.values());
+                loadPacketIds(ClientboundPacketType_1_19_1.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }

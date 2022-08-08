@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.util.List;
@@ -129,7 +130,12 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public void receivePacketSilently(Object channel, Object byteBuf) {
         //Receive the packet for all handlers after our decoder
         //TODO Consider viaversion when we are in play state
-        ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
+
+        if (ViaVersionUtil.isAvailable()) {
+            ChannelHelper.fireChannelReadInContext(channel, "decoder", byteBuf);
+        } else {
+            ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
+        }
     }
 
     @Override

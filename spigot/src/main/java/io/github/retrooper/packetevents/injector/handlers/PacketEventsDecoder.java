@@ -56,11 +56,7 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
-        if (skipDoubleTransform) {
-            skipDoubleTransform = false;
-            out.add(input.retain());
-        }
-        ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(input);
+        ByteBuf outputBuffer = ctx.alloc().buffer(input.readableBytes()).writeBytes(input);
         try {
             boolean doRecompression =
                     handleCompression(ctx, outputBuffer);
@@ -85,6 +81,11 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
 
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
+        if (skipDoubleTransform) {
+            skipDoubleTransform = false;
+            out.add(buffer.retain());
+            return;
+        }
         if (buffer.isReadable()) {
             read(ctx, buffer, out);
             for (ByteToMessageDecoder decoder : decoders) {
@@ -114,8 +115,10 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
         //Check if the minecraft server will already print our exception for us.
-        if (ExceptionUtil.isException(cause, PacketProcessException.class) && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
-                && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
+        //Don't print errors during handshake
+        if (ExceptionUtil.isException(cause, PacketProcessException.class)
+                && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
+                && (user != null && user.getConnectionState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();
         }
     }

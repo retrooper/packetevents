@@ -52,7 +52,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
     public void read() {
         this.protocolVersion = readVarInt();
         this.clientVersion = ClientVersion.getById(protocolVersion);
-        this.serverAddress = readString(Short.MAX_VALUE); // Should be 255, but spigot changes this
+        this.serverAddress = readString(Short.MAX_VALUE); // Should be 255, but :shrug: someone reported issues
         this.serverPort = readUnsignedShort();
         int nextStateIndex = readVarInt();
         this.nextConnectionState = ConnectionState.getById(nextStateIndex);

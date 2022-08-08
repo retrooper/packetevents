@@ -113,7 +113,7 @@ public enum ClientboundPacketType_1_17 {
     RESPAWN,
     ENTITY_HEAD_LOOK,
     MULTI_BLOCK_CHANGE,
-    SELECT_ADVANCEMENT_TAB,
+    SELECT_ADVANCEMENTS_TAB,
 
     //These 5 new packets were added
     ACTION_BAR,
@@ -163,7 +163,7 @@ public enum ClientboundPacketType_1_17 {
     NBT_QUERY_RESPONSE,
     COLLECT_ITEM,
     ENTITY_TELEPORT,
-    ADVANCEMENTS,
+    UPDATE_ADVANCEMENTS,
     ENTITY_PROPERTIES,
     ENTITY_EFFECT,
     DECLARE_RECIPES,

@@ -23,7 +23,10 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
-import com.github.retrooper.packetevents.protocol.chat.MessageSender;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
@@ -33,7 +36,6 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
-import java.security.PublicKey;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,7 +44,6 @@ public class User {
     private ConnectionState connectionState;
     private ClientVersion clientVersion;
     private final UserProfile profile;
-    private @Nullable PublicKey publicKey;
     private int entityId = -1;
     private int minWorldHeight = 0;
     private int totalWorldHeight = 256;
@@ -101,20 +102,16 @@ public class User {
         this.entityId = entityId;
     }
 
-    public @Nullable PublicKey getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(@Nullable PublicKey publicKey) {
-        this.publicKey = publicKey;
-    }
-
     public void sendPacket(Object buffer) {
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, buffer);
     }
 
     public void sendPacket(PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, wrapper);
+    }
+
+    public void sendPacketSilently(PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getProtocolManager().sendPacketSilently(channel, wrapper);
     }
 
     public void writePacket(PacketWrapper<?> wrapper) {
@@ -147,16 +144,22 @@ public class User {
     }
 
     public void sendMessage(Component component) {
-        sendMessage(component, ChatType.CHAT);
+        sendMessage(component, ChatTypes.CHAT);
     }
 
     public void sendMessage(Component component, ChatType type) {
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
         PacketWrapper<?> chatPacket;
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            chatPacket = new WrapperPlayServerSystemChatMessage(ChatType.SYSTEM, component);
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            chatPacket = new WrapperPlayServerSystemChatMessage(false, component);
         } else {
-            MessageSender sender = new MessageSender(getUUID(), null, null);
-            chatPacket = new WrapperPlayServerChatMessage(component, type, sender);
+            ChatMessage message;
+            if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+                message = new ChatMessage_v1_16(component, type, new UUID(0L, 0L));
+            } else {
+                message = new ChatMessageLegacy(component, type);
+            }
+            chatPacket = new WrapperPlayServerChatMessage(message);
         }
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatPacket);
     }

@@ -33,7 +33,6 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
-import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerEncryptionRequest;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
@@ -111,11 +110,6 @@ public class InternalPacketListener extends PacketListenerAbstract {
             user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
             user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
         }
-        //Link the public key with the user for us to be able to verify messages.
-        else if (event.getPacketType() == PacketType.Login.Server.ENCRYPTION_REQUEST) {
-            WrapperLoginServerEncryptionRequest request = new WrapperLoginServerEncryptionRequest(event);
-            event.getUser().setPublicKey(request.getPublicKey());
-        }
     }
 
     @Override
@@ -127,7 +121,9 @@ public class InternalPacketListener extends PacketListenerAbstract {
             WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
             ConnectionState nextState = handshake.getNextConnectionState();
             ClientVersion clientVersion = handshake.getClientVersion();
-
+            if (clientVersion == ClientVersion.UNKNOWN) {
+                return;
+            }
             //Update client version for this event call(and user)
             user.setClientVersion(clientVersion);
             PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());

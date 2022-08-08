@@ -117,8 +117,8 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         Component displayName = readBoolean() ? readComponent() : null;
 
                         SignatureData signatureData = null;
-                        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19) && readBoolean()) {
-                            signatureData = new SignatureData(readTimestamp(), readPublicKey(), readByteArray(4096));
+                        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+                            signatureData = readOptional(PacketWrapper::readSignatureData);
                         }
 
                         data = new PlayerData(displayName, userProfile, gameMode, signatureData, ping);
@@ -187,12 +187,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                             writeBoolean(false);
                         }
                         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-                            writeBoolean(data.signatureData != null);
-                            if (data.signatureData != null) {
-                                writeTimestamp(data.signatureData.getTimestamp());
-                                writePublicKey(data.signatureData.getPublicKey());
-                                writeByteArray(data.signatureData.getSignature());
-                            }
+                            writeOptional(data.getSignatureData(), PacketWrapper::writeSignatureData);
                         }
                         break;
                     }

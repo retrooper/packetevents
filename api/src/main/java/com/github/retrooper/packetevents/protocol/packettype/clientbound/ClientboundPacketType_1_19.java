@@ -87,7 +87,6 @@ public enum ClientboundPacketType_1_19 {
     PLAYER_ABILITIES,
 
     //Interesting changes in 1.19. This is used by vanilla to broadcast messages sent by clients to all connected clients.
-    //TODO Cryptography.
     CHAT_MESSAGE,
 
     END_COMBAT_EVENT,
@@ -105,9 +104,9 @@ public enum ClientboundPacketType_1_19 {
     RESPAWN,
     ENTITY_HEAD_LOOK,
     MULTI_BLOCK_CHANGE,
-    SELECT_ADVANCEMENT_TAB,
+    SELECT_ADVANCEMENTS_TAB,
 
-    //Added in 1.19. Relating preview chat message packet?
+    //Added in 1.19.
     SERVER_DATA,
 
     ACTION_BAR,
@@ -152,7 +151,7 @@ public enum ClientboundPacketType_1_19 {
     NBT_QUERY_RESPONSE,
     COLLECT_ITEM,
     ENTITY_TELEPORT,
-    ADVANCEMENTS,
+    UPDATE_ADVANCEMENTS,
     ENTITY_PROPERTIES,
     ENTITY_EFFECT,
     DECLARE_RECIPES,

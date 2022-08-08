@@ -18,23 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
-public enum ChatType {
-    CHAT,
-    SYSTEM,
-    GAME_INFO,
-    SAY_COMMAND,
-    MSG_COMMAND,
-    TEAM_MSG_COMMAND,
-    EMOTE_COMMAND,
-    TELLRAW_COMMAND;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 
-    private static final ChatType[] VALUES = values();
+public interface ChatType extends MappedEntity {
 
-    public int getId() {
-        return ordinal();
-    }
-
-    public static ChatType getById(int id) {
-        return VALUES[id];
-    }
 }

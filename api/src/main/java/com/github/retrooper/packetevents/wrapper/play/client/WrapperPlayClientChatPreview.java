@@ -5,43 +5,43 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientChatPreview extends PacketWrapper<WrapperPlayClientChatPreview> {
-    private int query;
+    private int queryId;
     private String message;
 
     public WrapperPlayClientChatPreview(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatPreview(int query, String message) {
+    public WrapperPlayClientChatPreview(int queryId, String message) {
         super(PacketType.Play.Client.CHAT_PREVIEW);
-        this.query = query;
+        this.queryId = queryId;
         this.message = message;
     }
 
     @Override
     public void read() {
-        query = readInt();
+        queryId = readInt();
         message = readString(256);
     }
 
     @Override
     public void write() {
-        writeInt(query);
+        writeInt(queryId);
         writeString(message, 256);
     }
 
     @Override
     public void copy(WrapperPlayClientChatPreview wrapper) {
-        query = wrapper.query;
+        queryId = wrapper.queryId;
         message = wrapper.message;
     }
 
-    public int getQuery() {
-        return query;
+    public int getQueryId() {
+        return queryId;
     }
 
-    public void setQuery(int query) {
-        this.query = query;
+    public void setQueryId(int queryId) {
+        this.queryId = queryId;
     }
 
     public String getMessage() {
