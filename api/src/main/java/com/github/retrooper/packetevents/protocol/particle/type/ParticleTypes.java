@@ -93,11 +93,8 @@ public class ParticleTypes {
         return define(key, wrapper -> {
             //Empty particle data
             return new ParticleData();
-        }, new BiConsumer<PacketWrapper<?>, ParticleData>() {
-            @Override
-            public void accept(PacketWrapper<?> wrapper, ParticleData data) {
-                //By default don't write any particle data
-            }
+        }, (wrapper, data) -> {
+            //By default don't write any particle data
         });
     }
 
@@ -142,7 +139,7 @@ public class ParticleTypes {
     public static final ParticleType FISHING = define("fishing");
     public static final ParticleType FLAME = define("flame");
     public static final ParticleType SCULK_SOUL = define("sculk_soul");
-    public static final ParticleType SCULK_CHARGE = define("sculk_charge");
+    public static final ParticleType SCULK_CHARGE = define("sculk_charge", ParticleSculkChargeData::read, (wrapper, data) -> ParticleSculkChargeData.write(wrapper, (ParticleSculkChargeData) data));
     public static final ParticleType SCULK_CHARGE_POP = define("sculk_charge_pop");
     public static final ParticleType SOUL_FIRE_FLAME = define("soul_fire_flame");
     public static final ParticleType SOUL = define("soul");
@@ -204,7 +201,7 @@ public class ParticleTypes {
     public static final ParticleType WAX_OFF = define("wax_off");
     public static final ParticleType ELECTRIC_SPARK = define("electric_spark");
     public static final ParticleType SCRAPE = define("scrape");
-    public static final ParticleType SHRIEK = define("shriek");
+    public static final ParticleType SHRIEK = define("shriek", ParticleShriekData::read, (wrapper, data) -> ParticleShriekData.write(wrapper, (ParticleShriekData) data));
 
     static {
         TYPES_BUILDER.unloadFileMappings();

@@ -18,12 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.particle.data;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class ParticleBlockStateData extends ParticleData {
+public class ParticleBlockStateData extends ParticleData implements LegacyConvertible {
     private WrappedBlockState blockState;
 
     public ParticleBlockStateData(WrappedBlockState blockState) {
@@ -43,8 +43,11 @@ public class ParticleBlockStateData extends ParticleData {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
             blockID = wrapper.readVarInt();
         }
-        else {
+        else if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
             blockID = wrapper.readInt();
+        }
+        else {
+            blockID = wrapper.readVarInt();
         }
         return new ParticleBlockStateData(WrappedBlockState.getByGlobalId(wrapper.getServerVersion()
                 .toClientVersion(), blockID));
@@ -63,4 +66,10 @@ public class ParticleBlockStateData extends ParticleData {
     public boolean isEmpty() {
         return false;
     }
+
+    @Override
+    public LegacyParticleData toLegacy(ClientVersion version) {
+        return LegacyParticleData.ofOne(blockState.getGlobalId());
+    }
+
 }

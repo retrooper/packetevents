@@ -18,10 +18,13 @@
 
 package com.github.retrooper.packetevents.protocol.particle.data;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class ParticleItemStackData extends ParticleData {
+public class ParticleItemStackData extends ParticleData implements LegacyConvertible {
     private ItemStack itemStack;
 
     public ParticleItemStackData(ItemStack itemStack) {
@@ -37,7 +40,14 @@ public class ParticleItemStackData extends ParticleData {
     }
 
     public static ParticleItemStackData read(PacketWrapper<?> wrapper) {
-        return new ParticleItemStackData(wrapper.readItemStack());
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            return new ParticleItemStackData(wrapper.readItemStack());
+        }
+        else {
+            return new ParticleItemStackData(ItemStack.builder()
+                    .type(ItemTypes.getById(wrapper.getClientVersion(), wrapper.readVarInt()))
+                    .build());
+        }
     }
 
     public static void write(PacketWrapper<?> wrapper, ParticleItemStackData data) {
@@ -48,4 +58,10 @@ public class ParticleItemStackData extends ParticleData {
     public boolean isEmpty() {
         return false;
     }
+
+    @Override
+    public LegacyParticleData toLegacy(ClientVersion version) {
+        return LegacyParticleData.ofTwo(itemStack.getType().getId(version), itemStack.getLegacyData());
+    }
+
 }
