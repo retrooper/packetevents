@@ -31,8 +31,7 @@ import com.github.retrooper.packetevents.protocol.particle.data.ParticleDustData
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.world.BlockFace;
-import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.protocol.world.*;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.TimeStampMode;
 import com.github.retrooper.packetevents.util.Vector3d;
@@ -41,11 +40,16 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.charset.StandardCharsets;
@@ -197,6 +201,34 @@ public class PacketEventsPlugin extends JavaPlugin {
             }
         };
         //PacketEvents.getAPI().getEventManager().registerListener(listener);
+
+        this.getServer().getPluginManager().registerEvents(new Listener() {
+            @EventHandler
+            public void handle(AsyncPlayerChatEvent event) {
+                Player player = event.getPlayer();
+                String message = event.getMessage();
+
+                if (message.equalsIgnoreCase("test")) {
+                    Dimension dimension = SpigotConversionUtil.fromBukkitWorld(player.getWorld());
+                    System.out.println(dimension.getDimensionName());
+                    WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(
+                            dimension,
+                            player.getWorld().getName(),
+                            Difficulty.EASY,
+                            player.getWorld().getSeed(),
+                            SpigotConversionUtil.fromBukkitGameMode(player.getGameMode()),
+                            SpigotConversionUtil.fromBukkitGameMode(player.getGameMode()),
+                            false,
+                            player.getWorld().getWorldType() == WorldType.FLAT,
+                            true,
+                            new ResourceLocation(dimension.getDimensionName()),
+                            new WorldBlockPosition(new ResourceLocation(dimension.getDimensionName()), new Vector3i(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))
+                    );
+                    PacketEvents.getAPI().getPlayerManager().sendPacket(player, respawn);
+                    player.sendMessage("Sent packet");
+                }
+            }
+        }, this);
     }
 
     @Override
