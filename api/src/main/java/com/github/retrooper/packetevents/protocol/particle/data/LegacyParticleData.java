@@ -9,8 +9,6 @@ import java.util.Arrays;
 
 public class LegacyParticleData extends ParticleData implements LegacyConvertible {
 
-    public static final int[] VALID_TYPES = new int[]{36, 37, 38, 46};
-
     private final int[] legacyData;
 
     public static LegacyParticleData nullValue(int id) {
@@ -48,13 +46,8 @@ public class LegacyParticleData extends ParticleData implements LegacyConvertibl
     }
 
     public void validate(int id) {
-        for (int validType : VALID_TYPES) {
-            if (validType == id) {
-                if (id == 36 && legacyData.length != getSize(id))
-                    throw new IllegalArgumentException("Invalid size for type " + id + ": " + legacyData.length);
-            }
-        }
-        throw new IllegalArgumentException("Invalid particle type for data: " + id);
+        if (legacyData.length != getSize(id))
+            throw new IllegalArgumentException("Invalid size for type " + id + ": " + legacyData.length);
     }
 
     public static int getSize(int id) {
