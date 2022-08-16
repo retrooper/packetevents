@@ -21,16 +21,15 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 
 public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClientTabComplete> {
-    private int transactionID;
+    private Optional<Integer> transactionId = Optional.empty();
+    private boolean assumeCommand = true;
     private String text;
     private @Nullable Vector3i blockPosition;
 
@@ -38,12 +37,22 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
         super(event);
     }
 
-    public WrapperPlayClientTabComplete(int transactionID, String text, @Nullable Vector3i blockPosition) {
+    public WrapperPlayClientTabComplete(int transactionId, String text, @Nullable Vector3i blockPosition) {
         super(PacketType.Play.Client.TAB_COMPLETE);
-        this.transactionID = transactionID;
+        this.transactionId = Optional.of(transactionId);
         this.text = text;
         this.blockPosition = blockPosition;
     }
+
+    @Deprecated
+    public WrapperPlayClientTabComplete(String text, boolean assumeCommand, @Nullable Vector3i blockPosition) {
+        super(PacketType.Play.Client.TAB_COMPLETE);
+        this.transactionId = Optional.empty();
+        this.text = text;
+        this.assumeCommand = assumeCommand;
+        this.blockPosition = blockPosition;
+    }
+
 
     @Override
     public void read() {
@@ -57,17 +66,16 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
                 //1.13 text length
                 textLength = 256;
             }
-            transactionID = readVarInt();
+            transactionId = Optional.of(readVarInt());
             text = readString(textLength);
         } else {
+            transactionId = Optional.empty();
             textLength = 32767;
             text = readString(textLength);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
-                boolean hasPosition = readBoolean();
-                if (hasPosition) {
-                    blockPosition = new Vector3i(readLong());
-                }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                assumeCommand = readBoolean();
             }
+            blockPosition = readOptional(PacketWrapper::readBlockPosition);
         }
     }
 
@@ -83,25 +91,23 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
                 //1.13 text length
                 textLength = 256;
             }
-            writeVarInt(transactionID);
+            writeVarInt(transactionId.orElse(0));
             writeString(text, textLength);
         } else {
             textLength = 32767;
             writeString(text, textLength);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
-                boolean hasPosition = blockPosition != null;
-                writeBoolean(hasPosition);
-                if (hasPosition) {
-                    writeLong(blockPosition.getSerializedPosition());
-                }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                writeBoolean(assumeCommand);
             }
+            writeOptional(blockPosition, PacketWrapper::writeBlockPosition);
         }
     }
 
     @Override
     public void copy(WrapperPlayClientTabComplete wrapper) {
         text = wrapper.text;
-        transactionID = wrapper.transactionID;
+        assumeCommand = wrapper.assumeCommand;
+        transactionId = wrapper.transactionId;
         blockPosition = wrapper.blockPosition;
     }
 
@@ -113,14 +119,22 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
         this.text = text;
     }
 
-    public OptionalInt getTransactionId() {
-        return OptionalInt.of(transactionID);
+    public Optional<Integer> getTransactionId() {
+        return transactionId;
     }
 
     public void setTransactionId(@Nullable Integer transactionID) {
-        if (transactionID != null) {
-            this.transactionID = transactionID;
-        }
+        this.transactionId = Optional.ofNullable(transactionID);
+    }
+
+    @Deprecated
+    public boolean isAssumeCommand() {
+        return assumeCommand;
+    }
+
+    @Deprecated
+    public void setAssumeCommand(boolean assumeCommand) {
+        this.assumeCommand = assumeCommand;
     }
 
     public Optional<Vector3i> getBlockPosition() {
@@ -128,8 +142,6 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
     }
 
     public void setBlockPosition(@Nullable Vector3i blockPosition) {
-        if (blockPosition != null) {
-            this.blockPosition = blockPosition;
-        }
+        this.blockPosition = blockPosition;
     }
 }

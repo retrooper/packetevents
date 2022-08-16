@@ -43,7 +43,7 @@ public class WrapperPlayServerMerchantOffers extends PacketWrapper<WrapperPlaySe
                                            int villagerLevel, int villagerXp, boolean showProgress, boolean canRestock) {
         super(PacketType.Play.Server.MERCHANT_OFFERS);
         this.containerId = containerId;
-        this.merchantOffers = new ArrayList<>(merchantOffers);
+        this.merchantOffers = merchantOffers;
         this.villagerLevel = villagerLevel;
         this.villagerXp = villagerXp;
         this.showProgress = showProgress;
