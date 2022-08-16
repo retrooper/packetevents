@@ -42,6 +42,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
@@ -830,6 +831,43 @@ public class PacketWrapper<T extends PacketWrapper> {
             writeBitSet(filterMask.getMask());
         }
     }
+
+    public MerchantOffer readMerchantOffer() {
+        ItemStack buyItemPrimary = readItemStack();
+        ItemStack sellItem = readItemStack();
+        ItemStack buyItemSecondary = readOptional(PacketWrapper::readItemStack);
+        boolean tradeDisabled = readBoolean();
+        int uses = readInt();
+        int maxUses = readInt();
+        int xp = readInt();
+        int specialPrice = readInt();
+        float priceMultiplier = readFloat();
+        int demand = readInt();
+        MerchantOffer data = MerchantOffer.of(buyItemPrimary, buyItemSecondary, sellItem, uses, maxUses, xp, specialPrice, priceMultiplier, demand);
+        if (tradeDisabled) {
+            data.setUses(data.getMaxUses());
+        }
+        return data;
+    }
+
+    public void writeMerchantOffer(MerchantOffer data) {
+        writeItemStack(data.getFirstInputItem());
+        writeItemStack(data.getOutputItem());
+        ItemStack buyItemSecondary = data.getSecondInputItem();
+        //In this case writing empty itemstacks is just as good as writing nothing according to vanilla server code
+        if (buyItemSecondary != null && buyItemSecondary.isEmpty()) {
+            buyItemSecondary = null;
+        }
+        writeOptional(buyItemSecondary, PacketWrapper::writeItemStack);
+        writeBoolean(data.getUses() >= data.getMaxUses());
+        writeInt(data.getUses());
+        writeInt(data.getMaxUses());
+        writeInt(data.getXp());
+        writeInt(data.getSpecialPrice());
+        writeFloat(data.getPriceMultiplier());
+        writeInt(data.getDemand());
+    }
+
 
     @Experimental
     public <U, V, R> U readMultiVersional(VersionComparison version, ServerVersion target, Reader<V> first, Reader<R> second) {

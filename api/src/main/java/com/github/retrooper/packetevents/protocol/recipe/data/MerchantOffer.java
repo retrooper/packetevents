@@ -19,23 +19,24 @@
 package com.github.retrooper.packetevents.protocol.recipe.data;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
-public class MerchantRecipeData implements RecipeData{
+public class MerchantOffer implements RecipeData {
 
-    private ItemStack buyItem1;
-    private ItemStack buyItem2;
-    private ItemStack sellItem;
+    private ItemStack firstInputItem;
+    private ItemStack secondInputItem;
+    private ItemStack outputItem;
     private int uses;
     private int maxUses;
     private int xp;
-    private float priceMultiplier;
     private int specialPrice;
+    private float priceMultiplier;
     private int demand;
 
-    private MerchantRecipeData(ItemStack buyItem1, ItemStack buyItem2, ItemStack sellItem, int uses, int maxUses, int xp, float priceMultiplier, int demand, int specialPrice) {
-        this.buyItem1 = buyItem1;
-        this.buyItem2 = buyItem2;
-        this.sellItem = sellItem;
+    private MerchantOffer(ItemStack firstInputItem, ItemStack secondInputItem, ItemStack outputItem, int uses, int maxUses, int xp, int specialPrice, float priceMultiplier, int demand) {
+        this.firstInputItem = firstInputItem;
+        this.secondInputItem = secondInputItem;
+        this.outputItem = outputItem;
         this.uses = uses;
         this.maxUses = maxUses;
         this.xp = xp;
@@ -44,40 +45,40 @@ public class MerchantRecipeData implements RecipeData{
         this.specialPrice = specialPrice;
     }
 
-    public static MerchantRecipeData of(ItemStack buyItem1, ItemStack buyItem2, ItemStack sellItem, int uses, int maxUses, int xp, float priceMultiplier, int demand, int specialPrice) {
-        return new MerchantRecipeData(buyItem1, buyItem2, sellItem, uses, maxUses, xp, priceMultiplier, demand, specialPrice);
+    public static MerchantOffer of(ItemStack buyItem1, @Nullable ItemStack buyItem2, ItemStack sellItem, int uses, int maxUses, int xp, int specialPrice, float priceMultiplier, int demand) {
+        return new MerchantOffer(buyItem1, buyItem2, sellItem, uses, maxUses, xp, specialPrice, priceMultiplier, demand);
     }
 
-    public static MerchantRecipeData of(ItemStack buyItem1, ItemStack sellItem, int uses, int maxUses, int xp, float priceMultiplier, int demand, int specialPrice) {
-        return new MerchantRecipeData(buyItem1, null, sellItem, uses, maxUses, xp, priceMultiplier, demand, specialPrice);
+    public static MerchantOffer of(ItemStack buyItem1, ItemStack sellItem, int uses, int maxUses, int xp, int specialPrice, float priceMultiplier, int demand) {
+        return new MerchantOffer(buyItem1, null, sellItem, uses, maxUses, xp, specialPrice, priceMultiplier, demand);
     }
 
-    public static MerchantRecipeData of(ItemStack buyItem1, ItemStack sellItem, int uses, int maxUses, int xp, float priceMultiplier, int demand) {
-        return new MerchantRecipeData(buyItem1, null, sellItem, uses, maxUses, xp, priceMultiplier, demand, 0);
+    public static MerchantOffer of(ItemStack buyItem1, ItemStack sellItem, int uses, int maxUses, int xp, float priceMultiplier, int demand) {
+        return new MerchantOffer(buyItem1, null, sellItem, uses, maxUses, xp, 0, priceMultiplier, demand);
     }
 
-    public ItemStack getBuyItem1() {
-        return buyItem1;
+    public ItemStack getFirstInputItem() {
+        return firstInputItem;
     }
 
-    public void setBuyItem1(ItemStack buyItem1) {
-        this.buyItem1 = buyItem1;
+    public void setFirstInputItem(ItemStack firstInputItem) {
+        this.firstInputItem = firstInputItem;
     }
 
-    public ItemStack getBuyItem2() {
-        return buyItem2;
+    public @Nullable ItemStack getSecondInputItem() {
+        return secondInputItem;
     }
 
-    public void setBuyItem2(ItemStack buyItem2) {
-        this.buyItem2 = buyItem2;
+    public void setSecondInputItem(@Nullable ItemStack secondInputItem) {
+        this.secondInputItem = secondInputItem;
     }
 
-    public ItemStack getSellItem() {
-        return sellItem;
+    public ItemStack getOutputItem() {
+        return outputItem;
     }
 
-    public void setSellItem(ItemStack sellItem) {
-        this.sellItem = sellItem;
+    public void setOutputItem(ItemStack outputItem) {
+        this.outputItem = outputItem;
     }
 
     public int getUses() {
@@ -126,5 +127,9 @@ public class MerchantRecipeData implements RecipeData{
 
     public void setSpecialPrice(int specialPrice) {
         this.specialPrice = specialPrice;
+    }
+
+    public boolean isOutOfStock() {
+        return uses >= maxUses;
     }
 }

@@ -19,31 +19,31 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.recipe.data.MerchantRecipeData;
+import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerTradeList> {
+public class WrapperPlayServerMerchantOffers extends PacketWrapper<WrapperPlayServerMerchantOffers> {
     private int containerId;
-    private List<MerchantRecipeData> merchantRecipeData;
+    private List<MerchantOffer> merchantOffers = new ArrayList<>();
     private int villagerLevel;
     private int villagerXp;
     private boolean showProgress;
     private boolean canRestock;
 
-    public WrapperPlayServerTradeList(PacketSendEvent event) {
+    public WrapperPlayServerMerchantOffers(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerTradeList(int containerId, Collection<? extends MerchantRecipeData> merchantRecipeData, int villagerLevel, int villagerXp, boolean showProgress, boolean canRestock) {
-        super(PacketType.Play.Server.TRADE_LIST);
+    public WrapperPlayServerMerchantOffers(int containerId, List<MerchantOffer> merchantOffers,
+                                           int villagerLevel, int villagerXp, boolean showProgress, boolean canRestock) {
+        super(PacketType.Play.Server.MERCHANT_OFFERS);
         this.containerId = containerId;
-        this.merchantRecipeData = new ArrayList<>(merchantRecipeData);
+        this.merchantOffers = new ArrayList<>(merchantOffers);
         this.villagerLevel = villagerLevel;
         this.villagerXp = villagerXp;
         this.showProgress = showProgress;
@@ -53,23 +53,14 @@ public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerT
     @Override
     public void read() {
         containerId = readVarInt();
-        int size = readByte() & 0xFF;
-        merchantRecipeData = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            ItemStack buyItemPrimary = readItemStack();
-            ItemStack sellItem = readItemStack();
-            ItemStack buyItemSecondary = null;
-            if (readBoolean()) {
-                buyItemSecondary = readItemStack();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            merchantOffers = readList(PacketWrapper::readMerchantOffer);
+        } else {
+            int size = readByte() & 0xFF;
+            merchantOffers = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                merchantOffers.add(readMerchantOffer());
             }
-            readBoolean(); //WASTE FOR FULL USE
-            int uses = readInt();
-            int maxUses = readInt();
-            int xp = readInt();
-            int specialPrice = readInt();
-            float priceMultiplier = readFloat();
-            int demand = readInt();
-            merchantRecipeData.add(MerchantRecipeData.of(buyItemPrimary, sellItem, buyItemSecondary, uses, maxUses, xp, priceMultiplier, demand, specialPrice));
         }
         villagerLevel = readVarInt();
         villagerXp = readVarInt();
@@ -80,35 +71,25 @@ public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerT
     @Override
     public void write() {
         writeVarInt(containerId);
-        writeByte(this.merchantRecipeData.size() & 0xFF);
-        for (MerchantRecipeData data : this.merchantRecipeData) {
-            writeItemStack(data.getBuyItem1());
-            writeItemStack(data.getSellItem());
-            ItemStack buyItemSecondary = data.getBuyItem2();
-            if (buyItemSecondary == null || buyItemSecondary.isEmpty()) {
-                writeBoolean(false);
-            } else {
-                writeBoolean(true);
-                writeItemStack(buyItemSecondary);
-            }
-            writeBoolean(data.getUses() >= data.getMaxUses());
-            writeInt(data.getUses());
-            writeInt(data.getMaxUses());
-            writeInt(data.getXp());
-            writeInt(data.getSpecialPrice());
-            writeFloat(data.getPriceMultiplier());
-            writeInt(data.getDemand());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            writeList(merchantOffers, PacketWrapper::writeMerchantOffer);
         }
-        writeVarInt(this.villagerLevel);
-        writeVarInt(this.villagerXp);
-        writeBoolean(this.showProgress);
-        writeBoolean(this.canRestock);
+        else {
+            writeByte(merchantOffers.size() & 0xFF);
+            for (MerchantOffer data : merchantOffers) {
+                writeMerchantOffer(data);
+            }
+        }
+        writeVarInt(villagerLevel);
+        writeVarInt(villagerXp);
+        writeBoolean(showProgress);
+        writeBoolean(canRestock);
     }
 
     @Override
-    public void copy(WrapperPlayServerTradeList wrapper) {
+    public void copy(WrapperPlayServerMerchantOffers wrapper) {
         containerId = wrapper.containerId;
-        merchantRecipeData = wrapper.merchantRecipeData;
+        merchantOffers = wrapper.merchantOffers;
         villagerLevel = wrapper.villagerLevel;
         villagerXp = wrapper.villagerXp;
         showProgress = wrapper.showProgress;
@@ -123,12 +104,12 @@ public class WrapperPlayServerTradeList extends PacketWrapper<WrapperPlayServerT
         this.containerId = containerId;
     }
 
-    public List<MerchantRecipeData> getMerchantRecipeData() {
-        return merchantRecipeData;
+    public List<MerchantOffer> getMerchantOffers() {
+        return merchantOffers;
     }
 
-    public void setMerchantRecipeData(List<MerchantRecipeData> merchantRecipeData) {
-        this.merchantRecipeData = merchantRecipeData;
+    public void setMerchantOffers(List<MerchantOffer> merchantOffers) {
+        this.merchantOffers = merchantOffers;
     }
 
     public int getVillagerLevel() {

@@ -456,7 +456,7 @@ public final class PacketType {
             UPDATE_LIGHT,
             JOIN_GAME,
             MAP_DATA,
-            TRADE_LIST,
+            MERCHANT_OFFERS,
             ENTITY_RELATIVE_MOVE,
             ENTITY_RELATIVE_MOVE_AND_ROTATION,
             ENTITY_ROTATION,
