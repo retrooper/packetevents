@@ -105,6 +105,6 @@ public enum ClientboundPacketType_1_12 {
     //This packet was added
     UPDATE_ADVANCEMENTS,
 
-    ENTITY_PROPERTIES,
+    UPDATE_ATTRIBUTES,
     ENTITY_EFFECT
 }

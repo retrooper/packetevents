@@ -113,7 +113,7 @@ public enum ClientboundPacketType_1_13 {
     COLLECT_ITEM,
     ENTITY_TELEPORT,
     UPDATE_ADVANCEMENTS,
-    ENTITY_PROPERTIES,
+    UPDATE_ATTRIBUTES,
     ENTITY_EFFECT,
 
     //These two packets were added

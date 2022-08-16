@@ -515,7 +515,7 @@ public final class PacketType {
             COLLECT_ITEM,
             ENTITY_TELEPORT,
             UPDATE_ADVANCEMENTS,
-            ENTITY_PROPERTIES,
+            UPDATE_ATTRIBUTES,
             ENTITY_EFFECT,
             DECLARE_RECIPES,
             TAGS,

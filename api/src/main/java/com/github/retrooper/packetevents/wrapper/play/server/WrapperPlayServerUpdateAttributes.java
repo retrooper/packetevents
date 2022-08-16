@@ -27,16 +27,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlayServerEntityProperties> {
+public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlayServerUpdateAttributes> {
     private int entityID;
     private List<Property> properties;
 
-    public WrapperPlayServerEntityProperties(PacketSendEvent event) {
+    public WrapperPlayServerUpdateAttributes(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityProperties(int entityID, List<Property> properties) {
-        super(PacketType.Play.Server.ENTITY_PROPERTIES);
+    public WrapperPlayServerUpdateAttributes(int entityID, List<Property> properties) {
+        super(PacketType.Play.Server.UPDATE_ATTRIBUTES);
         this.entityID = entityID;
         this.properties = properties;
     }
@@ -57,7 +57,9 @@ public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlay
         }
         properties = new ArrayList<>(propertyCount);
         for (int i = 0; i < propertyCount; i++) {
-            int maxKeyLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
+            //NOTE: Some people report errors that this limit check breaks for them, lets try removing it
+            //int maxKeyLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
+            int maxKeyLength = 32767;
             String key = readString(maxKeyLength);
             double value = readDouble();
             int modifiersLength;
@@ -111,7 +113,7 @@ public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlay
     }
 
     @Override
-    public void copy(WrapperPlayServerEntityProperties wrapper) {
+    public void copy(WrapperPlayServerUpdateAttributes wrapper) {
         entityID = wrapper.entityID;
         properties = wrapper.properties;
     }

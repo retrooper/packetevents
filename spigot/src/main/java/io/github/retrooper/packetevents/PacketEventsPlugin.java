@@ -148,7 +148,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                 } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
-                    System.out.println("He said:" + cm.getMessage().getChatContent() + ", type: " + cm.getMessage().getType());
+                    System.out.println("He said:" + cm.getMessage().getChatContent() + ", type: " + cm.getMessage().getType().getName());
                     if (cm.getMessage() instanceof ChatMessage_v1_19_1) {
                         UUID uuid = ((ChatMessage_v1_19_1)cm.getMessage()).getSenderUUID();
                         System.out.println("uuid: " + uuid + ", type: " + cm.getMessage().getType().getName());
@@ -178,6 +178,12 @@ public class PacketEventsPlugin extends JavaPlugin {
                 } else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
                     WrapperPlayServerChunkData data = new WrapperPlayServerChunkData(event);
                 }
+                else if (event.getPacketType() == PacketType.Play.Server.UPDATE_ATTRIBUTES) {
+                    WrapperPlayServerUpdateAttributes properties = new WrapperPlayServerUpdateAttributes(event);
+                    for (WrapperPlayServerUpdateAttributes.Property prop : properties.getProperties()) {
+                        event.getUser().sendMessage("prop: " + prop.getKey() + ", value: " + prop.getKey() + ", mod: " + prop.getModifiers().toString());
+                    }
+                }
             }
 
             @Override
@@ -196,7 +202,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
