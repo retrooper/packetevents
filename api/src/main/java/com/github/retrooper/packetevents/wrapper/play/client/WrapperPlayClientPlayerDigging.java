@@ -111,14 +111,6 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         this.blockPosition = blockPosition;
     }
 
-    public BlockFace getFace() {
-        return blockFace;
-    }
-
-    public void setFace(BlockFace blockFace) {
-        this.blockFace = blockFace;
-    }
-
     public BlockFace getBlockFace() {
         return blockFace;
     }
