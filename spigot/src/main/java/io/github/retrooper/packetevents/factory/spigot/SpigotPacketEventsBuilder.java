@@ -192,7 +192,7 @@ public class SpigotPacketEventsBuilder {
                         PacketEvents.getAPI().getLogManager().severe("You are attempting to combine 2.0 PacketEvents with a " +
                                 "ProtocolSupport version older than v1.18.1-1. (Failed to parse the ProtocolSupport version)" +
                                 "This is no longer works, please update to a newer build. " +
-                                "https://ci.dmulloy2.net/job/ProtocolLib/lastBuild/");
+                                "https://www.spigotmc.org/resources/protocolsupport.7201/");
                         Plugin ourPlugin = getPlugin();
                         Bukkit.getPluginManager().disablePlugin(ourPlugin);
                         throw new IllegalStateException("ProtocolSupport incompatibility! Update to v1.18.1-1 or newer!");
@@ -202,7 +202,7 @@ public class SpigotPacketEventsBuilder {
                         PacketEvents.getAPI().getLogManager().severe("You are attempting to combine 2.0 PacketEvents with a " +
                                 "ProtocolSupport version older than v1.18.1-1. (" + psVersion.toString() + ") " +
                                 "This is no longer works, please update to a newer build. " +
-                                "https://ci.dmulloy2.net/job/ProtocolLib/lastBuild/");
+                                "https://www.spigotmc.org/resources/protocolsupport.7201/");
                         Plugin ourPlugin = getPlugin();
                         Bukkit.getPluginManager().disablePlugin(ourPlugin);
                         throw new IllegalStateException("ProtocolSupport incompatibility! Update to v1.18.1-1 or newer!");
