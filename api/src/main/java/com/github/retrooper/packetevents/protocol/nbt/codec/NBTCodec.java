@@ -66,9 +66,8 @@ public class NBTCodec {
                 }
                 else if (num instanceof Long) {
                     return new NBTLong(num.longValue());
-                }else if(num instanceof LazilyParsedNumber){
-                    // don't know how to handle this, but this fixes a NPE
-                    return new NBTInt(((LazilyParsedNumber)).intValue());
+                }else if(num instanceof LazilyParsedNumber) {
+                    return new NBTInt(num.intValue());
                 }
             }
         }
