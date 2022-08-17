@@ -61,13 +61,11 @@ public class NBTCodec {
                 else if (num instanceof Short) {
                     return new NBTShort(num.shortValue());
                 }
-                else if (num instanceof Integer) {
+                else if (num instanceof Integer || num instanceof LazilyParsedNumber) {
                     return new NBTInt(num.intValue());
                 }
                 else if (num instanceof Long) {
                     return new NBTLong(num.longValue());
-                }else if(num instanceof LazilyParsedNumber) {
-                    return new NBTInt(num.intValue());
                 }
             }
         }
