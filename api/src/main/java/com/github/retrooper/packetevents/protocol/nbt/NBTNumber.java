@@ -20,6 +20,11 @@ package com.github.retrooper.packetevents.protocol.nbt;
 
 public abstract class NBTNumber extends NBT {
 
+    //PacketEvents start - We added this to make the nbt -> json conversion easier.
+    //We also implemented it in the classes extending this class.
+    public abstract Number getAsNumber();
+    //PacketEvents end
+
     public abstract byte getAsByte();
 
     public abstract short getAsShort();

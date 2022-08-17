@@ -22,18 +22,120 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufInputStream;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufOutputStream;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTEnd;
+import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
+import com.google.gson.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class NBTCodec {
-    public static NBTCompound readNBT(Object byteBuf, ServerVersion serverVersion) {
+    //PacketEvents start: JSON -> NBT conversion method
+    public static NBT jsonToNBT(JsonElement element) {
+        //Deal with the primitives first
+        if (element instanceof JsonPrimitive) {
+            if (((JsonPrimitive) element).isBoolean()) {
+                return new NBTByte(element.getAsBoolean());
+            }
+            else if (((JsonPrimitive) element).isString()) {
+                return new NBTString(element.getAsString());
+            }
+            else if (((JsonPrimitive) element).isNumber()) {
+                Number num = element.getAsNumber();
+                if (num instanceof Float) {
+                    return new NBTFloat(num.floatValue());
+                }
+                else if(num instanceof Double) {
+                    return new NBTDouble(num.doubleValue());
+                }
+                else if (num instanceof Byte) {
+                    return new NBTByte(num.byteValue());
+                }
+                else if (num instanceof Short) {
+                    return new NBTShort(num.shortValue());
+                }
+                else if (num instanceof Integer) {
+                    return new NBTInt(num.intValue());
+                }
+                else if (num instanceof Long) {
+                    return new NBTLong(num.longValue());
+                }
+            }
+        }
+        //Then handle arrays
+        else if (element instanceof JsonArray) {
+            List<NBT> list = new ArrayList<>();
+            for (JsonElement var : ((JsonArray)element)) {
+                list.add(jsonToNBT(var));
+            }
+            if (list.isEmpty()) {
+                return new NBTList<>(NBTType.COMPOUND);
+            }
+            NBTList<? extends NBT> l = new NBTList<>(list.get(0).getType());
+            for (NBT nbt : list) {
+                l.addTagUnsafe(nbt);
+            }
+            return l;
+        }
+        //Handle json objects
+        else if (element instanceof JsonObject) {
+            JsonObject obj = (JsonObject) element;
+            NBTCompound compound = new NBTCompound();
+            for (Map.Entry<String, JsonElement> jsonEntry : obj.entrySet()) {
+                compound.setTag(jsonEntry.getKey(), jsonToNBT(jsonEntry.getValue()));
+            }
+            return compound;
+        }
+        else if (element instanceof JsonNull || element == null) {
+            return new NBTCompound();
+        }
+        throw new IllegalStateException("Failed to convert JSON to NBT " + element.toString());
+    }
+    //PacketEvents end
+
+    //PacketEvents start - NBT to JSON conversion
+    public static JsonElement nbtToJson(NBT nbt, boolean parseByteAsBool) {
+        //TODO once I make my own nbt implementation, make a toJSON method that each nbt class implements to make this  a one liner
+        if (nbt instanceof NBTNumber) {
+            if (nbt instanceof NBTByte && parseByteAsBool) {
+                byte val = ((NBTByte)nbt).getAsByte();
+                if (val == 0) {
+                    return new JsonPrimitive(false);
+                }
+                else if (val == 1) {
+                    return new JsonPrimitive(true);
+                }
+            }
+            return new JsonPrimitive(((NBTNumber)nbt).getAsNumber());
+        }
+        else if (nbt instanceof NBTString) {
+            return new JsonPrimitive(((NBTString) nbt).getValue());
+        }
+        else if (nbt instanceof NBTList) {
+            NBTList<? extends NBT> list = (NBTList<? extends NBT>) nbt;
+            JsonArray jsonArray = new JsonArray();
+
+            list.getTags().forEach(tag -> {
+                jsonArray.add(nbtToJson(tag, parseByteAsBool));
+            });
+            return jsonArray;
+        }
+        else if (nbt instanceof NBTEnd) {
+            throw new IllegalStateException("Encountered the NBTEnd tag during the NBT to JSON conversion: " + nbt.toString());
+        }
+        else {
+            throw new IllegalStateException("Failed to convert NBT to JSON.");
+        }
+    }
+    //PacketEvents end
+
+    public static NBTCompound readNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try {
                 return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(
@@ -61,7 +163,7 @@ public class NBTCodec {
         return null;
     }
 
-    public static void writeNBT(Object byteBuf, ServerVersion serverVersion, NBTCompound tag) {
+    public static void writeNBTToBuffer(Object byteBuf, ServerVersion serverVersion, NBTCompound tag) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try (ByteBufOutputStream outputStream = new ByteBufOutputStream(byteBuf)) {
                 if (tag != null) {

@@ -357,11 +357,11 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public NBTCompound readNBT() {
-        return NBTCodec.readNBT(buffer, serverVersion);
+        return NBTCodec.readNBTFromBuffer(buffer, serverVersion);
     }
 
     public void writeNBT(NBTCompound nbt) {
-        NBTCodec.writeNBT(buffer, serverVersion, nbt);
+        NBTCodec.writeNBTToBuffer(buffer, serverVersion, nbt);
     }
 
     public String readString() {

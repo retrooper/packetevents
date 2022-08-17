@@ -36,6 +36,11 @@ public class NBTByte extends NBTNumber {
     }
 
     @Override
+    public Number getAsNumber() {
+        return value;
+    }
+
+    @Override
     public byte getAsByte() {
         return value;
     }

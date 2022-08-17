@@ -87,6 +87,10 @@ public class NBTList<T extends NBT> extends NBT {
         tags.add(tag);
     }
 
+    public void addTagUnsafe(NBT nbt) {
+        addTag((T)nbt);
+    }
+
     protected void validateAddTag(T tag) {
         if (type != tag.getType()) {
             throw new IllegalArgumentException(MessageFormat.format("Invalid tag type. Expected {0}, got {1}.", type.getNBTClass(), tag.getClass()));
