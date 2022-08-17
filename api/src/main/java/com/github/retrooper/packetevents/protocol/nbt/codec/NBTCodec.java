@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
 import com.google.gson.*;
+import com.google.gson.internal.LazilyParsedNumber;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -65,6 +66,9 @@ public class NBTCodec {
                 }
                 else if (num instanceof Long) {
                     return new NBTLong(num.longValue());
+                }else if(num instanceof LazilyParsedNumber){
+                    // don't know how to handle this, but this fixes a NPE
+                    return new NBTInt(((LazilyParsedNumber)).intValue());
                 }
             }
         }
