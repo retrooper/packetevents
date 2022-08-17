@@ -100,7 +100,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     case PLAYER_DIGGING:
                         WrapperPlayClientPlayerDigging digging = new WrapperPlayClientPlayerDigging(event);
                         DiggingAction action = digging.getAction();
-                        BlockFace face = digging.getFace();
+                        BlockFace face = digging.getBlockFace();
                         event.getUser().sendMessage("action: " + action + ", face: " + face);
                         break;
                     case PLAYER_BLOCK_PLACEMENT:
