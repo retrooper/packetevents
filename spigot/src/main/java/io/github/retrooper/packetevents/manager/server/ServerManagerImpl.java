@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.manager.server;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.util.PEVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -28,15 +29,27 @@ public class ServerManagerImpl implements ServerManager {
     private ServerVersion serverVersion;
 
     private ServerVersion resolveVersionNoCache() {
+        Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
+        String bukkitVersion = Bukkit.getBukkitVersion();
+        //Our PEVersion class can parse this version and detect if it is a newer version than what is currently supported
+        //and account for that properly
+        PEVersion version = new PEVersion(bukkitVersion.substring(0, bukkitVersion.indexOf("-")));
+        PEVersion latestVersion = new PEVersion(ServerVersion.getLatest().getReleaseName());
+        if (version.isNewerThan(latestVersion)) {
+            //We do not support this version yet, so let us warn the user
+            plugin.getLogger().warning("[packetevents] We currently do not support the minecraft version "
+                    + version.toString() + ", so things might break. PacketEvents will behave as if the minecraft version were "
+                    + latestVersion.toString() + "!");
+            return ServerVersion.getLatest();
+        }
         for (final ServerVersion val : ServerVersion.reversedValues()) {
             //For example "V_1_18" -> "1.18"
-            if (Bukkit.getBukkitVersion().contains(val.getReleaseName())) {
+            if (bukkitVersion.contains(val.getReleaseName())) {
                 return val;
             }
         }
 
         ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
-        Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
         plugin.getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the server version is " + fallbackVersion.name() + "...");
         return fallbackVersion;
     }
