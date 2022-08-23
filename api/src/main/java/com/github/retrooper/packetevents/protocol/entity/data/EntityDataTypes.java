@@ -24,8 +24,13 @@ import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.particle.Particle;
+import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
+import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
+import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.TypesBuilder;
 import com.github.retrooper.packetevents.util.TypesBuilderData;
 import com.github.retrooper.packetevents.util.Vector3f;
@@ -57,6 +62,9 @@ public class EntityDataTypes {
             ClientVersion.V_1_19);
 
     public static final EntityDataType<Byte> BYTE = define("byte", PacketWrapper::readByte, PacketWrapper::writeByte);
+
+    public static final EntityDataType<Short> SHORT = define("short", PacketWrapper::readShort, PacketWrapper::writeShort);
+
     public static final EntityDataType<Integer> INT = define("int", wrapper -> {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
             return wrapper.readVarInt();
@@ -66,19 +74,27 @@ public class EntityDataTypes {
     }, (wrapper, value) -> {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
             wrapper.writeVarInt(value);
-        }
-        else {
+        } else {
             wrapper.writeInt(value);
         }
     });
+
     public static final EntityDataType<Float> FLOAT = define("float", PacketWrapper::readFloat, PacketWrapper::writeFloat);
+
     public static final EntityDataType<String> STRING = define("string", PacketWrapper::readString, PacketWrapper::writeString);
+
     public static final EntityDataType<Component> COMPONENT = define("component", PacketWrapper::readComponent, PacketWrapper::writeComponent);
+
     public static final EntityDataType<Optional<Component>> OPTIONAL_COMPONENT = define("optional_component", readOptionalComponentDeserializer(), writeOptionalComponentSerializer());
+
     public static final EntityDataType<ItemStack> ITEMSTACK = define("itemstack", PacketWrapper::readItemStack, PacketWrapper::writeItemStack);
-    public static final EntityDataType<Integer> OPTIONAL_BLOCK_STATE = define("optional_block_state", readIntDeserializer(), writeIntSerializer());
+
+    public static final EntityDataType<Optional<ItemStack>> OPTIONAL_ITEMSTACK = define("optional_itemstack",
+            (PacketWrapper<?> wrapper) -> Optional.of(wrapper.readItemStack()),
+            (PacketWrapper<?> wrapper, Optional<ItemStack> value) -> wrapper.writeItemStack(value.orElse(null)));
+
     public static final EntityDataType<Boolean> BOOLEAN = define("boolean", PacketWrapper::readBoolean, PacketWrapper::writeBoolean);
-    public static final EntityDataType<Integer> PARTICLE = define("particle", PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
+
     public static final EntityDataType<Vector3f> ROTATION = define("rotation",
             (PacketWrapper<?> wrapper) -> new Vector3f(wrapper.readFloat(), wrapper.readFloat(), wrapper.readFloat()),
             (PacketWrapper<?> wrapper, Vector3f value) -> {
@@ -86,6 +102,7 @@ public class EntityDataTypes {
                 wrapper.writeFloat(value.y);
                 wrapper.writeFloat(value.z);
             });
+
     public static final EntityDataType<Vector3i> BLOCK_POSITION = define("block_position", (PacketWrapper<?> wrapper) -> {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
             return wrapper.readBlockPosition();
@@ -104,8 +121,10 @@ public class EntityDataTypes {
             wrapper.writeInt(blockPosition.getZ());
         }
     });
+
     public static final EntityDataType<Optional<Vector3i>> OPTIONAL_BLOCK_POSITION = define("optional_block_position",
             readOptionalBlockPositionDeserializer(), writeOptionalBlockPositionSerializer());
+
     public static final EntityDataType<BlockFace> BLOCK_FACE = define("block_face", (PacketWrapper<?> wrapper) -> {
                 int id = wrapper.readVarInt();
                 return BlockFace.getBlockFaceByValue(id);
@@ -117,8 +136,21 @@ public class EntityDataTypes {
             (PacketWrapper<?> wrapper, Optional<UUID> value) ->
                     wrapper.writeOptional(value.orElse(null), PacketWrapper::writeUUID));
 
+    public static final EntityDataType<Integer> OPTIONAL_BLOCK_STATE = define("optional_block_state", readIntDeserializer(), writeIntSerializer());
+
     public static final EntityDataType<NBTCompound> NBT = define("nbt", PacketWrapper::readNBT, PacketWrapper::writeNBT);
+
+    public static final EntityDataType<Particle> PARTICLE = define("particle", wrapper -> {
+        int id = wrapper.readVarInt();
+        ParticleType type = ParticleTypes.getById(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), id);
+        return new Particle(type, type.readDataFunction().apply(wrapper));
+    }, (wrapper, particle) -> {
+        wrapper.writeVarInt(particle.getType().getId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
+        particle.getType().writeDataFunction().accept(wrapper, particle.getData());
+    });
+
     public static final EntityDataType<VillagerData> VILLAGER_DATA = define("villager_data", PacketWrapper::readVillagerData, PacketWrapper::writeVillagerData);
+
     public static final EntityDataType<Optional<Integer>> OPTIONAL_INT = define("optional_int", (PacketWrapper<?> wrapper) -> {
         int i = wrapper.readVarInt();
         return i == 0 ? Optional.empty() : Optional.of(i - 1);
@@ -132,17 +164,17 @@ public class EntityDataTypes {
     }, (PacketWrapper<?> wrapper, EntityPose value) -> wrapper.writeVarInt(value.getId(wrapper.getServerVersion().toClientVersion())));
 
     public static final EntityDataType<Integer> CAT_VARIANT = define("cat_variant_type", readIntDeserializer(), writeIntSerializer());
+
     public static final EntityDataType<Integer> FROG_VARIANT = define("frog_variant_type", readIntDeserializer(), writeIntSerializer());
 
-    public static final EntityDataType<Optional<Vector3i>> OPTIONAL_GLOBAL_POSITION = define("optional_global_position",
-            (PacketWrapper<?> wrapper) -> Optional.ofNullable(wrapper.readOptional(PacketWrapper::readBlockPosition)),
-            (PacketWrapper<?> wrapper, Optional<Vector3i> value) ->
-                    wrapper.writeOptional(value.orElse(null), PacketWrapper::writeBlockPosition));
+    public static final EntityDataType<Optional<WorldBlockPosition>> OPTIONAL_GLOBAL_POSITION = define("optional_global_position",
+            (PacketWrapper<?> wrapper) -> Optional.ofNullable(wrapper.readOptional(w -> new WorldBlockPosition(new ResourceLocation(w.readString(32767)), w.readBlockPosition()))),
+            (PacketWrapper<?> wrapper, Optional<WorldBlockPosition> value) -> wrapper.writeOptional(value.orElse(null), (w, globalPos) -> {
+                w.writeString(globalPos.getWorld().toString());
+                w.writeBlockPosition(globalPos.getBlockPosition());
+            }));
 
     public static final EntityDataType<Integer> PAINTING_VARIANT_TYPE = define("painting_variant_type", readIntDeserializer(), writeIntSerializer());
-
-    @Deprecated
-    public static final EntityDataType<Short> SHORT = define("short", PacketWrapper::readShort, PacketWrapper::writeShort);
 
     public static EntityDataType<?> getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);
@@ -280,4 +312,5 @@ public class EntityDataTypes {
             };
         }
     }
+
 }

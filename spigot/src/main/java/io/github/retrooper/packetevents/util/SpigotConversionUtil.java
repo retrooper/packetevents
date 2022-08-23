@@ -24,11 +24,14 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
+import org.bukkit.World;
 
 public class SpigotConversionUtil {
     public static Location fromBukkitLocation(org.bukkit.Location location) {
@@ -108,5 +111,23 @@ public class SpigotConversionUtil {
 
     public static org.bukkit.inventory.ItemStack toBukkitItemStack(ItemStack itemStack) {
         return SpigotReflectionUtil.encodeBukkitItemStack(itemStack);
+    }
+
+    public static Dimension fromBukkitWorld(World world) {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_14)) {
+            return new Dimension(world.getEnvironment().getId());
+        } else if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_16)) {
+            Object worldServer = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
+            return new Dimension(SpigotReflectionUtil.getDimensionId(worldServer));
+        } else if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_16_2)) {
+            Object worldServer = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
+            Dimension dimension = new Dimension(new NBTCompound());
+            dimension.setDimensionName(SpigotReflectionUtil.getDimensionKey(worldServer));
+            return dimension;
+        } else {
+            Object worldServer = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
+            Object nbt = SpigotReflectionUtil.convertWorldServerDimensionToNMSNbt(worldServer);
+            return new Dimension(SpigotReflectionUtil.fromMinecraftNBT(nbt));
+        }
     }
 }

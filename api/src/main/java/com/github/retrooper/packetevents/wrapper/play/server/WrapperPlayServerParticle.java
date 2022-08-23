@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
+import com.github.retrooper.packetevents.protocol.particle.data.LegacyConvertible;
+import com.github.retrooper.packetevents.protocol.particle.data.LegacyParticleData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
@@ -32,20 +34,20 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 //Might be worthy to document
 //TODO: Check changelog through out the versions
 public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerParticle> {
+
     private Particle particle;
     private boolean longDistance;
     private Vector3d position;
     private Vector3f offset;
     private float maxSpeed;
     private int particleCount;
-    private int[] legacyData;
 
     public WrapperPlayServerParticle(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperPlayServerParticle(Particle particle, boolean longDistance, Vector3d position, Vector3f offset,
-                                     float maxSpeed, int particleCount, int... legacyData) {
+                                     float maxSpeed, int particleCount) {
         super(PacketType.Play.Server.PARTICLE);
         this.particle = particle;
         this.longDistance = longDistance;
@@ -53,7 +55,6 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this.offset = offset;
         this.maxSpeed = maxSpeed;
         this.particleCount = particleCount;
-        this.legacyData = legacyData;
     }
 
     @Override
@@ -79,23 +80,11 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         ParticleData data;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             data = particleType.readDataFunction().apply(this);
-            legacyData = new int[0];
         } else {
             data = new ParticleData();
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
                 //TODO Understand the legacy data: https://wiki.vg/index.php?title=Protocol&oldid=14204
-                int count;
-                if (particleTypeId == 37 || particleTypeId == 38 || particleTypeId == 46) {
-                    count = 1;
-                } else if (particleTypeId == 36) {
-                    count = 2;
-                } else {
-                    count = 0;
-                }
-                legacyData = new int[count];
-                for (int i = 0; i < count; i++) {
-                    legacyData[i] = readVarInt();
-                }
+                data = LegacyParticleData.read(this, particleTypeId);
             }
         }
         particle = new Particle(particleType, data);
@@ -103,15 +92,14 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
 
     @Override
     public void write() {
+        int id = particle.getType().getId(serverVersion.toClientVersion());
         //TODO on 1.7 we get particle type by 64 len string
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeString(particle.getType().getName().getKey(), 64);
         } else {
-            int id = particle.getType().getId(serverVersion.toClientVersion());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
                 writeVarInt(id);
-            }
-            else {
+            } else {
                 writeInt(id);
             }
         }
@@ -132,22 +120,14 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         writeInt(particleCount);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             particle.getType().writeDataFunction().accept(this, particle.getData());
-        } else {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-                int count;
-                if (particle.getType().getId(serverVersion.toClientVersion()) == 37
-                        || particle.getType().getId(serverVersion.toClientVersion()) == 38 ||
-                        particle.getType().getId(serverVersion.toClientVersion()) == 46) {
-                    count = 1;
-                } else if (particle.getType().getId(serverVersion.toClientVersion()) == 36) {
-                    count = 2;
-                } else {
-                    count = 0;
-                }
-                for (int i = 0; i < count; i++) {
-                    writeVarInt(legacyData[i]);
-                }
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            LegacyParticleData legacyData;
+            if (particle.getData() instanceof LegacyConvertible) {
+                legacyData = ((LegacyConvertible) particle.getData()).toLegacy(serverVersion.toClientVersion());
+            } else {
+                legacyData = LegacyParticleData.nullValue(id);
             }
+            LegacyParticleData.write(this, id, legacyData);
         }
     }
 
@@ -159,7 +139,6 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         offset = wrapper.offset;
         maxSpeed = wrapper.maxSpeed;
         particleCount = wrapper.particleCount;
-        legacyData = wrapper.legacyData;
     }
 
     public Particle getParticle() {
@@ -210,11 +189,4 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this.particleCount = particleCount;
     }
 
-    public int[] getLegacyData() {
-        return legacyData;
-    }
-
-    public void setLegacyData(int[] legacyData) {
-        this.legacyData = legacyData;
-    }
 }

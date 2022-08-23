@@ -22,12 +22,16 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 
 public class Dimension {
-    private DimensionType type;
+    private int id;
     private NBTCompound attributes;
 
     @Deprecated
     public Dimension(DimensionType type) {
-        this.type = type;
+        this.id = type.getId();
+    }
+
+    public Dimension(int id) {
+        this.id = id;
     }
 
     public Dimension(NBTCompound attributes) {
@@ -35,31 +39,31 @@ public class Dimension {
     }
 
     public String getDimensionName() {
-        if (attributes == null) {
-            return type.getName();
-        }
-
         return getAttributes().getStringTagValueOrDefault("effects", "");
     }
 
     public void setDimensionName(String name) {
-        if (attributes == null) {
-            setType(DimensionType.getByName(name));
-        }
-
         NBTCompound compound = getAttributes();
         compound.setTag("effects", new NBTString(name));
         setAttributes(compound);
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Deprecated
     public DimensionType getType() {
-        return type;
+        return DimensionType.getById(id);
     }
 
     @Deprecated
     public void setType(DimensionType type) {
-        this.type = type;
+        this.id = type.getId();
     }
 
     public NBTCompound getAttributes() {

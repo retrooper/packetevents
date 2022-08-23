@@ -36,6 +36,11 @@ public class WorldBlockPosition {
         this.blockPosition = new Vector3i(x, y, z);
     }
 
+    public WorldBlockPosition(@NotNull Dimension dimension, @NotNull Vector3i blockPosition) {
+        this.world = new ResourceLocation(dimension.getDimensionName());
+        this.blockPosition = blockPosition;
+    }
+
     public ResourceLocation getWorld() {
         return world;
     }

@@ -24,7 +24,8 @@ import org.jetbrains.annotations.Nullable;
 public enum DimensionType {
     NETHER(-1, "minecraft:the_nether"),
     OVERWORLD(0, "minecraft:overworld"),
-    END(1, "minecraft:the_end");
+    END(1, "minecraft:the_end"),
+    CUSTOM(-999, "minecraft:custom");
 
     private static final DimensionType[] VALUES = values();
 

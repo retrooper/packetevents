@@ -115,8 +115,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         } else {
             previousGameMode = gameMode;
             dimensionCodec = new NBTCompound();
-            DimensionType dimensionType = DimensionType.getById(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9_2) ? readInt() : readByte());
-            dimension = new Dimension(dimensionType);
+            dimension = new Dimension(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9_2) ? readInt() : readByte());
             if (!v1_14) {
                 difficulty = Difficulty.getById(readByte());
             }
@@ -183,9 +182,9 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         } else {
             previousGameMode = gameMode;
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                writeInt(dimension.getType().getId());
+                writeInt(dimension.getId());
             } else {
-                writeByte(dimension.getType().getId());
+                writeByte(dimension.getId());
             }
             if (!v1_14) {
                 writeByte(difficulty.getId());
