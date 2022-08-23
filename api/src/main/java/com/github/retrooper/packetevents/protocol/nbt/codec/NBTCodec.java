@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
 import com.google.gson.*;
+import com.google.gson.internal.LazilyParsedNumber;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -60,7 +61,7 @@ public class NBTCodec {
                 else if (num instanceof Short) {
                     return new NBTShort(num.shortValue());
                 }
-                else if (num instanceof Integer) {
+                else if (num instanceof Integer || num instanceof LazilyParsedNumber) {
                     return new NBTInt(num.intValue());
                 }
                 else if (num instanceof Long) {
