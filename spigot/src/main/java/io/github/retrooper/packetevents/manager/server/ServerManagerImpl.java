@@ -31,6 +31,10 @@ public class ServerManagerImpl implements ServerManager {
     private ServerVersion resolveVersionNoCache() {
         Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
         String bukkitVersion = Bukkit.getBukkitVersion();
+        ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
+        if (bukkitVersion.contains("Unknown")) {
+            return fallbackVersion;
+        }
         //Our PEVersion class can parse this version and detect if it is a newer version than what is currently supported
         //and account for that properly
         PEVersion version = new PEVersion(bukkitVersion.substring(0, bukkitVersion.indexOf("-")));
@@ -49,7 +53,6 @@ public class ServerManagerImpl implements ServerManager {
             }
         }
 
-        ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
         plugin.getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the server version is " + fallbackVersion.name() + "...");
         return fallbackVersion;
     }
