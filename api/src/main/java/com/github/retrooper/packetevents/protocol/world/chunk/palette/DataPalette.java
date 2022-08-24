@@ -91,7 +91,7 @@ public class DataPalette {
     }
 
     public static DataPalette readLegacy(NetStreamInput in) {
-        int bitsPerEntry = in.readByte() & 0xf;
+        int bitsPerEntry = in.readByte() & 0xff;
         Palette palette = readPalette(PaletteType.CHUNK, bitsPerEntry, in);
         BaseStorage storage;
         if (!(palette instanceof SingletonPalette)) {
