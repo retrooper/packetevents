@@ -84,6 +84,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
         else if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
             WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
             user.setEntityId(joinGame.getEntityId());
+            user.setDimension(joinGame.getDimension());
             if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
             }
@@ -100,11 +101,11 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
         // Respawn is used to switch dimensions
         else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
+            WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
+            user.setDimension(respawn.getDimension());
             if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
             }
-
-            WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
 
             NBTCompound worldNBT = user.getWorldNBT(respawn.getDimension().getDimensionName()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
             user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());

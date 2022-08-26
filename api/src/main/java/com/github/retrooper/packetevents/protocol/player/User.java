@@ -29,6 +29,7 @@ import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
@@ -48,6 +49,7 @@ public class User {
     private int minWorldHeight = 0;
     private int totalWorldHeight = 256;
     private List<NBTCompound> worldNBT;
+    private Dimension dimension = new Dimension(0);
 
     public User(Object channel,
                 ConnectionState connectionState, ClientVersion clientVersion,
@@ -228,6 +230,14 @@ public class User {
 
     public void setWorldNBT(NBTList<NBTCompound> worldNBT) {
         this.worldNBT = worldNBT.getTags();
+    }
+
+    public Dimension getDimension() {
+        return dimension;
+    }
+
+    public void setDimension(Dimension dimension) {
+        this.dimension = dimension;
     }
 
     @Nullable
