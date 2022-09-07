@@ -39,13 +39,15 @@ public final class WrappedPacketInChat extends WrappedPacket {
 
     @Override
     protected void load() {
-        Class<?> minecraftEncryptionClass = Reflection.getClassByNameWithoutException("net.minecraft.util.MinecraftEncryption");
-        if (minecraftEncryptionClass != null) {
-            VANILLA_SALT_SIGNATURE_CLASS = SubclassUtil.getSubClass(minecraftEncryptionClass, "b");
-            try {
-                VANILLA_SALT_SIGNATURE_CONSTRUCTOR = VANILLA_SALT_SIGNATURE_CLASS.getConstructor(long.class, byte[].class);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19)) {
+            Class<?> minecraftEncryptionClass = Reflection.getClassByNameWithoutException("net.minecraft.util.MinecraftEncryption");
+            if (minecraftEncryptionClass != null) {
+                VANILLA_SALT_SIGNATURE_CLASS = SubclassUtil.getSubClass(minecraftEncryptionClass, "b");
+                try {
+                    VANILLA_SALT_SIGNATURE_CONSTRUCTOR = VANILLA_SALT_SIGNATURE_CLASS.getConstructor(long.class, byte[].class);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
