@@ -18,9 +18,10 @@
 
 package com.github.retrooper.packetevents.settings;
 
-
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.util.TimeStampMode;
+
+import java.io.InputStream;
+import java.util.function.Function;
 
 /**
  * Packet Events' settings.
@@ -35,6 +36,9 @@ public class PacketEventsSettings {
     private boolean checkForUpdates = true;
     private boolean bStatsEnabled = true;
     private boolean debugEnabled = false;
+    private Function<String, InputStream> resourceProvider = path -> PacketEventsSettings.class
+            .getClassLoader()
+            .getResourceAsStream(path);
 
     /**
      * Time stamp mode. How precise should the timestamps in the events be.
@@ -98,6 +102,18 @@ public class PacketEventsSettings {
     }
 
     /**
+     * Some projects may want to implement a CDN with resources like asset mappings
+     * By default, all resources are retrieved from the ClassLoader
+     *
+     * @param resourceProvider Function
+     * @return Settings instance.
+     */
+    public PacketEventsSettings customResourceProvider(Function<String, InputStream> resourceProvider) {
+        this.resourceProvider = resourceProvider;
+        return this;
+    }
+
+    /**
      * Should the packet listeners be read only?
      * @return Getter for {@link #readOnlyListeners}
      */
@@ -131,5 +147,14 @@ public class PacketEventsSettings {
      */
     public boolean isDebugEnabled() {
         return debugEnabled;
+    }
+
+    /**
+     * As described above, this method retrieves the function that acquires the InputStream
+     * of a desired resource by its path.
+     * @return Getter for {@link #resourceProvider}
+     */
+    public Function<String, InputStream> getResourceProvider() {
+        return resourceProvider;
     }
 }
