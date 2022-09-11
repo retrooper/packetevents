@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,14 @@ public enum Combat {
     ENTER_COMBAT,
     END_COMBAT,
     ENTITY_DEAD;
+
+    public int getId() {
+        return ordinal();
+    }
+
+    public static Combat getById(int id) {
+        return VALUES[id];
+    }
 
     public static final Combat[] VALUES = values();
 }

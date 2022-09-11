@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        this.combat = Combat.VALUES[readVarInt()];
+        this.combat = Combat.getById(readVarInt());
         switch (combat) {
             case END_COMBAT:
                 this.duration = readVarInt();
@@ -80,7 +80,7 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
-        writeVarInt(combat.ordinal());
+        writeVarInt(combat.getId());
         switch (combat) {
             case END_COMBAT:
                 writeVarInt(duration);
@@ -114,24 +114,24 @@ public class WrapperPlayServerCombatEvent extends PacketWrapper<WrapperPlayServe
         this.combat = combat;
     }
 
-    public OptionalInt getDuration() {
-        return OptionalInt.of(duration);
+    public int getDuration() {
+        return duration;
     }
 
     public void setDuration(int duration) {
         this.duration = duration;
     }
 
-    public OptionalInt getEntityId() {
-        return OptionalInt.of(entityId);
+    public int getEntityId() {
+        return entityId;
     }
 
     public void setEntityId(int entityId) {
         this.entityId = entityId;
     }
 
-    public OptionalInt getPlayerId() {
-        return OptionalInt.of(playerId);
+    public int getPlayerId() {
+        return playerId;
     }
 
     public void setPlayerId(int playerId) {
