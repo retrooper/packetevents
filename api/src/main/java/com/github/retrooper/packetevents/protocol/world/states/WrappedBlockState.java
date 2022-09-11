@@ -7,8 +7,6 @@ import com.github.retrooper.packetevents.protocol.world.states.enums.*;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateValue;
-import com.github.retrooper.packetevents.util.MappingHelper;
-import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -148,7 +146,7 @@ public class WrappedBlockState {
         Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
         Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
         try {
-            InputStream mappings = WrappedBlockState.class.getClassLoader().getResourceAsStream("assets/mappings/block/legacy_block_mappings.txt");
+            InputStream mappings = PacketEvents.getAPI().getSettings().getResourceProvider().apply("assets/mappings/block/legacy_block_mappings.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(mappings));
 
             while ((line = reader.readLine()) != null) {
@@ -204,7 +202,7 @@ public class WrappedBlockState {
             return;
         }
 
-        InputStream mappings = WrappedBlockState.class.getClassLoader().getResourceAsStream("assets/mappings/block/modern_block_mappings.txt");
+        InputStream mappings = PacketEvents.getAPI().getSettings().getResourceProvider().apply("assets/mappings/block/modern_block_mappings.txt");
         BufferedReader reader = new BufferedReader(new InputStreamReader(mappings));
 
         Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();

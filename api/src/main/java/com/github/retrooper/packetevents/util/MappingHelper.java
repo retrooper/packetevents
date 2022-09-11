@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.util;
 
-import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.PacketEvents;
 import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
@@ -26,13 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MappingHelper {
     public static JsonObject getJSONObject(String id) {
         StringBuilder sb = new StringBuilder();
-        try (InputStream inputStream = ItemTypes.class.getClassLoader().getResourceAsStream("assets/mappings/" + id + ".json");
+        try (InputStream inputStream = PacketEvents.getAPI().getSettings().getResourceProvider().apply("assets/mappings/" + id + ".json");
              InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(streamReader)) {
 
