@@ -54,7 +54,17 @@ public class PacketEventsEncoder extends MessageToByteEncoder<Object> {
         if (!(o instanceof ByteBuf)) {
             //Convert NMS object to bytes, so we can process it right away.
             if (vanillaEncoder == null) return;
-            CustomPipelineUtil.callEncode(vanillaEncoder, ctx, o, out);
+            try {
+                CustomPipelineUtil.callEncode(vanillaEncoder, ctx, o, out);
+            }
+            catch (Exception ex) {
+                if (ex.getCause() instanceof Exception) {
+                    throw (Exception) ex.getCause();
+                }
+                else if (ex.getCause() instanceof Error) {
+                    throw (Error) ex.getCause();
+                }
+            }
             //Failed to translate it into ByteBuf form (which we can process)
             if (!out.isReadable()) return;
         } else {
