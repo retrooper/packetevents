@@ -87,7 +87,7 @@ public class ServerConnectionInitializer {
              * Taken the above into account, here we just drop all unhandled connections.
              */
             if (channel.pipeline().get("splitter") == null) {
-                channel.unsafe().closeForcibly();
+                channel.close();
                 return;
             }
 
