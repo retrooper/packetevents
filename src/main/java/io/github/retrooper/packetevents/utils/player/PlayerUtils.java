@@ -33,6 +33,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -275,6 +276,7 @@ public final class PlayerUtils {
         return GameProfileUtil.getGameProfileSkin(gameProfile);
     }
 
+    @Nullable
     public Object getChannel(Player player) {
         String name = player.getName();
         Object channel = channels.get(name);

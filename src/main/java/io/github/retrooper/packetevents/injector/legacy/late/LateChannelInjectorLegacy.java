@@ -41,12 +41,11 @@ public class LateChannelInjectorLegacy implements LateInjector {
         PlayerChannelHandlerLegacy playerChannelHandlerLegacy = new PlayerChannelHandlerLegacy();
         playerChannelHandlerLegacy.player = player;
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
-            return;
-        }
-        channel.eventLoop().execute(() -> {
-            channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerLegacy);
-        });
+       if (channel != null) {
+           channel.eventLoop().execute(() -> {
+               channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerLegacy);
+           });
+       }
     }
 
     @Override
@@ -64,7 +63,7 @@ public class LateChannelInjectorLegacy implements LateInjector {
     @Override
     public boolean hasInjected(Player player) {
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
-        return channel.pipeline().get(PacketEvents.get().getHandlerName()) != null;
+        return channel != null && channel.pipeline().get(PacketEvents.get().getHandlerName()) != null;
     }
 
     @Override

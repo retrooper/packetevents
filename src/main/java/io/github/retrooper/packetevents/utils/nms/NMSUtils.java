@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.utils.nms;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -519,7 +520,8 @@ public final class NMSUtils {
 
     public static Object getPlayerConnection(final Player player) {
         Object entityPlayer = getEntityPlayer(player);
-        if (entityPlayer == null) {
+        if (entityPlayer == null
+        || ClassUtil.getClassSimpleName(entityPlayer.getClass()).contains("Fake")) {
             return null;
         }
         WrappedPacket wrappedEntityPlayer = new WrappedPacket(new NMSPacket(entityPlayer));

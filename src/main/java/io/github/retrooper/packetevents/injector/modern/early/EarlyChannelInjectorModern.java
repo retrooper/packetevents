@@ -271,9 +271,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     public void ejectPlayer(Player player) {
         Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
-            Channel chnl = (Channel) channel;
             try {
-                chnl.pipeline().remove(PacketEvents.get().getHandlerName());
+                ((Channel)channel).pipeline().remove(PacketEvents.get().getHandlerName());
             } catch (Exception ignored) {
             }
         }
