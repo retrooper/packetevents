@@ -70,13 +70,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                 User user = event.getUser();
                 Player player = (Player) event.getPlayer();
                 switch (event.getPacketType()) {
-                    case INTERACT_ENTITY:
-                        ResourceLocation identifier = new ResourceLocation("minecraft:adventure/root");
-                        WrapperPlayServerSelectAdvancementsTab selectAdvancementsTab =
-                                new WrapperPlayServerSelectAdvancementsTab(identifier);
-                        user.sendPacket(selectAdvancementsTab);
-                        user.sendMessage("sent it!");
-                        break;
                     case CHAT_MESSAGE:
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                         if (chatMessage.getMessage().equalsIgnoreCase("!test")) {
@@ -146,43 +139,15 @@ public class PacketEventsPlugin extends JavaPlugin {
                         user.sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
                     System.out.println("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
-                } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
-                    WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
-                    System.out.println("He said:" + cm.getMessage().getChatContent() + ", type: " + cm.getMessage().getType().getName());
-                    if (cm.getMessage() instanceof ChatMessage_v1_19_1) {
-                        UUID uuid = ((ChatMessage_v1_19_1)cm.getMessage()).getSenderUUID();
-                        System.out.println("uuid: " + uuid + ", type: " + cm.getMessage().getType().getName());
-                    }
                 }
                 else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
                     System.out.println("sent sissysystemmessage!");
                 }
-                else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
-                    WrapperPlayServerEntityEffect effect = new WrapperPlayServerEntityEffect(event);
-                    System.out.println("type: " + effect.getPotionType().getName() + ", type id: " + effect.getPotionType().getId());
-                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
-                    WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
-                    EntityType type = spawnLivingEntity.getEntityType();
-                    System.out.println("Spawn living: " + type.getName());
-                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_PAINTING) {
-                    WrapperPlayServerSpawnPainting spawnPainting = new WrapperPlayServerSpawnPainting(event);
-                    System.out.println("Painting: " + spawnPainting.getEntityId() + ", " + spawnPainting.getType().toString() + ", "
-                            + spawnPainting.getPosition().toString() + ", " + spawnPainting.getDirection().name() + ", " + spawnPainting.getUUID().toString());
-
-                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_ENTITY) {
-                   // WrapperPlayServerSpawnEntity spawnEntity = new WrapperPlayServerSpawnEntity(event);
-                    //System.out.println("Spawning a new entity of type: " + spawnEntity.getEntityType());
-                } else if (event.getPacketType() == PacketType.Play.Server.BLOCK_CHANGE) {
+                else if (event.getPacketType() == PacketType.Play.Server.BLOCK_CHANGE) {
                     WrapperPlayServerBlockChange change = new WrapperPlayServerBlockChange(event);
                     Bukkit.broadcastMessage(change.getBlockState().toString());
                 } else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
                     WrapperPlayServerChunkData data = new WrapperPlayServerChunkData(event);
-                }
-                else if (event.getPacketType() == PacketType.Play.Server.UPDATE_ATTRIBUTES) {
-                    WrapperPlayServerUpdateAttributes properties = new WrapperPlayServerUpdateAttributes(event);
-                    for (WrapperPlayServerUpdateAttributes.Property prop : properties.getProperties()) {
-                        event.getUser().sendMessage("prop: " + prop.getKey() + ", value: " + prop.getKey() + ", mod: " + prop.getModifiers().toString());
-                    }
                 }
             }
 
