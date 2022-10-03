@@ -79,6 +79,18 @@ public class ServerConnectionInitializer {
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
 
         synchronized (channel) {
+            /*
+             * This is a rather rare one, BUT!
+             * If the plugin takes a while to initialize and handshakes/pings pile up,
+             * some may not be handled completely, thus, not having a 'splitter' ChannelHandler.
+             * We can, of course, wait for them to be handled, but this complexes the algorithm.
+             * Taken the above into account, here we just drop all unhandled connections.
+             */
+            if (channel.pipeline().get("splitter") == null) {
+                channel.close();
+                return;
+            }
+
             UserConnectEvent connectEvent = new UserConnectEvent(user);
             PacketEvents.getAPI().getEventManager().callEvent(connectEvent);
             if (connectEvent.isCancelled()) {
