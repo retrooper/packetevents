@@ -24,8 +24,7 @@ import io.github.retrooper.packetevents.packettype.PacketState;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.handshaking.setprotocol.WrappedPacketHandshakingInSetProtocol;
-import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;
-import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
+import io.github.retrooper.packetevents.packetwrappers.login.out.success.WrappedPacketLoginOutSuccess;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
@@ -90,12 +89,7 @@ public class PacketProcessorInternal {
                 }
                 break;
             case LOGIN:
-                PacketLoginReceiveEvent loginEvent = new PacketLoginReceiveEvent(channel, new NMSPacket(packet));//Cache the channel
-                if (loginEvent.getPacketId() == PacketType.Login.Client.START) {
-                    WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(loginEvent.getNMSPacket());
-                    String username = startWrapper.getUsername();
-                    PacketEvents.get().getPlayerUtils().channels.put(username, channel);
-                }
+                PacketLoginReceiveEvent loginEvent = new PacketLoginReceiveEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(loginEvent);
                 packet = loginEvent.getNMSPacket().getRawNMSPacket();
                 interceptLoginReceive(loginEvent);
@@ -148,6 +142,11 @@ public class PacketProcessorInternal {
                 break;
             case LOGIN:
                 PacketLoginSendEvent loginEvent = new PacketLoginSendEvent(channel, new NMSPacket(packet));
+                if (loginEvent.getPacketId() == PacketType.Login.Server.SUCCESS) {
+                    WrappedPacketLoginOutSuccess success = new WrappedPacketLoginOutSuccess(loginEvent.getNMSPacket());
+                    String username = success.getGameProfile().getName();
+                    PacketEvents.get().getPlayerUtils().channels.put(username, channel); //Cache channel
+                }
                 PacketEvents.get().getEventManager().callEvent(loginEvent);
                 if (loginEvent.isPostTaskAvailable()) {
                     data.postAction = loginEvent.getPostTask();
