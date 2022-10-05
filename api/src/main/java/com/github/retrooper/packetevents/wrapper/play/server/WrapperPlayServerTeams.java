@@ -156,7 +156,15 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
                     nameTagVisibility = NameTagVisibility.fromID(readString());
                     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9))
                         collisionRule = CollisionRule.fromID(readString());
-                    color = ColorUtil.fromId(readByte());
+                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+                        // starting from 1.17, the color is sent with ColorFormatting enum ordinal
+                        int colorId = readVarInt();
+                        if (colorId == 21)
+                            colorId = -1;
+                        color = ColorUtil.fromId(colorId);
+                    } else {
+                        color = ColorUtil.fromId(readByte());
+                    }
                 }
             } else {
                 displayName = readComponent();
@@ -208,7 +216,14 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
                 writeByte(info.optionData.getByteValue());
                 writeString(info.tagVisibility.id);
                 writeString(info.collisionRule.getId());
-                writeByte(ColorUtil.getId(info.color));
+                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+                    int colorId = ColorUtil.getId(info.color);
+                    if (colorId < 0)
+                        colorId = 21; // since 1.17, minecraft decides to use writeEnum rather than writing it value, while 21 equals RESET
+                    writeVarInt(colorId);
+                } else {
+                    writeByte(ColorUtil.getId(info.color));
+                }
                 writeComponent(info.prefix);
                 writeComponent(info.suffix);
             }
