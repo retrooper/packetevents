@@ -1,7 +1,11 @@
 package com.github.retrooper.packetevents.protocol.map;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMapData;
+import net.kyori.adventure.text.Component;
+
+import java.util.Objects;
 
 public class MapIcon implements Cloneable {
 
@@ -9,48 +13,82 @@ public class MapIcon implements Cloneable {
     private final int x;
     private final int y;
     private final int rotation;
+    private final Component name;
 
-    public MapIcon(Type type, int x, int y, int rotation) {
+    public MapIcon(Type type, int x, int y, int rotation, Component name) {
         this.type = type;
         this.x = x;
         this.y = y;
         this.rotation = rotation;
+        this.name = name;
     }
 
     public MapIcon(PacketWrapper<WrapperPlayServerMapData> packetWrapper) {
-        short s = packetWrapper.readByte();
-        this.type = Type.getById((byte) (s >> 4 & 15));
+        byte rotation = 0;
+        if (packetWrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            this.type = Type.values()[packetWrapper.readVarInt()];
+        } else {
+            short s = packetWrapper.readByte();
+            this.type = MapIcon.Type.getById((byte) (s >> 4));
+            rotation = (byte) (s & 15);
+        }
         this.x = packetWrapper.readByte();
         this.y = packetWrapper.readByte();
-        this.rotation = (byte) (s & 15);
+        if (packetWrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            rotation = packetWrapper.readByte();
+            if (packetWrapper.readBoolean()) {
+                this.name = packetWrapper.readComponent();
+            } else {
+                this.name = null;
+            }
+        } else {
+            this.name = null;
+        }
+        this.rotation = rotation;
     }
 
-    @Override
     public MapIcon clone() {
         try {
             return (MapIcon) super.clone();
-        } catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException var2) {
             throw new AssertionError();
         }
     }
 
     public Type getType() {
-        return type;
+        return this.type;
     }
 
     public int getX() {
-        return x;
+        return this.x;
     }
 
     public int getY() {
-        return y;
+        return this.y;
     }
 
     public int getRotation() {
-        return rotation;
+        return this.rotation;
     }
 
-    public enum Type {
+    public Component getName() {
+        return this.name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MapIcon mapIcon = (MapIcon) o;
+        return x == mapIcon.x && y == mapIcon.y && rotation == mapIcon.rotation && type == mapIcon.type && Objects.equals(name, mapIcon.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, x, y, rotation, name);
+    }
+
+    public static enum Type {
         WHITE_POINTER(0),
         GREEN_POINTER(1),
         RED_POINTER(2),
@@ -82,18 +120,21 @@ public class MapIcon implements Cloneable {
         private static final Type[] VALUES = values();
         private final byte id;
 
-        Type(int value) {
+        private Type(int value) {
             this.id = (byte) value;
         }
 
         public byte getId() {
-            return id;
+            return this.id;
         }
 
         public static Type getById(byte value) {
             for (Type t : VALUES) {
-                if (t.id == value) return t;
+                if (t.id == value) {
+                    return t;
+                }
             }
+
             return null;
         }
     }

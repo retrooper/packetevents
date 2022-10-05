@@ -92,9 +92,22 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
         if (writeIcons || this.serverVersion.isOlderThan(ServerVersion.V_1_17)) {
             this.writeVarInt(this.icons.size());
             this.icons.forEach(icon -> {
-                this.writeByte((icon.getType().getId() & 15) << 4 | icon.getRotation() & 15);
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                    this.writeVarInt(icon.getType().getId());
+                } else {
+                    this.writeByte(icon.getType().getId() << 4 | icon.getRotation() & 15);
+                }
                 this.writeByte(icon.getX());
                 this.writeByte(icon.getY());
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                    this.writeByte(icon.getRotation() & 15);
+                    if (icon.getName() != null) {
+                        this.writeBoolean(true);
+                        this.writeComponent(icon.getName());
+                    } else {
+                        this.writeBoolean(false);
+                    }
+                }
             });
         }
 
