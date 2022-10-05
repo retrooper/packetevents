@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.TileEntityType;
@@ -31,7 +31,7 @@ public class WrapperPlayServerBlockEntityData extends PacketWrapper<WrapperPlayS
     private int type;
     private NBTCompound nbt;
 
-    public WrapperPlayServerBlockEntityData(PacketReceiveEvent event) {
+    public WrapperPlayServerBlockEntityData(PacketSendEvent event) {
         super(event);
     }
 
