@@ -23,7 +23,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 
 public class Dimension {
     private int id;
-    private NBTCompound attributes;
+    private NBTCompound attributes = new NBTCompound();
 
     @Deprecated
     public Dimension(DimensionType type) {
