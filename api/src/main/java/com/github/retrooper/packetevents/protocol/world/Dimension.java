@@ -28,10 +28,12 @@ public class Dimension {
     @Deprecated
     public Dimension(DimensionType type) {
         this.id = type.getId();
+        this.attributes = new NBTCompound();
     }
 
     public Dimension(int id) {
         this.id = id;
+        this.attributes = new NBTCompound();
     }
 
     public Dimension(NBTCompound attributes) {
