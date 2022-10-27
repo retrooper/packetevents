@@ -161,7 +161,7 @@ public class WrappedBlockState {
 
                 String blockString = split[2].substring(0, endIndex != -1 ? endIndex : split[2].length());
 
-                StateType type = StateTypes.getByName(blockString.replace("minecraft:", ""));
+                StateType type = StateTypes.getByName(blockString);
 
                 String[] dataStrings = null;
                 if (endIndex != -1) {
@@ -174,15 +174,17 @@ public class WrappedBlockState {
 
                 WrappedBlockState state = new WrappedBlockState(type, dataStrings, combinedID, (byte) 0);
 
-                stateByStringMap.put(fullString, state);
                 stateByIdMap.put(combinedID, state);
                 stateToStringMap.put(state, fullString);
                 stateToIdMap.put(state, combinedID);
 
-                // 1.12's data type system doesn't support "default states" so I guess this works...
-                if (!stateTypeToBlockStateMap.containsKey(type)) {
-                    stateTypeToBlockStateMap.put(type, state);
-                }
+                // We want the first with this ID, to prevent invalid blocks that work with vanilla, but may
+                // cause other things handling data to have issues, such as air with a byte value of 1
+                // (this matters as doors read bytes if they are a half without caring what type the other block is)
+                stateByStringMap.putIfAbsent(fullString, state);
+
+                // This works because the first of a type is always the default block, by chance
+                stateTypeToBlockStateMap.putIfAbsent(type, state);
             }
         } catch (IOException e) {
             PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
