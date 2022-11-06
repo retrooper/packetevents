@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.ColorUtil;
+import com.github.retrooper.packetevents.util.LegacyFormat;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -199,9 +200,9 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
             ScoreBoardTeamInfo info = teamInfo.orElse(new ScoreBoardTeamInfo(Component.empty(), Component.empty(), Component.empty(), NameTagVisibility.ALWAYS, CollisionRule.ALWAYS, NamedTextColor.WHITE, OptionData.NONE));
             if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-                writeString(AdventureSerializer.asVanilla(info.displayName));
-                writeString(AdventureSerializer.asVanilla(info.prefix));
-                writeString(AdventureSerializer.asVanilla(info.suffix));
+                writeString(LegacyFormat.trimLegacyFormat(AdventureSerializer.asVanilla(info.displayName), 16));
+                writeString(LegacyFormat.trimLegacyFormat(AdventureSerializer.asVanilla(info.prefix), 16));
+                writeString(LegacyFormat.trimLegacyFormat(AdventureSerializer.asVanilla(info.suffix), 16));
                 writeByte(info.optionData.ordinal());
                 if (serverVersion == ServerVersion.V_1_7_10) {
                     writeString(NameTagVisibility.ALWAYS.getId());
