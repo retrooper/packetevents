@@ -189,6 +189,15 @@ public class NPC {
         }
     }
 
+    public void updateGameMode(GameMode gamemode) {
+        setGameMode(gamemode);
+        for (Object channel : channels) {
+            WrapperPlayServerPlayerInfo playerInfo =
+                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_GAME_MODE, getPlayerInfoData());
+            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
+        }
+    }
+
     public void changeSkin(UUID skinUUID, List<TextureProperty> skinTextureProperties) {
         for (Object channel : channels) {
             WrapperPlayServerPlayerInfo playerInfoRemove =
