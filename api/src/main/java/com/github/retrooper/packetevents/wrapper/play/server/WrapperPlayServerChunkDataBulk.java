@@ -78,7 +78,7 @@ public class WrapperPlayServerChunkDataBulk extends PacketWrapper<WrapperPlaySer
         for (int column = 0; column < columns; column++) {
             data[column].setData(readBytes(data[column].getData().length));
             BitSet mask = BitSet.valueOf(new long[]{data[column].getMask()});
-            BaseChunk[] chunkData = new ChunkReader_v1_8().read(mask, null, true, skylight, false, 16, data[column].getData(), null);
+            BaseChunk[] chunkData = new ChunkReader_v1_8().read(user.getDimension(), mask, null, true, skylight, false, 16, data[column].getData(), null);
             this.chunks[column] = chunkData;
             this.biomeData[column] = readBytes(256);
         }
@@ -135,7 +135,7 @@ public class WrapperPlayServerChunkDataBulk extends PacketWrapper<WrapperPlaySer
 
             // Read data into chunks and biome data.
             // BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn
-            BaseChunk[] chunkData = new ChunkReader_v1_7().read(chunkMask, extendedChunkMask, true, skylight, false, 16, dat, null);
+            BaseChunk[] chunkData = new ChunkReader_v1_7().read(user.getDimension(), chunkMask, extendedChunkMask, true, skylight, false, 16, dat, null);
             byte[] biomeDataBytes = Arrays.copyOfRange(dat, dat.length - 256, dat.length); // let's hope the server knows the right data length
 
             this.x[count] = x;

@@ -19,10 +19,11 @@
 package com.github.retrooper.packetevents.protocol.world.chunk.reader;
 
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 
 import java.util.BitSet;
 
 public interface ChunkReader {
-    BaseChunk[] read(BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn);
+    BaseChunk[] read(Dimension dimension, BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn);
 }
