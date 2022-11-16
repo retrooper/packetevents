@@ -33,6 +33,7 @@ import java.util.*;
 public class NPC {
     private final int id;
     private final UserProfile profile;
+    private GameMode gamemode;
     private Component tabName;
     private NamedTextColor nameColor;
     private Component prefixName;
@@ -47,10 +48,11 @@ public class NPC {
     private ItemStack boots = null;
     private final Set<Object> channels = new HashSet<>();
 
-    public NPC(UserProfile profile, int entityId, @Nullable Component tabName, @Nullable NamedTextColor nameColor,
+    public NPC(UserProfile profile, int entityId, GameMode gamemode, @Nullable Component tabName, @Nullable NamedTextColor nameColor,
                @Nullable Component prefixName, @Nullable Component suffixName) {
         this.profile = profile;
         this.id = entityId;
+        this.gamemode = gamemode;
 
         this.tabName = tabName;
         this.nameColor = nameColor;
@@ -59,7 +61,7 @@ public class NPC {
     }
 
     public NPC(UserProfile profile, int entityId, @Nullable Component tabName) {
-        this(profile, entityId, tabName, null, null, null);
+        this(profile, entityId, GameMode.SURVIVAL, tabName, null, null, null);
     }
 
     public NPC(UserProfile profile, int entityId) {
@@ -183,6 +185,15 @@ public class NPC {
         for (Object channel : channels) {
             WrapperPlayServerPlayerInfo playerInfo =
                     new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, getPlayerInfoData());
+            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
+        }
+    }
+
+    public void updateGameMode(GameMode gamemode) {
+        setGameMode(gamemode);
+        for (Object channel : channels) {
+            WrapperPlayServerPlayerInfo playerInfo =
+                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_GAME_MODE, getPlayerInfoData());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
         }
     }
@@ -367,6 +378,14 @@ public class NPC {
         return profile;
     }
 
+    public GameMode getGameMode() {
+        return gamemode;
+    }
+
+    public void setGameMode(GameMode gamemode) {
+        this.gamemode = gamemode;
+    }
+
     private WrapperPlayServerTeams generateTeamsData() {
         return new WrapperPlayServerTeams("custom_name_team",
                 WrapperPlayServerTeams.TeamMode.CREATE,
@@ -385,7 +404,7 @@ public class NPC {
 
     public WrapperPlayServerPlayerInfo.PlayerData getPlayerInfoData() {
         return new WrapperPlayServerPlayerInfo.PlayerData(getTabName(),
-                getProfile(), GameMode.SURVIVAL,
+                getProfile(), getGameMode(),
                 getDisplayPing());
     }
 
