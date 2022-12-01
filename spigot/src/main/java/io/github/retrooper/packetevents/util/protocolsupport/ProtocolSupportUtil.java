@@ -31,8 +31,10 @@ public class ProtocolSupportUtil {
         if (available == ProtocolSupportState.UNKNOWN) {
             try {
                 Class.forName("protocolsupport.api.ProtocolSupportAPI");
+                available = ProtocolSupportState.ENABLED;
                 return true;
             } catch (Exception e) {
+                available = ProtocolSupportState.DISABLED;
                 return false;
             }
         } else {
