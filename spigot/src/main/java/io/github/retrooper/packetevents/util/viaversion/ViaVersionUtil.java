@@ -18,11 +18,13 @@
 
 package io.github.retrooper.packetevents.util.viaversion;
 
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.reflection.Reflection;
+import io.netty.channel.Channel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ViaVersionUtil {
-    //TODO Cut support for legacy versions of viaversion(also include an error when users load with outdated via), as we will force everyone to update soon
     private static ViaState available = ViaState.UNKNOWN;
     private static ViaVersionAccessor viaVersionAccessor;
 
@@ -60,6 +62,24 @@ public class ViaVersionUtil {
     public static ViaVersionAccessor getViaVersionAccessor() {
         load();
         return viaVersionAccessor;
+    }
+
+    public static int getProtocolVersion(User user) {
+        try {
+            if (user.getUUID() != null) {
+                Player player = Bukkit.getPlayer(user.getUUID());
+                if (player != null) {
+                    return getProtocolVersion(player);
+                }
+            }
+            Object viaEncoder = ((Channel) user.getChannel()).pipeline().get("via-encoder");
+            Object connection = Reflection.getField(viaEncoder.getClass(), "connection").get(viaEncoder);
+            Object protocolInfo = Reflection.getField(connection.getClass(), "protocolInfo").get(connection);
+            return (int) Reflection.getField(protocolInfo.getClass(), "protocolVersion").get(protocolInfo);
+        } catch (Exception e) {
+            System.out.println("Unable to grab ViaVersion client version for player!");
+            return -1;
+        }
     }
 
     public static int getProtocolVersion(Player player) {

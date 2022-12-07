@@ -23,7 +23,6 @@ import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.injector.connection.ServerChannelHandler;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
@@ -31,13 +30,10 @@ import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
 import io.github.retrooper.packetevents.util.InjectedList;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
-import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
-import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -202,38 +198,6 @@ public class SpigotChannelInjector implements ChannelInjector {
             //Change connection state in encoder
             encoder.user.setConnectionState(connectionState);
         }
-
-        PacketEventsDecoder decoder = getDecoder(channel);
-        if (decoder != null) {
-            //Change connection state in decoder
-            decoder.user.setConnectionState(connectionState);
-            if (connectionState == ConnectionState.PLAY) {
-                if (ViaVersionUtil.isAvailable()) {
-                    channel.pipeline().remove(PacketEvents.DECODER_NAME);
-                    decoder.handledCompression = true;
-                    //Clone our decoder(as it is not sharable)
-                    decoder = new PacketEventsDecoder(decoder);
-                    //Inject our decoder into ViaVersion's decoder (because we have to)
-                    ChannelHandler viaDecoder = channel.pipeline().get("decoder");
-                    ReflectionObject reflectionObject = new ReflectionObject(viaDecoder);
-                    ByteToMessageDecoder mcDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
-                    String decoderClassName = ClassUtil.getClassSimpleName(mcDecoder.getClass());
-                    if (decoderClassName.equals("PacketEventsDecoder")) {
-                        //We aren't the first packetevents instance to inject into ViaVersion's decoder
-                        ReflectionObject reflectPacketDecoderModern = new ReflectionObject(mcDecoder);
-                        List<ByteToMessageDecoder> decoders = reflectPacketDecoderModern.readList(0);
-                        decoders.add(decoder);
-                    } else {
-                        //We are the first packetevents instance to inject into ViaVersion's decoder
-                        decoder.mcDecoder = mcDecoder;
-                        reflectionObject.write(ByteToMessageDecoder.class, 0, decoder);
-                    }
-                } else if (ProtocolSupportUtil.isAvailable()) {
-                    channel.pipeline().remove(PacketEvents.DECODER_NAME);
-                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, new PacketEventsDecoder(decoder));
-                }
-            }
-        }
     }
 
     @Override
@@ -276,31 +240,6 @@ public class SpigotChannelInjector implements ChannelInjector {
     }
 
     private PacketEventsDecoder getDecoder(Channel channel) {
-        ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
-        if (decoder instanceof PacketEventsDecoder) {
-            return (PacketEventsDecoder) decoder;
-        } else if (ViaVersionUtil.isAvailable()) {
-            decoder = channel.pipeline().get("decoder");
-            if (ViaVersionUtil.getBukkitDecodeHandlerClass().equals(decoder.getClass())) {
-                ReflectionObject reflectMCDecoder = new ReflectionObject(decoder);
-                ByteToMessageDecoder injectedDecoder = reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
-                //We are the father decoder
-                if (injectedDecoder instanceof PacketEventsDecoder) {
-                    return (PacketEventsDecoder) injectedDecoder;
-                } else if (ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketEventsDecoder")) {
-                    //Some other packetevents instance already injected. Let us find our child decoder somewhere in here.
-                    ReflectionObject reflectInjectedDecoder = new ReflectionObject(injectedDecoder);
-                    List<Object> decoders = reflectInjectedDecoder.readList(0);
-                    for (Object customDecoder : decoders) {
-                        if (customDecoder instanceof PacketEventsDecoder) {
-                            return (PacketEventsDecoder) customDecoder;
-                        }
-                    }
-                }
-            }
-        }
-        //We honestly have no idea where our decoder is?
-        return null;
+         return (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
     }
-
 }

@@ -21,7 +21,7 @@ dependencies {
     api(adventureDependencies)
 
     compileOnly 'org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT'
-    compileOnly 'com.viaversion:viaversion:4.0.1'
+    compileOnly 'com.viaversion:viaversion:4.5.0'
     compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
 
 

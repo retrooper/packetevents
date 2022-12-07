@@ -18,62 +18,52 @@
 
 package io.github.retrooper.packetevents.injector.handlers;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
-import io.netty.handler.codec.EncoderException;
-import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.util.ReferenceCountUtil;
+import io.netty.handler.codec.MessageToMessageEncoder;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 @ChannelHandler.Sharable
-public class PacketEventsEncoder extends MessageToByteEncoder<Object> {
+public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     public User user;
     public volatile Player player;
-    public MessageToByteEncoder<?> vanillaEncoder;
     public final List<Runnable> queuedPostTasks = new ArrayList<>();
+    public boolean handledCompression;
 
     public PacketEventsEncoder(User user) {
         this.user = user;
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf out) throws Exception {
-        if (!(o instanceof ByteBuf)) {
-            //Convert NMS object to bytes, so we can process it right away.
-            if (vanillaEncoder == null) return;
-            try {
-                CustomPipelineUtil.callEncode(vanillaEncoder, ctx, o, out);
-            }
-            catch (Exception ex) {
-                if (ex.getCause() instanceof Exception) {
-                    throw (Exception) ex.getCause();
-                }
-                else if (ex.getCause() instanceof Error) {
-                    throw (Error) ex.getCause();
-                }
-            }
-            //Failed to translate it into ByteBuf form (which we can process)
-            if (!out.isReadable()) return;
-        } else {
-            ByteBuf in = (ByteBuf) o;
-            //Empty packets?
-            if (!in.isReadable()) return;
-            out.writeBytes(in);
+    protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
+        queuedPostTasks.clear();
+
+        boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
+
+        PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, true, false);
+
+        if (needsRecompression) {
+            compress(ctx, byteBuf);
         }
-        PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, out, true, false);
+
+        list.add(byteBuf.retain());
+
         if (sendEvent.hasPostTasks()) {
             queuedPostTasks.addAll(sendEvent.getPostTasks());
         }
@@ -81,50 +71,14 @@ public class PacketEventsEncoder extends MessageToByteEncoder<Object> {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        //This is netty code of the write method, and we are just "injecting" into it.
-        ByteBuf buf = null;
-        try {
-            if (this.acceptOutboundMessage(msg)) {
-                buf = this.allocateBuffer(ctx, msg, true);
-                try {
-                    this.encode(ctx, msg, buf);
-                } finally {
-                    ReferenceCountUtil.release(msg);
-                    //PacketEvents - Start
-                    //Now we added the post tasks to the queuedPostTasks list, so let us execute them after we send the packet.
-                    if (!queuedPostTasks.isEmpty()) {
-                        List<Runnable> tasks = new ArrayList<>(queuedPostTasks);
-                        queuedPostTasks.clear();
-                        promise.addListener(f -> {
-                            for (Runnable task : tasks) {
-                                task.run();
-                            }
-                        });
-                    }
-                    //PacketEvents - End
-                }
-                if (buf.isReadable()) {
-                    ctx.write(buf, promise);
-                } else {
-                    buf.release();
-                    // While we should write an empty buffer, various proxies and custom minecraft client
-                    // are unable to handle an empty buffer, and it will break them...
-                    //ctx.write(Unpooled.EMPTY_BUFFER, promise);
-                }
-                buf = null;
-            } else {
-                ctx.write(msg, promise);
+        promise.addListener(p -> {
+            for (Runnable runnable : queuedPostTasks) {
+                runnable.run();
             }
-        } catch (EncoderException e) {
-            throw e;
-        } catch (Throwable e2) {
-            throw new EncoderException(e2);
-        } finally {
-            if (buf != null) {
-                buf.release();
-            }
-        }
+        });
+        super.write(ctx, msg, promise);
     }
+
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
@@ -136,5 +90,48 @@ public class PacketEventsEncoder extends MessageToByteEncoder<Object> {
                 && (user != null && user.getConnectionState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();
         }
+    }
+
+    private void compress(ChannelHandlerContext ctx, ByteBuf input) throws InvocationTargetException {
+        ChannelHandler compressor = ctx.pipeline().get("compress");
+        ByteBuf temp = ctx.alloc().buffer();
+        try {
+            if (compressor != null) {
+                CustomPipelineUtil.callEncode(compressor, ctx, input, temp);
+            }
+        } finally {
+            input.clear().writeBytes(temp);
+            temp.release();
+        }
+    }
+
+    private void decompress(ChannelHandlerContext ctx, ByteBuf input, ByteBuf output) throws InvocationTargetException {
+        ChannelHandler decompressor = ctx.pipeline().get("decompress");
+        if (decompressor != null) {
+            ByteBuf temp = (ByteBuf) CustomPipelineUtil.callDecode(decompressor, ctx, input).get(0);
+            try {
+                output.clear().writeBytes(temp);
+            } finally {
+                temp.release();
+            }
+        }
+    }
+
+    private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
+        if (handledCompression) return false;
+        int decompressIndex = ctx.pipeline().names().indexOf("decompress");
+        if (decompressIndex == -1) return false;
+        handledCompression = true;
+        int peDecoderIndex = ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME);
+        if (peDecoderIndex == -1) return false;
+        if (decompressIndex > peDecoderIndex) {
+            //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
+            //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
+            decompress(ctx, buffer, buffer);
+            //Let us relocate and no longer deal with compression.
+            ServerConnectionInitializer.relocateHandlers(ctx.channel(), null);
+            return true;
+        }
+        return false;
     }
 }
