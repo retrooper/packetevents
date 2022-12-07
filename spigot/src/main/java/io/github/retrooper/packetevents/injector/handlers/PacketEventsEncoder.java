@@ -53,7 +53,7 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
         boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
 
-        PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, false, false);
+        PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, true, false);
 
         if (needsRecompression) {
             compress(ctx, byteBuf);
