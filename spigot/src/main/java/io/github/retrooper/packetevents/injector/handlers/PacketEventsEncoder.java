@@ -36,14 +36,13 @@ import io.netty.handler.codec.MessageToMessageEncoder;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     public User user;
     public volatile Player player;
-    public final List<Runnable> queuedPostTasks = new ArrayList<>();
+    private ChannelPromise promise;
     public boolean handledCompression;
 
     public PacketEventsEncoder(User user) {
@@ -63,21 +62,17 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
         list.add(byteBuf.retain());
 
         if (sendEvent.hasPostTasks()) {
-            queuedPostTasks.addAll(sendEvent.getPostTasks());
+            promise.addListener(p -> {
+                for (Runnable runnable : sendEvent.getPostTasks()) {
+                    runnable.run();
+                }
+            });
         }
     }
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (!queuedPostTasks.isEmpty()) {
-            List<Runnable> tasks = new ArrayList<>(queuedPostTasks);
-            queuedPostTasks.clear();
-            promise.addListener(p -> {
-                for (Runnable runnable : tasks) {
-                    runnable.run();
-                }
-            });
-        }
+        this.promise = promise;
         super.write(ctx, msg, promise);
     }
 
