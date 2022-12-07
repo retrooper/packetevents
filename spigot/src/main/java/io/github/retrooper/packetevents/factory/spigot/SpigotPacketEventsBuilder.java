@@ -98,7 +98,7 @@ public class SpigotPacketEventsBuilder {
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
                     PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
                     try {
-                        SpigotReflectionUtil.init();
+                        SpigotReflectionUtil.init(getServerManager().getVersion());
                         CustomPipelineUtil.init();
                     } catch (Exception ex) {
                         throw new IllegalStateException(ex);

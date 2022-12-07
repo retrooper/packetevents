@@ -119,14 +119,14 @@ public final class SpigotReflectionUtil {
             GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, Iterable.class, 0);
         }
         if (DIMENSION_MANAGER_CLASS != null) {
-            if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16
-                || PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16_1) {
+            if (VERSION == ServerVersion.V_1_16
+                || VERSION == ServerVersion.V_1_16_1) {
                 GET_DIMENSION_KEY = Reflection.getMethod(NMS_WORLD_CLASS, "getTypeKey", 0);
             }
             GET_DIMENSION_MANAGER = Reflection.getMethod(NMS_WORLD_CLASS, DIMENSION_MANAGER_CLASS, 0);
             GET_DIMENSION_ID = Reflection.getMethod(DIMENSION_MANAGER_CLASS, int.class, 0);
         }
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
+        if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
             CODEC_ENCODE_METHOD = Reflection.getMethod(MOJANG_ENCODER_CLASS, "encodeStart", 0);
             DATA_RESULT_GET_METHOD = Reflection.getMethod(DATA_RESULT_CLASS, "result", 0);
         }
@@ -158,7 +158,7 @@ public final class SpigotReflectionUtil {
         ENTITY_BOUNDING_BOX_FIELD = Reflection.getField(NMS_ENTITY_CLASS, BOUNDING_BOX_CLASS, 0, true);
         ENTITY_PLAYER_PING_FIELD = Reflection.getField(ENTITY_PLAYER_CLASS, "ping");
         BYTE_BUF_IN_PACKET_DATA_SERIALIZER = Reflection.getField(NMS_PACKET_DATA_SERIALIZER_CLASS, BYTE_BUF_CLASS, 0, true);
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
+        if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
             DIMENSION_CODEC_FIELD = Reflection.getField(DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, 0);
             DYNAMIC_OPS_NBT_INSTANCE_FIELD = Reflection.getField(DYNAMIC_OPS_NBT_CLASS, DYNAMIC_OPS_NBT_CLASS, 0);
         }
@@ -187,7 +187,7 @@ public final class SpigotReflectionUtil {
             PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
         }
         DIMENSION_MANAGER_CLASS = getServerClass("world.level.dimension.DimensionManager", "DimensionManager");
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
+        if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
             MOJANG_CODEC_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Codec");
             MOJANG_ENCODER_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Encoder");
             DATA_RESULT_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.DataResult");
@@ -216,8 +216,8 @@ public final class SpigotReflectionUtil {
         NBT_COMPRESSION_STREAM_TOOLS_CLASS = getServerClass("nbt.NBTCompressedStreamTools", "NBTCompressedStreamTools");
     }
 
-    public static void init() {
-        VERSION = PacketEvents.getAPI().getServerManager().getVersion();
+    public static void init(ServerVersion version) {
+        VERSION = version;
         V_1_19_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_19);
         V_1_17_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_17);
         V_1_12_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_12);
@@ -604,13 +604,13 @@ public final class SpigotReflectionUtil {
     }
 
     public static int getBlockDataCombinedId(MaterialData materialData) {
-        if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
+        if (VERSION == ServerVersion.V_1_7_10) {
             //TODO Finish for 1.7.10
             throw new IllegalStateException("This operation is not supported yet on 1.7.10!");
         }
         //TODO Finish
         int combinedID;
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+        if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             combinedID = -1;
         } else {
             combinedID = materialData.getItemType().getId() << 4 | materialData.getData();
@@ -629,7 +629,7 @@ public final class SpigotReflectionUtil {
     }
 
     public static MaterialData getBlockDataByCombinedId(int combinedID) {
-        if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
+        if (VERSION == ServerVersion.V_1_7_10) {
             //TODO Finish for 1.7.10
             throw new IllegalStateException("This operation is not supported yet on 1.7.10!");
         }

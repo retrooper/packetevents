@@ -40,6 +40,7 @@ import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
+import io.github.retrooper.packetevents.context.SpigotContext;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -63,6 +64,7 @@ public class PacketEventsPlugin extends JavaPlugin {
         //Register your listeners
         PacketEvents.getAPI().getSettings().debug(false).bStats(true)
                 .checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).readOnlyListeners(false);
+        //PacketEvents.getAPI().load();
         PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
             @Override
@@ -81,6 +83,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     new Vector3d(player.getLocation().getX(), player.getLocation().getY() + 1, player.getLocation().getZ()),
                                     new Vector3f(0.65F, 0, 0.65F), 1, 100));
                             user.sendMessage("Sent!");
+                            player.sendMessage("User and player object both work!!!");
                         }
                         break;
                     case PLAYER_FLYING:
@@ -167,7 +170,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
