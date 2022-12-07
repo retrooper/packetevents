@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
+import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -95,4 +96,17 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
             cause.printStackTrace();
         }
     }
+
+    @Override
+    public void userEventTriggered(final ChannelHandlerContext ctx, final Object event) throws Exception {
+        if (PacketEventsEncoder.COMPRESSION_ENABLED_EVENT == null || event != PacketEventsEncoder.COMPRESSION_ENABLED_EVENT) {
+            super.userEventTriggered(ctx, event);
+            return;
+        }
+
+        // Via changes the order of handlers in this event, so we must respond to Via changing their stuff
+        ServerConnectionInitializer.relocateHandlers(ctx.channel(), null);
+        super.userEventTriggered(ctx, event);
+    }
+
 }

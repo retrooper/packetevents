@@ -43,7 +43,8 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     public User user;
     public volatile Player player;
     private ChannelPromise promise;
-    public boolean handledCompression;
+    public static final Object COMPRESSION_ENABLED_EVENT = paperCompressionEnabledEvent();
+    public boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
 
     public PacketEventsEncoder(User user) {
         this.user = user;
@@ -86,6 +87,15 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
                 && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
                 && (user != null && user.getConnectionState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();
+        }
+    }
+
+    private static Object paperCompressionEnabledEvent() {
+        try {
+            final Class<?> eventClass = Class.forName("io.papermc.paper.network.ConnectionEvent");
+            return eventClass.getDeclaredField("COMPRESSION_THRESHOLD_SET").get(null);
+        } catch (final ReflectiveOperationException e) {
+            return null;
         }
     }
 
