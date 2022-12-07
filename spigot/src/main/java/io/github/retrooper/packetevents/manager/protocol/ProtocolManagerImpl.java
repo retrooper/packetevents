@@ -100,10 +100,12 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public void receivePacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
             List<String> handlerNames = ChannelHelper.pipelineHandlerNames(channel);
-            //Account for ProtocolSupport
+            //Account for ViaVersion
             if (handlerNames.contains("via-encoder")) {
-                ChannelHelper.fireChannelReadInContext(channel, "via-encoder", byteBuf);
-            } else if (handlerNames.contains("ps_decoder_transformer")) {
+                ChannelHelper.fireChannelReadInContext(channel, "via-decoder", byteBuf);
+            }
+            //Account for ProtocolSupport
+            else if (handlerNames.contains("ps_decoder_transformer")) {
                 //We want to skip ProtocolSupport's translation handlers,
                 //because the buffer is fit for the current server-version
                 ChannelHelper.fireChannelReadInContext(channel, "ps_decoder_transformer", byteBuf);

@@ -116,12 +116,12 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
         if (handledCompression) return false;
-        int decompressIndex = ctx.pipeline().names().indexOf("decompress");
-        if (decompressIndex == -1) return false;
+        int compressIndex = ctx.pipeline().names().indexOf("compress");
+        if (compressIndex == -1) return false;
         handledCompression = true;
-        int peDecoderIndex = ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME);
-        if (peDecoderIndex == -1) return false;
-        if (decompressIndex > peDecoderIndex) {
+        int peEncoderIndex = ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME);
+        if (peEncoderIndex == -1) return false;
+        if (compressIndex > peEncoderIndex) {
             //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
             //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
             decompress(ctx, buffer, buffer);
