@@ -52,8 +52,6 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        queuedPostTasks.clear();
-
         boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
 
         PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, true, false);
@@ -71,11 +69,15 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        promise.addListener(p -> {
-            for (Runnable runnable : queuedPostTasks) {
-                runnable.run();
-            }
-        });
+        if (!queuedPostTasks.isEmpty()) {
+            List<Runnable> tasks = new ArrayList<>(queuedPostTasks);
+            queuedPostTasks.clear();
+            promise.addListener(p -> {
+                for (Runnable runnable : tasks) {
+                    runnable.run();
+                }
+            });
+        }
         super.write(ctx, msg, promise);
     }
 
