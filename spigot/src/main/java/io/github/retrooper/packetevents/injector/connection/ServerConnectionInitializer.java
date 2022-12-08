@@ -65,31 +65,31 @@ public class ServerConnectionInitializer {
                 return;
             }
 
-            relocateHandlers(channel, user);
+            relocateHandlers(channel, null, user);
 
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
             ProtocolManager.USERS.put(channel, user);
         }
     }
 
-    public static void relocateHandlers(Channel ctx, User user) {
-        // User == null means we already have handlers
+    public static void relocateHandlers(Channel ctx, PacketEventsDecoder decoder, User user) {
+        // Decoder == null means we haven't made handlers for the user yet
         try {
-            ChannelHandler decoder;
             ChannelHandler encoder;
-
-            if (user == null) {
+            if (decoder != null) {
+                // This patches a bug where PE 2.0 handlers keep jumping behind one another causing a stackoverflow
+                if (decoder.hasBeenRelocated) return;
+                // Make sure we only relocate because of compression once
+                decoder.hasBeenRelocated = true;
+                decoder = (PacketEventsDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
                 encoder = ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
             } else {
                 encoder = new PacketEventsEncoder(user);
-            }
-
-            if (user == null) {
-                decoder = ctx.pipeline().remove(PacketEvents.DECODER_NAME);
-            } else {
                 decoder = new PacketEventsDecoder(user);
             }
-
+            // We are targeting the encoder and decoder since we don't want to target specific plugins
+            // (ProtocolSupport has changed its handler name in the past)
+            // I don't like the hacks required for compression but that's on vanilla, we can't fix it.
             ctx.pipeline().addBefore("decoder", PacketEvents.DECODER_NAME, decoder);
             ctx.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, encoder);
         } catch (NoSuchElementException ex) {

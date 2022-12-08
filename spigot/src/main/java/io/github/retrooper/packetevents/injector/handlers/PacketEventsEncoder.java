@@ -136,7 +136,8 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
             //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
             decompress(ctx, buffer, buffer);
             //Let us relocate and no longer deal with compression.
-            ServerConnectionInitializer.relocateHandlers(ctx.channel(), null);
+            PacketEventsDecoder decoder = (PacketEventsDecoder) ctx.pipeline().get(PacketEvents.DECODER_NAME);
+            ServerConnectionInitializer.relocateHandlers(ctx.channel(), decoder, user);
             return true;
         }
         return false;

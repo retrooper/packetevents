@@ -40,6 +40,7 @@ import java.util.List;
 public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public User user;
     public volatile Player player;
+    public boolean hasBeenRelocated;
 
     public PacketEventsDecoder(User user) {
         this.user = user;
@@ -105,7 +106,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         }
 
         // Via changes the order of handlers in this event, so we must respond to Via changing their stuff
-        ServerConnectionInitializer.relocateHandlers(ctx.channel(), null);
+        ServerConnectionInitializer.relocateHandlers(ctx.channel(), this, user);
         super.userEventTriggered(ctx, event);
     }
 
