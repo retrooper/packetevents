@@ -26,9 +26,12 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -867,6 +870,20 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeInt(data.getSpecialPrice());
         writeFloat(data.getPriceMultiplier());
         writeInt(data.getDemand());
+    }
+
+    public ChatMessage_v1_19_1.ChatTypeBoundNetwork readChatTypeBoundNetwork() {
+        int id = readVarInt();
+        ChatType type = ChatTypes.getById(getServerVersion().toClientVersion(), id);
+        Component name = readComponent();
+        Component targetName = readOptional(PacketWrapper::readComponent);
+        return new ChatMessage_v1_19_1.ChatTypeBoundNetwork(type, name, targetName);
+    }
+
+    public void writeChatTypeBoundNetwork(ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
+        writeVarInt(chatType.getType().getId(getServerVersion().toClientVersion()));
+        writeComponent(chatType.getName());
+        writeOptional(chatType.getTargetName(), PacketWrapper::writeComponent);
     }
 
 
