@@ -50,7 +50,8 @@ public final class PacketType {
             ClientVersion.V_1_17,
             ClientVersion.V_1_18,
             ClientVersion.V_1_19,
-            ClientVersion.V_1_19_1);
+            ClientVersion.V_1_19_1,
+            ClientVersion.V_1_19_3);
 
     //TODO UPDATE Update packet type mappings (serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
@@ -66,7 +67,8 @@ public final class PacketType {
             ClientVersion.V_1_16_2,
             ClientVersion.V_1_17,
             ClientVersion.V_1_19,
-            ClientVersion.V_1_19_1);
+            ClientVersion.V_1_19_1,
+            ClientVersion.V_1_19_3);
 
     public static void prepare() {
         PacketType.Play.Client.load();
@@ -389,6 +391,7 @@ public final class PacketType {
                 loadPacketIds(ServerboundPacketType_1_17.values());
                 loadPacketIds(ServerboundPacketType_1_19.values());
                 loadPacketIds(ServerboundPacketType_1_19_1.values());
+                loadPacketIds(ServerboundPacketType_1_19_3.values());
                 //TODO UPDATE Update packet type mappings (serverbound pt. 2)
             }
 
@@ -591,6 +594,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_18.values());
                 loadPacketIds(ClientboundPacketType_1_19.values());
                 loadPacketIds(ClientboundPacketType_1_19_1.values());
+                loadPacketIds(ClientboundPacketType_1_19_3.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }
