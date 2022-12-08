@@ -29,6 +29,7 @@ import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationH
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
+import com.github.retrooper.packetevents.protocol.chat.RemoteChatSession;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
@@ -44,6 +45,7 @@ import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.PublicProfileKey;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
@@ -739,6 +741,28 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writePublicKey(PublicKey publicKey) {
         writeByteArray(publicKey.getEncoded());
+    }
+
+    public PublicProfileKey readPublicProfileKey() {
+        Instant expiresAt = readTimestamp();
+        PublicKey key = readPublicKey();
+        byte[] keySignature = readByteArray(4096);
+        return new PublicProfileKey(expiresAt, key, keySignature);
+    }
+
+    public void writePublicProfileKey(PublicProfileKey key) {
+        writeTimestamp(key.getExpiresAt());
+        writePublicKey(key.getKey());
+        writeByteArray(key.getKeySignature());
+    }
+
+    public RemoteChatSession readRemoteChatSession() {
+        return new RemoteChatSession(readUUID(), readPublicProfileKey());
+    }
+
+    public void writeRemoteChatSession(RemoteChatSession chatSession) {
+        writeUUID(chatSession.getSessionId());
+        writePublicProfileKey(chatSession.getPublicProfileKey());
     }
 
     public Instant readTimestamp() {
