@@ -188,7 +188,7 @@ public class SpigotPacketEventsBuilder {
                     String[] ver = viaPlugin.getDescription().getVersion().split("\\.", 3);
                     int major = Integer.parseInt(ver[0]);
                     int minor = Integer.parseInt(ver[1]);
-                    if (major < 4 || minor < 5) {
+                    if (major < 4 || major == 4 && minor < 5) {
                         PacketEvents.getAPI().getLogManager().severe("You are attempting to combine 2.0 PacketEvents with a " +
                                 "ViaVersion older than 4.5.0, please update your ViaVersion!");
                         Plugin ourPlugin = getPlugin();
