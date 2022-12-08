@@ -45,4 +45,8 @@ public enum GameMode {
         }
         return VALUES[id];
     }
+
+    public static GameMode defaultGameMode() {
+        return SURVIVAL;
+    }
 }

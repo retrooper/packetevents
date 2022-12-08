@@ -910,6 +910,30 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeOptional(chatType.getTargetName(), PacketWrapper::writeComponent);
     }
 
+    public <T extends Enum<T>> EnumSet<T> readEnumSet(Class<T> enumClazz) {
+        T[] values = enumClazz.getEnumConstants();
+        byte[] bytes = new byte[-Math.floorDiv(-values.length, 8)];
+        ByteBufHelper.readBytes(getBuffer(), bytes);
+        BitSet bitSet = BitSet.valueOf(bytes);
+        EnumSet<T> set = EnumSet.noneOf(enumClazz);
+        for (int i = 0; i < values.length; i++) {
+            if (bitSet.get(i)) {
+                set.add(values[i]);
+            }
+        }
+        return set;
+    }
+
+    public <T extends Enum<T>> void writeEnumSet(EnumSet<T> set, Class<T> enumClazz) {
+        T[] values = enumClazz.getEnumConstants();
+        BitSet bitSet = new BitSet(values.length);
+        for (int i = 0; i < values.length; i++) {
+            if (set.contains(values[i])) {
+                bitSet.set(i);
+            }
+        }
+        writeBytes(Arrays.copyOf(bitSet.toByteArray(), -Math.floorDiv(-values.length, 8)));
+    }
 
     @Experimental
     public <U, V, R> U readMultiVersional(VersionComparison version, ServerVersion target, Reader<V> first, Reader<R> second) {
