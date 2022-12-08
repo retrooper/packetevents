@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.exception;
 
-public class PacketProcessException extends Exception {
+public class PacketProcessException extends RuntimeException {
     public PacketProcessException(String msg, Throwable cause) {
         super(msg, cause);
     }
