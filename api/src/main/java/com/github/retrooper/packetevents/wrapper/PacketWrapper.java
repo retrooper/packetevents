@@ -26,9 +26,13 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
+import com.github.retrooper.packetevents.protocol.chat.RemoteChatSession;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -41,6 +45,7 @@ import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.PublicProfileKey;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
@@ -738,6 +743,28 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeByteArray(publicKey.getEncoded());
     }
 
+    public PublicProfileKey readPublicProfileKey() {
+        Instant expiresAt = readTimestamp();
+        PublicKey key = readPublicKey();
+        byte[] keySignature = readByteArray(4096);
+        return new PublicProfileKey(expiresAt, key, keySignature);
+    }
+
+    public void writePublicProfileKey(PublicProfileKey key) {
+        writeTimestamp(key.getExpiresAt());
+        writePublicKey(key.getKey());
+        writeByteArray(key.getKeySignature());
+    }
+
+    public RemoteChatSession readRemoteChatSession() {
+        return new RemoteChatSession(readUUID(), readPublicProfileKey());
+    }
+
+    public void writeRemoteChatSession(RemoteChatSession chatSession) {
+        writeUUID(chatSession.getSessionId());
+        writePublicProfileKey(chatSession.getPublicProfileKey());
+    }
+
     public Instant readTimestamp() {
         return Instant.ofEpochMilli(readLong());
     }
@@ -869,6 +896,44 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeInt(data.getDemand());
     }
 
+    public ChatMessage_v1_19_1.ChatTypeBoundNetwork readChatTypeBoundNetwork() {
+        int id = readVarInt();
+        ChatType type = ChatTypes.getById(getServerVersion().toClientVersion(), id);
+        Component name = readComponent();
+        Component targetName = readOptional(PacketWrapper::readComponent);
+        return new ChatMessage_v1_19_1.ChatTypeBoundNetwork(type, name, targetName);
+    }
+
+    public void writeChatTypeBoundNetwork(ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
+        writeVarInt(chatType.getType().getId(getServerVersion().toClientVersion()));
+        writeComponent(chatType.getName());
+        writeOptional(chatType.getTargetName(), PacketWrapper::writeComponent);
+    }
+
+    public <T extends Enum<T>> EnumSet<T> readEnumSet(Class<T> enumClazz) {
+        T[] values = enumClazz.getEnumConstants();
+        byte[] bytes = new byte[-Math.floorDiv(-values.length, 8)];
+        ByteBufHelper.readBytes(getBuffer(), bytes);
+        BitSet bitSet = BitSet.valueOf(bytes);
+        EnumSet<T> set = EnumSet.noneOf(enumClazz);
+        for (int i = 0; i < values.length; i++) {
+            if (bitSet.get(i)) {
+                set.add(values[i]);
+            }
+        }
+        return set;
+    }
+
+    public <T extends Enum<T>> void writeEnumSet(EnumSet<T> set, Class<T> enumClazz) {
+        T[] values = enumClazz.getEnumConstants();
+        BitSet bitSet = new BitSet(values.length);
+        for (int i = 0; i < values.length; i++) {
+            if (set.contains(values[i])) {
+                bitSet.set(i);
+            }
+        }
+        writeBytes(Arrays.copyOf(bitSet.toByteArray(), -Math.floorDiv(-values.length, 8)));
+    }
 
     @Experimental
     public <U, V, R> U readMultiVersional(VersionComparison version, ServerVersion target, Reader<V> first, Reader<R> second) {

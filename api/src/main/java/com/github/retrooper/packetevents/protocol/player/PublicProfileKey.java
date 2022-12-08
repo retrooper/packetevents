@@ -18,35 +18,33 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
-import org.jetbrains.annotations.Nullable;
+import java.security.PublicKey;
+import java.time.Instant;
 
-/**
- * Representation of a player's game mode.
- *
- * @author retrooper
- * @since 1.8
- */
-public enum GameMode {
-    SURVIVAL,
-    CREATIVE,
-    ADVENTURE,
-    SPECTATOR;
+public class PublicProfileKey {
+    private final Instant expiresAt;
+    private final PublicKey key;
+    private final byte[] keySignature;
 
-    private static final GameMode[] VALUES = values();
-
-    public int getId() {
-        return ordinal();
+    public PublicProfileKey(Instant expiresAt, PublicKey key, byte[] keySignature) {
+        this.expiresAt = expiresAt;
+        this.key = key;
+        this.keySignature = keySignature;
     }
 
-    @Nullable
-    public static GameMode getById(int id) {
-        if (id == -1) {
-            return null;
-        }
-        return VALUES[id];
+    public Instant getExpiresAt() {
+        return expiresAt;
     }
 
-    public static GameMode defaultGameMode() {
-        return SURVIVAL;
+    public PublicKey getKey() {
+        return key;
+    }
+
+    public byte[] getKeySignature() {
+        return keySignature;
+    }
+
+    public boolean hasExpired() {
+        return expiresAt.isBefore(Instant.now());
     }
 }

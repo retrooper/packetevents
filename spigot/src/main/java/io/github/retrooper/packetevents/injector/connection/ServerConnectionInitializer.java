@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.injector.connection;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
-import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -28,48 +27,16 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.util.reflection.ClassUtil;
-import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
-import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 
 public class ServerConnectionInitializer {
-
-    private static void destroyHandlers(Channel channel) {
-        channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-        ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
-        if (decoder != null && ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketEventsDecoder")) {
-            channel.pipeline().remove(PacketEvents.DECODER_NAME);
-        } else if (ViaVersionUtil.isAvailable()) {
-            decoder = channel.pipeline().get("decoder");
-            if (ViaVersionUtil.getBukkitDecodeHandlerClass().equals(decoder.getClass())) {
-                ReflectionObject reflectMCDecoder = new ReflectionObject(decoder);
-                ByteToMessageDecoder injectedDecoder = reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
-                if (injectedDecoder == null) {
-                    return;
-                }
-                //We are the father decoder
-                if (injectedDecoder instanceof PacketEventsDecoder) {
-                    //Since we are the father, we can just hop out of Via's handler.
-                    reflectMCDecoder.write(ByteToMessageDecoder.class, 0, injectedDecoder);
-                } else if (ClassUtil.getClassSimpleName(injectedDecoder.getClass()).equals("PacketEventsDecoder")) {
-                    //Some other packetevents instance already injected. Let us find our child decoder somewhere in here.
-                    ReflectionObject reflectInjectedDecoder = new ReflectionObject(injectedDecoder);
-                    List<Object> decoders = reflectInjectedDecoder.readList(0);
-                    decoders.removeIf(o -> o instanceof PacketEventsDecoder);
-                }
-            }
-        }
-    }
 
     public static void initChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
@@ -98,48 +65,36 @@ public class ServerConnectionInitializer {
                 return;
             }
 
+            relocateHandlers(channel, user);
+
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
             ProtocolManager.USERS.put(channel, user);
         }
-
-        try {
-            PacketEventsDecoder decoder = new PacketEventsDecoder(user);
-            channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
-        } catch (NoSuchElementException ex) {
-            String handlers = ChannelHelper.pipelineHandlerNamesAsString(channel);
-            throw new IllegalStateException("PacketEvents failed to add a decoder to the netty pipeline. Pipeline handlers: " + handlers, ex);
-        }
-
-        PacketEventsEncoder encoder = new PacketEventsEncoder(user);
-        ChannelHandler vanillaEncoder = channel.pipeline().get("encoder");
-
-        if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitEncodeHandlerClass().equals(vanillaEncoder.getClass())) {
-            //Read the minecraft encoder stored in ViaVersion's encoder.
-            encoder.vanillaEncoder = new ReflectionObject(vanillaEncoder)
-                    .read(0, MessageToByteEncoder.class);
-        } else {
-            encoder.vanillaEncoder = (MessageToByteEncoder<?>) vanillaEncoder;
-        }
-
-        channel.pipeline().addAfter("encoder", PacketEvents.ENCODER_NAME, encoder);
     }
 
-    public static void destroyChannel(Object ch) {
-        Channel channel = (Channel) ch;
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
-            return;
-        }
-        synchronized (channel) {
-            User user = ProtocolManager.USERS.get(channel);
+    public static void relocateHandlers(Channel ctx, User user) {
+        // User == null means we already have handlers
+        try {
+            ChannelHandler decoder;
+            ChannelHandler encoder;
+
             if (user == null) {
-                return;
+                encoder = ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
+            } else {
+                encoder = new PacketEventsEncoder(user);
             }
 
-            UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
-            PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
+            if (user == null) {
+                decoder = ctx.pipeline().remove(PacketEvents.DECODER_NAME);
+            } else {
+                decoder = new PacketEventsDecoder(user);
+            }
 
-            destroyHandlers(channel);
-            ProtocolManager.USERS.remove(channel);
+            ctx.pipeline().addBefore("decoder", PacketEvents.DECODER_NAME, decoder);
+            ctx.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, encoder);
+        } catch (NoSuchElementException ex) {
+            String handlers = ChannelHelper.pipelineHandlerNamesAsString(ctx);
+            throw new IllegalStateException("PacketEvents failed to add a decoder to the netty pipeline. Pipeline handlers: " + handlers, ex);
         }
     }
 }

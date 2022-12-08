@@ -16,37 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.player;
+package com.github.retrooper.packetevents.protocol.chat;
 
-import org.jetbrains.annotations.Nullable;
+import com.github.retrooper.packetevents.protocol.player.PublicProfileKey;
 
-/**
- * Representation of a player's game mode.
- *
- * @author retrooper
- * @since 1.8
- */
-public enum GameMode {
-    SURVIVAL,
-    CREATIVE,
-    ADVENTURE,
-    SPECTATOR;
+import java.util.UUID;
 
-    private static final GameMode[] VALUES = values();
+public class RemoteChatSession {
+    private final UUID sessionId;
+    private final PublicProfileKey publicProfileKey;
 
-    public int getId() {
-        return ordinal();
+    public RemoteChatSession(UUID sessionId, PublicProfileKey publicProfileKey) {
+        this.sessionId = sessionId;
+        this.publicProfileKey = publicProfileKey;
     }
 
-    @Nullable
-    public static GameMode getById(int id) {
-        if (id == -1) {
-            return null;
-        }
-        return VALUES[id];
+    public UUID getSessionId() {
+        return sessionId;
     }
 
-    public static GameMode defaultGameMode() {
-        return SURVIVAL;
+    public PublicProfileKey getPublicProfileKey() {
+        return publicProfileKey;
     }
 }

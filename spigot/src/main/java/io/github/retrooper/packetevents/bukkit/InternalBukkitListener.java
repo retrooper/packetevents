@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.bukkit;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
@@ -44,7 +43,6 @@ public class InternalBukkitListener implements Listener {
         //In the spigot PlayerManager impl, we ask protocol translation dependencies for the version
         //if we failed to catch it.(shouldn't ever happen really)
         //TODO With Via we might have to run this a tick AFTER join event (atleast when via & viabackwards & rewind are present)
-        ClientVersion version = PacketEvents.getAPI().getPlayerManager().getClientVersion(player);
         injector.updatePlayer(user, player);
     }
 

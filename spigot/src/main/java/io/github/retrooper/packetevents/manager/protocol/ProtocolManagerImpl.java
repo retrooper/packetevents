@@ -24,16 +24,9 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.reflection.ClassUtil;
-import com.github.retrooper.packetevents.util.reflection.Reflection;
-import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
-import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
-import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.ByteToMessageDecoder;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class ProtocolManagerImpl implements ProtocolManager {
@@ -106,43 +99,29 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void receivePacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            Object decoder = ChannelHelper.getPipelineHandler(channel, "decoder");
-            //Account for ViaVersion first
-            if (ViaVersionUtil.isAvailable() && !ClassUtil.getClassSimpleName(decoder.getClass()).startsWith("PacketDecoder")) {
-                //For ViaVersion we must convert the bytes to NMS objects ourselves and bypass them.
-                //TODO Once ViaVersion fixes their injector, we can just fire the bytebuf after their decoder.
-                //We hack into our packetevents "decoder" and fire the fake packet.
-                ReflectionObject reflectionObject = new ReflectionObject(decoder);
-                ByteToMessageDecoder mcDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
-                Object ctx = ChannelHelper.getPipelineContext(channel, "decoder");
-                try {
-                    List<Object> nms = CustomPipelineUtil.callDecode(mcDecoder, ctx, byteBuf);
-                    ChannelHelper.fireChannelReadInContext(channel, "decoder", nms.get(0));
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+            List<String> handlerNames = ChannelHelper.pipelineHandlerNames(channel);
+            //Account for ViaVersion
+            if (handlerNames.contains("via-encoder")) {
+                ChannelHelper.fireChannelReadInContext(channel, "via-decoder", byteBuf);
             }
-            else {
-                List<String> handlerNames = ChannelHelper.pipelineHandlerNames(channel);
-                //Account for ProtocolSupport
-                if (handlerNames.contains("ps_decoder_transformer")) {
-                    //We want to skip ProtocolSupport's translation handlers,
-                    //because the buffer is fit for the current server-version
-                    ChannelHelper.fireChannelReadInContext(channel, "ps_decoder_transformer", byteBuf);
-                } else if (handlerNames.contains("decompress")) {
-                    //We will have to just skip through the minecraft server's decompression handler
-                    ChannelHelper.fireChannelReadInContext(channel, "decompress", byteBuf);
+            //Account for ProtocolSupport
+            else if (handlerNames.contains("ps_decoder_transformer")) {
+                //We want to skip ProtocolSupport's translation handlers,
+                //because the buffer is fit for the current server-version
+                ChannelHelper.fireChannelReadInContext(channel, "ps_decoder_transformer", byteBuf);
+            } else if (handlerNames.contains("decompress")) {
+                //We will have to just skip through the minecraft server's decompression handler
+                ChannelHelper.fireChannelReadInContext(channel, "decompress", byteBuf);
+            } else {
+                if (handlerNames.contains("decrypt")) {
+                    //We will have to just skip through the minecraft server's decryption handler
+                    //We don't have to deal with decompressing, as that handler isn't currently in the pipeline
+                    ChannelHelper.fireChannelReadInContext(channel, "decrypt", byteBuf);
                 } else {
-                    if (handlerNames.contains("decrypt")) {
-                        //We will have to just skip through the minecraft server's decryption handler
-                        //We don't have to deal with decompressing, as that handler isn't currently in the pipeline
-                        ChannelHelper.fireChannelReadInContext(channel, "decrypt", byteBuf);
-                    } else {
-                        //No decompressing nor decrypting handlers are present
-                        //You cannot fill this buffer up with chunks of packets,
-                        //since we skip the packet-splitter handler.
-                        ChannelHelper.fireChannelReadInContext(channel, "splitter", byteBuf);
-                    }
+                    //No decompressing nor decrypting handlers are present
+                    //You cannot fill this buffer up with chunks of packets,
+                    //since we skip the packet-splitter handler.
+                    ChannelHelper.fireChannelReadInContext(channel, "splitter", byteBuf);
                 }
             }
         } else {
@@ -152,28 +131,10 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void receivePacketSilently(Object channel, Object byteBuf) {
-        //Receive the packet for all handlers after our decoder
-
-        Object decoder = ChannelHelper.getPipelineHandler(channel, "decoder");
-        if (ViaVersionUtil.isAvailable() && !ClassUtil.getClassSimpleName(decoder.getClass()).startsWith("PacketDecoder")) {
-            //For ViaVersion we must convert the bytes to NMS objects ourselves and bypass them.
-            //TODO Once ViaVersion fixes their injector, we can just fire the bytebuf after their decoder.
-            //We must hack into the real mcDecoder, which is hidden in ours.
-            //TODO Once multiple packetevents instances come into play, this won't function as intended and won't be "silent".
-            //TODO Once ViaVersion fixes their injector, we can't fix this.
-            ReflectionObject reflectionObject = new ReflectionObject(decoder);
-            ByteToMessageDecoder packetEventsDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
-            ReflectionObject reflectPacketEventsDecoder = new ReflectionObject(packetEventsDecoder);
-            ByteToMessageDecoder mcDecoder = reflectPacketEventsDecoder.readObject(0, ByteToMessageDecoder.class);
-            Object ctx = ChannelHelper.getPipelineContext(channel, "decoder");
-            try {
-                List<Object> nms = CustomPipelineUtil.callDecode(mcDecoder, ctx, byteBuf);
-                ChannelHelper.fireChannelReadInContext(channel, "decoder", nms.get(0));
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        } else {
+        if (ChannelHelper.isOpen(channel)) {
             ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 

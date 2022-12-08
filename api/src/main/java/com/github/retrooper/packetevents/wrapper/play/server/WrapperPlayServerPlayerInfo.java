@@ -108,7 +108,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         for (int j = 0; j < propertyCount; j++) {
                             String propertyName = readString();
                             String propertyValue = readString();
-                            String propertySignature = readBoolean() ? readString() : null;
+                            String propertySignature = readOptional(PacketWrapper::readString);
                             TextureProperty textureProperty = new TextureProperty(propertyName, propertyValue, propertySignature);
                             userProfile.getTextureProperties().add(textureProperty);
                         }
@@ -170,16 +170,11 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                 switch (action) {
                     case ADD_PLAYER: {
                         writeString(data.userProfile.getName(), 16);
-                        writeVarInt(data.userProfile.getTextureProperties().size());
-                        for (TextureProperty textureProperty : data.userProfile.getTextureProperties()) {
-                            writeString(textureProperty.getName());
-                            writeString(textureProperty.getValue());
-                            boolean hasSignature = textureProperty.getSignature() != null;
-                            writeBoolean(hasSignature);
-                            if (hasSignature) {
-                                writeString(textureProperty.getSignature());
-                            }
-                        }
+                        writeList(data.userProfile.getTextureProperties(), (wrapper, textureProperty) -> {
+                            wrapper.writeString(textureProperty.getName());
+                            wrapper.writeString(textureProperty.getValue());
+                            wrapper.writeOptional(textureProperty.getSignature(), PacketWrapper::writeString);
+                        });
                         writeVarInt(data.gameMode.ordinal());
                         writeVarInt(data.ping);
                         if (data.displayName != null) {
