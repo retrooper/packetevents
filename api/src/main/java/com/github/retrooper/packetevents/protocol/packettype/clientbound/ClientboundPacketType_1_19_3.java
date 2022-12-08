@@ -113,6 +113,10 @@ public enum ClientboundPacketType_1_19_3 {
     //Removed in 1.19.3 and replaced with PLAYER_INFO_REMOVE and PLAYER_INFO_UPDATE
     //PLAYER_INFO,
 
+    //Added in 1.19.3 (read comment above)
+    PLAYER_INFO_REMOVE,
+    PLAYER_INFO_UPDATE,
+
     FACE_PLAYER,
     PLAYER_POSITION_AND_LOOK,
     UNLOCK_RECIPES,

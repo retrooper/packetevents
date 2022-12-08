@@ -288,6 +288,9 @@ public final class PacketType {
 
     public static class Play {
         public enum Client implements PacketTypeCommon {
+            //Packets that no longer exist on the latest version
+            CHAT_PREVIEW,
+
             TELEPORT_CONFIRM,
             QUERY_BLOCK_NBT,
             SET_DIFFICULTY,
@@ -340,9 +343,11 @@ public final class PacketType {
             USE_ITEM,
             //Added in 1.19
             CHAT_COMMAND,
-            CHAT_PREVIEW,
             //Added in 1.19.1
-            CHAT_ACK;
+            CHAT_ACK,
+            //Added in 1.19.3
+            CHAT_SESSION_UPDATE;
+
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -420,6 +425,11 @@ public final class PacketType {
             SPAWN_PAINTING,
             SCULK_VIBRATION_SIGNAL,
             ACKNOWLEDGE_PLAYER_DIGGING,
+            CHAT_PREVIEW_PACKET,
+            NAMED_SOUND_EFFECT,
+            PLAYER_CHAT_HEADER,
+            PLAYER_INFO,
+            DISPLAY_CHAT_PREVIEW,
 
             //Okay these are normal ones
             WINDOW_CONFIRMATION,
@@ -444,7 +454,6 @@ public final class PacketType {
             SET_SLOT,
             SET_COOLDOWN,
             PLUGIN_MESSAGE,
-            NAMED_SOUND_EFFECT,
             DISCONNECT,
             ENTITY_STATUS,
             EXPLOSION,
@@ -473,7 +482,6 @@ public final class PacketType {
             END_COMBAT_EVENT,
             ENTER_COMBAT_EVENT,
             DEATH_COMBAT_EVENT,
-            PLAYER_INFO,
             FACE_PLAYER,
             PLAYER_POSITION_AND_LOOK,
             UNLOCK_RECIPES,
@@ -526,15 +534,18 @@ public final class PacketType {
 
             //Added in 1.19
             ACKNOWLEDGE_BLOCK_CHANGES,
-            CHAT_PREVIEW_PACKET,
             SERVER_DATA,
-            DISPLAY_CHAT_PREVIEW,
             SYSTEM_CHAT_MESSAGE,
 
             //Added in 1.19.1
             DELETE_CHAT,
-            PLAYER_CHAT_HEADER,
-            CUSTOM_CHAT_COMPLETIONS;
+            CUSTOM_CHAT_COMPLETIONS,
+
+            //Added in 1.19.3
+            DISGUISED_CHAT,
+            PLAYER_INFO_REMOVE,
+            PLAYER_INFO_UPDATE,
+            UPDATE_ENABLED_FEATURES;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
