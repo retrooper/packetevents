@@ -69,7 +69,9 @@ public class ViaVersionUtil {
             if (user.getUUID() != null) {
                 Player player = Bukkit.getPlayer(user.getUUID());
                 if (player != null) {
-                    return getProtocolVersion(player);
+                    int version = getProtocolVersion(player);
+                    // -1 means via hasn't gotten join event yet
+                    if (version != -1) return version;
                 }
             }
             Object viaEncoder = ((Channel) user.getChannel()).pipeline().get("via-encoder");
