@@ -49,8 +49,13 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
-        PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, true);
-        out.add(input.retain());
+        final ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(input);
+        try {
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, transformedBuf, true);
+            out.add(transformedBuf.retain());
+        } finally {
+            transformedBuf.release();
+        }
     }
 
     @Override

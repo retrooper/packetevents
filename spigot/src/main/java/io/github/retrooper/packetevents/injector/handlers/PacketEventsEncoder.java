@@ -52,22 +52,27 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
+        final ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
+        try {
+            boolean needsRecompression = !handledCompression && handleCompression(ctx, transformedBuf);
 
-        PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, true, false);
+            PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, transformedBuf, true, false);
 
-        if (needsRecompression) {
-            compress(ctx, byteBuf);
-        }
+            if (needsRecompression) {
+                compress(ctx, transformedBuf);
+            }
 
-        list.add(byteBuf.retain());
+            list.add(transformedBuf.retain());
 
-        if (sendEvent != null && sendEvent.hasPostTasks()) {
-            promise.addListener(p -> {
-                for (Runnable runnable : sendEvent.getPostTasks()) {
-                    runnable.run();
-                }
-            });
+            if (sendEvent != null && sendEvent.hasPostTasks()) {
+                promise.addListener(p -> {
+                    for (Runnable runnable : sendEvent.getPostTasks()) {
+                        runnable.run();
+                    }
+                });
+            }
+        } finally {
+            transformedBuf.release();
         }
     }
 
