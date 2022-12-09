@@ -18,14 +18,11 @@
 
 package io.github.retrooper.packetevents.injector.handlers;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.netty.buffer.ByteBuf;
@@ -52,31 +49,8 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
-        ByteBuf transformed = ctx.alloc().buffer().writeBytes(input);
-        try {
-            int firstReaderIndex = transformed.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(),
-                    user, player, transformed, true);
-            int readerIndex = transformed.readerIndex();
-            PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> transformed.readerIndex(readerIndex));
-
-            if (!packetReceiveEvent.isCancelled()) {
-                if (packetReceiveEvent.getLastUsedWrapper() != null) {
-                    ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
-                    packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
-                    packetReceiveEvent.getLastUsedWrapper().write();
-                }
-                transformed.readerIndex(firstReaderIndex);
-                out.add(transformed.retain());
-            }
-            if (packetReceiveEvent.hasPostTasks()) {
-                for (Runnable task : packetReceiveEvent.getPostTasks()) {
-                    task.run();
-                }
-            }
-        } finally {
-            transformed.release();
-        }
+        PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, true);
+        out.add(input.retain());
     }
 
     @Override

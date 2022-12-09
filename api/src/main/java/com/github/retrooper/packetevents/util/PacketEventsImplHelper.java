@@ -34,6 +34,8 @@ public class PacketEventsImplHelper {
     public static PacketSendEvent handleClientBoundPacket(Object channel, User user, Object player,
                                                           Object buffer, boolean autoProtocolTranslation,
                                                           boolean runPostTasks) throws Exception {
+        if (!ByteBufHelper.isReadable(buffer)) return null;
+
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer,
                 autoProtocolTranslation);
@@ -70,6 +72,8 @@ public class PacketEventsImplHelper {
                                                              Object player,
                                                              Object buffer,
                                                              boolean autoProtocolTranslation) throws Exception {
+        if (!ByteBufHelper.isReadable(buffer)) return null;
+
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer,
                 autoProtocolTranslation);

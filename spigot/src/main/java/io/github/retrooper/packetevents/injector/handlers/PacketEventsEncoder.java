@@ -62,7 +62,7 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
         list.add(byteBuf.retain());
 
-        if (sendEvent.hasPostTasks()) {
+        if (sendEvent != null && sendEvent.hasPostTasks()) {
             promise.addListener(p -> {
                 for (Runnable runnable : sendEvent.getPostTasks()) {
                     runnable.run();
