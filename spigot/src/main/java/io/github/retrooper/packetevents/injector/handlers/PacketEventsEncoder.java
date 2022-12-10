@@ -56,7 +56,7 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
         try {
             boolean needsRecompression = !handledCompression && handleCompression(ctx, transformedBuf);
 
-            PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, transformedBuf, true, false);
+            PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, transformedBuf, true);
 
             if (needsRecompression) {
                 compress(ctx, transformedBuf);
@@ -64,9 +64,9 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
             list.add(transformedBuf.retain());
 
-            if (sendEvent != null && sendEvent.hasPostTasks()) {
+            if (sendEvent != null && sendEvent.hasTasksAfterSend()) {
                 promise.addListener(p -> {
-                    for (Runnable runnable : sendEvent.getPostTasks()) {
+                    for (Runnable runnable : sendEvent.getTasksAfterSend()) {
                         runnable.run();
                     }
                 });
