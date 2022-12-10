@@ -291,18 +291,30 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     @Override
     public void writePacket(Object ch, Object rawNMSPacket) {
         Channel channel = (Channel) ch;
+        //Don't write packets to fake channels
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+            return;
+        }
         channel.write(rawNMSPacket);
     }
 
     @Override
     public void flushPackets(Object ch) {
         Channel channel = (Channel) ch;
+        //Don't flush packets for fake channels
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+            return;
+        }
         channel.flush();
     }
 
     @Override
     public void sendPacket(Object ch, Object rawNMSPacket) {
         Channel channel = (Channel) ch;
+        //Don't send packets to fake channels
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+            return;
+        }
         channel.writeAndFlush(rawNMSPacket);
     }
 
