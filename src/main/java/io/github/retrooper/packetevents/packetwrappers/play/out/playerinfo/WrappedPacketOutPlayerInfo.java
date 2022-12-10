@@ -201,6 +201,14 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
         return packetInstance;
     }
 
+    @Override
+    public boolean isSupported() {
+        //1.19.3 removed this packet and replaced it with PlayerInfoRemove & PlayerInfoUpdate
+        //TODO Since this is a minimal update, we won't add those. v1.8 will eventually be discontinued
+        //so please consider updating to 2.0
+        return version.isOlderThanOrEquals(ServerVersion.v_1_19_2);
+    }
+
     public enum PlayerInfoAction {
         ADD_PLAYER,
         UPDATE_GAME_MODE,
