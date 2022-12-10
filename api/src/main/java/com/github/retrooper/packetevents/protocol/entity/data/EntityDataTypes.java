@@ -59,7 +59,8 @@ public class EntityDataTypes {
             ClientVersion.V_1_11,
             ClientVersion.V_1_13,
             ClientVersion.V_1_14,
-            ClientVersion.V_1_19);
+            ClientVersion.V_1_19,
+            ClientVersion.V_1_19_3);
 
     public static final EntityDataType<Byte> BYTE = define("byte", PacketWrapper::readByte, PacketWrapper::writeByte);
 
@@ -78,6 +79,8 @@ public class EntityDataTypes {
             wrapper.writeInt(value);
         }
     });
+
+    public static final EntityDataType<Long> VAR_LONG = define("var_long", PacketWrapper::readVarLong, PacketWrapper::writeVarLong);
 
     public static final EntityDataType<Float> FLOAT = define("float", PacketWrapper::readFloat, PacketWrapper::writeFloat);
 

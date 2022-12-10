@@ -34,5 +34,12 @@ public enum Instrument {
     IRON_XYLOPHONE,
     PLING,
     SNARE,
-    XYLOPHONE
+    XYLOPHONE,
+    ZOMBIE,
+    SKELETON,
+    CREEPER,
+    DRAGON,
+    WITHER_SKELETON,
+    PIGLIN,
+    CUSTOM_HEAD
 }

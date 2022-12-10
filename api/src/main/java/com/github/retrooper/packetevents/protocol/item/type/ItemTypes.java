@@ -44,7 +44,8 @@ public class ItemTypes {
             ClientVersion.V_1_16_2,
             ClientVersion.V_1_17,
             ClientVersion.V_1_18,
-            ClientVersion.V_1_19);
+            ClientVersion.V_1_19,
+            ClientVersion.V_1_19_3);
 
     public static final ItemType GILDED_BLACKSTONE = builder("gilded_blackstone").setMaxAmount(64).setPlacedType(StateTypes.GILDED_BLACKSTONE).build();
     public static final ItemType NETHER_BRICK_SLAB = builder("nether_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.NETHER_BRICK_SLAB).build();
