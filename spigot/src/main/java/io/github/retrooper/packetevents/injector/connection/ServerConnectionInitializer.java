@@ -26,7 +26,6 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
-import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
 import io.netty.channel.Channel;
@@ -40,7 +39,7 @@ public class ServerConnectionInitializer {
 
     public static void initChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+        if (channel.getClass().getSimpleName().equals("FakeChannel")) {
             return;
         }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
