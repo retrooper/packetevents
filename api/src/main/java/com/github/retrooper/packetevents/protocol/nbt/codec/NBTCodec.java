@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -129,6 +130,16 @@ public class NBTCodec {
         }
         else if (nbt instanceof NBTEnd) {
             throw new IllegalStateException("Encountered the NBTEnd tag during the NBT to JSON conversion: " + nbt.toString());
+        }
+        else if (nbt instanceof NBTCompound) {
+            JsonObject jsonObject = new JsonObject();
+            Map<String, NBT> compoundTags = ((NBTCompound)nbt).getTags();
+            for (String tagName : compoundTags.keySet()) {
+                NBT tag = compoundTags.get(tagName);
+                JsonElement jsonValue = nbtToJson(tag, parseByteAsBool);
+                jsonObject.add(tagName, jsonValue);
+            }
+            return jsonObject;
         }
         else {
             throw new IllegalStateException("Failed to convert NBT to JSON.");
