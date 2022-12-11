@@ -18,7 +18,7 @@ public class ChatMessageProcessor_v1_19_3 implements ChatMessageProcessor {
     public ChatMessage readChatMessage(@NotNull PacketWrapper<?> wrapper) {
         UUID senderUUID = wrapper.readUUID();
         int index = wrapper.readVarInt();
-        byte[] signature = wrapper.readOptional(PacketWrapper::readByteArray);
+        byte[] signature = wrapper.readOptional((w) -> w.readBytes(256));
         String plainContent = wrapper.readString(256);
         Instant timestamp = wrapper.readTimestamp();
         long salt = wrapper.readLong();
@@ -35,7 +35,7 @@ public class ChatMessageProcessor_v1_19_3 implements ChatMessageProcessor {
         ChatMessage_v1_19_3 newData = (ChatMessage_v1_19_3) data;
         wrapper.writeUUID(newData.getSenderUUID());
         wrapper.writeVarInt(newData.getIndex());
-        wrapper.writeOptional(newData.getSignature(), PacketWrapper::writeByteArray);
+        wrapper.writeOptional(newData.getSignature(), PacketWrapper::writeBytes);
         wrapper.writeString(newData.getPlainContent());
         wrapper.writeTimestamp(newData.getTimestamp());
         wrapper.writeLong(newData.getSalt());
