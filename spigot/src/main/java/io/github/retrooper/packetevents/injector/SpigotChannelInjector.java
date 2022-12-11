@@ -187,16 +187,16 @@ public class SpigotChannelInjector implements ChannelInjector {
 
     @Override
     public User getUser(Object channel) {
-        return getEncoder((Channel) channel).user;
+        PacketEventsEncoder encoder = getEncoder((Channel)channel);
+        return encoder != null ? encoder.user : null;
     }
 
     @Override
     public void changeConnectionState(Object ch, @Nullable ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-        PacketEventsEncoder encoder = getEncoder(channel);
-        if (encoder != null) {
-            //Change connection state in encoder
-            encoder.user.setConnectionState(connectionState);
+        User user = getUser(channel);
+        if (user != null) {
+            user.setConnectionState(connectionState);
         }
     }
 

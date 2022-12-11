@@ -33,11 +33,9 @@ public class InternalBukkitPacketListener extends com.github.retrooper.packeteve
             //Update client version for this event call(and user)
             user.setClientVersion(clientVersion);
             PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());
-            event.getPostTasks().add(() -> {
-                //Transition into the LOGIN OR STATUS connection state
-                PacketEvents.getAPI().getInjector().changeConnectionState(channel, nextState);
-                PacketEvents.getAPI().getLogManager().debug("Transitioned " + address.getHostString() + ":" + address.getPort() + " into the " + nextState + " state!");
-            });
+            //Transition into LOGIN or STATUS connection state immediately, to remain in sync with vanilla
+            user.setConnectionState(nextState);
+            PacketEvents.getAPI().getLogManager().debug("Transitioned " + address.getHostString() + ":" + address.getPort() + " into the " + nextState + " state!");
         }
     }
 }
