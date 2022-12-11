@@ -22,10 +22,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.reader.ChatMessageProcessor;
-import com.github.retrooper.packetevents.protocol.chat.message.reader.impl.ChatMessageProcessorLegacy;
-import com.github.retrooper.packetevents.protocol.chat.message.reader.impl.ChatMessageProcessor_v1_16;
-import com.github.retrooper.packetevents.protocol.chat.message.reader.impl.ChatMessageProcessor_v1_19;
-import com.github.retrooper.packetevents.protocol.chat.message.reader.impl.ChatMessageProcessor_v1_19_1;
+import com.github.retrooper.packetevents.protocol.chat.message.reader.impl.*;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus.Internal;
@@ -35,12 +32,14 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     private static final ChatMessageProcessor CHAT_V1_16_PROCESSOR;
     private static final ChatMessageProcessor CHAT_V1_19_PROCESSOR;
     private static final ChatMessageProcessor CHAT_V1_19_1_PROCESSOR;
+    private static final ChatMessageProcessor CHAT_V1_19_3_PROCESSOR;
 
     static {
         CHAT_LEGACY_PROCESSOR = new ChatMessageProcessorLegacy();
         CHAT_V1_16_PROCESSOR = new ChatMessageProcessor_v1_16();
         CHAT_V1_19_PROCESSOR = new ChatMessageProcessor_v1_19();
         CHAT_V1_19_1_PROCESSOR = new ChatMessageProcessor_v1_19_1();
+        CHAT_V1_19_3_PROCESSOR = new ChatMessageProcessor_v1_19_3();
     }
 
     private ChatMessage message;
@@ -79,7 +78,9 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
     @Internal
     protected ChatMessageProcessor getProcessor() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            return CHAT_V1_19_3_PROCESSOR;
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
             return CHAT_V1_19_1_PROCESSOR;
         } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             return CHAT_V1_19_PROCESSOR;
