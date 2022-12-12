@@ -20,49 +20,15 @@ package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 public class PacketEventsImplHelper {
-    public static PacketSendEvent handleClientBoundPacket(Object channel, User user, Object player, Object buffer, boolean autoProtocolTranslation) throws Exception {
-        if (!ByteBufHelper.isReadable(buffer)) return null;
-
-        int preProcessIndex = ByteBufHelper.readerIndex(buffer);
-        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer,
-                autoProtocolTranslation);
-        int processIndex = ByteBufHelper.readerIndex(buffer);
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
-            ByteBufHelper.readerIndex(buffer, processIndex);
-        });
-        if (!packetSendEvent.isCancelled()) {
-            PacketWrapper<?> wrapper = packetSendEvent.getLastUsedWrapper();
-            if (wrapper != null) {
-                ByteBufHelper.clear(buffer);
-                int packetId = packetSendEvent.getPacketId();
-                packetSendEvent.getLastUsedWrapper().writeVarInt(packetId);
-
-                packetSendEvent.getLastUsedWrapper().write();
-            }
-            ByteBufHelper.readerIndex(buffer, preProcessIndex);
-        } else {
-            //Make the buffer unreadable for the next handlers
-            ByteBufHelper.clear(buffer);
-        }
-
-        if (packetSendEvent.hasPostTasks()) {
-            for (Runnable task : packetSendEvent.getPostTasks()) {
-                task.run();
-            }
-        }
-        return packetSendEvent;
-    }
 
     public static PacketReceiveEvent handleServerBoundPacket(Object channel, User user,
                                                              Object player,

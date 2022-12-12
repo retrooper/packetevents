@@ -21,14 +21,17 @@ package io.github.retrooper.packetevents.injector.handlers;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
-import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -41,7 +44,7 @@ import java.util.List;
 @ChannelHandler.Sharable
 public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     public User user;
-    public volatile Player player;
+    public Player player;
     private ChannelPromise promise;
     public static final Object COMPRESSION_ENABLED_EVENT = paperCompressionEnabledEvent();
     public boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
@@ -56,28 +59,65 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
         try {
             boolean needsRecompression = !handledCompression && handleCompression(ctx, transformedBuf);
 
-            PacketSendEvent sendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, transformedBuf, true);
+            handleClientBoundPacket(ctx.channel(), user, player, transformedBuf, this.promise);
 
             if (needsRecompression) {
                 compress(ctx, transformedBuf);
             }
 
             list.add(transformedBuf.retain());
-
-            if (sendEvent != null && sendEvent.hasTasksAfterSend()) {
-                promise.addListener(p -> {
-                    for (Runnable runnable : sendEvent.getTasksAfterSend()) {
-                        runnable.run();
-                    }
-                });
-            }
         } finally {
             transformedBuf.release();
         }
     }
 
+    private PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
+        if (!ByteBufHelper.isReadable(buffer)) return null;
+
+        int preProcessIndex = ByteBufHelper.readerIndex(buffer);
+        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer, true);
+        int processIndex = ByteBufHelper.readerIndex(buffer);
+        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
+            ByteBufHelper.readerIndex(buffer, processIndex);
+        });
+        if (!packetSendEvent.isCancelled()) {
+            PacketWrapper<?> wrapper = packetSendEvent.getLastUsedWrapper();
+            if (wrapper != null) {
+                ByteBufHelper.clear(buffer);
+                int packetId = packetSendEvent.getPacketId();
+                packetSendEvent.getLastUsedWrapper().writeVarInt(packetId);
+
+                packetSendEvent.getLastUsedWrapper().write();
+            }
+            ByteBufHelper.readerIndex(buffer, preProcessIndex);
+        } else {
+            //Make the buffer unreadable for the next handlers
+            ByteBufHelper.clear(buffer);
+        }
+
+        if (packetSendEvent.hasPostTasks()) {
+            for (Runnable task : packetSendEvent.getPostTasks()) {
+                task.run();
+            }
+        }
+        if (packetSendEvent.hasTasksAfterSend()) {
+            promise.addListener((p) -> {
+                for (Runnable task : packetSendEvent.getTasksAfterSend()) {
+                    task.run();
+                }
+            });
+        }
+
+        return packetSendEvent;
+    }
+
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        // We must restore the old promise (in case we are stacking promises such as sending packets on send event)
+        // If the old promise was successful, set it to null to avoid memory leaks.
+        ChannelPromise oldPromise = this.promise != null && !this.promise.isSuccess() ? this.promise : null;
+        promise.addListener(p -> this.promise = oldPromise);
+
         this.promise = promise;
         super.write(ctx, msg, promise);
     }
