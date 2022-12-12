@@ -17,17 +17,22 @@ public class InternalBukkitPacketListener extends com.github.retrooper.packeteve
     public void onPacketReceive(PacketReceiveEvent event) {
         User user = event.getUser();
         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
-            Object channel = event.getChannel();
             InetSocketAddress address = event.getSocketAddress();
             WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
             ConnectionState nextState = handshake.getNextConnectionState();
             ClientVersion clientVersion = handshake.getClientVersion();
+
+            PacketEvents.getAPI().getLogManager().debug("Read handshake version for " + address.getHostString() + ":" + address.getPort() + " as " + clientVersion);
+
             if (ViaVersionUtil.isAvailable()) {
                 clientVersion = ClientVersion.getById(ViaVersionUtil.getProtocolVersion(user));
+                PacketEvents.getAPI().getLogManager().debug("Read ViaVersion version for " + address.getHostString() + ":" + address.getPort() + " as " + clientVersion + " with UUID=" + user.getUUID());
             } else if (ProtocolSupportUtil.isAvailable()) {
                 clientVersion = ClientVersion.getById(ProtocolSupportUtil.getProtocolVersion(user.getAddress()));
+                PacketEvents.getAPI().getLogManager().debug("Read ProtocolSupport version for " + address.getHostString() + ":" + address.getPort() + " as " + clientVersion);
             }
             if (clientVersion == ClientVersion.UNKNOWN) {
+                PacketEvents.getAPI().getLogManager().debug("Client version for " + address.getHostString() + ":" + address.getPort() + " is unknown!");
                 return;
             }
             //Update client version for this event call(and user)
