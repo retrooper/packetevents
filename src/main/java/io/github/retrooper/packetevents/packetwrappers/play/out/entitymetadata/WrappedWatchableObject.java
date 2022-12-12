@@ -38,7 +38,15 @@ public class WrappedWatchableObject extends WrappedPacket {
 
     @Override
     protected void load() {
-        if (version.isNewerThan(ServerVersion.v_1_8_8)) {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_19_3)) {
+            valueIndex = 2;
+            try {
+                googleOptionalClass = Class.forName("com.google.common.base.Optional");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (version.isNewerThan(ServerVersion.v_1_8_8)) {
             valueIndex = 1;
             try {
                 googleOptionalClass = Class.forName("com.google.common.base.Optional");
@@ -49,17 +57,19 @@ public class WrappedWatchableObject extends WrappedPacket {
     }
 
     public int getIndex() {
-        if (version.isNewerThan(ServerVersion.v_1_8_8)) {
+        if (version.isNewerThan(ServerVersion.v_1_8_8) && version.isOlderThan(ServerVersion.v_1_19_3)) {
             Object dataWatcherObject = readAnyObject(0);
             WrappedPacket wrappedDataWatcher = new WrappedPacket(new NMSPacket(dataWatcherObject));
             return wrappedDataWatcher.readInt(0);
+
         } else {
+            //1.19.3 changed back to this
             return readInt(0);
         }
     }
 
     public void setIndex(int index) {
-        if (version.isNewerThan(ServerVersion.v_1_8_8)) {
+        if (version.isNewerThan(ServerVersion.v_1_8_8) && version.isOlderThan(ServerVersion.v_1_19_3)) {
             Object dataWatcherObject = readAnyObject(0);
             WrappedPacket wrappedDataWatcher = new WrappedPacket(new NMSPacket(dataWatcherObject));
             wrappedDataWatcher.writeInt(0, index);
@@ -69,11 +79,13 @@ public class WrappedWatchableObject extends WrappedPacket {
     }
 
     public boolean isDirty() {
-        return readBoolean(0);
+        return !version.isOlderThan(ServerVersion.v_1_19_3) || readBoolean(0);
     }
 
     public void setDirty(boolean dirty) {
-        writeBoolean(0, dirty);
+        if (version.isOlderThan(ServerVersion.v_1_19_3)) {
+            writeBoolean(0, dirty);
+        }
     }
 
     public Object getRawValue() {

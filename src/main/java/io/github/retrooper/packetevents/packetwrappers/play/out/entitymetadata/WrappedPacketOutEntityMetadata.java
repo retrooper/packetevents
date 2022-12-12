@@ -37,7 +37,7 @@ public class WrappedPacketOutEntityMetadata extends WrappedPacketEntityAbstracti
 
     public List<WrappedWatchableObject> getWatchableObjects() {
         List<Object> nmsWatchableObjectList = readList(0);
-        //Its annotated as nullable on 1.17 NMS, so lets just handle it being null
+        //It's annotated as nullable on 1.17 NMS, so lets just handle it being null
         if (nmsWatchableObjectList == null) {
             return new ArrayList<>();
         }
