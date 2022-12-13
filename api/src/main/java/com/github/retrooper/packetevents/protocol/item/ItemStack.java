@@ -125,7 +125,7 @@ public class ItemStack {
     }
 
     public ItemStack copy() {
-        return cachedIsEmpty ? EMPTY : new ItemStack(type, amount, nbt == null ? new NBTCompound() : nbt.copy(), legacyData);
+        return cachedIsEmpty ? EMPTY : new ItemStack(type, amount, nbt == null ? null : nbt.copy(), legacyData);
     }
 
     @Nullable
