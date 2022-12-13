@@ -27,7 +27,6 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.net.SocketAddress;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -36,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public interface ProtocolManager {
     Map<UUID, Object> CHANNELS = new ConcurrentHashMap<>();
     // Use SocketAddress because ProtocolLib wraps Channels with NettyChannelProxy class
-    Map<SocketAddress, User> USERS = new ConcurrentHashMap<>();
+    Map<Object, User> USERS = new ConcurrentHashMap<>();
 
     default Collection<User> getUsers() {
         return USERS.values();
@@ -148,18 +147,19 @@ public interface ProtocolManager {
     }
 
     default User getUser(Object channel) {
-        SocketAddress address = ChannelHelper.remoteAddress(channel);
-        return USERS.get(address);
+        Object pipeline = ChannelHelper.getPipeline(channel);
+        return USERS.get(pipeline);
     }
 
     default User removeUser(Object channel) {
-        SocketAddress address = ChannelHelper.remoteAddress(channel);
-        return USERS.remove(address);
+        Object pipeline = ChannelHelper.getPipeline(channel);
+        return USERS.remove(pipeline);
     }
 
     default void setUser(Object channel, User user) {
         synchronized (channel) {
-            USERS.put(ChannelHelper.remoteAddress(channel), user);
+            Object pipeline = ChannelHelper.getPipeline(channel);
+            USERS.put(pipeline, user);
         }
         PacketEvents.getAPI().getInjector().updateUser(channel, user);
     }
