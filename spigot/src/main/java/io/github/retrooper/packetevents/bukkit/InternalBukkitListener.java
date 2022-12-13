@@ -44,8 +44,23 @@ public class InternalBukkitListener implements Listener {
 
         User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
         if (user == null) {
-            Bukkit.getScheduler().runTask(plugin, () -> player.kickPlayer("PacketEvents 2.0 failed to inject"));
-            return;
+            Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+
+            // Due to how processors work, we aren't guaranteed to have a channel
+            // This is called on the bukkit thread instead of the netty thread
+            // Even if the netty thread set a channel in the map in real time, caches
+            // mean that we may not see it.  Therefore, use synchronized to fix cache issues.
+            //
+            // Just fall back to synchronized and reflection for performance reasons.
+            synchronized (channel) {
+                user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+            }
+
+            // We still don't have it
+            if (user == null) {
+                Bukkit.getScheduler().runTask(plugin, () -> player.kickPlayer("PacketEvents 2.0 failed to inject"));
+                return;
+            }
         }
 
         // Set bukkit player object in the injectors
