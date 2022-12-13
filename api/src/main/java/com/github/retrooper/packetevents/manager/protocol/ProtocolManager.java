@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.net.SocketAddress;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -34,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public interface ProtocolManager {
     Map<UUID, Object> CHANNELS = new ConcurrentHashMap<>();
-    Map<Object, User> USERS = new ConcurrentHashMap<>();
+    Map<SocketAddress, User> USERS = new ConcurrentHashMap<>();
 
     default Collection<User> getUsers() {
         return USERS.values();
@@ -146,12 +147,18 @@ public interface ProtocolManager {
     }
 
     default User getUser(Object channel) {
-        return USERS.get(channel);
+        SocketAddress address = ChannelHelper.remoteAddress(channel);
+        return USERS.get(address);
+    }
+
+    default User removeUser(Object channel) {
+        SocketAddress address = ChannelHelper.remoteAddress(channel);
+        return USERS.remove(address);
     }
 
     default void setUser(Object channel, User user) {
         synchronized (channel) {
-            USERS.put(channel, user);
+            USERS.put(ChannelHelper.remoteAddress(channel), user);
         }
         PacketEvents.getAPI().getInjector().updateUser(channel, user);
     }

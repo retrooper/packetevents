@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.injector;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
-import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
@@ -43,14 +42,14 @@ public class ServerConnectionInitializer {
             channel.unsafe().closeForcibly();
             return;
         }
-        ProtocolManager.USERS.put(channel, user);
+        PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
         PacketEventsDecoder decoder = new PacketEventsDecoder(user);
         PacketEventsEncoder encoder = new PacketEventsEncoder(user);
         addChannelHandlers(channel, decoder, encoder);
     }
 
     public static void destroyChannel(Channel channel) {
-        User user = ProtocolManager.USERS.get(channel);
+        User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
         UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
         PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
         channel.pipeline().remove(PacketEvents.DECODER_NAME);

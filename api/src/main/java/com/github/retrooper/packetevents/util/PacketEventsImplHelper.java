@@ -69,12 +69,12 @@ public class PacketEventsImplHelper {
 
     public static void handleDisconnection(Object channel, @Nullable UUID uuid) {
         synchronized (channel) {
-            User user = ProtocolManager.USERS.get(channel);
+            User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
 
             if (user != null) {
                 UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
                 PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
-                ProtocolManager.USERS.remove(user.getChannel());
+                PacketEvents.getAPI().getProtocolManager().removeUser(user.getChannel());
             }
 
             if (uuid == null) {

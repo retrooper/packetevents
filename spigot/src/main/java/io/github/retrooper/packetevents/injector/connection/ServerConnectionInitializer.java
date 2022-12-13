@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.injector.connection;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
-import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -73,7 +72,7 @@ public class ServerConnectionInitializer {
             relocateHandlers(channel, null, user);
 
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
-            ProtocolManager.USERS.put(channel, user);
+            PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
         }
     }
 

@@ -137,7 +137,7 @@ public class BungeePacketEventsBuilder {
                                 return null;
                             }
 
-                            ProtocolManager.USERS.put(channel, user);
+                            PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
                             PacketEvents.getAPI().getInjector().updateUser(channel, user);
                         }
                     }
