@@ -103,6 +103,10 @@ public class SpigotChannelInjector implements ChannelInjector {
                 networkManagers = SpigotReflectionUtil.getNetworkManagers();
             }
             synchronized (networkManagers) {
+                if (!networkManagers.isEmpty()) {
+                    PacketEvents.getAPI().getLogManager().debug("Late bind not enabled, injecting into existing channel");
+                }
+
                 for (Object networkManager : networkManagers) {
                     ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
                     Channel channel = networkManagerWrapper.readObject(0, Channel.class);
@@ -223,8 +227,8 @@ public class SpigotChannelInjector implements ChannelInjector {
         PacketEventsDecoder decoder = getDecoder((Channel) channel);
         if (decoder != null) {
             decoder.player = (Player) player;
-            decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
             decoder.user.getProfile().setName(((Player) player).getName());
+            decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
         }
     }
 

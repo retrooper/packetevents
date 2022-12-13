@@ -141,34 +141,17 @@ public class SpigotPacketEventsBuilder {
                             return getVersion().toString() + "-beta";//TODO Cut off "-beta" once 2.0 releases
                         }));
                     }
-                    Bukkit.getPluginManager().registerEvents(new InternalBukkitListener(),
-                            plugin);
-                    //TODO Clean up and remove redundant post inject task? or is it?
-                    Runnable postInjectTask = () -> {
-                        /*for (final Player p : Bukkit.getOnlinePlayers()) {
-                            try {
-                                Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(p);
-                                User user = PacketEvents.getAPI().getPlayerManager().getUser(p);
-                                injector.updatePlayer(user, p);
-                                getEventManager().callEvent(new UserLoginEvent(user, p));
-                            } catch (Exception ex) {
-                                p.kickPlayer("Failed to inject... Please rejoin!");
-                                ex.printStackTrace();
-                            }
-                        }*/
-                    };
+
+                    Bukkit.getPluginManager().registerEvents(new InternalBukkitListener(plugin), plugin);
 
                     if (lateBind) {
                         //If late-bind is enabled, we still need to inject (after all plugins enabled).
                         Runnable lateBindTask = () -> {
                             if (injector.isServerBound()) {
                                 injector.inject();
-                                postInjectTask.run();
                             }
                         };
                         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, lateBindTask);
-                    } else {
-                        postInjectTask.run();
                     }
 
                     // Let people override this, at their own risk
