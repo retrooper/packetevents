@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public interface ProtocolManager {
     Map<UUID, Object> CHANNELS = new ConcurrentHashMap<>();
+    // Use SocketAddress because ProtocolLib wraps Channels with NettyChannelProxy class
     Map<SocketAddress, User> USERS = new ConcurrentHashMap<>();
 
     default Collection<User> getUsers() {
