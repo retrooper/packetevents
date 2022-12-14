@@ -87,6 +87,8 @@ public class ServerConnectionInitializer {
                 decoder.hasBeenRelocated = true;
                 decoder = (PacketEventsDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
                 encoder = ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
+                decoder = new PacketEventsDecoder(decoder);
+                encoder = new PacketEventsEncoder(encoder);
             } else {
                 encoder = new PacketEventsEncoder(user);
                 decoder = new PacketEventsDecoder(user);

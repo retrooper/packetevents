@@ -41,16 +41,22 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-@ChannelHandler.Sharable
 public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     public User user;
     public Player player;
+    private boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
     private ChannelPromise promise;
     public static final Object COMPRESSION_ENABLED_EVENT = paperCompressionEnabledEvent();
-    public boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
 
     public PacketEventsEncoder(User user) {
         this.user = user;
+    }
+
+    public PacketEventsEncoder(ChannelHandler encoder) {
+        user = ((PacketEventsEncoder) encoder).user;
+        player = ((PacketEventsEncoder) encoder).player;
+        handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
+        promise = ((PacketEventsEncoder) encoder).promise;
     }
 
     @Override

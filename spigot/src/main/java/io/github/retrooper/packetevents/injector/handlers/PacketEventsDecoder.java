@@ -26,17 +26,15 @@ import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
-@ChannelHandler.Sharable
 public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public User user;
-    public volatile Player player;
+    public Player player;
     public boolean hasBeenRelocated;
 
     public PacketEventsDecoder(User user) {
@@ -46,6 +44,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public PacketEventsDecoder(PacketEventsDecoder decoder) {
         user = decoder.user;
         player = decoder.player;
+        hasBeenRelocated = decoder.hasBeenRelocated;
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
