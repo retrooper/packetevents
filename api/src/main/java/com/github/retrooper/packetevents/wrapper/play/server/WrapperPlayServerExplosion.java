@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerExplosion> {
-    private Vector3f position;
+    private Vector3d position;
     private float strength;
     //Chunk posiitons?
     private List<Vector3i> records;
@@ -39,7 +40,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         super(event);
     }
 
-    public WrapperPlayServerExplosion(Vector3f position, float strength, List<Vector3i> records, Vector3f playerMotion) {
+    public WrapperPlayServerExplosion(Vector3d position, float strength, List<Vector3i> records, Vector3f playerMotion) {
         super(PacketType.Play.Server.EXPLOSION);
         this.position = position;
         this.strength = strength;
@@ -49,10 +50,11 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
 
     @Override
     public void read() {
-        float x = readFloat();
-        float y = readFloat();
-        float z = readFloat();
-        position = new Vector3f(x, y, z);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            position = new Vector3d(readDouble(), readDouble(), readDouble());
+        } else {
+            position = new Vector3d(readFloat(), readFloat(), readFloat());
+        }
         strength = readFloat();
         int recordsLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? readVarInt() : readInt();
         records = new ArrayList<>(recordsLength);
@@ -74,9 +76,15 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
 
     @Override
     public void write() {
-        writeFloat(position.x);
-        writeFloat(position.y);
-        writeFloat(position.z);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            writeDouble(position.getX());
+            writeDouble(position.getY());
+            writeDouble(position.getZ());
+        } else {
+            writeFloat((float) position.getX());
+            writeFloat((float) position.getY());
+            writeFloat((float) position.getZ());
+        }
         writeFloat(strength);
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
@@ -106,7 +114,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         playerMotion = wrapper.playerMotion;
     }
 
-    private Vector3i toFloor(Vector3f position) {
+    private Vector3i toFloor(Vector3d position) {
         int floorX;
         int floorY;
         int floorZ;
@@ -122,11 +130,11 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         return new Vector3i(floorX, floorY, floorZ);
     }
 
-    public Vector3f getPosition() {
+    public Vector3d getPosition() {
         return position;
     }
 
-    public void setPosition(Vector3f position) {
+    public void setPosition(Vector3d position) {
         this.position = position;
     }
 
