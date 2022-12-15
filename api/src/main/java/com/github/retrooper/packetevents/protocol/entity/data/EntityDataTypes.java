@@ -36,7 +36,6 @@ import com.github.retrooper.packetevents.util.TypesBuilderData;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -88,9 +87,7 @@ public class EntityDataTypes {
 
     public static final EntityDataType<String> COMPONENT = define("component", PacketWrapper::readComponentJSON, PacketWrapper::writeComponentJSON);
 
-    public static final EntityDataType<Optional<String>> OPTIONAL_COMPONENT = define("optional_component",
-            (PacketWrapper<?> wrapper) -> Optional.of(wrapper.readComponentJSON()),
-            (PacketWrapper<?> wrapper, Optional<String> value) -> wrapper.writeComponentJSON(value.orElse(null)));
+    public static final EntityDataType<Optional<String>> OPTIONAL_COMPONENT = define("optional_component", readOptionalComponentDeserializer(), writeOptionalComponentSerializer());
 
     public static final EntityDataType<ItemStack> ITEMSTACK = define("itemstack", PacketWrapper::readItemStack, PacketWrapper::writeItemStack);
 
@@ -237,7 +234,7 @@ public class EntityDataTypes {
     private static <T> Function<PacketWrapper<?>, T> readOptionalComponentDeserializer() {
         return (PacketWrapper<?> wrapper) -> {
             if (wrapper.readBoolean()) {
-                return (T) Optional.of(wrapper.readComponent());
+                return (T) Optional.of(wrapper.readString());
             } else {
                 return (T) Optional.empty();
             }
@@ -247,10 +244,10 @@ public class EntityDataTypes {
     private static <T> BiConsumer<PacketWrapper<?>, T> writeOptionalComponentSerializer() {
         return (PacketWrapper<?> wrapper, T value) -> {
             if (value instanceof Optional) {
-                Optional<Component> optional = (Optional<Component>) value;
+                Optional<String> optional = (Optional<String>) value;
                 if (optional.isPresent()) {
                     wrapper.writeBoolean(true);
-                    wrapper.writeComponent(optional.get());
+                    wrapper.writeString(optional.get());
                 } else {
                     wrapper.writeBoolean(false);
                 }
