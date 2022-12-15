@@ -43,4 +43,5 @@ public interface ChannelOperator {
     Object getPipelineContext(Object channel, String name);
     Object getPipeline(Object channel);
     void runInEventLoop(Object channel, Runnable runnable);
+    Object pooledByteBuf(Object channel);
 }

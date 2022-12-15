@@ -129,4 +129,9 @@ public class ChannelOperatorImpl implements ChannelOperator {
     public void runInEventLoop(Object channel, Runnable runnable) {
         ((Channel)channel).eventLoop().execute(runnable);
     }
+
+    @Override
+    public Object pooledByteBuf(Object channel) {
+        return ((Channel)channel).alloc().buffer();
+    }
 }

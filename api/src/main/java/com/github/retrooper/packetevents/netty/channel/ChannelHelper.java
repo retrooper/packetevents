@@ -93,6 +93,10 @@ public class ChannelHelper {
         return PacketEvents.getAPI().getNettyManager().getChannelOperator().getPipelineContext(channel, handlerName);
     }
 
+    public static Object pooledByteBuf(Object channel) {
+        return PacketEvents.getAPI().getNettyManager().getChannelOperator().pooledByteBuf(channel);
+    }
+
     public static void runInEventLoop(Object channel, Runnable runnable) {
         PacketEvents.getAPI().getNettyManager().getChannelOperator().runInEventLoop(channel, runnable);
     }

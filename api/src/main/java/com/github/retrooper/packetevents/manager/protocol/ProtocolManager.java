@@ -104,45 +104,45 @@ public interface ProtocolManager {
         getUser(channel).setClientVersion(version);
     }
 
-    default Object[] transformWrappers(PacketWrapper<?> wrapper) {
+    default Object[] transformWrappers(PacketWrapper<?> wrapper, Object channel) {
         //It is possible that our packet transformer util decides to transform one wrapper into multiple packets.
         //(Correcting some mistakes on your end)
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
         Object[] buffers = new Object[wrappers.length];
         for (int i = 0; i < wrappers.length; i++) {
-            wrappers[i].prepareForSend();
+            wrappers[i].prepareForSend(channel);
             buffers[i] = wrappers[i].buffer;
         }
         return buffers;
     }
 
     default void sendPacket(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper);
+        Object[] transformed = transformWrappers(wrapper, channel);
         sendPackets(channel, transformed);
     }
 
     default void sendPacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper);
+        Object[] transformed = transformWrappers(wrapper, channel);
         sendPacketsSilently(channel, transformed);
     }
 
     default void writePacket(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper);
+        Object[] transformed = transformWrappers(wrapper, channel);
         writePackets(channel, transformed);
     }
 
     default void writePacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper);
+        Object[] transformed = transformWrappers(wrapper, channel);
         writePacketsSilently(channel, transformed);
     }
 
     default void receivePacket(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper);
+        Object[] transformed = transformWrappers(wrapper, channel);
         receivePackets(channel, transformed);
     }
 
     default void receivePacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper);
+        Object[] transformed = transformWrappers(wrapper, channel);
         receivePacketsSilently(channel, transformed);
     }
 

@@ -129,4 +129,9 @@ public class ChannelOperatorModernImpl implements ChannelOperator {
     public void runInEventLoop(Object channel, Runnable runnable) {
         ((Channel)channel).eventLoop().execute(runnable);
     }
+
+    @Override
+    public Object pooledByteBuf(Object o) {
+        return ((Channel)o).alloc().buffer();
+    }
 }

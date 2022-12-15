@@ -25,7 +25,7 @@ import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
@@ -49,7 +49,6 @@ import com.github.retrooper.packetevents.protocol.player.PublicProfileKey;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
-import com.github.retrooper.packetevents.protocol.world.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
@@ -145,11 +144,11 @@ public class PacketWrapper<T extends PacketWrapper> {
         return wrapper;
     }
 
-    public final void prepareForSend() {
+    public final void prepareForSend(Object channel) {
         // Null means the packet was manually created and wasn't sent by the server itself
         // A reference count of 0 means that the packet was freed (it was already sent)
         if (buffer == null || ByteBufHelper.refCnt(buffer) == 0) {
-            buffer = UnpooledByteBufAllocationHelper.buffer();
+            buffer = ChannelHelper.pooledByteBuf(channel);
         }
 
         writeVarInt(packetID);
