@@ -86,9 +86,11 @@ public class EntityDataTypes {
 
     public static final EntityDataType<String> STRING = define("string", PacketWrapper::readString, PacketWrapper::writeString);
 
-    public static final EntityDataType<Component> COMPONENT = define("component", PacketWrapper::readComponent, PacketWrapper::writeComponent);
+    public static final EntityDataType<String> COMPONENT = define("component", PacketWrapper::readComponentJSON, PacketWrapper::writeComponentJSON);
 
-    public static final EntityDataType<Optional<Component>> OPTIONAL_COMPONENT = define("optional_component", readOptionalComponentDeserializer(), writeOptionalComponentSerializer());
+    public static final EntityDataType<Optional<String>> OPTIONAL_COMPONENT = define("optional_component",
+            (PacketWrapper<?> wrapper) -> Optional.of(wrapper.readComponentJSON()),
+            (PacketWrapper<?> wrapper, Optional<String> value) -> wrapper.writeComponentJSON(value.orElse(null)));
 
     public static final EntityDataType<ItemStack> ITEMSTACK = define("itemstack", PacketWrapper::readItemStack, PacketWrapper::writeItemStack);
 
