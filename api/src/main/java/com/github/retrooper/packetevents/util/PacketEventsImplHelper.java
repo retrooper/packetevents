@@ -50,11 +50,11 @@ public class PacketEventsImplHelper {
                 ByteBufHelper.clear(buffer);
                 packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
                 packetReceiveEvent.getLastUsedWrapper().write();
+            } else {
+                //If no wrappers were used, just pass on the original buffer.
+                //Correct the reader index, basically what the next handler is expecting.
+                ByteBufHelper.readerIndex(buffer, preProcessIndex);
             }
-            //If no wrappers were used, just pass on the original buffer.
-
-            //Correct the reader index, basically what the next handler is expecting.
-            ByteBufHelper.readerIndex(buffer, preProcessIndex);
         } else {
             //Cancelling the packet, lets clear the buffer
             ByteBufHelper.clear(buffer);

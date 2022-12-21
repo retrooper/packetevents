@@ -61,20 +61,15 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        final ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
-        try {
-            boolean needsRecompression = !handledCompression && handleCompression(ctx, transformedBuf);
+        boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
 
-            handleClientBoundPacket(ctx.channel(), user, player, transformedBuf, this.promise);
+        handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
 
-            if (needsRecompression) {
-                compress(ctx, transformedBuf);
-            }
-
-            list.add(transformedBuf.retain());
-        } finally {
-            transformedBuf.release();
+        if (needsRecompression) {
+            compress(ctx, byteBuf);
         }
+
+        list.add(byteBuf.retain());
     }
 
     private PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
@@ -94,8 +89,10 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
                 packetSendEvent.getLastUsedWrapper().writeVarInt(packetId);
 
                 packetSendEvent.getLastUsedWrapper().write();
+            } else {
+                // Pass it along without changes
+                ByteBufHelper.readerIndex(buffer, preProcessIndex);
             }
-            ByteBufHelper.readerIndex(buffer, preProcessIndex);
         } else {
             //Make the buffer unreadable for the next handlers
             ByteBufHelper.clear(buffer);
