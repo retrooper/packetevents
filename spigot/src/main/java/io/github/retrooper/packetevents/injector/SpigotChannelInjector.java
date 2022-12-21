@@ -175,7 +175,8 @@ public class SpigotChannelInjector implements ChannelInjector {
             for (Object networkManager : networkManagers) {
                 ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
                 Channel channel = networkManagerWrapper.readObject(0, Channel.class);
-                if (channel.isOpen()) {
+                // This can somehow be null on spigot 1.8?
+                if (channel != null && channel.isOpen()) {
                     if (channel.localAddress().equals(serverChannel.localAddress())) {
                         channel.close();
                     }
