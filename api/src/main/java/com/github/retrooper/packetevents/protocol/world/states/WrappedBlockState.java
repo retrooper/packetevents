@@ -247,10 +247,8 @@ public class WrappedBlockState {
 
                     type = StateTypes.getByName(blockString);
 
-                    // TODO: Proper 1.20 support for experimental worlds
                     if (type == null) {
-                        type = StateTypes.AIR;
-                        //PacketEvents.getAPI().getLogger().warning("Unknown block type: " + fullBlockString);
+                        PacketEvents.getAPI().getLogger().warning("Unknown block type: " + fullBlockString);
                     }
                 }
 

@@ -1199,6 +1199,41 @@ public class ItemTypes {
     public static final ItemType DARK_OAK_CHEST_BOAT = builder("dark_oak_chest_boat").setMaxAmount(1).build();
     public static final ItemType MANGROVE_BOAT = builder("mangrove_boat").setMaxAmount(1).build();
     public static final ItemType MANGROVE_CHEST_BOAT = builder("mangrove_chest_boat").setMaxAmount(1).build();
+    // 1.20 experimental items
+    public static final ItemType BAMBOO_PLANKS = builder("bamboo_planks").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_PLANKS).build();
+    public static final ItemType BAMBOO_MOSAIC = builder("bamboo_mosaic").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_MOSAIC).build();
+    public static final ItemType BAMBOO_BLOCK = builder("bamboo_block").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_BLOCK).build();
+    public static final ItemType STRIPPED_BAMBOO_BLOCK = builder("stripped_bamboo_block").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.STRIPPED_BAMBOO_BLOCK).build();
+    public static final ItemType BAMBOO_SLAB = builder("bamboo_slab").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_SLAB).build();
+    public static final ItemType BAMBOO_MOSAIC_SLAB = builder("bamboo_mosaic_slab").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_MOSAIC_SLAB).build();
+    public static final ItemType CHISELED_BOOKSHELF = builder("chiseled_bookshelf").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.CHISELED_BOOKSHELF).build();
+    public static final ItemType BAMBOO_FENCE = builder("bamboo_fence").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_FENCE).build();
+    public static final ItemType BAMBOO_STAIRS = builder("bamboo_stairs").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_STAIRS).build();
+    public static final ItemType BAMBOO_MOSAIC_STAIRS = builder("bamboo_mosaic_stairs").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_MOSAIC_STAIRS).build();
+    public static final ItemType BAMBOO_BUTTON = builder("bamboo_button").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_BUTTON).build();
+    public static final ItemType BAMBOO_PRESSURE_PLATE = builder("bamboo_pressure_plate").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_PRESSURE_PLATE).build();
+    public static final ItemType BAMBOO_DOOR = builder("bamboo_door").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_DOOR).build();
+    public static final ItemType BAMBOO_TRAPDOOR = builder("bamboo_trapdoor").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_TRAPDOOR).build();
+    public static final ItemType BAMBOO_FENCE_GATE = builder("bamboo_fence_gate").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_FENCE_GATE).build();
+    public static final ItemType BAMBOO_RAFT = builder("bamboo_raft").setMaxAmount(1).setAttributes(ItemAttribute.FUEL).build();
+    public static final ItemType BAMBOO_CHEST_RAFT = builder("bamboo_chest_raft").setMaxAmount(1).setAttributes(ItemAttribute.FUEL).build();
+    public static final ItemType BAMBOO_SIGN = builder("bamboo_sign").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_SIGN).build();
+    public static final ItemType OAK_HANGING_SIGN = builder("oak_hanging_sign").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.OAK_HANGING_SIGN).build();
+    public static final ItemType SPRUCE_HANGING_SIGN = builder("spruce_hanging_sign").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.SPRUCE_HANGING_SIGN).build();
+    public static final ItemType BIRCH_HANGING_SIGN = builder("birch_hanging_sign").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BIRCH_HANGING_SIGN).build();
+    public static final ItemType JUNGLE_HANGING_SIGN = builder("jungle_hanging_sign").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.JUNGLE_HANGING_SIGN).build();
+    public static final ItemType ACACIA_HANGING_SIGN = builder("acacia_hanging_sign").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.ACACIA_HANGING_SIGN).build();
+    public static final ItemType DARK_OAK_HANGING_SIGN = builder("dark_oak_hanging_sign").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.DARK_OAK_HANGING_SIGN).build();
+    public static final ItemType MANGROVE_HANGING_SIGN = builder("mangrove_hanging_sign").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.MANGROVE_HANGING_SIGN).build();
+    public static final ItemType BAMBOO_HANGING_SIGN = builder("bamboo_hanging_sign").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BAMBOO_HANGING_SIGN).build();
+    public static final ItemType CRIMSON_HANGING_SIGN = builder("crimson_hanging_sign").setMaxAmount(16).setPlacedType(StateTypes.CRIMSON_HANGING_SIGN).build();
+    public static final ItemType WARPED_HANGING_SIGN = builder("warped_hanging_sign").setMaxAmount(16).setPlacedType(StateTypes.WARPED_HANGING_SIGN).build();
+    public static final ItemType CAMEL_SPAWN_EGG = builder("camel_spawn_egg").setMaxAmount(64).build();
+    public static final ItemType ENDER_DRAGON_SPAWN_EGG = builder("ender_dragon_spawn_egg").setMaxAmount(64).build();
+    public static final ItemType IRON_GOLEM_SPAWN_EGG = builder("iron_golem_spawn_egg").setMaxAmount(64).build();
+    public static final ItemType SNOW_GOLEM_SPAWN_EGG = builder("snow_golem_spawn_egg").setMaxAmount(64).build();
+    public static final ItemType WITHER_SPAWN_EGG = builder("wither_spawn_egg").setMaxAmount(64).build();
+    public static final ItemType PIGLIN_HEAD = builder("piglin_head").setMaxAmount(64).setPlacedType(StateTypes.PIGLIN_HEAD).build();
     /**
      * @deprecated Burning furnace shows up as a missing texture, removed in 1.9
      */
