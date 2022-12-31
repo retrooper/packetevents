@@ -71,12 +71,10 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
             PacketEvents.getAPI().getLogManager().debug("Mapped player UUID with their channel.");
 
-            //Update connection state(injectors might do some adjustments when we transition into PLAY state)
-            //This also updates it for the user instance
-            event.getPostTasks().add(() -> {
-                PacketEvents.getAPI().getInjector().changeConnectionState(channel, ConnectionState.PLAY);
-                PacketEvents.getAPI().getLogManager().debug("Transitioned " + profile.getName() + " into the PLAY state!");
-            });
+            //Switch the user's connection state to PLAY, but the variable event.getConnectionState() remains LOGIN
+            //We switch user state immediately to remain in sync with vanilla, allowing you to send PLAY packets immediately
+            user.setConnectionState(ConnectionState.PLAY);
+            PacketEvents.getAPI().getLogManager().debug("Transitioned " + profile.getName() + " into the PLAY state!");
         }
 
         // Join game can be used to update world height, and sets dimension data
@@ -128,11 +126,9 @@ public class InternalPacketListener extends PacketListenerAbstract {
             //Update client version for this event call(and user)
             user.setClientVersion(clientVersion);
             PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());
-            event.getPostTasks().add(() -> {
-                //Transition into the LOGIN OR STATUS connection state
-                PacketEvents.getAPI().getInjector().changeConnectionState(channel, nextState);
-                PacketEvents.getAPI().getLogManager().debug("Transitioned " + address.getHostString() + ":" + address.getPort() + " into the " + nextState + " state!");
-            });
+            //Transition into LOGIN or STATUS connection state immediately, to remain in sync with vanilla
+            user.setConnectionState(nextState);
+            PacketEvents.getAPI().getLogManager().debug("Transitioned " + address.getHostString() + ":" + address.getPort() + " into the " + nextState + " state!");
         }
     }
 }

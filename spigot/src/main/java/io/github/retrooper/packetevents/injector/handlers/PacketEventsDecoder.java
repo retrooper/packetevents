@@ -18,28 +18,24 @@
 
 package io.github.retrooper.packetevents.injector.handlers;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
-@ChannelHandler.Sharable
 public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public User user;
-    public volatile Player player;
+    public Player player;
+    public boolean hasBeenRelocated;
 
     public PacketEventsDecoder(User user) {
         this.user = user;
@@ -48,34 +44,12 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public PacketEventsDecoder(PacketEventsDecoder decoder) {
         user = decoder.user;
         player = decoder.player;
+        hasBeenRelocated = decoder.hasBeenRelocated;
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
-        ByteBuf transformed = ctx.alloc().buffer().writeBytes(input);
-        try {
-            int firstReaderIndex = transformed.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(),
-                    user, player, transformed, true);
-            int readerIndex = transformed.readerIndex();
-            PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> transformed.readerIndex(readerIndex));
-
-            if (!packetReceiveEvent.isCancelled()) {
-                if (packetReceiveEvent.getLastUsedWrapper() != null) {
-                    ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
-                    packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
-                    packetReceiveEvent.getLastUsedWrapper().write();
-                }
-                transformed.readerIndex(firstReaderIndex);
-                out.add(transformed.retain());
-            }
-            if (packetReceiveEvent.hasPostTasks()) {
-                for (Runnable task : packetReceiveEvent.getPostTasks()) {
-                    task.run();
-                }
-            }
-        } finally {
-            transformed.release();
-        }
+        PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, true);
+        out.add(input.retain());
     }
 
     @Override
@@ -105,7 +79,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         }
 
         // Via changes the order of handlers in this event, so we must respond to Via changing their stuff
-        ServerConnectionInitializer.relocateHandlers(ctx.channel(), null);
+        ServerConnectionInitializer.relocateHandlers(ctx.channel(), this, user);
         super.userEventTriggered(ctx, event);
     }
 

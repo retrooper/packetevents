@@ -20,38 +20,35 @@ package io.github.retrooper.packetevents.bukkit;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.Plugin;
 
 public class InternalBukkitListener implements Listener {
+
+    private final Plugin plugin;
+
+    public InternalBukkitListener(Plugin plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
         SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-        //By accessing user with the player object, we ensure that a valid user is cached.
-        //In the spigot PlayerManager impl, if there was no user cached,
-        //we will create one with help of the Player object.
-        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
-        if (user == null) return;
-        //By accessing the client version with the player object, we should ensure the client version is valid.
-        //In the spigot PlayerManager impl, we ask protocol translation dependencies for the version
-        //if we failed to catch it.(shouldn't ever happen really)
-        //TODO With Via we might have to run this a tick AFTER join event (atleast when via & viabackwards & rewind are present)
-        injector.updatePlayer(user, player);
-    }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onQuit(PlayerQuitEvent e) {
-        Player player = e.getPlayer();
-        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        //When we receive LOGIN_SUCCESS, we cache username with their channel.
-        //Here we clean that up.
-        PacketEventsImplHelper.handleDisconnection(channel, player.getUniqueId());
+        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+        if (user == null) {
+            Bukkit.getScheduler().runTask(plugin, () -> player.kickPlayer("PacketEvents 2.0 failed to inject"));
+            return;
+        }
+
+        // Set bukkit player object in the injectors
+        injector.updatePlayer(user, player);
     }
 }

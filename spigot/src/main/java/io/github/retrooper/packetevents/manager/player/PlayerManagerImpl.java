@@ -22,13 +22,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.util.reflection.Reflection;
-import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.util.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
@@ -36,9 +31,6 @@ import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.UUID;
 
 public class PlayerManagerImpl implements PlayerManager {
@@ -100,31 +92,8 @@ public class PlayerManagerImpl implements PlayerManager {
     public User getUser(@NotNull Object player) {
         Player p = (Player) player;
         Object channel = getChannel(p);
-        User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
 
-        // Creating a user that is offline will memory leak
         if (channel == null) return null;
-
-        if (user == null) {
-            user = new User(channel, ConnectionState.PLAY, null, new UserProfile(p.getUniqueId(), p.getName()));
-
-            synchronized (channel) {
-                if (!ChannelHelper.isOpen(channel)) {
-                    return null;
-                }
-
-                ProtocolManager.USERS.put(channel, user);
-                PacketEvents.getAPI().getInjector().updateUser(channel, user);
-            }
-        }
-
-        UserProfile profile = user.getProfile();
-        if (profile.getName() == null) {
-            profile.setName(p.getName());
-        }
-        if (profile.getUUID() == null) {
-            profile.setUUID(p.getUniqueId());
-        }
-        return user;
+        return PacketEvents.getAPI().getProtocolManager().getUser(channel);
     }
 }

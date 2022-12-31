@@ -101,6 +101,11 @@ public class ChannelOperatorModernImpl implements ChannelOperator {
     }
 
     @Override
+    public Object getPipeline(Object channel) {
+        return ((Channel)channel).pipeline();
+    }
+
+    @Override
     public Object fireChannelReadInContext(Object channel, String ctx, Object buffer) {
         return ((Channel)channel).pipeline().context(ctx).fireChannelRead(buffer);
     }
@@ -123,5 +128,10 @@ public class ChannelOperatorModernImpl implements ChannelOperator {
     @Override
     public void runInEventLoop(Object channel, Runnable runnable) {
         ((Channel)channel).eventLoop().execute(runnable);
+    }
+
+    @Override
+    public Object pooledByteBuf(Object o) {
+        return ((Channel)o).alloc().buffer();
     }
 }

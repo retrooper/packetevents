@@ -53,7 +53,9 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
     public void read() {
         motd = readOptional(PacketWrapper::readComponent);
         icon = readOptional(PacketWrapper::readString);
-        previewsChat = readBoolean();
+        if (serverVersion.isOlderThan(ServerVersion.V_1_19_3)) {
+            previewsChat = readBoolean();
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
             enforceSecureChat = readBoolean();
         }
@@ -63,7 +65,9 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
     public void write() {
         writeOptional(motd, PacketWrapper::writeComponent);
         writeOptional(icon, PacketWrapper::writeString);
-        writeBoolean(previewsChat);
+        if (serverVersion.isOlderThan(ServerVersion.V_1_19_3)) {
+            writeBoolean(previewsChat);
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
             writeBoolean(enforceSecureChat);
         }

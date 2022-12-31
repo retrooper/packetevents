@@ -23,12 +23,15 @@ import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.event.simple.PacketStatusSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PacketSendEvent extends ProtocolPacketEvent<Object> {
+    private List<Runnable> tasksAfterSend = null;
     protected PacketSendEvent(Object channel, User user, Object player, Object rawByteBuf,
                               boolean autoProtocolTranslation) throws PacketProcessException {
         super(PacketSide.SERVER, channel, user, player, rawByteBuf, autoProtocolTranslation);
@@ -46,6 +49,18 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     @Override
     public void call(PacketListenerCommon listener) {
         listener.onPacketSend(this);
+    }
+
+
+    public List<Runnable> getTasksAfterSend() {
+        if (tasksAfterSend == null) {
+            tasksAfterSend = new ArrayList<>();
+        }
+        return tasksAfterSend;
+    }
+
+    public boolean hasTasksAfterSend() {
+        return tasksAfterSend != null && !tasksAfterSend.isEmpty();
     }
 
     @Override

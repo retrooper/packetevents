@@ -133,9 +133,10 @@ public class WrappedBlockState {
             return 6;
         } else if (version.isOlderThanOrEquals(ClientVersion.V_1_18_2)) {
             return 7;
-        } else {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_19_1)){
             return 8;
         }
+        return 9;
     }
 
     private static void loadLegacy() {
@@ -246,8 +247,10 @@ public class WrappedBlockState {
 
                     type = StateTypes.getByName(blockString);
 
+                    // TODO: Proper 1.20 support for experimental worlds
                     if (type == null) {
-                        PacketEvents.getAPI().getLogger().warning("Unknown block type: " + fullBlockString);
+                        type = StateTypes.AIR;
+                        //PacketEvents.getAPI().getLogger().warning("Unknown block type: " + fullBlockString);
                     }
                 }
 
@@ -882,6 +885,66 @@ public class WrappedBlockState {
     public void setSignalFire(boolean signalFire) {
         checkIfCloneNeeded();
         data.put(StateValue.SIGNAL_FIRE, signalFire);
+        checkIsStillValid();
+    }
+
+    public boolean isSlotZeroOccupied() {
+        return (boolean) data.get(StateValue.SLOT_0_OCCUPIED);
+    }
+
+    public void setSlotZeroOccupied(boolean slotZeroOccupied) {
+        checkIfCloneNeeded();
+        data.put(StateValue.SLOT_0_OCCUPIED, slotZeroOccupied);
+        checkIsStillValid();
+    }
+
+    public boolean isSlotOneOccupied() {
+        return (boolean) data.get(StateValue.SLOT_1_OCCUPIED);
+    }
+
+    public void setSlotOneOccupied(boolean slotOneOccupied) {
+        checkIfCloneNeeded();
+        data.put(StateValue.SLOT_1_OCCUPIED, slotOneOccupied);
+        checkIsStillValid();
+    }
+
+    public boolean isSlotTwoOccupied() {
+        return (boolean) data.get(StateValue.SLOT_2_OCCUPIED);
+    }
+
+    public void setSlotTwoOccupied(boolean slotTwoOccupied) {
+        checkIfCloneNeeded();
+        data.put(StateValue.SLOT_2_OCCUPIED, slotTwoOccupied);
+        checkIsStillValid();
+    }
+
+    public boolean isSlotThreeOccupied() {
+        return (boolean) data.get(StateValue.SLOT_3_OCCUPIED);
+    }
+
+    public void setSlotThreeOccupied(boolean slotThreeOccupied) {
+        checkIfCloneNeeded();
+        data.put(StateValue.SLOT_3_OCCUPIED, slotThreeOccupied);
+        checkIsStillValid();
+    }
+
+    public boolean isSlotFourOccupied() {
+        return (boolean) data.get(StateValue.SLOT_4_OCCUPIED);
+    }
+
+    public void setSlotFourOccupied(boolean slotFourOccupied) {
+        checkIfCloneNeeded();
+        data.put(StateValue.SLOT_4_OCCUPIED, slotFourOccupied);
+        checkIsStillValid();
+    }
+
+    public boolean isSlotFiveOccupied() {
+        return (boolean) data.get(StateValue.SLOT_5_OCCUPIED);
+    }
+
+    public void setSlotFiveOccupied(boolean slotFiveOccupied) {
+        checkIfCloneNeeded();
+        data.put(StateValue.SLOT_5_OCCUPIED, slotFiveOccupied);
         checkIsStillValid();
     }
 

@@ -147,6 +147,14 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         this.button = button;
     }
 
+    public Optional<Integer> getActionNumber() {
+        return actionNumber;
+    }
+
+    public void setActionNumber(int button) {
+        this.actionNumber = Optional.of(button);
+    }
+
     public WindowClickType getWindowClickType() {
         return windowClickType;
     }

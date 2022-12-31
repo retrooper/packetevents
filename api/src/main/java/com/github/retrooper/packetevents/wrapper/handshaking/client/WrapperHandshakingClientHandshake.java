@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.handshaking.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -50,12 +51,18 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
 
     @Override
     public void read() {
-        this.protocolVersion = readVarInt();
-        this.clientVersion = ClientVersion.getById(protocolVersion);
-        this.serverAddress = readString(Short.MAX_VALUE); // Should be 255, but :shrug: someone reported issues
-        this.serverPort = readUnsignedShort();
-        int nextStateIndex = readVarInt();
-        this.nextConnectionState = ConnectionState.getById(nextStateIndex);
+        // Bots scanning the internet often break the minecraft protocol (they don't even know what minecraft is!)
+        // as people love scanning the ipv4 range trying to connect to any service
+        try {
+            this.protocolVersion = readVarInt();
+            this.clientVersion = ClientVersion.getById(protocolVersion);
+            this.serverAddress = readString(Short.MAX_VALUE); // Should be 255, but :shrug: someone reported issues
+            this.serverPort = readUnsignedShort();
+            int nextStateIndex = readVarInt();
+            this.nextConnectionState = ConnectionState.getById(nextStateIndex);
+        } catch (Exception e) {
+            throw new PacketProcessException(e);
+        }
     }
 
     @Override

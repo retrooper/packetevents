@@ -103,6 +103,10 @@ public class SpigotChannelInjector implements ChannelInjector {
                 networkManagers = SpigotReflectionUtil.getNetworkManagers();
             }
             synchronized (networkManagers) {
+                if (!networkManagers.isEmpty()) {
+                    PacketEvents.getAPI().getLogManager().debug("Late bind not enabled, injecting into existing channel");
+                }
+
                 for (Object networkManager : networkManagers) {
                     ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
                     Channel channel = networkManagerWrapper.readObject(0, Channel.class);
@@ -171,7 +175,8 @@ public class SpigotChannelInjector implements ChannelInjector {
             for (Object networkManager : networkManagers) {
                 ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
                 Channel channel = networkManagerWrapper.readObject(0, Channel.class);
-                if (channel.isOpen()) {
+                // This can somehow be null on spigot 1.8?
+                if (channel != null && channel.isOpen()) {
                     if (channel.localAddress().equals(serverChannel.localAddress())) {
                         channel.close();
                     }
@@ -187,16 +192,16 @@ public class SpigotChannelInjector implements ChannelInjector {
 
     @Override
     public User getUser(Object channel) {
-        return getEncoder((Channel) channel).user;
+        PacketEventsEncoder encoder = getEncoder((Channel)channel);
+        return encoder != null ? encoder.user : null;
     }
 
     @Override
     public void changeConnectionState(Object ch, @Nullable ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-        PacketEventsEncoder encoder = getEncoder(channel);
-        if (encoder != null) {
-            //Change connection state in encoder
-            encoder.user.setConnectionState(connectionState);
+        User user = getUser(channel);
+        if (user != null) {
+            user.setConnectionState(connectionState);
         }
     }
 
@@ -223,8 +228,8 @@ public class SpigotChannelInjector implements ChannelInjector {
         PacketEventsDecoder decoder = getDecoder((Channel) channel);
         if (decoder != null) {
             decoder.player = (Player) player;
-            decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
             decoder.user.getProfile().setName(((Player) player).getName());
+            decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
         }
     }
 

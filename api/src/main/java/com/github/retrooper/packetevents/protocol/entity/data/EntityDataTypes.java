@@ -36,7 +36,6 @@ import com.github.retrooper.packetevents.util.TypesBuilderData;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +58,8 @@ public class EntityDataTypes {
             ClientVersion.V_1_11,
             ClientVersion.V_1_13,
             ClientVersion.V_1_14,
-            ClientVersion.V_1_19);
+            ClientVersion.V_1_19,
+            ClientVersion.V_1_19_3);
 
     public static final EntityDataType<Byte> BYTE = define("byte", PacketWrapper::readByte, PacketWrapper::writeByte);
 
@@ -79,13 +79,15 @@ public class EntityDataTypes {
         }
     });
 
+    public static final EntityDataType<Long> VAR_LONG = define("var_long", PacketWrapper::readVarLong, PacketWrapper::writeVarLong);
+
     public static final EntityDataType<Float> FLOAT = define("float", PacketWrapper::readFloat, PacketWrapper::writeFloat);
 
     public static final EntityDataType<String> STRING = define("string", PacketWrapper::readString, PacketWrapper::writeString);
 
-    public static final EntityDataType<Component> COMPONENT = define("component", PacketWrapper::readComponent, PacketWrapper::writeComponent);
+    public static final EntityDataType<String> COMPONENT = define("component", PacketWrapper::readComponentJSON, PacketWrapper::writeComponentJSON);
 
-    public static final EntityDataType<Optional<Component>> OPTIONAL_COMPONENT = define("optional_component", readOptionalComponentDeserializer(), writeOptionalComponentSerializer());
+    public static final EntityDataType<Optional<String>> OPTIONAL_COMPONENT = define("optional_component", readOptionalComponentDeserializer(), writeOptionalComponentSerializer());
 
     public static final EntityDataType<ItemStack> ITEMSTACK = define("itemstack", PacketWrapper::readItemStack, PacketWrapper::writeItemStack);
 
@@ -232,7 +234,7 @@ public class EntityDataTypes {
     private static <T> Function<PacketWrapper<?>, T> readOptionalComponentDeserializer() {
         return (PacketWrapper<?> wrapper) -> {
             if (wrapper.readBoolean()) {
-                return (T) Optional.of(wrapper.readComponent());
+                return (T) Optional.of(wrapper.readString());
             } else {
                 return (T) Optional.empty();
             }
@@ -242,10 +244,10 @@ public class EntityDataTypes {
     private static <T> BiConsumer<PacketWrapper<?>, T> writeOptionalComponentSerializer() {
         return (PacketWrapper<?> wrapper, T value) -> {
             if (value instanceof Optional) {
-                Optional<Component> optional = (Optional<Component>) value;
+                Optional<String> optional = (Optional<String>) value;
                 if (optional.isPresent()) {
                     wrapper.writeBoolean(true);
-                    wrapper.writeComponent(optional.get());
+                    wrapper.writeString(optional.get());
                 } else {
                     wrapper.writeBoolean(false);
                 }

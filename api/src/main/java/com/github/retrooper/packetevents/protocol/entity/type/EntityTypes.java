@@ -43,7 +43,8 @@ public class EntityTypes {
             ClientVersion.V_1_16,
             ClientVersion.V_1_16_2,
             ClientVersion.V_1_17,
-            ClientVersion.V_1_19);
+            ClientVersion.V_1_19,
+            ClientVersion.V_1_19_3);
     private static final TypesBuilder LEGACY_TYPES_BUILDER = new TypesBuilder("entity/legacy_entity_type_mappings",
             ClientVersion.V_1_8,
             ClientVersion.V_1_9,
@@ -178,6 +179,7 @@ public class EntityTypes {
     public static final EntityType BOAT = define("boat", ENTITY);
     public static final EntityType CHEST_BOAT = define("chest_boat", BOAT);
     public static final EntityType CAT = define("cat", ABSTRACT_TAMEABLE_ANIMAL);
+    public static final EntityType CAMEL = define("camel", ABSTRACT_HORSE);
     public static final EntityType SPIDER = define("spider", ABSTRACT_MONSTER);
     public static final EntityType CAVE_SPIDER = define("cave_spider", SPIDER);
     public static final EntityType CHICKEN = define("chicken", ABSTRACT_ANIMAL);

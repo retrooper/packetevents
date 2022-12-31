@@ -20,13 +20,11 @@ package io.github.retrooper.packetevents.injector.connection;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
-import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
-import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
 import io.netty.channel.Channel;
@@ -40,10 +38,16 @@ public class ServerConnectionInitializer {
 
     public static void initChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+        if (channel.getClass().getSimpleName().equals("FakeChannel")) {
             return;
         }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));
+
+        if (connectionState == ConnectionState.PLAY) {
+            // Player connected before ViaVersion init, therefore the player is server version (mostly true except 1.7 servers)
+            user.setClientVersion(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+            PacketEvents.getAPI().getLogManager().debug("Late injection detected!");
+        }
 
         synchronized (channel) {
             /*
@@ -65,31 +69,33 @@ public class ServerConnectionInitializer {
                 return;
             }
 
-            relocateHandlers(channel, user);
+            relocateHandlers(channel, null, user);
 
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
-            ProtocolManager.USERS.put(channel, user);
+            PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
         }
     }
 
-    public static void relocateHandlers(Channel ctx, User user) {
-        // User == null means we already have handlers
+    public static void relocateHandlers(Channel ctx, PacketEventsDecoder decoder, User user) {
+        // Decoder == null means we haven't made handlers for the user yet
         try {
-            ChannelHandler decoder;
             ChannelHandler encoder;
-
-            if (user == null) {
+            if (decoder != null) {
+                // This patches a bug where PE 2.0 handlers keep jumping behind one another causing a stackoverflow
+                if (decoder.hasBeenRelocated) return;
+                // Make sure we only relocate because of compression once
+                decoder.hasBeenRelocated = true;
+                decoder = (PacketEventsDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
                 encoder = ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
+                decoder = new PacketEventsDecoder(decoder);
+                encoder = new PacketEventsEncoder(encoder);
             } else {
                 encoder = new PacketEventsEncoder(user);
-            }
-
-            if (user == null) {
-                decoder = ctx.pipeline().remove(PacketEvents.DECODER_NAME);
-            } else {
                 decoder = new PacketEventsDecoder(user);
             }
-
+            // We are targeting the encoder and decoder since we don't want to target specific plugins
+            // (ProtocolSupport has changed its handler name in the past)
+            // I don't like the hacks required for compression but that's on vanilla, we can't fix it.
             ctx.pipeline().addBefore("decoder", PacketEvents.DECODER_NAME, decoder);
             ctx.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, encoder);
         } catch (NoSuchElementException ex) {

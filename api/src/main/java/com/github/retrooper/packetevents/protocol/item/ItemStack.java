@@ -125,7 +125,7 @@ public class ItemStack {
     }
 
     public ItemStack copy() {
-        return cachedIsEmpty ? EMPTY : new ItemStack(type, amount, nbt == null ? new NBTCompound() : nbt.copy(), legacyData);
+        return cachedIsEmpty ? EMPTY : new ItemStack(type, amount, nbt == null ? null : nbt.copy(), legacyData);
     }
 
     @Nullable
@@ -258,7 +258,16 @@ public class ItemStack {
     }
 
     public static boolean tagMatches(ItemStack left, ItemStack right) {
-        return left.isEmpty() && right.isEmpty() || (!left.isEmpty() && !right.isEmpty() && ((left.nbt != null || right.nbt == null) && (left.nbt == null || left.nbt.equals(right.nbt))));
+        if (left == right) {
+            return true;
+        }
+        if (left == null) {
+            return right.isEmpty();
+        }
+        if (right == null) {
+            return left.isEmpty();
+        }
+        return Objects.equals(left.nbt, right.nbt);
     }
 
     @Override
