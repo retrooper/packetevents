@@ -43,13 +43,14 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
         super(event);
     }
 
-    public WrapperPlayClientPlayerBlockPlacement(InteractionHand interactionHand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition, Optional<Boolean> insideBlock, int sequence) {
+    public WrapperPlayClientPlayerBlockPlacement(InteractionHand interactionHand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition, ItemStack itemStack, Boolean insideBlock, int sequence) {
         super(PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT);
         this.interactionHand = interactionHand;
         this.blockPosition = blockPosition;
         this.face = face;
         this.cursorPosition = cursorPosition;
-        this.insideBlock = insideBlock;
+        this.itemStack = Optional.ofNullable(itemStack);
+        this.insideBlock = Optional.ofNullable(insideBlock);
         this.sequence = sequence;
     }
 
