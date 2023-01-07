@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.player.*;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -74,9 +75,15 @@ public class NPC {
 
     public void spawn(Object channel) {
         if (hasSpawned(channel)) return;
-        WrapperPlayServerPlayerInfo playerInfoPacket =
-                new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getPlayerInfoData());
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoPacket);
+        PacketWrapper<?> playerInfo;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
+                    getModernPlayerInfoData());
+        }
+        else {
+            playerInfo = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getLegacyPlayerInfoData());
+        }
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
 
         //TODO Later if we want entity metadata, its not supported on newer server versions though(confirm if its mandatory on older versions)
         WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(getId(),
@@ -183,8 +190,14 @@ public class NPC {
     public void updateTabPing(int ping) {
         setDisplayPing(ping);
         for (Object channel : channels) {
-            WrapperPlayServerPlayerInfo playerInfo =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, getPlayerInfoData());
+            PacketWrapper<?> playerInfo;
+            if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
+                playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LATENCY, getModernPlayerInfoData());
+            }
+            else {
+                playerInfo =
+                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, getLegacyPlayerInfoData());
+            }
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
         }
     }
@@ -192,16 +205,29 @@ public class NPC {
     public void updateGameMode(GameMode gamemode) {
         setGameMode(gamemode);
         for (Object channel : channels) {
-            WrapperPlayServerPlayerInfo playerInfo =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_GAME_MODE, getPlayerInfoData());
+            PacketWrapper<?> playerInfo;
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+                playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_GAME_MODE,
+                        getModernPlayerInfoData());
+            }
+            else {
+                playerInfo =
+                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_GAME_MODE, getLegacyPlayerInfoData());
+            }
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
         }
     }
 
     public void changeSkin(UUID skinUUID, List<TextureProperty> skinTextureProperties) {
         for (Object channel : channels) {
-            WrapperPlayServerPlayerInfo playerInfoRemove =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getPlayerInfoData());
+            PacketWrapper<?> playerInfoRemove;
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+                playerInfoRemove = new WrapperPlayServerPlayerInfoRemove(getProfile().getUUID());
+            }
+            else {
+                playerInfoRemove =
+                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
+            }
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoRemove);
 
             WrapperPlayServerDestroyEntities destroyEntities =
@@ -210,8 +236,15 @@ public class NPC {
 
             getProfile().setTextureProperties(skinTextureProperties);
             getProfile().setUUID(skinUUID);
-            WrapperPlayServerPlayerInfo playerInfoAdd =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getPlayerInfoData());
+            PacketWrapper<?> playerInfoAdd;
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+                playerInfoAdd = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
+                        getModernPlayerInfoData());
+            }
+            else {
+                playerInfoAdd =
+                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getLegacyPlayerInfoData());
+            }
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoAdd);
 
             WrapperPlayServerSpawnPlayer spawnPlayer =
@@ -402,10 +435,15 @@ public class NPC {
                 getProfile().getName());
     }
 
-    public WrapperPlayServerPlayerInfo.PlayerData getPlayerInfoData() {
+    public WrapperPlayServerPlayerInfo.PlayerData getLegacyPlayerInfoData() {
         return new WrapperPlayServerPlayerInfo.PlayerData(getTabName(),
                 getProfile(), getGameMode(),
                 getDisplayPing());
+    }
+
+    public WrapperPlayServerPlayerInfoUpdate.PlayerInfo getModernPlayerInfoData() {
+        return new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(getProfile(), true,
+                getDisplayPing(), getGameMode(), getTabName(), null);
     }
 
     public int getDisplayPing() {
