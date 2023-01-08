@@ -102,6 +102,15 @@ public class NPC {
     public void despawn(Object channel) {
         if (!hasSpawned(channel)) return;
         //TODO Confirm if we need to destroy the team too
+        PacketWrapper<?> playerInfoRemove;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            playerInfoRemove = new WrapperPlayServerPlayerInfoRemove(getProfile().getUUID());
+        } else {
+            playerInfoRemove =
+                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
+        }
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoRemove);
+
         WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
         channels.remove(channel);
@@ -109,9 +118,16 @@ public class NPC {
 
     public void despawnAll() {
         if (channels.isEmpty()) return;
-
+        PacketWrapper<?> playerInfoRemove;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            playerInfoRemove = new WrapperPlayServerPlayerInfoRemove(getProfile().getUUID());
+        } else {
+            playerInfoRemove =
+                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
+        }
         WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
         for (Object channel : channels) {
+            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoRemove);
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
         }
     }
