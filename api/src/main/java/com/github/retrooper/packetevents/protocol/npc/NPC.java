@@ -33,6 +33,7 @@ import java.util.*;
 
 public class NPC {
     private final int id;
+    private float health;
     private final UserProfile profile;
     private GameMode gamemode;
     private Component tabName;
@@ -79,8 +80,7 @@ public class NPC {
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
             playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
                     getModernPlayerInfoData());
-        }
-        else {
+        } else {
             playerInfo = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getLegacyPlayerInfoData());
         }
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
@@ -108,16 +108,21 @@ public class NPC {
     }
 
     public void despawnAll() {
+        if (channels.isEmpty()) return;
+
+        WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
         for (Object channel : channels) {
-            WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
         }
     }
 
     public void teleport(Location to) {
         setLocation(to);
+        if (channels.isEmpty()) return;
+
+        WrapperPlayServerEntityTeleport entityTeleport = new WrapperPlayServerEntityTeleport(getId(), to, true);
+
         for (Object channel : channels) {
-            WrapperPlayServerEntityTeleport entityTeleport = new WrapperPlayServerEntityTeleport(getId(), to, true);
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityTeleport);
         }
     }
@@ -176,62 +181,83 @@ public class NPC {
     public void updateRotation(float yaw, float pitch) {
         getLocation().setYaw(yaw);
         getLocation().setPitch(pitch);
-        for (Object channel : channels) {
-            WrapperPlayServerEntityRotation entityRotation =
-                    new WrapperPlayServerEntityRotation(getId(), yaw, pitch, true);
-            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRotation);
 
-            WrapperPlayServerEntityHeadLook headYaw =
-                    new WrapperPlayServerEntityHeadLook(getId(), yaw);
+        if (channels.isEmpty()) return;
+        WrapperPlayServerEntityRotation entityRotation =
+                new WrapperPlayServerEntityRotation(getId(), yaw, pitch, true);
+        WrapperPlayServerEntityHeadLook headYaw =
+                new WrapperPlayServerEntityHeadLook(getId(), yaw);
+
+        for (Object channel : channels) {
+            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRotation);
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, headYaw);
         }
     }
 
     public void updateTabPing(int ping) {
         setDisplayPing(ping);
+        if (channels.isEmpty()) return;
+        PacketWrapper<?> playerInfo;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
+            playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LATENCY, getModernPlayerInfoData());
+        } else {
+            playerInfo =
+                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, getLegacyPlayerInfoData());
+        }
         for (Object channel : channels) {
-            PacketWrapper<?> playerInfo;
-            if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
-                playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LATENCY, getModernPlayerInfoData());
-            }
-            else {
-                playerInfo =
-                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, getLegacyPlayerInfoData());
-            }
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
+        }
+    }
+
+    public void doAnimation(WrapperPlayServerEntityAnimation.EntityAnimationType animation) {
+        if (channels.isEmpty()) return;
+
+        WrapperPlayServerEntityAnimation entityAnimation = new WrapperPlayServerEntityAnimation(getId(), animation);
+        for (Object channel : channels) {
+            PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityAnimation);
+        }
+    }
+
+    public void updateHealth(float health, int food, float foodSaturation) {
+        setHealth(health);
+        if (channels.isEmpty()) return;
+
+        WrapperPlayServerUpdateHealth updateHealth = new WrapperPlayServerUpdateHealth(health, food, foodSaturation);
+        for (Object channel : channels) {
+            PacketEvents.getAPI().getPlayerManager().sendPacket(channel, updateHealth);
         }
     }
 
     public void updateGameMode(GameMode gamemode) {
         setGameMode(gamemode);
+        if (channels.isEmpty()) return;
+        PacketWrapper<?> playerInfo;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_GAME_MODE,
+                    getModernPlayerInfoData());
+        } else {
+            playerInfo =
+                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_GAME_MODE, getLegacyPlayerInfoData());
+        }
         for (Object channel : channels) {
-            PacketWrapper<?> playerInfo;
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-                playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_GAME_MODE,
-                        getModernPlayerInfoData());
-            }
-            else {
-                playerInfo =
-                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_GAME_MODE, getLegacyPlayerInfoData());
-            }
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
         }
     }
 
     public void changeSkin(UUID skinUUID, List<TextureProperty> skinTextureProperties) {
+        if (channels.isEmpty()) return;
+        PacketWrapper<?> playerInfoRemove;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            playerInfoRemove = new WrapperPlayServerPlayerInfoRemove(getProfile().getUUID());
+        } else {
+            playerInfoRemove =
+                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
+        }
+        WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
+
         for (Object channel : channels) {
-            PacketWrapper<?> playerInfoRemove;
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-                playerInfoRemove = new WrapperPlayServerPlayerInfoRemove(getProfile().getUUID());
-            }
-            else {
-                playerInfoRemove =
-                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
-            }
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoRemove);
 
-            WrapperPlayServerDestroyEntities destroyEntities =
-                    new WrapperPlayServerDestroyEntities(getId());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
 
             getProfile().setTextureProperties(skinTextureProperties);
@@ -240,8 +266,7 @@ public class NPC {
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
                 playerInfoAdd = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
                         getModernPlayerInfoData());
-            }
-            else {
+            } else {
                 playerInfoAdd =
                         new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getLegacyPlayerInfoData());
             }
@@ -254,12 +279,14 @@ public class NPC {
     }
 
     public void updateNameTag(NPC npc) {
+        if (channels.isEmpty()) return;
+
+        WrapperPlayServerTeams removeTeam =
+                new WrapperPlayServerTeams("custom_name_team",
+                        WrapperPlayServerTeams.TeamMode.REMOVE,
+                        Optional.empty());
         for (Object channel : channels) {
             //Destroy team
-            WrapperPlayServerTeams removeTeam =
-                    new WrapperPlayServerTeams("custom_name_team",
-                            WrapperPlayServerTeams.TeamMode.REMOVE,
-                            Optional.empty());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, removeTeam);
 
             if (npc.getNameColor() != null || npc.getPrefixName() != null
@@ -270,51 +297,53 @@ public class NPC {
     }
 
     public void updateEquipment() {
+        if (channels.isEmpty()) return;
+
+        List<Equipment> equipmentList = new ArrayList<>();
+        ItemStack handItem = getMainHand();
+        if (handItem == null) {
+            handItem = ItemStack.EMPTY;
+        }
+        equipmentList.add(new Equipment(EquipmentSlot.MAIN_HAND,
+                handItem));
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            ItemStack offHandItem = getOffHand();
+            if (offHandItem == null) {
+                offHandItem = ItemStack.EMPTY;
+            }
+            equipmentList.add(new Equipment(EquipmentSlot.OFF_HAND,
+                    offHandItem));
+        }
+        ItemStack helmetItem = getHelmet();
+        if (helmetItem == null) {
+            helmetItem = ItemStack.EMPTY;
+        }
+        equipmentList.add(new Equipment(EquipmentSlot.HELMET,
+                helmetItem));
+
+        ItemStack chestPlateItem = getChestplate();
+        if (chestPlateItem == null) {
+            chestPlateItem = ItemStack.EMPTY;
+        }
+        equipmentList.add(new Equipment(EquipmentSlot.CHEST_PLATE,
+                chestPlateItem));
+        ItemStack leggingsItem = getLeggings();
+        if (leggingsItem == null) {
+            leggingsItem = ItemStack.EMPTY;
+        }
+        equipmentList.add(new Equipment(EquipmentSlot.LEGGINGS,
+                leggingsItem));
+        ItemStack bootsItem = getBoots();
+        if (bootsItem == null) {
+            bootsItem = ItemStack.EMPTY;
+        }
+        equipmentList.add(new Equipment(EquipmentSlot.BOOTS,
+                bootsItem));
+
+        WrapperPlayServerEntityEquipment equipmentPacket
+                = new WrapperPlayServerEntityEquipment(getId(),
+                equipmentList);
         for (Object channel : channels) {
-            List<Equipment> equipmentList = new ArrayList<>();
-            ItemStack handItem = getMainHand();
-            if (handItem == null) {
-                handItem = ItemStack.EMPTY;
-            }
-            equipmentList.add(new Equipment(EquipmentSlot.MAIN_HAND,
-                    handItem));
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                ItemStack offHandItem = getOffHand();
-                if (offHandItem == null) {
-                    offHandItem = ItemStack.EMPTY;
-                }
-                equipmentList.add(new Equipment(EquipmentSlot.OFF_HAND,
-                        offHandItem));
-            }
-            ItemStack helmetItem = getHelmet();
-            if (helmetItem == null) {
-                helmetItem = ItemStack.EMPTY;
-            }
-            equipmentList.add(new Equipment(EquipmentSlot.HELMET,
-                    helmetItem));
-
-            ItemStack chestPlateItem = getChestplate();
-            if (chestPlateItem == null) {
-                chestPlateItem = ItemStack.EMPTY;
-            }
-            equipmentList.add(new Equipment(EquipmentSlot.CHEST_PLATE,
-                    chestPlateItem));
-            ItemStack leggingsItem = getLeggings();
-            if (leggingsItem == null) {
-                leggingsItem = ItemStack.EMPTY;
-            }
-            equipmentList.add(new Equipment(EquipmentSlot.LEGGINGS,
-                    leggingsItem));
-            ItemStack bootsItem = getBoots();
-            if (bootsItem == null) {
-                bootsItem = ItemStack.EMPTY;
-            }
-            equipmentList.add(new Equipment(EquipmentSlot.BOOTS,
-                    bootsItem));
-
-            WrapperPlayServerEntityEquipment equipmentPacket
-                    = new WrapperPlayServerEntityEquipment(getId(),
-                    equipmentList);
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, equipmentPacket);
         }
     }
@@ -405,6 +434,14 @@ public class NPC {
 
     public int getId() {
         return id;
+    }
+
+    private void setHealth(float health) {
+        this.health = health;
+    }
+
+    public float getHealth() {
+        return health;
     }
 
     public UserProfile getProfile() {
