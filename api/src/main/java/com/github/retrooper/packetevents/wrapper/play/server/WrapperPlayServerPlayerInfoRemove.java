@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,6 +37,12 @@ public class WrapperPlayServerPlayerInfoRemove extends PacketWrapper<WrapperPlay
     public WrapperPlayServerPlayerInfoRemove(List<UUID> profileIds) {
         super(PacketType.Play.Server.PLAYER_INFO_REMOVE);
         this.profileIds = profileIds;
+    }
+
+    public WrapperPlayServerPlayerInfoRemove(UUID... profileIds) {
+        super(PacketType.Play.Server.PLAYER_INFO_REMOVE);
+        this.profileIds = new ArrayList<>();
+        Collections.addAll(this.profileIds, profileIds);
     }
 
     @Override

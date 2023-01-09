@@ -55,6 +55,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         this.position = position;
         this.pitch = pitch;
         this.yaw = yaw;
+        this.headYaw = headYaw;
         this.data = data;
         this.velocity = velocity;
     }
