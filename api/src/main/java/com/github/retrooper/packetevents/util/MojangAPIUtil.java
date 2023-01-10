@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -70,6 +71,51 @@ public class MojangAPIUtil {
                 textureProperties.add(new TextureProperty(name, value, signature));
             }
             return textureProperties;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Here you can get a full User Profile with Texture in only one HTTP Request
+     */
+    public static UserProfile createUserProfile(UUID uuid) {
+        String uuidStr = UUIDUtil.toStringWithoutDashes(uuid);
+        try {
+            List<TextureProperty> textureProperties = new ArrayList<>();
+            URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr + "?unsigned=false");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            //Bad request, this UUID is not valid
+            if (connection.getResponseCode() != 200) {
+                throw new IllegalStateException("Failed to request texture properties with their UUID " + uuidStr + "! Response code: " + connection.getResponseCode());
+            }
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream()));
+            String inputLine;
+            // We know the output from here MUST be a string (assuming
+            // - they don't change their API) so we can use StringBuilder not buffer.
+            StringBuilder sb = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                sb.append(inputLine);
+            }
+            in.close();
+            JsonObject responseObject = AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
+            JsonArray jsonProperties = responseObject.get("properties").getAsJsonArray();
+            for (JsonElement element : jsonProperties) {
+                JsonObject property = element.getAsJsonObject();
+
+                String name = property.get("name").getAsString();
+                String value = property.get("value").getAsString();
+                String signature = null;
+                if (property.has("signature")) {
+                    signature = property.get("signature").getAsString();
+                }
+
+                textureProperties.add(new TextureProperty(name, value, signature));
+            }
+            return new UserProfile(uuid, responseObject.get("name").getAsString(), textureProperties);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
