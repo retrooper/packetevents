@@ -334,7 +334,7 @@ public class NPC {
         if (helmetItem == null) {
             helmetItem = ItemStack.EMPTY;
         }
-        equipmentList.add(new Equipment(EquipmentSlot.HELMET,
+        equipmentList.add(new Equipment(EquipmentSlot.HELMET, helmetItem));
                 helmetItem));
 
         ItemStack chestPlateItem = getChestplate();
