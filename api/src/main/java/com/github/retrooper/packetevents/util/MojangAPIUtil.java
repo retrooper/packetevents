@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,148 +36,73 @@ import java.util.UUID;
 
 public class MojangAPIUtil {
     public static List<TextureProperty> requestPlayerTextureProperties(UUID uuid) {
-        //Remove the "-" from the UUID
-        String uuidStr = UUIDUtil.toStringWithoutDashes(uuid);
-        try {
-            List<TextureProperty> textureProperties = new ArrayList<>();
-            URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr + "?unsigned=false");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            //Bad request, this UUID is not valid
-            if (connection.getResponseCode() != 200) {
-                throw new IllegalStateException("Failed to request texture properties with their UUID " + uuidStr + "! Response code: " + connection.getResponseCode());
-            }
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            // We know the output from here MUST be a string (assuming
-            // - they don't change their API) so we can use StringBuilder not buffer.
-            StringBuilder sb = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            in.close();
-            JsonObject responseObject = AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
-            JsonArray jsonProperties = responseObject.get("properties").getAsJsonArray();
-            for (JsonElement element : jsonProperties) {
-                JsonObject property = element.getAsJsonObject();
-
-                String name = property.get("name").getAsString();
-                String value = property.get("value").getAsString();
-                String signature = null;
-                if (property.has("signature")) {
-                    signature = property.get("signature").getAsString();
-                }
-
-                textureProperties.add(new TextureProperty(name, value, signature));
-            }
-            return textureProperties;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return null;
+        return createUserProfile(uuid).getTextureProperties();
     }
 
     /**
      * Here you can get a full User Profile with Texture in only one HTTP Request
      */
     public static UserProfile createUserProfile(UUID uuid) {
-        String uuidStr = UUIDUtil.toStringWithoutDashes(uuid);
-        try {
-            List<TextureProperty> textureProperties = new ArrayList<>();
-            URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr + "?unsigned=false");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            //Bad request, this UUID is not valid
-            if (connection.getResponseCode() != 200) {
-                throw new IllegalStateException("Failed to request texture properties with their UUID " + uuidStr + "! Response code: " + connection.getResponseCode());
-            }
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            // We know the output from here MUST be a string (assuming
-            // - they don't change their API) so we can use StringBuilder not buffer.
-            StringBuilder sb = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            in.close();
-            JsonObject responseObject = AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
-            JsonArray jsonProperties = responseObject.get("properties").getAsJsonArray();
-            for (JsonElement element : jsonProperties) {
-                JsonObject property = element.getAsJsonObject();
+        List<TextureProperty> textureProperties = new ArrayList<>();
+        JsonObject responseObject = parseMojangURL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDUtil.toStringWithoutDashes(uuid) + "?unsigned=false");
+        if (responseObject == null) return null;
 
-                String name = property.get("name").getAsString();
-                String value = property.get("value").getAsString();
-                String signature = null;
-                if (property.has("signature")) {
-                    signature = property.get("signature").getAsString();
-                }
+        JsonArray jsonProperties = responseObject.get("properties").getAsJsonArray();
+        for (JsonElement element : jsonProperties) {
+            JsonObject property = element.getAsJsonObject();
 
-                textureProperties.add(new TextureProperty(name, value, signature));
+            String name = property.get("name").getAsString();
+            String value = property.get("value").getAsString();
+            String signature = null;
+            if (property.has("signature")) {
+                signature = property.get("signature").getAsString();
             }
-            return new UserProfile(uuid, responseObject.get("name").getAsString(), textureProperties);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+
+            textureProperties.add(new TextureProperty(name, value, signature));
         }
-        return null;
+        return new UserProfile(uuid, responseObject.get("name").getAsString(), textureProperties);
     }
 
     public static String requestPlayerName(UUID uuid) {
         //Remove the "-"s from the UUID
-        String uuidStr = UUIDUtil.toStringWithoutDashes(uuid);
+        JsonObject responseObject = parseMojangURL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDUtil.toStringWithoutDashes(uuid));
+        if (responseObject == null) return null;
+
+        return responseObject.get("name").getAsString();
+    }
+
+    public static UUID requestPlayerUUID(String name) {
+        JsonObject responseObject = parseMojangURL("https://api.mojang.com/users/profiles/minecraft/" + name);
+        if (responseObject == null) return null;
+
+        String uuidStr = responseObject.get("id").getAsString();
+        //Now we must add the "-"s to the UUID
+        return UUIDUtil.fromStringWithoutDashes(uuidStr);
+    }
+
+    public static JsonObject parseMojangURL(String purl) {
         try {
-            URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr);
+            URL url = new URL(purl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            //Bad request, this UUID is not valid
-            if (connection.getResponseCode() != 200) {
-                throw new IllegalStateException("Failed to request player name with their UUID " + uuidStr + "! Response code: " + connection.getResponseCode());
+            // GET Request are by Default
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new IllegalStateException("Failed to do a HTTP request to: " + purl + " Response code: " + connection.getResponseCode());
             }
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            // We know the output from here MUST be a string (assuming
-            // - they don't change their API) so we can use StringBuilder not buffer.
-            StringBuilder sb = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));) {
+                String inputLine;
+                // We know the output from here MUST be a string (assuming
+                // - they don't change their API) so we can use StringBuilder not buffer.
+                StringBuilder sb = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    sb.append(inputLine);
+                }
+                return AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
             }
-            in.close();
-            JsonObject responseObject = AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
-            return responseObject.get("name").getAsString();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
-    public static UUID requestPlayerUUID(String name) {
-        try {
-            URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + name);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            //Bad request, this name is not valid
-            if (connection.getResponseCode() != 200) {
-                throw new IllegalStateException("Failed to request player UUID with their name: " + name + "! Response code: " + connection.getResponseCode());
-            }
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            // We know the output from here MUST be a string (assuming
-            // - they don't change their API) so we can use StringBuilder not buffer.
-            StringBuilder sb = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            in.close();
-            JsonObject responseObject = AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
-            String uuidStr = responseObject.get("id").getAsString();
-            //Now we must add the "-"s to the UUID
-            return UUIDUtil.fromStringWithoutDashes(uuidStr);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
 }
