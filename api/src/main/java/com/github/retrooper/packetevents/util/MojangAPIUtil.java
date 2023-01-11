@@ -65,7 +65,7 @@ public class MojangAPIUtil {
         return new UserProfile(uuid, responseObject.get("name").getAsString(), textureProperties);
     }
 
-    public static String requestPlayerName(final @NotNull UUID uuid) {
+    public static @Nullable String requestPlayerName(final @NotNull UUID uuid) {
         //Remove the "-"s from the UUID
         JsonObject responseObject = parseMojangURL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDUtil.toStringWithoutDashes(uuid));
         if (responseObject == null) return null;
