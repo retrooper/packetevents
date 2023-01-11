@@ -34,7 +34,6 @@ import java.util.*;
 
 public class NPC {
     private final int id;
-    private float health;
     private final UserProfile profile;
     private GameMode gamemode;
     private Component tabName;
@@ -237,15 +236,6 @@ public class NPC {
         }
     }
 
-    public void updateHealth(float health, int food, float foodSaturation) {
-        setHealth(health);
-        if (channels.isEmpty()) return;
-
-        WrapperPlayServerUpdateHealth updateHealth = new WrapperPlayServerUpdateHealth(health, food, foodSaturation);
-        for (Object channel : channels) {
-            PacketEvents.getAPI().getPlayerManager().sendPacket(channel, updateHealth);
-        }
-    }
 
     public void updateGameMode(@NotNull GameMode gamemode) {
         setGameMode(gamemode);
@@ -447,14 +437,6 @@ public class NPC {
 
     public int getId() {
         return id;
-    }
-
-    private void setHealth(float health) {
-        this.health = health;
-    }
-
-    public float getHealth() {
-        return health;
     }
 
     public UserProfile getProfile() {
