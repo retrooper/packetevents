@@ -112,6 +112,7 @@ public class NPC {
         }
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoRemove);
 
+
         WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
         channels.remove(channel);

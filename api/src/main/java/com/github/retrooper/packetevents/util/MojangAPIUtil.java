@@ -24,6 +24,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,14 +38,14 @@ import java.util.List;
 import java.util.UUID;
 
 public class MojangAPIUtil {
-    public static List<TextureProperty> requestPlayerTextureProperties(final @NotNull UUID uuid) {
+    public static List<TextureProperty> requestPlayerTextureProperties(@NotNull UUID uuid) {
         return createUserProfile(uuid).getTextureProperties();
     }
 
     /**
      * Here you can get a full User Profile with Texture in only one HTTP Request
      */
-    public static @Nullable UserProfile createUserProfile(final @NotNull UUID uuid) {
+    public static @Nullable UserProfile createUserProfile(@NotNull UUID uuid) {
         List<TextureProperty> textureProperties = new ArrayList<>();
         JsonObject responseObject = parseMojangURL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDUtil.toStringWithoutDashes(uuid) + "?unsigned=false");
         if (responseObject == null) return null;
@@ -65,7 +66,7 @@ public class MojangAPIUtil {
         return new UserProfile(uuid, responseObject.get("name").getAsString(), textureProperties);
     }
 
-    public static @Nullable String requestPlayerName(final @NotNull UUID uuid) {
+    public static @Nullable String requestPlayerName(@NotNull UUID uuid) {
         //Remove the "-"s from the UUID
         JsonObject responseObject = parseMojangURL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDUtil.toStringWithoutDashes(uuid));
         if (responseObject == null) return null;
@@ -73,7 +74,7 @@ public class MojangAPIUtil {
         return responseObject.get("name").getAsString();
     }
 
-    public static @Nullable UUID requestPlayerUUID(final @NotNull String name) {
+    public static @Nullable UUID requestPlayerUUID(@NotNull String name) {
         JsonObject responseObject = parseMojangURL("https://api.mojang.com/users/profiles/minecraft/" + name);
         if (responseObject == null) return null;
 
@@ -82,7 +83,7 @@ public class MojangAPIUtil {
         return UUIDUtil.fromStringWithoutDashes(uuidStr);
     }
 
-    public static @Nullable JsonObject parseMojangURL(final @NotNull String purl) {
+    public static @Nullable JsonObject parseMojangURL(@NotNull String purl) {
         try {
             URL url = new URL(purl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
