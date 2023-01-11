@@ -37,14 +37,14 @@ import java.util.List;
 import java.util.UUID;
 
 public class MojangAPIUtil {
-    public static List<TextureProperty> requestPlayerTextureProperties(final @NotNull UUID uuid) {
+    public static List<TextureProperty> requestPlayerTextureProperties(@NotNull UUID uuid) {
         return createUserProfile(uuid).getTextureProperties();
     }
 
     /**
      * Here you can get a full User Profile with Texture in only one HTTP Request
      */
-    public static UserProfile createUserProfile(final @NotNull UUID uuid) {
+    public static UserProfile createUserProfile(@NotNull UUID uuid) {
         List<TextureProperty> textureProperties = new ArrayList<>();
         JsonObject responseObject = parseMojangURL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDUtil.toStringWithoutDashes(uuid) + "?unsigned=false");
         if (responseObject == null) return null;
@@ -65,27 +65,26 @@ public class MojangAPIUtil {
         return new UserProfile(uuid, responseObject.get("name").getAsString(), textureProperties);
     }
 
-    public static String requestPlayerName(final @NotNull UUID uuid) {
+    public static String requestPlayerName(@NotNull UUID uuid) {
         //Remove the "-"s from the UUID
-        JsonObject responseObject = parseMojangURL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDUtil.toStringWithoutDashes(uuid));
+        final JsonObject responseObject = parseMojangURL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDUtil.toStringWithoutDashes(uuid));
         if (responseObject == null) return null;
 
         return responseObject.get("name").getAsString();
     }
 
-    public static UUID requestPlayerUUID(final @NotNull String name) {
-        JsonObject responseObject = parseMojangURL("https://api.mojang.com/users/profiles/minecraft/" + name);
+    public static UUID requestPlayerUUID(@NotNull String name) {
+        final JsonObject responseObject = parseMojangURL("https://api.mojang.com/users/profiles/minecraft/" + name);
         if (responseObject == null) return null;
 
-        String uuidStr = responseObject.get("id").getAsString();
         //Now we must add the "-"s to the UUID
-        return UUIDUtil.fromStringWithoutDashes(uuidStr);
+        return UUIDUtil.fromStringWithoutDashes(responseObject.get("id").getAsString());
     }
 
-    public static JsonObject parseMojangURL(final @NotNull String purl) {
+    public static JsonObject parseMojangURL(@NotNull String purl) {
         try {
-            URL url = new URL(purl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            final URL url = new URL(purl);
+            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             // GET Request are by Default
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new IllegalStateException("Failed to do a HTTP request to: " + purl + " Response code: " + connection.getResponseCode());
@@ -94,7 +93,7 @@ public class MojangAPIUtil {
                 String inputLine;
                 // We know the output from here MUST be a string (assuming
                 // - they don't change their API) so we can use StringBuilder not buffer.
-                StringBuilder sb = new StringBuilder();
+                final StringBuilder sb = new StringBuilder();
                 while ((inputLine = in.readLine()) != null) {
                     sb.append(inputLine);
                 }

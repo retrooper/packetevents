@@ -51,7 +51,7 @@ public class NPC {
     private ItemStack boots = null;
     private final Set<Object> channels = new HashSet<>();
 
-    public NPC(final @NotNull UserProfile profile, final int entityId, final @NotNull GameMode gamemode, @Nullable Component tabName, @Nullable NamedTextColor nameColor,
+    public NPC(@NotNull UserProfile profile, int entityId, @NotNull GameMode gamemode, @Nullable Component tabName, @Nullable NamedTextColor nameColor,
                @Nullable Component prefixName, @Nullable Component suffixName) {
         this.profile = profile;
         this.id = entityId;
@@ -63,19 +63,19 @@ public class NPC {
         this.suffixName = suffixName;
     }
 
-    public NPC(final @NotNull UserProfile profile, final int entityId, @Nullable Component tabName) {
+    public NPC(@NotNull UserProfile profile, int entityId, @Nullable Component tabName) {
         this(profile, entityId, GameMode.SURVIVAL, tabName, null, null, null);
     }
 
-    public NPC(final @NotNull UserProfile profile, final int entityId) {
+    public NPC(@NotNull UserProfile profile, int entityId) {
         this(profile, entityId, null);
     }
 
-    public boolean hasSpawned(final Object channel) {
+    public boolean hasSpawned(Object channel) {
         return channels.contains(channel);
     }
 
-    public void spawn(final Object channel) {
+    public void spawn(Object channel) {
         if (hasSpawned(channel)) return;
         PacketWrapper<?> playerInfo;
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
@@ -100,7 +100,7 @@ public class NPC {
         channels.add(channel);
     }
 
-    public void despawn(final Object channel) {
+    public void despawn(Object channel) {
         if (!hasSpawned(channel)) return;
         //TODO Confirm if we need to destroy the team too
         PacketWrapper<?> playerInfoRemove;
@@ -134,7 +134,7 @@ public class NPC {
         channels.clear();
     }
 
-    public void teleport(final Location to) {
+    public void teleport(Location to) {
         setLocation(to);
         if (channels.isEmpty()) return;
 
@@ -145,7 +145,7 @@ public class NPC {
         }
     }
 
-    public void updateLocation(final Location to) {
+    public void updateLocation(Location to) {
         Location from = getLocation();
         setLocation(to);
         double distXAbs = Math.abs(to.getPosition().getX() - from.getPosition().getX());
@@ -196,7 +196,7 @@ public class NPC {
         }
     }
 
-    public void updateRotation(final float yaw, final float pitch) {
+    public void updateRotation(float yaw, float pitch) {
         getLocation().setYaw(yaw);
         getLocation().setPitch(pitch);
 
@@ -212,7 +212,7 @@ public class NPC {
         }
     }
 
-    public void updateTabPing(final int ping) {
+    public void updateTabPing(int ping) {
         setDisplayPing(ping);
         if (channels.isEmpty()) return;
         PacketWrapper<?> playerInfo;
@@ -227,7 +227,7 @@ public class NPC {
         }
     }
 
-    public void doAnimation(final @NotNull WrapperPlayServerEntityAnimation.EntityAnimationType animation) {
+    public void doAnimation(@NotNull WrapperPlayServerEntityAnimation.EntityAnimationType animation) {
         if (channels.isEmpty()) return;
 
         WrapperPlayServerEntityAnimation entityAnimation = new WrapperPlayServerEntityAnimation(getId(), animation);
@@ -236,7 +236,7 @@ public class NPC {
         }
     }
 
-    public void updateHealth(final float health, final int food, final float foodSaturation) {
+    public void updateHealth(float health, int food, float foodSaturation) {
         setHealth(health);
         if (channels.isEmpty()) return;
 
@@ -246,7 +246,7 @@ public class NPC {
         }
     }
 
-    public void updateGameMode(final @NotNull GameMode gamemode) {
+    public void updateGameMode(@NotNull GameMode gamemode) {
         setGameMode(gamemode);
         if (channels.isEmpty()) return;
         PacketWrapper<?> playerInfo;
@@ -262,7 +262,7 @@ public class NPC {
         }
     }
 
-    public void changeSkin(final @NotNull UUID skinUUID, final @NotNull List<TextureProperty> skinTextureProperties) {
+    public void changeSkin(@NotNull UUID skinUUID, @NotNull List<TextureProperty> skinTextureProperties) {
         if (channels.isEmpty()) return;
         PacketWrapper<?> playerInfoRemove;
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
@@ -296,7 +296,7 @@ public class NPC {
         }
     }
 
-    public void updateNameTag(final @NotNull NPC npc) {
+    public void updateNameTag(@NotNull NPC npc) {
         if (channels.isEmpty()) return;
 
         WrapperPlayServerTeams removeTeam =
@@ -317,20 +317,18 @@ public class NPC {
     public void updateEquipment() {
         if (channels.isEmpty()) return;
 
-        List<Equipment> equipmentList = new ArrayList<>();
+        final List<Equipment> equipmentList = new ArrayList<>();
         ItemStack handItem = getMainHand();
         if (handItem == null) {
             handItem = ItemStack.EMPTY;
         }
-        equipmentList.add(new Equipment(EquipmentSlot.MAIN_HAND,
-                handItem));
+        equipmentList.add(new Equipment(EquipmentSlot.MAIN_HAND, handItem));
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
             ItemStack offHandItem = getOffHand();
             if (offHandItem == null) {
                 offHandItem = ItemStack.EMPTY;
             }
-            equipmentList.add(new Equipment(EquipmentSlot.OFF_HAND,
-                    offHandItem));
+            equipmentList.add(new Equipment(EquipmentSlot.OFF_HAND, offHandItem));
         }
         ItemStack helmetItem = getHelmet();
         if (helmetItem == null) {
@@ -342,20 +340,17 @@ public class NPC {
         if (chestPlateItem == null) {
             chestPlateItem = ItemStack.EMPTY;
         }
-        equipmentList.add(new Equipment(EquipmentSlot.CHEST_PLATE,
-                chestPlateItem));
+        equipmentList.add(new Equipment(EquipmentSlot.CHEST_PLATE, chestPlateItem));
         ItemStack leggingsItem = getLeggings();
         if (leggingsItem == null) {
             leggingsItem = ItemStack.EMPTY;
         }
-        equipmentList.add(new Equipment(EquipmentSlot.LEGGINGS,
-                leggingsItem));
+        equipmentList.add(new Equipment(EquipmentSlot.LEGGINGS, leggingsItem));
         ItemStack bootsItem = getBoots();
         if (bootsItem == null) {
             bootsItem = ItemStack.EMPTY;
         }
-        equipmentList.add(new Equipment(EquipmentSlot.BOOTS,
-                bootsItem));
+        equipmentList.add(new Equipment(EquipmentSlot.BOOTS, bootsItem));
 
         WrapperPlayServerEntityEquipment equipmentPacket
                 = new WrapperPlayServerEntityEquipment(getId(),
