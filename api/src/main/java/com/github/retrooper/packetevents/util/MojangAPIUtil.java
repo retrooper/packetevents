@@ -73,7 +73,7 @@ public class MojangAPIUtil {
         return responseObject.get("name").getAsString();
     }
 
-    public static UUID requestPlayerUUID(final @NotNull String name) {
+    public static @Nullable UUID requestPlayerUUID(final @NotNull String name) {
         JsonObject responseObject = parseMojangURL("https://api.mojang.com/users/profiles/minecraft/" + name);
         if (responseObject == null) return null;
 
