@@ -82,7 +82,7 @@ public class MojangAPIUtil {
         return UUIDUtil.fromStringWithoutDashes(uuidStr);
     }
 
-    public static JsonObject parseMojangURL(final @NotNull String purl) {
+    public static @Nullable JsonObject parseMojangURL(final @NotNull String purl) {
         try {
             URL url = new URL(purl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
