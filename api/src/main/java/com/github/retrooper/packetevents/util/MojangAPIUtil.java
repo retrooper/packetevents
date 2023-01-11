@@ -44,6 +44,7 @@ public class MojangAPIUtil {
 
     /**
      * Here you can get a full User Profile with Texture in only one HTTP Request
+     * This rate limit is around 200 requests per minute.
      */
     public static @Nullable UserProfile createUserProfile(@NotNull UUID uuid) {
         List<TextureProperty> textureProperties = new ArrayList<>();
@@ -66,27 +67,29 @@ public class MojangAPIUtil {
         return new UserProfile(uuid, responseObject.get("name").getAsString(), textureProperties);
     }
 
-    public static @Nullable String requestPlayerName(@NotNull UUID uuid) {
-        //Remove the "-"s from the UUID
-        JsonObject responseObject = parseMojangURL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDUtil.toStringWithoutDashes(uuid));
-        if (responseObject == null) return null;
+    public static @Nullable NameAvailability requestNameAvailability(@NotNull String name) {
+        final JsonObject response = parseMojangURL("https://api.minecraftservices.com/minecraft/profile/name/" + name + "/available");
+        if (response == null) return null;
 
-        return responseObject.get("name").getAsString();
+        return NameAvailability.valueOf(response.get("status").getAsString());
+    }
+
+    public static @Nullable String requestPlayerName(@NotNull UUID uuid) {
+        return createUserProfile(uuid).getName();
     }
 
     public static @Nullable UUID requestPlayerUUID(@NotNull String name) {
         JsonObject responseObject = parseMojangURL("https://api.mojang.com/users/profiles/minecraft/" + name);
         if (responseObject == null) return null;
 
-        String uuidStr = responseObject.get("id").getAsString();
         //Now we must add the "-"s to the UUID
-        return UUIDUtil.fromStringWithoutDashes(uuidStr);
+        return UUIDUtil.fromStringWithoutDashes(responseObject.get("id").getAsString());
     }
 
     public static @Nullable JsonObject parseMojangURL(@NotNull String purl) {
         try {
-            URL url = new URL(purl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            final URL url = new URL(purl);
+            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             // GET Request are by Default
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new IllegalStateException("Failed to do a HTTP request to: " + purl + " Response code: " + connection.getResponseCode());
@@ -95,7 +98,7 @@ public class MojangAPIUtil {
                 String inputLine;
                 // We know the output from here MUST be a string (assuming
                 // - they don't change their API) so we can use StringBuilder not buffer.
-                StringBuilder sb = new StringBuilder();
+                final StringBuilder sb = new StringBuilder();
                 while ((inputLine = in.readLine()) != null) {
                     sb.append(inputLine);
                 }
@@ -106,6 +109,12 @@ public class MojangAPIUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public enum NameAvailability {
+        DUPLICATE,
+        AVAILABLE,
+        NOT_ALLOWED
     }
 
 }
