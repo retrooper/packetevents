@@ -116,5 +116,4 @@ public class MojangAPIUtil {
         AVAILABLE,
         NOT_ALLOWED
     }
-
 }
