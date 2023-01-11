@@ -34,7 +34,7 @@ public class UserProfile {
     public UserProfile(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;
-        textureProperties = new ArrayList<>();
+        this.textureProperties = new ArrayList<>();
     }
 
     public UserProfile(UUID uuid, String name, List<TextureProperty> textureProperties) {
@@ -44,7 +44,7 @@ public class UserProfile {
     }
 
     public UUID getUUID() {
-        return uuid;
+        return this.uuid;
     }
 
     public void setUUID(UUID uuid) {
@@ -52,7 +52,7 @@ public class UserProfile {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -60,7 +60,7 @@ public class UserProfile {
     }
 
     public List<TextureProperty> getTextureProperties() {
-        return textureProperties;
+        return this.textureProperties;
     }
 
     public void setTextureProperties(List<TextureProperty> textureProperties) {

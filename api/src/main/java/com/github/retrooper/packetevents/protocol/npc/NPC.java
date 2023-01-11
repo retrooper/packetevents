@@ -78,17 +78,14 @@ public class NPC {
         if (hasSpawned(channel)) return;
         PacketWrapper<?> playerInfo;
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-            playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
-                    getModernPlayerInfoData());
+            playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER, getModernPlayerInfoData());
         } else {
             playerInfo = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getLegacyPlayerInfoData());
         }
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
 
         //TODO Later if we want entity metadata, its not supported on newer server versions though(confirm if its mandatory on older versions)
-        WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(getId(),
-                getProfile().getUUID(),
-                getLocation());
+        WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(getId(), getProfile().getUUID(), getLocation());
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPlayer);
 
         //Create team
@@ -106,8 +103,7 @@ public class NPC {
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
             playerInfoRemove = new WrapperPlayServerPlayerInfoRemove(getProfile().getUUID());
         } else {
-            playerInfoRemove =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
+            playerInfoRemove = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
         }
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoRemove);
 
@@ -123,8 +119,7 @@ public class NPC {
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
             playerInfoRemove = new WrapperPlayServerPlayerInfoRemove(getProfile().getUUID());
         } else {
-            playerInfoRemove =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
+            playerInfoRemove = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
         }
         WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
         for (Object channel : channels) {
@@ -151,45 +146,35 @@ public class NPC {
         double distXAbs = Math.abs(to.getPosition().getX() - from.getPosition().getX());
         double distYAbs = Math.abs(to.getPosition().getY() - from.getPosition().getY());
         double distZAbs = Math.abs(to.getPosition().getZ() - from.getPosition().getZ());
-        boolean shouldUseEntityTeleport = distXAbs > 8 ||
-                distYAbs > 8 ||
-                distZAbs > 8;
+        boolean shouldUseEntityTeleport = distXAbs > 8 || distYAbs > 8 || distZAbs > 8;
         for (Object channel : channels) {
             if (shouldUseEntityTeleport) {
-                WrapperPlayServerEntityTeleport entityTeleport =
-                        new WrapperPlayServerEntityTeleport(getId(), to, true);
+                WrapperPlayServerEntityTeleport entityTeleport = new WrapperPlayServerEntityTeleport(getId(), to, true);
                 PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityTeleport);
             } else {
                 boolean rotationChanged =
                         to.getYaw() != from.getYaw() || to.getPitch() != from.getPitch();
                 boolean positionChanged =
-                        to.getPosition().getX() != from.getPosition().getX() ||
+                                to.getPosition().getX() != from.getPosition().getX() ||
                                 to.getPosition().getY() != from.getPosition().getY() ||
                                 to.getPosition().getZ() != from.getPosition().getZ();
                 double deltaX = positionChanged ? (to.getPosition().getX() - from.getPosition().getX()) : 0;
                 double deltaY = positionChanged ? (to.getPosition().getY() - from.getPosition().getY()) : 0;
                 double deltaZ = positionChanged ? (to.getPosition().getZ() - from.getPosition().getZ()) : 0;
                 if (positionChanged && rotationChanged) {
-                    WrapperPlayServerEntityRelativeMoveAndRotation entityRelativeMoveAndRotation =
-                            new WrapperPlayServerEntityRelativeMoveAndRotation(getId(), deltaX, deltaY, deltaZ,
-                                    to.getYaw(), to.getPitch(), true);
-                    PacketEvents.getAPI().getProtocolManager()
-                            .sendPacket(channel, entityRelativeMoveAndRotation);
+                    WrapperPlayServerEntityRelativeMoveAndRotation entityRelativeMoveAndRotation = new WrapperPlayServerEntityRelativeMoveAndRotation(getId(), deltaX, deltaY, deltaZ, to.getYaw(), to.getPitch(), true);
+                    PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRelativeMoveAndRotation);
 
-                    WrapperPlayServerEntityHeadLook headYaw =
-                            new WrapperPlayServerEntityHeadLook(getId(), to.getYaw());
+                    WrapperPlayServerEntityHeadLook headYaw = new WrapperPlayServerEntityHeadLook(getId(), to.getYaw());
                     PacketEvents.getAPI().getProtocolManager().sendPacket(channel, headYaw);
                 } else if (positionChanged) {
-                    WrapperPlayServerEntityRelativeMove entityRelativeMove =
-                            new WrapperPlayServerEntityRelativeMove(getId(), deltaX, deltaY, deltaZ, true);
+                    WrapperPlayServerEntityRelativeMove entityRelativeMove = new WrapperPlayServerEntityRelativeMove(getId(), deltaX, deltaY, deltaZ, true);
                     PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRelativeMove);
                 } else if (rotationChanged) {
-                    WrapperPlayServerEntityRotation entityRotation =
-                            new WrapperPlayServerEntityRotation(getId(), to.getYaw(), to.getPitch(), true);
+                    WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(getId(), to.getYaw(), to.getPitch(), true);
                     PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRotation);
 
-                    WrapperPlayServerEntityHeadLook headYaw =
-                            new WrapperPlayServerEntityHeadLook(getId(), to.getYaw());
+                    WrapperPlayServerEntityHeadLook headYaw = new WrapperPlayServerEntityHeadLook(getId(), to.getYaw());
                     PacketEvents.getAPI().getProtocolManager().sendPacket(channel, headYaw);
                 }
             }
@@ -201,10 +186,8 @@ public class NPC {
         getLocation().setPitch(pitch);
 
         if (channels.isEmpty()) return;
-        WrapperPlayServerEntityRotation entityRotation =
-                new WrapperPlayServerEntityRotation(getId(), yaw, pitch, true);
-        WrapperPlayServerEntityHeadLook headYaw =
-                new WrapperPlayServerEntityHeadLook(getId(), yaw);
+        WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(getId(), yaw, pitch, true);
+        WrapperPlayServerEntityHeadLook headYaw = new WrapperPlayServerEntityHeadLook(getId(), yaw);
 
         for (Object channel : channels) {
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, entityRotation);
@@ -219,9 +202,9 @@ public class NPC {
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
             playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LATENCY, getModernPlayerInfoData());
         } else {
-            playerInfo =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, getLegacyPlayerInfoData());
+            playerInfo = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, getLegacyPlayerInfoData());
         }
+
         for (Object channel : channels) {
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
         }
@@ -242,11 +225,9 @@ public class NPC {
         if (channels.isEmpty()) return;
         PacketWrapper<?> playerInfo;
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-            playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_GAME_MODE,
-                    getModernPlayerInfoData());
+            playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_GAME_MODE, getModernPlayerInfoData());
         } else {
-            playerInfo =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_GAME_MODE, getLegacyPlayerInfoData());
+            playerInfo = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_GAME_MODE, getLegacyPlayerInfoData());
         }
         for (Object channel : channels) {
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
@@ -259,10 +240,16 @@ public class NPC {
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
             playerInfoRemove = new WrapperPlayServerPlayerInfoRemove(getProfile().getUUID());
         } else {
-            playerInfoRemove =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
+            playerInfoRemove = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
         }
         WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
+
+        PacketWrapper<?> playerInfoAdd;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            playerInfoAdd = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER, getModernPlayerInfoData());
+        } else {
+            playerInfoAdd = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getLegacyPlayerInfoData());
+        }
 
         for (Object channel : channels) {
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoRemove);
@@ -271,18 +258,10 @@ public class NPC {
 
             getProfile().setTextureProperties(skinTextureProperties);
             getProfile().setUUID(skinUUID);
-            PacketWrapper<?> playerInfoAdd;
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-                playerInfoAdd = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
-                        getModernPlayerInfoData());
-            } else {
-                playerInfoAdd =
-                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getLegacyPlayerInfoData());
-            }
+
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoAdd);
 
-            WrapperPlayServerSpawnPlayer spawnPlayer =
-                    new WrapperPlayServerSpawnPlayer(getId(), getProfile().getUUID(), getLocation());
+            WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(getId(), getProfile().getUUID(), getLocation());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPlayer);
         }
     }
@@ -290,16 +269,12 @@ public class NPC {
     public void updateNameTag(@NotNull NPC npc) {
         if (channels.isEmpty()) return;
 
-        WrapperPlayServerTeams removeTeam =
-                new WrapperPlayServerTeams("custom_name_team",
-                        WrapperPlayServerTeams.TeamMode.REMOVE,
-                        Optional.empty());
+        WrapperPlayServerTeams removeTeam = new WrapperPlayServerTeams("custom_name_team", WrapperPlayServerTeams.TeamMode.REMOVE, Optional.empty());
         for (Object channel : channels) {
             //Destroy team
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, removeTeam);
 
-            if (npc.getNameColor() != null || npc.getPrefixName() != null
-                    || npc.getSuffixName() != null) {
+            if (npc.getNameColor() != null || npc.getPrefixName() != null || npc.getSuffixName() != null) {
                 PacketEvents.getAPI().getProtocolManager().sendPacket(channel, generateTeamsData());
             }
         }
@@ -343,9 +318,7 @@ public class NPC {
         }
         equipmentList.add(new Equipment(EquipmentSlot.BOOTS, bootsItem));
 
-        WrapperPlayServerEntityEquipment equipmentPacket
-                = new WrapperPlayServerEntityEquipment(getId(),
-                equipmentList);
+        WrapperPlayServerEntityEquipment equipmentPacket = new WrapperPlayServerEntityEquipment(getId(), equipmentList);
         for (Object channel : channels) {
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, equipmentPacket);
         }
@@ -439,19 +412,19 @@ public class NPC {
         return id;
     }
 
-    public UserProfile getProfile() {
+    public @NotNull UserProfile getProfile() {
         return profile;
     }
 
-    public GameMode getGameMode() {
+    public @NotNull GameMode getGameMode() {
         return gamemode;
     }
 
-    public void setGameMode(GameMode gamemode) {
+    public void setGameMode(@NotNull GameMode gamemode) {
         this.gamemode = gamemode;
     }
 
-    private WrapperPlayServerTeams generateTeamsData() {
+    private @NotNull WrapperPlayServerTeams generateTeamsData() {
         return new WrapperPlayServerTeams("custom_name_team",
                 WrapperPlayServerTeams.TeamMode.CREATE,
                 Optional.of(
@@ -467,15 +440,12 @@ public class NPC {
                 getProfile().getName());
     }
 
-    public WrapperPlayServerPlayerInfo.PlayerData getLegacyPlayerInfoData() {
-        return new WrapperPlayServerPlayerInfo.PlayerData(getTabName(),
-                getProfile(), getGameMode(),
-                getDisplayPing());
+    public @NotNull WrapperPlayServerPlayerInfo.PlayerData getLegacyPlayerInfoData() {
+        return new WrapperPlayServerPlayerInfo.PlayerData(getTabName(), getProfile(), getGameMode(), getDisplayPing());
     }
 
-    public WrapperPlayServerPlayerInfoUpdate.PlayerInfo getModernPlayerInfoData() {
-        return new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(getProfile(), true,
-                getDisplayPing(), getGameMode(), getTabName(), null);
+    public @NotNull WrapperPlayServerPlayerInfoUpdate.PlayerInfo getModernPlayerInfoData() {
+        return new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(getProfile(), true, getDisplayPing(), getGameMode(), getTabName(), null);
     }
 
     public int getDisplayPing() {
@@ -486,11 +456,11 @@ public class NPC {
         this.displayPing = ping;
     }
 
-    public Location getLocation() {
+    public @NotNull Location getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(@NotNull Location location) {
         this.location = location;
     }
 }
