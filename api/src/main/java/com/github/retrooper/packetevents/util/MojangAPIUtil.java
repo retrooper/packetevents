@@ -44,7 +44,7 @@ public class MojangAPIUtil {
     /**
      * Here you can get a full User Profile with Texture in only one HTTP Request
      */
-    public static UserProfile createUserProfile(final @NotNull UUID uuid) {
+    public static @Nullable UserProfile createUserProfile(final @NotNull UUID uuid) {
         List<TextureProperty> textureProperties = new ArrayList<>();
         JsonObject responseObject = parseMojangURL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDUtil.toStringWithoutDashes(uuid) + "?unsigned=false");
         if (responseObject == null) return null;
