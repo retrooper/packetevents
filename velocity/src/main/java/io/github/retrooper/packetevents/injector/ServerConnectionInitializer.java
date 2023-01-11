@@ -42,10 +42,10 @@ public class ServerConnectionInitializer {
             channel.unsafe().closeForcibly();
             return;
         }
-        PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
         PacketEventsDecoder decoder = new PacketEventsDecoder(user);
         PacketEventsEncoder encoder = new PacketEventsEncoder(user);
         addChannelHandlers(channel, decoder, encoder);
+        PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
     }
 
     public static void destroyChannel(Channel channel) {
