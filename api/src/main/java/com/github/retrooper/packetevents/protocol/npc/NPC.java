@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -50,7 +51,7 @@ public class NPC {
     private ItemStack boots = null;
     private final Set<Object> channels = new HashSet<>();
 
-    public NPC(UserProfile profile, int entityId, GameMode gamemode, @Nullable Component tabName, @Nullable NamedTextColor nameColor,
+    public NPC(final @NotNull UserProfile profile, final int entityId, final @NotNull GameMode gamemode, @Nullable Component tabName, @Nullable NamedTextColor nameColor,
                @Nullable Component prefixName, @Nullable Component suffixName) {
         this.profile = profile;
         this.id = entityId;
@@ -62,19 +63,19 @@ public class NPC {
         this.suffixName = suffixName;
     }
 
-    public NPC(UserProfile profile, int entityId, @Nullable Component tabName) {
+    public NPC(final @NotNull UserProfile profile, final int entityId, @Nullable Component tabName) {
         this(profile, entityId, GameMode.SURVIVAL, tabName, null, null, null);
     }
 
-    public NPC(UserProfile profile, int entityId) {
+    public NPC(final @NotNull UserProfile profile, final int entityId) {
         this(profile, entityId, null);
     }
 
-    public boolean hasSpawned(Object channel) {
+    public boolean hasSpawned(final Object channel) {
         return channels.contains(channel);
     }
 
-    public void spawn(Object channel) {
+    public void spawn(final Object channel) {
         if (hasSpawned(channel)) return;
         PacketWrapper<?> playerInfo;
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
@@ -99,7 +100,7 @@ public class NPC {
         channels.add(channel);
     }
 
-    public void despawn(Object channel) {
+    public void despawn(final Object channel) {
         if (!hasSpawned(channel)) return;
         //TODO Confirm if we need to destroy the team too
         PacketWrapper<?> playerInfoRemove;
@@ -130,9 +131,10 @@ public class NPC {
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoRemove);
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
         }
+        channels.clear();
     }
 
-    public void teleport(Location to) {
+    public void teleport(final Location to) {
         setLocation(to);
         if (channels.isEmpty()) return;
 
@@ -143,7 +145,7 @@ public class NPC {
         }
     }
 
-    public void updateLocation(Location to) {
+    public void updateLocation(final Location to) {
         Location from = getLocation();
         setLocation(to);
         double distXAbs = Math.abs(to.getPosition().getX() - from.getPosition().getX());
@@ -194,7 +196,7 @@ public class NPC {
         }
     }
 
-    public void updateRotation(float yaw, float pitch) {
+    public void updateRotation(final float yaw, final float pitch) {
         getLocation().setYaw(yaw);
         getLocation().setPitch(pitch);
 
@@ -210,7 +212,7 @@ public class NPC {
         }
     }
 
-    public void updateTabPing(int ping) {
+    public void updateTabPing(final int ping) {
         setDisplayPing(ping);
         if (channels.isEmpty()) return;
         PacketWrapper<?> playerInfo;
@@ -225,7 +227,7 @@ public class NPC {
         }
     }
 
-    public void doAnimation(WrapperPlayServerEntityAnimation.EntityAnimationType animation) {
+    public void doAnimation(final @NotNull WrapperPlayServerEntityAnimation.EntityAnimationType animation) {
         if (channels.isEmpty()) return;
 
         WrapperPlayServerEntityAnimation entityAnimation = new WrapperPlayServerEntityAnimation(getId(), animation);
@@ -234,7 +236,7 @@ public class NPC {
         }
     }
 
-    public void updateHealth(float health, int food, float foodSaturation) {
+    public void updateHealth(final float health, final int food, final float foodSaturation) {
         setHealth(health);
         if (channels.isEmpty()) return;
 
@@ -244,7 +246,7 @@ public class NPC {
         }
     }
 
-    public void updateGameMode(GameMode gamemode) {
+    public void updateGameMode(final @NotNull GameMode gamemode) {
         setGameMode(gamemode);
         if (channels.isEmpty()) return;
         PacketWrapper<?> playerInfo;
@@ -260,7 +262,7 @@ public class NPC {
         }
     }
 
-    public void changeSkin(UUID skinUUID, List<TextureProperty> skinTextureProperties) {
+    public void changeSkin(final @NotNull UUID skinUUID, final @NotNull List<TextureProperty> skinTextureProperties) {
         if (channels.isEmpty()) return;
         PacketWrapper<?> playerInfoRemove;
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
@@ -294,7 +296,7 @@ public class NPC {
         }
     }
 
-    public void updateNameTag(NPC npc) {
+    public void updateNameTag(final @NotNull NPC npc) {
         if (channels.isEmpty()) return;
 
         WrapperPlayServerTeams removeTeam =
@@ -335,7 +337,6 @@ public class NPC {
             helmetItem = ItemStack.EMPTY;
         }
         equipmentList.add(new Equipment(EquipmentSlot.HELMET, helmetItem));
-                helmetItem));
 
         ItemStack chestPlateItem = getChestplate();
         if (chestPlateItem == null) {
