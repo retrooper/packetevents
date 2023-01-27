@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.injector.handlers;
 
 import com.github.retrooper.packetevents.exception.PacketProcessException;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
@@ -50,8 +49,6 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
         PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, true);
-        // Bungeecord doesn't handle this properly, so simply don't try sending zero sized buffers
-        if (!ByteBufHelper.isReadable(input)) return;
         out.add(input.retain());
     }
 

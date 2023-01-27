@@ -64,8 +64,6 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
         boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
 
         handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
-        // Bungeecord doesn't handle this properly, so simply don't try sending zero sized buffers
-        if (!ByteBufHelper.isReadable(byteBuf)) return;
 
         if (needsRecompression) {
             compress(ctx, byteBuf);
