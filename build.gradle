@@ -4,8 +4,6 @@ plugins {
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.0' apply(false)
 }
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-java.targetCompatibility = JavaVersion.VERSION_1_8
 
 wrapper {
     gradleVersion = "7.3.1"
@@ -29,6 +27,9 @@ subprojects {
                                        "net.kyori:adventure-text-serializer-gson:${adventureVersion}",
                                        "net.kyori:adventure-text-serializer-legacy:${adventureVersion}",
                                        "net.kyori:adventure-nbt:${adventureVersion}"]
+
+    java.sourceCompatibility = JavaVersion.VERSION_1_8
+    java.targetCompatibility = JavaVersion.VERSION_1_8
 
     repositories {
         mavenLocal()
