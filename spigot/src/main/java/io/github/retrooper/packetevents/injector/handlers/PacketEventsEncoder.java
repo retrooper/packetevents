@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.injector.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.exception.CancelPacketException;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -62,11 +63,15 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
         boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
-
         handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
 
         if (needsRecompression) {
             compress(ctx, byteBuf);
+        }
+
+        // So apparently, this is how ViaVersion hacks around bungeecord not supporting sending empty packets
+        if (!ByteBufHelper.isReadable(byteBuf)) {
+            throw new CancelPacketException();
         }
 
         list.add(byteBuf.retain());
@@ -128,6 +133,11 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        // This is a terrible hack, shame on Bungeecord.
+        if (ExceptionUtil.isException(cause, CancelPacketException.class)) {
+            return;
+        }
+
         boolean didWeCauseThis = ExceptionUtil.isException(cause, PacketProcessException.class);
 
         if (didWeCauseThis) {
