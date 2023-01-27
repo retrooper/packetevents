@@ -22,9 +22,8 @@ import java.util.Set;
 
 public class ExceptionUtil {
     public static boolean isException(Throwable t, Class<?> clazz) {
-        Class<?> throwableClass = t.getClass();
         while (t != null) {
-            if (clazz.isAssignableFrom(throwableClass)) {
+            if (clazz.isAssignableFrom(t.getClass())) {
                 return true;
             }
 

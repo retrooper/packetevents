@@ -128,13 +128,19 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-        //Check if the minecraft server will already print our exception for us.
-        //Don't print errors during handshake
-        if (ExceptionUtil.isException(cause, PacketProcessException.class)
-                && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
-                && (user != null && user.getConnectionState() != ConnectionState.HANDSHAKING)) {
-            cause.printStackTrace();
+        boolean didWeCauseThis = ExceptionUtil.isException(cause, PacketProcessException.class);
+
+        if (didWeCauseThis) {
+            if (SpigotReflectionUtil.isMinecraftServerInstanceDebugging()) {
+                // You asked for it
+                cause.printStackTrace();
+            } else if (user != null && user.getConnectionState() != ConnectionState.HANDSHAKING) {
+                // Ignore handshaking exceptions
+                cause.printStackTrace();
+            }
+        } else {
+            // Not our fault
+            super.exceptionCaught(ctx, cause);
         }
     }
 
