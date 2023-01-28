@@ -18,8 +18,6 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
-import org.jetbrains.annotations.Nullable;
-
 /**
  * Representation of a player's game mode.
  *
@@ -38,10 +36,10 @@ public enum GameMode {
         return ordinal();
     }
 
-    @Nullable
     public static GameMode getById(int id) {
-        if (id == -1) {
-            return null;
+        // Minecraft defaults to a survival gamemode if invalid
+        if (id < 0 || id >= VALUES.length) {
+            return GameMode.SURVIVAL;
         }
         return VALUES[id];
     }
