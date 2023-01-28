@@ -76,6 +76,12 @@ public class ServerConnectionInitializer {
         }
     }
 
+    public static void destroyHandlers(Object ch) {
+        Channel channel = (Channel) ch;
+        channel.pipeline().remove(PacketEvents.DECODER_NAME);
+        channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+    }
+
     public static void relocateHandlers(Channel ctx, PacketEventsDecoder decoder, User user) {
         // Decoder == null means we haven't made handlers for the user yet
         try {
