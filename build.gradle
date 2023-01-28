@@ -19,7 +19,7 @@ subprojects {
 
     group = 'com.github.retrooper'
     description = project.name
-    version = '2.0.0-SNAPSHOT'
+    version = '2.0.1-SNAPSHOT'
 
     project.ext.nettyVersion = '4.1.72.Final'
     project.ext.adventureVersion = '4.10.1'
