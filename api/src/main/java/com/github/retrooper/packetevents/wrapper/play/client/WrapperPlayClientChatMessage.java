@@ -38,9 +38,17 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
     private String message;
     private MessageSignData messageSignData;
     private @Nullable LastSeenMessages.Update lastSeenMessages;
+    private @Nullable LastSeenMessages.LegacyUpdate legacyLastSeenMessages;
 
     public WrapperPlayClientChatMessage(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperPlayClientChatMessage(String message, @Nullable MessageSignData messageSignData, @Nullable LastSeenMessages.LegacyUpdate lastSeenMessages) {
+        super(PacketType.Play.Client.CHAT_MESSAGE);
+        this.message = message;
+        this.messageSignData = messageSignData;
+        this.legacyLastSeenMessages = lastSeenMessages;
     }
 
     public WrapperPlayClientChatMessage(String message, @Nullable MessageSignData messageSignData, @Nullable LastSeenMessages.Update lastSeenMessages) {
@@ -57,10 +65,14 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             Instant timestamp = readTimestamp();
             SaltSignature saltSignature = readSaltSignature();
-            boolean signedPreview = readBoolean();
-            this.messageSignData = new MessageSignData(saltSignature, timestamp, signedPreview);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+            this.messageSignData = new MessageSignData(saltSignature, timestamp);
+
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
                 this.lastSeenMessages = readLastSeenMessagesUpdate();
+            } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+                boolean signedPreview = readBoolean();
+                this.messageSignData.setSignedPreview(signedPreview);
+                this.legacyLastSeenMessages = readLegacyLastSeenMessagesUpdate();
             }
         }
     }
@@ -72,9 +84,12 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeTimestamp(messageSignData.getTimestamp());
             writeSaltSignature(messageSignData.getSaltSignature());
-            writeBoolean(messageSignData.isSignedPreview());
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3) && lastSeenMessages != null) {
                 writeLastSeenMessagesUpdate(lastSeenMessages);
+            } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1) && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_2) && legacyLastSeenMessages != null) {
+                writeBoolean(messageSignData.isSignedPreview());
+                writeLegacyLastSeenMessagesUpdate(legacyLastSeenMessages);
             }
         }
     }
@@ -84,6 +99,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         this.message = wrapper.message;
         this.messageSignData = wrapper.messageSignData;
         this.lastSeenMessages = wrapper.lastSeenMessages;
+        this.legacyLastSeenMessages = wrapper.legacyLastSeenMessages;
     }
 
     /**
@@ -120,22 +136,15 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         return lastSeenMessages;
     }
 
-    public void setLastSeenMessages(@Nullable LastSeenMessages.Update lastSeenMessages) {
+    public void setLastSeenMessages(LastSeenMessages.@Nullable Update lastSeenMessages) {
         this.lastSeenMessages = lastSeenMessages;
     }
 
-    /*protected boolean verify(UUID uuid, PublicKey key) {
-        if (messageSignData == null) {
-            System.out.println("wait a minute!");
-            return false;
-        }
-        Component component = Component.text(message);
-        System.out.println("str: " + AdventureSerializer.toJson(component));
-        try {
-            return MessageVerifierHelper.verify(uuid, messageSignData, key, String.format("{\"text\":\"%s\"}", message));
-        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }*/
+    public @Nullable LastSeenMessages.LegacyUpdate getLegacyLastSeenMessages() {
+        return legacyLastSeenMessages;
+    }
+
+    public void setLegacyLastSeenMessages(@Nullable LastSeenMessages.LegacyUpdate lastSeenMessages) {
+        this.legacyLastSeenMessages = lastSeenMessages;
+    }
 }

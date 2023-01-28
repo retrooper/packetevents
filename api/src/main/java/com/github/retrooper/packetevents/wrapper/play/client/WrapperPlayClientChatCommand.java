@@ -15,13 +15,21 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
     private String command;
     private MessageSignData messageSignData;
     private @Nullable LastSeenMessages.Update lastSeenMessages;
+    private @Nullable LastSeenMessages.LegacyUpdate legacyLastSeenMessages;
 
     public WrapperPlayClientChatCommand(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData, @Nullable LastSeenMessages.Update lastSeenMessages) {
+    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData, @Nullable LastSeenMessages.LegacyUpdate lastSeenMessages) {
         super(PacketType.Play.Client.CHAT_COMMAND);
+        this.command = command;
+        this.messageSignData = messageSignData;
+        this.legacyLastSeenMessages = lastSeenMessages;
+    }
+
+    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData, @Nullable LastSeenMessages.Update lastSeenMessages) {
+        super(PacketType.Play.Client.CHAT_MESSAGE);
         this.command = command;
         this.messageSignData = messageSignData;
         this.lastSeenMessages = lastSeenMessages;
@@ -36,8 +44,11 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
             SaltSignature saltSignature = readSaltSignature();
             boolean signedPreview = readBoolean();
             this.messageSignData = new MessageSignData(saltSignature, timestamp, signedPreview);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
                 this.lastSeenMessages = readLastSeenMessagesUpdate();
+            } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+                this.legacyLastSeenMessages = readLegacyLastSeenMessagesUpdate();
             }
         }
     }
@@ -49,8 +60,10 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
             writeTimestamp(messageSignData.getTimestamp());
             writeSaltSignature(messageSignData.getSaltSignature());
             writeBoolean(messageSignData.isSignedPreview());
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3) && lastSeenMessages != null) {
                 writeLastSeenMessagesUpdate(lastSeenMessages);
+            } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1) && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_2) && legacyLastSeenMessages != null) {
+                writeLegacyLastSeenMessagesUpdate(legacyLastSeenMessages);
             }
         }
     }
@@ -60,6 +73,7 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
         this.command = wrapper.command;
         this.messageSignData = wrapper.messageSignData;
         this.lastSeenMessages = wrapper.lastSeenMessages;
+        this.legacyLastSeenMessages = wrapper.legacyLastSeenMessages;
     }
 
     public String getCommand() {
@@ -78,11 +92,19 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
         this.messageSignData = messageSignData;
     }
 
-    public @Nullable LastSeenMessages.Update getLastSeenMessages() {
+    public LastSeenMessages.@Nullable Update getLastSeenMessages() {
         return lastSeenMessages;
     }
 
-    public void setLastSeenMessages(@Nullable LastSeenMessages.Update lastSeenMessages) {
+    public void setLastSeenMessages(LastSeenMessages.@Nullable Update lastSeenMessages) {
         this.lastSeenMessages = lastSeenMessages;
+    }
+
+    public LastSeenMessages.@Nullable LegacyUpdate getLegacyLastSeenMessages() {
+        return legacyLastSeenMessages;
+    }
+
+    public void setLegacyLastSeenMessages(LastSeenMessages.@Nullable LegacyUpdate legacyLastSeenMessages) {
+        this.legacyLastSeenMessages = legacyLastSeenMessages;
     }
 }
