@@ -186,7 +186,11 @@ public class SpigotChannelInjector implements ChannelInjector {
     }
 
     private void uninjectServerChannel(Channel serverChannel) {
-        serverChannel.pipeline().remove(PacketEvents.CONNECTION_HANDLER_NAME);
+        if (serverChannel.pipeline().get(PacketEvents.CONNECTION_HANDLER_NAME) != null) {
+            serverChannel.pipeline().remove(PacketEvents.CONNECTION_HANDLER_NAME);
+        } else {
+            PacketEvents.getAPI().getLogManager().warn("Failed to uninject server channel, handler not found");
+        }
     }
 
 

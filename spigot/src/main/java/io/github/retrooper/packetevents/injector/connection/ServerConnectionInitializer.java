@@ -78,8 +78,17 @@ public class ServerConnectionInitializer {
 
     public static void destroyHandlers(Object ch) {
         Channel channel = (Channel) ch;
-        channel.pipeline().remove(PacketEvents.DECODER_NAME);
-        channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+        if (channel.pipeline().get(PacketEvents.DECODER_NAME) != null) {
+            channel.pipeline().remove(PacketEvents.DECODER_NAME);
+        } else {
+            PacketEvents.getAPI().getLogger().warning("Could not find decoder handler in channel pipeline!");
+        }
+
+        if (channel.pipeline().get(PacketEvents.ENCODER_NAME) != null) {
+            channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+        } else {
+            PacketEvents.getAPI().getLogger().warning("Could not find encoder handler in channel pipeline!");
+        }
     }
 
     public static void relocateHandlers(Channel ctx, PacketEventsDecoder decoder, User user) {
