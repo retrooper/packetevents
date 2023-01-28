@@ -34,7 +34,20 @@ import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState
 public interface BaseChunk {
     WrappedBlockState get(ClientVersion version, int x, int y, int z);
 
-    void set(ClientVersion version, int x, int y, int z, int combinedID);
+    default WrappedBlockState get(int x, int y, int z) {
+        return get(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), x, y, z);
+    }
+
+    default void set(int x, int y, int z, WrappedBlockState state) {
+        set(x, y, z, state.getGlobalId());
+    }
+
+    void set(int x, int y, int z, int combinedID);
+
+    // We don't use ClientVersion, but it's here to maintain backwards compatibility.
+    default void set(ClientVersion version, int x, int y, int z, int combinedID) {
+        set(x, y, z, combinedID);
+    }
 
     boolean isEmpty();
 

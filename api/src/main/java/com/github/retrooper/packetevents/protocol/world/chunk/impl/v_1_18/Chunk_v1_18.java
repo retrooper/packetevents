@@ -66,7 +66,7 @@ public class Chunk_v1_18 implements BaseChunk {
     }
 
     @Override
-    public void set(ClientVersion version, int x, int y, int z, int state) {
+    public void set(int x, int y, int z, int state) {
         int curr = this.chunkData.set(x, y, z, state);
         if (state != AIR && curr == AIR) {
             this.blockCount++;

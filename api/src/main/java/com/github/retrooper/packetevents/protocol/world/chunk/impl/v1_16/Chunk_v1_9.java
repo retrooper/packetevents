@@ -88,7 +88,7 @@ public class Chunk_v1_9 implements BaseChunk {
         return WrappedBlockState.getByGlobalId(version, this.dataPalette.get(x, y, z));
     }
 
-    public void set(ClientVersion version, int x, int y, int z, int state) {
+    public void set(int x, int y, int z, int state) {
         int curr = this.dataPalette.set(x, y, z, state);
         // Pre-1.14 we don't get block counts
         if (blockCount == Integer.MAX_VALUE) return;

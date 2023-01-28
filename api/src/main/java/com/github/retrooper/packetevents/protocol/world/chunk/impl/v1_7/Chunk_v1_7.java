@@ -50,7 +50,7 @@ public class Chunk_v1_7 implements BaseChunk {
     }
 
     @Override
-    public void set(ClientVersion version, int x, int y, int z, int combinedID) {
+    public void set(int x, int y, int z, int combinedID) {
         blocks.set(x, y, z, combinedID & 0xFF);
         extendedBlocks.set(x, y, z, combinedID >> 12);
     }
