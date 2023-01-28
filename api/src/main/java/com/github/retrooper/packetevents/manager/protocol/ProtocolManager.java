@@ -112,6 +112,8 @@ public interface ProtocolManager {
         for (int i = 0; i < wrappers.length; i++) {
             wrappers[i].prepareForSend(channel);
             buffers[i] = wrappers[i].buffer;
+            // Fix race condition when sending packets to multiple people (due to when the buffer is freed)
+            wrappers[i].buffer = null;
         }
         return buffers;
     }
