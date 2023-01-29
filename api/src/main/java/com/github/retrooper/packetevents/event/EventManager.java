@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -50,7 +51,10 @@ public class EventManager {
                     try {
                         event.call(listener);
                     } catch (Throwable t) {
-                        PacketEvents.getAPI().getLogger().log(Level.WARNING, "PacketEvents caught an unhandled exception while calling your listener.", t);
+                        // ignore handshake exceptions
+                        if (t.getClass() != InvalidHandshakeException.class) {
+                            PacketEvents.getAPI().getLogger().log(Level.WARNING, "PacketEvents caught an unhandled exception while calling your listener.", t);
+                        }
                     }
                     if (postCallListenerAction != null) {
                         postCallListenerAction.run();

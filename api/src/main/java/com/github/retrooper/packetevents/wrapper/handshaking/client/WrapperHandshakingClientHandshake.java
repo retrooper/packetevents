@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.handshaking.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -61,7 +62,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
             int nextStateIndex = readVarInt();
             this.nextConnectionState = ConnectionState.getById(nextStateIndex);
         } catch (Exception e) {
-            throw new PacketProcessException(e);
+            throw new InvalidHandshakeException();
         }
     }
 
