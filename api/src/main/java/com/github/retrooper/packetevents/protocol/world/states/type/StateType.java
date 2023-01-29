@@ -153,4 +153,9 @@ public class StateType {
     public MaterialType getMaterialType() {
         return materialType;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
