@@ -106,7 +106,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
         } else {
             if (serverVersion == ServerVersion.V_1_7_10) {
                 writeInt(blockPosition.x);
-                writeByte(blockPosition.x);
+                writeByte(blockPosition.y);
                 writeInt(blockPosition.z);
             } else {
                 writeBlockPosition(blockPosition);
