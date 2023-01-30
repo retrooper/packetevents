@@ -34,7 +34,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.InvocationTargetException;
 
-//Thanks to ViaVersion for the compression method.
+// Thanks to ViaVersion for the compression method.
 @ChannelHandler.Sharable
 public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
     public ProxiedPlayer player;
@@ -72,23 +72,29 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
-        if (!msg.isReadable()) return;
+        if (!msg.isReadable()) {
+            return;
+        }
         read(ctx, msg);
         out.writeBytes(msg);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
+        // if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
         super.exceptionCaught(ctx, cause);
-        //}
+        // }
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {
         ChannelPipeline pipe = ctx.pipeline();
-        if (handledCompression) return false;
+        if (handledCompression) {
+            return false;
+        }
         int encoderIndex = pipe.names().indexOf("compress");
-        if (encoderIndex == -1) return false;
+        if (encoderIndex == -1) {
+            return false;
+        }
         if (encoderIndex > pipe.names().indexOf(PacketEvents.ENCODER_NAME)) {
             // Need to decompress this packet due to bad order
             ChannelHandler decompressor = pipe.get("decompress");

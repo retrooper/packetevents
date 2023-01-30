@@ -28,14 +28,16 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
 public class InternalBungeeProcessor implements Listener {
-    //Called right after LoginSuccess is sent to the user.
+    // Called right after LoginSuccess is sent to the user.
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
         Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         PacketEvents.getAPI().getInjector().setPlayer(channel, player);
         User user = PacketEvents.getAPI().getPlayerManager().getUser(event.getPlayer());
-        if (user == null) return;
+        if (user == null) {
+            return;
+        }
         UserLoginEvent loginEvent = new UserLoginEvent(user, player);
         PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
     }
