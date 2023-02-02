@@ -93,7 +93,7 @@ public enum ClientVersion {
     private static final ClientVersion[] REVERSED_VALUES;
 
     static {
-        List<ClientVersion> valuesAsList = Arrays.asList(VALUES);
+        List<ClientVersion> valuesAsList = Arrays.asList(values());
         Collections.reverse(valuesAsList);
         REVERSED_VALUES = valuesAsList.toArray(new ClientVersion[0]);
     }
