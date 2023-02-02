@@ -29,7 +29,6 @@ import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
-import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -140,18 +139,13 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
         boolean didWeCauseThis = ExceptionUtil.isException(cause, PacketProcessException.class);
 
-        if (didWeCauseThis) {
-            if (SpigotReflectionUtil.isMinecraftServerInstanceDebugging()) {
-                // You asked for it
-                cause.printStackTrace();
-            } else if (user != null && user.getConnectionState() != ConnectionState.HANDSHAKING) {
-                // Ignore handshaking exceptions
-                cause.printStackTrace();
-            }
-        } else {
-            // Not our fault
-            super.exceptionCaught(ctx, cause);
+        if (didWeCauseThis && user != null && user.getConnectionState() != ConnectionState.HANDSHAKING) {
+            // Ignore handshaking exceptions
+            cause.printStackTrace();
+            return;
         }
+
+        super.exceptionCaught(ctx, cause);
     }
 
     private static Object paperCompressionEnabledEvent() {
