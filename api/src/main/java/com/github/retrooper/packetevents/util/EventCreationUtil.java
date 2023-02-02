@@ -18,10 +18,13 @@
 
 package com.github.retrooper.packetevents.util;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.simple.*;
+import com.github.retrooper.packetevents.exception.InvalidPacketIdException;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 public class EventCreationUtil {
@@ -43,17 +46,28 @@ public class EventCreationUtil {
 
     public static PacketSendEvent createSendEvent(Object channel, User user, Object player, Object buffer,
                                                   boolean autoProtocolTranslation) throws PacketProcessException{
-        switch (user.getConnectionState()) {
-            case HANDSHAKING:
-                return new PacketHandshakeSendEvent(channel, user, player, buffer, autoProtocolTranslation);
-            case STATUS:
-                return new PacketStatusSendEvent(channel, user, player, buffer, autoProtocolTranslation);
-            case LOGIN:
-                return new PacketLoginSendEvent(channel, user, player, buffer, autoProtocolTranslation);
-            case PLAY:
-                return new PacketPlaySendEvent(channel, user, player, buffer, autoProtocolTranslation);
-            default:
-                return null;
+        try {
+            switch (user.getConnectionState()) {
+                case HANDSHAKING:
+                    return new PacketHandshakeSendEvent(channel, user, player, buffer, autoProtocolTranslation);
+                case STATUS:
+                    return new PacketStatusSendEvent(channel, user, player, buffer, autoProtocolTranslation);
+                case LOGIN:
+                    return new PacketLoginSendEvent(channel, user, player, buffer, autoProtocolTranslation);
+                case PLAY:
+                    return new PacketPlaySendEvent(channel, user, player, buffer, autoProtocolTranslation);
+                default:
+                    return null;
+            }
+        } catch (InvalidPacketIdException e) {
+            if (user.getConnectionState() != ConnectionState.PLAY) {
+                // TODO: This hack may be removed once we verify that we don't miss the transition to the PLAY state https://github.com/retrooper/packetevents/issues/533
+                user.setConnectionState(ConnectionState.PLAY);
+                e.printStackTrace();
+                PacketEvents.getAPI().getLogger().warning("Transitioning to PLAY state, assuming we missed a packet somewhere");
+                return createSendEvent(channel, user, player, buffer, autoProtocolTranslation);
+            }
+            return null;
         }
     }
 }
