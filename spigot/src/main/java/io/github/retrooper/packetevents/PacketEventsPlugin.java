@@ -20,28 +20,20 @@ package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.*;
+import com.github.retrooper.packetevents.event.simple.PacketLoginSendEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
-import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.particle.Particle;
-import com.github.retrooper.packetevents.protocol.particle.data.ParticleDustData;
-import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.TimeStampMode;
-import com.github.retrooper.packetevents.util.Vector3d;
-import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
-import com.google.gson.JsonElement;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -62,28 +54,21 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.getAPI().getSettings().debug(false).bStats(true)
+        PacketEvents.getAPI().getSettings().debug(true).bStats(true)
                 .checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).readOnlyListeners(false);
         PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
+            @Override
+            public void onPacketLoginSend(PacketLoginSendEvent event) {
+
+            }
+
+
             @Override
             public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
                 User user = event.getUser();
                 Player player = (Player) event.getPlayer();
                 switch (event.getPacketType()) {
-                    case CHAT_MESSAGE:
-                        WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
-                        if (chatMessage.getMessage().equalsIgnoreCase("!test")) {
-                            final Particle particle = new Particle(ParticleTypes.DUST, new ParticleDustData(0.5F,
-                                    new Vector3f(0, 1, 0)));
-                            user.sendPacket(new WrapperPlayServerParticle(
-                                    // still needs magnolia colors
-                                    particle, true,
-                                    new Vector3d(player.getLocation().getX(), player.getLocation().getY() + 1, player.getLocation().getZ()),
-                                    new Vector3f(0.65F, 0, 0.65F), 1, 100));
-                            user.sendMessage("Sent!");
-                        }
-                        break;
                     case PLAYER_FLYING:
                     case PLAYER_POSITION:
                     case PLAYER_POSITION_AND_ROTATION:
@@ -101,7 +86,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         WrapperPlayClientPlayerBlockPlacement blockPlacement = new WrapperPlayClientPlayerBlockPlacement(event);
                         BlockFace frace = blockPlacement.getFace();
                         Vector3i bp = blockPlacement.getBlockPosition();
-                        user.sendMessage(ChatColor.GOLD + "Face: " + frace + ", bp: " + bp);
+                        user.sendMessage(Component.text("fuck you!"), ChatTypes.CHAT);
                         break;
                     case PLUGIN_MESSAGE:
                         WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
@@ -122,6 +107,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                     case UPDATE_SIGN:
                         WrapperPlayClientUpdateSign sign = new WrapperPlayClientUpdateSign(event);
                         user.sendMessage("Sign is " + sign.getBlockPosition());
+                        break;
+                    case CHAT_MESSAGE:
+                        WrapperPlayClientChatMessage chat = new WrapperPlayClientChatMessage(event);
                         break;
                     default:
                         break;
@@ -149,9 +137,16 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
                 else if (event.getPacketType() == PacketType.Play.Server.BLOCK_CHANGE) {
                     WrapperPlayServerBlockChange change = new WrapperPlayServerBlockChange(event);
+                    event.getByteBuf();
                     Bukkit.broadcastMessage(change.getBlockState().toString());
                 } else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
                     WrapperPlayServerChunkData data = new WrapperPlayServerChunkData(event);
+                } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                    WrapperPlayServerChatMessage message = new WrapperPlayServerChatMessage(event);
+                    event.getByteBuf();
+                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_ENTITY) {
+                    WrapperPlayServerSpawnEntity entity = new WrapperPlayServerSpawnEntity(event);
+                    int id = entity.getEntityId();
                 }
             }
 
@@ -171,7 +166,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 System.out.println("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
