@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.entity.data.provider;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
+import com.github.retrooper.packetevents.util.AdventureSerializer;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -201,7 +202,7 @@ public class EntityDataProvider implements DataProvider {
         List<EntityData> metadata = new ArrayList<>(8);
         metadata.add(new EntityData(0, EntityDataTypes.BYTE, mask));
         metadata.add(new EntityData(1, EntityDataTypes.INT, airTicks));
-        metadata.add(new EntityData(2, EntityDataTypes.OPTIONAL_COMPONENT, Optional.ofNullable(customName)));
+        metadata.add(new EntityData(2, EntityDataTypes.OPTIONAL_COMPONENT, customName == null ? null : AdventureSerializer.toJson(customName)));
         metadata.add(new EntityData(3, EntityDataTypes.BOOLEAN, customNameVisible));
         metadata.add(new EntityData(4, EntityDataTypes.BOOLEAN, silent));
         metadata.add(new EntityData(5, EntityDataTypes.BOOLEAN, !hasGravity));
