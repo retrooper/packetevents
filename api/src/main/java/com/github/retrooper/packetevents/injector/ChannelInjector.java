@@ -18,9 +18,7 @@
 
 package com.github.retrooper.packetevents.injector;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
-import org.jetbrains.annotations.Nullable;
 
 public interface ChannelInjector {
     default boolean isServerBound() {
@@ -33,11 +31,7 @@ public interface ChannelInjector {
 
     User getUser(Object channel);
 
-    void changeConnectionState(Object channel, @Nullable ConnectionState connectionState);
-
     void updateUser(Object channel, User user);
 
     void setPlayer(Object channel, Object player);
-
-    boolean hasPlayer(Object player);
 }

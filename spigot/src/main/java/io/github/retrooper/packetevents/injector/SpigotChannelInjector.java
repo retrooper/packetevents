@@ -35,7 +35,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -201,15 +200,6 @@ public class SpigotChannelInjector implements ChannelInjector {
     }
 
     @Override
-    public void changeConnectionState(Object ch, @Nullable ConnectionState connectionState) {
-        Channel channel = (Channel) ch;
-        User user = getUser(channel);
-        if (user != null) {
-            user.setConnectionState(connectionState);
-        }
-    }
-
-    @Override
     public void updateUser(Object channel, User user) {
         PacketEventsEncoder encoder = getEncoder((Channel) channel);
         if (encoder != null) {
@@ -235,13 +225,6 @@ public class SpigotChannelInjector implements ChannelInjector {
             decoder.user.getProfile().setName(((Player) player).getName());
             decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
         }
-    }
-
-    @Override
-    public boolean hasPlayer(Object player) {
-        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        PacketEventsDecoder decoder = getDecoder((Channel) channel);
-        return decoder != null && decoder.player != null;
     }
 
     private PacketEventsEncoder getEncoder(Channel channel) {
