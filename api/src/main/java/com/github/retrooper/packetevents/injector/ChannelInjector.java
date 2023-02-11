@@ -29,8 +29,6 @@ public interface ChannelInjector {
 
     void uninject();
 
-    User getUser(Object channel);
-
     void updateUser(Object channel, User user);
 
     void setPlayer(Object channel, Object player);

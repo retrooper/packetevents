@@ -84,11 +84,6 @@ public class VelocityPipelineInjector implements ChannelInjector {
     }
 
     @Override
-    public User getUser(Object channel) {
-        PacketEventsDecoder decoder = (PacketEventsDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME);
-        return decoder.user;
-    }
-    @Override
     public void updateUser(Object channel, User user) {
         PacketEventsDecoder decoder = (PacketEventsDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME);
         decoder.user = user;

@@ -192,13 +192,6 @@ public class SpigotChannelInjector implements ChannelInjector {
         }
     }
 
-
-    @Override
-    public User getUser(Object channel) {
-        PacketEventsEncoder encoder = getEncoder((Channel)channel);
-        return encoder != null ? encoder.user : null;
-    }
-
     @Override
     public void updateUser(Object channel, User user) {
         PacketEventsEncoder encoder = getEncoder((Channel) channel);

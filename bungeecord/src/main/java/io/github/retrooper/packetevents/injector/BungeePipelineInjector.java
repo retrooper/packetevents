@@ -53,11 +53,6 @@ public class BungeePipelineInjector implements ChannelInjector {
 
     private final List<Channel> connectionChannels = new ArrayList<>();
 
-    @Override
-    public User getUser(Object channel) {
-        return ((PacketEventsDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME)).user;
-    }
-
     public void injectChannel(Channel channel) {
         channel.pipeline().addFirst(PacketEvents.CONNECTION_HANDLER_NAME,
                 new ChannelInboundHandlerAdapter() {
