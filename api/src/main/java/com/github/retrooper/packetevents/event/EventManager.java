@@ -22,13 +22,15 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 public class EventManager {
-    private final Map<Byte, HashSet<PacketListenerCommon>> listenersMap = new ConcurrentHashMap<>();
+    private final Map<Byte, Set<PacketListenerCommon>> listenersMap = new ConcurrentHashMap<>();
 
     /**
      * Call the PacketEvent.
@@ -45,7 +47,7 @@ public class EventManager {
 
     public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
         for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
-            HashSet<PacketListenerCommon> listeners = listenersMap.get(priority);
+            Set<PacketListenerCommon> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerCommon listener : listeners) {
                     try {
@@ -80,9 +82,9 @@ public class EventManager {
      */
     public PacketListenerCommon registerListener(PacketListenerCommon listener) {
         byte priority = listener.getPriority().getId();
-        HashSet<PacketListenerCommon> listenerSet = listenersMap.get(priority);
+        Set<PacketListenerCommon> listenerSet = listenersMap.get(priority);
         if (listenerSet == null) {
-            listenerSet = new HashSet<>();
+            listenerSet = Collections.synchronizedSet(new HashSet<>());
         }
         listenerSet.add(listener);
         listenersMap.put(priority, listenerSet);
@@ -102,7 +104,7 @@ public class EventManager {
     }
 
     public void unregisterListener(PacketListenerCommon listener) {
-        HashSet<PacketListenerCommon> listenerSet = listenersMap.get(listener.getPriority().getId());
+        Set<PacketListenerCommon> listenerSet = listenersMap.get(listener.getPriority().getId());
         if (listenerSet == null) return;
         listenerSet.remove(listener);
     }
