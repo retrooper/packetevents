@@ -19,7 +19,6 @@ package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
@@ -31,7 +30,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -54,17 +52,6 @@ public class BungeePipelineInjector implements ChannelInjector {
     }
 
     private final List<Channel> connectionChannels = new ArrayList<>();
-
-    @Override
-    public User getUser(Object channel) {
-        return ((PacketEventsDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME)).user;
-    }
-
-    @Override
-    public void changeConnectionState(Object channel, @Nullable ConnectionState connectionState) {
-        // No adjustments to the pipeline necessary on bungee.
-        getUser(channel).setConnectionState(connectionState);
-    }
 
     public void injectChannel(Channel channel) {
         channel.pipeline().addFirst(PacketEvents.CONNECTION_HANDLER_NAME,
@@ -138,12 +125,5 @@ public class BungeePipelineInjector implements ChannelInjector {
         decoder.user = user;
         PacketEventsEncoder encoder = (PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
         encoder.user = user;
-    }
-
-    @Override
-    public boolean hasPlayer(Object player) {
-        Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        PacketEventsDecoder decoder = (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-        return decoder != null && decoder.player != null;
     }
 }
