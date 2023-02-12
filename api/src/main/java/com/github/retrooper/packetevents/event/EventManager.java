@@ -84,7 +84,7 @@ public class EventManager {
         byte priority = listener.getPriority().getId();
         Set<PacketListenerCommon> listenerSet = listenersMap.get(priority);
         if (listenerSet == null) {
-            listenerSet = Collections.synchronizedSet(new HashSet<>());
+            listenerSet = ConcurrentHashMap.newKeySet();
         }
         listenerSet.add(listener);
         listenersMap.put(priority, listenerSet);
