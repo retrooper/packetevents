@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.injector.handlers;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.CancelPacketException;
+import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -70,7 +71,7 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
         // So apparently, this is how ViaVersion hacks around bungeecord not supporting sending empty packets
         if (!ByteBufHelper.isReadable(byteBuf)) {
-            throw new CancelPacketException();
+            throw CancelPacketException.INSTANCE;
         }
 
         list.add(byteBuf.retain());
@@ -132,8 +133,12 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        // This is a terrible hack, shame on Bungeecord.
+        // This is a terrible hack (to support bungee), I think we should use something other than a MessageToMessageEncoder
         if (ExceptionUtil.isException(cause, CancelPacketException.class)) {
+            return;
+        }
+        // Ignore how mojang sends DISCONNECT packets in the wrong state
+        if (ExceptionUtil.isException(cause, InvalidDisconnectPacketSend.class)) {
             return;
         }
 
