@@ -37,7 +37,6 @@ public class SetWrapper<E> extends ForwardingSet<E> {
     @Override
     public boolean add(@NonNull E element) {
         addListener.accept(element);
-
         return super.add(element);
     }
 
@@ -46,7 +45,6 @@ public class SetWrapper<E> extends ForwardingSet<E> {
         for (E element : collection) {
             addListener.accept(element);
         }
-
         return super.addAll(collection);
     }
 

@@ -20,6 +20,8 @@ package io.github.retrooper.packetevents.injector.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.exception.CancelPacketException;
+import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -28,7 +30,6 @@ import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
-import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -62,11 +63,15 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
         boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
-
         handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
 
         if (needsRecompression) {
             compress(ctx, byteBuf);
+        }
+
+        // So apparently, this is how ViaVersion hacks around bungeecord not supporting sending empty packets
+        if (!ByteBufHelper.isReadable(byteBuf)) {
+            throw CancelPacketException.INSTANCE;
         }
 
         list.add(byteBuf.retain());
@@ -128,14 +133,24 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-        //Check if the minecraft server will already print our exception for us.
-        //Don't print errors during handshake
-        if (ExceptionUtil.isException(cause, PacketProcessException.class)
-                && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
-                && (user != null && user.getConnectionState() != ConnectionState.HANDSHAKING)) {
-            cause.printStackTrace();
+        // This is a terrible hack (to support bungee), I think we should use something other than a MessageToMessageEncoder
+        if (ExceptionUtil.isException(cause, CancelPacketException.class)) {
+            return;
         }
+        // Ignore how mojang sends DISCONNECT packets in the wrong state
+        if (ExceptionUtil.isException(cause, InvalidDisconnectPacketSend.class)) {
+            return;
+        }
+
+        boolean didWeCauseThis = ExceptionUtil.isException(cause, PacketProcessException.class);
+
+        if (didWeCauseThis && user != null && user.getConnectionState() != ConnectionState.HANDSHAKING) {
+            // Ignore handshaking exceptions
+            cause.printStackTrace();
+            return;
+        }
+
+        super.exceptionCaught(ctx, cause);
     }
 
     private static Object paperCompressionEnabledEvent() {

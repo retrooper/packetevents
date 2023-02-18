@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.manager.protocol;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -92,13 +91,6 @@ public interface ProtocolManager {
         }
     }
 
-    //TODO Make it clear that this only updates the connection state in our user.
-    //Sometimes you should use getInjector().changeConnectionState because that can allow the injector to make adjustments.
-    //This is very important, especially on Spigot.
-    //As soon as we switch to the play state on spigot, our injector makes some adjustments.
-    default void changeConnectionState(Object channel, ConnectionState connectionState) {
-        getUser(channel).setConnectionState(connectionState);
-    }
 
     default void setClientVersion(Object channel, ClientVersion version) {
         getUser(channel).setClientVersion(version);
@@ -112,6 +104,8 @@ public interface ProtocolManager {
         for (int i = 0; i < wrappers.length; i++) {
             wrappers[i].prepareForSend(channel);
             buffers[i] = wrappers[i].buffer;
+            // Fix race condition when sending packets to multiple people (due to when the buffer is freed)
+            wrappers[i].buffer = null;
         }
         return buffers;
     }

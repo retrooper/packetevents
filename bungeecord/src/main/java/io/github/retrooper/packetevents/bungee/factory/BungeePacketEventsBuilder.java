@@ -35,6 +35,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
+import io.github.retrooper.packetevents.PacketEventsPlugin;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
@@ -73,16 +74,14 @@ public class BungeePacketEventsBuilder {
         return INSTANCE;
     }
 
-
     public static PacketEventsAPI<Plugin> buildNoCache(Plugin plugin) {
         return buildNoCache(plugin, new PacketEventsSettings());
     }
 
-
     public static PacketEventsAPI<Plugin> buildNoCache(Plugin plugin, PacketEventsSettings inSettings) {
         return new PacketEventsAPI<Plugin>() {
             private final PacketEventsSettings settings = inSettings;
-            //TODO Implement platform version
+            // TODO: Implement platform version
             private final ProtocolManager protocolManager = new ProtocolManagerAbstract() {
                 @Override
                 public ProtocolVersion getPlatformVersion() {
@@ -94,12 +93,11 @@ public class BungeePacketEventsBuilder {
 
                 @Override
                 public ServerVersion getVersion() {
-                    //TODO Not perfect, as this is on the client! Might be inaccurate by a few patch versions.
+                    // TODO: Not perfect, as this is on the client! Might be inaccurate by a few patch versions.
                     if (version == null) {
-                        String bungeeVersion =
-                                ProxyServer.getInstance().getVersion();
+                        String bungeeVersion = ProxyServer.getInstance().getVersion();
                         for (final ServerVersion val : ServerVersion.reversedValues()) {
-                            if (bungeeVersion.contains(val.getReleaseName())) {
+                        	if (val.getReleaseName().contains(bungeeVersion)) {
                                 return version = val;
                             }
                         }
@@ -126,10 +124,12 @@ public class BungeePacketEventsBuilder {
                     User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
 
                     // Creating a user that is offline will memory leak
-                    if (channel == null) return null;
+                    if (channel == null) {
+                        return null;
+                    }
 
                     if (user == null) {
-                        System.out.println("Usero null???");
+                        System.out.println("User null???");
                         user = new User(channel, ConnectionState.PLAY, null, new UserProfile(p.getUniqueId(), p.getName()));
 
                         synchronized (channel) {
@@ -158,10 +158,11 @@ public class BungeePacketEventsBuilder {
             private final LogManager logManager = new LogManager() {
                 @Override
                 protected void log(Level level, @Nullable NamedTextColor color, String message) {
-                    //First we must strip away the color codes that might be in this message
+                    // First we must strip away the color codes that might be in this message
                     message = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
                     System.out.println(message);
-                    //TODO This doesn't work in bungee console PacketEvents.getAPI().getLogger().log(level, color != null ? (color.toString()) : "" + message);
+                    // TODO: Remove "[com.github.retrooper.packetevents.PacketEventsAPI]:" From logger
+                    // PacketEvents.getAPI().getLogger().log(level, color != null ? (color.toString()) : "" + message);
                 }
             };
             private boolean loaded;
@@ -180,11 +181,10 @@ public class BungeePacketEventsBuilder {
                     PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
 
                     injector.inject();
-
                     loaded = true;
 
-                    //Register internal packet listener (should be the first listener)
-                    //This listener doesn't do any modifications to the packets, just reads data
+                    // Register internal packet listener (should be the first listener)
+                    // This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalPacketListener());
                 }
             }
@@ -196,7 +196,7 @@ public class BungeePacketEventsBuilder {
 
             @Override
             public void init() {
-                //Load if we haven't loaded already
+                // Load if we haven't loaded already
                 load();
                 if (!initialized) {
                     ProxyServer.getInstance().getPluginManager().registerListener(plugin, new InternalBungeeProcessor());
@@ -205,7 +205,7 @@ public class BungeePacketEventsBuilder {
                     }
 
                     if (settings.isbStatsEnabled()) {
-                        //TODO Cross-platform metrics?
+                        // TODO: Cross-platform metrics?
                     }
 
                     PacketType.Play.Client.load();
@@ -222,9 +222,9 @@ public class BungeePacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    //Uninject the injector if needed(depends on the injector implementation)
+                    // Uninject the injector if needed(depends on the injector implementation)
                     injector.uninject();
-                    //Unregister all our listeners
+                    // Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;
                 }

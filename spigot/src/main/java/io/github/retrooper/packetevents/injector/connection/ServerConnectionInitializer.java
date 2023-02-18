@@ -46,7 +46,7 @@ public class ServerConnectionInitializer {
         if (connectionState == ConnectionState.PLAY) {
             // Player connected before ViaVersion init, therefore the player is server version (mostly true except 1.7 servers)
             user.setClientVersion(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
-            PacketEvents.getAPI().getLogManager().debug("Late injection detected!");
+            PacketEvents.getAPI().getLogManager().warn("Late injection detected, we missed packets so some functionality may break!");
         }
 
         synchronized (channel) {
@@ -73,6 +73,21 @@ public class ServerConnectionInitializer {
 
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
             PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
+        }
+    }
+
+    public static void destroyHandlers(Object ch) {
+        Channel channel = (Channel) ch;
+        if (channel.pipeline().get(PacketEvents.DECODER_NAME) != null) {
+            channel.pipeline().remove(PacketEvents.DECODER_NAME);
+        } else {
+            PacketEvents.getAPI().getLogger().warning("Could not find decoder handler in channel pipeline!");
+        }
+
+        if (channel.pipeline().get(PacketEvents.ENCODER_NAME) != null) {
+            channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+        } else {
+            PacketEvents.getAPI().getLogger().warning("Could not find encoder handler in channel pipeline!");
         }
     }
 

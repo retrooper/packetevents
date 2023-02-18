@@ -22,6 +22,10 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Client Version.
  * This is a nice tool for minecraft's client protocol versions.
@@ -89,15 +93,9 @@ public enum ClientVersion {
     private static final ClientVersion[] REVERSED_VALUES;
 
     static {
-        REVERSED_VALUES = values();
-        int i = 0;
-        int j = REVERSED_VALUES.length - 1;
-        ClientVersion tmp;
-        while (j > i) {
-            tmp = REVERSED_VALUES[j];
-            REVERSED_VALUES[j--] = REVERSED_VALUES[i];
-            REVERSED_VALUES[i++] = tmp;
-        }
+        List<ClientVersion> valuesAsList = Arrays.asList(values());
+        Collections.reverse(valuesAsList);
+        REVERSED_VALUES = valuesAsList.toArray(new ClientVersion[0]);
     }
 
     private static final int LOWEST_SUPPORTED_PROTOCOL_VERSION = LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1;

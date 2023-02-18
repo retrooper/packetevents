@@ -69,13 +69,6 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         Collections.addAll(playerDataList, playerData);
     }
 
-    public WrapperPlayServerPlayerInfo(@NotNull Action action, PlayerData playerData) {
-        super(PacketType.Play.Server.PLAYER_INFO);
-        this.action = action;
-        this.playerDataList = new ArrayList<>();
-        this.playerDataList.add(playerData);
-    }
-
     @Override
     public void read() {
         if (serverVersion == ServerVersion.V_1_7_10) {
@@ -112,8 +105,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                             TextureProperty textureProperty = new TextureProperty(propertyName, propertyValue, propertySignature);
                             userProfile.getTextureProperties().add(textureProperty);
                         }
-                        int gameModeId = readVarInt();
-                        GameMode gameMode = GameMode.values()[gameModeId == -1 ? 0 : gameModeId];
+                        GameMode gameMode = GameMode.getById(readVarInt());
                         int ping = readVarInt();
                         Component displayName = readBoolean() ? readComponent() : null;
 
@@ -126,8 +118,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         break;
                     }
                     case UPDATE_GAME_MODE: {
-                        int gameModeId = readVarInt();
-                        GameMode gameMode = GameMode.values()[gameModeId == -1 ? 0 : gameModeId];
+                        GameMode gameMode = GameMode.getById(readVarInt());
                         data = new PlayerData((Component) null, new UserProfile(uuid, null), gameMode, -1);
                         break;
                     }

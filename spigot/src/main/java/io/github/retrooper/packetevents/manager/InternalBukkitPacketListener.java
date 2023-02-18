@@ -33,7 +33,6 @@ public class InternalBukkitPacketListener extends com.github.retrooper.packeteve
             }
             if (clientVersion == ClientVersion.UNKNOWN) {
                 PacketEvents.getAPI().getLogManager().debug("Client version for " + address.getHostString() + ":" + address.getPort() + " is unknown!");
-                return;
             }
             //Update client version for this event call(and user)
             user.setClientVersion(clientVersion);

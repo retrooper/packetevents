@@ -28,9 +28,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlayServerPlayerInfoUpdate> {
     //Specify entries using EnumSet.of()
@@ -49,7 +47,6 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
     }
 
     public static class PlayerInfo {
-        private final UUID profileId;
         private final UserProfile gameProfile;
         private final boolean listed;
         private final int latency;
@@ -59,10 +56,9 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
         @Nullable
         private final RemoteChatSession chatSession;
 
-        public PlayerInfo(UUID profileId, UserProfile gameProfile, boolean listed,
+        public PlayerInfo(UserProfile gameProfile, boolean listed,
                           int latency, GameMode gameMode,
                           @Nullable Component displayName, @Nullable RemoteChatSession chatSession) {
-            this.profileId = profileId;
             this.gameProfile = gameProfile;
             this.listed = listed;
             this.latency = latency;
@@ -71,8 +67,9 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
             this.chatSession = chatSession;
         }
 
+        @Deprecated
         public UUID getProfileId() {
-            return profileId;
+            return gameProfile.getUUID();
         }
 
         public UserProfile getGameProfile() {
@@ -110,12 +107,27 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
         this.entries = entries;
     }
 
+    public WrapperPlayServerPlayerInfoUpdate(EnumSet<Action> actions, PlayerInfo... entries) {
+        super(PacketType.Play.Server.PLAYER_INFO_UPDATE);
+        this.actions = actions;
+        this.entries = new ArrayList<>();
+        Collections.addAll(this.entries, entries);
+    }
+
+    public WrapperPlayServerPlayerInfoUpdate(Action action, List<PlayerInfo> entries) {
+        this(EnumSet.of(action), entries);
+    }
+
+    public WrapperPlayServerPlayerInfoUpdate(Action action, PlayerInfo... entries) {
+        this(EnumSet.of(action), entries);
+    }
+
     @Override
     public void read() {
         this.actions = readEnumSet(Action.class);
         this.entries = readList(wrapper -> {
             UUID uuid = wrapper.readUUID();
-            UserProfile gameProfile = new UserProfile(null, null);
+            UserProfile gameProfile = new UserProfile(uuid, null);
             GameMode gameMode = GameMode.defaultGameMode();
             boolean listed = false;
             int latency = 0;
@@ -153,7 +165,7 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
                         break;
                 }
             }
-            return new PlayerInfo(uuid, gameProfile, listed, latency, gameMode, displayName, chatSession);
+            return new PlayerInfo(gameProfile, listed, latency, gameMode, displayName, chatSession);
         });
     }
 

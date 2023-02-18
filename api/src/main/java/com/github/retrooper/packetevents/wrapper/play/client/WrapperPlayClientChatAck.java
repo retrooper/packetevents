@@ -19,42 +19,66 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientChatAck extends PacketWrapper<WrapperPlayClientChatAck> {
-    private LastSeenMessages.Update lastSeenMessages;
+    private LastSeenMessages.LegacyUpdate lastSeenMessages;
+    private int offset;
 
     public WrapperPlayClientChatAck(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatAck(LastSeenMessages.Update lastSeenMessages) {
+    public WrapperPlayClientChatAck(LastSeenMessages.LegacyUpdate lastSeenMessages) {
         super(PacketType.Play.Client.CHAT_ACK);
         this.lastSeenMessages = lastSeenMessages;
     }
 
+    public WrapperPlayClientChatAck(int offset) {
+        super(PacketType.Play.Client.CHAT_ACK);
+        this.offset = offset;
+    }
+
     @Override
     public void read() {
-        lastSeenMessages = readLastSeenMessagesUpdate();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            offset = readVarInt();
+        } else {
+            lastSeenMessages = readLegacyLastSeenMessagesUpdate();
+        }
     }
 
     @Override
     public void write() {
-        writeLastSeenMessagesUpdate(lastSeenMessages);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            writeVarInt(offset);
+        } else {
+            writeLegacyLastSeenMessagesUpdate(lastSeenMessages);
+        }
     }
 
     @Override
     public void copy(WrapperPlayClientChatAck wrapper) {
         this.lastSeenMessages = wrapper.lastSeenMessages;
+        this.offset = wrapper.offset;
     }
 
-    public LastSeenMessages.Update getLastSeenMessages() {
+    public int getOffset() {
+        return offset;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
+
+    public LastSeenMessages.LegacyUpdate getLastSeenMessages() {
         return lastSeenMessages;
     }
 
-    public void setLastSeenMessages(LastSeenMessages.Update lastSeenMessages) {
+    public void setLastSeenMessages(LastSeenMessages.LegacyUpdate lastSeenMessages) {
         this.lastSeenMessages = lastSeenMessages;
     }
 }

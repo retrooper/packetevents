@@ -43,7 +43,6 @@ public class PreChannelInitializer extends ChannelInboundHandlerAdapter {
         ctx.pipeline().fireChannelRegistered();
     }
 
-
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable t) {
         PreChannelInitializer.logger.warn("Failed to initialize a channel. Closing: " + ctx.channel(), t);

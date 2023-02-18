@@ -681,6 +681,9 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeEntityMetadata(List<EntityData> list) {
+        if (list == null) {
+            list = new ArrayList<>();
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             boolean v1_10 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10);
             for (EntityData entityData : list) {
@@ -810,14 +813,26 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public LastSeenMessages.Update readLastSeenMessagesUpdate() {
-       LastSeenMessages lastSeenMessages = readLastSeenMessages();
-        LastSeenMessages.Entry lastReceived = readOptional(PacketWrapper::readLastSeenMessagesEntry);
-        return new LastSeenMessages.Update(lastSeenMessages, lastReceived);
+        int signedMessages = readVarInt();
+        BitSet seen = BitSet.valueOf(readBytes(3));
+        return new LastSeenMessages.Update(signedMessages, seen);
     }
 
     public void writeLastSeenMessagesUpdate(LastSeenMessages.Update update) {
-        writeLastSeenMessages(update.getLastSeenMessages());
-        writeOptional(update.getLastReceived(), PacketWrapper::writeLastMessagesEntry);
+        writeVarInt(update.getOffset());
+        byte[] lastSeen = Arrays.copyOf(update.getAcknowledged().toByteArray(), 3);
+        writeBytes(lastSeen);
+    }
+
+    public LastSeenMessages.LegacyUpdate readLegacyLastSeenMessagesUpdate() {
+       LastSeenMessages lastSeenMessages = readLastSeenMessages();
+        LastSeenMessages.Entry lastReceived = readOptional(PacketWrapper::readLastSeenMessagesEntry);
+        return new LastSeenMessages.LegacyUpdate(lastSeenMessages, lastReceived);
+    }
+
+    public void writeLegacyLastSeenMessagesUpdate(LastSeenMessages.LegacyUpdate legacyUpdate) {
+        writeLastSeenMessages(legacyUpdate.getLastSeenMessages());
+        writeOptional(legacyUpdate.getLastReceived(), PacketWrapper::writeLastMessagesEntry);
     }
 
     public LastSeenMessages readLastSeenMessages() {

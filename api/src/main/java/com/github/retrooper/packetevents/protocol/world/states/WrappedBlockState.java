@@ -92,6 +92,11 @@ public class WrappedBlockState {
     }
 
     @NotNull
+    public static WrappedBlockState getByGlobalId(int globalID) {
+        return getByGlobalId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), globalID);
+    }
+
+    @NotNull
     public static WrappedBlockState getByGlobalId(ClientVersion version, int globalID) {
         if (globalID == 0) return AIR; // Hardcode for performance
         byte mappingsIndex = getMappingsIndex(version);
@@ -99,9 +104,19 @@ public class WrappedBlockState {
     }
 
     @NotNull
+    public static WrappedBlockState getByString(String string) {
+        return getByString(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), string);
+    }
+
+    @NotNull
     public static WrappedBlockState getByString(ClientVersion version, String string) {
         byte mappingsIndex = getMappingsIndex(version);
         return BY_STRING.get(mappingsIndex).getOrDefault(string.replace("minecraft:", ""), AIR).clone();
+    }
+
+    @NotNull
+    public static WrappedBlockState getDefaultState(StateType type) {
+        return getDefaultState(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), type);
     }
 
     @NotNull
@@ -133,7 +148,7 @@ public class WrappedBlockState {
             return 6;
         } else if (version.isOlderThanOrEquals(ClientVersion.V_1_18_2)) {
             return 7;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_19_1)){
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_19_1)) {
             return 8;
         }
         return 9;

@@ -19,14 +19,9 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListenerAbstract;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.*;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
+import com.github.retrooper.packetevents.util.TimeStampMode;
 import io.github.retrooper.packetevents.bungee.factory.BungeePacketEventsBuilder;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -35,14 +30,15 @@ public final class PacketEventsPlugin extends Plugin {
     public void onLoad() {
         PacketEvents.setAPI(BungeePacketEventsBuilder.build(this));
         PacketEvents.getAPI().load();
-        PacketEvents.getAPI().getSettings().debug(true);
     }
 
     @Override
     public void onEnable() {
-
-        //Register your listeners
-        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+        // Register your listeners
+        PacketEvents.getAPI().getSettings().debug(true).bStats(true)
+                .checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).readOnlyListeners(false);
+        PacketEvents.getAPI().init();
+        PacketListenerCommon listener = new PacketListenerAbstract(PacketListenerPriority.HIGH) {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 System.out.println("in sv: " + event.getServerVersion());
@@ -58,10 +54,9 @@ public final class PacketEventsPlugin extends Plugin {
                 System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
                 System.out.println("Out type: " + event.getPacketType().getName());
             }
-        });
-        PacketEvents.getAPI().init();
+        };
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
-
 
     @Override
     public void onDisable() {

@@ -29,13 +29,13 @@ import io.github.retrooper.packetevents.handlers.PacketEventsEncoder;
 import io.netty.channel.Channel;
 
 public class ServerConnectionInitializer {
-    //This can be called on connection refactors. Not specifically on channel initialization,
+    // This can be called on connection refactors. Not specifically on channel initialization,
     public static void addChannelHandlers(Channel channel, PacketEventsDecoder decoder, PacketEventsEncoder encoder) {
         channel.pipeline().addBefore("packet-decoder", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addBefore("packet-encoder", PacketEvents.ENCODER_NAME, encoder);
     }
 
-    //This is ONLY called whenever the connection starts.
+    // This is ONLY called whenever the connection starts.
     public static void initChannel(Channel channel, ConnectionState state) {
         User user = new User(channel, state, null, new UserProfile(null, null));
         UserConnectEvent connectEvent = new UserConnectEvent(user);
@@ -44,9 +44,9 @@ public class ServerConnectionInitializer {
             channel.unsafe().closeForcibly();
             return;
         }
-        PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
         PacketEventsDecoder decoder = new PacketEventsDecoder(user);
         PacketEventsEncoder encoder = new PacketEventsEncoder(user);
+        PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
         addChannelHandlers(channel, decoder, encoder);
     }
 
