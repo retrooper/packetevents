@@ -42,7 +42,7 @@ public class AdventureSerializer {
         return GSON;
     }
 
-    public static LegacyComponentSerializer getLegacyComponentSerializer() {
+    public static LegacyComponentSerializer getLegacyGsonSerializer() {
         if (LEGACY == null) {
             LegacyComponentSerializer.Builder builder = LegacyComponentSerializer.builder();
             if (!PacketEvents.getAPI().getSettings().shouldDownsampleColors() || PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16))
@@ -53,11 +53,11 @@ public class AdventureSerializer {
     }
 
     public static String asVanilla(Component component) {
-        return getLegacyComponentSerializer().serialize(component);
+        return getLegacyGsonSerializer().serialize(component);
     }
 
     public static Component fromLegacyFormat(String legacyMessage) {
-        return getLegacyComponentSerializer().deserialize(legacyMessage);
+        return getLegacyGsonSerializer().deserialize(legacyMessage);
     }
 
     public static Component parseComponent(String json) {
