@@ -44,7 +44,8 @@ public class InternalBukkitListener implements Listener {
 
         User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
         if (user == null) {
-            Bukkit.getScheduler().runTask(plugin, () -> player.kickPlayer("PacketEvents 2.0 failed to inject"));
+            /*Bukkit.getScheduler().runTask(plugin, () -> player.kickPlayer("PacketEvents 2.0 failed to inject"));*/
+            PacketEvents.getAPI().getLogger().warning("PacketEvents 2.0 failed to inject on player "+player.getName()+". This modified fork of packet events would refrain from kicking them!");
             return;
         }
 
