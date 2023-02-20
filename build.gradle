@@ -59,11 +59,11 @@ subprojects {
         }
 
         jar.configure {
-            classifier = 'default'
+            archiveClassifier = 'default'
         }
 
         shadowJar.configure {
-            classifier = null
+            archiveClassifier = null
         }
     }
 

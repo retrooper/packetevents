@@ -34,6 +34,7 @@ public class PacketEventsSettings {
     private TimeStampMode timestampMode = TimeStampMode.MILLIS;
     private boolean readOnlyListeners = false;
     private boolean checkForUpdates = true;
+    private boolean downsampleColors = true;
     private boolean bStatsEnabled = true;
     private boolean debugEnabled = false;
     private Function<String, InputStream> resourceProvider = path -> PacketEventsSettings.class
@@ -76,6 +77,17 @@ public class PacketEventsSettings {
      */
     public PacketEventsSettings checkForUpdates(boolean checkForUpdates) {
         this.checkForUpdates = checkForUpdates;
+        return this;
+    }
+
+    /**
+     * This decides if PacketEvents should downsample RGB colors on pre-1.16 servers.
+     *
+     * @param downsampleColors Value
+     * @return Settings instance.
+     */
+    public PacketEventsSettings downsampleColors(boolean downsampleColors) {
+        this.downsampleColors = downsampleColors;
         return this;
     }
 
@@ -128,6 +140,15 @@ public class PacketEventsSettings {
      */
     public boolean shouldCheckForUpdates() {
         return checkForUpdates;
+    }
+
+    /**
+     * Should we downsample RGB colors on pre-1.16 servers?
+     *
+     * @return Getter for {@link #downsampleColors}
+     */
+    public boolean shouldDownsampleColors() {
+        return downsampleColors;
     }
 
 

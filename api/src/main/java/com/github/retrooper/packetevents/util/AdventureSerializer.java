@@ -29,27 +29,35 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 public class AdventureSerializer {
 
     private static GsonComponentSerializer GSON;
-    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder().build();
-
-    public static String asVanilla(Component component) {
-        return LEGACY.serialize(component);
-    }
-
-    public static Component fromLegacyFormat(String legacyMessage) {
-        return LEGACY.deserialize(legacyMessage);
-    }
+    private static LegacyComponentSerializer LEGACY;
 
     public static GsonComponentSerializer getGsonSerializer() {
         if (GSON == null) {
             ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
-            GSON = new GsonComponentSerializerExtended(version.isOlderThan(ServerVersion.V_1_16),
-                    version.isOlderThanOrEquals(ServerVersion.V_1_12_2));
+            GSON = new GsonComponentSerializerExtended(
+                    version.isOlderThan(ServerVersion.V_1_16) && PacketEvents.getAPI().getSettings().shouldDownsampleColors(),
+                    version.isOlderThanOrEquals(ServerVersion.V_1_12_2)
+            );
         }
         return GSON;
     }
 
     public static LegacyComponentSerializer getLegacyGsonSerializer() {
+        if (LEGACY == null) {
+            LegacyComponentSerializer.Builder builder = LegacyComponentSerializer.builder();
+            if (!PacketEvents.getAPI().getSettings().shouldDownsampleColors() || PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16))
+                builder = builder.hexColors();
+            LEGACY = builder.build();
+        }
         return LEGACY;
+    }
+
+    public static String asVanilla(Component component) {
+        return getLegacyGsonSerializer().serialize(component);
+    }
+
+    public static Component fromLegacyFormat(String legacyMessage) {
+        return getLegacyGsonSerializer().deserialize(legacyMessage);
     }
 
     public static Component parseComponent(String json) {

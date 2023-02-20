@@ -11,9 +11,10 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: Set up JDK 8
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: '8'
           distribution: 'adopt'
@@ -21,34 +22,34 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Build with Gradle
-        run: gradle shadowJar
+        run: chmod +x gradlew && ./gradlew shadowJar
 
       - name: Upload build artifacts api
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: api-build
           path: api/build/libs
 
       - name: Upload build artifacts spigot
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: spigot-build
           path: spigot/build/libs
 
       - name: Upload build artifacts netty-common
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: netty-common-build
           path: netty-common/build/libs
 
       - name: Upload build artifacts bungeecord
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: bungeecord-build
           path: bungeecord/build/libs
 
       - name: Upload build artifacts velocity
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: velocity-build
           path: velocity/build/libs
