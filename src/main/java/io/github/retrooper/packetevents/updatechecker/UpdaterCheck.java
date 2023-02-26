@@ -24,10 +24,23 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-public interface LowLevelUpdateChecker {
-    String getLatestRelease();
+public class UpdaterCheck {
+    public String getLatestRelease() {
+        try {
+            String jsonResponse = getLatestReleaseJson();
 
-    default String getLatestReleaseJson() throws IOException {
+            String targetPart = "\"name\":";
+            int nameIndex = jsonResponse.indexOf(targetPart);
+
+            int stringStart = nameIndex + targetPart.length();
+            int stringEnd = jsonResponse.indexOf(",", stringStart);
+            return jsonResponse.substring(stringStart + 1, stringEnd - 1);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String getLatestReleaseJson() throws IOException {
         URLConnection connection = new URL("https://api.github.com/repos/retrooper/packetevents/releases/latest").openConnection();
         connection.addRequestProperty("User-Agent", "Mozilla/4.0");
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));

@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.updatechecker;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -31,14 +30,10 @@ import org.bukkit.ChatColor;
  * @since 1.6.9
  */
 public class UpdateChecker {
-    private final LowLevelUpdateChecker lowLevelUpdateChecker;
+    private final UpdaterCheck lowLevelUpdateChecker;
 
     public UpdateChecker() {
-        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
-            lowLevelUpdateChecker = new LowLevelUpdateCheckerLegacy();
-        } else {
-            lowLevelUpdateChecker = new LowLevelUpdateCheckerModern();
-        }
+        lowLevelUpdateChecker = new UpdaterCheck();
     }
 
     public String checkLatestReleasedVersion() {
@@ -50,23 +45,26 @@ public class UpdateChecker {
      */
     public UpdateCheckerStatus checkForUpdate() {
         PEVersion localVersion = PacketEvents.get().getVersion();
-        PEVersion newVersion;
-        try {
-            newVersion = new PEVersion(checkLatestReleasedVersion());
-        } catch (Exception ex) {
-            newVersion = null;
+
+        String version = checkLatestReleasedVersion();
+
+        if (version == null) {
+            return UpdateCheckerStatus.FAILED;
         }
-        if (newVersion != null && localVersion.isOlderThan(newVersion)) {
-            inform("There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+
+        PEVersion newVersion = new PEVersion(checkLatestReleasedVersion());
+
+        if (localVersion.isOlderThan(newVersion)) {
+            inform("There is an update available for the PacketEvents API! Your build: (" + localVersion + ") | Latest released build: (" + newVersion + ")");
             return UpdateCheckerStatus.OUTDATED;
-        } else if (newVersion != null && localVersion.isNewerThan(newVersion)) {
-            inform("You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+        } else if (localVersion.isNewerThan(newVersion)) {
+            inform("You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion + ") | Latest released build: (" + newVersion + ")");
             return UpdateCheckerStatus.PRE_RELEASE;
         } else if (localVersion.equals(newVersion)) {
-            inform("You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
+            inform("You are on the latest released version of PacketEvents. (" + newVersion + ")");
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {
-            report("Something went wrong while checking for an update. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            report("Something went wrong while checking for an update. Your build: (" + localVersion + ") | Latest released build: (" + newVersion + ")");
             return UpdateCheckerStatus.FAILED;
         }
     }
