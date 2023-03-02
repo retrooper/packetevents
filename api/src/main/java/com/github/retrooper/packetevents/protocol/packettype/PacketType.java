@@ -112,7 +112,7 @@ public final class PacketType {
     }
 
     public static class Handshaking {
-        public enum Client implements PacketTypeConstant {
+        public enum Client implements PacketTypeConstant, ServerBoundPacket {
             HANDSHAKE(0),
             /**
              * Technically not part of the current protocol, but clients older than 1.7 will send this to initiate Server List Ping.
@@ -142,7 +142,7 @@ public final class PacketType {
             }
         }
 
-        public enum Server implements PacketTypeConstant {
+        public enum Server implements PacketTypeConstant, ClientBoundPacket {
             LEGACY_SERVER_LIST_RESPONSE(254); //0xFE in hex
 
             private final int id;
@@ -163,7 +163,7 @@ public final class PacketType {
     }
 
     public static class Status {
-        public enum Client implements PacketTypeConstant {
+        public enum Client implements PacketTypeConstant, ServerBoundPacket {
             REQUEST(0),
             PING(1);
 
@@ -189,7 +189,7 @@ public final class PacketType {
             }
         }
 
-        public enum Server implements PacketTypeConstant {
+        public enum Server implements PacketTypeConstant, ClientBoundPacket {
             RESPONSE(0),
             PONG(1);
 
@@ -217,7 +217,7 @@ public final class PacketType {
     }
 
     public static class Login {
-        public enum Client implements PacketTypeConstant {
+        public enum Client implements PacketTypeConstant, ServerBoundPacket {
             LOGIN_START(0),
             ENCRYPTION_RESPONSE(1),
             ///Added in 1.13
@@ -247,7 +247,7 @@ public final class PacketType {
             }
         }
 
-        public enum Server implements PacketTypeConstant {
+        public enum Server implements PacketTypeConstant, ClientBoundPacket {
             DISCONNECT(0),
             ENCRYPTION_REQUEST(1),
             LOGIN_SUCCESS(2),
@@ -287,7 +287,7 @@ public final class PacketType {
     }
 
     public static class Play {
-        public enum Client implements PacketTypeCommon {
+        public enum Client implements PacketTypeCommon, ServerBoundPacket {
             //Packets that no longer exist on the latest version
             CHAT_PREVIEW,
 
@@ -409,7 +409,7 @@ public final class PacketType {
             }
         }
 
-        public enum Server implements PacketTypeCommon {
+        public enum Server implements PacketTypeCommon, ClientBoundPacket {
             //Packets that are no longer present on latest version
             SET_COMPRESSION,
             MAP_CHUNK_BULK,
