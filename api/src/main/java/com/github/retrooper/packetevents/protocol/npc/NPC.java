@@ -253,7 +253,7 @@ public class NPC {
         }
     }
 
-    public void updateNameTag(NPC npc) {
+    public void updateNameTag() {
         for (Object channel : channels) {
             //Destroy team
             WrapperPlayServerTeams removeTeam =
@@ -262,8 +262,8 @@ public class NPC {
                             Optional.empty());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, removeTeam);
 
-            if (npc.getNameColor() != null || npc.getPrefixName() != null
-                    || npc.getSuffixName() != null) {
+            if (this.getNameColor() != null || this.getPrefixName() != null
+                    || this.getSuffixName() != null) {
                 PacketEvents.getAPI().getProtocolManager().sendPacket(channel, generateTeamsData());
             }
         }
@@ -460,5 +460,9 @@ public class NPC {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public Set<Object> getChannels() {
+        return channels;
     }
 }
