@@ -43,6 +43,8 @@ subprojects {
 
     tasks {
         shadowJar {
+            relocate 'net.kyori.adventure.text.serializer.gson.legacyimpl', 'io.github.retrooper.packetevents.adventure.serializer.gson.legacyimpl'
+            relocate 'net.kyori.adventure.util.Codec', 'io.github.retrooper.packetevents.adventure.util.Codec'
             archiveFileName.set("packetevents-${project.name}-${project.version}.jar")
         }
 
