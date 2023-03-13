@@ -31,6 +31,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.util.Codec;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -42,7 +43,8 @@ import java.util.regex.Pattern;
 public class HoverSerializer {
 
     private static final TagStringIO SNBT_IO = TagStringIO.get();
-    private static final Codec<CompoundBinaryTag, String, IOException, IOException> SNBT_CODEC = Codec.codec(SNBT_IO::asCompound, SNBT_IO::asString);
+    // Have to change this in upcoming adventure version
+    private static final Codec<CompoundBinaryTag, String, IOException, IOException> SNBT_CODEC = Codec.of(SNBT_IO::asCompound, SNBT_IO::asString);
 
     static final String ITEM_TYPE = "id";
     static final String ITEM_COUNT = "Count";
@@ -53,15 +55,9 @@ public class HoverSerializer {
     static final String ENTITY_ID = "id";
     static final Pattern LEGACY_NAME_PATTERN = Pattern.compile("([A-Z][a-z]+)([A-Z][a-z]+)?");
 
-    private final Gson gson;
-
-    public HoverSerializer(Gson gson) {
-        this.gson = gson;
-    }
-
-    public HoverEvent.ShowItem deserializeShowItem(final JsonElement input, boolean legacy) throws IOException {
+    public HoverEvent.ShowItem deserializeShowItem(final GsonLike gson, final JsonElement input, boolean legacy) throws IOException {
         if (legacy) {
-            Component component = this.gson.fromJson(input, Component.class);
+            final Component component = gson.fromJson(input, Component.class);
             assertTextComponent(component);
             final CompoundBinaryTag contents = SNBT_CODEC.decode(((TextComponent) component).content());
             final CompoundBinaryTag tag = contents.getCompound(ITEM_TAG);
@@ -71,19 +67,19 @@ public class HoverSerializer {
                     tag == CompoundBinaryTag.empty() ? null : BinaryTagHolder.encode(tag, SNBT_CODEC)
             );
         } else {
-            return this.gson.fromJson(input, HoverEvent.ShowItem.class);
+            return gson.fromJson(input, HoverEvent.ShowItem.class);
         }
     }
 
-    public HoverEvent.ShowEntity deserializeShowEntity(final JsonElement input, final Codec.Decoder<Component, String, ? extends RuntimeException> componentCodec, boolean legacy) throws IOException {
+    public HoverEvent.ShowEntity deserializeShowEntity(final GsonLike gson, final JsonElement input, final Codec.Decoder<Component, String, ? extends RuntimeException> componentCodec, boolean legacy) throws IOException {
         if (legacy) {
-            Component component = this.gson.fromJson(input, Component.class);
+            final Component component = gson.fromJson(input, Component.class);
             assertTextComponent(component);
             final CompoundBinaryTag contents = SNBT_CODEC.decode(((TextComponent) component).content());
             String type = contents.getString(ENTITY_TYPE);
-            Matcher matcher = LEGACY_NAME_PATTERN.matcher(type);
+            final Matcher matcher = LEGACY_NAME_PATTERN.matcher(type);
             if (matcher.matches()) {
-                StringJoiner joiner = new StringJoiner("_");
+                final StringJoiner joiner = new StringJoiner("_");
                 joiner.add(matcher.group(1));
                 if (matcher.group(2) != null) {
                     joiner.add(matcher.group(2));
@@ -96,11 +92,11 @@ public class HoverSerializer {
                     componentCodec.decode(contents.getString(ENTITY_NAME))
             );
         } else {
-            return this.gson.fromJson(input, HoverEvent.ShowEntity.class);
+            return gson.fromJson(input, HoverEvent.ShowEntity.class);
         }
     }
 
-    public Component deserializeShowAchievement(final JsonElement input) throws IOException {
+    public Component deserializeShowAchievement(final JsonElement input) {
         assertStringValue(input);
         return Statistics.getById(input.getAsString()).display();
     }
@@ -137,6 +133,16 @@ public class HoverSerializer {
             builder.putString(ENTITY_NAME, componentCodec.encode(name));
         }
         return Component.text(SNBT_CODEC.encode(builder.build()));
+    }
+
+    public interface GsonLike {
+
+        static GsonLike fromGson(final Gson gson) {
+            return gson::fromJson;
+        }
+
+        <T> T fromJson(final @Nullable JsonElement json, final Class<T> classOfT);
+
     }
 
 }

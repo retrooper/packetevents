@@ -79,7 +79,7 @@ public class StyleSerializerExtended extends TypeAdapter<Style> {
     private StyleSerializerExtended(final boolean emitLegacyHover, final Gson gson) {
         this.emitLegacyHover = emitLegacyHover;
         this.gson = gson;
-        this.hoverSerializer = new HoverSerializer(gson);
+        this.hoverSerializer = new HoverSerializer();
     }
 
     @Override
@@ -150,11 +150,11 @@ public class StyleSerializerExtended extends TypeAdapter<Style> {
                                 break;
                             case "show_item":
                                 action = HoverEvent.Action.SHOW_ITEM;
-                                value = this.hoverSerializer.deserializeShowItem(rawValue, legacy);
+                                value = this.hoverSerializer.deserializeShowItem(HoverSerializer.GsonLike.fromGson(gson), rawValue, legacy);
                                 break;
                             case "show_entity":
                                 action = HoverEvent.Action.SHOW_ENTITY;
-                                value = this.hoverSerializer.deserializeShowEntity(rawValue, this.decoder(), legacy);
+                                value = this.hoverSerializer.deserializeShowEntity(HoverSerializer.GsonLike.fromGson(gson), rawValue, this.decoder(), legacy);
                                 break;
                             case "show_achievement":
                                 action = HoverEvent.Action.SHOW_TEXT;
