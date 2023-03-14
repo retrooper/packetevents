@@ -191,12 +191,17 @@ public class ItemStack {
             String tagName = getEnchantmentsTagName(version);
             for (NBTCompound base : nbt.getCompoundListTagOrNull(tagName).getTags()) {
                 if (base == null) {
-                    return 0;
+                    continue;
                 }
                 
                 EnchantmentType type = getEnchantmentTypeFromTag(base, version);
                 if (enchantment == type) {
-                    return base.getTagOfTypeOrNull("lvl", NBTShort.class).getAsInt();
+                    NBTShort level = base.getTagOfTypeOrNull("lvl", NBTShort.class);
+                    if (level == null) {
+                        continue;
+                    }
+                    
+                    return level.getAsInt();
                 }
             }
         }
