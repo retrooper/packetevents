@@ -190,6 +190,10 @@ public class ItemStack {
             assert nbt != null;
             String tagName = getEnchantmentsTagName(version);
             for (NBTCompound base : nbt.getCompoundListTagOrNull(tagName).getTags()) {
+                if (base == null) {
+                    return 0;
+                }
+                
                 EnchantmentType type = getEnchantmentTypeFromTag(base, version);
                 if (enchantment == type) {
                     return base.getTagOfTypeOrNull("lvl", NBTShort.class).getAsInt();
