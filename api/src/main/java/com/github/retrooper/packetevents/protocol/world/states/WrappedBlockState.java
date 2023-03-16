@@ -130,7 +130,7 @@ public class WrappedBlockState {
         byte mappingsIndex = getMappingsIndex(version);
         WrappedBlockState state = DEFAULT_STATES.get(mappingsIndex).get(type);
         if (state == null) {
-            PacketEvents.getAPI().getLogger().warning("Default state for " + type.getName() + " is null. Returning AIR");
+            PacketEvents.getAPI().getLogger().config("Default state for " + type.getName() + " is null. Returning AIR");
             return AIR;
         }
         return state.clone();
