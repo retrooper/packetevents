@@ -47,14 +47,14 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
     }
 
     public static class PlayerInfo {
-        private final UserProfile gameProfile;
-        private final boolean listed;
-        private final int latency;
-        private final GameMode gameMode;
+        private UserProfile gameProfile;
+        private boolean listed;
+        private int latency;
+        private GameMode gameMode;
         @Nullable
-        private final Component displayName;
+        private Component displayName;
         @Nullable
-        private final RemoteChatSession chatSession;
+        private RemoteChatSession chatSession;
 
         public PlayerInfo(UserProfile gameProfile, boolean listed,
                           int latency, GameMode gameMode,
@@ -94,6 +94,30 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
 
         public @Nullable RemoteChatSession getChatSession() {
             return chatSession;
+        }
+
+        public void setGameProfile(UserProfile gameProfile) {
+            this.gameProfile = gameProfile;
+        }
+
+        public void setListed(boolean listed) {
+            this.listed = listed;
+        }
+
+        public void setLatency(int latency) {
+            this.latency = latency;
+        }
+
+        public void setGameMode(GameMode gameMode) {
+            this.gameMode = gameMode;
+        }
+
+        public void setDisplayName(@Nullable Component displayName) {
+            this.displayName = displayName;
+        }
+
+        public void setChatSession(@Nullable RemoteChatSession chatSession) {
+            this.chatSession = chatSession;
         }
     }
 
