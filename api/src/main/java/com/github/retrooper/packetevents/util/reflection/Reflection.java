@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.util.reflection;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -30,22 +31,35 @@ import java.util.List;
 
 public final class Reflection {
     //FIELDS
-    public static Field[] getFields(Class<?> cls) {
-        Field[] declaredFields = cls.getDeclaredFields();
-        for (Field f : declaredFields) {
+    public static Field[] getFields(final Class<?> cls) {
+        if (cls == null) {
+            return new Field[0];
+        }
+        final Field[] declaredFields = cls.getDeclaredFields();
+        for (final Field f : declaredFields) {
             f.setAccessible(true);
         }
         return declaredFields;
     }
 
     public static Field getField(final Class<?> cls, final String name) {
-        for (final Field f : getFields(cls)) {
-            if (f.getName().equals(name)) {
-                return f;
-            }
+        if (cls == null) {
+            return null;
         }
-        if (cls.getSuperclass() != null) {
-            return getField(cls.getSuperclass(), name);
+        try {
+            final Field field = cls.getDeclaredField(name);
+            field.setAccessible(true);
+            return field;
+        } catch (NoSuchFieldException e) {
+            try {
+                final Field field = cls.getField(name);
+                field.setAccessible(true);
+                return field;
+            } catch (NoSuchFieldException e1) {
+                if (cls.getSuperclass() != null) {
+                    return getField(cls.getSuperclass(), name);
+                }
+            }
         }
         return null;
     }
@@ -87,6 +101,9 @@ public final class Reflection {
     }
 
     public static Field getField(final Class<?> cls, final int index) {
+        if (cls == null) {
+            return null;
+        }
         try {
             return getFields(cls)[index];
         } catch (Exception ex) {
@@ -98,18 +115,32 @@ public final class Reflection {
     }
 
     //METHODS
-    public static List<Method> getMethods(Class<?> cls, String name, Class<?>... params) {
-        List<Method> methods = new ArrayList<>();
-        for (Method m : cls.getDeclaredMethods()) {
-            if ((params == null || Arrays.equals(m.getParameterTypes(), params)) && name.equals(m.getName())) {
+    public static Method getMethod(final Class<?> cls, final String name, final Class<?>... params) {
+        if (cls == null) {
+            return null;
+        }
+        try {
+            final Method m = cls.getDeclaredMethod(name, params);
+            m.setAccessible(true);
+            return m;
+        } catch (NoSuchMethodException e) {
+            try {
+                final Method m = cls.getMethod(name, params);
                 m.setAccessible(true);
-                methods.add(m);
+                return m;
+            } catch (NoSuchMethodException e1) {
+                if (cls.getSuperclass() != null) {
+                    return getMethod(cls.getSuperclass(), name, params);
+                }
             }
         }
-        return methods;
+        return null;
     }
 
     public static Method getMethod(final Class<?> cls, final int index, final Class<?>... params) {
+        if (cls == null) {
+            return null;
+        }
         int currentIndex = 0;
         for (final Method m : cls.getDeclaredMethods()) {
             if ((params == null || Arrays.equals(m.getParameterTypes(), params)) && index == currentIndex++) {
@@ -123,9 +154,12 @@ public final class Reflection {
         return null;
     }
 
-    public static Method getMethod(Class<?> cls, Class<?> returning, int index, Class<?>... params) {
+    public static Method getMethod(final Class<?> cls, final Class<?> returning, final int index, final Class<?>... params) {
+        if (cls == null) {
+            return null;
+        }
         int currentIndex = 0;
-        for (Method m : cls.getDeclaredMethods()) {
+        for (final Method m : cls.getDeclaredMethods()) {
             if (Arrays.equals(m.getParameterTypes(), params)
                     && (returning == null || m.getReturnType().equals(returning))
                     && index == currentIndex++) {
@@ -139,7 +173,10 @@ public final class Reflection {
         return null;
     }
 
-    public static Method getMethod(final Class<?> cls, final String name, Class<?> returning, Class<?>... params) {
+    public static Method getMethodExact(final Class<?> cls, final String name, Class<?> returning, Class<?>... params) {
+        if (cls == null) {
+            return null;
+        }
         for (final Method m : cls.getDeclaredMethods()) {
             if (m.getName().equals(name)
                     && Arrays.equals(m.getParameterTypes(), params) &&
@@ -149,7 +186,7 @@ public final class Reflection {
             }
         }
         if (cls.getSuperclass() != null) {
-            return getMethod(cls.getSuperclass(), name, null, params);
+            return getMethodExact(cls.getSuperclass(), name, null, params);
         }
         return null;
     }
@@ -188,7 +225,7 @@ public final class Reflection {
         return null;
     }
 
-    public static Method getMethodCheckContainsString(Class<?> cls, String nameContainsThisStr, Class<?> returning) {
+    public static Method getMethodCheckContainsString(final Class<?> cls, final String nameContainsThisStr, final Class<?> returning) {
         if (cls == null) {
             return null;
         }
@@ -204,29 +241,60 @@ public final class Reflection {
         return null;
     }
 
-    public static Method getMethod(final Class<?> cls, final String name, final Class<?> returning) {
+    public static List<Method> getMethods(final Class<?> cls, final String name, final Class<?> returning) {
         if (cls == null) {
             return null;
         }
+        final List<Method> methods = new ArrayList<>();
         for (final Method m : cls.getDeclaredMethods()) {
             if (m.getName().equals(name)
                     && (returning == null || m.getReturnType().equals(returning))) {
                 m.setAccessible(true);
-                return m;
+                methods.add(m);
             }
         }
         if (cls.getSuperclass() != null) {
-            return getMethod(cls.getSuperclass(), name, returning);
+            methods.addAll(getMethods(cls.getSuperclass(), name, returning));
         }
-        return null;
+        return methods;
     }
 
+    // CLASS
     @Nullable
-    public static Class<?> getClassByNameWithoutException(String name) {
+    public static Class<?> getClassByNameWithoutException(final String name) {
         try {
             return Class.forName(name);
         } catch (ClassNotFoundException e) {
             return null;
+        }
+    }
+
+    // CONSTRUCTOR
+    public static Constructor<?> getConstructor(final Class<?> cls, final int index) {
+        if (cls == null) {
+            return null;
+        }
+        final Constructor<?> constructor = cls.getDeclaredConstructors()[index];
+        constructor.setAccessible(true);
+        return constructor;
+    }
+
+    public static Constructor<?> getConstructor(final Class<?> cls, final Class<?>... params) {
+        if (cls == null) {
+            return null;
+        }
+        try {
+            final Constructor<?> c = cls.getDeclaredConstructor(params);
+            c.setAccessible(true);
+            return c;
+        } catch (NoSuchMethodException e) {
+            try {
+                final Constructor<?> c = cls.getConstructor(params);
+                c.setAccessible(true);
+                return c;
+            } catch (NoSuchMethodException e1) {
+                return null;
+            }
         }
     }
 }
