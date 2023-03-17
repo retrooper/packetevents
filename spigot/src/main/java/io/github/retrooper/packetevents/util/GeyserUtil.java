@@ -53,7 +53,7 @@ public class GeyserUtil {
                 }
             }
             if (GEYSER_API_METHOD == null) {
-                GEYSER_API_METHOD = Reflection.getMethod(GEYSER_CLASS, "api", null, new Class<?>[]{});
+                GEYSER_API_METHOD = Reflection.getMethodExact(GEYSER_CLASS, "api", null);
             }
             if (CONNECTION_BY_UUID_METHOD == null) {
                 CONNECTION_BY_UUID_METHOD = Reflection.getMethod(GEYSER_API_CLASS, "connectionByUuid", 0);

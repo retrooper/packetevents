@@ -102,6 +102,7 @@ $RECYCLE.BIN/
 
 .gradle
 build/
+bin/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -118,3 +119,7 @@ run/
 !gradle-wrapper.jar
 /src/main/resources/plugin.yml
 /.idea/
+.vscode/
+.project
+.settings/
+.classpath

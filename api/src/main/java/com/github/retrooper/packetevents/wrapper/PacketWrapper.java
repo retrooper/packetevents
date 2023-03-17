@@ -681,6 +681,9 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeEntityMetadata(List<EntityData> list) {
+        if (list == null) {
+            list = new ArrayList<>();
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             boolean v1_10 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10);
             for (EntityData entityData : list) {

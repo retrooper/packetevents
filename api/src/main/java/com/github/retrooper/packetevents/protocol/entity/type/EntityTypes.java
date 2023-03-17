@@ -300,4 +300,10 @@ public class EntityTypes {
     public static final EntityType MINECART_TNT = define("minecart_tnt", MINECART_ABSTRACT);
     public static final EntityType MINECART_HOPPER = define("minecart_hopper", MINECART_ABSTRACT);
     public static final EntityType MINECART_MOB_SPAWNER = define("minecart_mob_spawner", MINECART_ABSTRACT);
+    // Display type entities added in 1.19.4
+    public static final EntityType DISPLAY = define("display", ENTITY);
+    public static final EntityType BLOCK_DISPLAY = define("block_display", DISPLAY);
+    public static final EntityType ITEM_DISPLAY = define("item_display", DISPLAY);
+    public static final EntityType TEXT_DISPLAY = define("text_display", DISPLAY);
+    public static final EntityType INTERACTION = define("interaction", DISPLAY);
 }

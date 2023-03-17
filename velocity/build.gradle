@@ -1,7 +1,7 @@
 repositories {
     mavenCentral()
     maven {
-        url 'https://repo.velocitypowered.com/snapshots/'
+        url 'https://papermc.io/repo/repository/maven-public/'
     }
 }
 

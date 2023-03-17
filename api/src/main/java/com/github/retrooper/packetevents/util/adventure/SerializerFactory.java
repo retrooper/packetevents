@@ -31,21 +31,7 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
 public class SerializerFactory implements TypeAdapterFactory {
-
-    static Method COMPONENT_SERIALIZER_CREATE_METHOD;
-    static TypeAdapter<Key> KEY_SERIALIZER_INSTANCE;
-    static TypeAdapter<ClickEvent.Action> CLICK_EVENT_ACTION_SERIALIZER_INSTANCE;
-    static TypeAdapter<HoverEvent.Action<?>> HOVER_EVENT_ACTION_SERIALIZER_INSTANCE;
-    static Method SHOW_ITEM_SERIALIZER_CREATE_METHOD;
-    static Method SHOW_ENTITY_SERIALIZER_CREATE_METHOD;
-    static TypeAdapter<TextColor> TEXT_COLOR_SERIALIZER_INSTANCE;
-    static TypeAdapter<TextColor> TEXT_COLOR_SERIALIZER_DOWNSAMPLE_COLOR_INSTANCE;
-    static TypeAdapter<TextDecoration> TEXT_DECORATION_SERIALIZER_INSTANCE;
-    static TypeAdapter<BlockNBTComponent.Pos> BLOCK_NBT_POS_SERIALIZER_INSTANCE;
 
     private final boolean downsampleColors;
     private final boolean emitLegacyHover;
@@ -60,91 +46,29 @@ public class SerializerFactory implements TypeAdapterFactory {
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
         final Class<? super T> rawType = type.getRawType();
         if (Component.class.isAssignableFrom(rawType)) {
-            return (TypeAdapter<T>) this.invokeSafe(COMPONENT_SERIALIZER_CREATE_METHOD, gson);
+            return (TypeAdapter<T>) AdventureReflectionUtil.COMPONENT_SERIALIZER_CREATE.apply(gson);
         } else if (Key.class.isAssignableFrom(rawType)) {
-            return (TypeAdapter<T>) KEY_SERIALIZER_INSTANCE;
+            return (TypeAdapter<T>) AdventureReflectionUtil.KEY_SERIALIZER_INSTANCE;
         } else if (Style.class.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) StyleSerializerExtended.create(this.emitLegacyHover, gson);
         } else if (ClickEvent.Action.class.isAssignableFrom(rawType)) {
-            return (TypeAdapter<T>) CLICK_EVENT_ACTION_SERIALIZER_INSTANCE;
+            return (TypeAdapter<T>) AdventureReflectionUtil.CLICK_EVENT_ACTION_SERIALIZER_INSTANCE;
         } else if (HoverEvent.Action.class.isAssignableFrom(rawType)) {
-            return (TypeAdapter<T>) HOVER_EVENT_ACTION_SERIALIZER_INSTANCE;
+            return (TypeAdapter<T>) AdventureReflectionUtil.HOVER_EVENT_ACTION_SERIALIZER_INSTANCE;
         } else if (HoverEvent.ShowItem.class.isAssignableFrom(rawType)) {
-            return (TypeAdapter<T>) this.invokeSafe(SHOW_ITEM_SERIALIZER_CREATE_METHOD, gson);
+            return (TypeAdapter<T>) AdventureReflectionUtil.SHOW_ITEM_SERIALIZER_CREATE.apply(gson);
         } else if (HoverEvent.ShowEntity.class.isAssignableFrom(rawType)) {
-            return (TypeAdapter<T>) this.invokeSafe(SHOW_ENTITY_SERIALIZER_CREATE_METHOD, gson);
+            return (TypeAdapter<T>) AdventureReflectionUtil.SHOW_ENTITY_SERIALIZER_CREATE.apply(gson);
         } else if (TextColorWrapper.class.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) TextColorWrapper.Serializer.INSTANCE;
         } else if (TextColor.class.isAssignableFrom(rawType)) {
-            return (TypeAdapter<T>) (this.downsampleColors ? TEXT_COLOR_SERIALIZER_DOWNSAMPLE_COLOR_INSTANCE : TEXT_COLOR_SERIALIZER_INSTANCE);
+            return (TypeAdapter<T>) (this.downsampleColors ? AdventureReflectionUtil.TEXT_COLOR_SERIALIZER_DOWNSAMPLE_COLOR_INSTANCE : AdventureReflectionUtil.TEXT_COLOR_SERIALIZER_INSTANCE);
         } else if (TextDecoration.class.isAssignableFrom(rawType)) {
-            return (TypeAdapter<T>) TEXT_DECORATION_SERIALIZER_INSTANCE;
+            return (TypeAdapter<T>) AdventureReflectionUtil.TEXT_DECORATION_SERIALIZER_INSTANCE;
         } else if (BlockNBTComponent.Pos.class.isAssignableFrom(rawType)) {
-            return (TypeAdapter<T>) BLOCK_NBT_POS_SERIALIZER_INSTANCE;
+            return (TypeAdapter<T>) AdventureReflectionUtil.BLOCK_NBT_POS_SERIALIZER_INSTANCE;
         } else {
             return null;
-        }
-    }
-
-    private Object invokeSafe(Method method, Object... params) {
-        try {
-            return method.invoke(null, params);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    static {
-        try {
-            Class<?> COMPONENT_SERIALIZER = Class.forName("net.kyori.adventure.text.serializer.gson.ComponentSerializerImpl");
-            COMPONENT_SERIALIZER_CREATE_METHOD = COMPONENT_SERIALIZER.getDeclaredMethod("create", Gson.class);
-            COMPONENT_SERIALIZER_CREATE_METHOD.setAccessible(true);
-
-            Class<?> KEY_SERIALIZER = Class.forName("net.kyori.adventure.text.serializer.gson.KeySerializer");
-            Field KEY_SERIALIZER_INSTANCE_FIELD = KEY_SERIALIZER.getDeclaredField("INSTANCE");
-            KEY_SERIALIZER_INSTANCE_FIELD.setAccessible(true);
-            KEY_SERIALIZER_INSTANCE = (TypeAdapter<Key>) KEY_SERIALIZER_INSTANCE_FIELD.get(null);
-
-            Class<?> CLICK_EVENT_ACTION_SERIALIZER = Class.forName("net.kyori.adventure.text.serializer.gson.ClickEventActionSerializer");
-            Field CLICK_EVENT_ACTION_SERIALIZER_INSTANCE_FIELD = CLICK_EVENT_ACTION_SERIALIZER.getDeclaredField("INSTANCE");
-            CLICK_EVENT_ACTION_SERIALIZER_INSTANCE_FIELD.setAccessible(true);
-            CLICK_EVENT_ACTION_SERIALIZER_INSTANCE = (TypeAdapter<ClickEvent.Action>) CLICK_EVENT_ACTION_SERIALIZER_INSTANCE_FIELD.get(null);
-
-            Class<?> HOVER_EVENT_ACTION_SERIALIZER = Class.forName("net.kyori.adventure.text.serializer.gson.HoverEventActionSerializer");
-            Field HOVER_EVENT_ACTION_SERIALIZER_INSTANCE_FIELD = HOVER_EVENT_ACTION_SERIALIZER.getDeclaredField("INSTANCE");
-            HOVER_EVENT_ACTION_SERIALIZER_INSTANCE_FIELD.setAccessible(true);
-            HOVER_EVENT_ACTION_SERIALIZER_INSTANCE = (TypeAdapter<HoverEvent.Action<?>>) HOVER_EVENT_ACTION_SERIALIZER_INSTANCE_FIELD.get(null);
-
-            Class<?> SHOW_ITEM_SERIALIZER = Class.forName("net.kyori.adventure.text.serializer.gson.ShowItemSerializer");
-            SHOW_ITEM_SERIALIZER_CREATE_METHOD = SHOW_ITEM_SERIALIZER.getDeclaredMethod("create", Gson.class);
-            SHOW_ITEM_SERIALIZER_CREATE_METHOD.setAccessible(true);
-
-            Class<?> SHOW_ENTITY_SERIALIZER = Class.forName("net.kyori.adventure.text.serializer.gson.ShowEntitySerializer");
-            SHOW_ENTITY_SERIALIZER_CREATE_METHOD = SHOW_ENTITY_SERIALIZER.getDeclaredMethod("create", Gson.class);
-            SHOW_ENTITY_SERIALIZER_CREATE_METHOD.setAccessible(true);
-
-            Class<?> TEXT_COLOR_SERIALIZER = Class.forName("net.kyori.adventure.text.serializer.gson.TextColorSerializer");
-            Field TEXT_COLOR_SERIALIZER_INSTANCE_FIELD = TEXT_COLOR_SERIALIZER.getDeclaredField("INSTANCE");
-            TEXT_COLOR_SERIALIZER_INSTANCE_FIELD.setAccessible(true);
-            TEXT_COLOR_SERIALIZER_INSTANCE = (TypeAdapter<TextColor>) TEXT_COLOR_SERIALIZER_INSTANCE_FIELD.get(null);
-
-            Class<?> TEXT_COLOR_SERIALIZER_DOWNSAMPLE_COLOR = Class.forName("net.kyori.adventure.text.serializer.gson.TextColorSerializer");
-            Field TEXT_COLOR_SERIALIZER_DOWNSAMPLE_COLOR_INSTANCE_FIELD = TEXT_COLOR_SERIALIZER_DOWNSAMPLE_COLOR.getDeclaredField("DOWNSAMPLE_COLOR");
-            TEXT_COLOR_SERIALIZER_DOWNSAMPLE_COLOR_INSTANCE_FIELD.setAccessible(true);
-            TEXT_COLOR_SERIALIZER_DOWNSAMPLE_COLOR_INSTANCE = (TypeAdapter<TextColor>) TEXT_COLOR_SERIALIZER_DOWNSAMPLE_COLOR_INSTANCE_FIELD.get(null);
-
-            Class<?> TEXT_DECORATION_SERIALIZER = Class.forName("net.kyori.adventure.text.serializer.gson.TextDecorationSerializer");
-            Field TEXT_DECORATION_SERIALIZER_INSTANCE_FIELD = TEXT_DECORATION_SERIALIZER.getDeclaredField("INSTANCE");
-            TEXT_DECORATION_SERIALIZER_INSTANCE_FIELD.setAccessible(true);
-            TEXT_DECORATION_SERIALIZER_INSTANCE = (TypeAdapter<TextDecoration>) TEXT_DECORATION_SERIALIZER_INSTANCE_FIELD.get(null);
-
-            Class<?> BLOCK_NBT_COMPONENT_POS_SERIALIZER = Class.forName("net.kyori.adventure.text.serializer.gson.BlockNBTComponentPosSerializer");
-            Field BLOCK_NBT_COMPONENT_POS_SERIALIZER_INSTANCE_FIELD = BLOCK_NBT_COMPONENT_POS_SERIALIZER.getDeclaredField("INSTANCE");
-            BLOCK_NBT_COMPONENT_POS_SERIALIZER_INSTANCE_FIELD.setAccessible(true);
-            BLOCK_NBT_POS_SERIALIZER_INSTANCE = (TypeAdapter<BlockNBTComponent.Pos>) BLOCK_NBT_COMPONENT_POS_SERIALIZER_INSTANCE_FIELD.get(null);
-        } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
         }
     }
 

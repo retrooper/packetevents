@@ -80,7 +80,8 @@ public class LegacyFlexibleStorage extends BaseStorage {
         this.data[startIndex] = this.data[startIndex] & ~(this.maxEntryValue << startBitSubIndex) | ((long) value & this.maxEntryValue) << startBitSubIndex;
         if (startIndex != endIndex) {
             int endBitSubIndex = 64 - startBitSubIndex;
-            this.data[endIndex] = this.data[endIndex] >>> endBitSubIndex << endBitSubIndex | ((long) value & this.maxEntryValue) >> endBitSubIndex;
+            int j1 = this.bitsPerEntry - endBitSubIndex;
+            this.data[endIndex] = this.data[endIndex] >>> j1 << j1 | ((long) value & this.maxEntryValue) >> endBitSubIndex;
         }
     }
 

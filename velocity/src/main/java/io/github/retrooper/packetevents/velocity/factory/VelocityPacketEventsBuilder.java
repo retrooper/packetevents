@@ -18,6 +18,10 @@
 
 package io.github.retrooper.packetevents.velocity.factory;
 
+import java.util.logging.Level;
+
+import org.jetbrains.annotations.Nullable;
+
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
@@ -37,23 +41,17 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import io.github.retrooper.packetevents.PacketEventsPlugin;
+
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import io.github.retrooper.packetevents.injector.VelocityPipelineInjector;
 import io.github.retrooper.packetevents.manager.PlayerManagerImpl;
-import io.netty.channel.Channel;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.logging.Level;
 
 public class VelocityPacketEventsBuilder {
     private static PacketEventsAPI<PluginContainer> INSTANCE;
-
 
     public static void clearBuildCache() {
         INSTANCE = null;
@@ -66,23 +64,23 @@ public class VelocityPacketEventsBuilder {
         return INSTANCE;
     }
 
-    public static PacketEventsAPI<PluginContainer> build(ProxyServer server, PluginContainer plugin, PacketEventsSettings settings) {
+    public static PacketEventsAPI<PluginContainer> build(ProxyServer server, PluginContainer plugin,
+            PacketEventsSettings settings) {
         if (INSTANCE == null) {
             INSTANCE = buildNoCache(server, plugin, settings);
         }
         return INSTANCE;
     }
 
-
     public static PacketEventsAPI<PluginContainer> buildNoCache(ProxyServer server, PluginContainer plugin) {
         return buildNoCache(server, plugin, new PacketEventsSettings());
     }
 
-
-    public static PacketEventsAPI<PluginContainer> buildNoCache(ProxyServer server, PluginContainer plugin, PacketEventsSettings inSettings) {
+    public static PacketEventsAPI<PluginContainer> buildNoCache(ProxyServer server, PluginContainer plugin,
+            PacketEventsSettings inSettings) {
         return new PacketEventsAPI<PluginContainer>() {
             private final PacketEventsSettings settings = inSettings;
-            //TODO Implement platform version
+            // TODO Implement platform version
             private final ProtocolManager protocolManager = new ProtocolManagerAbstract() {
                 @Override
                 public ProtocolVersion getPlatformVersion() {
@@ -95,10 +93,11 @@ public class VelocityPacketEventsBuilder {
                 @Override
                 public ServerVersion getVersion() {
                     if (version == null) {
-                        String velocityVersion = com.velocitypowered.api.network.ProtocolVersion
-                                .MAXIMUM_VERSION.getName();
+                        String velocityVersion = com.velocitypowered.api.network.ProtocolVersion.MAXIMUM_VERSION
+                                .getName();
+
                         for (final ServerVersion val : ServerVersion.values()) {
-                            if (velocityVersion.contains(val.getReleaseName())) {
+                            if (val.getReleaseName().contains(velocityVersion)) {
                                 return version = val;
                             }
                         }
@@ -125,7 +124,7 @@ public class VelocityPacketEventsBuilder {
             public void load() {
                 if (!loaded) {
                     String id = plugin.getDescription().getId();
-                    //Resolve server version and cache
+                    // Resolve server version and cache
                     PacketEvents.IDENTIFIER = "pe-" + id;
                     PacketEvents.ENCODER_NAME = "pe-encoder-" + id;
                     PacketEvents.DECODER_NAME = "pe-decoder-" + id;
@@ -136,8 +135,8 @@ public class VelocityPacketEventsBuilder {
 
                     loaded = true;
 
-                    //Register internal packet listener (should be the first listener)
-                    //This listener doesn't do any modifications to the packets, just reads data
+                    // Register internal packet listener (should be the first listener)
+                    // This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalPacketListener());
                 }
             }
@@ -149,26 +148,28 @@ public class VelocityPacketEventsBuilder {
 
             @Override
             public void init() {
-                //Load if we haven't loaded already
+                // Load if we haven't loaded already
                 load();
                 if (!initialized) {
-                    server.getEventManager().register(plugin.getInstance().orElse(null), PostLoginEvent.class, (event) -> {
-                        Player player = event.getPlayer();
-                        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-                        PacketEvents.getAPI().getInjector().setPlayer(channel, player);
+                    server.getEventManager().register(plugin.getInstance().orElse(null), PostLoginEvent.class,
+                            (event) -> {
+                                Player player = event.getPlayer();
+                                Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+                                PacketEvents.getAPI().getInjector().setPlayer(channel, player);
 
-                        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
-                        if (user == null) return;
+                                User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+                                if (user == null)
+                                    return;
 
-                        UserLoginEvent loginEvent = new UserLoginEvent(user, player);
-                        PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
-                    });
+                                UserLoginEvent loginEvent = new UserLoginEvent(user, player);
+                                PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
+                            });
                     if (settings.shouldCheckForUpdates()) {
                         getUpdateChecker().handleUpdateCheck();
                     }
 
                     if (settings.isbStatsEnabled()) {
-                        //TODO Cross-platform metrics?
+                        // TODO Cross-platform metrics?
                     }
 
                     PacketType.Play.Client.load();
@@ -185,9 +186,9 @@ public class VelocityPacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    //Eject the injector if needed(depends on the injector implementation)
+                    // Eject the injector if needed(depends on the injector implementation)
                     injector.uninject();
-                    //Unregister all our listeners
+                    // Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;
                 }
