@@ -91,9 +91,8 @@ public final class SpigotReflectionUtil {
     private static Object MINECRAFT_SERVER_INSTANCE;
     private static Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
 
-    //Initialized in PacketEvents#load
+    //Cache entities right after we request/find them for faster search.
     public static Map<Integer, Entity> ENTITY_ID_CACHE = new MapMaker().weakValues().makeMap();
-    ;
 
     private static void initConstructors() {
         Class<?> itemClass = NMS_IMATERIAL_CLASS != null ? NMS_IMATERIAL_CLASS : NMS_ITEM_CLASS;
@@ -820,6 +819,8 @@ public final class SpigotReflectionUtil {
         if (V_1_17_OR_HIGHER) {
             try {
                 if (world != null) {
+                    //On 1.17 we have to use hacks to get the entity list bypassing Spigot's checks
+                    //We cannot recommend finding entity objects asynchronously.
                     for (Entity entity : getEntityList(world)) {
                         if (entity.getEntityId() == entityID) {
                             ENTITY_ID_CACHE.putIfAbsent(entity.getEntityId(), entity);
@@ -828,6 +829,8 @@ public final class SpigotReflectionUtil {
                     }
                 }
             } catch (Exception ex) {
+                System.out.println("Failed to find entity by id on 1.19.3!");
+                throw ex;
                 //We are retrying below
             }
             try {
