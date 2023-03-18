@@ -44,7 +44,8 @@ public class EntityTypes {
             ClientVersion.V_1_16_2,
             ClientVersion.V_1_17,
             ClientVersion.V_1_19,
-            ClientVersion.V_1_19_3);
+            ClientVersion.V_1_19_3,
+            ClientVersion.V_1_19_4);
     private static final TypesBuilder LEGACY_TYPES_BUILDER = new TypesBuilder("entity/legacy_entity_type_mappings",
             ClientVersion.V_1_8,
             ClientVersion.V_1_9,
