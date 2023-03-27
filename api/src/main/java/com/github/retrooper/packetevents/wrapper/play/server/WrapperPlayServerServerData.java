@@ -25,9 +25,13 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Optional;
 
 public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServerServerData> {
+    private static final String BASE64_IMAGE_HEADER = "data:image/png;base64,";
+
     private @Nullable Component motd;
     private @Nullable String icon;
     private boolean previewsChat;
@@ -51,8 +55,17 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void read() {
-        motd = readOptional(PacketWrapper::readComponent);
-        icon = readOptional(PacketWrapper::readString);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4) || readBoolean()) {
+            motd = readComponent();
+        }
+        if (readBoolean()) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
+                byte[] iconByteArray = readByteArray();
+                icon = BASE64_IMAGE_HEADER + new String(Base64.getEncoder().encode(iconByteArray), StandardCharsets.UTF_8);
+            } else {
+                icon = readString();
+            }
+        }
         if (serverVersion.isOlderThan(ServerVersion.V_1_19_3)) {
             previewsChat = readBoolean();
         }
@@ -63,8 +76,20 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void write() {
-        writeOptional(motd, PacketWrapper::writeComponent);
-        writeOptional(icon, PacketWrapper::writeString);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
+            writeComponent(motd);
+            byte[] iconByteArray;
+            if (icon == null) {
+                iconByteArray = null;
+            } else {
+                String iconData = icon.substring(BASE64_IMAGE_HEADER.length());
+                iconByteArray = Base64.getDecoder().decode(iconData.getBytes(StandardCharsets.UTF_8));
+            }
+            writeOptional(iconByteArray, PacketWrapper::writeByteArray);
+        } else {
+            writeOptional(motd, PacketWrapper::writeComponent);
+            writeOptional(icon, PacketWrapper::writeString);
+        }
         if (serverVersion.isOlderThan(ServerVersion.V_1_19_3)) {
             writeBoolean(previewsChat);
         }
