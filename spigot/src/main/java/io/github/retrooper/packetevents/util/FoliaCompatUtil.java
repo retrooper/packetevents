@@ -14,16 +14,23 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class FoliaCompatUtil {
-    // Thanks powercas_gamer in #folia-dev
-    private static boolean isFolia() {
+    private static boolean folia;
+
+    static {
         try {
             Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            return true;
+            folia = true;
         } catch (ClassNotFoundException e) {
-            return false;
+            folia = false;
         }
     }
-    private static final boolean folia = isFolia();
+
+    /**
+     * @return Whether the server is running Folia
+     */
+    private static boolean isFolia() {
+        return folia;
+    }
 
     /**
      * Run a task async, either with bukkit scheduler or using java
