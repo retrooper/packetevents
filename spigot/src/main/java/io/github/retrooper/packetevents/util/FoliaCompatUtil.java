@@ -28,7 +28,7 @@ public class FoliaCompatUtil {
     /**
      * @return Whether the server is running Folia
      */
-    private static boolean isFolia() {
+    public static boolean isFolia() {
         return folia;
     }
 
