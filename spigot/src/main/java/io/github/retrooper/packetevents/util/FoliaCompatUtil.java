@@ -71,6 +71,30 @@ public class FoliaCompatUtil {
     }
 
     /**
+     * Run a task on the next global tick
+     * @param plugin Your plugin or PacketEvents
+     * @param run Consumer that accepts an object or null, for Folia or Paper/Spigot respectively
+     */
+    public static void runTask(Plugin plugin, Consumer<Object> run) {
+        if (!folia) {
+            Bukkit.getScheduler().runTask(plugin, () -> run.accept(null));
+            return;
+        }
+        try {
+            Method getSchedulerMethod = Reflection.getMethod(Server.class, "getGlobalRegionScheduler", 0);
+            Object globalRegionScheduler = getSchedulerMethod.invoke(Bukkit.getServer());
+
+            Class<?> schedulerClass = globalRegionScheduler.getClass();
+            Method executeMethod = schedulerClass.getMethod("run", Plugin.class, Consumer.class);
+
+            executeMethod.invoke(globalRegionScheduler, plugin, run);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
      * Run a task after the server has finished initializing.
      * Undefined behavior if called after the server has finished initializing.
      * @param plugin Your plugin or PacketEvents
