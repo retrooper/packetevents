@@ -35,7 +35,7 @@ public class ItemTags {
     public static final ItemTags STONE_BRICKS = bind("stone_bricks");
     public static final ItemTags WOODEN_BUTTONS = bind("wooden_buttons");
     public static final ItemTags BUTTONS = bind("buttons");
-    public static final ItemTags CARPETS = bind("carpets");
+    public static final ItemTags WOOL_CARPETS = bind("carpets");
     public static final ItemTags WOODEN_DOORS = bind("wooden_doors");
     public static final ItemTags WOODEN_STAIRS = bind("wooden_stairs");
     public static final ItemTags WOODEN_SLABS = bind("wooden_slabs");
@@ -111,7 +111,7 @@ public class ItemTags {
         copy(BlockTags.STONE_BRICKS, ItemTags.STONE_BRICKS);
         copy(BlockTags.WOODEN_BUTTONS, ItemTags.WOODEN_BUTTONS);
         copy(BlockTags.BUTTONS, ItemTags.BUTTONS);
-        copy(BlockTags.CARPETS, ItemTags.CARPETS);
+        copy(BlockTags.WOOL_CARPETS, ItemTags.WOOL_CARPETS);
         copy(BlockTags.WOODEN_DOORS, ItemTags.WOODEN_DOORS);
         copy(BlockTags.WOODEN_STAIRS, ItemTags.WOODEN_STAIRS);
         copy(BlockTags.WOODEN_SLABS, ItemTags.WOODEN_SLABS);
