@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.entity.data;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
+import com.github.retrooper.packetevents.protocol.entity.sniffer.SnifferState;
 import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
@@ -31,10 +32,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
-import com.github.retrooper.packetevents.util.Vector3f;
-import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.*;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.HashMap;
@@ -178,6 +176,29 @@ public class EntityDataTypes {
             }));
 
     public static final EntityDataType<Integer> PAINTING_VARIANT_TYPE = define("painting_variant_type", readIntDeserializer(), writeIntSerializer());
+
+    public static final EntityDataType<SnifferState> SNIFFER_STATE = define("sniffer_state", (PacketWrapper<?> wrapper) -> {
+        int id = wrapper.readVarInt();
+        return SnifferState.values()[id];
+    }, (PacketWrapper<?> wrapper, SnifferState value) -> wrapper.writeVarInt(value.ordinal()));
+
+
+    public static final EntityDataType<Vector3f> VECTOR3F = define("vector3f",
+            (PacketWrapper<?> wrapper) -> new Vector3f(wrapper.readFloat(), wrapper.readFloat(), wrapper.readFloat()),
+            (PacketWrapper<?> wrapper, Vector3f value) -> {
+                wrapper.writeFloat(value.x);
+                wrapper.writeFloat(value.y);
+                wrapper.writeFloat(value.z);
+            });
+
+    public static final EntityDataType<Quaternion4f> QUATERNION = define("vector3f",
+            (PacketWrapper<?> wrapper) -> new Quaternion4f(wrapper.readFloat(), wrapper.readFloat(), wrapper.readFloat(), wrapper.readFloat()),
+            (PacketWrapper<?> wrapper, Quaternion4f value) -> {
+                wrapper.writeFloat(value.getX());
+                wrapper.writeFloat(value.getY());
+                wrapper.writeFloat(value.getZ());
+                wrapper.writeFloat(value.getW());
+            });
 
     public static EntityDataType<?> getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);
