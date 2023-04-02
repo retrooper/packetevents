@@ -191,7 +191,7 @@ public class EntityDataTypes {
                 wrapper.writeFloat(value.z);
             });
 
-    public static final EntityDataType<Quaternion4f> QUATERNION = define("vector3f",
+    public static final EntityDataType<Quaternion4f> QUATERNION = define("quaternion",
             (PacketWrapper<?> wrapper) -> new Quaternion4f(wrapper.readFloat(), wrapper.readFloat(), wrapper.readFloat(), wrapper.readFloat()),
             (PacketWrapper<?> wrapper, Quaternion4f value) -> {
                 wrapper.writeFloat(value.getX());
