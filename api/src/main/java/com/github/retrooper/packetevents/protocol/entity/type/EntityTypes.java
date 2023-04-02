@@ -307,4 +307,5 @@ public class EntityTypes {
     public static final EntityType ITEM_DISPLAY = define("item_display", DISPLAY);
     public static final EntityType TEXT_DISPLAY = define("text_display", DISPLAY);
     public static final EntityType INTERACTION = define("interaction", DISPLAY);
+    public static final EntityType SNIFFER = define("sniffer", ABSTRACT_ANIMAL);
 }
