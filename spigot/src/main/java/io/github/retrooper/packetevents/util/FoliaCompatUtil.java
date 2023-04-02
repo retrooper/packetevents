@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class FoliaCompatUtil {
@@ -42,7 +42,7 @@ public class FoliaCompatUtil {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, run);
             return;
         }
-        CompletableFuture.runAsync(run);
+        Executors.defaultThreadFactory().newThread(run).start();
     }
 
     /**
