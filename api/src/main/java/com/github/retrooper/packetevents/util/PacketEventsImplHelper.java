@@ -37,8 +37,7 @@ public class PacketEventsImplHelper {
         if (!ByteBufHelper.isReadable(buffer)) return null;
 
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
-        PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer,
-                autoProtocolTranslation);
+        PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);

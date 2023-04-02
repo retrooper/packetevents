@@ -36,9 +36,8 @@ public class EventCreationUtil {
                 return new PacketLoginReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
             case PLAY:
                 return new PacketPlayReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
-            default:
-                return null;
         }
+        throw new RuntimeException("Unknown connection state " + user.getConnectionState() + "!");
     }
 
     public static PacketSendEvent createSendEvent(Object channel, User user, Object player, Object buffer,
@@ -52,8 +51,7 @@ public class EventCreationUtil {
                 return new PacketLoginSendEvent(channel, user, player, buffer, autoProtocolTranslation);
             case PLAY:
                 return new PacketPlaySendEvent(channel, user, player, buffer, autoProtocolTranslation);
-            default:
-                return null;
         }
+        throw new RuntimeException("Unknown connection state " + user.getConnectionState() + "!");
     }
 }

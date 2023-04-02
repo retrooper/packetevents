@@ -32,7 +32,7 @@ import java.util.function.Function;
 public class PacketEventsSettings {
 
     private TimeStampMode timestampMode = TimeStampMode.MILLIS;
-    private boolean readOnlyListeners = false;
+    private boolean defaultReencode = true; // true for backwards compat and more idiot-proof
     private boolean checkForUpdates = true;
     private boolean downsampleColors = true;
     private boolean bStatsEnabled = true;
@@ -60,12 +60,12 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Are the packet listeners all read only?
-     * @param readOnlyListeners Value
+     * Do we re-encode all packets by default?
+     * @param reEncodeByDefault Value
      * @return Settings instance
      */
-    public PacketEventsSettings readOnlyListeners(boolean readOnlyListeners) {
-        this.readOnlyListeners = readOnlyListeners;
+    public PacketEventsSettings reEncodeByDefault(boolean reEncodeByDefault) {
+        this.defaultReencode = reEncodeByDefault;
         return this;
     }
 
@@ -127,10 +127,10 @@ public class PacketEventsSettings {
 
     /**
      * Should the packet listeners be read only?
-     * @return Getter for {@link #readOnlyListeners}
+     * @return Getter for {@link #defaultReencode}
      */
-    public boolean shouldListenersReadOnly() {
-        return readOnlyListeners;
+    public boolean reEncodeByDefault() {
+        return defaultReencode;
     }
 
     /**

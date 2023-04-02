@@ -52,6 +52,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private PacketWrapper<?> lastUsedWrapper;
     private List<Runnable> postTasks = null;
     private boolean cloned;
+    private boolean needsReEncode = PacketEvents.getAPI().getSettings().reEncodeByDefault();
 
     public ProtocolPacketEvent(PacketSide packetSide, Object channel,
                                User user, T player, Object byteBuf,
@@ -101,6 +102,15 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.connectionState = user.getConnectionState();
         cloned = true;
     }
+
+    public void markForReEncode(boolean needsReEncode) {
+        this.needsReEncode = needsReEncode;
+    }
+
+    public boolean needsReEncode() {
+        return needsReEncode;
+    }
+
 
     public boolean isClone() {
         return cloned;
