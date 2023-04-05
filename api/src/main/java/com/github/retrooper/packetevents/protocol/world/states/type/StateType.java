@@ -31,11 +31,10 @@ public class StateType {
     private final boolean isBlocking;
     private final boolean isAir;
     private final boolean requiresCorrectTool;
-    private final boolean isReplaceable;
     private final boolean exceedsCube;
     private final MaterialType materialType;
 
-    public StateType(String name, float blastResistance, float hardness, boolean isSolid, boolean isBlocking, boolean isAir, boolean requiresCorrectTool, boolean isReplaceable, boolean isShapeExceedsCube, MaterialType materialType) {
+    public StateType(String name, float blastResistance, float hardness, boolean isSolid, boolean isBlocking, boolean isAir, boolean requiresCorrectTool, boolean isShapeExceedsCube, MaterialType materialType) {
         this.name = name;
         this.blastResistance = blastResistance;
         this.hardness = hardness;
@@ -43,7 +42,6 @@ public class StateType {
         this.isBlocking = isBlocking;
         this.isAir = isAir;
         this.requiresCorrectTool = requiresCorrectTool;
-        this.isReplaceable = isReplaceable;
         this.exceedsCube = isShapeExceedsCube;
         this.materialType = materialType;
     }
@@ -85,7 +83,21 @@ public class StateType {
     }
 
     public boolean isReplaceable() {
-        return isReplaceable;
+        switch (getMaterialType()) {
+            case AIR:
+            case STRUCTURAL_AIR:
+            case REPLACEABLE_PLANT:
+            case REPLACEABLE_FIREPROOF_PLANT:
+            case REPLACEABLE_WATER_PLANT:
+            case WATER:
+            case BUBBLE_COLUMN:
+            case LAVA:
+            case TOP_SNOW:
+            case FIRE:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public boolean exceedsCube() {

@@ -1095,9 +1095,8 @@ public class StateTypes {
             this.isShapeExceedsCube = b;
             return this;
         }
-
         public StateType build() {
-            StateType type = new StateType(name, blastResistance, hardness, isSolid, isBlocking, isAir, requiresCorrectTool, isReplaceable, isShapeExceedsCube, materialType);
+            StateType type = new StateType(name, blastResistance, hardness, isSolid, isBlocking, isAir, requiresCorrectTool, isShapeExceedsCube, materialType);
             BY_NAME.put(name, type);
             return type;
         }
