@@ -520,11 +520,18 @@ public final class NMSUtils {
 
     public static Object getPlayerConnection(final Player player) {
         Object entityPlayer = getEntityPlayer(player);
+        Class<?> entityPlayerClass = entityPlayer != null ? entityPlayer.getClass() : null;
+        String className = entityPlayer != null ? ClassUtil.getClassSimpleName(entityPlayerClass) : "";
         if (entityPlayer == null
-        || ClassUtil.getClassSimpleName(entityPlayer.getClass()).contains("Fake")) {
+        || className.contains("Fake")) {
             return null;
         }
-        WrappedPacket wrappedEntityPlayer = new WrappedPacket(new NMSPacket(entityPlayer));
+        //If we need to get the superclass, we get it
+        if (!className.equals("EntityPlayer")
+                && ClassUtil.getClassSimpleName(entityPlayerClass.getSuperclass()).equals("EntityPlayer")) {
+            entityPlayerClass = entityPlayerClass.getSuperclass();
+        }
+        WrappedPacket wrappedEntityPlayer = new WrappedPacket(new NMSPacket(entityPlayer), entityPlayerClass);
         return wrappedEntityPlayer.readObject(0, NMSUtils.playerConnectionClass);
     }
 
