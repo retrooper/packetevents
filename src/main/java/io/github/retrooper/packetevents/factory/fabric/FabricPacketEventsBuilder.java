@@ -128,20 +128,6 @@ public class FabricPacketEventsBuilder {
                 }
 
                 @Override
-                public User getUser(Object ch) {
-                    Channel channel = (Channel) ch;
-                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-                    return decoder.user;
-                }
-
-                @Override
-                public void changeConnectionState(Object ch, @Nullable ConnectionState packetState) {
-                    Channel channel = (Channel) ch;
-                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-                    decoder.user.setConnectionState(packetState);
-                }
-
-                @Override
                 public void updateUser(Object ch, User user) {
                     Channel channel = (Channel) ch;
                     PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
@@ -158,12 +144,6 @@ public class FabricPacketEventsBuilder {
 
                     PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
                     encoder.player = (LocalPlayer) player;
-                }
-
-                @Override
-                public boolean hasPlayer(Object ch) {
-                    PacketDecoder decoder = (PacketDecoder) ((Channel) ch).pipeline().get(PacketEvents.DECODER_NAME);
-                    return decoder != null && decoder.player != null;
                 }
             };
             private final NettyManager nettyManager = new NettyManagerImpl();

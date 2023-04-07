@@ -61,7 +61,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
         if (msg.isReadable()) {
-            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, msg);
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, msg, false);
             out.writeBytes(msg);
         }
     }

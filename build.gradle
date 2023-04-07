@@ -22,7 +22,7 @@ project.ext.adventureDependencies=["net.kyori:adventure-api:${adventureVersion}"
 
 repositories {
 	mavenCentral()
-	maven { url 'https://jitpack.io/' }
+	maven { url 'https://repo.codemc.io/repository/maven-snapshots/' }
 	maven {
 		name = 'ParchmentMC'
 		url = 'https://maven.parchmentmc.org'
@@ -30,8 +30,8 @@ repositories {
 }
 
 dependencies {
-	modImplementation 'com.github.retrooper.packetevents:netty-common:2.0-SNAPSHOT'
-	include('com.github.retrooper.packetevents:netty-common:2.0-SNAPSHOT')
+	modImplementation 'com.github.retrooper.packetevents:netty-common:2.0.0-SNAPSHOT'
+	include('com.github.retrooper.packetevents:netty-common:2.0.0-SNAPSHOT')
 	modImplementation(adventureDependencies)
 	include(adventureDependencies)
 
