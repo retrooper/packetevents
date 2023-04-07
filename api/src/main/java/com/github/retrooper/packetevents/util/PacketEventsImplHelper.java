@@ -46,11 +46,11 @@ public class PacketEventsImplHelper {
         });
         if (!packetSendEvent.isCancelled()) {
             //Did they ever use a wrapper?
-            if (packetReceiveEvent.getLastUsedWrapper() != null) {
+            if (packetSendEvent.getLastUsedWrapper() != null) {
                 //Rewrite the buffer
                 ByteBufHelper.clear(buffer);
-                packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
-                packetReceiveEvent.getLastUsedWrapper().write();
+                packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
+                packetSendEvent.getLastUsedWrapper().write();
             } else {
                 //If no wrappers were used, just pass on the original buffer.
                 //Correct the reader index, basically what the next handler is expecting.
