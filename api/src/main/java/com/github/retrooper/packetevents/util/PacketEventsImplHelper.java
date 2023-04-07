@@ -31,7 +31,7 @@ import java.util.UUID;
 
 public class PacketEventsImplHelper {
     
-    public static PacketSendEvent handleClientBoundPacket(Channel channel, 
+    public static PacketSendEvent handleClientBoundPacket(Object channel, 
                                                               User user, 
                                                               Object player, 
                                                               Object buffer, 
