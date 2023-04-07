@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import org.jetbrains.annotations.Nullable;
+import io.netty.channel.ChannelPromise;
 
 import java.util.UUID;
 
@@ -33,7 +34,7 @@ public class PacketEventsImplHelper {
     public static PacketSendEvent handleClientBoundPacket(Channel channel, 
                                                               User user, 
                                                               Object player, 
-                                                              ByteBuf buffer, 
+                                                              Object buffer, 
                                                               ChannelPromise promise,
                                                              boolean autoProtocolTranslation) throws Exception {
         if (!ByteBufHelper.isReadable(buffer)) return null;
