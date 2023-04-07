@@ -1,10 +1,7 @@
 package io.github.retrooper.packetevents.handler;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -33,7 +30,8 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         if (msg.isReadable()) {
             ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(msg);
             boolean recompress = handleCompression(ctx, outputBuffer);
-            PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, outputBuffer);
+            PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, outputBuffer, false);
+            //TODO hasTasksAfter
             if (outputBuffer.isReadable()) {
                 if (recompress) {
                     recompress(ctx, outputBuffer);
