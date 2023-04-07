@@ -45,14 +45,15 @@ public class PacketEventsImplHelper {
             ByteBufHelper.readerIndex(buffer, processIndex);
         });
         if (!packetSendEvent.isCancelled()) {
-            PacketWrapper<?> wrapper = packetSendEvent.getLastUsedWrapper();
-            if (wrapper != null) {
+            //Did they ever use a wrapper?
+            if (packetReceiveEvent.getLastUsedWrapper() != null) {
+                //Rewrite the buffer
                 ByteBufHelper.clear(buffer);
-                int packetId = packetSendEvent.getPacketId();
-                packetSendEvent.getLastUsedWrapper().writeVarInt(packetId);
-                packetSendEvent.getLastUsedWrapper().write();
+                packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
+                packetReceiveEvent.getLastUsedWrapper().write();
             } else {
-                // Pass it along without changes
+                //If no wrappers were used, just pass on the original buffer.
+                //Correct the reader index, basically what the next handler is expecting.
                 ByteBufHelper.readerIndex(buffer, preProcessIndex);
             }
         } else {
