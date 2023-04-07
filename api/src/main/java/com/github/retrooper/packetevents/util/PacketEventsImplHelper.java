@@ -25,7 +25,6 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import org.jetbrains.annotations.Nullable;
-import io.netty.channel.ChannelPromise;
 
 import java.util.UUID;
 
@@ -35,7 +34,6 @@ public class PacketEventsImplHelper {
                                                               User user, 
                                                               Object player, 
                                                               Object buffer, 
-                                                              ChannelPromise promise,
                                                              boolean autoProtocolTranslation) throws Exception {
         if (!ByteBufHelper.isReadable(buffer)) return null;
 
@@ -51,7 +49,6 @@ public class PacketEventsImplHelper {
                 ByteBufHelper.clear(buffer);
                 int packetId = packetSendEvent.getPacketId();
                 packetSendEvent.getLastUsedWrapper().writeVarInt(packetId);
-
                 packetSendEvent.getLastUsedWrapper().write();
             } else {
                 // Pass it along without changes
@@ -66,13 +63,6 @@ public class PacketEventsImplHelper {
             for (Runnable task : packetSendEvent.getPostTasks()) {
                 task.run();
             }
-        }
-        if (packetSendEvent.hasTasksAfterSend()) {
-            promise.addListener((p) -> {
-                for (Runnable task : packetSendEvent.getTasksAfterSend()) {
-                    task.run();
-                }
-            });
         }
 
         return packetSendEvent;
