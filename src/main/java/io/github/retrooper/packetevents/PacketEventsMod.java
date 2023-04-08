@@ -25,5 +25,6 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
     @Override
     public void onInitialize() {
         PacketEvents.getAPI().init();
+        PacketEvents.getAPI().getEventManager().registerListener(new test());
     }
 }

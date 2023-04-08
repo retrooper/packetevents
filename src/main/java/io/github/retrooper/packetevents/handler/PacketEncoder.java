@@ -1,10 +1,6 @@
 package io.github.retrooper.packetevents.handler;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -25,7 +21,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     }
 
     @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
         ByteBuf buf = null;
         try {
             if (acceptOutboundMessage(msg)) {

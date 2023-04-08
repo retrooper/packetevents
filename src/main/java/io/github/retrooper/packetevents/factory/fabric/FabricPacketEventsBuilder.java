@@ -2,8 +2,6 @@ package io.github.retrooper.packetevents.factory.fabric;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
-import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
-import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
@@ -11,7 +9,6 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -113,7 +110,7 @@ public class FabricPacketEventsBuilder {
 
             private final ChannelInjector injector = new ChannelInjector() {
                 @Override
-                public boolean isServerBound() {
+                   public boolean isServerBound() {
                     return true;
                 }
 
@@ -176,16 +173,19 @@ public class FabricPacketEventsBuilder {
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalPacketListener());
-                    getEventManager().registerListener(new SimplePacketListenerAbstract() {
+
+                    //TODO: Fix Make this load on the client
+                    /*getEventManager().registerListener(new SimplePacketListenerAbstract() {
                         @Override
                         public void onPacketPlaySend(PacketPlaySendEvent event) {
                             if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
-                                System.out.println("Is player null? " + (Minecraft.getInstance().player != null));
+                                PacketEventsMod.LOGGER.info("Is player null? " + (Minecraft.getInstance().player != null));
                                 PacketEvents.getAPI().getInjector().setPlayer(event.getChannel(),
                                         Minecraft.getInstance().player);
                             }
                         }
-                    });
+                    });*/
+
                 }
             }
 

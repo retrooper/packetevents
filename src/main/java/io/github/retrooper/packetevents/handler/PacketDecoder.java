@@ -8,6 +8,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.minecraft.client.player.LocalPlayer;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,6 +31,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         if (msg.isReadable()) {
             ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(msg);
             boolean recompress = handleCompression(ctx, outputBuffer);
+
             PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, outputBuffer, false);
             //TODO hasTasksAfter
             if (outputBuffer.isReadable()) {
@@ -42,12 +44,12 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(@NotNull ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
     }
 
 
-    private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) {
+    protected boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) {
         if (checkedCompression) return false;
         if (ctx.pipeline().names().indexOf("decompress") > ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME)) {
             // Need to decompress this packet due to bad order
@@ -81,7 +83,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         return false;
     }
 
-    private void recompress(ChannelHandlerContext ctx, ByteBuf buffer) {
+    protected void recompress(ChannelHandlerContext ctx, ByteBuf buffer) {
         ByteBuf compressed = ctx.alloc().buffer();
         try {
             ChannelHandler compressor = ctx.pipeline().get("compress");
