@@ -79,7 +79,7 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     }
 
     private PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
-        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, false);
+        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, true);
         if (packetSendEvent.hasTasksAfterSend()) {
             promise.addListener((p) -> {
                 for (Runnable task : packetSendEvent.getTasksAfterSend()) {
