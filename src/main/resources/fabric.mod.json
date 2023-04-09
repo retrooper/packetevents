@@ -23,6 +23,9 @@
     ],
     "main": [
       "io.github.retrooper.packetevents.PacketEventsMod"
+    ],
+    "client": [
+      "io.github.retrooper.packetevents.PacketEventsMod"
     ]
   },
   "mixins": [

@@ -9,12 +9,12 @@ import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.util.ReferenceCountUtil;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Player;
 
 @ChannelHandler.Sharable
 public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     public User user;
-    public LocalPlayer player;
+    public Player player;
 
     public PacketEncoder(User user) {
         this.user = user;

@@ -31,7 +31,7 @@ public class PacketEventsInjectorMixin {
 
     @Inject(method = "channelActive", at = @At("HEAD"))
     private void channelActive(ChannelHandlerContext ctx, CallbackInfo info) {
-        PacketEventsMod.LOGGER.info("Connected!");
+        PacketEventsMod.LOGGER.debug("Connected!");
         Channel channel = ctx.channel();
         User user = new User(channel, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
                 new UserProfile(null, null));
@@ -51,11 +51,11 @@ public class PacketEventsInjectorMixin {
 
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, encoder);
-        PacketEventsMod.LOGGER.info("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
+        PacketEventsMod.LOGGER.debug("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
     }
 
     @Inject(method = "channelInactive", at = @At("HEAD"))
     private void channelInactive(ChannelHandlerContext ctx, CallbackInfo info) {
-        PacketEventsMod.LOGGER.info("Disconnected!");
+        PacketEventsMod.LOGGER.debug("Disconnected!");
     }
 }

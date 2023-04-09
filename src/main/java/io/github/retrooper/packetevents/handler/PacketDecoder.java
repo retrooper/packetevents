@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
@@ -19,7 +19,7 @@ import java.util.List;
 public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
     private static Method DECOMPRESSOR_METHOD, COMPRESSOR_METHOD;
     public User user;
-    public LocalPlayer player;
+    public Player player;
     public boolean checkedCompression;
 
     public PacketDecoder(User user) {
