@@ -1,6 +1,8 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerAbstract;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsBuilder;
 import io.github.retrooper.packetevents.factory.fabric.ServerInstanceManager;
 import io.github.retrooper.packetevents.mixin.ClientPacketListenerAccessor;
@@ -35,7 +37,16 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer, Cli
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             var connection = ((ServerGamePacketListenerImplAccessor)handler).getConnection();
             var channel = ((ConnectionAccessor)connection).getChannel();
-            PacketEvents.getAPI().getInjector().setPlayer(channel, handler.player);
+            if(ChannelUtilities.pipelineContainsSplitterAndPrepender(channel.pipeline()))
+                PacketEvents.getAPI().getInjector().setPlayer(channel, handler.player);
+        });
+
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketSend(PacketSendEvent event) {
+                System.out.println("Packet send: " + event.getPacketType());
+                System.out.println("player: " + event.getPlayer());
+            }
         });
     }
 
@@ -44,7 +55,8 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer, Cli
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             var connection = ((ClientPacketListenerAccessor)handler).getConnection();
             var channel = ((ConnectionAccessor)connection).getChannel();
-            PacketEvents.getAPI().getInjector().setPlayer(channel, Minecraft.getInstance().player);
+            if(ChannelUtilities.pipelineContainsSplitterAndPrepender(channel.pipeline()))
+                PacketEvents.getAPI().getInjector().setPlayer(channel, Minecraft.getInstance().player);
         });
     }
 }

@@ -7,11 +7,12 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import io.github.retrooper.packetevents.ChannelUtilities;
 import io.github.retrooper.packetevents.PacketEventsMod;
-import io.github.retrooper.packetevents.handler.PacketDecoder;
-import io.github.retrooper.packetevents.handler.PacketEncoder;
 import io.github.retrooper.packetevents.handler.ServerPacketDecoder;
 import io.github.retrooper.packetevents.handler.ServerPacketEncoder;
+import io.github.retrooper.packetevents.handler.ClientPacketDecoder;
+import io.github.retrooper.packetevents.handler.ClientPacketEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.protocol.PacketFlow;
@@ -31,27 +32,32 @@ public class PacketEventsInjectorMixin {
 
     @Inject(method = "channelActive", at = @At("HEAD"))
     private void channelActive(ChannelHandlerContext ctx, CallbackInfo info) {
-        PacketEventsMod.LOGGER.debug("Connected!");
+
         Channel channel = ctx.channel();
         User user = new User(channel, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
                 new UserProfile(null, null));
         ProtocolManager.USERS.put(channel, user);
-        PacketDecoder decoder;
-        PacketEncoder encoder;
-        if(receiving == PacketFlow.CLIENTBOUND)
-        {
-            decoder = new PacketDecoder(user);
-            encoder = new PacketEncoder(user);
+        ServerPacketDecoder decoder;
+        ServerPacketEncoder encoder;
+        if(receiving == PacketFlow.CLIENTBOUND) {
+            PacketEventsMod.LOGGER.info("Connected as Client!");
+            decoder = new ClientPacketDecoder(user);
+            encoder = new ClientPacketEncoder(user);
         }
         else
         {
+
+            PacketEventsMod.LOGGER.info("Connected as Server!");
             decoder = new ServerPacketDecoder(user);
             encoder = new ServerPacketEncoder(user);
         }
 
-        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
-        channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, encoder);
-        PacketEventsMod.LOGGER.debug("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
+        if(ChannelUtilities.pipelineContainsSplitterAndPrepender(channel.pipeline()))
+        {
+            channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
+            channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, encoder);
+        }
+        PacketEventsMod.LOGGER.info("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
     }
 
     @Inject(method = "channelInactive", at = @At("HEAD"))
