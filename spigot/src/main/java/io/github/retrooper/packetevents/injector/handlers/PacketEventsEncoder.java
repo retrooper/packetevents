@@ -21,12 +21,14 @@ package io.github.retrooper.packetevents.injector.handlers;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.CancelPacketException;
+import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
@@ -70,43 +72,14 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
         // So apparently, this is how ViaVersion hacks around bungeecord not supporting sending empty packets
         if (!ByteBufHelper.isReadable(byteBuf)) {
-            throw new CancelPacketException();
+            throw CancelPacketException.INSTANCE;
         }
 
         list.add(byteBuf.retain());
     }
 
     private PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
-        if (!ByteBufHelper.isReadable(buffer)) return null;
-
-        int preProcessIndex = ByteBufHelper.readerIndex(buffer);
-        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer, true);
-        int processIndex = ByteBufHelper.readerIndex(buffer);
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
-            ByteBufHelper.readerIndex(buffer, processIndex);
-        });
-        if (!packetSendEvent.isCancelled()) {
-            PacketWrapper<?> wrapper = packetSendEvent.getLastUsedWrapper();
-            if (wrapper != null) {
-                ByteBufHelper.clear(buffer);
-                int packetId = packetSendEvent.getPacketId();
-                packetSendEvent.getLastUsedWrapper().writeVarInt(packetId);
-
-                packetSendEvent.getLastUsedWrapper().write();
-            } else {
-                // Pass it along without changes
-                ByteBufHelper.readerIndex(buffer, preProcessIndex);
-            }
-        } else {
-            //Make the buffer unreadable for the next handlers
-            ByteBufHelper.clear(buffer);
-        }
-
-        if (packetSendEvent.hasPostTasks()) {
-            for (Runnable task : packetSendEvent.getPostTasks()) {
-                task.run();
-            }
-        }
+        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, true);
         if (packetSendEvent.hasTasksAfterSend()) {
             promise.addListener((p) -> {
                 for (Runnable task : packetSendEvent.getTasksAfterSend()) {
@@ -114,7 +87,6 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
                 }
             });
         }
-
         return packetSendEvent;
     }
 
@@ -132,8 +104,12 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        // This is a terrible hack, shame on Bungeecord.
+        // This is a terrible hack (to support bungee), I think we should use something other than a MessageToMessageEncoder
         if (ExceptionUtil.isException(cause, CancelPacketException.class)) {
+            return;
+        }
+        // Ignore how mojang sends DISCONNECT packets in the wrong state
+        if (ExceptionUtil.isException(cause, InvalidDisconnectPacketSend.class)) {
             return;
         }
 

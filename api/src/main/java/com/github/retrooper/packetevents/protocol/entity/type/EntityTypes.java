@@ -44,7 +44,8 @@ public class EntityTypes {
             ClientVersion.V_1_16_2,
             ClientVersion.V_1_17,
             ClientVersion.V_1_19,
-            ClientVersion.V_1_19_3);
+            ClientVersion.V_1_19_3,
+            ClientVersion.V_1_19_4);
     private static final TypesBuilder LEGACY_TYPES_BUILDER = new TypesBuilder("entity/legacy_entity_type_mappings",
             ClientVersion.V_1_8,
             ClientVersion.V_1_9,
@@ -300,4 +301,11 @@ public class EntityTypes {
     public static final EntityType MINECART_TNT = define("minecart_tnt", MINECART_ABSTRACT);
     public static final EntityType MINECART_HOPPER = define("minecart_hopper", MINECART_ABSTRACT);
     public static final EntityType MINECART_MOB_SPAWNER = define("minecart_mob_spawner", MINECART_ABSTRACT);
+    // Display type entities added in 1.19.4
+    public static final EntityType DISPLAY = define("display", ENTITY);
+    public static final EntityType BLOCK_DISPLAY = define("block_display", DISPLAY);
+    public static final EntityType ITEM_DISPLAY = define("item_display", DISPLAY);
+    public static final EntityType TEXT_DISPLAY = define("text_display", DISPLAY);
+    public static final EntityType INTERACTION = define("interaction", DISPLAY);
+    public static final EntityType SNIFFER = define("sniffer", ABSTRACT_ANIMAL);
 }

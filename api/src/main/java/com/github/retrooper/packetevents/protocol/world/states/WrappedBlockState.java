@@ -73,9 +73,14 @@ public class WrappedBlockState {
 
         if (data != null) {
             for (String s : data) {
-                String[] split = s.split("=");
-                StateValue value = StateValue.byName(split[0]);
-                this.data.put(value, value.getParser().apply(split[1].toUpperCase(Locale.ROOT)));
+                try {
+                    String[] split = s.split("=");
+                    StateValue value = StateValue.byName(split[0]);
+                    this.data.put(value, value.getParser().apply(split[1].toUpperCase(Locale.ROOT)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Failed to parse block state: " + s);
+                }
             }
         }
 
@@ -125,7 +130,7 @@ public class WrappedBlockState {
         byte mappingsIndex = getMappingsIndex(version);
         WrappedBlockState state = DEFAULT_STATES.get(mappingsIndex).get(type);
         if (state == null) {
-            PacketEvents.getAPI().getLogger().warning("Default state for " + type.getName() + " is null. Returning AIR");
+            PacketEvents.getAPI().getLogger().config("Default state for " + type.getName() + " is null. Returning AIR");
             return AIR;
         }
         return state.clone();
@@ -150,8 +155,10 @@ public class WrappedBlockState {
             return 7;
         } else if (version.isOlderThanOrEquals(ClientVersion.V_1_19_1)) {
             return 8;
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_19_3)) {
+            return 9;
         }
-        return 9;
+        return 10;
     }
 
     private static void loadLegacy() {
@@ -262,10 +269,8 @@ public class WrappedBlockState {
 
                     type = StateTypes.getByName(blockString);
 
-                    // TODO: Proper 1.20 support for experimental worlds
                     if (type == null) {
-                        type = StateTypes.AIR;
-                        //PacketEvents.getAPI().getLogger().warning("Unknown block type: " + fullBlockString);
+                        PacketEvents.getAPI().getLogger().warning("Unknown block type: " + fullBlockString);
                     }
                 }
 

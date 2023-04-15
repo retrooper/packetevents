@@ -67,5 +67,6 @@ public enum MaterialType {
     AMETHYST,
     POWDER_SNOW,
     FROGSPAWN,
-    FROGLIGHT
+    FROGLIGHT,
+    DECORATED_POT
 }

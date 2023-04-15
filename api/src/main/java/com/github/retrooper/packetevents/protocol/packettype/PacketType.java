@@ -51,7 +51,8 @@ public final class PacketType {
             ClientVersion.V_1_18,
             ClientVersion.V_1_19,
             ClientVersion.V_1_19_1,
-            ClientVersion.V_1_19_3);
+            ClientVersion.V_1_19_3,
+            ClientVersion.V_1_19_4);
 
     //TODO UPDATE Update packet type mappings (serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
@@ -68,7 +69,8 @@ public final class PacketType {
             ClientVersion.V_1_17,
             ClientVersion.V_1_19,
             ClientVersion.V_1_19_1,
-            ClientVersion.V_1_19_3);
+            ClientVersion.V_1_19_3,
+            ClientVersion.V_1_19_4);
 
     public static void prepare() {
         PacketType.Play.Client.load();
@@ -397,6 +399,7 @@ public final class PacketType {
                 loadPacketIds(ServerboundPacketType_1_19.values());
                 loadPacketIds(ServerboundPacketType_1_19_1.values());
                 loadPacketIds(ServerboundPacketType_1_19_3.values());
+                loadPacketIds(ServerboundPacketType_1_19_4.values());
                 //TODO UPDATE Update packet type mappings (serverbound pt. 2)
             }
 
@@ -545,7 +548,12 @@ public final class PacketType {
             DISGUISED_CHAT,
             PLAYER_INFO_REMOVE,
             PLAYER_INFO_UPDATE,
-            UPDATE_ENABLED_FEATURES;
+            UPDATE_ENABLED_FEATURES,
+            // 1.19.4
+            DAMAGE_EVENT,
+            HURT_ANIMATION,
+            BUNDLE,
+            CHUNK_BIOMES;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -606,6 +614,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_19.values());
                 loadPacketIds(ClientboundPacketType_1_19_1.values());
                 loadPacketIds(ClientboundPacketType_1_19_3.values());
+                loadPacketIds(ClientboundPacketType_1_19_4.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }

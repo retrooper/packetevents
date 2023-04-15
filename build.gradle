@@ -22,7 +22,7 @@ subprojects {
     version = '2.0.0-SNAPSHOT'
 
     project.ext.nettyVersion = '4.1.72.Final'
-    project.ext.adventureVersion = '4.10.1'
+    project.ext.adventureVersion = '4.12.0'
     project.ext.adventureDependencies=["net.kyori:adventure-api:${adventureVersion}",
                                        "net.kyori:adventure-text-serializer-gson:${adventureVersion}",
                                        "net.kyori:adventure-text-serializer-legacy:${adventureVersion}",
@@ -43,8 +43,6 @@ subprojects {
 
     tasks {
         shadowJar {
-            relocate 'net.kyori.adventure.text.serializer.gson.legacyimpl', 'io.github.retrooper.packetevents.adventure.serializer.gson.legacyimpl'
-            relocate 'net.kyori.adventure.util.Codec', 'io.github.retrooper.packetevents.adventure.util.Codec'
             archiveFileName.set("packetevents-${project.name}-${project.version}.jar")
         }
 
@@ -61,11 +59,11 @@ subprojects {
         }
 
         jar.configure {
-            classifier = 'default'
+            archiveClassifier = 'default'
         }
 
         shadowJar.configure {
-            classifier = null
+            archiveClassifier = null
         }
     }
 

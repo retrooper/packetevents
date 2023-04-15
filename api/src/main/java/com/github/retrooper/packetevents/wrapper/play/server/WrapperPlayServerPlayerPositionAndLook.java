@@ -47,7 +47,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             this.teleportId = readVarInt();
         }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
             this.dismountVehicle = readBoolean();
         }
     }
@@ -63,7 +63,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeVarInt(teleportId);
         }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
             writeBoolean(dismountVehicle);
         }
     }

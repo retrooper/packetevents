@@ -1,8 +1,8 @@
 repositories {
     maven { url 'https://jitpack.io' }
-    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
-    maven { url 'https://nexus.funkemunky.cc/content/repositories/releases/' }
     maven { url 'https://repo.viaversion.com/' }
+    maven { url 'https://nexus.funkemunky.cc/content/repositories/releases/' }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
@@ -10,7 +10,6 @@ java.targetCompatibility = JavaVersion.VERSION_1_8
 
 shadowJar {
     relocate 'net.kyori.adventure.text.serializer', 'io.github.retrooper.packetevents.adventure.serializer'
-    relocate 'net.kyori.adventure.util.Codec', 'io.github.retrooper.packetevents.adventure.util.Codec'
     dependencies {
         exclude(dependency('com.google.code.gson:gson:2.8.0'))
     }
@@ -20,31 +19,9 @@ dependencies {
     api project(':api')
     api(adventureDependencies)
 
-    compileOnly 'org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT'
     compileOnly 'com.viaversion:viaversion:4.5.0'
     compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
 
-
-    /*compileOnly 'org.github.spigot:1.17:1.17'
-    compileOnly 'org.github.spigot:1.16.2:1.16.2'
-    compileOnly 'org.github.spigot:1.8.8:1.8.8'*/
-    //All these dependencies are only enabled when developing wrappers for quick access to spigot source
-
     compileOnly 'org.github.spigot:1.17:1.17'
-    compileOnly 'org.github.spigot:1.16.2:1.16.2'
-    compileOnly 'org.github.spigot:1.16.1:1.16.1'
-    compileOnly 'org.github.spigot:1.15.2:1.15.2'
-    compileOnly 'org.github.spigot:1.15.1:1.15.1'
-    compileOnly 'org.github.spigot:1.15:1.15'
-    compileOnly 'org.github.spigot:1.14:1.14'
-    compileOnly 'org.github.spigot:1.13.2:1.13.2'
-    compileOnly 'org.github.spigot:1.13:1.13'
-    compileOnly 'org.github.spigot:1.12.2:1.12.2'
-    compileOnly 'org.github.spigot:1.12.1:1.12.1'
-    compileOnly 'org.github.spigot:1.11.2:1.11.2'
-    compileOnly 'org.github.spigot:1.11.1:1.11.1'
-    compileOnly 'org.github.spigot:1.10.2:1.10.2'
-    compileOnly 'org.github.spigot:1.9.4:1.9.4'
-    compileOnly 'org.github.spigot:1.9:1.9'
-    compileOnly 'org.github.spigot:1.8.8:1.8.8'
 }

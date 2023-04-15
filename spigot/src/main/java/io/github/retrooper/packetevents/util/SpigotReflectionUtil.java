@@ -31,12 +31,11 @@ import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.MapMaker;
-import net.minecraft.server.v1_12_R1.EnumParticle;
+import io.netty.buffer.PooledByteBufAllocator;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Server;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_16_R1.CraftParticle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -97,9 +96,8 @@ public final class SpigotReflectionUtil {
     private static Object MINECRAFT_SERVER_INSTANCE;
     private static Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
 
-    //Initialized in PacketEvents#load
+    //Cache entities right after we request/find them for faster search.
     public static Map<Integer, Entity> ENTITY_ID_CACHE = new MapMaker().weakValues().makeMap();
-    ;
 
     private static void initConstructors() {
         Class<?> itemClass = NMS_IMATERIAL_CLASS != null ? NMS_IMATERIAL_CLASS : NMS_ITEM_CLASS;
@@ -139,9 +137,9 @@ public final class SpigotReflectionUtil {
         }
         String getEntityByIdMethodName = (VERSION.getProtocolVersion() == (short) 47 || V_1_19_OR_HIGHER) // Back to these stupid mappings, thanks MD_5
                 ? "a" : "getEntity";
-        GET_ENTITY_BY_ID_METHOD = Reflection.getMethod(WORLD_SERVER_CLASS, getEntityByIdMethodName, NMS_ENTITY_CLASS, int.class);
+        GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(WORLD_SERVER_CLASS, getEntityByIdMethodName, NMS_ENTITY_CLASS, int.class);
         if (GET_ENTITY_BY_ID_METHOD == null) {
-            GET_ENTITY_BY_ID_METHOD = Reflection.getMethod(WORLD_SERVER_CLASS, "getEntity", NMS_ENTITY_CLASS, int.class);
+            GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(WORLD_SERVER_CLASS, "getEntity", NMS_ENTITY_CLASS, int.class);
         }
 
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
@@ -153,11 +151,11 @@ public final class SpigotReflectionUtil {
         CRAFT_ITEM_STACK_AS_NMS_COPY = Reflection.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", 0);
 
         // Had to hardcode the 1.12 vanilla names because some jar was screwing with it, fall back to normal mappings if not found
-        READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, "k", NMS_ITEM_STACK_CLASS);
+        READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethodExact(NMS_PACKET_DATA_SERIALIZER_CLASS, "k", NMS_ITEM_STACK_CLASS);
         if (READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD == null) {
             READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS, 0);
         }
-        WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, "a", NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS);
+        WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethodExact(NMS_PACKET_DATA_SERIALIZER_CLASS, "a", NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS);
         if (WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD == null) {
             WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, 0, NMS_ITEM_STACK_CLASS);
         }
@@ -165,7 +163,7 @@ public final class SpigotReflectionUtil {
         GET_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, IBLOCK_DATA_CLASS, 0, int.class);
         GET_BY_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, IBLOCK_DATA_CLASS, 0, int.class);
         if (CRAFT_BLOCK_DATA_CLASS != null) {
-            GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA = Reflection.getMethod(CRAFT_BLOCK_DATA_CLASS, "fromData", CRAFT_BLOCK_DATA_CLASS, IBLOCK_DATA_CLASS);
+            GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA = Reflection.getMethodExact(CRAFT_BLOCK_DATA_CLASS, "fromData", CRAFT_BLOCK_DATA_CLASS, IBLOCK_DATA_CLASS);
         }
 
         READ_NBT_FROM_STREAM_METHOD = Reflection.getMethod(NBT_COMPRESSION_STREAM_TOOLS_CLASS, 0, DataInputStream.class);
@@ -388,7 +386,7 @@ public final class SpigotReflectionUtil {
         if (PROPERTY_MAP_CLASS == null) {
             PROPERTY_MAP_CLASS = Reflection.getClassByNameWithoutException("" +
                     "com.mojang.authlib.properties.PropertyMap");
-            PROPERTY_MAP_GET_METHOD = Reflection.getMethod(PROPERTY_MAP_CLASS, "get", Collection.class, Object.class);
+            PROPERTY_MAP_GET_METHOD = Reflection.getMethodExact(PROPERTY_MAP_CLASS, "get", Collection.class, Object.class);
         }
 
         //Get the player's game profile in NMS
@@ -611,7 +609,7 @@ public final class SpigotReflectionUtil {
     }
 
     public static com.github.retrooper.packetevents.protocol.item.ItemStack decodeBukkitItemStack(ItemStack in) {
-        Object buffer = UnpooledByteBufAllocationHelper.buffer();
+        Object buffer = PooledByteBufAllocator.DEFAULT.buffer();
         //3 reflection calls
         Object packetDataSerializer = createPacketDataSerializer(buffer);
         Object nmsItemStack = toNMSItemStack(in);
@@ -624,7 +622,7 @@ public final class SpigotReflectionUtil {
     }
 
     public static ItemStack encodeBukkitItemStack(com.github.retrooper.packetevents.protocol.item.ItemStack in) {
-        Object buffer = UnpooledByteBufAllocationHelper.buffer();
+        Object buffer = PooledByteBufAllocator.DEFAULT.buffer();
         PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
         wrapper.writeItemStack(in);
         //3 reflection calls
@@ -843,6 +841,8 @@ public final class SpigotReflectionUtil {
         if (V_1_17_OR_HIGHER) {
             try {
                 if (world != null) {
+                    //On 1.17 we have to use hacks to get the entity list bypassing Spigot's checks
+                    //We cannot recommend finding entity objects asynchronously.
                     for (Entity entity : getEntityList(world)) {
                         if (entity.getEntityId() == entityID) {
                             ENTITY_ID_CACHE.putIfAbsent(entity.getEntityId(), entity);
@@ -851,6 +851,8 @@ public final class SpigotReflectionUtil {
                     }
                 }
             } catch (Exception ex) {
+                System.out.println("Failed to find entity by id on 1.19.3!");
+                throw ex;
                 //We are retrying below
             }
             try {
