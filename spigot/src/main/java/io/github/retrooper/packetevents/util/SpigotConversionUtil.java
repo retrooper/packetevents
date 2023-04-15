@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
@@ -140,4 +141,13 @@ public class SpigotConversionUtil {
             return new Dimension(SpigotReflectionUtil.fromMinecraftNBT(nbt));
         }
     }
+
+    public static ParticleType fromBukkitParticle(org.bukkit.Particle particle) {
+        return SpigotReflectionUtil.toPacketEventsParticle(particle);
+    }
+
+    public static org.bukkit.Particle toBukkitParticle(ParticleType particle) {
+        return SpigotReflectionUtil.fromPacketEventsParticle(particle);
+    }
+
 }
