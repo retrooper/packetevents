@@ -31,7 +31,6 @@ import org.bukkit.entity.Player;
 
 public class GlobalChannelInjector {
     private ChannelInjector injector;
-
     private boolean spoof;
 
     public void load() {
@@ -41,9 +40,7 @@ public class GlobalChannelInjector {
         } else {
             injector = legacy ? new LateChannelInjectorLegacy() : new LateChannelInjectorModern();
         }
-
-        //If Spoof is enabled (https://spoof.abyssdev.net)
-        this.spoof = PacketEvents.get().getPlugin().getServer().getPluginManager().isPluginEnabled("ExploitPatcher");
+        spoof = PacketEvents.get().getPlugin().getServer().getPluginManager().isPluginEnabled("ExploitPatcher");
     }
 
     public boolean isBound() {
@@ -71,18 +68,14 @@ public class GlobalChannelInjector {
     }
 
     public void injectPlayer(final Player player) {
-
         if (this.spoof && SpoofAPI.getPlayerProvider().hasSpoofedChannel(player)) {
             return;
         }
-
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
         PacketEvents.get().callEvent(injectEvent);
-
         if (!injectEvent.isCancelled()) {
             injector.injectPlayer(player);
         }
-
     }
 
     public void ejectPlayer(Player player) {
