@@ -67,7 +67,7 @@ public class GlobalChannelInjector {
         injector.eject();
     }
 
-    public void injectPlayer(final Player player) {
+    public void injectPlayer(Player player) {
         if (this.spoof && SpoofAPI.getPlayerProvider().hasSpoofedChannel(player)) {
             return;
         }
