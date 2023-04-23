@@ -54,12 +54,6 @@ public class EntityTypes {
             ClientVersion.V_1_12,
             ClientVersion.V_1_13);
 
-
-    static {
-        TYPES_BUILDER.unloadFileMappings();
-        LEGACY_TYPES_BUILDER.unloadFileMappings();
-    }
-
     public static EntityType define(String key, @Nullable EntityType parent) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
         TypesBuilderData legacyData = LEGACY_TYPES_BUILDER.define(key);
@@ -308,4 +302,10 @@ public class EntityTypes {
     public static final EntityType TEXT_DISPLAY = define("text_display", DISPLAY);
     public static final EntityType INTERACTION = define("interaction", DISPLAY);
     public static final EntityType SNIFFER = define("sniffer", ABSTRACT_ANIMAL);
+
+    // This HAS to be at the end of the file so the types load properly, please do not move it
+    static {
+        TYPES_BUILDER.unloadFileMappings();
+        LEGACY_TYPES_BUILDER.unloadFileMappings();
+    }
 }
