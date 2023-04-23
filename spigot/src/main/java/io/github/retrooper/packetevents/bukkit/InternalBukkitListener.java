@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.bukkit;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
-import org.bukkit.Bukkit;
+import io.github.retrooper.packetevents.util.FoliaCompatUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -44,7 +44,7 @@ public class InternalBukkitListener implements Listener {
 
         User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
         if (user == null) {
-            Bukkit.getScheduler().runTask(plugin, () -> player.kickPlayer("PacketEvents 2.0 failed to inject"));
+            FoliaCompatUtil.runTaskForEntity(player, plugin, () -> player.kickPlayer("PacketEvents 2.0 failed to inject"), null, 0);
             return;
         }
 

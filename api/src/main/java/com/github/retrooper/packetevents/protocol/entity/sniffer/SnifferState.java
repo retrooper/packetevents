@@ -16,13 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.entity.data.provider;
+package com.github.retrooper.packetevents.protocol.entity.sniffer;
 
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
-
-import java.util.List;
-
-public interface DataProvider {
-    List<EntityData> encode();
-    void decode(List<EntityData> data);
+public enum SnifferState {
+    IDLING,
+    FEELING_HAPPY,
+    SCENTING,
+    SNIFFING,
+    SEARCHING,
+    DIGGING,
+    RISING
 }

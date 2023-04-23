@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
@@ -78,36 +79,7 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     }
 
     private PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
-        if (!ByteBufHelper.isReadable(buffer)) return null;
-
-        int preProcessIndex = ByteBufHelper.readerIndex(buffer);
-        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer, true);
-        int processIndex = ByteBufHelper.readerIndex(buffer);
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
-            ByteBufHelper.readerIndex(buffer, processIndex);
-        });
-        if (!packetSendEvent.isCancelled()) {
-            PacketWrapper<?> wrapper = packetSendEvent.getLastUsedWrapper();
-            if (wrapper != null) {
-                ByteBufHelper.clear(buffer);
-                int packetId = packetSendEvent.getPacketId();
-                packetSendEvent.getLastUsedWrapper().writeVarInt(packetId);
-
-                packetSendEvent.getLastUsedWrapper().write();
-            } else {
-                // Pass it along without changes
-                ByteBufHelper.readerIndex(buffer, preProcessIndex);
-            }
-        } else {
-            //Make the buffer unreadable for the next handlers
-            ByteBufHelper.clear(buffer);
-        }
-
-        if (packetSendEvent.hasPostTasks()) {
-            for (Runnable task : packetSendEvent.getPostTasks()) {
-                task.run();
-            }
-        }
+        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, true);
         if (packetSendEvent.hasTasksAfterSend()) {
             promise.addListener((p) -> {
                 for (Runnable task : packetSendEvent.getTasksAfterSend()) {
@@ -115,7 +87,6 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
                 }
             });
         }
-
         return packetSendEvent;
     }
 

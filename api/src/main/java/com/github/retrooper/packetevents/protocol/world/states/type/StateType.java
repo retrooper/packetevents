@@ -21,58 +21,34 @@ package com.github.retrooper.packetevents.protocol.world.states.type;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.MaterialType;
-import com.github.retrooper.packetevents.protocol.world.PushReaction;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
 public class StateType {
     private final String name;
     private final float blastResistance;
     private final float hardness;
-    private final float slipperiness;
-    private final float friction;
-    private final float speed;
-    private final boolean hasGravity;
-    private final boolean isAir;
-    private final boolean isBurnable;
-    private final boolean isFlammable;
-    private final boolean isOccluding;
     private final boolean isSolid;
-    private final boolean isLiquid;
     private final boolean isBlocking;
+    private final boolean isAir;
     private final boolean requiresCorrectTool;
-    private final boolean isReplaceable;
     private final boolean exceedsCube;
-    private final PushReaction pushReaction;
     private final MaterialType materialType;
 
-    public StateType(String name, float blastResistance, float hardness, float slipperiness, float friction, float speed, boolean hasGravity,
-                     boolean isAir, boolean isBurnable, boolean isFlammable, boolean isOccluding, boolean isSolid, boolean isLiquid,
-                     boolean isBlocking, boolean requiresCorrectTool, boolean isReplaceable, boolean exceedsCube, PushReaction pushReaction, MaterialType materialType) {
+    public StateType(String name, float blastResistance, float hardness, boolean isSolid, boolean isBlocking, boolean isAir, boolean requiresCorrectTool, boolean isShapeExceedsCube, MaterialType materialType) {
         this.name = name;
         this.blastResistance = blastResistance;
         this.hardness = hardness;
-        this.slipperiness = slipperiness;
-        this.friction = friction;
-        this.speed = speed;
-        this.hasGravity = hasGravity;
-        this.isAir = isAir;
-        this.isBurnable = isBurnable;
-        this.isFlammable = isFlammable;
-        this.isOccluding = isOccluding;
         this.isSolid = isSolid;
-        this.isLiquid = isLiquid;
         this.isBlocking = isBlocking;
+        this.isAir = isAir;
         this.requiresCorrectTool = requiresCorrectTool;
-        this.isReplaceable = isReplaceable;
-        this.exceedsCube = exceedsCube;
-        this.pushReaction = pushReaction;
+        this.exceedsCube = isShapeExceedsCube;
         this.materialType = materialType;
     }
 
     public WrappedBlockState createBlockState() {
         return WrappedBlockState.getDefaultState(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), this);
     }
-
 
     public WrappedBlockState createBlockState(ClientVersion version) {
         return WrappedBlockState.getDefaultState(version, this);
@@ -90,48 +66,16 @@ public class StateType {
         return hardness;
     }
 
-    public float getSlipperiness() {
-        return slipperiness;
-    }
-
-    public float getFriction() {
-        return friction;
-    }
-
-    public float getSpeed() {
-        return speed;
-    }
-
-    public boolean isHasGravity() {
-        return hasGravity;
-    }
-
-    public boolean isAir() {
-        return isAir;
-    }
-
-    public boolean isBurnable() {
-        return isBurnable;
-    }
-
-    public boolean isFlammable() {
-        return isFlammable;
-    }
-
-    public boolean isOccluding() {
-        return isOccluding;
-    }
-
     public boolean isSolid() {
         return isSolid;
     }
 
-    public boolean isLiquid() {
-        return isLiquid;
-    }
-
     public boolean isBlocking() {
         return isBlocking;
+    }
+
+    public boolean isAir() {
+        return isAir;
     }
 
     public boolean isRequiresCorrectTool() {
@@ -139,15 +83,25 @@ public class StateType {
     }
 
     public boolean isReplaceable() {
-        return isReplaceable;
+        switch (getMaterialType()) {
+            case AIR:
+            case STRUCTURAL_AIR:
+            case REPLACEABLE_PLANT:
+            case REPLACEABLE_FIREPROOF_PLANT:
+            case REPLACEABLE_WATER_PLANT:
+            case WATER:
+            case BUBBLE_COLUMN:
+            case LAVA:
+            case TOP_SNOW:
+            case FIRE:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public boolean exceedsCube() {
         return exceedsCube;
-    }
-
-    public PushReaction getPushReaction() {
-        return pushReaction;
     }
 
     public MaterialType getMaterialType() {
