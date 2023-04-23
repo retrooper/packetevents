@@ -42,44 +42,39 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void read() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
-        this.command = readString(maxMessageLength);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            Instant timestamp = readTimestamp();
-            long salt = readLong();
-            this.messageSignData = new MessageSignData(new SaltSignature(salt, new byte[0]), timestamp);
-            this.signedArguments = readSignedCommandArguments();
+        this.command = readString(256);
+        Instant timestamp = readTimestamp();
+        long salt = readLong();
+        this.messageSignData = new MessageSignData(new SaltSignature(salt, new byte[0]), timestamp);
+        this.signedArguments = readSignedCommandArguments();
 
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-                this.lastSeenMessages = readLastSeenMessagesUpdate();
-            } else {
-                boolean signedPreview = readBoolean();
-                this.messageSignData.setSignedPreview(signedPreview);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            this.lastSeenMessages = readLastSeenMessagesUpdate();
+        } else {
+            boolean signedPreview = readBoolean();
+            this.messageSignData.setSignedPreview(signedPreview);
 
-                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-                    this.legacyLastSeenMessages = readLegacyLastSeenMessagesUpdate();
-                }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+                this.legacyLastSeenMessages = readLegacyLastSeenMessagesUpdate();
             }
         }
     }
 
     @Override
     public void write() {
-        writeString(command);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeTimestamp(messageSignData.getTimestamp());
-            writeLong(messageSignData.getSaltSignature().getSalt());
-            writeSignedCommandArguments(signedArguments);
+        writeString(command, 256);
+        writeTimestamp(messageSignData.getTimestamp());
+        writeLong(messageSignData.getSaltSignature().getSalt());
+        writeSignedCommandArguments(signedArguments);
 
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-                if (lastSeenMessages != null)
-                    writeLastSeenMessagesUpdate(lastSeenMessages);
-            } else {
-                writeBoolean(messageSignData.isSignedPreview());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            if (lastSeenMessages != null)
+                writeLastSeenMessagesUpdate(lastSeenMessages);
+        } else {
+            writeBoolean(messageSignData.isSignedPreview());
 
-                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1) && legacyLastSeenMessages != null) {
-                    writeLegacyLastSeenMessagesUpdate(legacyLastSeenMessages);
-                }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1) && legacyLastSeenMessages != null) {
+                writeLegacyLastSeenMessagesUpdate(legacyLastSeenMessages);
             }
         }
     }
@@ -87,8 +82,10 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
     @Override
     public void copy(WrapperPlayClientChatCommand wrapper) {
         this.command = wrapper.command;
+        this.messageSignData = wrapper.messageSignData;
         this.signedArguments = wrapper.signedArguments;
         this.lastSeenMessages = wrapper.lastSeenMessages;
+        this.legacyLastSeenMessages = wrapper.legacyLastSeenMessages;
     }
 
     public String getCommand() {
