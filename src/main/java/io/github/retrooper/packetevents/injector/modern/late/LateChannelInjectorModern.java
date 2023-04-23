@@ -53,7 +53,7 @@ public class LateChannelInjectorModern implements LateInjector {
         Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
             try {
-                ((Channel)channel).pipeline().remove(PacketEvents.get().getHandlerName());
+                ((Channel) channel).pipeline().remove(PacketEvents.get().getHandlerName());
             } catch (Exception ex) {
 
             }
@@ -70,7 +70,8 @@ public class LateChannelInjectorModern implements LateInjector {
     public void writePacket(Object ch, Object rawNMSPacket) {
         Channel channel = (Channel) ch;
         //Don't write packets to fake channels
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
+                || ClassUtil.getClassSimpleName(channel.getClass()).equals("SpoofedChannel")) {
             return;
         }
         channel.write(rawNMSPacket);
@@ -80,7 +81,8 @@ public class LateChannelInjectorModern implements LateInjector {
     public void flushPackets(Object ch) {
         Channel channel = (Channel) ch;
         //Don't flush packets for fake channels
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
+                || ClassUtil.getClassSimpleName(channel.getClass()).equals("SpoofedChannel")) {
             return;
         }
         channel.flush();
@@ -90,7 +92,8 @@ public class LateChannelInjectorModern implements LateInjector {
     public void sendPacket(Object rawChannel, Object packet) {
         Channel channel = (Channel) rawChannel;
         //Don't send packets to fake channels
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")) {
+        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
+                || ClassUtil.getClassSimpleName(channel.getClass()).equals("SpoofedChannel")) {
             return;
         }
         channel.pipeline().writeAndFlush(packet);
