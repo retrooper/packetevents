@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.protocol.stats;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.MappingHelper;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.kyori.adventure.text.Component;

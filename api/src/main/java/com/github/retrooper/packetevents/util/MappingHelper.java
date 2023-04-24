@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
