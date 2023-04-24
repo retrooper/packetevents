@@ -303,7 +303,7 @@ public class EntityTypes {
     public static final EntityType INTERACTION = define("interaction", DISPLAY);
     public static final EntityType SNIFFER = define("sniffer", ABSTRACT_ANIMAL);
 
-    // This HAS to be at the end of the file so the types load properly, please do not move it
+    // This HAS to be at the end of the file so the types unload properly, please do not move it
     static {
         TYPES_BUILDER.unloadFileMappings();
         LEGACY_TYPES_BUILDER.unloadFileMappings();
