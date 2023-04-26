@@ -38,7 +38,8 @@ public class ServerConnectionInitializer {
 
     public static void initChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-        if (channel.getClass().getSimpleName().equals("FakeChannel")) {
+        if (channel.getClass().getSimpleName().equals("FakeChannel")
+        || channel.getClass().getSimpleName().equals("SpoofedChannel")) {
             return;
         }
         User user = new User(channel, connectionState, null, new UserProfile(null, null));

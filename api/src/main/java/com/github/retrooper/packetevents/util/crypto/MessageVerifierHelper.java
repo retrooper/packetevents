@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.util.crypto;
 
-import com.github.retrooper.packetevents.util.AdventureSerializer;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import net.kyori.adventure.text.Component;
 
 import java.nio.ByteBuffer;

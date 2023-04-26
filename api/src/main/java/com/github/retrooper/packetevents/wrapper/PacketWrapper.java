@@ -26,10 +26,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
-import com.github.retrooper.packetevents.protocol.chat.ChatType;
-import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
-import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
-import com.github.retrooper.packetevents.protocol.chat.RemoteChatSession;
+import com.github.retrooper.packetevents.protocol.chat.*;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
@@ -51,9 +48,9 @@ import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.util.crypto.SignatureData;
@@ -825,7 +822,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public LastSeenMessages.LegacyUpdate readLegacyLastSeenMessagesUpdate() {
-       LastSeenMessages lastSeenMessages = readLastSeenMessages();
+        LastSeenMessages lastSeenMessages = readLastSeenMessages();
         LastSeenMessages.Entry lastReceived = readOptional(PacketWrapper::readLastSeenMessagesEntry);
         return new LastSeenMessages.LegacyUpdate(lastSeenMessages, lastReceived);
     }
@@ -843,6 +840,17 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeLastSeenMessages(LastSeenMessages lastSeenMessages) {
         writeCollection(lastSeenMessages.getEntries(), PacketWrapper::writeLastMessagesEntry);
+    }
+
+    public List<SignedCommandArgument> readSignedCommandArguments() {
+        return readCollection(ArrayList::new, (_packet) -> new SignedCommandArgument(readString(), readByteArray()));
+    }
+
+    public void writeSignedCommandArguments(List<SignedCommandArgument> signedArguments) {
+        writeCollection(signedArguments, (_packet, argument) -> {
+            writeString(argument.getArgument());
+            writeByteArray(argument.getSignature());
+        });
     }
 
     public BitSet readBitSet() {
