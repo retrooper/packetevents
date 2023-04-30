@@ -932,6 +932,34 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeOptional(chatType.getTargetName(), PacketWrapper::writeComponent);
     }
 
+    public Node readNode() {
+        byte flags = readByte();
+        int nodeType = flags & 0x03; // 0: root, 1: literal, 2: argument
+        boolean hasRedirect = (flags & 0x08) != 0;
+        boolean hasSuggestionsType = nodeType == 2 && ((flags & 0x10) != 0);
+
+        List<Integer> children = readList(PacketWrapper::readVarInt);
+
+        Integer redirectNodeIndex = hasRedirect ? readVarInt() : null;
+        String name = nodeType == 1 || nodeType == 2 ? readString() : null;
+        Integer parserID = nodeType == 2 ? readVarInt() : null;
+        List<Object> properties = nodeType == 2 ? Parsers.getParsers().get(parserID).getProperties(this).orElse(null) : null;
+        ResourceLocation suggestionType = hasSuggestionsType ? readIdentifier() : null;
+
+        return new Node(flags, children, redirectNodeIndex, name, parserID, properties, suggestionType);
+    }
+
+    public void writeNode(Node node) {
+        writeByte(node.getFlags());
+        writeList(node.getChildren(), PacketWrapper::writeVarInt);
+        node.getRedirectNodeIndex().ifPresent(this::writeVarInt);
+        node.getName().ifPresent(this::writeString);
+        node.getParserID().ifPresent(this::writeVarInt);
+        if (node.getProperties().isPresent())
+            Parsers.getParsers().get(node.getParserID().get()).writeProperties(this, node.getProperties().get());
+        node.getSuggestionsType().ifPresent(this::writeIdentifier);
+    }
+
     public <T extends Enum<T>> EnumSet<T> readEnumSet(Class<T> enumClazz) {
         T[] values = enumClazz.getEnumConstants();
         byte[] bytes = new byte[-Math.floorDiv(-values.length, 8)];
