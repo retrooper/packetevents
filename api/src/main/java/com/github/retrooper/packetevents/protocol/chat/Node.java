@@ -20,6 +20,7 @@
 package com.github.retrooper.packetevents.protocol.chat;
 
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class Node {
     private Optional<List<Object>> properties;
     private Optional<ResourceLocation> suggestionsType;
 
-    public Node(byte flags, List<Integer> children, Integer redirectNodeIndex, String name, Integer parserID, List<Object> properties, ResourceLocation suggestionsType) {
+    public Node(byte flags, List<Integer> children, @Nullable Integer redirectNodeIndex, @Nullable String name, @Nullable Integer parserID, @Nullable List<Object> properties, @Nullable ResourceLocation suggestionsType) {
         this.flags = flags;
         this.children = children;
         this.redirectNodeIndex = Optional.ofNullable(redirectNodeIndex);
