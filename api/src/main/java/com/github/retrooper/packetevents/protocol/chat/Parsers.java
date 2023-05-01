@@ -174,7 +174,7 @@ public class Parsers {
             this.write = Optional.ofNullable(write);
         }
 
-        public Optional<List<Object>> getProperties(PacketWrapper<?> packetWrapper) {
+        public Optional<List<Object>> readProperties(PacketWrapper<?> packetWrapper) {
             return read.map(fn -> fn.apply(packetWrapper));
         }
 

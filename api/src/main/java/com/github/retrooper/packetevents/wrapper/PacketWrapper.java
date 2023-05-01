@@ -943,7 +943,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         Integer redirectNodeIndex = hasRedirect ? readVarInt() : null;
         String name = nodeType == 1 || nodeType == 2 ? readString() : null;
         Integer parserID = nodeType == 2 ? readVarInt() : null;
-        List<Object> properties = nodeType == 2 ? Parsers.getParsers().get(parserID).getProperties(this).orElse(null) : null;
+        List<Object> properties = nodeType == 2 ? Parsers.getParsers().get(parserID).readProperties(this).orElse(null) : null;
         ResourceLocation suggestionType = hasSuggestionsType ? readIdentifier() : null;
 
         return new Node(flags, children, redirectNodeIndex, name, parserID, properties, suggestionType);
