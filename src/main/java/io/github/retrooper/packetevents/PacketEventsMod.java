@@ -44,8 +44,8 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer, Cli
         PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketSend(PacketSendEvent event) {
-                System.out.println("Packet send: " + event.getPacketType());
-                System.out.println("player: " + event.getPlayer());
+                //System.out.println("Packet send: " + event.getPacketType());
+                //System.out.println("player: " + event.getPlayer());
             }
         });
     }
