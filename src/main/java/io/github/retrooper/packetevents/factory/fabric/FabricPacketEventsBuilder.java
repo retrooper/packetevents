@@ -2,8 +2,6 @@ package io.github.retrooper.packetevents.factory.fabric;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
-import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
-import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
@@ -11,15 +9,15 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
-import io.github.retrooper.packetevents.handler.PacketDecoder;
-import io.github.retrooper.packetevents.handler.PacketEncoder;
+import io.github.retrooper.packetevents.PacketEventsMod;
+import io.github.retrooper.packetevents.handler.ServerPacketDecoder;
+import io.github.retrooper.packetevents.handler.ServerPacketEncoder;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
@@ -27,31 +25,33 @@ import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerA
 import io.netty.channel.Channel;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.SharedConstants;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.Connection;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public class FabricPacketEventsBuilder {
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]");
-    private static PacketEventsAPI<Minecraft> INSTANCE;
+    private static PacketEventsAPI<MinecraftServer> INSTANCE;
 
     public static void clearBuildCache() {
         INSTANCE = null;
     }
 
-    public static PacketEventsAPI<Minecraft> build(String modId) {
+    public static PacketEventsAPI<MinecraftServer> build(String modId) {
         if (INSTANCE == null) {
             INSTANCE = buildNoCache(modId);
         }
         return INSTANCE;
     }
 
-    public static PacketEventsAPI<Minecraft> build(String modId, PacketEventsSettings settings) {
+    public static PacketEventsAPI<MinecraftServer> build(String modId, PacketEventsSettings settings) {
         if (INSTANCE == null) {
             INSTANCE = buildNoCache(modId, settings);
         }
@@ -59,11 +59,11 @@ public class FabricPacketEventsBuilder {
     }
 
 
-    public static PacketEventsAPI<Minecraft> buildNoCache(String modId) {
+    public static PacketEventsAPI<MinecraftServer> buildNoCache(String modId) {
         return buildNoCache(modId, new PacketEventsSettings());
     }
 
-    public static PacketEventsAPI<Minecraft> buildNoCache(String modId, PacketEventsSettings inSettings) {
+    public static PacketEventsAPI<MinecraftServer> buildNoCache(String modId, PacketEventsSettings inSettings) {
         return new PacketEventsAPI<>() {
             private final PacketEventsSettings settings = inSettings;
             //TODO Implement platform version
@@ -94,11 +94,18 @@ public class FabricPacketEventsBuilder {
             private final PlayerManagerAbstract playerManager = new PlayerManagerAbstract() {
                 @Override
                 public int getPing(@NotNull Object player) {
-                    String name = ((LocalPlayer) player).getGameProfile().getName();
+                    UUID id = ((Player) player).getGameProfile().getId();
                     try {
-                        return ((LocalPlayer) player).connection.getPlayerInfo(name).getLatency();
+                        var minecraft = getPlugin();
+                        if(minecraft == null)
+                            return ((LocalPlayer) player).connection.getPlayerInfo(id).getLatency();
+                        else {
+                            var playerManager = minecraft.getPlayerList();
+                            var playerEntity = playerManager.getPlayer(id);
+                            return playerEntity.latency;
+                        }
                     } catch (Exception ex) {
-                        PacketEvents.getAPI().getLogManager().debug("Failed to get ping for player " + name);
+                        PacketEvents.getAPI().getLogManager().debug("Failed to get ping for player " + id);
                         return -1;
                     }
                 }
@@ -113,7 +120,7 @@ public class FabricPacketEventsBuilder {
 
             private final ChannelInjector injector = new ChannelInjector() {
                 @Override
-                public boolean isServerBound() {
+                   public boolean isServerBound() {
                     return true;
                 }
 
@@ -130,20 +137,20 @@ public class FabricPacketEventsBuilder {
                 @Override
                 public void updateUser(Object ch, User user) {
                     Channel channel = (Channel) ch;
-                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+                    ServerPacketDecoder decoder = (ServerPacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
                     decoder.user = user;
-                    PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
+                    ServerPacketEncoder encoder = (ServerPacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
                     encoder.user = user;
                 }
 
                 @Override
                 public void setPlayer(Object ch, Object player) {
                     Channel channel = (Channel) ch;
-                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-                    decoder.player = (LocalPlayer) player;
+                    ServerPacketDecoder decoder = (ServerPacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+                    decoder.player = (Player) player;
 
-                    PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
-                    encoder.player = (LocalPlayer) player;
+                    ServerPacketEncoder encoder = (ServerPacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
+                    encoder.player = (Player) player;
                 }
             };
             private final NettyManager nettyManager = new NettyManagerImpl();
@@ -152,7 +159,7 @@ public class FabricPacketEventsBuilder {
                 protected void log(Level level, @Nullable NamedTextColor color, String message) {
                     //First we must strip away the color codes that might be in this message
                     message = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
-                    System.out.println(message);
+                    PacketEventsMod.LOGGER.info(message);
                 }
             };
             private boolean loaded;
@@ -176,16 +183,6 @@ public class FabricPacketEventsBuilder {
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalPacketListener());
-                    getEventManager().registerListener(new SimplePacketListenerAbstract() {
-                        @Override
-                        public void onPacketPlaySend(PacketPlaySendEvent event) {
-                            if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
-                                System.out.println("Is player null? " + (Minecraft.getInstance().player != null));
-                                PacketEvents.getAPI().getInjector().setPlayer(event.getChannel(),
-                                        Minecraft.getInstance().player);
-                            }
-                        }
-                    });
                 }
             }
 
@@ -230,8 +227,8 @@ public class FabricPacketEventsBuilder {
             }
 
             @Override
-            public Minecraft getPlugin() {
-                return Minecraft.getInstance();
+            public MinecraftServer getPlugin() {
+                return ServerInstanceManager.getServerInstance();
             }
 
             @Override

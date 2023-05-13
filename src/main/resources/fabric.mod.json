@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "PacketEvents Fabric",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "fabric implementation of packetevents",
   "authors": [
     "Me!"
   ],
@@ -23,6 +23,9 @@
     ],
     "main": [
       "io.github.retrooper.packetevents.PacketEventsMod"
+    ],
+    "client": [
+      "io.github.retrooper.packetevents.PacketEventsMod"
     ]
   },
   "mixins": [
@@ -30,9 +33,9 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.12.12",
+    "fabricloader": ">=0.14.18",
     "fabric": "*",
-    "minecraft": "1.18.x",
+    "minecraft": "1.19.x",
     "java": ">=17"
   },
   "suggests": {

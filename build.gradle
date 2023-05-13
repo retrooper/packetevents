@@ -3,10 +3,6 @@ plugins {
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
@@ -40,7 +36,7 @@ dependencies {
 
 	mappings loom.layered() {
 		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-${project.minecraft_version}:${project.parchment_mappings}")
+		parchment("org.parchmentmc.data:parchment-${project.parchment_minecraft_version}:${project.parchment_mappings}")
 	}
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"

@@ -4,11 +4,14 @@
   "package": "io.github.retrooper.packetevents.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-  ],
-  "client": [
-    "PacketEventsInjectorMixin"
+    "ConnectionAccessor",
+    "PacketEventsInjectorMixin",
+    "ServerGamePacketListenerImplAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "ClientPacketListenerAccessor"
+  ]
 }

@@ -16,13 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ChannelHandler.Sharable
-public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
+public class ServerPacketDecoder extends MessageToMessageDecoder<ByteBuf> {
     private static Method DECOMPRESSOR_METHOD, COMPRESSOR_METHOD;
     public User user;
     public Player player;
     public boolean checkedCompression;
 
-    public PacketDecoder(User user) {
+    public ServerPacketDecoder(User user) {
         this.user = user;
     }
 
@@ -32,7 +32,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
             ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(msg);
             boolean recompress = handleCompression(ctx, outputBuffer);
 
-            PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, outputBuffer, false);
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer, false);
             //TODO hasTasksAfter
             if (outputBuffer.isReadable()) {
                 if (recompress) {
@@ -70,9 +70,9 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
                     }
                 }
                 //Relocate handlers
-                PacketDecoder decoder = (PacketDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
+                ServerPacketDecoder decoder = (ServerPacketDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
                 ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
-                PacketEncoder encoder = (PacketEncoder) ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
+                ServerPacketEncoder encoder = (ServerPacketEncoder) ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
                 ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
                 checkedCompression = true;
                 return true;

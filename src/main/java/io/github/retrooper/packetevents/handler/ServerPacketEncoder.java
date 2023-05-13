@@ -12,11 +12,11 @@ import io.netty.util.ReferenceCountUtil;
 import net.minecraft.world.entity.player.Player;
 
 @ChannelHandler.Sharable
-public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
+public class ServerPacketEncoder extends MessageToByteEncoder<ByteBuf> {
     public User user;
     public Player player;
 
-    public PacketEncoder(User user) {
+    public ServerPacketEncoder(User user) {
         this.user = user;
     }
 
@@ -57,7 +57,7 @@ public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
         if (msg.isReadable()) {
-            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, msg, false);
+            PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, msg, false);
             out.writeBytes(msg);
         }
     }
