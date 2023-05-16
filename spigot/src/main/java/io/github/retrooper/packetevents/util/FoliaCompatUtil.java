@@ -18,7 +18,7 @@ public class FoliaCompatUtil {
 
     static {
         try {
-            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            Class.forName("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
             folia = true;
         } catch (ClassNotFoundException e) {
             folia = false;
