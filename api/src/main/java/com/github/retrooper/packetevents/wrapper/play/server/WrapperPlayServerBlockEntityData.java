@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.TileEntityType;
@@ -49,14 +50,22 @@ public class WrapperPlayServerBlockEntityData extends PacketWrapper<WrapperPlayS
     @Override
     public void read() {
         this.position = readBlockPosition();
-        this.type = readInt();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            this.type = readVarInt();
+        } else {
+            this.type = readUnsignedByte();
+        }
         this.nbt = readNBT();
     }
 
     @Override
     public void write() {
         writeBlockPosition(this.position);
-        writeInt(this.type);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            writeVarInt(this.type);
+        } else {
+            writeByte(this.type);
+        }
         writeNBT(this.nbt);
     }
 
