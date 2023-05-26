@@ -134,6 +134,8 @@ public class EntityDataTypes {
 
     public static final EntityDataType<Optional<UUID>> OPTIONAL_UUID = define("optional_uuid",
             (PacketWrapper<?> wrapper) -> Optional.ofNullable(wrapper.readOptional(PacketWrapper::readUUID)),
+            (PacketWrapper<?> wrapper, Optional<UUID> value) ->
+                    wrapper.writeOptional(value.orElse(null), PacketWrapper::writeUUID));
 
     public static final EntityDataType<Integer> BLOCK_STATE = define("block_state",
             readIntDeserializer(), writeIntSerializer());
