@@ -661,6 +661,9 @@ public class PacketWrapper<T extends PacketWrapper> {
             while ((index = readUnsignedByte()) != 255) {
                 int typeID = v1_10 ? readVarInt() : readUnsignedByte();
                 EntityDataType<?> type = EntityDataTypes.getById(serverVersion.toClientVersion(), typeID);
+                if (type == null) {
+                    throw new IllegalStateException("Unknown entity metadata type id: " + typeID + " version " + serverVersion.toClientVersion());
+                }
                 Object value = type.getDataDeserializer().apply(this);
                 list.add(new EntityData(index, type, value));
             }
