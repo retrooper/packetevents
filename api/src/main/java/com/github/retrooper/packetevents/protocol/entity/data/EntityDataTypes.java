@@ -137,6 +137,9 @@ public class EntityDataTypes {
             (PacketWrapper<?> wrapper, Optional<UUID> value) ->
                     wrapper.writeOptional(value.orElse(null), PacketWrapper::writeUUID));
 
+    public static final EntityDataType<Integer> BLOCK_STATE = define("block_state",
+            readIntDeserializer(), writeIntSerializer());
+
     public static final EntityDataType<Integer> OPTIONAL_BLOCK_STATE = define("optional_block_state", readIntDeserializer(), writeIntSerializer());
 
     public static final EntityDataType<NBTCompound> NBT = define("nbt", PacketWrapper::readNBT, PacketWrapper::writeNBT);
