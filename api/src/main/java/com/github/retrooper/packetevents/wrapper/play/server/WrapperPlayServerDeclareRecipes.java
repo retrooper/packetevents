@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.recipe.Ingredient;
 import com.github.retrooper.packetevents.protocol.recipe.Recipe;
 import com.github.retrooper.packetevents.protocol.recipe.RecipeType;
@@ -34,6 +35,10 @@ public class WrapperPlayServerDeclareRecipes extends PacketWrapper<WrapperPlaySe
 
     public WrapperPlayServerDeclareRecipes(PacketSendEvent event) {
         super(event);
+    }
+
+    public WrapperPlayServerDeclareRecipes(PacketTypeCommon packetType) {
+        super(packetType);
     }
 
     public Recipe[] getRecipes() {
@@ -54,6 +59,7 @@ public class WrapperPlayServerDeclareRecipes extends PacketWrapper<WrapperPlaySe
             switch (type) {
                 case CRAFTING_SHAPELESS: {
                     String group = readString();
+                    int category = readVarInt();
                     Ingredient[] ingredients = new Ingredient[readVarInt()];
                     for (int j = 0; j < ingredients.length; j++) {
                         ingredients[j] = this.readIngredient();
@@ -61,13 +67,14 @@ public class WrapperPlayServerDeclareRecipes extends PacketWrapper<WrapperPlaySe
 
                     ItemStack result = readItemStack();
 
-                    data = new ShapelessRecipeData(group, ingredients, result);
+                    data = new ShapelessRecipeData(group, CraftingBookCategory.byId(category), ingredients, result);
                     break;
                 }
                 case CRAFTING_SHAPED: {
                     int width = readVarInt();
                     int height = readVarInt();
                     String group = readString();
+                    int category = readVarInt();
                     Ingredient[] ingredients = new Ingredient[width * height];
                     for (int j = 0; j < ingredients.length; j++) {
                         ingredients[j] = this.readIngredient();
@@ -75,7 +82,7 @@ public class WrapperPlayServerDeclareRecipes extends PacketWrapper<WrapperPlaySe
 
                     ItemStack result = readItemStack();
 
-                    data = new ShapedRecipeData(width, height, group, ingredients, result);
+                    data = new ShapedRecipeData(width, height, group, CraftingBookCategory.byId(category), ingredients, result);
                     break;
                 }
                 case SMELTING:
@@ -146,6 +153,7 @@ public class WrapperPlayServerDeclareRecipes extends PacketWrapper<WrapperPlaySe
                     ShapelessRecipeData data = (ShapelessRecipeData) recipe.getData();
 
                     writeString(data.getGroup());
+                    writeVarInt(data.getCategory().getId());
                     writeVarInt(data.getIngredients().length);
                     for (Ingredient ingredient : data.getIngredients()) {
                         this.writeIngredient(ingredient);
@@ -163,6 +171,7 @@ public class WrapperPlayServerDeclareRecipes extends PacketWrapper<WrapperPlaySe
                     writeVarInt(data.getWidth());
                     writeVarInt(data.getHeight());
                     writeString(data.getGroup());
+                    writeVarInt(data.getCategory().getId());
                     for (Ingredient ingredient : data.getIngredients()) {
                         this.writeIngredient(ingredient);
                     }
