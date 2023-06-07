@@ -82,11 +82,12 @@ public enum ClientVersion {
     V_1_19_1(760),
     V_1_19_3(761),
     V_1_19_4(762),
+    V_1_20_0(763),
     //TODO UPDATE Add new protocol version field
 
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
-    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_19_4.protocolVersion + 1, true),
+    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_20_0.protocolVersion + 1, true),
 
     UNKNOWN(-1, true);
 
