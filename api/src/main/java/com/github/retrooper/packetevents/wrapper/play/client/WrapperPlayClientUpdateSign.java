@@ -30,15 +30,17 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClientUpdateSign> {
     private Vector3i blockPosition;
     private String[] textLines;
+    private boolean isFrontText = true;
 
     public WrapperPlayClientUpdateSign(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientUpdateSign(Vector3i blockPosition, String[] textLines) {
+    public WrapperPlayClientUpdateSign(Vector3i blockPosition, String[] textLines, boolean isFrontText) {
         super(PacketType.Play.Client.UPDATE_SIGN);
         this.blockPosition = blockPosition;
         this.textLines = textLines;
+        this.isFrontText = isFrontText;
     }
 
     @Override
@@ -50,6 +52,9 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
             int y = readShort();
             int z = readInt();
             this.blockPosition = new Vector3i(x, y, z);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
+            isFrontText = readBoolean();
         }
         textLines = new String[4];
         for (int i = 0; i < 4; i++) {
@@ -67,14 +72,18 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
             writeShort(blockPosition.y);
             writeInt(blockPosition.z);
         }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
+            writeBoolean(isFrontText);
+        }
         for (int i = 0; i < 4; i++) {
-            writeString(textLines[i], 384);
+            writeString(textLines[i]);
         }
     }
 
     @Override
     public void copy(WrapperPlayClientUpdateSign wrapper) {
         this.blockPosition = wrapper.blockPosition;
+        this.isFrontText = wrapper.isFrontText;
         this.textLines = wrapper.textLines;
     }
 
@@ -112,5 +121,13 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
      */
     public void setTextLines(String[] textLines) {
         this.textLines = textLines;
+    }
+
+    public boolean isFrontText() {
+        return isFrontText;
+    }
+
+    public void setFrontText(boolean frontText) {
+        isFrontText = frontText;
     }
 }

@@ -40,6 +40,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     private boolean worldFlat;
     private boolean keepingAllPlayerData;
     private WorldBlockPosition lastDeathPosition;
+    private Integer portalCooldown;
 
     //This should not be accessed
     private String levelType;
@@ -50,7 +51,8 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     public WrapperPlayServerRespawn(Dimension dimension, @Nullable String worldName, Difficulty difficulty, long hashedSeed, GameMode gameMode,
                                     @Nullable GameMode previousGameMode, boolean worldDebug, boolean worldFlat, boolean keepingAllPlayerData,
-                                    @Nullable ResourceLocation deathDimensionName, @Nullable WorldBlockPosition lastDeathPosition) {
+                                    @Nullable ResourceLocation deathDimensionName, @Nullable WorldBlockPosition lastDeathPosition,
+                                    @Nullable Integer portalCooldown) {
         super(PacketType.Play.Server.RESPAWN);
         this.dimension = dimension;
         setWorldName(worldName);
@@ -62,6 +64,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         this.worldFlat = worldFlat;
         this.keepingAllPlayerData = keepingAllPlayerData;
         this.lastDeathPosition = lastDeathPosition;
+        this.portalCooldown = portalCooldown;
     }
 
     @Override
@@ -83,6 +86,9 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             keepingAllPlayerData = readBoolean();
             if (v1_19) {
                 lastDeathPosition = readOptional(PacketWrapper::readWorldBlockPosition);
+            }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
+                portalCooldown = readVarInt();
             }
         } else {
             dimension = new Dimension(readInt());
@@ -121,6 +127,10 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             writeBoolean(keepingAllPlayerData);
             if (v1_19) {
                 writeOptional(lastDeathPosition, PacketWrapper::writeWorldBlockPosition);
+            }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
+                int pCooldown = portalCooldown != null ? portalCooldown : 0;
+                writeVarInt(pCooldown);
             }
         } else {
             writeInt(dimension.getId());
@@ -238,5 +248,13 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     public void setLastDeathPosition(@Nullable WorldBlockPosition lastDeathPosition) {
         this.lastDeathPosition = lastDeathPosition;
+    }
+
+    public Optional<Integer> getPortalCooldown() {
+        return Optional.ofNullable(portalCooldown);
+    }
+
+    public void setPortalCooldown(int portalCooldown) {
+        this.portalCooldown = portalCooldown;
     }
 }

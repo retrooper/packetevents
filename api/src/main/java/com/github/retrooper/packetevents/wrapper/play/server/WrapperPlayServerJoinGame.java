@@ -24,12 +24,12 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.*;
-import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJoinGame> {
     private int entityID;
@@ -53,6 +53,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     private boolean isDebug;
     private boolean isFlat;
     private WorldBlockPosition lastDeathPosition;
+    private Integer portalCooldown;
 
     public WrapperPlayServerJoinGame(PacketSendEvent event) {
         super(event);
@@ -64,7 +65,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                                      Difficulty difficulty, String worldName, long hashedSeed,
                                      int maxPlayers, int viewDistance, int simulationDistance,
                                      boolean reducedDebugInfo, boolean enableRespawnScreen,
-                                     boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition) {
+                                     boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition, @Nullable Integer portalCooldown) {
         super(PacketType.Play.Server.JOIN_GAME);
         this.entityID = entityID;
         this.hardcore = hardcore;
@@ -84,6 +85,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         this.isDebug = isDebug;
         this.isFlat = isFlat;
         this.lastDeathPosition = lastDeathPosition;
+        this.portalCooldown = portalCooldown;
     }
 
     @Override
@@ -146,6 +148,9 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         }
         if (v1_19) {
             lastDeathPosition = readOptional(PacketWrapper::readWorldBlockPosition);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
+            portalCooldown = readVarInt();
         }
     }
 
@@ -224,6 +229,10 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         if (v1_19) {
             writeOptional(lastDeathPosition, PacketWrapper::writeWorldBlockPosition);
         }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
+            int pCooldown = portalCooldown != null ? portalCooldown : 0;
+            writeVarInt(pCooldown);
+        }
     }
 
     @Override
@@ -246,6 +255,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         isDebug = wrapper.isDebug;
         isFlat = wrapper.isFlat;
         lastDeathPosition = wrapper.lastDeathPosition;
+        portalCooldown = wrapper.portalCooldown;
     }
 
     public int getEntityId() {
@@ -392,5 +402,13 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
 
     public void setLastDeathPosition(@Nullable WorldBlockPosition lastDeathPosition) {
         this.lastDeathPosition = lastDeathPosition;
+    }
+
+    public Optional<Integer> getPortalCooldown() {
+        return Optional.ofNullable(portalCooldown);
+    }
+
+    public void setPortalCooldown(int portalCooldown) {
+        this.portalCooldown = portalCooldown;
     }
 }

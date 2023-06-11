@@ -19,20 +19,24 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class WrapperPlayServerDeathCombatEvent extends PacketWrapper<WrapperPlayServerDeathCombatEvent> {
     private int playerId;
-    private int entityId;
+    private Integer entityId;
     private Component deathMessage;
 
     public WrapperPlayServerDeathCombatEvent(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerDeathCombatEvent(int playerId, int entityId, Component deathMessage) {
+    public WrapperPlayServerDeathCombatEvent(int playerId, @Nullable Integer entityId, Component deathMessage) {
         super(PacketType.Play.Server.DEATH_COMBAT_EVENT);
         this.playerId = playerId;
         this.entityId = entityId;
@@ -42,14 +46,19 @@ public class WrapperPlayServerDeathCombatEvent extends PacketWrapper<WrapperPlay
     @Override
     public void read() {
         this.playerId = readVarInt();
-        this.entityId = readInt();
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
+            this.entityId = readInt();
+        }
         this.deathMessage = readComponent();
     }
 
     @Override
     public void write() {
         writeVarInt(this.playerId);
-        writeInt(this.entityId);
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
+            int id = entityId != null ? entityId : 0;
+            writeInt(id);
+        }
         writeComponent(this.deathMessage);
     }
 
@@ -68,8 +77,8 @@ public class WrapperPlayServerDeathCombatEvent extends PacketWrapper<WrapperPlay
         this.playerId = playerId;
     }
 
-    public int getEntityId() {
-        return entityId;
+    public Optional<Integer> getEntityId() {
+        return Optional.ofNullable(entityId);
     }
 
     public void setEntityId(int entityId) {

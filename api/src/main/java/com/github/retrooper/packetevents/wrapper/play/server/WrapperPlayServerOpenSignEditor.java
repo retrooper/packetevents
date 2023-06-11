@@ -26,14 +26,16 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerOpenSignEditor extends PacketWrapper<WrapperPlayServerOpenSignEditor> {
     private Vector3i position;
+    private boolean isFrontText = true;
 
     public WrapperPlayServerOpenSignEditor(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerOpenSignEditor(Vector3i position) {
+    public WrapperPlayServerOpenSignEditor(Vector3i position, boolean isFrontText) {
         super(PacketType.Play.Server.OPEN_SIGN_EDITOR);
         this.position = position;
+        this.isFrontText = isFrontText;
     }
 
     @Override
@@ -45,6 +47,9 @@ public class WrapperPlayServerOpenSignEditor extends PacketWrapper<WrapperPlaySe
             int y = readInt();
             int z = readInt();
             this.position = new Vector3i(x, y, z);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
+            isFrontText = readBoolean();
         }
     }
 
@@ -58,11 +63,15 @@ public class WrapperPlayServerOpenSignEditor extends PacketWrapper<WrapperPlaySe
             writeInt(position.y);
             writeInt(position.z);
         }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
+            writeBoolean(isFrontText);
+        }
     }
 
     @Override
     public void copy(WrapperPlayServerOpenSignEditor wrapper) {
         this.position = wrapper.position;
+        this.isFrontText = wrapper.isFrontText;
     }
 
     public Vector3i getPosition() {
@@ -71,5 +80,13 @@ public class WrapperPlayServerOpenSignEditor extends PacketWrapper<WrapperPlaySe
 
     public void setPosition(Vector3i position) {
         this.position = position;
+    }
+
+    public boolean isFrontText() {
+        return isFrontText;
+    }
+
+    public void setFrontText(boolean frontText) {
+        isFrontText = frontText;
     }
 }

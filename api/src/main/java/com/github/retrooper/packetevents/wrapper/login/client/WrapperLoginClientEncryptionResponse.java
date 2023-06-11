@@ -57,17 +57,22 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
     @Override
     public void read() {
         this.encryptedSharedSecret = readByteArray(ByteBufHelper.readableBytes(buffer));
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19) && !readBoolean()) {
-            this.saltSignature = readSaltSignature();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_2)
+                && !readBoolean()) {
+            saltSignature = readSaltSignature();
         } else {
-            this.encryptedVerifyToken = readByteArray();
+            encryptedVerifyToken = readByteArray();
         }
     }
 
     @Override
     public void write() {
         writeByteArray(encryptedSharedSecret);
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19) && saltSignature != null) {
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_2)
+                && saltSignature != null) {
             writeBoolean(false);
             writeSaltSignature(saltSignature);
         } else {

@@ -19,18 +19,22 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class WrapperPlayServerEndCombatEvent extends PacketWrapper<WrapperPlayServerEndCombatEvent> {
     private int duration;
-    private int entityId;
+    private Integer entityId;
 
     public WrapperPlayServerEndCombatEvent(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEndCombatEvent(int duration, int entityId) {
+    public WrapperPlayServerEndCombatEvent(int duration, @Nullable Integer entityId) {
         super(PacketType.Play.Server.END_COMBAT_EVENT);
         this.duration = duration;
         this.entityId = entityId;
@@ -39,13 +43,18 @@ public class WrapperPlayServerEndCombatEvent extends PacketWrapper<WrapperPlaySe
     @Override
     public void read() {
         this.duration = readVarInt();
-        this.entityId = readInt();
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
+            this.entityId = readInt();
+        }
     }
 
     @Override
     public void write() {
-        writeVarInt(this.duration);
-        writeInt(this.entityId);
+        writeVarInt(duration);
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
+            int id = entityId != null ? entityId : 0;
+            writeInt(id);
+        }
     }
 
     @Override
@@ -62,8 +71,8 @@ public class WrapperPlayServerEndCombatEvent extends PacketWrapper<WrapperPlaySe
         this.duration = duration;
     }
 
-    public int getEntityId() {
-        return entityId;
+    public Optional<Integer> getEntityId() {
+        return Optional.ofNullable(entityId);
     }
 
     public void setEntityId(int entityId) {

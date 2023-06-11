@@ -214,7 +214,9 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            trustEdges = readBoolean();
+            if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
+                trustEdges = readBoolean();
+            }
 
             skyLightMask = readChunkMask();
             blockLightMask = readChunkMask();
@@ -434,7 +436,9 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            writeBoolean(trustEdges);
+            if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
+                writeBoolean(trustEdges);
+            }
             writeChunkMask(skyLightMask);
             writeChunkMask(blockLightMask);
             writeChunkMask(emptySkyLightMask);
