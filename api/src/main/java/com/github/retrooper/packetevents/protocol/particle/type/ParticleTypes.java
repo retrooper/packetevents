@@ -44,7 +44,8 @@ public class ParticleTypes {
             ClientVersion.V_1_17,
             ClientVersion.V_1_18,
             ClientVersion.V_1_19,
-            ClientVersion.V_1_19_4);
+            ClientVersion.V_1_19_4,
+            ClientVersion.V_1_20);
 
     public static ParticleType define(String key, Function<PacketWrapper<?>, ParticleData> readDataFunction, BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction) {
         TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
@@ -203,7 +204,13 @@ public class ParticleTypes {
     public static final ParticleType ELECTRIC_SPARK = define("electric_spark");
     public static final ParticleType SCRAPE = define("scrape");
     public static final ParticleType SHRIEK = define("shriek", ParticleShriekData::read, (wrapper, data) -> ParticleShriekData.write(wrapper, (ParticleShriekData) data));
-
+    //Added in 1.19.3, BUT REMOVED in 1.20, replaced with CHERRY_LEAVES
+    public static final ParticleType DRIPPING_CHERRY_LEAVES = define("dripping_cherry_leaves");
+    public static final ParticleType FALLING_CHERRY_LEAVES = define("falling_cherry_leaves");
+    public static final ParticleType LANDING_CHERRY_LEAVES = define("landing_cherry_leaves");
+    //Added in 1.20
+    public static final ParticleType CHERRY_LEAVES = define("cherry_leaves");
+    public static final ParticleType EGG_CRACK = define("egg_crack");
     static {
         TYPES_BUILDER.unloadFileMappings();
     }
