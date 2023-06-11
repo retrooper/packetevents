@@ -46,7 +46,8 @@ public class ItemTypes {
             ClientVersion.V_1_18,
             ClientVersion.V_1_19,
             ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4);
+            ClientVersion.V_1_19_4,
+            ClientVersion.V_1_20);
 
     public static final ItemType GILDED_BLACKSTONE = builder("gilded_blackstone").setMaxAmount(64).setPlacedType(StateTypes.GILDED_BLACKSTONE).build();
     public static final ItemType NETHER_BRICK_SLAB = builder("nether_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.NETHER_BRICK_SLAB).build();
@@ -1277,7 +1278,38 @@ public class ItemTypes {
     public static ItemType POTTERY_SHARD_PRIZE = builder("POTTERY_SHARD_PRIZE").setMaxAmount(64).build();
     public static ItemType POTTERY_SHARD_ARMS_UP = builder("POTTERY_SHARD_ARMS_UP").setMaxAmount(64).build();
     public static ItemType POTTERY_SHARD_SKULL = builder("POTTERY_SHARD_SKULL").setMaxAmount(64).build();
-
+    //1.20 items
+    public static ItemType SUSPICIOUS_GRAVEL = builder("SUSPICIOUS_GRAVEL").setMaxAmount(64).build();
+    public static ItemType PITCHER_PLANT = builder("PITCHER_PLANT").setMaxAmount(64).build();
+    public static ItemType SNIFFER_EGG = builder("SNIFFER_EGG").setMaxAmount(64).build();
+    public static ItemType CALIBRATED_SCULK_SENSOR = builder("CALIBRATED_SCULK_SENSOR").setMaxAmount(64).build();
+    public static ItemType PITCHER_POD = builder("PITCHER_POD").setMaxAmount(64).build();
+    public static ItemType MUSIC_DISC_RELIC = builder("MUSIC_DISC_RELIC").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).build();
+    public static ItemType WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE = builder("WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE").setMaxAmount(64).build();
+    public static ItemType SHARPER_ARMOR_TRIM_SMITHING_TEMPLATE = builder("SHARPER_ARMOR_TRIM_SMITHING_TEMPLATE").setMaxAmount(64).build();
+    public static ItemType SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE = builder("SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE").setMaxAmount(64).build();
+    public static ItemType RAISER_ARMOR_TRIM_SMITHING_TEMPLATE = builder("RAISER_ARMOR_TRIM_SMITHING_TEMPLATE").setMaxAmount(64).build();
+    public static ItemType HOST_ARMOR_TRIM_SMITHING_TEMPLATE = builder("HOST_ARMOR_TRIM_SMITHING_TEMPLATE").setMaxAmount(64).build();
+    public static ItemType ANGLER_POTTERY_SHERD = builder("ANGLER_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType ARCHER_POTTERY_SHERD = builder("ARCHER_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType ARMS_UP_POTTERY_SHERD = builder("ARMS_UP_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType BLADE_POTTERY_SHERD = builder("BLADE_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType BREWER_POTTERY_SHERD = builder("BREWER_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType BURN_POTTERY_SHERD = builder("BURN_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType DANGER_POTTERY_SHERD = builder("DANGER_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType EXPLORER_POTTERY_SHERD = builder("EXPLORER_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType FRIEND_POTTERY_SHERD = builder("FRIEND_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType HEART_POTTERY_SHERD = builder("HEART_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType HEARTBREAK_POTTERY_SHERD = builder("HEARTBREAK_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType HOWL_POTTERY_SHERD = builder("HOWL_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType MINER_POTTERY_SHERD = builder("MINER_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType MOURNER_POTTERY_SHERD = builder("MOURNER_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType PLENTY_POTTERY_SHERD = builder("PLENTY_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType PRIZE_POTTERY_SHERD = builder("PRIZE_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType SHEAF_POTTERY_SHERD = builder("SHEAF_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType SHELTER_POTTERY_SHERD = builder("SHELTER_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType SKULL_POTTERY_SHERD = builder("SKULL_POTTERY_SHERD").setMaxAmount(64).build();
+    public static ItemType SNORT_POTTERY_SHERD = builder("SNORT_POTTERY_SHERD").setMaxAmount(64).build();
     /**
      * @deprecated Burning furnace shows up as a missing texture, removed in 1.9
      */
