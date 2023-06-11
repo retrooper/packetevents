@@ -729,12 +729,12 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public SaltSignature readSaltSignature() {
-        return new SaltSignature(readLong(), readByteArray());
+        return new SaltSignature(readLong(), readBytes(256));
     }
 
     public void writeSaltSignature(SaltSignature signature) {
         writeLong(signature.getSalt());
-        writeByteArray(signature.getSignature());
+        writeBytes(signature.getSignature());
     }
 
     public PublicKey readPublicKey() {

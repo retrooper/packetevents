@@ -64,8 +64,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         this.message = readString(maxMessageLength);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             Instant timestamp = readTimestamp();
-            SaltSignature saltSignature = readSaltSignature();
-            this.messageSignData = new MessageSignData(saltSignature, timestamp);
+            this.messageSignData = new MessageSignData(readSaltSignature(), timestamp);
 
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
                 this.lastSeenMessages = readLastSeenMessagesUpdate();
