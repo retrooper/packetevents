@@ -74,7 +74,7 @@ public class AdventureReflectionUtil {
             SHOW_ITEM_SERIALIZER_CREATE = gson -> invokeSafe(SHOW_ITEM_SERIALIZER_CREATE_METHOD, gson);
 
             Method SHOW_ENTITY_SERIALIZER_CREATE_METHOD = Reflection.getMethod(SHOW_ENTITY_SERIALIZER, "create", Gson.class);
-            SHOW_ITEM_SERIALIZER_CREATE = gson -> invokeSafe(SHOW_ENTITY_SERIALIZER_CREATE_METHOD, gson);
+            SHOW_ENTITY_SERIALIZER_CREATE = gson -> invokeSafe(SHOW_ENTITY_SERIALIZER_CREATE_METHOD, gson);
         }
 
         Class<?> TEXT_COLOR_SERIALIZER = Reflection.getClassByNameWithoutException("net.kyori.adventure.text.serializer.gson.TextColorSerializer");
