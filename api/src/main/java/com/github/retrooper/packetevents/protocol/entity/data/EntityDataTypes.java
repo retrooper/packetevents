@@ -78,7 +78,7 @@ public class EntityDataTypes {
         }
     });
 
-    public static final EntityDataType<Long> VAR_LONG = define("var_long", PacketWrapper::readVarLong, PacketWrapper::writeVarLong);
+    public static final EntityDataType<Long> LONG = define("long", PacketWrapper::readVarLong, PacketWrapper::writeVarLong);
 
     public static final EntityDataType<Float> FLOAT = define("float", PacketWrapper::readFloat, PacketWrapper::writeFloat);
 

@@ -2,7 +2,7 @@
   "V_1_19_4": {
     "byte": 0,
     "int": 1,
-    "var_long": 2,
+    "long": 2,
     "float": 3,
     "string": 4,
     "component": 5,
@@ -32,7 +32,7 @@
   "V_1_19_3": {
     "byte": 0,
     "int": 1,
-    "var_long": 2,
+    "long": 2,
     "float": 3,
     "string": 4,
     "component": 5,
