@@ -729,12 +729,37 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public SaltSignature readSaltSignature() {
-        return new SaltSignature(readLong(), readBytes(256));
+        long salt = readLong();
+        byte[] signature;
+        //1.19.3+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            //Read optional signature
+            if (readBoolean()) {
+                signature = readBytes(256);
+            }
+            else {
+                signature = new byte[0];
+            }
+        }
+        else {
+            signature = readByteArray(256);
+        }
+        return new SaltSignature(salt, signature);
     }
 
     public void writeSaltSignature(SaltSignature signature) {
         writeLong(signature.getSalt());
-        writeBytes(signature.getSignature());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            boolean present = signature.getSignature().length != 0;
+            writeBoolean(present);
+            if (present) {
+                writeBytes(signature.getSignature());
+            }
+
+        }
+        else {
+            writeByteArray(signature.getSignature());
+        }
     }
 
     public PublicKey readPublicKey() {

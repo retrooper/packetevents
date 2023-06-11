@@ -87,6 +87,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
             writeTimestamp(messageSignData.getTimestamp());
             writeSaltSignature(messageSignData.getSaltSignature());
 
+
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
                 if (lastSeenMessages != null)
                     writeLastSeenMessagesUpdate(lastSeenMessages);
