@@ -33,6 +33,7 @@ class WrappedPacketOutRespawn extends WrappedPacket {
     private Difficulty difficulty;
     private GameMode gameMode;
     private WorldType levelType;
+    private int portalCooldown;
 
     public WrappedPacketOutRespawn(NMSPacket packet) {
         super(packet);
@@ -73,6 +74,24 @@ class WrappedPacketOutRespawn extends WrappedPacket {
             writeGameMode(0, gameMode);
         } else {
             this.gameMode = gameMode;
+        }
+    }
+
+    public int getPortalCooldown() {
+        if (packet != null) {
+            return readInt(0);
+        }
+        else {
+            return portalCooldown;
+        }
+    }
+
+    public void setPortalCooldown(int portalCooldown) {
+        if (packet != null) {
+            writeInt(0, portalCooldown);
+        }
+        else {
+            this.portalCooldown = portalCooldown;
         }
     }
 

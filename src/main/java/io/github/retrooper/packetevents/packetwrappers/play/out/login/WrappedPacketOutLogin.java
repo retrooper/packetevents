@@ -80,4 +80,27 @@ public class WrappedPacketOutLogin extends WrappedPacketEntityAbstraction {
             return -1;
         }
     }
+
+    public int getPortalCooldown() {
+        if (packet != null) {
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_20)) {
+                return readInt(4);
+            }
+        }
+        else {
+            //TODO unfinished
+        }
+        return 0;
+    }
+
+    public void setPortalCooldown(int portalCooldown) {
+        if (packet != null) {
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_20)) {
+                writeInt(4, portalCooldown);
+            }
+        }
+        else {
+            //TODO unfinished
+        }
+    }
 }

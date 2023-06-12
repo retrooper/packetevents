@@ -23,6 +23,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
 public class WrappedPacketInUpdateSign extends WrappedPacket {
@@ -76,6 +77,21 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
         } else {
             Object[] iChatComponents = NMSUtils.generateIChatBaseComponents(lines);
             writeAnyObject(1, iChatComponents);
+        }
+    }
+
+    public boolean isFrontText() {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_20)) {
+            return readBoolean(0);
+        }
+        else {
+            return true;
+        }
+    }
+
+    public void setFrontText(boolean frontText) {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_20)) {
+            writeBoolean(0,frontText);
         }
     }
 }
