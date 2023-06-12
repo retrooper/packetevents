@@ -1333,7 +1333,7 @@ public class ItemTypes {
     }
 
     public static Builder builder(String key) {
-        return new Builder(key);
+        return new Builder(key.toLowerCase());
     }
 
     public static ItemType define(int maxAmount, String key, ItemType craftRemainder, StateType placedType, int maxDurability, List<ItemAttribute> attributesArr) {
