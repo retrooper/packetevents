@@ -73,7 +73,9 @@ public class StateTypes {
     public static StateType MANGROVE_PROPAGULE = StateTypes.builder().name("MANGROVE_PROPAGULE").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
     public static StateType BEDROCK = StateTypes.builder().name("BEDROCK").blastResistance(3600000.0f).hardness(-1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType SAND = StateTypes.builder().name("SAND").blastResistance(0.5f).hardness(0.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.SAND).build();
-    public static StateType SUSPICIOUS_SAND = StateTypes.builder().name("SUSPICIOUS_SAND").blastResistance(0.25f).hardness(0.25f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.SAND).build();
+    public static StateType SUSPICIOUS_SAND = StateTypes.builder().name("SUSPICIOUS_SAND").blastResistance(0.25f).hardness(0.25f)
+            .isBlocking(true)
+            .requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SAND).build();
     public static StateType RED_SAND = StateTypes.builder().name("RED_SAND").blastResistance(0.5f).hardness(0.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.SAND).build();
     public static StateType GRAVEL = StateTypes.builder().name("GRAVEL").blastResistance(0.6f).hardness(0.6f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.SAND).build();
     public static StateType COAL_ORE = StateTypes.builder().name("COAL_ORE").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
@@ -1026,6 +1028,20 @@ public class StateTypes {
     public static StateType BIG_DRIPLEAF_STEM = StateTypes.builder().name("BIG_DRIPLEAF_STEM").blastResistance(0.1f).hardness(0.1f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
     public static StateType POTTED_AZALEA_BUSH = StateTypes.builder().name("POTTED_AZALEA_BUSH").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DECORATION).build();
     public static StateType POTTED_FLOWERING_AZALEA_BUSH = StateTypes.builder().name("POTTED_FLOWERING_AZALEA_BUSH").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DECORATION).build();
+    //1.20 added types
+    public static StateType SUSPICIOUS_GRAVEL = StateTypes.builder().name("SUSPICIOUS_GRAVEL").blastResistance(0.25f)
+            .hardness(0.25f).isBlocking(true).requiresCorrectTool(true)
+            .isSolid(true).setMaterial(MaterialType.SAND).build();
+    public static StateType PITCHER_CROP = StateTypes.builder().name("PITCHER_CROP").blastResistance(0.0f).hardness(0.0f)
+            .isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
+    public static StateType PITCHER_PLANT = StateTypes.builder().name("PITCHER_PLANT").blastResistance(0.0f).hardness(0.0f)
+            .isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
+    public static StateType SNIFFER_EGG = StateTypes.builder().name("SNIFFER_EGG")
+            .blastResistance(0.5f).hardness(0.5f).isBlocking(true)
+            .requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.EGG).build();
+    public static StateType CALIBRATED_SCULK_SENSOR = StateTypes.builder().name("CALIBRATED_SCULK_SENSOR")
+            .blastResistance(1.5f).hardness(1.5f).isBlocking(true).requiresCorrectTool(false)
+            .isSolid(true).setMaterial(MaterialType.SCULK).build();
 
     public static Builder builder() {
         return new Builder();
@@ -1047,7 +1063,6 @@ public class StateTypes {
         boolean isBlocking;
         boolean isAir;
         boolean requiresCorrectTool = false;
-        boolean isReplaceable;
         boolean isShapeExceedsCube;
         MaterialType materialType;
 
