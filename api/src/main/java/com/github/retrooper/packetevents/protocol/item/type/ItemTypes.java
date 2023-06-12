@@ -1286,7 +1286,7 @@ public class ItemTypes {
     public static ItemType PITCHER_POD = builder("PITCHER_POD").setMaxAmount(64).build();
     public static ItemType MUSIC_DISC_RELIC = builder("MUSIC_DISC_RELIC").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).build();
     public static ItemType WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE = builder("WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE").setMaxAmount(64).build();
-    public static ItemType SHARPER_ARMOR_TRIM_SMITHING_TEMPLATE = builder("SHARPER_ARMOR_TRIM_SMITHING_TEMPLATE").setMaxAmount(64).build();
+    public static ItemType SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE = builder("SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE").setMaxAmount(64).build();
     public static ItemType SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE = builder("SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE").setMaxAmount(64).build();
     public static ItemType RAISER_ARMOR_TRIM_SMITHING_TEMPLATE = builder("RAISER_ARMOR_TRIM_SMITHING_TEMPLATE").setMaxAmount(64).build();
     public static ItemType HOST_ARMOR_TRIM_SMITHING_TEMPLATE = builder("HOST_ARMOR_TRIM_SMITHING_TEMPLATE").setMaxAmount(64).build();
