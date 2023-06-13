@@ -104,7 +104,8 @@ public enum StateValue {
     UP("up", Boolean::parseBoolean),
     VERTICAL_DIRECTION("vertical_direction", VerticalDirection::valueOf),
     WATERLOGGED("waterlogged", Boolean::parseBoolean),
-    WEST("west", West::valueOf);
+    WEST("west", West::valueOf),
+    CRACKED("cracked", Boolean::parseBoolean);
 
     private final String name;
     private final Function<String, Object> parser;
