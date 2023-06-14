@@ -149,7 +149,8 @@ public final class SpigotReflectionUtil {
             BUKKIT_PARTICLE_TO_NMS_ENUM_PARTICLE = Reflection.getMethod(CRAFT_PARTICLE_CLASS, "toNMS", NMS_ENUM_PARTICLE_CLASS);
             // Referencing the Particle class will throw an exception on 1.8, as there is no particle class
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                NMS_ENUM_PARTICLE_TO_BUKKIT_PARTICLE = Reflection.getMethod(CRAFT_PARTICLE_CLASS, "toBukkit", Particle.class);
+                Class<?> particleClass = Reflection.getClassByNameWithoutException("org.bukkit.Particle");
+                NMS_ENUM_PARTICLE_TO_BUKKIT_PARTICLE = Reflection.getMethod(CRAFT_PARTICLE_CLASS, "toBukkit", particleClass);
             }
         }
 
@@ -911,12 +912,15 @@ public final class SpigotReflectionUtil {
         }
     }
 
-    public static ParticleType toPacketEventsParticle(Particle particle) {
+    public static ParticleType toPacketEventsParticle(Enum<?> particle) {
         try {
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
-                BiMap<Particle, ?> map = (BiMap<Particle, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
+                BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
                 // must be done because issues happen otherwise since they are actually the same particle 1.13+
-                particle = particle == Particle.BLOCK_DUST ? Particle.BLOCK_CRACK : particle;
+
+                if (particle.name().equals("BLOCK_DUST")) {
+                    particle = Enum.valueOf(particle.getClass(), "BLOCK_CRACK");
+                }
                 Object minecraftKey = map.get(particle);
                 return ParticleTypes.getByName(minecraftKey.toString());
             } else {
@@ -931,18 +935,18 @@ public final class SpigotReflectionUtil {
         return null;
     }
 
-    public static Particle fromPacketEventsParticle(ParticleType particle) {
+    public static Enum<?> fromPacketEventsParticle(ParticleType particle) {
         try {
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
-                BiMap<Particle, ?> map = (BiMap<Particle, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
+                BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
                 Object minecraftKey = NMS_MINECRAFT_KEY_CONSTRUCTOR.newInstance(particle.getName().getNamespace(), particle.getName().getKey());
-                Particle bukkitParticle = map.inverse().get(minecraftKey);
-                return bukkitParticle;
+                Object bukkitParticle = map.inverse().get(minecraftKey);
+                return (Enum<?>) bukkitParticle;
             } else {
                 Map<String, ?> keyToParticleMap = (Map<String, ?>) LEGACY_NMS_KEY_TO_NMS_PARTICLE.get(null);
                 Object enumParticle = keyToParticleMap.get(particle.getName().getKey());
-                Particle bukkitParticle = (Particle) NMS_ENUM_PARTICLE_TO_BUKKIT_PARTICLE.invoke(null, enumParticle);
-                return bukkitParticle;
+                Object bukkitParticle = NMS_ENUM_PARTICLE_TO_BUKKIT_PARTICLE.invoke(null, enumParticle);
+                return (Enum<?>) bukkitParticle;
             }
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             e.printStackTrace();

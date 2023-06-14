@@ -20,118 +20,98 @@ package io.github.retrooper.packetevents.impl.netty.channel;
 
 import com.github.retrooper.packetevents.netty.channel.ChannelOperator;
 import io.netty.channel.Channel;
-import io.netty.channel.unix.Errors;
-import io.netty.handler.timeout.ReadTimeoutException;
 
-import java.io.IOException;
 import java.net.SocketAddress;
-import java.nio.channels.ClosedChannelException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ChannelOperatorImpl implements ChannelOperator {
-    private static Set<Class<? extends Throwable>> IGNORED_HANDLER_EXCEPTIONS = null;
-
-    @Override
-    public Set<Class<? extends Throwable>> getIgnoredHandlerExceptions() {
-        if (IGNORED_HANDLER_EXCEPTIONS == null) {
-            IGNORED_HANDLER_EXCEPTIONS = new HashSet<>();
-            IGNORED_HANDLER_EXCEPTIONS.add(ClosedChannelException.class);
-            IGNORED_HANDLER_EXCEPTIONS.add(ReadTimeoutException.class);
-            IGNORED_HANDLER_EXCEPTIONS.add(IOException.class);
-            IGNORED_HANDLER_EXCEPTIONS.add(Errors.NativeIoException.class);
-        }
-        return IGNORED_HANDLER_EXCEPTIONS;
-    }
-
     @Override
     public SocketAddress remoteAddress(Object channel) {
-        return ((Channel)channel).remoteAddress();
+        return ((Channel) channel).remoteAddress();
     }
 
     @Override
     public SocketAddress localAddress(Object channel) {
-        return ((Channel)channel).localAddress();
+        return ((Channel) channel).localAddress();
     }
 
     @Override
     public boolean isOpen(Object channel) {
-        return ((Channel)channel).isOpen();
+        return ((Channel) channel).isOpen();
     }
 
     @Override
     public Object close(Object channel) {
-        return ((Channel)channel).close();
+        return ((Channel) channel).close();
     }
 
     @Override
     public Object write(Object channel, Object buffer) {
-        return ((Channel)channel).write(buffer);
+        return ((Channel) channel).write(buffer);
     }
 
     @Override
     public Object flush(Object channel) {
-        return ((Channel)channel).flush();
+        return ((Channel) channel).flush();
     }
 
     @Override
     public Object writeAndFlush(Object channel, Object buffer) {
-        return ((Channel)channel).writeAndFlush(buffer);
+        return ((Channel) channel).writeAndFlush(buffer);
     }
 
     @Override
     public Object fireChannelRead(Object channel, Object buffer) {
-        return ((Channel)channel).pipeline().fireChannelRead(buffer);
+        return ((Channel) channel).pipeline().fireChannelRead(buffer);
     }
 
     @Override
     public Object writeInContext(Object channel, String ctx, Object buffer) {
-        return ((Channel)channel).pipeline().context(ctx).write(buffer);
+        return ((Channel) channel).pipeline().context(ctx).write(buffer);
     }
 
     @Override
     public Object flushInContext(Object channel, String ctx) {
-        return ((Channel)channel).pipeline().context(ctx).flush();
+        return ((Channel) channel).pipeline().context(ctx).flush();
     }
 
     @Override
     public Object writeAndFlushInContext(Object channel, String ctx, Object buffer) {
-        return ((Channel)channel).pipeline().context(ctx).writeAndFlush(buffer);
+        return ((Channel) channel).pipeline().context(ctx).writeAndFlush(buffer);
     }
 
     @Override
     public Object fireChannelReadInContext(Object channel, String ctx, Object buffer) {
-        return ((Channel)channel).pipeline().context(ctx).fireChannelRead(buffer);
+        return ((Channel) channel).pipeline().context(ctx).fireChannelRead(buffer);
     }
 
     @Override
     public List<String> pipelineHandlerNames(Object channel) {
-        return ((Channel)channel).pipeline().names();
+        return ((Channel) channel).pipeline().names();
     }
 
     @Override
     public Object getPipelineHandler(Object channel, String name) {
-        return ((Channel)channel).pipeline().get(name);
+        return ((Channel) channel).pipeline().get(name);
     }
 
     @Override
     public Object getPipelineContext(Object channel, String name) {
-        return ((Channel)channel).pipeline().context(name);
+        return ((Channel) channel).pipeline().context(name);
     }
 
     @Override
     public Object getPipeline(Object channel) {
-        return ((Channel)channel).pipeline();
+        return ((Channel) channel).pipeline();
     }
 
     @Override
     public void runInEventLoop(Object channel, Runnable runnable) {
-        ((Channel)channel).eventLoop().execute(runnable);
+        ((Channel) channel).eventLoop().execute(runnable);
     }
 
     @Override
     public Object pooledByteBuf(Object channel) {
-        return ((Channel)channel).alloc().buffer();
+        return ((Channel) channel).alloc().buffer();
     }
 }

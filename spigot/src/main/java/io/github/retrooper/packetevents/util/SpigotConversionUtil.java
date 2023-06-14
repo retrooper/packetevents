@@ -142,11 +142,11 @@ public class SpigotConversionUtil {
         }
     }
 
-    public static ParticleType fromBukkitParticle(org.bukkit.Particle particle) {
+    public static ParticleType fromBukkitParticle(Enum<?> particle) {
         return SpigotReflectionUtil.toPacketEventsParticle(particle);
     }
 
-    public static org.bukkit.Particle toBukkitParticle(ParticleType particle) {
+    public static Enum<?> toBukkitParticle(ParticleType particle) {
         return SpigotReflectionUtil.fromPacketEventsParticle(particle);
     }
 

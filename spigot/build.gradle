@@ -21,9 +21,9 @@ dependencies {
     api project(':api')
     api(adventureDependencies)
 
-    compileOnly 'org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT'
     compileOnly 'com.viaversion:viaversion:4.5.0'
     compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
 
-    compileOnly 'org.github.spigot:1.17:1.17'
+    compileOnly 'org.github.spigot:1.8:1.8'
 }
