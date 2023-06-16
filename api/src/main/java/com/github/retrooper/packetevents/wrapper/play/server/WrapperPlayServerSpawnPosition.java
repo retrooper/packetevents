@@ -28,7 +28,7 @@ import java.util.Optional;
 
 public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlayServerSpawnPosition> {
     private Vector3i position;
-    private float angle;
+    private Float angle;
 
     public WrapperPlayServerSpawnPosition(PacketSendEvent event) {
         super(event);
@@ -90,7 +90,7 @@ public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlaySer
     }
 
     public Optional<Float> getAngle() {
-        return Optional.of(angle);
+        return Optional.ofNullable(angle);
     }
 
     public void setAngle(float angle) {

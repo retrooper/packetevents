@@ -126,12 +126,8 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
         return transactionID;
     }
 
-    public void setTransactionId(Integer transactionID) {
-        if (transactionID != null) {
-            this.transactionID = Optional.of(transactionID);
-        } else {
-            this.transactionID = Optional.empty();
-        }
+    public void setTransactionId(@Nullable Integer transactionID) {
+        this.transactionID = Optional.ofNullable(transactionID);
     }
 
     public Optional<CommandRange> getCommandRange() {
@@ -139,11 +135,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
     }
 
     public void setCommandRange(@Nullable CommandRange commandRange) {
-        if (commandRange != null) {
-            this.commandRange = Optional.of(commandRange);
-        } else {
-            this.commandRange = Optional.empty();
-        }
+        this.commandRange = Optional.ofNullable(commandRange);
     }
 
     public List<CommandMatch> getCommandMatches() {

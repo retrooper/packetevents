@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.particle.data;
 
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -49,23 +50,23 @@ public class ParticleVibrationData extends ParticleData {
 
     private Vector3i startingPosition;
     private PositionType type;
-    private final Optional<Vector3i> blockPosition;
-    private final Optional<Integer> entityId;
+    private @Nullable Vector3i blockPosition;
+    private @Nullable Integer entityId;
     private int ticks;
 
-    public ParticleVibrationData(Vector3i startingPosition, Vector3i blockPosition, int ticks) {
+    public ParticleVibrationData(Vector3i startingPosition, @Nullable Vector3i blockPosition, int ticks) {
         this.startingPosition = startingPosition;
         this.type = PositionType.BLOCK;
-        this.blockPosition = Optional.of(blockPosition);
-        this.entityId = Optional.empty();
+        this.blockPosition = blockPosition;
+        this.entityId = null;
         this.ticks = ticks;
     }
 
     public ParticleVibrationData(Vector3i startingPosition, int entityId, int ticks) {
         this.startingPosition = startingPosition;
         this.type = PositionType.ENTITY;
-        this.blockPosition = Optional.empty();
-        this.entityId = Optional.of(entityId);
+        this.blockPosition = null;
+        this.entityId = entityId;
         this.ticks = ticks;
     }
 
@@ -82,11 +83,19 @@ public class ParticleVibrationData extends ParticleData {
     }
 
     public Optional<Vector3i> getBlockPosition() {
-        return blockPosition;
+        return Optional.ofNullable(blockPosition);
+    }
+
+    public void setBlockPosition(@Nullable Vector3i blockPosition) {
+        this.blockPosition = blockPosition;
     }
 
     public Optional<Integer> getEntityId() {
-        return entityId;
+        return Optional.ofNullable(entityId);
+    }
+
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
     }
 
     public int getTicks() {
