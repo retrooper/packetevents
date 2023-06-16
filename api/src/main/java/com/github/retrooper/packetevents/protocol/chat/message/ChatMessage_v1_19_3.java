@@ -14,12 +14,12 @@ public class ChatMessage_v1_19_3 extends ChatMessage {
     String plainContent;
     Instant timestamp;
     long salt;
-    LastSeenMessages lastSeenMessages;
+    LastSeenMessages.Packed lastSeenMessagesPacked;
     Component unsignedChatContent;
     FilterMask filterMask;
     ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType;
 
-    public ChatMessage_v1_19_3(UUID senderUUID, int index, byte[] signature, String plainContent, Instant timestamp, long salt, LastSeenMessages lastSeenMessages, Component unsignedChatContent, FilterMask filterMask, ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
+    public ChatMessage_v1_19_3(UUID senderUUID, int index, byte[] signature, String plainContent, Instant timestamp, long salt, LastSeenMessages.Packed lastSeenMessagesPacked, Component unsignedChatContent, FilterMask filterMask, ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
         super(unsignedChatContent, chatType.getType());
         this.senderUUID = senderUUID;
         this.index = index;
@@ -27,7 +27,7 @@ public class ChatMessage_v1_19_3 extends ChatMessage {
         this.plainContent = plainContent;
         this.timestamp = timestamp;
         this.salt = salt;
-        this.lastSeenMessages = lastSeenMessages;
+        this.lastSeenMessagesPacked = lastSeenMessagesPacked;
         this.unsignedChatContent = unsignedChatContent;
         this.filterMask = filterMask;
         this.chatType = chatType;
@@ -81,12 +81,12 @@ public class ChatMessage_v1_19_3 extends ChatMessage {
         this.salt = salt;
     }
 
-    public LastSeenMessages getLastSeenMessages() {
-        return lastSeenMessages;
+    public LastSeenMessages.Packed getLastSeenMessagesPacked() {
+        return lastSeenMessagesPacked;
     }
 
-    public void setLastSeenMessages(LastSeenMessages lastSeenMessages) {
-        this.lastSeenMessages = lastSeenMessages;
+    public void setLastSeenMessagesPacked(LastSeenMessages.Packed lastSeenMessagesPacked) {
+        this.lastSeenMessagesPacked = lastSeenMessagesPacked;
     }
 
     public Component getUnsignedChatContent() {

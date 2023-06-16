@@ -33,6 +33,22 @@ public class LastSeenMessages {
         return entries;
     }
 
+    public static class Packed {
+        private List<MessageSignature.Packed> packedMessageSignatures;
+
+        public Packed(List<MessageSignature.Packed> packedMessageSignatures) {
+            this.packedMessageSignatures = packedMessageSignatures;
+        }
+
+        public List<MessageSignature.Packed> getPackedMessageSignatures() {
+            return packedMessageSignatures;
+        }
+
+        public void setPackedMessageSignatures(List<MessageSignature.Packed> packedMessageSignatures) {
+            this.packedMessageSignatures = packedMessageSignatures;
+        }
+    }
+
     public static class Entry {
         private final UUID uuid;
         private final byte[] signature;

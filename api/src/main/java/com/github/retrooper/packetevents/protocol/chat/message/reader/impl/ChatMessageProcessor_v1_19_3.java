@@ -22,12 +22,12 @@ public class ChatMessageProcessor_v1_19_3 implements ChatMessageProcessor {
         String plainContent = wrapper.readString(256);
         Instant timestamp = wrapper.readTimestamp();
         long salt = wrapper.readLong();
-        LastSeenMessages lastSeenMessages = wrapper.readLastSeenMessages();
+        LastSeenMessages.Packed lastSeenMessagesPacked = wrapper.readLastSeenMessagesPacked();
         Component unsignedChatContent = wrapper.readOptional(PacketWrapper::readComponent);
         FilterMask filterMask = wrapper.readFilterMask();
         ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType = wrapper.readChatTypeBoundNetwork();
 
-        return new ChatMessage_v1_19_3(senderUUID, index, signature, plainContent, timestamp, salt, lastSeenMessages, unsignedChatContent, filterMask, chatType);
+        return new ChatMessage_v1_19_3(senderUUID, index, signature, plainContent, timestamp, salt, lastSeenMessagesPacked, unsignedChatContent, filterMask, chatType);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ChatMessageProcessor_v1_19_3 implements ChatMessageProcessor {
         wrapper.writeString(newData.getPlainContent());
         wrapper.writeTimestamp(newData.getTimestamp());
         wrapper.writeLong(newData.getSalt());
-        wrapper.writeLastSeenMessages(newData.getLastSeenMessages());
+        wrapper.writeLastSeenMessagesPacked(newData.getLastSeenMessagesPacked());
         wrapper.writeOptional(newData.getUnsignedChatContent(), PacketWrapper::writeComponent);
         wrapper.writeFilterMask(newData.getFilterMask());
         wrapper.writeChatTypeBoundNetwork(newData.getChatType());

@@ -860,6 +860,30 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeOptional(legacyUpdate.getLastReceived(), PacketWrapper::writeLastMessagesEntry);
     }
 
+    public MessageSignature.Packed readMessageSignaturePacked() {
+        int id = readVarInt() - 1;
+        if (id == -1) {
+            return new MessageSignature.Packed(new MessageSignature(readBytes(256)));
+        }
+        return new MessageSignature.Packed(id);
+    }
+
+    public void writeMessageSignaturePacked(MessageSignature.Packed messageSignaturePacked) {
+        writeVarInt(messageSignaturePacked.getId() + 1);
+        if (messageSignaturePacked.getFullSignature().isPresent()) {
+            writeBytes(messageSignaturePacked.getFullSignature().get().getBytes());
+        }
+    }
+
+    public LastSeenMessages.Packed readLastSeenMessagesPacked() {
+        List<MessageSignature.Packed> packedMessageSignatures = readCollection(limitValue(ArrayList::new, 20), PacketWrapper::readMessageSignaturePacked);
+        return new LastSeenMessages.Packed(packedMessageSignatures);
+    }
+
+    public void writeLastSeenMessagesPacked(LastSeenMessages.Packed lastSeenMessagesPacked) {
+        writeCollection(lastSeenMessagesPacked.getPackedMessageSignatures(), PacketWrapper::writeMessageSignaturePacked);
+    }
+
     public LastSeenMessages readLastSeenMessages() {
         List<LastSeenMessages.Entry> entries = readCollection(limitValue(ArrayList::new, 5),
                 PacketWrapper::readLastSeenMessagesEntry);
