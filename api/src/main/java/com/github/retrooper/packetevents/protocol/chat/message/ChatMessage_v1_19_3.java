@@ -3,8 +3,10 @@ package com.github.retrooper.packetevents.protocol.chat.message;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 public class ChatMessage_v1_19_3 extends ChatMessage {
@@ -15,11 +17,11 @@ public class ChatMessage_v1_19_3 extends ChatMessage {
     Instant timestamp;
     long salt;
     LastSeenMessages.Packed lastSeenMessagesPacked;
-    Component unsignedChatContent;
+    @Nullable Component unsignedChatContent;
     FilterMask filterMask;
     ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType;
 
-    public ChatMessage_v1_19_3(UUID senderUUID, int index, byte[] signature, String plainContent, Instant timestamp, long salt, LastSeenMessages.Packed lastSeenMessagesPacked, Component unsignedChatContent, FilterMask filterMask, ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
+    public ChatMessage_v1_19_3(UUID senderUUID, int index, byte[] signature, String plainContent, Instant timestamp, long salt, LastSeenMessages.Packed lastSeenMessagesPacked, @Nullable Component unsignedChatContent, FilterMask filterMask, ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
         super(Component.text(plainContent), chatType.getType());
         this.senderUUID = senderUUID;
         this.index = index;
@@ -89,11 +91,11 @@ public class ChatMessage_v1_19_3 extends ChatMessage {
         this.lastSeenMessagesPacked = lastSeenMessagesPacked;
     }
 
-    public Component getUnsignedChatContent() {
-        return unsignedChatContent;
+    public Optional<Component> getUnsignedChatContent() {
+        return Optional.ofNullable(unsignedChatContent);
     }
 
-    public void setUnsignedChatContent(Component unsignedChatContent) {
+    public void setUnsignedChatContent(@Nullable Component unsignedChatContent) {
         this.unsignedChatContent = unsignedChatContent;
     }
 

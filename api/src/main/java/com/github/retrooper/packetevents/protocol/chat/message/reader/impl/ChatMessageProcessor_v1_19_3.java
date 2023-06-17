@@ -40,7 +40,7 @@ public class ChatMessageProcessor_v1_19_3 implements ChatMessageProcessor {
         wrapper.writeTimestamp(newData.getTimestamp());
         wrapper.writeLong(newData.getSalt());
         wrapper.writeLastSeenMessagesPacked(newData.getLastSeenMessagesPacked());
-        wrapper.writeOptional(newData.getUnsignedChatContent(), PacketWrapper::writeComponent);
+        wrapper.writeOptional(newData.getUnsignedChatContent().orElse(null), PacketWrapper::writeComponent);
         wrapper.writeFilterMask(newData.getFilterMask());
         wrapper.writeChatTypeBoundNetwork(newData.getChatType());
     }
