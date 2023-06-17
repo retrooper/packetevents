@@ -116,7 +116,7 @@ public class GsonComponentSerializerExtended implements GsonComponentSerializer 
 
     @Override
     public @NotNull Builder toBuilder() {
-        return null; // We don't need to support this
+        throw new UnsupportedOperationException("Builder pattern is not supported."); // We don't need to support this
     }
 
 }
