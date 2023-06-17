@@ -20,7 +20,7 @@ public class ChatMessage_v1_19_3 extends ChatMessage {
     ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType;
 
     public ChatMessage_v1_19_3(UUID senderUUID, int index, byte[] signature, String plainContent, Instant timestamp, long salt, LastSeenMessages.Packed lastSeenMessagesPacked, Component unsignedChatContent, FilterMask filterMask, ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
-        super(Component.text(plainContent), chatType.getType());
+        super(unsignedChatContent, chatType.getType());
         this.senderUUID = senderUUID;
         this.index = index;
         this.signature = signature;
