@@ -24,9 +24,6 @@ public class ChatMessageProcessor_v1_19_3 implements ChatMessageProcessor {
         long salt = wrapper.readLong();
         LastSeenMessages.Packed lastSeenMessagesPacked = wrapper.readLastSeenMessagesPacked();
         Component unsignedChatContent = wrapper.readOptional(PacketWrapper::readComponent);
-        if (unsignedChatContent == null) {
-            unsignedChatContent = Component.text(plainContent);
-        }
         FilterMask filterMask = wrapper.readFilterMask();
         ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType = wrapper.readChatTypeBoundNetwork();
 
