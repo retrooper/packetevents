@@ -40,7 +40,9 @@ public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
         byte[] signature = wrapper.readByteArray();
         String plainContent = wrapper.readString(256);
         Component chatContent = wrapper.readOptional(PacketWrapper::readComponent);
-        if (chatContent == null) {
+        if (chatContent == null && plainContent.isEmpty()) {
+            chatContent = Component.empty();
+        } else if (chatContent == null) {
             chatContent = Component.text(plainContent);
         }
         Instant timestamp = wrapper.readTimestamp();
