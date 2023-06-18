@@ -2,6 +2,7 @@ package com.github.retrooper.packetevents.protocol.chat.message;
 
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,6 +58,16 @@ public class ChatMessage_v1_19_3 extends ChatMessage {
 
     public void setSignature(byte[] signature) {
         this.signature = signature;
+    }
+
+    @Override
+    public Component getChatContent() {
+        return Component.text(plainContent);
+    }
+
+    @Override
+    public void setChatContent(Component chatContent) {
+        plainContent = AdventureSerializer.toJson(chatContent);
     }
 
     public String getPlainContent() {
