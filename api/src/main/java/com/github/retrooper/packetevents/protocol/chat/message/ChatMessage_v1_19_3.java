@@ -65,6 +65,7 @@ public class ChatMessage_v1_19_3 extends ChatMessage {
         return Component.text(plainContent);
     }
 
+    @Deprecated
     @Override
     public void setChatContent(Component chatContent) {
         throw new UnsupportedOperationException("PacketEvents is not able to serialize components to plain-text. Please use the #setPlainContent instead to update the content.");
