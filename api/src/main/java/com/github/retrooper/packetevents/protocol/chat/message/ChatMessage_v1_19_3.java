@@ -67,7 +67,7 @@ public class ChatMessage_v1_19_3 extends ChatMessage {
 
     @Override
     public void setChatContent(Component chatContent) {
-        plainContent = AdventureSerializer.toJson(chatContent);
+        throw new UnsupportedOperationException("PacketEvents is not able to serialize components to plain-text. Please use the #setPlainContent instead to update the content.");
     }
 
     public String getPlainContent() {
