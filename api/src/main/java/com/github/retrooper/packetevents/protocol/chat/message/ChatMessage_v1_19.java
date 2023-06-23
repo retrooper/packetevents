@@ -24,10 +24,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.UUID;
-
-public class ChatMessage_v1_19 extends ChatMessage {
+//We'll extend ChatMessage_v1_16 for now, hopefully no breaking changes in the future
+public class ChatMessage_v1_19 extends ChatMessage_v1_16 {
     private @Nullable Component unsignedChatContent;
-    private UUID senderUUID;
     private Component senderDisplayName;
     private @Nullable Component teamName;
     private Instant timestamp;
@@ -37,9 +36,8 @@ public class ChatMessage_v1_19 extends ChatMessage {
     public ChatMessage_v1_19(Component chatContent, @Nullable Component unsignedChatContent, ChatType type,
                              UUID senderUUID, Component senderDisplayName, @Nullable Component teamName, Instant timestamp,
                              long salt, byte[] signature) {
-        super(chatContent, type);
+        super(chatContent, type, senderUUID);
         this.unsignedChatContent = unsignedChatContent;
-        this.senderUUID = senderUUID;
         this.senderDisplayName = senderDisplayName;
         this.teamName = teamName;
         this.timestamp = timestamp;
@@ -49,10 +47,6 @@ public class ChatMessage_v1_19 extends ChatMessage {
 
     public @Nullable Component getUnsignedChatContent() {
         return unsignedChatContent;
-    }
-
-    public UUID getSenderUUID() {
-        return senderUUID;
     }
 
     public Component getSenderDisplayName() {
@@ -77,10 +71,6 @@ public class ChatMessage_v1_19 extends ChatMessage {
 
     public void setUnsignedChatContent(@Nullable Component unsignedChatContent) {
         this.unsignedChatContent = unsignedChatContent;
-    }
-
-    public void setSenderUUID(UUID senderUUID) {
-        this.senderUUID = senderUUID;
     }
 
     public void setSenderDisplayName(Component senderDisplayName) {

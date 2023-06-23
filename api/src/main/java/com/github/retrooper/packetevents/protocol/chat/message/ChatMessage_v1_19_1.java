@@ -26,11 +26,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.UUID;
-
-public class ChatMessage_v1_19_1 extends ChatMessage {
+//We'll extend ChatMessage_v1_16 for now, hopefully no breaking changes in the future
+public class ChatMessage_v1_19_1 extends ChatMessage_v1_16 {
     private String plainContent;
     private @Nullable Component unsignedChatContent;
-    private UUID senderUUID;
     private ChatTypeBoundNetwork chatType;
     private byte @Nullable [] previousSignature;
     private byte[] signature;
@@ -46,10 +45,9 @@ public class ChatMessage_v1_19_1 extends ChatMessage {
                                Instant timestamp, long salt,
                                LastSeenMessages lastSeenMessages,
                                FilterMask filterMask) {
-        super(decoratedChatContent, chatType.getType());
+        super(decoratedChatContent, chatType.getType(), senderUUID);
         this.plainContent = plainContent;
         this.unsignedChatContent = unsignedChatContent;
-        this.senderUUID = senderUUID;
         this.chatType = chatType;
         this.previousSignature = previousSignature;
         this.signature = signature;
@@ -77,14 +75,6 @@ public class ChatMessage_v1_19_1 extends ChatMessage {
 
     public void setUnsignedChatContent(@Nullable Component unsignedChatContent) {
         this.unsignedChatContent = unsignedChatContent;
-    }
-
-    public UUID getSenderUUID() {
-        return senderUUID;
-    }
-
-    public void setSenderUUID(UUID senderUUID) {
-        this.senderUUID = senderUUID;
     }
 
     @Override
