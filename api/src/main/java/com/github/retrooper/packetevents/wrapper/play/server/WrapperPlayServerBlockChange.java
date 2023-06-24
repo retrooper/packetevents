@@ -76,11 +76,23 @@ public class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServe
         return blockPosition;
     }
 
+    public void setBlockPosition(Vector3i blockPosition) {
+        this.blockPosition = blockPosition;
+    }
+
     public int getBlockId() {
         return blockID;
     }
 
+    public void setBlockID(int blockID) {
+        this.blockID = blockID;
+    }
+
     public WrappedBlockState getBlockState() {
         return WrappedBlockState.getByGlobalId(serverVersion.toClientVersion(), blockID);
+    }
+
+    public void setBlockState(WrappedBlockState blockState) {
+        this.blockID = blockState.getGlobalId();
     }
 }
