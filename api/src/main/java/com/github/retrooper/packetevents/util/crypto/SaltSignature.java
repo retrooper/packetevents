@@ -19,8 +19,8 @@
 package com.github.retrooper.packetevents.util.crypto;
 
 public class SaltSignature {
-    private final long salt;
-    private final byte[] signature;
+    private long salt;
+    private byte[] signature;
 
     public SaltSignature(long salt, byte[] signature) {
         this.salt = salt;
@@ -31,7 +31,15 @@ public class SaltSignature {
         return salt;
     }
 
+    public void setSalt(long salt) {
+        this.salt = salt;
+    }
+
     public byte[] getSignature() {
         return signature;
+    }
+
+    public void setSignature(byte[] signature) {
+        this.signature = signature;
     }
 }

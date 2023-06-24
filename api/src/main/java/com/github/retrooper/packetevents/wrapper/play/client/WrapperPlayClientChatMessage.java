@@ -44,14 +44,14 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         super(event);
     }
 
-    public WrapperPlayClientChatMessage(String message, @Nullable MessageSignData messageSignData, @Nullable LastSeenMessages.LegacyUpdate lastSeenMessages) {
+    public WrapperPlayClientChatMessage(String message, MessageSignData messageSignData, @Nullable LastSeenMessages.LegacyUpdate lastSeenMessages) {
         super(PacketType.Play.Client.CHAT_MESSAGE);
         this.message = message;
         this.messageSignData = messageSignData;
         this.legacyLastSeenMessages = lastSeenMessages;
     }
 
-    public WrapperPlayClientChatMessage(String message, @Nullable MessageSignData messageSignData, @Nullable LastSeenMessages.Update lastSeenMessages) {
+    public WrapperPlayClientChatMessage(String message, MessageSignData messageSignData, @Nullable LastSeenMessages.Update lastSeenMessages) {
         super(PacketType.Play.Client.CHAT_MESSAGE);
         this.message = message;
         this.messageSignData = messageSignData;
