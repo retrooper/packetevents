@@ -178,6 +178,7 @@ public class BlockTags {
     public static final BlockTags SCULK_REPLACEABLE = bind("sculk_replaceable");
     public static final BlockTags SCULK_REPLACEABLE_WORLD_GEN = bind("sculk_replaceable_world_gen");
     public static final BlockTags ANCIENT_CITY_REPLACEABLE = bind("ancient_city_replaceable");
+    public static final BlockTags VIBRATION_RESONATORS = bind("vibration_resonators");
     public static final BlockTags ANIMALS_SPAWNABLE_ON = bind("animals_spawnable_on");
     public static final BlockTags AXOLOTLS_SPAWNABLE_ON = bind("axolotls_spawnable_on");
     public static final BlockTags GOATS_SPAWNABLE_ON = bind("goats_spawnable_on");
@@ -200,6 +201,10 @@ public class BlockTags {
     public static final BlockTags INVALID_SPAWN_INSIDE = bind("invalid_spawn_inside");
     public static final BlockTags SNIFFER_DIGGABLE_BLOCK = bind("sniffer_diggable_block");
     public static final BlockTags SNIFFER_EGG_HATCH_BOOST = bind("sniffer_egg_hatch_boost");
+    public static final BlockTags TRAIL_RUINS_REPLACEABLE = bind("trail_ruins_replaceable");
+    public static final BlockTags REPLACEABLE = bind("replaceable");
+    public static final BlockTags ENCHANTMENT_POWER_PROVIDER = bind("enchantment_power_provider");
+    public static final BlockTags ENCHANTMENT_POWER_TRANSMITTER = bind("enchantment_power_transmitter");
     public static final BlockTags MAINTAINS_FARMLAND = bind("maintains_farmland");
     /**
      * Unofficial tag for all glass blocks
@@ -363,6 +368,7 @@ public class BlockTags {
         BlockTags.FROG_PREFER_JUMP_TO.add(StateTypes.LILY_PAD, StateTypes.BIG_DRIPLEAF);
         BlockTags.SCULK_REPLACEABLE.addTag(BlockTags.BASE_STONE_OVERWORLD).addTag(BlockTags.DIRT).addTag(BlockTags.TERRACOTTA).addTag(BlockTags.NYLIUM).addTag(BlockTags.BASE_STONE_NETHER).addTag(BlockTags.SAND).add(StateTypes.GRAVEL).add(StateTypes.SOUL_SAND).add(StateTypes.SOUL_SOIL).add(StateTypes.CALCITE).add(StateTypes.SMOOTH_BASALT).add(StateTypes.CLAY).add(StateTypes.DRIPSTONE_BLOCK).add(StateTypes.END_STONE).add(StateTypes.RED_SANDSTONE).add(StateTypes.SANDSTONE);
         BlockTags.SCULK_REPLACEABLE_WORLD_GEN.addTag(BlockTags.SCULK_REPLACEABLE).add(StateTypes.DEEPSLATE_BRICKS).add(StateTypes.DEEPSLATE_TILES).add(StateTypes.COBBLED_DEEPSLATE).add(StateTypes.CRACKED_DEEPSLATE_BRICKS).add(StateTypes.CRACKED_DEEPSLATE_TILES).add(StateTypes.POLISHED_DEEPSLATE);
+        BlockTags.VIBRATION_RESONATORS.add(StateTypes.AMETHYST_BLOCK);
         BlockTags.CONVERTABLE_TO_MUD.add(StateTypes.DIRT, StateTypes.COARSE_DIRT, StateTypes.ROOTED_DIRT);
         BlockTags.ANCIENT_CITY_REPLACEABLE.add(StateTypes.DEEPSLATE).add(StateTypes.DEEPSLATE_BRICKS).add(StateTypes.DEEPSLATE_TILES).add(StateTypes.DEEPSLATE_BRICK_SLAB).add(StateTypes.DEEPSLATE_TILE_SLAB).add(StateTypes.DEEPSLATE_BRICK_STAIRS).add(StateTypes.DEEPSLATE_TILE_WALL).add(StateTypes.DEEPSLATE_BRICK_WALL).add(StateTypes.COBBLED_DEEPSLATE).add(StateTypes.CRACKED_DEEPSLATE_BRICKS).add(StateTypes.CRACKED_DEEPSLATE_TILES).add(StateTypes.GRAY_WOOL);
         BlockTags.MANGROVE_LOGS_CAN_GROW_THROUGH.add(StateTypes.MUD, StateTypes.MUDDY_MANGROVE_ROOTS, StateTypes.MANGROVE_ROOTS, StateTypes.MANGROVE_LEAVES, StateTypes.MANGROVE_LOG, StateTypes.MANGROVE_PROPAGULE, StateTypes.MOSS_CARPET, StateTypes.VINE);
@@ -373,8 +379,14 @@ public class BlockTags {
         BlockTags.COMPLETES_FIND_TREE_TUTORIAL.addTag(BlockTags.LOGS).addTag(BlockTags.LEAVES).addTag(BlockTags.WART_BLOCKS);
         BlockTags.SNAPS_GOAT_HORN.addTag(BlockTags.OVERWORLD_NATURAL_LOGS).add(StateTypes.STONE).add(StateTypes.PACKED_ICE).add(StateTypes.IRON_ORE).add(StateTypes.COAL_ORE).add(StateTypes.COPPER_ORE).add(StateTypes.EMERALD_ORE);
         BlockTags.INVALID_SPAWN_INSIDE.add(StateTypes.END_PORTAL, StateTypes.END_GATEWAY);
+        BlockTags.TRAIL_RUINS_REPLACEABLE.add(StateTypes.GRAVEL);
         BlockTags.SNIFFER_DIGGABLE_BLOCK.add(StateTypes.DIRT, StateTypes.GRASS_BLOCK, StateTypes.PODZOL, StateTypes.COARSE_DIRT, StateTypes.ROOTED_DIRT, StateTypes.MOSS_BLOCK, StateTypes.MUD, StateTypes.MUDDY_MANGROVE_ROOTS);
         BlockTags.SNIFFER_EGG_HATCH_BOOST.add(StateTypes.MOSS_BLOCK);
+        for (StateType value : StateTypes.values()) {
+            if (value.isReplaceable()) BlockTags.REPLACEABLE.add(value);
+        }
+        BlockTags.ENCHANTMENT_POWER_PROVIDER.add(StateTypes.BOOKSHELF);
+        BlockTags.ENCHANTMENT_POWER_TRANSMITTER.addTag(BlockTags.REPLACEABLE);
         BlockTags.MAINTAINS_FARMLAND.add(StateTypes.PUMPKIN_STEM, StateTypes.ATTACHED_PUMPKIN_STEM, StateTypes.MELON_STEM, StateTypes.ATTACHED_MELON_STEM, StateTypes.BEETROOTS, StateTypes.CARROTS, StateTypes.POTATOES, StateTypes.TORCHFLOWER_CROP, StateTypes.TORCHFLOWER, StateTypes.PITCHER_CROP, StateTypes.WHEAT);
         // Unofficial blocks to help packetevents users
         BlockTags.GLASS_BLOCKS.add(StateTypes.GLASS, StateTypes.WHITE_STAINED_GLASS, StateTypes.ORANGE_STAINED_GLASS, StateTypes.MAGENTA_STAINED_GLASS, StateTypes.LIGHT_BLUE_STAINED_GLASS, StateTypes.YELLOW_STAINED_GLASS, StateTypes.LIME_STAINED_GLASS, StateTypes.PINK_STAINED_GLASS, StateTypes.GRAY_STAINED_GLASS, StateTypes.LIGHT_GRAY_STAINED_GLASS, StateTypes.CYAN_STAINED_GLASS, StateTypes.PURPLE_STAINED_GLASS, StateTypes.BLUE_STAINED_GLASS, StateTypes.BROWN_STAINED_GLASS, StateTypes.GREEN_STAINED_GLASS, StateTypes.RED_STAINED_GLASS, StateTypes.BLACK_STAINED_GLASS, StateTypes.TINTED_GLASS);
