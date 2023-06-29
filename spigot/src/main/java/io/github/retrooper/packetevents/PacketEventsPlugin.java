@@ -37,7 +37,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.getAPI().getSettings().debug(false).bStats(true).checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).reEncodeByDefault(false);
+        PacketEvents.getAPI().getSettings().debug(false).bStats(true).checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).reEncodeByDefault(true);
         PacketEvents.getAPI().init();
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
             @Override
