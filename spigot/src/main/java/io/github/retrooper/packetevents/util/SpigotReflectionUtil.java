@@ -858,7 +858,7 @@ public final class SpigotReflectionUtil {
                     }
                 }
             } catch (Exception ex) {
-                System.out.println("Failed to find entity by id on 1.19.3!");
+                PacketEvents.getAPI().getLogManager().warn("Failed to find entity by id on 1.19.3!");
                 throw ex;
                 //We are retrying below
             }

@@ -79,7 +79,7 @@ public class WrappedBlockState {
                     this.data.put(value, value.getParser().apply(split[1].toUpperCase(Locale.ROOT)));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    System.out.println("Failed to parse block state: " + s);
+                    PacketEvents.getAPI().getLogManager().warn("Failed to parse block state: " + s);
                 }
             }
         }

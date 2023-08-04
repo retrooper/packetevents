@@ -129,7 +129,7 @@ public class BungeePacketEventsBuilder {
                     }
 
                     if (user == null) {
-                        System.out.println("User null???");
+                        PacketEvents.getAPI().getLogManager().warn("User is null?");
                         user = new User(channel, ConnectionState.PLAY, null, new UserProfile(p.getUniqueId(), p.getName()));
 
                         synchronized (channel) {

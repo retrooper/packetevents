@@ -61,7 +61,7 @@ public class UpdateChecker {
         try {
             newVersion = new PEVersion(checkLatestReleasedVersion());
         } catch (Exception ex) {
-            ex.printStackTrace();
+            PacketEvents.getAPI().getLogManager().warn("Failed to parse packetevents version! " + ex.getMessage());
             newVersion = null;
         }
         if (newVersion != null && localVersion.isOlderThan(newVersion)) {
@@ -79,7 +79,7 @@ public class UpdateChecker {
                     + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             return UpdateCheckerStatus.PRE_RELEASE;
         } else if (localVersion.equals(newVersion)) {
-            PacketEvents.getAPI().getLogManager().info("You are on the latest released version of packetevents. ("
+            PacketEvents.getAPI().getLogManager().info("You are on the latest released version of packetevents. Your build: ("
                     + ColorUtil.toString(NamedTextColor.GREEN) + newVersion + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {
@@ -93,13 +93,10 @@ public class UpdateChecker {
             PacketEvents.getAPI().getLogManager().info("Checking for an update, please wait...");
             UpdateChecker.UpdateCheckerStatus status = checkForUpdate();
             int waitTimeInSeconds = 5;
-            int maxRetryCount = 5;
+            int maxRetryCount = 3;
             int retries = 0;
-            while (retries < maxRetryCount) {
-                if (status != UpdateChecker.UpdateCheckerStatus.FAILED) {
-                    break;
-                }
-                PacketEvents.getAPI().getLogManager().warn("[Checking for an update again in " + waitTimeInSeconds + " seconds...");
+            while (retries < maxRetryCount && status == UpdateChecker.UpdateCheckerStatus.FAILED) {
+                PacketEvents.getAPI().getLogManager().warn("Checking for an update again in " + waitTimeInSeconds + " seconds...");
                 try {
                     Thread.sleep(waitTimeInSeconds * 1000L);
                 } catch (InterruptedException e) {
@@ -111,7 +108,7 @@ public class UpdateChecker {
                 status = checkForUpdate();
 
                 if (retries == (maxRetryCount - 1)) {
-                    PacketEvents.getAPI().getLogManager().warn("packetevents failed to check for an update. No longer retrying.");
+                    PacketEvents.getAPI().getLogManager().warn("packetevents failed to check for an update.");
                     break;
                 }
 
