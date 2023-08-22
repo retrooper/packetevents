@@ -97,7 +97,7 @@ public class BungeePacketEventsBuilder {
                     if (version == null) {
                         String bungeeVersion = ProxyServer.getInstance().getVersion();
                         for (final ServerVersion val : ServerVersion.reversedValues()) {
-                        	if (val.getReleaseName().contains(bungeeVersion)) {
+                        	if (bungeeVersion.contains(val.getReleaseName())) {
                                 return version = val;
                             }
                         }

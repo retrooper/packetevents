@@ -55,12 +55,12 @@ public class PacketEventsPlugin {
         PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
-                System.out.println("Incoming: " + event.getPacketType().getName());
+                //System.out.println("Incoming: " + event.getPacketType().getName());
             }
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
-                System.out.println("Outgoing: " + event.getPacketType().getName());
+                //System.out.println("Outgoing: " + event.getPacketType().getName());
             }
         });
         PacketEvents.getAPI().init();

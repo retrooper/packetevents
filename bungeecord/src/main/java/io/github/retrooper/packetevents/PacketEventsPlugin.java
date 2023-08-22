@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.*;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.util.TimeStampMode;
 import io.github.retrooper.packetevents.bungee.factory.BungeePacketEventsBuilder;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -40,18 +39,14 @@ public final class PacketEventsPlugin extends Plugin {
         PacketListenerCommon listener = new PacketListenerAbstract(PacketListenerPriority.HIGH) {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
-                System.out.println("in sv: " + event.getServerVersion());
-                System.out.println("in sv: " + event.getClientVersion());
-                System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
-                System.out.println("In type: " + event.getPacketType().getName());
+                //System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
+                //System.out.println("In type: " + event.getPacketType().getName());
             }
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
-                System.out.println("out sv: " + event.getServerVersion());
-                System.out.println("out sv: " + event.getClientVersion());
-                System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
-                System.out.println("Out type: " + event.getPacketType().getName());
+                //System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
+                //System.out.println("Out type: " + event.getPacketType().getName());
             }
         };
         PacketEvents.getAPI().getEventManager().registerListener(listener);

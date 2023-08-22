@@ -46,8 +46,10 @@ public class ServerConnectionInitializer {
         }
         PacketEventsDecoder decoder = new PacketEventsDecoder(user);
         PacketEventsEncoder encoder = new PacketEventsEncoder(user);
-        PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
+        //Order of these
         addChannelHandlers(channel, decoder, encoder);
+        //two methods is important.
+        PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
     }
 
     public static void destroyChannel(Channel channel) {
