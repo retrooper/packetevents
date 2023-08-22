@@ -814,6 +814,7 @@ public final class SpigotReflectionUtil {
 
     @Nullable
     private static Entity getEntityByIdUnsafe(World origin, int id) {
+        //This is bad code!
         Entity e = getEntityByIdWithWorldUnsafe(origin, id);
         if (e != null) {
             return e;
@@ -849,7 +850,7 @@ public final class SpigotReflectionUtil {
             try {
                 if (world != null) {
                     //On 1.17 we have to use hacks to get the entity list bypassing Spigot's checks
-                    //We cannot recommend finding entity objects asynchronously.
+                    //We strongly do not recommend finding entity objects asynchronously.
                     for (Entity entity : getEntityList(world)) {
                         if (entity.getEntityId() == entityID) {
                             ENTITY_ID_CACHE.putIfAbsent(entity.getEntityId(), entity);
