@@ -19,7 +19,7 @@ subprojects {
 
     group = 'com.github.retrooper'
     description = project.name
-    version = '2.0.0'//TODO UPDATE - ADD "-SNAPSHOT"
+    version = '2.0.0'//TODO UPDATE - ADD "-SNAPSHOT" if we are dealing with snapshot versions
 
     project.ext.nettyVersion = '4.1.72.Final'
     project.ext.adventureVersion = '4.14.0'
@@ -80,13 +80,11 @@ subprojects {
 
         repositories {
             maven {
-                //TODO UPDATE isRelease boolean to publish to correct repository, for now we publish all to snapshots url
-                boolean isRelease = true
                 def snapshotUrl = "https://repo.codemc.io/repository/maven-snapshots/"
                 def releaseUrl = "https://repo.codemc.io/repository/maven-releases/"
 
                 // Check which URL should be used
-                url = isRelease ? releaseUrl : snapshotUrl
+                url = project.version.endsWith("SNAPSHOT") ? snapshotUrl : releaseUrl
 
                 def mavenUsername = System.getenv("retrooper_username") ? System.getenv("retrooper_username") : null
                 def mavenPassword = System.getenv("retrooper_password") ? System.getenv("retrooper_password") : null
