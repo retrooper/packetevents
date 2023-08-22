@@ -2,7 +2,7 @@
 
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
-PacketEvents is a powerful packet library. Our packet wrappers are efficient and easy to use. With our API, you can write code that runs on many platforms including Spigot, BungeeCord, Velocity, and Fabric! Switch to PacketEvents today by joining \
+PacketEvents is a fast and efficient multi-platform packet processing library. Our packet wrappers are easy to use with multi-version support. With our API you can write code that runs on Spigot, BungeeCord, Velocity, and Fabric! Switch to PacketEvents today by joining \
 our [Discord Server](https://discord.me/packetevents) for help.
 
 ### Links
