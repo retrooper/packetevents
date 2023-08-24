@@ -342,14 +342,11 @@ public class PacketWrapper<T extends PacketWrapper> {
                 writeNBT(itemStack.getNBT());
             }
         } else {
-            int typeID;
             if (itemStack.isEmpty()) {
-                typeID = -1;
+                writeShort(-1);
             } else {
-                typeID = itemStack.getType().getId(serverVersion.toClientVersion());
-            }
-            writeShort(typeID);
-            if (typeID >= 0) {
+                int typeID = itemStack.getType().getId(serverVersion.toClientVersion());
+                writeShort(typeID);
                 writeByte(itemStack.getAmount());
                 writeShort(itemStack.getLegacyData());
                 writeNBT(itemStack.getNBT());
@@ -668,9 +665,9 @@ public class PacketWrapper<T extends PacketWrapper> {
                 list.add(new EntityData(index, type, value));
             }
         } else {
-            for (byte data = readByte(); data != 127; data = readByte()) {
-                int typeID = (data & 224) >> 5;
-                int index = data & 31;
+            for (byte data = readByte(); data != Byte.MAX_VALUE; data = readByte()) {
+                int typeID = (data & 0xE0) >> 5;
+                int index = data & 0x1F;
                 EntityDataType<?> type = EntityDataTypes.getById(serverVersion.toClientVersion(), typeID);
                 Object value = type.getDataDeserializer().apply(this);
                 EntityData entityData = new EntityData(index, type, value);
@@ -736,12 +733,10 @@ public class PacketWrapper<T extends PacketWrapper> {
             //Read optional signature
             if (readBoolean()) {
                 signature = readBytes(256);
-            }
-            else {
+            } else {
                 signature = new byte[0];
             }
-        }
-        else {
+        } else {
             signature = readByteArray(256);
         }
         return new SaltSignature(salt, signature);
@@ -756,8 +751,7 @@ public class PacketWrapper<T extends PacketWrapper> {
                 writeBytes(signature.getSignature());
             }
 
-        }
-        else {
+        } else {
             writeByteArray(signature.getSignature());
         }
     }
