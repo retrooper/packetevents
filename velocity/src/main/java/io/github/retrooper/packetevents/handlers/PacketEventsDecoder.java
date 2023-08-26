@@ -89,13 +89,12 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         }
         //We can use == as it is an enum constant
         if (event == VELOCITY_CONNECTION_EVENT_CONSTANT && !handledCompression) {
-            System.out.println("constant: " + VELOCITY_CONNECTION_EVENT_CONSTANT.name());
             ChannelPipeline pipe = ctx.pipeline();
             PacketEventsEncoder encoder = (PacketEventsEncoder) pipe.remove(PacketEvents.ENCODER_NAME);
             pipe.addBefore("minecraft-encoder", PacketEvents.ENCODER_NAME, encoder);
             PacketEventsDecoder decoder = (PacketEventsDecoder) pipe.remove(PacketEvents.DECODER_NAME);
             pipe.addBefore("minecraft-decoder", PacketEvents.DECODER_NAME, decoder);
-            System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
+            //System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
             handledCompression = true;
         }
         super.userEventTriggered(ctx, event);

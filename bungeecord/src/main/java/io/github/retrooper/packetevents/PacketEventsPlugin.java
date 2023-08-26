@@ -34,7 +34,7 @@ public final class PacketEventsPlugin extends Plugin {
     @Override
     public void onEnable() {
         // Register your listeners
-        PacketEvents.getAPI().getSettings().debug(true).bStats(true).checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).reEncodeByDefault(false);
+        PacketEvents.getAPI().getSettings().debug(true).bStats(true).checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).reEncodeByDefault(true);
         PacketEvents.getAPI().init();
         PacketListenerCommon listener = new PacketListenerAbstract(PacketListenerPriority.HIGH) {
             @Override
@@ -49,7 +49,7 @@ public final class PacketEventsPlugin extends Plugin {
                 //System.out.println("Out type: " + event.getPacketType().getName());
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(listener);
+        //PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override

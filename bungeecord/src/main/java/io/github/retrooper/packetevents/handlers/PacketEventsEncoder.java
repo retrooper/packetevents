@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.handlers;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
@@ -58,7 +57,9 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
                 packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
                 packetSendEvent.getLastUsedWrapper().write();
             }
-            buffer.readerIndex(firstReaderIndex);
+            else {
+                buffer.readerIndex(firstReaderIndex);
+            }
             if (doCompression) {
                 recompress(ctx, buffer);
             }
@@ -110,7 +111,7 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
                 PacketEventsEncoder encoder = (PacketEventsEncoder) pipe.remove(PacketEvents.ENCODER_NAME);
                 pipe.addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
                 pipe.addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
-                System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
+                //System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
                 handledCompression = true;
                 return true;
             } catch (InvocationTargetException e) {

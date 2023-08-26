@@ -56,7 +56,9 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
                     packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
                     packetReceiveEvent.getLastUsedWrapper().write();
                 }
-                transformed.readerIndex(firstReaderIndex);
+                else {
+                    transformed.readerIndex(firstReaderIndex);
+                }
                 output.add(transformed.retain());
             }
             if (packetReceiveEvent.hasPostTasks()) {
