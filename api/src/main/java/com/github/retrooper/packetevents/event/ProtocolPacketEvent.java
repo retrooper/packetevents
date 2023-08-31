@@ -166,7 +166,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.byteBuf = byteBuf;
     }
 
-    @Deprecated
     public int getPacketId() {
         return packetID;
     }

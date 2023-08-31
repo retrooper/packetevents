@@ -142,6 +142,11 @@ public final class PacketType {
             public int getId() {
                 return id;
             }
+
+            @Override
+            public PacketSide getSide() {
+                return PacketSide.CLIENT;
+            }
         }
 
         public enum Server implements PacketTypeConstant, ClientBoundPacket {
@@ -160,6 +165,11 @@ public final class PacketType {
 
             public int getId() {
                 return id;
+            }
+
+            @Override
+            public PacketSide getSide() {
+                return PacketSide.SERVER;
             }
         }
     }
@@ -189,6 +199,12 @@ public final class PacketType {
             public int getId() {
                 return id;
             }
+
+
+            @Override
+            public PacketSide getSide() {
+                return PacketSide.CLIENT;
+            }
         }
 
         public enum Server implements PacketTypeConstant, ClientBoundPacket {
@@ -214,6 +230,11 @@ public final class PacketType {
 
             public int getId() {
                 return id;
+            }
+
+            @Override
+            public PacketSide getSide() {
+                return PacketSide.SERVER;
             }
         }
     }
@@ -246,6 +267,11 @@ public final class PacketType {
 
             public int getId() {
                 return id;
+            }
+
+            @Override
+            public PacketSide getSide() {
+                return PacketSide.CLIENT;
             }
         }
 
@@ -284,6 +310,11 @@ public final class PacketType {
 
             public int getId() {
                 return id;
+            }
+
+            @Override
+            public PacketSide getSide() {
+                return PacketSide.SERVER;
             }
         }
     }
@@ -409,6 +440,11 @@ public final class PacketType {
                 }
                 int index = SERVERBOUND_PLAY_VERSION_MAPPER.getIndex(version);
                 return ids[index];
+            }
+
+            @Override
+            public PacketSide getSide() {
+                return PacketSide.CLIENT;
             }
         }
 
@@ -580,6 +616,11 @@ public final class PacketType {
                 int index = CLIENTBOUND_PLAY_VERSION_MAPPER.getIndex(version);
                 Map<Integer, PacketTypeCommon> map = PACKET_TYPE_ID_MAP.get((byte) index);
                 return map.get(packetId);
+            }
+
+            @Override
+            public PacketSide getSide() {
+                return PacketSide.SERVER;
             }
 
             private static void loadPacketIds(Enum<?>[] enumConstants) {

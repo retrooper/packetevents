@@ -27,6 +27,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class WrapperPlayServerTitle extends PacketWrapper<WrapperPlayServerTitle> {
     public static boolean HANDLE_JSON = true;
     private TitleAction action;
@@ -77,15 +79,14 @@ public class WrapperPlayServerTitle extends PacketWrapper<WrapperPlayServerTitle
 
     @Override
     public void read() {
-        boolean modern = PacketEvents.getAPI().getServerManager()
-                .getVersion().isNewerThanOrEquals(ServerVersion.V_1_11);
+        boolean modern = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11);
         int id = readVarInt();
         if (modern) {
             action = TitleAction.fromId(id);
         } else {
             action = TitleAction.fromLegacyId(id);
         }
-        switch (action) {
+        switch (Objects.requireNonNull(action)) {
             case SET_TITLE:
                 titleJson = readComponentJSON();
                 if (HANDLE_JSON) {
@@ -128,8 +129,7 @@ public class WrapperPlayServerTitle extends PacketWrapper<WrapperPlayServerTitle
 
     @Override
     public void write() {
-        boolean modern = PacketEvents.getAPI().getServerManager()
-                .getVersion().isNewerThanOrEquals(ServerVersion.V_1_11);
+        boolean modern = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11);
         int id = modern ? action.getId() : action.getLegacyId();
         writeVarInt(id);
         switch (action) {

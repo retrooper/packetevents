@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 import java.util.Map;
@@ -96,13 +97,14 @@ public interface ProtocolManager {
         getUser(channel).setClientVersion(version);
     }
 
-    default Object[] transformWrappers(PacketWrapper<?> wrapper, Object channel) {
+    @ApiStatus.Internal
+    default Object[] transformWrappers(PacketWrapper<?> wrapper, Object channel, boolean outgoing) {
         //It is possible that our packet transformer util decides to transform one wrapper into multiple packets.
         //(Correcting some mistakes on your end)
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
         Object[] buffers = new Object[wrappers.length];
         for (int i = 0; i < wrappers.length; i++) {
-            wrappers[i].prepareForSend(channel);
+            wrappers[i].prepareForSend(channel, outgoing);
             buffers[i] = wrappers[i].buffer;
             // Fix race condition when sending packets to multiple people (due to when the buffer is freed)
             wrappers[i].buffer = null;
@@ -111,32 +113,32 @@ public interface ProtocolManager {
     }
 
     default void sendPacket(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper, channel);
+        Object[] transformed = transformWrappers(wrapper, channel, true);
         sendPackets(channel, transformed);
     }
 
     default void sendPacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper, channel);
+        Object[] transformed = transformWrappers(wrapper, channel, true);
         sendPacketsSilently(channel, transformed);
     }
 
     default void writePacket(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper, channel);
+        Object[] transformed = transformWrappers(wrapper, channel, true);
         writePackets(channel, transformed);
     }
 
     default void writePacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper, channel);
+        Object[] transformed = transformWrappers(wrapper, channel, true);
         writePacketsSilently(channel, transformed);
     }
 
     default void receivePacket(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper, channel);
+        Object[] transformed = transformWrappers(wrapper, channel, false);
         receivePackets(channel, transformed);
     }
 
     default void receivePacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        Object[] transformed = transformWrappers(wrapper, channel);
+        Object[] transformed = transformWrappers(wrapper, channel, false);
         receivePacketsSilently(channel, transformed);
     }
 

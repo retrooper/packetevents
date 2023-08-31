@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
+import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.chat.*;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
@@ -39,6 +40,7 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
@@ -55,6 +57,7 @@ import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -73,7 +76,7 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
-    private int packetID;
+    private PacketTypeData packetTypeData;
     // For sending chunk data packets, which need this data
     @Nullable
     protected User user;
@@ -88,7 +91,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.clientVersion = clientVersion;
         this.serverVersion = serverVersion;
         this.buffer = null;
-        this.packetID = packetID;
+        this.packetTypeData = new PacketTypeData(null, packetID);
     }
 
     public PacketWrapper(PacketReceiveEvent event) {
@@ -100,7 +103,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.serverVersion = event.getServerVersion();
         this.user = event.getUser();
         this.buffer = event.getByteBuf();
-        this.packetID = event.getPacketId();
+        this.packetTypeData = new PacketTypeData(event.getPacketType(), event.getPacketId());
         if (readData) {
             readEvent(event);
         }
@@ -114,7 +117,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.clientVersion = event.getUser().getClientVersion();
         this.serverVersion = event.getServerVersion();
         this.buffer = event.getByteBuf();
-        this.packetID = event.getPacketId();
+        this.packetTypeData = new PacketTypeData(event.getPacketType(), event.getPacketId());
         this.user = event.getUser();
         if (readData) {
             readEvent(event);
@@ -126,13 +129,21 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public PacketWrapper(int packetID) {
-        this(ClientVersion.UNKNOWN,
-                PacketEvents.getAPI().getServerManager().getVersion(),
-                packetID);
+        if (packetID == -1) {
+            throw new IllegalArgumentException("Packet does not exist on this protocol version!");
+        }
+        this.clientVersion = ClientVersion.UNKNOWN;
+        this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
+        this.buffer = null;
+        this.packetTypeData = new PacketTypeData(null, packetID);
     }
 
     public PacketWrapper(PacketTypeCommon packetType) {
-        this(packetType.getId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
+        this.clientVersion = ClientVersion.UNKNOWN;
+        this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
+        this.buffer = null;
+        int id = packetType.getId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+        this.packetTypeData = new PacketTypeData(packetType, id);
     }
 
     public static PacketWrapper<?> createUniversalPacketWrapper(Object byteBuf) {
@@ -141,14 +152,30 @@ public class PacketWrapper<T extends PacketWrapper> {
         return wrapper;
     }
 
-    public final void prepareForSend(Object channel) {
+    @ApiStatus.Internal
+    public final void prepareForSend(Object channel, boolean outgoing) {
         // Null means the packet was manually created and wasn't sent by the server itself
         // A reference count of 0 means that the packet was freed (it was already sent)
         if (buffer == null || ByteBufHelper.refCnt(buffer) == 0) {
             buffer = ChannelHelper.pooledByteBuf(channel);
         }
 
-        writeVarInt(packetID);
+        //On proxies, we must rewrite the packet ID in a format compatible for the targeted client version
+        if (PacketEvents.getAPI().getInjector().isProxy()) {
+            User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+            if (packetTypeData.getPacketType() == null) {
+                //Get the packet type with the local version packet type mappings.
+                packetTypeData.setPacketType(PacketType.getById(outgoing ? PacketSide.SERVER : PacketSide.CLIENT,
+                        user.getConnectionState(), serverVersion.toClientVersion(), packetTypeData.getNativePacketId()));
+            }
+            //Change local version to user version so that the packet can be processed correctly.
+            serverVersion = user.getClientVersion().toServerVersion();
+            int id = packetTypeData.getPacketType().getId(user.getClientVersion());
+            writeVarInt(id);
+        }
+        else {
+            writeVarInt(packetTypeData.getNativePacketId());
+        }
         write();
     }
 
@@ -197,21 +224,50 @@ public class PacketWrapper<T extends PacketWrapper> {
         return buffer;
     }
 
+
+    /**
+     * Gets the Packet ID for the current platform version
+     * @deprecated Use {@link #getNativePacketId()}
+     * @return Packet ID
+     */
+    @Deprecated
     public int getPacketId() {
-        return packetID;
+        return getNativePacketId();
     }
 
+    /**
+     * Sets the Packet ID for the current platform version
+     * @deprecated Use {@link #setNativePacketId(int)}
+     */
+    @Deprecated
     public void setPacketId(int packetID) {
-        this.packetID = packetID;
+        setNativePacketId(packetID);
+    }
+
+    public int getNativePacketId() {
+        return packetTypeData.getNativePacketId();
+    }
+
+    public void setNativePacketId(int nativePacketId) {
+        this.packetTypeData.setNativePacketId(nativePacketId);
+    }
+
+    @ApiStatus.Internal
+    public PacketTypeData getPacketTypeData() {
+        return packetTypeData;
     }
 
     public int getMaxMessageLength() {
         return serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
     }
 
+    @Deprecated
     public void resetByteBuf() {
         ByteBufHelper.clear(buffer);
-        writeVarInt(packetID);
+    }
+
+    public void resetBuffer() {
+        ByteBufHelper.clear(buffer);
     }
 
     public byte readByte() {

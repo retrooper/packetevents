@@ -126,4 +126,9 @@ public class BungeePipelineInjector implements ChannelInjector {
         PacketEventsEncoder encoder = (PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
         encoder.user = user;
     }
+
+    @Override
+    public boolean isProxy() {
+        return true;
+    }
 }

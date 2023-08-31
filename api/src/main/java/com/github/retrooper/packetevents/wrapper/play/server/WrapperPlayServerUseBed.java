@@ -47,7 +47,7 @@ public class WrapperPlayServerUseBed extends PacketWrapper<WrapperPlayServerUseB
 
     @Override
     public void read() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             entityId = readVarInt();
             position = readBlockPosition();
         } else {
@@ -61,7 +61,7 @@ public class WrapperPlayServerUseBed extends PacketWrapper<WrapperPlayServerUseB
 
     @Override
     public void write() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             writeVarInt(entityId);
             writeBlockPosition(position);
         } else {

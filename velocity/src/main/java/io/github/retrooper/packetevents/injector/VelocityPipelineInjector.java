@@ -103,4 +103,9 @@ public class VelocityPipelineInjector implements ChannelInjector {
         PacketEventsEncoder encoder = (PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
         encoder.player = player;
     }
+
+    @Override
+    public boolean isProxy() {
+        return true;
+    }
 }

@@ -150,7 +150,8 @@ public class User {
     }
 
     public void sendMessage(Component component, ChatType type) {
-        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        ServerVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion().toServerVersion() :
+                PacketEvents.getAPI().getServerManager().getVersion();
         PacketWrapper<?> chatPacket;
         if (version.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             chatPacket = new WrapperPlayServerSystemChatMessage(false, component);
@@ -174,7 +175,9 @@ public class User {
     }
 
     public void sendTitle(Component title, Component subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        boolean modern = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_17);
+        ServerVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion().toServerVersion() :
+                PacketEvents.getAPI().getServerManager().getVersion();
+        boolean modern = version.isNewerThanOrEquals(ServerVersion.V_1_17);
         PacketWrapper<?> animation;
         PacketWrapper<?> setTitle = null;
         PacketWrapper<?> setSubtitle = null;

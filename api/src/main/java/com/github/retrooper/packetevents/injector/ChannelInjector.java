@@ -32,4 +32,6 @@ public interface ChannelInjector {
     void updateUser(Object channel, User user);
 
     void setPlayer(Object channel, Object player);
+
+    boolean isProxy();
 }

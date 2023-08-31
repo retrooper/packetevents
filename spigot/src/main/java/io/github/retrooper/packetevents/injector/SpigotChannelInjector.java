@@ -227,4 +227,9 @@ public class SpigotChannelInjector implements ChannelInjector {
     private PacketEventsDecoder getDecoder(Channel channel) {
          return (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
     }
+
+    @Override
+    public boolean isProxy() {
+        return false;
+    }
 }
