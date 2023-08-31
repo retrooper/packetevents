@@ -1,15 +1,16 @@
 # packetevents
 
-[![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
+[![](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://github.com/retrooper/packetevents/blob/2.0/LICENSE) [![](https://github.com/retrooper/packetevents/actions/workflows/build.yml/badge.svg)](https://github.com/retrooper/packetevents/actions) [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/prqzNg9tRU)
 
 PacketEvents is a fast and efficient multi-platform packet processing library. Our packet wrappers are easy to use with multi-version support. With our API you can write code that runs on Spigot, BungeeCord, Velocity, and Fabric! Switch to PacketEvents today by joining \
 our [Discord Server](https://discord.me/packetevents) for help.
 
 ### Links
-* [Find release builds on SpigotMC](https://www.spigotmc.org/resources/packetevents-api.80279/)
+* [Find release builds on Modrinth](https://modrinth.com/plugin/packetevents)
 * [View documentation on our JavaDocs Page](https://packetevents.github.io/javadocs)
+
 ### Setup
-[Learn more](https://github.com/retrooper/packetevents/wiki/Setup-2.0)
+[How to Setup PacketEvents](https://github.com/retrooper/packetevents/wiki/Depending-on-pre-built-PacketEvents)
 
 ### Sponsorships
 [![](https://www.ej-technologies.com/images/product_banners/jprofiler_small.png)](https://www.ej-technologies.com/products/jprofiler/overview.html)
@@ -17,15 +18,6 @@ our [Discord Server](https://discord.me/packetevents) for help.
 ### Statistics
 PacketEvents optionally collects statistics using [bStats](https://bstats.org/)\
 Check out our [bStats page](https://bstats.org/plugin/bukkit/packetevents/11327)
-
-This library is licensed under the GPLv3 (General Public License version 3). Here are a few sources to learn more about the license.\
-[![](https://www.gnu.org/graphics/gplv3-with-text-136x68.png)](https://github.com/retrooper/packetevents/blob/2.0/LICENSE)
-### GPL Resources
-* https://www.gnu.org/philosophy/free-sw.html
-* https://www.gnu.org/philosophy/free-sw.html#clarifying
-* https://www.gnu.org/licenses/copyleft.en.html
-* https://www.gnu.org/licenses/quick-guide-gplv3.html
-* https://gpl-violations.org/faq/sourcecode-faq/
 
 ### Credit to these projects
 [wiki.vg/Protocol](https://wiki.vg/Protocol)\
