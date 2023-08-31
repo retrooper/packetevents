@@ -7,6 +7,7 @@ our [Discord Server](https://discord.me/packetevents) for help.
 
 ### Links
 * [Find release builds on Modrinth](https://modrinth.com/plugin/packetevents)
+* [Find development builds on Jenkins](https://ci.codemc.io/job/retrooper/job/packetevents)
 * [View documentation on our JavaDocs Page](https://packetevents.github.io/javadocs)
 
 ### Setup
