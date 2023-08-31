@@ -10,7 +10,7 @@ our [Discord Server](https://discord.me/packetevents) for help.
 * [View documentation on our JavaDocs Page](https://packetevents.github.io/javadocs)
 
 ### Setup
-[How to Setup PacketEvents](https://github.com/retrooper/packetevents/wiki/Depending-on-pre-built-PacketEvents)
+[How to Setup PacketEvents](https://github.com/retrooper/packetevents/wiki/Depending-on-pre%E2%80%90built-PacketEvents)
 
 ### Sponsorships
 [![](https://www.ej-technologies.com/images/product_banners/jprofiler_small.png)](https://www.ej-technologies.com/products/jprofiler/overview.html)
