@@ -47,21 +47,33 @@ public class NBTSerializer<IN, OUT> {
     }
 
     public NBT deserializeTag(IN from) throws IOException {
+        return deserializeTag(from, true);
+    }
+
+    public NBT deserializeTag(IN from, boolean named) throws IOException {
         NBTType<?> type = readTagType(from);
         if (type == NBTType.END) {
             return null;
         }
-        readTagName(from);
+        if (named) {
+            readTagName(from);
+        }
         return readTag(from, type);
     }
 
     public void serializeTag(OUT to, NBT tag) throws IOException {
+        serializeTag(to, tag, true);
+    }
+
+    public void serializeTag(OUT to, NBT tag, boolean named) throws IOException {
         NBTType<?> type = tag.getType();
         writeTagType(to, type);
         if (tag.getType() == NBTType.END) {
             return;
         }
-        writeTagName(to, "");
+        if (named) {
+            writeTagName(to, "");
+        }
         writeTag(to, tag);
     }
 

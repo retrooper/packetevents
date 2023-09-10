@@ -50,6 +50,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     private int simulationDistance;
     private boolean reducedDebugInfo;
     private boolean enableRespawnScreen;
+    private boolean limitedCrafting;
     private boolean isDebug;
     private boolean isFlat;
     private WorldBlockPosition lastDeathPosition;
@@ -65,6 +66,18 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                                      Difficulty difficulty, String worldName, long hashedSeed,
                                      int maxPlayers, int viewDistance, int simulationDistance,
                                      boolean reducedDebugInfo, boolean enableRespawnScreen,
+                                     boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition, @Nullable Integer portalCooldown) {
+        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, dimension,
+                difficulty, worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo, enableRespawnScreen,
+                false, isDebug, isFlat, lastDeathPosition, portalCooldown);
+    }
+
+    public WrapperPlayServerJoinGame(int entityID, boolean hardcore, GameMode gameMode,
+                                     @Nullable GameMode previousGameMode, List<String> worldNames,
+                                     NBTCompound dimensionCodec, Dimension dimension,
+                                     Difficulty difficulty, String worldName, long hashedSeed,
+                                     int maxPlayers, int viewDistance, int simulationDistance,
+                                     boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
                                      boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition, @Nullable Integer portalCooldown) {
         super(PacketType.Play.Server.JOIN_GAME);
         this.entityID = entityID;
@@ -82,6 +95,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         this.simulationDistance = simulationDistance;
         this.reducedDebugInfo = reducedDebugInfo;
         this.enableRespawnScreen = enableRespawnScreen;
+        this.limitedCrafting = limitedCrafting;
         this.isDebug = isDebug;
         this.isFlat = isFlat;
         this.lastDeathPosition = lastDeathPosition;
@@ -91,6 +105,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     @Override
     public void read() {
         entityID = readInt();
+        boolean v1_20_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2);
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
@@ -98,22 +113,28 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         if (v1_16) {
             hardcore = readBoolean();
-            gameMode = readGameMode();
+            if (!v1_20_2) {
+                gameMode = readGameMode();
+            }
         } else {
             int gameModeId = readUnsignedByte();
             hardcore = (gameModeId & 0x8) == 0x8;
             gameMode = GameMode.getById(gameModeId & -0x9);
         }
         if (v1_16) {
-            previousGameMode = readGameMode();
+            if (!v1_20_2) {
+                previousGameMode = readGameMode();
+            }
             int worldCount = readVarInt();
             worldNames = new ArrayList<>(worldCount);
             for (int i = 0; i < worldCount; i++) {
                 worldNames.add(readString());
             }
-            dimensionCodec = readNBT();
-            dimension = readDimension();
-            worldName = readString();
+            if (!v1_20_2) {
+                dimensionCodec = readNBT();
+                dimension = readDimension();
+                worldName = readString();
+            }
         } else {
             previousGameMode = gameMode;
             dimensionCodec = new NBTCompound();
@@ -122,7 +143,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 difficulty = Difficulty.getById(readByte());
             }
         }
-        if (v1_15) {
+        if (v1_15 && !v1_20_2) {
             hashedSeed = readLong();
         }
         if (v1_16) {
@@ -131,6 +152,14 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             if (v1_18) simulationDistance = readVarInt();
             reducedDebugInfo = readBoolean();
             enableRespawnScreen = readBoolean();
+            if (v1_20_2) {
+                limitedCrafting = readBoolean();
+                dimension = readDimension();
+                worldName = readString();
+                hashedSeed = readLong();
+                gameMode = readGameMode();
+                previousGameMode = readGameMode();
+            }
             isDebug = readBoolean();
             isFlat = readBoolean();
         } else {
@@ -157,6 +186,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     @Override
     public void write() {
         writeInt(entityID);
+        boolean v1_20_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2);
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
@@ -164,7 +194,9 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
         if (v1_16) {
             writeBoolean(hardcore);
-            writeGameMode(gameMode);
+            if (!v1_20_2) {
+                writeGameMode(gameMode);
+            }
         } else {
             int gameModeId = gameMode.getId();
             if (hardcore) {
@@ -176,14 +208,18 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             if (previousGameMode == null) {
                 previousGameMode = gameMode;
             }
-            writeGameMode(previousGameMode);
+            if (!v1_20_2) {
+                writeGameMode(previousGameMode);
+            }
             writeVarInt(worldNames.size());
             for (String name : worldNames) {
                 writeString(name);
             }
-            writeNBT(dimensionCodec);
-            writeDimension(dimension);
-            writeString(worldName);
+            if (!v1_20_2) {
+                writeNBT(dimensionCodec);
+                writeDimension(dimension);
+                writeString(worldName);
+            }
         } else {
             previousGameMode = gameMode;
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
@@ -195,7 +231,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 writeByte(difficulty.getId());
             }
         }
-        if (v1_15) {
+        if (v1_15 && !v1_20_2) {
             writeLong(hashedSeed);
         }
         if (v1_16) {
@@ -204,6 +240,14 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             if (v1_18) writeVarInt(simulationDistance);
             writeBoolean(reducedDebugInfo);
             writeBoolean(enableRespawnScreen);
+            if (v1_20_2) {
+                writeBoolean(limitedCrafting);
+                writeDimension(dimension);
+                writeString(worldName);
+                writeLong(hashedSeed);
+                writeGameMode(gameMode);
+                writeGameMode(previousGameMode);
+            }
             writeBoolean(isDebug);
             writeBoolean(isFlat);
         } else {
@@ -252,6 +296,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         simulationDistance = wrapper.simulationDistance;
         reducedDebugInfo = wrapper.reducedDebugInfo;
         enableRespawnScreen = wrapper.enableRespawnScreen;
+        limitedCrafting = wrapper.limitedCrafting;
         isDebug = wrapper.isDebug;
         isFlat = wrapper.isFlat;
         lastDeathPosition = wrapper.lastDeathPosition;
@@ -367,7 +412,6 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         return reducedDebugInfo;
     }
 
-
     public void setReducedDebugInfo(boolean reducedDebugInfo) {
         this.reducedDebugInfo = reducedDebugInfo;
     }
@@ -378,6 +422,14 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
 
     public void setRespawnScreenEnabled(boolean enableRespawnScreen) {
         this.enableRespawnScreen = enableRespawnScreen;
+    }
+
+    public boolean isLimitedCrafting() {
+        return this.limitedCrafting;
+    }
+
+    public void setLimitedCrafting(boolean limitedCrafting) {
+        this.limitedCrafting = limitedCrafting;
     }
 
     public boolean isDebug() {

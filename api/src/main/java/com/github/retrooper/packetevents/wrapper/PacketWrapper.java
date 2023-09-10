@@ -152,6 +152,18 @@ public class PacketWrapper<T extends PacketWrapper> {
         return wrapper;
     }
 
+    public static int getChunkX(long chunkKey) {
+        return (int) (chunkKey & 0xFFFFFFFFL);
+    }
+
+    public static int getChunkZ(long chunkKey) {
+        return (int) ((chunkKey >>> 32) & 0xFFFFFFFFL);
+    }
+
+    public static long getChunkKey(int chunkX, int chunkZ) {
+        return (long) chunkX & 0xFFFFFFFFL | ((long) chunkZ & 0xFFFFFFFFL) << 32;
+    }
+
     @ApiStatus.Internal
     public final void prepareForSend(Object channel, boolean outgoing) {
         // Null means the packet was manually created and wasn't sent by the server itself

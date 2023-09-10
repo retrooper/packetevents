@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -38,13 +39,21 @@ public class WrapperPlayServerDisplayScoreboard extends PacketWrapper<WrapperPla
 
     @Override
     public void read() {
-        position = readByte();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+            position = readVarInt();
+        } else {
+            position = readByte();
+        }
         scoreName = readString(16);
     }
 
     @Override
     public void write() {
-        writeByte(position);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+            writeVarInt(position);
+        } else {
+            writeByte(position);
+        }
         writeString(scoreName, 16);
     }
 

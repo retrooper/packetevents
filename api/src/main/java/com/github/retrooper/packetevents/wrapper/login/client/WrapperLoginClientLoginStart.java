@@ -57,12 +57,15 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     @Override
     public void read() {
         this.username = readString(16);
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
                 //Removed in 1.19.4
                 this.signatureData = readOptional(PacketWrapper::readSignatureData);
             }
-            if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19_1)) {
+           
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+                this.playerUUID = readUUID();
+            } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
                 this.playerUUID = readOptional(PacketWrapper::readUUID);
             }
         }
@@ -71,12 +74,15 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     @Override
     public void write() {
         writeString(username, 16);
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19)) {
-            if (clientVersion.isOlderThanOrEquals(ClientVersion.V_1_19_3)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
                 //Removed in 1.19.4
                 writeOptional(signatureData, PacketWrapper::writeSignatureData);
             }
-            if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19_1)) {
+           
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+                writeUUID(java.util.Objects.requireNonNull(playerUUID, "playerUUID is required for >= 1.20.2"));
+            } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
                 writeOptional(playerUUID, PacketWrapper::writeUUID);
             }
         }
