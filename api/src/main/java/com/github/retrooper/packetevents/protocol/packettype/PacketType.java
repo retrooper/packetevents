@@ -52,7 +52,8 @@ public final class PacketType {
             ClientVersion.V_1_19,
             ClientVersion.V_1_19_1,
             ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4);
+            ClientVersion.V_1_19_4,
+            ClientVersion.V_1_20_2);
 
     //TODO UPDATE Update packet type mappings (serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
@@ -70,7 +71,8 @@ public final class PacketType {
             ClientVersion.V_1_19,
             ClientVersion.V_1_19_1,
             ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4);
+            ClientVersion.V_1_19_4,
+            ClientVersion.V_1_20_2);
 
     public static void prepare() {
         PacketType.Play.Client.load();
@@ -107,6 +109,12 @@ public final class PacketType {
                     return Play.Client.getById(version, packetID);
                 } else {
                     return Play.Server.getById(version, packetID);
+                }
+            case CONFIGURATION:
+                if (side == PacketSide.CLIENT) {
+                    return Configuration.Client.getById(packetID);
+                } else {
+                    return Configuration.Server.getById(packetID);
                 }
             default:
                 return null;
@@ -244,7 +252,9 @@ public final class PacketType {
             LOGIN_START(0),
             ENCRYPTION_RESPONSE(1),
             ///Added in 1.13
-            LOGIN_PLUGIN_RESPONSE(2);
+            LOGIN_PLUGIN_RESPONSE(2),
+            //Added in 1.20.2
+            LOGIN_SUCCESS_ACK(3);
 
             private final int id;
 
@@ -260,6 +270,8 @@ public final class PacketType {
                     return ENCRYPTION_RESPONSE;
                 } else if (packetID == 2) {
                     return LOGIN_PLUGIN_RESPONSE;
+                } else if (packetID == 3) {
+                    return LOGIN_SUCCESS_ACK;
                 } else {
                     return null;
                 }
@@ -315,6 +327,96 @@ public final class PacketType {
             @Override
             public PacketSide getSide() {
                 return PacketSide.SERVER;
+            }
+        }
+    }
+   
+    // Added in 1.20.2
+    public static class Configuration {
+
+        public enum Client implements PacketTypeConstant, ServerBoundPacket {
+
+            CLIENT_SETTINGS(0x00),
+            PLUGIN_MESSAGE(0x01),
+            CONFIGURATION_END_ACK(0x02),
+            KEEP_ALIVE(0x03),
+            PONG(0x04),
+            RESOURCE_PACK_STATUS(0x05);
+
+            private final int id;
+
+            Client(int id) {
+                this.id = id;
+            }
+
+            public static @Nullable PacketTypeCommon getById(int packetId) {
+                switch (packetId) {
+                    case 0x00:
+                        return CLIENT_SETTINGS;
+                    case 0x01:
+                        return PLUGIN_MESSAGE;
+                    case 0x02:
+                        return CONFIGURATION_END_ACK;
+                    case 0x03:
+                        return KEEP_ALIVE;
+                    case 0x04:
+                        return PONG;
+                    case 0x05:
+                        return RESOURCE_PACK_STATUS;
+                    default:
+                        return null;
+                }
+            }
+
+            @Override
+            public int getId() {
+                return this.id;
+            }
+        }
+
+        public enum Server implements PacketTypeConstant, ClientBoundPacket {
+
+            PLUGIN_MESSAGE(0x00),
+            DISCONNECT(0x01),
+            CONFIGURATION_END(0x02),
+            KEEP_ALIVE(0x03),
+            REGISTRY_DATA(0x04),
+            RESOURCE_PACK_SEND(0x05),
+            UPDATE_ENABLED_FEATURES(0x06),
+            UPDATE_TAGS(0x07);
+
+            private final int id;
+
+            Server(int id) {
+                this.id = id;
+            }
+
+            public static @Nullable PacketTypeCommon getById(int packetId) {
+                switch (packetId) {
+                    case 0x00:
+                        return PLUGIN_MESSAGE;
+                    case 0x01:
+                        return DISCONNECT;
+                    case 0x02:
+                        return CONFIGURATION_END;
+                    case 0x03:
+                        return KEEP_ALIVE;
+                    case 0x04:
+                        return REGISTRY_DATA;
+                    case 0x05:
+                        return RESOURCE_PACK_SEND;
+                    case 0x06:
+                        return UPDATE_ENABLED_FEATURES;
+                    case 0x07:
+                        return UPDATE_TAGS;
+                    default:
+                        return null;
+                }
+            }
+
+            @Override
+            public int getId() {
+                return this.id;
             }
         }
     }
@@ -379,8 +481,11 @@ public final class PacketType {
             //Added in 1.19.1
             CHAT_ACK,
             //Added in 1.19.3
-            CHAT_SESSION_UPDATE;
-
+            CHAT_SESSION_UPDATE,
+            //Added in 1.20.2
+            CHUNK_BATCH_ACK,
+            CONFIGURATION_ACK,
+            DEBUG_PING;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -431,6 +536,7 @@ public final class PacketType {
                 loadPacketIds(ServerboundPacketType_1_19_1.values());
                 loadPacketIds(ServerboundPacketType_1_19_3.values());
                 loadPacketIds(ServerboundPacketType_1_19_4.values());
+                loadPacketIds(ServerboundPacketType_1_20_2.values());
                 //TODO UPDATE Update packet type mappings (serverbound pt. 2)
             }
 
@@ -469,12 +575,13 @@ public final class PacketType {
             PLAYER_CHAT_HEADER,
             PLAYER_INFO,
             DISPLAY_CHAT_PREVIEW,
+            UPDATE_ENABLED_FEATURES,
+            SPAWN_PLAYER,
 
             //Okay these are normal ones
             WINDOW_CONFIRMATION,
             SPAWN_ENTITY,
             SPAWN_EXPERIENCE_ORB,
-            SPAWN_PLAYER,
             ENTITY_ANIMATION,
             STATISTICS,
             BLOCK_BREAK_ANIMATION,
@@ -584,12 +691,16 @@ public final class PacketType {
             DISGUISED_CHAT,
             PLAYER_INFO_REMOVE,
             PLAYER_INFO_UPDATE,
-            UPDATE_ENABLED_FEATURES,
-            // 1.19.4
+            //Added in 1.19.4
             DAMAGE_EVENT,
             HURT_ANIMATION,
             BUNDLE,
-            CHUNK_BIOMES;
+            CHUNK_BIOMES,
+            //Added in 1.20.2
+            CHUNK_BATCH_END,
+            CHUNK_BATCH_BEGIN,
+            DEBUG_PONG,
+            CONFIGURATION_START;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -656,6 +767,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_19_1.values());
                 loadPacketIds(ClientboundPacketType_1_19_3.values());
                 loadPacketIds(ClientboundPacketType_1_19_4.values());
+                loadPacketIds(ClientboundPacketType_1_20_2.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }

@@ -36,6 +36,8 @@ public class EventCreationUtil {
                 return new PacketLoginReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
             case PLAY:
                 return new PacketPlayReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
+            case CONFIGURATION:
+                return new PacketConfigReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
         }
         throw new RuntimeException("Unknown connection state " + user.getConnectionState() + "!");
     }
@@ -51,6 +53,8 @@ public class EventCreationUtil {
                 return new PacketLoginSendEvent(channel, user, player, buffer, autoProtocolTranslation);
             case PLAY:
                 return new PacketPlaySendEvent(channel, user, player, buffer, autoProtocolTranslation);
+            case CONFIGURATION:
+                return new PacketConfigSendEvent(channel, user, player, buffer, autoProtocolTranslation);
         }
         throw new RuntimeException("Unknown connection state " + user.getConnectionState() + "!");
     }
