@@ -66,7 +66,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         //Don't print errors during handshake
         if (ExceptionUtil.isException(cause, PacketProcessException.class)
                 && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
-                && (user != null && user.getConnectionState() != ConnectionState.HANDSHAKING)) {
+                && (user != null && user.getDecoderState() != ConnectionState.HANDSHAKING)) {
             cause.printStackTrace();
         }
     }
