@@ -245,6 +245,9 @@ public class User {
 
     @Nullable
     public NBTCompound getWorldNBT(String worldName) {
+        if (worldNBT == null) {
+            return null;
+        }
         for (NBTCompound compound : worldNBT) {
             if (compound.getStringTagOrNull("name").getValue().equals(worldName)) {
                 return compound;

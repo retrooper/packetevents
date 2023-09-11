@@ -92,9 +92,12 @@ public class InternalPacketListener extends PacketListenerAbstract {
             user.setWorldNBT(list);
 
             // Update world height
-            NBTCompound worldNBT = user.getWorldNBT(joinGame.getDimension().getDimensionName()).getCompoundTagOrNull("element");
-            user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-            user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+            NBTCompound dimension = user.getWorldNBT(joinGame.getDimension().getDimensionName());
+            if (dimension != null) {
+                NBTCompound worldNBT = dimension.getCompoundTagOrNull("element");
+                user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
+                user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+            }
         }
 
         // Respawn is used to switch dimensions
@@ -105,9 +108,12 @@ public class InternalPacketListener extends PacketListenerAbstract {
                 return; // Fixed world height, no tags are sent to the client
             }
 
-            NBTCompound worldNBT = user.getWorldNBT(respawn.getDimension().getDimensionName()).getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
-            user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-            user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+            NBTCompound dimension = user.getWorldNBT(respawn.getDimension().getDimensionName());
+            if (dimension != null) {
+                NBTCompound worldNBT = dimension.getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
+                user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
+                user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+            }
         }
     }
 
