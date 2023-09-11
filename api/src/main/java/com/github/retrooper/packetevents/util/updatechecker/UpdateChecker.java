@@ -69,7 +69,7 @@ public class UpdateChecker {
                     + ColorUtil.toString(NamedTextColor.YELLOW) + localVersion
                     + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
                     + ColorUtil.toString(NamedTextColor.GREEN) + newVersion
-                    + ColorUtil.toString(NamedTextColor.RED) + ")");
+                    + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             return UpdateCheckerStatus.OUTDATED;
         } else if (newVersion != null && localVersion.isNewerThan(newVersion)) {
             PacketEvents.getAPI().getLogManager().info("You are on a dev or pre released build of packetevents. Your build: ("
