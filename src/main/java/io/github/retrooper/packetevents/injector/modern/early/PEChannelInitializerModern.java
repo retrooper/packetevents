@@ -37,7 +37,7 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     }
 
     public static void postInitChannel(Channel channel) {
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
+        if (channel == null || ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
                 || ClassUtil.getClassSimpleName(channel.getClass()).equals("SpoofedChannel")) {
             return;
         }

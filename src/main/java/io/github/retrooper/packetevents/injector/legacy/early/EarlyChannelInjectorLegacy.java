@@ -284,7 +284,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     public void writePacket(Object ch, Object rawNMSPacket) {
         Channel channel = (Channel) ch;
         //Don't write packets to fake channels
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
+        if (channel == null || ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
                 || ClassUtil.getClassSimpleName(channel.getClass()).equals("SpoofedChannel")) {
             return;
         }
@@ -295,7 +295,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     public void flushPackets(Object ch) {
         Channel channel = (Channel) ch;
         //Don't flush packets for fake channels
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
+        if (channel == null || ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
                 || ClassUtil.getClassSimpleName(channel.getClass()).equals("SpoofedChannel")) {
             return;
         }
@@ -306,7 +306,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     public void sendPacket(Object ch, Object rawNMSPacket) {
         Channel channel = (Channel) ch;
         //Don't send packets to fake channels
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
+        if (channel == null || ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
                 || ClassUtil.getClassSimpleName(channel.getClass()).equals("SpoofedChannel")) {
             return;
         }

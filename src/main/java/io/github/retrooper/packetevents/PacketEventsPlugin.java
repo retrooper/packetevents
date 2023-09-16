@@ -45,7 +45,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        /*PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
+        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
                 if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
@@ -68,7 +68,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
                 }
             }
-        });*/
+        });
         PacketEvents.get().init();
     }
 

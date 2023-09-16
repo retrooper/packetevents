@@ -48,7 +48,7 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<Channel> {
     protected void initChannel(Channel channel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, channel);
         PlayerChannelHandlerLegacy channelHandler = new PlayerChannelHandlerLegacy();
-        if (ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
+        if (channel == null || ClassUtil.getClassSimpleName(channel.getClass()).equals("FakeChannel")
                 || ClassUtil.getClassSimpleName(channel.getClass()).equals("SpoofedChannel")) {
             return;
         }
