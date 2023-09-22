@@ -385,10 +385,11 @@ public final class PacketType {
             DISCONNECT(0x01),
             CONFIGURATION_END(0x02),
             KEEP_ALIVE(0x03),
-            REGISTRY_DATA(0x04),
-            RESOURCE_PACK_SEND(0x05),
-            UPDATE_ENABLED_FEATURES(0x06),
-            UPDATE_TAGS(0x07);
+            PING(0x04),
+            REGISTRY_DATA(0x05),
+            RESOURCE_PACK_SEND(0x06),
+            UPDATE_ENABLED_FEATURES(0x07),
+            UPDATE_TAGS(0x08);
 
             private final int id;
 
@@ -407,12 +408,14 @@ public final class PacketType {
                     case 0x03:
                         return KEEP_ALIVE;
                     case 0x04:
-                        return REGISTRY_DATA;
+                        return PING;
                     case 0x05:
-                        return RESOURCE_PACK_SEND;
+                        return REGISTRY_DATA;
                     case 0x06:
-                        return UPDATE_ENABLED_FEATURES;
+                        return RESOURCE_PACK_SEND;
                     case 0x07:
+                        return UPDATE_ENABLED_FEATURES;
+                    case 0x08:
                         return UPDATE_TAGS;
                     default:
                         return null;
