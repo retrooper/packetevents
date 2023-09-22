@@ -372,6 +372,11 @@ public final class PacketType {
             public int getId() {
                 return this.id;
             }
+
+            @Override
+            public PacketSide getSide() {
+                return PacketSide.CLIENT;
+            }
         }
 
         public enum Server implements PacketTypeConstant, ClientBoundPacket {
@@ -417,6 +422,11 @@ public final class PacketType {
             @Override
             public int getId() {
                 return this.id;
+            }
+
+            @Override
+            public PacketSide getSide() {
+                return PacketSide.CLIENT;
             }
         }
     }
