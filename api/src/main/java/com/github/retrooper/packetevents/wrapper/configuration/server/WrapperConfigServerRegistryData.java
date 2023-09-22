@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.configuration.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -27,7 +27,7 @@ public class WrapperConfigServerRegistryData extends PacketWrapper<WrapperConfig
 
     private NBTCompound registryData;
 
-    public WrapperConfigServerRegistryData(PacketReceiveEvent event) {
+    public WrapperConfigServerRegistryData(PacketSendEvent event) {
         super(event);
     }
 

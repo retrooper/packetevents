@@ -18,13 +18,13 @@
 
 package com.github.retrooper.packetevents.wrapper.login.client;
 
-import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperLoginClientLoginSuccessAck extends PacketWrapper<WrapperLoginClientLoginSuccessAck> {
 
-    public WrapperLoginClientLoginSuccessAck(PacketSendEvent event) {
+    public WrapperLoginClientLoginSuccessAck(PacketReceiveEvent event) {
         super(event);
     }
 

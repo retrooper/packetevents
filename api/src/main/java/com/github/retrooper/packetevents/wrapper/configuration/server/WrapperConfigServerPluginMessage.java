@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.configuration.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -29,7 +29,7 @@ public class WrapperConfigServerPluginMessage extends PacketWrapper<WrapperConfi
     private String channelName;
     private byte[] data;
 
-    public WrapperConfigServerPluginMessage(PacketReceiveEvent event) {
+    public WrapperConfigServerPluginMessage(PacketSendEvent event) {
         super(event);
     }
 

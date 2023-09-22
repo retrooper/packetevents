@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.configuration.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -27,7 +27,7 @@ public class WrapperConfigServerDisconnect extends PacketWrapper<WrapperConfigSe
 
     private Component reason;
 
-    public WrapperConfigServerDisconnect(PacketReceiveEvent event) {
+    public WrapperConfigServerDisconnect(PacketSendEvent event) {
         super(event);
     }
 

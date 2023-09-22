@@ -18,13 +18,13 @@
 
 package com.github.retrooper.packetevents.wrapper.configuration.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperConfigServerConfigurationEnd extends PacketWrapper<WrapperConfigServerConfigurationEnd> {
 
-    public WrapperConfigServerConfigurationEnd(PacketReceiveEvent event) {
+    public WrapperConfigServerConfigurationEnd(PacketSendEvent event) {
         super(event);
     }
 

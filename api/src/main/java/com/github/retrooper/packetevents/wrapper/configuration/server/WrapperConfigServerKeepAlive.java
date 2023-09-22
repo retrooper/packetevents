@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.configuration.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -26,7 +26,7 @@ public class WrapperConfigServerKeepAlive extends PacketWrapper<WrapperConfigSer
 
     private long id;
 
-    public WrapperConfigServerKeepAlive(PacketReceiveEvent event) {
+    public WrapperConfigServerKeepAlive(PacketSendEvent event) {
         super(event);
     }
 
