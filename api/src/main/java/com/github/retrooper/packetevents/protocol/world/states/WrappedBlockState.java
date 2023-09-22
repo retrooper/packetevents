@@ -157,11 +157,12 @@ public class WrappedBlockState {
             return 8;
         } else if (version.isOlderThanOrEquals(ClientVersion.V_1_19_3)) {
             return 9;
-        }
-        else if (version.isOlderThanOrEquals(ClientVersion.V_1_19_4)) {
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_19_4)) {
             return 10;
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_20)) {
+            return 11;
         }
-        return 11;
+        return 12;
     }
 
     private static void loadLegacy() {
