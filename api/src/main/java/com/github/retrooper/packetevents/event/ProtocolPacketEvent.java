@@ -81,7 +81,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.packetType = PacketType.getById(packetSide, user.getConnectionState(),
                 version, packetID);
         if (this.packetType == null) {
-            // mojang fucked up and keeps sending disconnect packets in the wrong protocol state
+            // mojang messed up and keeps sending disconnect packets in the wrong protocol state
             if (PacketType.getById(packetSide, ConnectionState.PLAY, version, packetID) == PacketType.Play.Server.DISCONNECT) {
                 throw new InvalidDisconnectPacketSend();
             }

@@ -169,7 +169,6 @@ public class VelocityPacketEventsBuilder {
                     }
 
                     if (settings.isbStatsEnabled()) {
-                        // TODO Cross-platform metrics?
                     }
 
                     PacketType.Play.Client.load();

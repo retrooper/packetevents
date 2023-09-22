@@ -22,8 +22,11 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerExplosion;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
@@ -38,7 +41,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.logging.Logger;
 
-@Plugin(id = "packetevents", name = "PacketEvents", version = "2.0.0")
+@Plugin(id = "packetevents", name = "PacketEvents", version = "2.0.2")
 public class PacketEventsPlugin {
     private final ProxyServer server;
     private final Logger logger;
@@ -75,6 +78,11 @@ public class PacketEventsPlugin {
             @Override
             public void onPacketSend(PacketSendEvent event) {
                 //System.out.println("Outgoing: " + event.getPacketType().getName());
+                /*if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
+                    System.out.println("Before processing, pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
+                    WrapperPlayServerSystemChatMessage msg = new WrapperPlayServerSystemChatMessage(event);
+                    System.out.println("After processing: " + msg.getMessage());
+                }*/
             }
         });
         PacketEvents.getAPI().init();
