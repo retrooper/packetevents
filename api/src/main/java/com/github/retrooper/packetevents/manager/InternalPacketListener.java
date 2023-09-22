@@ -32,6 +32,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
@@ -80,8 +81,21 @@ public class InternalPacketListener extends PacketListenerAbstract {
             }
         }
 
-        // Join game can be used to update world height, and sets dimension data
+        // The server sends dimension information in configuration phase >= 1.20.2
+        else if (event.getPacketType() == PacketType.Configuration.Server.REGISTRY_DATA) {
+            WrapperConfigServerRegistryData registryData = new WrapperConfigServerRegistryData(event);
 
+            // Store world data
+            NBTCompound registryDataTag = registryData.getRegistryData();
+            if (registryDataTag != null) {
+                NBTList<NBTCompound> list = registryDataTag
+                        .getCompoundTagOrNull("minecraft:dimension_type")
+                        .getCompoundListTagOrNull("value");
+                user.setWorldNBT(list);
+            }
+        }
+
+        // The server sends dimension information in login packet for >= 1.17 and < 1.20.2
         else if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
             WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
             user.setEntityId(joinGame.getEntityId());
@@ -90,9 +104,14 @@ public class InternalPacketListener extends PacketListenerAbstract {
                 return; // Fixed world height, no tags are sent to the client
             }
 
-            // Store world height
-            NBTList<NBTCompound> list = joinGame.getDimensionCodec().getCompoundTagOrNull("minecraft:dimension_type").getCompoundListTagOrNull("value");
-            user.setWorldNBT(list);
+            // Store world data
+            NBTCompound dimensionCodec = joinGame.getDimensionCodec();
+            if (dimensionCodec != null) {
+                NBTList<NBTCompound> list = dimensionCodec
+                        .getCompoundTagOrNull("minecraft:dimension_type")
+                        .getCompoundListTagOrNull("value");
+                user.setWorldNBT(list);
+            }
 
             // Update world height
             NBTCompound dimension = user.getWorldNBT(joinGame.getDimension().getDimensionName());
