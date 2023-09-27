@@ -22,15 +22,15 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayServerChunkDebugPong extends PacketWrapper<WrapperPlayServerChunkDebugPong> {
+public class WrapperPlayServerDebugPong extends PacketWrapper<WrapperPlayServerDebugPong> {
 
     private long timestamp;
 
-    public WrapperPlayServerChunkDebugPong(PacketSendEvent event) {
+    public WrapperPlayServerDebugPong(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerChunkDebugPong(long timestamp) {
+    public WrapperPlayServerDebugPong(long timestamp) {
         super(PacketType.Play.Server.DEBUG_PONG);
         this.timestamp = timestamp;
     }
@@ -46,7 +46,7 @@ public class WrapperPlayServerChunkDebugPong extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void copy(WrapperPlayServerChunkDebugPong wrapper) {
+    public void copy(WrapperPlayServerDebugPong wrapper) {
         this.timestamp = wrapper.timestamp;
     }
 
