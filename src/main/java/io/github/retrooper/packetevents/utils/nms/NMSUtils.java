@@ -117,10 +117,6 @@ public final class NMSUtils {
 
         entityBoundingBoxField = Reflection.getField(nmsEntityClass, boundingBoxClass, 0, true);
 
-        if (builtInRegistriesClass != null) {
-            mobEffectsRegistryField = Reflection.getField(builtInRegistriesClass, "e");
-        }
-
         if (nmsEntityClass != null) {
             getBukkitEntity = Reflection.getMethod(nmsEntityClass, craftEntityClass, 0);
         }
@@ -243,6 +239,10 @@ public final class NMSUtils {
         registryClass = Reflection.getClassByNameWithoutException("net.minecraft.core.Registry");
 
         builtInRegistriesClass = Reflection.getClassByNameWithoutException("net.minecraft.core.registries.BuiltInRegistries");
+
+        if (builtInRegistriesClass != null) {
+            mobEffectsRegistryField = Reflection.getField(builtInRegistriesClass, "e");
+        }
 
         vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");
         if (vec3DClass == null) {
