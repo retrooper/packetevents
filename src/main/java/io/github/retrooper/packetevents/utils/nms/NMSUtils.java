@@ -373,7 +373,7 @@ public final class NMSUtils {
         }
 
         if (registryClass != null) {
-            getRegistryId = Reflection.getMethod(registryClass, int.class, 0);
+            getRegistryId = Reflection.getMethod(registryClass, "a", int.class);
             getRegistryById = Reflection.getMethod(registryClass, 0, int.class);
         }
 
