@@ -56,14 +56,14 @@ public final class NMSUtils {
             blockPosClass, sectionPositionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
             dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, iMaterialClass, movingObjectPositionBlockClass, boundingBoxClass,
-            tileEntityCommandClass, mojangEitherClass;
+            tileEntityCommandClass, mojangEitherClass, registryClass, builtInRegistriesClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass, tileEntityCommandTypeClass;
-    public static Method getBlockPosX, getBlockPosY, getBlockPosZ, mojangEitherLeft, mojangEitherRight;
+    public static Method getBlockPosX, getBlockPosY, getBlockPosZ, mojangEitherLeft, mojangEitherRight, getRegistryId, getRegistryById;
     private static String nettyPrefix;
     private static Method getCraftPlayerHandle, getCraftEntityHandle, getCraftWorldHandle, asBukkitCopy,
             asNMSCopy, getMessageMethod, chatFromStringMethod, getMaterialFromNMSBlock, getNMSBlockFromMaterial,
             getMobEffectListId, getMobEffectListById, getItemId, getItemById, getBukkitEntity;
-    private static Field entityPlayerPingField, entityBoundingBoxField;
+    private static Field entityPlayerPingField, entityBoundingBoxField, mobEffectsRegistryField;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
 
@@ -116,6 +116,10 @@ public final class NMSUtils {
         }
 
         entityBoundingBoxField = Reflection.getField(nmsEntityClass, boundingBoxClass, 0, true);
+
+        if (builtInRegistriesClass != null) {
+            mobEffectsRegistryField = Reflection.getField(builtInRegistriesClass, "e");
+        }
 
         if (nmsEntityClass != null) {
             getBukkitEntity = Reflection.getMethod(nmsEntityClass, craftEntityClass, 0);
@@ -235,6 +239,10 @@ public final class NMSUtils {
 
         //Isn't present on every version
         mojangEitherClass = Reflection.getClassByNameWithoutException("com.mojang.datafixers.util.Either");
+
+        registryClass = Reflection.getClassByNameWithoutException("net.minecraft.core.Registry");
+
+        builtInRegistriesClass = Reflection.getClassByNameWithoutException("net.minecraft.core.registries.BuiltInRegistries");
 
         vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");
         if (vec3DClass == null) {
@@ -363,6 +371,12 @@ public final class NMSUtils {
             mojangEitherLeft = Reflection.getMethod(mojangEitherClass, "left", Optional.class);
             mojangEitherRight = Reflection.getMethod(mojangEitherClass, "right", Optional.class);
         }
+
+        if (registryClass != null) {
+            getRegistryId = Reflection.getMethod(registryClass, int.class, 0);
+            getRegistryById = Reflection.getMethod(registryClass, 0, int.class);
+        }
+
         worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
         if (worldServerClass == null) {
             worldServerClass = getNMClassWithoutException("world.level.WorldSettings");
@@ -798,6 +812,11 @@ public final class NMSUtils {
 
     public static int getEffectId(Object nmsMobEffectList) {
         try {
+            //1.20.2+
+            if (getMobEffectListId == null) {
+                Object registry = mobEffectsRegistryField.get(null);
+                return (int) getRegistryId.invoke(registry, nmsMobEffectList);
+            }
             return (int) getMobEffectListId.invoke(null, nmsMobEffectList);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
@@ -807,6 +826,10 @@ public final class NMSUtils {
 
     public static Object getMobEffectListById(int effectID) {
         try {
+            if (getMobEffectListById != null) {
+                Object registry = mobEffectsRegistryField.get(null);
+                return getRegistryById.invoke(registry, effectID);
+            }
             return getMobEffectListById.invoke(null, effectID);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
