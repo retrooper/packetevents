@@ -60,12 +60,10 @@ public class PacketEventsPlugin extends JavaPlugin {
             public void onPacketPlaySend(PacketPlaySendEvent event) {
                 if (PacketType.Play.Server.Util.isInstanceOfEntity(event.getPacketId())) {
                     WrappedPacketOutEntity entity = new WrappedPacketOutEntity(event.getNMSPacket());
-                    System.out.println("en: " + entity.getEntityId() + ", delta x: " + entity.getDeltaX()
-                            + ", delta y: " + entity.getDeltaY() + ", delta z: " + entity.getDeltaZ());
                 } else if (event.getPacketId() == PacketType.Play.Server.ENTITY_EFFECT) {
                     WrappedPacketOutEntityEffect eff = new WrappedPacketOutEntityEffect(event.getNMSPacket());
+                    eff.setEffectId(eff.getEffectId());
                     System.out.println("eff: " + eff.getEffectId() + ", ampl: " + eff.getAmplifier() + ", dur:" + eff.getDuration());
-
                 }
             }
         });*/

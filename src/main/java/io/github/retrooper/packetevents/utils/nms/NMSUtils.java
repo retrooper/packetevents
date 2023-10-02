@@ -56,7 +56,7 @@ public final class NMSUtils {
             blockPosClass, sectionPositionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
             dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, iMaterialClass, movingObjectPositionBlockClass, boundingBoxClass,
-            tileEntityCommandClass, mojangEitherClass, registryClass, builtInRegistriesClass;
+            tileEntityCommandClass, mojangEitherClass, registryMaterials, builtInRegistriesClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass, tileEntityCommandTypeClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ, mojangEitherLeft, mojangEitherRight, getRegistryId, getRegistryById;
     private static String nettyPrefix;
@@ -236,7 +236,7 @@ public final class NMSUtils {
         //Isn't present on every version
         mojangEitherClass = Reflection.getClassByNameWithoutException("com.mojang.datafixers.util.Either");
 
-        registryClass = Reflection.getClassByNameWithoutException("net.minecraft.core.Registry");
+        registryMaterials = Reflection.getClassByNameWithoutException("net.minecraft.core.RegistryMaterials");
 
         builtInRegistriesClass = Reflection.getClassByNameWithoutException("net.minecraft.core.registries.BuiltInRegistries");
 
@@ -372,9 +372,9 @@ public final class NMSUtils {
             mojangEitherRight = Reflection.getMethod(mojangEitherClass, "right", Optional.class);
         }
 
-        if (registryClass != null) {
-            getRegistryId = Reflection.getMethod(registryClass, "a", int.class);
-            getRegistryById = Reflection.getMethod(registryClass, 0, int.class);
+        if (registryMaterials != null) {
+            getRegistryId = Reflection.getMethod(registryMaterials, int.class, 0, 1);
+            getRegistryById = Reflection.getMethod(registryMaterials, Optional.class, true,0, int.class);
         }
 
         worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
@@ -826,7 +826,7 @@ public final class NMSUtils {
 
     public static Object getMobEffectListById(int effectID) {
         try {
-            if (getMobEffectListById != null) {
+            if (getMobEffectListById == null) {
                 Object registry = mobEffectsRegistryField.get(null);
                 return getRegistryById.invoke(registry, effectID);
             }

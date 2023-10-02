@@ -139,6 +139,23 @@ public final class Reflection {
         return null;
     }
 
+    public static Method getMethod(Class<?> cls, Class<?> returning, boolean checkIfIsNotReturnType, int index, Class<?>... params) {
+        int currentIndex = 0;
+        for (Method m : cls.getDeclaredMethods()) {
+            boolean isReturnType = returning == null || m.getReturnType().equals(returning);
+            if (Arrays.equals(m.getParameterTypes(), params)
+                    && (checkIfIsNotReturnType ? !isReturnType : isReturnType)
+                    && index == currentIndex++) {
+                m.setAccessible(true);
+                return m;
+            }
+        }
+        if (cls.getSuperclass() != null) {
+            return getMethod(cls.getSuperclass(), null, index, params);
+        }
+        return null;
+    }
+
     public static Method getMethod(final Class<?> cls, final String name, Class<?> returning, Class<?>... params) {
         for (final Method m : cls.getDeclaredMethods()) {
             if (m.getName().equals(name)
@@ -178,6 +195,24 @@ public final class Reflection {
         int currentIndex = 0;
         for (final Method m : cls.getDeclaredMethods()) {
             if ((returning == null || m.getReturnType().equals(returning)) && index == currentIndex++) {
+                m.setAccessible(true);
+                return m;
+            }
+        }
+        if (cls.getSuperclass() != null) {
+            return getMethod(cls.getSuperclass(), returning, index);
+        }
+        return null;
+    }
+
+    public static Method getMethod(final Class<?> cls, final Class<?> returning, final int index, int amountOfArguments) {
+        if (cls == null) {
+            return null;
+        }
+        int currentIndex = 0;
+        for (final Method m : cls.getDeclaredMethods()) {
+            if ((returning == null || m.getReturnType().equals(returning)) && m.getParameterTypes().length == amountOfArguments
+                    && index == currentIndex++) {
                 m.setAccessible(true);
                 return m;
             }
