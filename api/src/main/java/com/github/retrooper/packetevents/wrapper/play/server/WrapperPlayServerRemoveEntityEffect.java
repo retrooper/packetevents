@@ -48,7 +48,7 @@ public class WrapperPlayServerRemoveEntityEffect extends PacketWrapper<WrapperPl
         } else {
             effectId = readByte();
         }
-        this.potionType = PotionTypes.getById(effectId);
+        this.potionType = PotionTypes.getById(effectId, this.serverVersion);
     }
 
     @Override

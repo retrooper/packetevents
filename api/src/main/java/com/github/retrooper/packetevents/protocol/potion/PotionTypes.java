@@ -63,14 +63,13 @@ public class PotionTypes {
 
     @Deprecated
     public static @Nullable PotionType getById(int id) {
-        return getById(com.github.retrooper.packetevents.protocol.player.ClientVersion.UNKNOWN, id);
+        return getById(id, com.github.retrooper.packetevents.manager.server.ServerVersion.ERROR);
     }
 
-    public static @Nullable PotionType getById(com.github.retrooper.packetevents.protocol.player.ClientVersion version, int id) {
-        if (version.isOlderThan(com.github.retrooper.packetevents.protocol.player.ClientVersion.V_1_20_2)) {
+    public static @Nullable PotionType getById(int id, com.github.retrooper.packetevents.manager.server.ServerVersion version) {
+        if (version.isOlderThan(com.github.retrooper.packetevents.manager.server.ServerVersion.V_1_20_2)) {
             id--; // potion effects ids where shifted by -1 in 1.20.2
         }
-       
         return POTION_TYPE_ID_MAP.get((byte)id);
     }
 
