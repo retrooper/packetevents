@@ -20,9 +20,7 @@ package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.*;
-import com.github.retrooper.packetevents.event.simple.PacketLoginSendEvent;
-import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
-import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.event.simple.*;
 import com.github.retrooper.packetevents.util.TimeStampMode;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -48,12 +46,18 @@ public class PacketEventsPlugin extends JavaPlugin {
 
             @Override
             public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+            }
 
+            @Override
+            public void onPacketConfigReceive(PacketConfigReceiveEvent event) {
+            }
+
+            @Override
+            public void onPacketConfigSend(PacketConfigSendEvent event) {
             }
 
             @Override
             public void onPacketPlaySend(PacketPlaySendEvent event) {
-
             }
 
             @Override

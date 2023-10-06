@@ -32,6 +32,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
@@ -71,14 +72,32 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
             PacketEvents.getAPI().getLogManager().debug("Mapped player UUID with their channel.");
 
-            //Switch the user's connection state to PLAY, but the variable event.getConnectionState() remains LOGIN
-            //We switch user state immediately to remain in sync with vanilla, allowing you to send PLAY packets immediately
-            user.setConnectionState(ConnectionState.PLAY);
-            PacketEvents.getAPI().getLogManager().debug("Transitioned " + profile.getName() + " into the PLAY state!");
+            // Switch the user's connection state to new state, but the variable event.getConnectionState() remains LOGIN
+            // We switch user state immediately to remain in sync with vanilla, allowing you to encode packets immediately
+            boolean proxy = PacketEvents.getAPI().getInjector().isProxy();
+            if (proxy ? event.getUser().getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_20_2)
+                    : event.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+                user.setEncoderState(ConnectionState.CONFIGURATION);
+            } else {
+                user.setConnectionState(ConnectionState.PLAY);
+            }
         }
 
-        // Join game can be used to update world height, and sets dimension data
+        // The server sends dimension information in configuration phase >= 1.20.2
+        else if (event.getPacketType() == PacketType.Configuration.Server.REGISTRY_DATA) {
+            WrapperConfigServerRegistryData registryData = new WrapperConfigServerRegistryData(event);
 
+            // Store world data
+            NBTCompound registryDataTag = registryData.getRegistryData();
+            if (registryDataTag != null) {
+                NBTList<NBTCompound> list = registryDataTag
+                        .getCompoundTagOrNull("minecraft:dimension_type")
+                        .getCompoundListTagOrNull("value");
+                user.setWorldNBT(list);
+            }
+        }
+
+        // The server sends dimension information in login packet for >= 1.17 and < 1.20.2
         else if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
             WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
             user.setEntityId(joinGame.getEntityId());
@@ -87,9 +106,14 @@ public class InternalPacketListener extends PacketListenerAbstract {
                 return; // Fixed world height, no tags are sent to the client
             }
 
-            // Store world height
-            NBTList<NBTCompound> list = joinGame.getDimensionCodec().getCompoundTagOrNull("minecraft:dimension_type").getCompoundListTagOrNull("value");
-            user.setWorldNBT(list);
+            // Store world data
+            NBTCompound dimensionCodec = joinGame.getDimensionCodec();
+            if (dimensionCodec != null) {
+                NBTList<NBTCompound> list = dimensionCodec
+                        .getCompoundTagOrNull("minecraft:dimension_type")
+                        .getCompoundListTagOrNull("value");
+                user.setWorldNBT(list);
+            }
 
             // Update world height
             NBTCompound dimension = user.getWorldNBT(joinGame.getDimension().getDimensionName());
@@ -114,6 +138,10 @@ public class InternalPacketListener extends PacketListenerAbstract {
                 user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
                 user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
             }
+        } else if (event.getPacketType() == PacketType.Play.Server.CONFIGURATION_START) {
+            user.setEncoderState(ConnectionState.CONFIGURATION);
+        } else if (event.getPacketType() == PacketType.Configuration.Server.CONFIGURATION_END) {
+            user.setEncoderState(ConnectionState.PLAY);
         }
     }
 
@@ -131,7 +159,12 @@ public class InternalPacketListener extends PacketListenerAbstract {
             PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());
             //Transition into LOGIN or STATUS connection state immediately, to remain in sync with vanilla
             user.setConnectionState(nextState);
-            PacketEvents.getAPI().getLogManager().debug("Transitioned " + address.getHostString() + ":" + address.getPort() + " into the " + nextState + " state!");
+        } else if (event.getPacketType() == PacketType.Login.Client.LOGIN_SUCCESS_ACK) {
+            user.setDecoderState(ConnectionState.CONFIGURATION);
+        } else if (event.getPacketType() == PacketType.Play.Client.CONFIGURATION_ACK) {
+            user.setDecoderState(ConnectionState.CONFIGURATION);
+        } else if (event.getPacketType() == PacketType.Configuration.Client.CONFIGURATION_END_ACK) {
+            user.setDecoderState(ConnectionState.PLAY);
         }
     }
 }

@@ -42,7 +42,8 @@ import java.util.UUID;
 
 public class User {
     private final Object channel;
-    private ConnectionState connectionState;
+    private ConnectionState decoderState;
+    private ConnectionState encoderState;
     private ClientVersion clientVersion;
     private final UserProfile profile;
     private int entityId = -1;
@@ -55,7 +56,8 @@ public class User {
                 ConnectionState connectionState, ClientVersion clientVersion,
                 UserProfile profile) {
         this.channel = channel;
-        this.connectionState = connectionState;
+        this.decoderState = connectionState;
+        this.encoderState = connectionState;
         this.clientVersion = clientVersion;
         this.profile = profile;
     }
@@ -69,11 +71,37 @@ public class User {
     }
 
     public ConnectionState getConnectionState() {
-        return connectionState;
+        ConnectionState decoderState = this.decoderState;
+        ConnectionState encoderState = this.encoderState;
+        if (decoderState != encoderState) {
+            throw new IllegalArgumentException("Can't get common connection state: " + decoderState + " != " + encoderState);
+        }
+        return decoderState;
     }
 
     public void setConnectionState(ConnectionState connectionState) {
-        this.connectionState = connectionState;
+        this.setDecoderState(connectionState);
+        this.setEncoderState(connectionState);
+    }
+
+    public ConnectionState getDecoderState() {
+        return this.decoderState;
+    }
+
+    public void setDecoderState(ConnectionState decoderState) {
+        this.decoderState = decoderState;
+        PacketEvents.getAPI().getLogManager().debug(
+                "Transitioned " + this.getName() + "'s decoder into " + decoderState + " state!");
+    }
+
+    public ConnectionState getEncoderState() {
+        return this.encoderState;
+    }
+
+    public void setEncoderState(ConnectionState encoderState) {
+        this.encoderState = encoderState;
+        PacketEvents.getAPI().getLogManager().debug(
+                "Transitioned " + this.getName() + "'s encoder into " + encoderState + " state!");
     }
 
     public ClientVersion getClientVersion() {

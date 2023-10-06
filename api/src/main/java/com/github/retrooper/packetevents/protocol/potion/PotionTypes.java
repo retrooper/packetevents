@@ -61,42 +61,49 @@ public class PotionTypes {
         return POTION_TYPE_MAP.get(name);
     }
 
-    @Nullable
-    public static PotionType getById(int id) {
+    @Deprecated
+    public static @Nullable PotionType getById(int id) {
+        return getById(id, com.github.retrooper.packetevents.manager.server.ServerVersion.ERROR);
+    }
+
+    public static @Nullable PotionType getById(int id, com.github.retrooper.packetevents.manager.server.ServerVersion version) {
+        if (version.isOlderThan(com.github.retrooper.packetevents.manager.server.ServerVersion.V_1_20_2)) {
+            id--; // potion effects ids where shifted by -1 in 1.20.2
+        }
         return POTION_TYPE_ID_MAP.get((byte)id);
     }
 
-    public static final PotionType SPEED = define("speed", 1);
-    public static final PotionType SLOWNESS = define("slowness", 2);
-    public static final PotionType HASTE = define("haste", 3);
-    public static final PotionType MINING_FATIGUE = define("mining_fatigue", 4);
-    public static final PotionType STRENGTH = define("strength", 5);
-    public static final PotionType INSTANT_HEALTH = define("instant_health", 6);
-    public static final PotionType INSTANT_DAMAGE = define("instant_damage", 7);
-    public static final PotionType JUMP_BOOST = define("jump_boost", 8);
-    public static final PotionType NAUSEA = define("nausea", 9);
-    public static final PotionType REGENERATION = define("regeneration", 10);
-    public static final PotionType RESISTANCE = define("resistance", 11);
-    public static final PotionType FIRE_RESISTANCE = define("fire_resistance", 12);
-    public static final PotionType WATER_BREATHING = define("water_breathing", 13);
-    public static final PotionType INVISIBILITY = define("invisibility", 14);
-    public static final PotionType BLINDNESS = define("blindness", 15);
-    public static final PotionType NIGHT_VISION = define("night_vision", 16);
-    public static final PotionType HUNGER = define("hunger", 17);
-    public static final PotionType WEAKNESS = define("weakness", 18);
-    public static final PotionType POISON = define("poison", 19);
-    public static final PotionType WITHER = define("wither", 20);
-    public static final PotionType HEALTH_BOOST = define("health_boost", 21);
-    public static final PotionType ABSORPTION = define("absorption", 22);
-    public static final PotionType SATURATION = define("saturation", 23);
-    public static final PotionType GLOWING = define("glowing", 24);
-    public static final PotionType LEVITATION = define("levitation", 25);
-    public static final PotionType LUCK = define("luck", 26);
-    public static final PotionType UNLUCK = define("unluck", 27);
-    public static final PotionType SLOW_FALLING = define("slow_falling", 28);
-    public static final PotionType CONDUIT_POWER = define("conduit_power", 29);
-    public static final PotionType DOLPHINS_GRACE = define("dolphins_grace", 30);
-    public static final PotionType BAD_OMEN = define("bad_omen", 31);
-    public static final PotionType HERO_OF_THE_VILLAGE = define("hero_of_the_village", 32);
-    public static final PotionType DARKNESS = define("darkness", 33);
+    public static final PotionType SPEED = define("speed", 0);
+    public static final PotionType SLOWNESS = define("slowness", 1);
+    public static final PotionType HASTE = define("haste", 2);
+    public static final PotionType MINING_FATIGUE = define("mining_fatigue", 3);
+    public static final PotionType STRENGTH = define("strength", 4);
+    public static final PotionType INSTANT_HEALTH = define("instant_health", 5);
+    public static final PotionType INSTANT_DAMAGE = define("instant_damage", 6);
+    public static final PotionType JUMP_BOOST = define("jump_boost", 7);
+    public static final PotionType NAUSEA = define("nausea", 8);
+    public static final PotionType REGENERATION = define("regeneration", 9);
+    public static final PotionType RESISTANCE = define("resistance", 10);
+    public static final PotionType FIRE_RESISTANCE = define("fire_resistance", 11);
+    public static final PotionType WATER_BREATHING = define("water_breathing", 12);
+    public static final PotionType INVISIBILITY = define("invisibility", 13);
+    public static final PotionType BLINDNESS = define("blindness", 14);
+    public static final PotionType NIGHT_VISION = define("night_vision", 15);
+    public static final PotionType HUNGER = define("hunger", 16);
+    public static final PotionType WEAKNESS = define("weakness", 17);
+    public static final PotionType POISON = define("poison", 18);
+    public static final PotionType WITHER = define("wither", 19);
+    public static final PotionType HEALTH_BOOST = define("health_boost", 20);
+    public static final PotionType ABSORPTION = define("absorption", 21);
+    public static final PotionType SATURATION = define("saturation", 22);
+    public static final PotionType GLOWING = define("glowing", 23);
+    public static final PotionType LEVITATION = define("levitation", 24);
+    public static final PotionType LUCK = define("luck", 25);
+    public static final PotionType UNLUCK = define("unluck", 26);
+    public static final PotionType SLOW_FALLING = define("slow_falling", 27);
+    public static final PotionType CONDUIT_POWER = define("conduit_power", 28);
+    public static final PotionType DOLPHINS_GRACE = define("dolphins_grace", 29);
+    public static final PotionType BAD_OMEN = define("bad_omen", 30);
+    public static final PotionType HERO_OF_THE_VILLAGE = define("hero_of_the_village", 31);
+    public static final PotionType DARKNESS = define("darkness", 32);
 }

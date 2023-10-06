@@ -115,7 +115,7 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
         boolean didWeCauseThis = ExceptionUtil.isException(cause, PacketProcessException.class);
 
-        if (didWeCauseThis && user != null && user.getConnectionState() != ConnectionState.HANDSHAKING) {
+        if (didWeCauseThis && user != null && user.getEncoderState() != ConnectionState.HANDSHAKING) {
             // Ignore handshaking exceptions
             cause.printStackTrace();
             return;

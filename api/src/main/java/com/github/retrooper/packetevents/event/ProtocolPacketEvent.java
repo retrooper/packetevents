@@ -78,16 +78,16 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
             throw new PacketProcessException("Failed to read the Packet ID of a packet. (Size: " + size + ")");
         }
         ClientVersion version = serverVersion.toClientVersion();
-        this.packetType = PacketType.getById(packetSide, user.getConnectionState(),
+        this.packetType = PacketType.getById(packetSide, user.getDecoderState(),
                 version, packetID);
         if (this.packetType == null) {
             // mojang messed up and keeps sending disconnect packets in the wrong protocol state
             if (PacketType.getById(packetSide, ConnectionState.PLAY, version, packetID) == PacketType.Play.Server.DISCONNECT) {
                 throw new InvalidDisconnectPacketSend();
             }
-            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Bound: " + packetSide.getOpposite() + ", Connection state: " + user.getConnectionState() + ", Server version: " + serverVersion.getReleaseName());
+            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Bound: " + packetSide.getOpposite() + ", Connection state: " + user.getDecoderState() + ", Server version: " + serverVersion.getReleaseName());
         }
-        this.connectionState = user.getConnectionState();
+        this.connectionState = user.getDecoderState();
     }
 
     public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, Object channel,
@@ -99,7 +99,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.byteBuf = byteBuf;
         this.packetID = packetID;
         this.packetType = packetType;
-        this.connectionState = user.getConnectionState();
+        this.connectionState = user.getDecoderState();
         cloned = true;
     }
 

@@ -16,6 +16,7 @@ public class InternalBukkitPacketListener extends com.github.retrooper.packeteve
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
         User user = event.getUser();
+        //Only handle Handshake uniquely on Bukkit
         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
             InetSocketAddress address = event.getSocketAddress();
             WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
@@ -39,7 +40,8 @@ public class InternalBukkitPacketListener extends com.github.retrooper.packeteve
             PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());
             //Transition into LOGIN or STATUS connection state immediately, to remain in sync with vanilla
             user.setConnectionState(nextState);
-            PacketEvents.getAPI().getLogManager().debug("Transitioned " + address.getHostString() + ":" + address.getPort() + " into the " + nextState + " state!");
+        } else {
+            super.onPacketReceive(event);
         }
     }
 }

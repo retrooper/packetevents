@@ -45,7 +45,7 @@ public class SpigotConversionUtil {
     }
 
     public static PotionType fromBukkitPotionEffectType(org.bukkit.potion.PotionEffectType potionEffectType) {
-        return PotionTypes.getById(potionEffectType.getId());
+        return PotionTypes.getById(potionEffectType.getId(), PacketEvents.getAPI().getServerManager().getVersion());
     }
 
     public static org.bukkit.potion.PotionEffectType toBukkitPotionEffectType(PotionType potionType) {

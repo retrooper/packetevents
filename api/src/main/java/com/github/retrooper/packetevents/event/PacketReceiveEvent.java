@@ -47,20 +47,13 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public PacketReceiveEvent clone() {
-        if (this instanceof PacketHandshakeReceiveEvent) {
-            return ((PacketHandshakeReceiveEvent)this).clone();
+        try {
+            Object clonedBuffer = ByteBufHelper.retainedDuplicate(getByteBuf());
+            return new PacketReceiveEvent(getPacketId(), getPacketType(), getServerVersion(),
+                    getChannel(), getUser(), getPlayer(), clonedBuffer);
+        } catch (PacketProcessException e) {
+            e.printStackTrace();
         }
-        else if (this instanceof PacketStatusReceiveEvent) {
-            return ((PacketStatusReceiveEvent)this).clone();
-        }
-        else if (this instanceof PacketLoginReceiveEvent) {
-            return ((PacketLoginReceiveEvent)this).clone();
-        }
-        else if (this instanceof PacketPlayReceiveEvent) {
-            return ((PacketPlayReceiveEvent)this).clone();
-        }
-        else {
-            return null;
-        }
+        return null;
     }
 }

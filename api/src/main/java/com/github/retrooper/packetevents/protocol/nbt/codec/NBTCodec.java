@@ -150,8 +150,9 @@ public class NBTCodec {
     public static NBTCompound readNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try {
+                boolean named = serverVersion.isOlderThan(ServerVersion.V_1_20_2);
                 return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(
-                        new ByteBufInputStream(byteBuf));
+                        new ByteBufInputStream(byteBuf), named);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -179,7 +180,8 @@ public class NBTCodec {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try (ByteBufOutputStream outputStream = new ByteBufOutputStream(byteBuf)) {
                 if (tag != null) {
-                    DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, tag);
+                    boolean named = serverVersion.isOlderThan(ServerVersion.V_1_20_2);
+                    DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, tag, named);
                 } else {
                     DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, NBTEnd.INSTANCE);
                 }
