@@ -16,6 +16,7 @@ public class InternalBukkitPacketListener extends com.github.retrooper.packeteve
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
         User user = event.getUser();
+        //Only handle Handshake uniquely on Bukkit
         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
             InetSocketAddress address = event.getSocketAddress();
             WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);

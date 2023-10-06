@@ -74,7 +74,9 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
             // Switch the user's connection state to new state, but the variable event.getConnectionState() remains LOGIN
             // We switch user state immediately to remain in sync with vanilla, allowing you to encode packets immediately
-            if (event.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+            boolean proxy = PacketEvents.getAPI().getInjector().isProxy();
+            if (proxy ? event.getUser().getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_20_2)
+                    : event.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
                 user.setEncoderState(ConnectionState.CONFIGURATION);
             } else {
                 user.setConnectionState(ConnectionState.PLAY);

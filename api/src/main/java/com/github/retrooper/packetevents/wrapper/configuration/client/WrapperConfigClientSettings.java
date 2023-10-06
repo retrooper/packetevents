@@ -23,7 +23,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperConfigClientClientSettings extends PacketWrapper<WrapperConfigClientClientSettings> {
+public class WrapperConfigClientSettings extends PacketWrapper<WrapperConfigClientSettings> {
 
     private String locale;
     private int viewDistance;
@@ -34,13 +34,13 @@ public class WrapperConfigClientClientSettings extends PacketWrapper<WrapperConf
     private boolean textFilteringEnabled;
     private boolean allowServerListings;
 
-    public WrapperConfigClientClientSettings(PacketReceiveEvent event) {
+    public WrapperConfigClientSettings(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperConfigClientClientSettings(String locale, int viewDistance, ChatVisibility visibility,
-                                             boolean chatColorable, byte visibleSkinSectionMask, HumanoidArm hand,
-                                             boolean textFilteringEnabled, boolean allowServerListings) {
+    public WrapperConfigClientSettings(String locale, int viewDistance, ChatVisibility visibility,
+                                       boolean chatColorable, byte visibleSkinSectionMask, HumanoidArm hand,
+                                       boolean textFilteringEnabled, boolean allowServerListings) {
         super(PacketType.Configuration.Client.CLIENT_SETTINGS);
         this.locale = locale;
         this.viewDistance = viewDistance;
@@ -77,7 +77,7 @@ public class WrapperConfigClientClientSettings extends PacketWrapper<WrapperConf
     }
 
     @Override
-    public void copy(WrapperConfigClientClientSettings wrapper) {
+    public void copy(WrapperConfigClientSettings wrapper) {
         this.locale = wrapper.locale;
         this.viewDistance = wrapper.viewDistance;
         this.visibility = wrapper.visibility;
