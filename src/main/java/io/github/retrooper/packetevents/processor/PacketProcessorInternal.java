@@ -97,6 +97,14 @@ public class PacketProcessorInternal {
                     packet = null;
                 }
                 break;
+            case CONFIG:
+                PacketConfigReceiveEvent configEvent = new PacketConfigReceiveEvent(channel, new NMSPacket(packet));
+                PacketEvents.get().getEventManager().callEvent(configEvent);
+                packet = configEvent.getNMSPacket().getRawNMSPacket();
+                if (configEvent.isCancelled()) {
+                    packet = null;
+                }
+                break;
             case PLAY:
                 PacketPlayReceiveEvent event = new PacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(event);
@@ -154,6 +162,17 @@ public class PacketProcessorInternal {
                 packet = loginEvent.getNMSPacket().getRawNMSPacket();
                 interceptLoginSend(loginEvent);
                 if (loginEvent.isCancelled()) {
+                    packet = null;
+                }
+                break;
+            case CONFIG:
+                PacketConfigSendEvent configEvent = new PacketConfigSendEvent(channel, new NMSPacket(packet));
+                PacketEvents.get().getEventManager().callEvent(configEvent);
+                if (configEvent.isPostTaskAvailable()) {
+                    data.postAction = configEvent.getPostTask();
+                }
+                packet = configEvent.getNMSPacket().getRawNMSPacket();
+                if (configEvent.isCancelled()) {
                     packet = null;
                 }
                 break;
@@ -323,7 +342,11 @@ public class PacketProcessorInternal {
                 return PacketState.LOGIN;
             } else if (packetName.startsWith("PacketS")) {
                 return PacketState.STATUS;
-            } else {
+            }
+            else if (packet.getClass().getName().contains("protocol.common")) {
+                return PacketState.CONFIG;
+            }
+            else {
                 return null;
             }
         }

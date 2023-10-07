@@ -20,6 +20,8 @@ package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
 public interface ByteBufUtil {
 
+    Object buffer();
+
     Object newByteBuf(byte[] data);
 
     void retain(Object byteBuf);

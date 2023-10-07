@@ -80,6 +80,12 @@ public abstract class PacketListenerAbstract {
     public void onPacketLoginSend(PacketLoginSendEvent event) {
     }
 
+    public void onPacketConfigReceive(PacketConfigReceiveEvent event) {
+    }
+
+    public void onPacketConfigSend(PacketConfigSendEvent event) {
+    }
+
     public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
     }
 

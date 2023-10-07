@@ -19,9 +19,11 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketConfigReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entityeffect.WrappedPacketOutEntityEffect;
 import io.github.retrooper.packetevents.packetwrappers.play.out.setslot.WrappedPacketOutSetSlot;
@@ -30,6 +32,8 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.nio.charset.StandardCharsets;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -53,6 +57,24 @@ public class PacketEventsPlugin extends JavaPlugin {
                     ItemStack stack = new ItemStack(Material.STICK);
                     WrappedPacketOutSetSlot setSlot = new WrappedPacketOutSetSlot(0, 37, stack);
                     PacketEvents.get().getPlayerUtils().sendPacket(event.getPlayer(), setSlot);
+                }
+                else if (event.getPacketId() == PacketType.Play.Client.CUSTOM_PAYLOAD) {
+                    WrappedPacketInCustomPayload cp = new WrappedPacketInCustomPayload(event.getNMSPacket());
+                    System.out.println("name: " + cp.getChannelName());
+                    if (cp.getChannelName().contains("brand")) {
+                        System.out.println("Data: " + ((new String(cp.getData(), StandardCharsets.UTF_8))));
+                    }
+                }
+            }
+
+            @Override
+            public void onPacketConfigReceive(PacketConfigReceiveEvent event) {
+                if (event.getPacketId() == PacketType.Play.Client.CUSTOM_PAYLOAD) {
+                    WrappedPacketInCustomPayload cp = new WrappedPacketInCustomPayload(event.getNMSPacket());
+                    System.out.println("name: " + cp.getChannelName());
+                    if (cp.getChannelName().contains("brand")) {
+                        System.out.println("Data: " + ((new String(cp.getData(), StandardCharsets.UTF_8))));
+                    }
                 }
             }
 

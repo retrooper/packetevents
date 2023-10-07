@@ -25,6 +25,11 @@ import net.minecraft.util.io.netty.util.internal.EmptyArrays;
 public final class ByteBufUtil_7 implements ByteBufUtil {
 
     @Override
+    public Object buffer() {
+        return Unpooled.buffer();
+    }
+
+    @Override
     public Object newByteBuf(byte[] data) {
         return Unpooled.wrappedBuffer(data);
     }
