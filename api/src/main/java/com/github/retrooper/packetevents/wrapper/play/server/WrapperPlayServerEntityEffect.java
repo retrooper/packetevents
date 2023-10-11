@@ -60,9 +60,9 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     public void write() {
         writeVarInt(entityID);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18_2)) {
-            writeVarInt(potionType.getId());
+            writeVarInt(potionType.getId(serverVersion.toClientVersion()));
         } else {
-            writeByte(potionType.getId());
+            writeByte(potionType.getId(serverVersion.toClientVersion()));
         }
         writeByte(effectAmplifier);
         writeVarInt(effectDurationTicks);

@@ -49,7 +49,7 @@ public class SpigotConversionUtil {
     }
 
     public static org.bukkit.potion.PotionEffectType toBukkitPotionEffectType(PotionType potionType) {
-        return org.bukkit.potion.PotionEffectType.getById(potionType.getId());
+        return org.bukkit.potion.PotionEffectType.getById(potionType.getId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
     }
 
     public static GameMode fromBukkitGameMode(org.bukkit.GameMode gameMode) {

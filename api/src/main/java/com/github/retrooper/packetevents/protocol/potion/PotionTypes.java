@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.potion;
 
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,14 +38,17 @@ public class PotionTypes {
             }
 
             @Override
-            public int getId() {
+            public int getId(ClientVersion version) {
+                if (version.isOlderThan(ClientVersion.V_1_20_2)) {
+                    return id + 1;
+                }
                 return id;
             }
 
             @Override
             public boolean equals(Object obj) {
                 if (obj instanceof PotionType) {
-                    return getId() == ((PotionType)obj).getId();
+                    return getName().equals(((PotionType)obj).getName());
                 }
                 return false;
             }
@@ -52,7 +56,8 @@ public class PotionTypes {
 
         //minecraft:speed would be a string for example
         POTION_TYPE_MAP.put(potionType.getName().toString(), potionType);
-        POTION_TYPE_ID_MAP.put((byte) potionType.getId(), potionType);
+        //We map the 1.20.2 IDs
+        POTION_TYPE_ID_MAP.put((byte) potionType.getId(ClientVersion.V_1_20_2), potionType);
         return potionType;
     }
 
@@ -67,7 +72,13 @@ public class PotionTypes {
     }
 
     public static @Nullable PotionType getById(int id, com.github.retrooper.packetevents.manager.server.ServerVersion version) {
-        if (version.isOlderThan(com.github.retrooper.packetevents.manager.server.ServerVersion.V_1_20_2)) {
+        return getById(id, version.toClientVersion());
+    }
+
+    public static @Nullable PotionType getById(int id, ClientVersion version) {
+        if (version.isOlderThan(ClientVersion.V_1_20_2)) {
+            //We map the 1.20.2 values (starting from 0)
+            //If the version is older than that, we must subtract one from the input ID (cause it starts from 1)
             id--; // potion effects ids where shifted by -1 in 1.20.2
         }
         return POTION_TYPE_ID_MAP.get((byte)id);
