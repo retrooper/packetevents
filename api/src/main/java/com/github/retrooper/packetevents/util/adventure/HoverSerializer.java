@@ -32,6 +32,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.util.Codec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -43,8 +44,7 @@ import java.util.regex.Pattern;
 public class HoverSerializer {
 
     private static final TagStringIO SNBT_IO = TagStringIO.get();
-    // Have to change this in upcoming adventure version
-    private static final Codec<CompoundBinaryTag, String, IOException, IOException> SNBT_CODEC = Codec.of(SNBT_IO::asCompound, SNBT_IO::asString);
+    private static final Codec<CompoundBinaryTag, String, IOException, IOException> SNBT_CODEC = createCodec(SNBT_IO::asCompound, SNBT_IO::asString);
 
     static final String ITEM_TYPE = "id";
     static final String ITEM_COUNT = "Count";
@@ -61,7 +61,7 @@ public class HoverSerializer {
             assertTextComponent(component);
             final CompoundBinaryTag contents = SNBT_CODEC.decode(((TextComponent) component).content());
             final CompoundBinaryTag tag = contents.getCompound(ITEM_TAG);
-            return HoverEvent.ShowItem.of(
+            return createShowItem(
                     Key.key(contents.getString(ITEM_TYPE)),
                     contents.getByte(ITEM_COUNT, (byte) 1),
                     tag == CompoundBinaryTag.empty() ? null : BinaryTagHolder.encode(tag, SNBT_CODEC)
@@ -86,7 +86,7 @@ public class HoverSerializer {
                 }
                 type = joiner.toString().toLowerCase(Locale.ROOT);
             }
-            return HoverEvent.ShowEntity.of(
+            return createShowEntity(
                     Key.key(type),
                     UUID.fromString(contents.getString(ENTITY_ID)),
                     componentCodec.decode(contents.getString(ENTITY_NAME))
@@ -143,6 +143,31 @@ public class HoverSerializer {
 
         <T> T fromJson(final @Nullable JsonElement json, final Class<T> classOfT);
 
+    }
+
+    // Backward Compatibility
+    private static HoverEvent.ShowItem createShowItem(final @NotNull Key item, final @Range(from = 0, to = Integer.MAX_VALUE) int count, final @Nullable BinaryTagHolder nbt) {
+        try {
+            return HoverEvent.ShowItem.showItem(item, count, nbt);
+        } catch (final NoSuchMethodError ignored) {
+            return HoverEvent.ShowItem.of(item, count, nbt);
+        }
+    }
+
+    private static HoverEvent.ShowEntity createShowEntity(final @NotNull Key type, final @NotNull UUID id, final @Nullable Component name) {
+        try {
+            return HoverEvent.ShowEntity.showEntity(type, id, name);
+        } catch (final NoSuchMethodError ignored) {
+            return HoverEvent.ShowEntity.of(type, id, name);
+        }
+    }
+
+    private static <D, E, DX extends Throwable, EX extends Throwable> @NotNull Codec<D, E, DX, EX> createCodec(final @NotNull Codec.Decoder<D, E, DX> decoder, final @NotNull Codec.Encoder<D, E, EX> encoder) {
+        try {
+            return Codec.codec(decoder, encoder);
+        } catch (final NoSuchMethodError ignored) {
+            return Codec.of(decoder, encoder);
+        }
     }
 
 }
