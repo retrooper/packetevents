@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.potion;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -68,7 +69,7 @@ public class PotionTypes {
 
     @Deprecated
     public static @Nullable PotionType getById(int id) {
-        return getById(id, com.github.retrooper.packetevents.manager.server.ServerVersion.ERROR);
+        return getById(id, PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
     }
 
     public static @Nullable PotionType getById(int id, com.github.retrooper.packetevents.manager.server.ServerVersion version) {

@@ -43,17 +43,16 @@ public class PacketEventsPlugin extends JavaPlugin {
 
             }
 
-
-            @Override
-            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-            }
-
             @Override
             public void onPacketConfigReceive(PacketConfigReceiveEvent event) {
             }
 
             @Override
             public void onPacketConfigSend(PacketConfigSendEvent event) {
+            }
+
+            @Override
+            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
             }
 
             @Override
