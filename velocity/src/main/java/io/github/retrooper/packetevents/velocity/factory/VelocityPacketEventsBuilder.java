@@ -94,7 +94,7 @@ public class VelocityPacketEventsBuilder {
                 public ServerVersion getVersion() {
                     if (version == null) {
                         String velocityVersion = com.velocitypowered.api.network.ProtocolVersion.MAXIMUM_VERSION
-                                .getName();
+                                .getVersionIntroducedIn();
 
                         for (final ServerVersion val : ServerVersion.values()) {
                             if (val.getReleaseName().contains(velocityVersion)) {
@@ -169,6 +169,7 @@ public class VelocityPacketEventsBuilder {
                     }
 
                     if (settings.isbStatsEnabled()) {
+                        // TODO: Velocity bstats
                     }
 
                     PacketType.Play.Client.load();
