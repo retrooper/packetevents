@@ -1,7 +1,6 @@
 repositories {
     maven { url 'https://jitpack.io' }
     maven { url 'https://repo.viaversion.com/' }
-    maven { url 'https://nexus.funkemunky.cc/content/repositories/releases/' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
 }
 
@@ -18,12 +17,12 @@ shadowJar {
 }
 
 dependencies {
+    compileOnly 'io.netty:netty-all:4.1.75.Final'
     api project(':api')
+    api project(':netty-common')
     api(adventureDependencies)
 
     compileOnly 'org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT'
     compileOnly 'com.viaversion:viaversion:4.5.0'
     compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
-
-    compileOnly 'org.github.spigot:1.8:1.8'
 }
