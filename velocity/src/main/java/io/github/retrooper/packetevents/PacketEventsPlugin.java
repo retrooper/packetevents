@@ -22,13 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerExplosion;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.google.inject.Inject;
-import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -36,8 +30,6 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.ProxyServer;
 import io.github.retrooper.packetevents.velocity.factory.VelocityPacketEventsBuilder;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.logging.Logger;
 
@@ -45,20 +37,27 @@ import java.util.logging.Logger;
 public class PacketEventsPlugin {
     private final ProxyServer server;
     private final Logger logger;
+    private final PluginContainer pluginContainer;
+
     @Inject
-    public PacketEventsPlugin(ProxyServer server, Logger logger) {
+    public PacketEventsPlugin(
+            final ProxyServer server,
+            final Logger logger,
+            final PluginContainer pluginContainer
+    ) {
         this.server = server;
         this.logger = logger;
-        logger.info("Plugin started?");
+        this.pluginContainer = pluginContainer;
+        logger.info("Plugin started");
     }
 
-    @Subscribe(order = PostOrder.LATE)
+    @Subscribe
     public void onProxyInitialize(ProxyInitializeEvent event) {
         logger.info("Injecting packetevents...");
-        PluginContainer plugin = server.getPluginManager().getPlugin("packetevents").orElse(null);
-        PacketEvents.setAPI(VelocityPacketEventsBuilder.build(server, plugin));
+        PacketEvents.setAPI(VelocityPacketEventsBuilder.build(server, pluginContainer));
         PacketEvents.getAPI().load();
-        PacketEvents.getAPI().getSettings().debug(true);
+        // It should only be enabled in a development environment, not globally
+        // PacketEvents.getAPI().getSettings().debug(true);
         PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
