@@ -52,9 +52,8 @@ public class Chunk_v1_8 implements BaseChunk {
     }
 
     @Override
-    public WrappedBlockState get(ClientVersion version, int x, int y, int z) {
-        int combinedID = this.blocks.get(x, y, z);
-        return WrappedBlockState.getByGlobalId(version, combinedID);
+    public int getBlockId(int x, int y, int z) {
+        return this.blocks.get(x, y, z);
     }
 
     @Override
