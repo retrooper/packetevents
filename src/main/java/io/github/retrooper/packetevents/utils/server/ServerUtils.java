@@ -31,7 +31,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spigotmc.SpigotConfig;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -93,10 +92,6 @@ public final class ServerUtils {
      */
     public NPCManager getNPCManager() {
         return npcManager;
-    }
-
-    public boolean isBungeeCordEnabled() {
-        return SpigotConfig.bungee;
     }
 
     public BoundingBox getEntityBoundingBox(Entity entity) {

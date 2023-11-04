@@ -35,7 +35,6 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
-import org.spigotmc.AsyncCatcher;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
