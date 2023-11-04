@@ -40,7 +40,6 @@ public class PacketEventsPlugin extends JavaPlugin {
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
             @Override
             public void onPacketLoginSend(PacketLoginSendEvent event) {
-
             }
 
             @Override

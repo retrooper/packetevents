@@ -33,7 +33,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.MapMaker;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.bukkit.Bukkit;
-import org.bukkit.Particle;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -65,7 +64,7 @@ public final class SpigotReflectionUtil {
     //Minecraft classes
     public static Class<?> MINECRAFT_SERVER_CLASS, NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS,
             NMS_IMATERIAL_CLASS, NMS_ENTITY_CLASS, ENTITY_PLAYER_CLASS, BOUNDING_BOX_CLASS, NMS_MINECRAFT_KEY_CLASS,
-            ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS, NMS_ENUM_PARTICLE_CLASS,
+            ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS, NMS_ENUM_PARTICLE_CLASS,
             MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, NMS_WORLD_CLASS, WORLD_SERVER_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
             GAME_PROFILE_CLASS, CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS, CRAFT_PARTICLE_CLASS,
             LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
@@ -128,7 +127,7 @@ public final class SpigotReflectionUtil {
         }
         if (DIMENSION_MANAGER_CLASS != null) {
             if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16
-                || PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16_1) {
+                    || PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16_1) {
                 GET_DIMENSION_KEY = Reflection.getMethod(NMS_WORLD_CLASS, "getTypeKey", 0);
             }
             GET_DIMENSION_MANAGER = Reflection.getMethod(NMS_WORLD_CLASS, DIMENSION_MANAGER_CLASS, 0);
@@ -204,9 +203,13 @@ public final class SpigotReflectionUtil {
         NMS_ENTITY_CLASS = getServerClass("world.entity.Entity", "Entity");
         ENTITY_PLAYER_CLASS = getServerClass("server.level.EntityPlayer", "EntityPlayer");
         BOUNDING_BOX_CLASS = getServerClass("world.phys.AxisAlignedBB", "AxisAlignedBB");
-        NMS_MINECRAFT_KEY_CLASS = getServerClass("resources.MinecraftKey" ,"MinecraftKey");
+        NMS_MINECRAFT_KEY_CLASS = getServerClass("resources.MinecraftKey", "MinecraftKey");
         ENTITY_HUMAN_CLASS = getServerClass("world.entity.player.EntityHuman", "EntityHuman");
         PLAYER_CONNECTION_CLASS = getServerClass("server.network.PlayerConnection", "PlayerConnection");
+
+        //Only on 1.20.2
+        SERVER_COMMON_PACKETLISTENER_IMPL_CLASS = getServerClass("server.network.ServerCommonPacketListenerImpl", "ServerCommonPacketListenerImpl");
+
         SERVER_CONNECTION_CLASS = getServerClass("server.network.ServerConnection", "ServerConnection");
         NETWORK_MANAGER_CLASS = getServerClass("network.NetworkManager", "NetworkManager");
         MOB_EFFECT_LIST_CLASS = getServerClass("world.effect.MobEffectList", "MobEffectList");
@@ -429,21 +432,24 @@ public final class SpigotReflectionUtil {
         if (playerConnection == null) {
             return null;
         }
-        ReflectionObject wrapper = new ReflectionObject(playerConnection, PLAYER_CONNECTION_CLASS);
+        Class<?> playerConnectionClass = SERVER_COMMON_PACKETLISTENER_IMPL_CLASS != null ?
+                SERVER_COMMON_PACKETLISTENER_IMPL_CLASS : PLAYER_CONNECTION_CLASS;
+        ReflectionObject wrapper = new ReflectionObject(playerConnection, playerConnectionClass);
         try {
             return wrapper.readObject(0, NETWORK_MANAGER_CLASS);
         } catch (Exception ex) {
-            //Don't ask me why I do this, but this is terrible.
-            wrapper = new ReflectionObject(playerConnection);
+            //Support for some weird custom plugins.
             try {
-                return wrapper.readObject(0, NETWORK_MANAGER_CLASS);
-            } catch (Exception ex2) {
-                //Support for some custom plugins.
                 playerConnection = wrapper.read(0, PLAYER_CONNECTION_CLASS);
                 wrapper = new ReflectionObject(playerConnection, PLAYER_CONNECTION_CLASS);
                 return wrapper.readObject(0, NETWORK_MANAGER_CLASS);
             }
+            catch (Exception ex2) {
+                //Print the original error!
+                ex.printStackTrace();
+            }
         }
+        return null;
     }
 
     public static Object getChannel(Player player) {
