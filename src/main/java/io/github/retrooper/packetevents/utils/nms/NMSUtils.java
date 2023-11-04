@@ -51,7 +51,7 @@ public final class NMSUtils {
     public static boolean legacyNettyImportMode;
     public static ServerVersion version;
     public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor, dataWatcherConstructor, packetDataSerializerConstructor, itemStackConstructor;
-    public static Class<?> mobEffectListClass, nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
+    public static Class<?> mobEffectListClass, nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, sectionPositionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
@@ -135,6 +135,8 @@ public final class NMSUtils {
         playerConnectionClass = getNMSClassWithoutException("PlayerConnection");
         if (playerConnectionClass == null) {
             playerConnectionClass = getNMClassWithoutException("server.network.PlayerConnection");
+            //Only for 1.20.2
+            SERVER_COMMON_PACKETLISTENER_IMPL_CLASS = getNMClassWithoutException("server.network.ServerCommonPacketListenerImpl");
         }
         serverConnectionClass = getNMSClassWithoutException("ServerConnection");
         if (serverConnectionClass == null) {
@@ -560,7 +562,8 @@ public final class NMSUtils {
         if (playerConnection == null) {
             return null;
         }
-        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
+        Class<?> playerConClass = SERVER_COMMON_PACKETLISTENER_IMPL_CLASS != null ? SERVER_COMMON_PACKETLISTENER_IMPL_CLASS : playerConnectionClass;
+        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConClass);
         try {
             return wrapper.readObject(0, networkManagerClass);
         } catch (Exception ex) {
@@ -569,11 +572,18 @@ public final class NMSUtils {
                 return wrapper.readObject(0, networkManagerClass);
             } catch (Exception ex2) {
                 //Support for some custom plugins.
-                playerConnection = wrapper.read(0, playerConnectionClass);
-                wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
-                return wrapper.readObject(0, networkManagerClass);
+                try {
+                    playerConnection = wrapper.read(0, playerConnectionClass);
+                    wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
+                    return wrapper.readObject(0, networkManagerClass);
+                }
+                catch (Exception ex3) {
+                    //Print the original exception!
+                    ex.printStackTrace();
+                }
             }
         }
+        return null;
     }
 
     public static Object getChannel(final Player player) {
