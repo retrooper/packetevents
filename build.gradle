@@ -60,9 +60,8 @@ dependencies {
     compileOnly 'com.viaversion:viaversion-api:4.0.1'
     compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
 
-    compileOnly 'org.github.spigot:1.16.2:1.16.2'
-    compileOnly 'org.github.spigot:1.8.8:1.8.8'
-    compileOnly 'org.github.spigot:1.7.10:1.7.10'
+    compileOnly group: 'com.github.azbh111', name: 'craftbukkit-1.8.8', version: 'R'
+    compileOnly group: 'com.github.azbh111', name: 'craftbukkit-1.7.10', version: 'R'
 }
 
 group = 'io.github.retrooper'
