@@ -35,10 +35,6 @@ repositories {
     }
 
     maven {
-        url = uri('https://nexus.funkemunky.cc/content/repositories/releases/')
-    }
-
-    maven {
         url = uri('https://repo.viaversion.com/')
     }
 
