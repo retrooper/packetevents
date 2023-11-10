@@ -29,7 +29,7 @@ import java.util.List;
 
 public class WrapperPlayServerMerchantOffers extends PacketWrapper<WrapperPlayServerMerchantOffers> {
     private int containerId;
-    private List<MerchantOffer> merchantOffers = new ArrayList<>();
+    private List<MerchantOffer> merchantOffers;
     private int villagerLevel;
     private int villagerXp;
     private boolean showProgress;
