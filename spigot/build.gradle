@@ -8,7 +8,8 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 java.targetCompatibility = JavaVersion.VERSION_1_8
 
 shadowJar {
-    relocate 'net.kyori.adventure.text.serializer', 'io.github.retrooper.packetevents.adventure.serializer'
+    relocate 'net.kyori.adventure.text.serializer.gson', 'io.github.retrooper.packetevents.adventure.serializer.gson'
+    relocate 'net.kyori.adventure.text.serializer.legacy', 'io.github.retrooper.packetevents.adventure.serializer.legacy'
     dependencies {
         exclude(dependency('com.google.code.gson:gson:2.8.0'))
         exclude(dependency('com.google.code.gson:gson:2.8.5'))
