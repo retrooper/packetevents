@@ -36,12 +36,14 @@ import org.jetbrains.annotations.Nullable;
  * For example, join messages, quit messages, etc...
  */
 public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPlayServerSystemChatMessage> {
+
+    @Deprecated
     public static boolean HANDLE_JSON = true;
+
     private @Nullable ChatType type;
     //Overlay is a replacement for the chat type field. If overlay is true, the message will appear above your hot bar.
     //If not, it will appear in the normal chat.
     private boolean overlay;
-    private String messageJson;
     private Component message;
 
     public WrapperPlayServerSystemChatMessage(PacketSendEvent event) {
@@ -61,7 +63,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
     @Deprecated
     public WrapperPlayServerSystemChatMessage(@NotNull ChatType type, String messageJson) {
         super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
-        this.messageJson = messageJson;
+        this.message = AdventureSerializer.parseComponent(messageJson);
         this.type = type;
         if (type == ChatTypes.GAME_INFO) {
             this.overlay = true;
@@ -78,18 +80,14 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
     @Deprecated
     public WrapperPlayServerSystemChatMessage(boolean overlay, String messageJson) {
         super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
-        this.messageJson = messageJson;
+        this.message = AdventureSerializer.parseComponent(messageJson);
         this.overlay = overlay;
         this.type = overlay ? ChatTypes.GAME_INFO : ChatTypes.SYSTEM;
     }
 
     @Override
     public void read() {
-        this.messageJson = readComponentJSON();
-        // Parse JSON message
-        if (HANDLE_JSON) {
-            message = AdventureSerializer.parseComponent(this.messageJson);
-        }
+        this.message = this.readComponent();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
             overlay = readBoolean();
         } else {
@@ -99,10 +97,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
 
     @Override
     public void write() {
-        if (HANDLE_JSON && message != null) {
-            messageJson = AdventureSerializer.toJson(message);
-        }
-        writeComponentJSON(messageJson);
+        this.writeComponent(this.message);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
             writeBoolean(overlay);
         } else {
@@ -122,7 +117,6 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
     public void copy(WrapperPlayServerSystemChatMessage wrapper) {
         this.type = wrapper.type;
         this.overlay = wrapper.overlay;
-        this.messageJson = wrapper.messageJson;
         this.message = wrapper.message;
     }
 
@@ -136,12 +130,14 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         this.type = type;
     }
 
+    @Deprecated
     public String getMessageJson() {
-        return messageJson;
+        return AdventureSerializer.toJson(this.getMessage());
     }
 
+    @Deprecated
     public void setMessageJson(String messageJson) {
-        this.messageJson = messageJson;
+        this.setMessage(AdventureSerializer.parseComponent(messageJson));
     }
 
     public Component getMessage() {

@@ -148,10 +148,14 @@ public class NBTCodec {
     //PacketEvents end
 
     public static NBTCompound readNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
+        return (NBTCompound) readRawNBTFromBuffer(byteBuf, serverVersion);
+    }
+
+    public static NBT readRawNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try {
-                boolean named = serverVersion.isOlderThan(ServerVersion.V_1_20_2);
-                return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(
+                final boolean named = serverVersion.isOlderThan(ServerVersion.V_1_20_2);
+                return DefaultNBTSerializer.INSTANCE.deserializeTag(
                         new ByteBufInputStream(byteBuf), named);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -166,7 +170,7 @@ public class NBTCodec {
                 Object slicedBuffer = ByteBufHelper.readSlice(byteBuf, length);
                 try (DataInputStream stream = new DataInputStream(
                         new GZIPInputStream(new ByteBufInputStream(slicedBuffer)))) {
-                    return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(stream);
+                    return DefaultNBTSerializer.INSTANCE.deserializeTag(stream);
                 }
             }
             catch (IOException ex) {
@@ -177,6 +181,10 @@ public class NBTCodec {
     }
 
     public static void writeNBTToBuffer(Object byteBuf, ServerVersion serverVersion, NBTCompound tag) {
+        writeNBTToBuffer(byteBuf, serverVersion, (NBT) tag);
+    }
+
+    public static void writeNBTToBuffer(Object byteBuf, ServerVersion serverVersion, NBT tag) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try (ByteBufOutputStream outputStream = new ByteBufOutputStream(byteBuf)) {
                 if (tag != null) {

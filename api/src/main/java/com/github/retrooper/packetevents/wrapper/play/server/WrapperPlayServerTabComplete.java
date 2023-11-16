@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -68,14 +67,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             commandMatches = new ArrayList<>(matchLength);
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
-                Component tooltip;
-                boolean hasTooltip = readBoolean();
-                if (hasTooltip) {
-                    String tooltipJson = readComponentJSON();
-                    tooltip = AdventureSerializer.parseComponent(tooltipJson);
-                } else {
-                    tooltip = null;
-                }
+                Component tooltip = readOptional(PacketWrapper::readComponent);
                 CommandMatch commandMatch = new CommandMatch(text, tooltip);
                 commandMatches.add(commandMatch);
             }
@@ -84,7 +76,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             commandMatches = new ArrayList<>(matchLength);
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
-                CommandMatch commandMatch = new CommandMatch(text, (Component) null);
+                CommandMatch commandMatch = new CommandMatch(text, null);
                 commandMatches.add(commandMatch);
             }
         }
@@ -103,8 +95,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
                 boolean hasTooltip = match.getTooltip().isPresent();
                 writeBoolean(hasTooltip);
                 if (hasTooltip) {
-                    String tooltipJson = AdventureSerializer.toJson(match.getTooltip().get());
-                    writeComponentJSON(tooltipJson);
+                    writeComponent(match.getTooltip().get());
                 }
             }
         } else {
