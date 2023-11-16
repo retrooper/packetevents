@@ -211,6 +211,14 @@ public class ParticleTypes {
     //Added in 1.20
     public static final ParticleType CHERRY_LEAVES = define("cherry_leaves");
     public static final ParticleType EGG_CRACK = define("egg_crack");
+    //Added in 1.20.3
+    public static final ParticleType GUST = define("gust");
+    public static final ParticleType GUST_EMITTER = define("gust_emitter");
+    public static final ParticleType WHITE_SMOKE = define("white_smoke");
+    public static final ParticleType DUST_PLUME = define("dust_plume");
+    public static final ParticleType GUST_DUST = define("gust_dust");
+    public static final ParticleType TRIAL_SPAWNER_DETECTION = define("trial_spawner_detection");
+
     static {
         TYPES_BUILDER.unloadFileMappings();
     }
