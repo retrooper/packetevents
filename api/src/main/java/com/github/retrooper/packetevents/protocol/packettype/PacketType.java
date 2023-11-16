@@ -53,7 +53,8 @@ public final class PacketType {
             ClientVersion.V_1_19_1,
             ClientVersion.V_1_19_3,
             ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20_2);
+            ClientVersion.V_1_20_2,
+            ClientVersion.V_1_20_3);
 
     //TODO UPDATE Update packet type mappings (serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
@@ -72,7 +73,8 @@ public final class PacketType {
             ClientVersion.V_1_19_1,
             ClientVersion.V_1_19_3,
             ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20_2);
+            ClientVersion.V_1_20_2,
+            ClientVersion.V_1_20_3);
 
     public static void prepare() {
         PacketType.Play.Client.load();
@@ -498,7 +500,9 @@ public final class PacketType {
             //Added in 1.20.2
             CHUNK_BATCH_ACK,
             CONFIGURATION_ACK,
-            DEBUG_PING;
+            DEBUG_PING,
+            //Added in 1.20.3
+            SLOT_STATE_CHANGE;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -550,6 +554,7 @@ public final class PacketType {
                 loadPacketIds(ServerboundPacketType_1_19_3.values());
                 loadPacketIds(ServerboundPacketType_1_19_4.values());
                 loadPacketIds(ServerboundPacketType_1_20_2.values());
+                loadPacketIds(ServerboundPacketType_1_20_3.values());
                 //TODO UPDATE Update packet type mappings (serverbound pt. 2)
             }
 
@@ -704,16 +709,23 @@ public final class PacketType {
             DISGUISED_CHAT,
             PLAYER_INFO_REMOVE,
             PLAYER_INFO_UPDATE,
+
             //Added in 1.19.4
             DAMAGE_EVENT,
             HURT_ANIMATION,
             BUNDLE,
             CHUNK_BIOMES,
+
             //Added in 1.20.2
             CHUNK_BATCH_END,
             CHUNK_BATCH_BEGIN,
             DEBUG_PONG,
-            CONFIGURATION_START;
+            CONFIGURATION_START,
+
+            //Added in 1.20.3
+            RESET_SCORE,
+            TICKING_INFO,
+            TICKING_STEP;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -781,6 +793,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_19_3.values());
                 loadPacketIds(ClientboundPacketType_1_19_4.values());
                 loadPacketIds(ClientboundPacketType_1_20_2.values());
+                loadPacketIds(ClientboundPacketType_1_20_3.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }
