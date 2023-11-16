@@ -45,7 +45,8 @@ public class EntityTypes {
             ClientVersion.V_1_17,
             ClientVersion.V_1_19,
             ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4);
+            ClientVersion.V_1_19_4,
+            ClientVersion.V_1_20_3);
     private static final TypesBuilder LEGACY_TYPES_BUILDER = new TypesBuilder("entity/legacy_entity_type_mappings",
             ClientVersion.V_1_8,
             ClientVersion.V_1_9,
@@ -178,6 +179,7 @@ public class EntityTypes {
     public static final EntityType BEE = define("bee", ABSTRACT_INSENTIENT);
     public static final EntityType BLAZE = define("blaze", ABSTRACT_MONSTER);
     public static final EntityType BOAT = define("boat", ENTITY);
+    public static final EntityType BREEZE = define("breeze", ABSTRACT_MONSTER);
     public static final EntityType CHEST_BOAT = define("chest_boat", BOAT);
     public static final EntityType CAT = define("cat", ABSTRACT_TAMEABLE_ANIMAL);
     public static final EntityType CAMEL = define("camel", ABSTRACT_HORSE);
@@ -279,6 +281,7 @@ public class EntityTypes {
     public static final EntityType VINDICATOR = define("vindicator", ABSTRACT_ILLAGER_BASE);
     public static final EntityType WANDERING_TRADER = define("wandering_trader", ABSTRACT_AGEABLE);
     public static final EntityType WARDEN = define("warden", ABSTRACT_MONSTER);
+    public static final EntityType WIND_CHARGE = define("wind_charge", PROJECTILE_ABSTRACT);
     public static final EntityType WITCH = define("witch", ABSTRACT_MONSTER);
     public static final EntityType WITHER = define("wither", ABSTRACT_MONSTER);
     public static final EntityType WITHER_SKELETON = define("wither_skeleton", ABSTRACT_SKELETON);
