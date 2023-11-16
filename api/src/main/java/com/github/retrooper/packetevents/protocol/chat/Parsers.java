@@ -108,6 +108,7 @@ public class Parsers {
             new Parser("minecraft:item_predicate", null, null),
             new Parser("minecraft:color", null, null),
             new Parser("minecraft:component", null, null),
+            new Parser("minecraft:style", null, null),
             new Parser("minecraft:message", null, null),
             new Parser("minecraft:nbt", null, null),
             new Parser("minecraft:nbt_tag", null, null),
