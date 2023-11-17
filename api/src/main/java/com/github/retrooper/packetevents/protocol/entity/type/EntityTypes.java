@@ -179,7 +179,6 @@ public class EntityTypes {
     public static final EntityType BEE = define("bee", ABSTRACT_INSENTIENT);
     public static final EntityType BLAZE = define("blaze", ABSTRACT_MONSTER);
     public static final EntityType BOAT = define("boat", ENTITY);
-    public static final EntityType BREEZE = define("breeze", ABSTRACT_MONSTER);
     public static final EntityType CHEST_BOAT = define("chest_boat", BOAT);
     public static final EntityType CAT = define("cat", ABSTRACT_TAMEABLE_ANIMAL);
     public static final EntityType CAMEL = define("camel", ABSTRACT_HORSE);
@@ -281,7 +280,6 @@ public class EntityTypes {
     public static final EntityType VINDICATOR = define("vindicator", ABSTRACT_ILLAGER_BASE);
     public static final EntityType WANDERING_TRADER = define("wandering_trader", ABSTRACT_AGEABLE);
     public static final EntityType WARDEN = define("warden", ABSTRACT_MONSTER);
-    public static final EntityType WIND_CHARGE = define("wind_charge", PROJECTILE_ABSTRACT);
     public static final EntityType WITCH = define("witch", ABSTRACT_MONSTER);
     public static final EntityType WITHER = define("wither", ABSTRACT_MONSTER);
     public static final EntityType WITHER_SKELETON = define("wither_skeleton", ABSTRACT_SKELETON);
@@ -304,11 +302,16 @@ public class EntityTypes {
     public static final EntityType MINECART_TNT = define("minecart_tnt", MINECART_ABSTRACT);
     public static final EntityType MINECART_HOPPER = define("minecart_hopper", MINECART_ABSTRACT);
     public static final EntityType MINECART_MOB_SPAWNER = define("minecart_mob_spawner", MINECART_ABSTRACT);
-    // Display type entities added in 1.19.4
+
+    // Added in 1.19.4
     public static final EntityType DISPLAY = define("display", ENTITY);
     public static final EntityType BLOCK_DISPLAY = define("block_display", DISPLAY);
     public static final EntityType ITEM_DISPLAY = define("item_display", DISPLAY);
     public static final EntityType TEXT_DISPLAY = define("text_display", DISPLAY);
     public static final EntityType INTERACTION = define("interaction", DISPLAY);
     public static final EntityType SNIFFER = define("sniffer", ABSTRACT_ANIMAL);
+
+    // Added in 1.20.3
+    public static final EntityType BREEZE = define("breeze", ABSTRACT_MONSTER);
+    public static final EntityType WIND_CHARGE = define("wind_charge", PROJECTILE_ABSTRACT);
 }
