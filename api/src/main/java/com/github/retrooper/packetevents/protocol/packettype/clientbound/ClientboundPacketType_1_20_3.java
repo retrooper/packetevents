@@ -87,6 +87,7 @@ public enum ClientboundPacketType_1_20_3 {
     DESTROY_ENTITIES,
     REMOVE_ENTITY_EFFECT,
     RESET_SCORE, // New packet
+    RESOURCE_PACK_REMOVE, // New packet
     RESOURCE_PACK_SEND,
     RESPAWN,
     ENTITY_HEAD_LOOK,
