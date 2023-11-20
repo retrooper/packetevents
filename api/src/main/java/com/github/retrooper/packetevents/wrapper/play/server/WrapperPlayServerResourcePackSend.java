@@ -25,8 +25,13 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlayServerResourcePackSend> {
+
     public static final int MAX_HASH_LENGTH = 40;
+
+    private UUID packId;
     private String url;
     private String hash;
     private boolean required;
@@ -37,19 +42,29 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
     }
 
     public WrapperPlayServerResourcePackSend(String url, String hash, boolean required, @Nullable Component prompt) {
+        this(UUID.randomUUID(), url, hash, required, prompt);
+    }
+
+    public WrapperPlayServerResourcePackSend(UUID packId, String url, String hash, boolean required, @Nullable Component prompt) {
         super(PacketType.Play.Server.RESOURCE_PACK_SEND);
+
         if (hash.length() > MAX_HASH_LENGTH) {
-            throw new IllegalArgumentException("Hash is too long (max 40, was " + hash.length() + ")");
-        } else {
-            this.url = url;
-            this.hash = hash;
-            this.required = required;
-            this.prompt = prompt;
+            throw new IllegalArgumentException("Hash is too long (max " + MAX_HASH_LENGTH + ", was " + hash.length() + ")");
         }
+
+        this.packId = packId;
+        this.url = url;
+        this.hash = hash;
+        this.required = required;
+        this.prompt = prompt;
     }
 
     @Override
     public void read() {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            this.packId = this.readUUID();
+        }
+
         url = readString();
         hash = readString(MAX_HASH_LENGTH);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
@@ -63,6 +78,10 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
 
     @Override
     public void write() {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            this.writeUUID(this.packId);
+        }
+
         writeString(url);
         writeString(hash, MAX_HASH_LENGTH);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
@@ -76,22 +95,43 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
 
     @Override
     public void copy(WrapperPlayServerResourcePackSend wrapper) {
+        packId = wrapper.packId;
         url = wrapper.url;
         hash = wrapper.hash;
         required = wrapper.required;
         prompt = wrapper.prompt;
     }
 
+    public UUID getPackId() {
+        return this.packId;
+    }
+
+    public void setPackId(UUID packId) {
+        this.packId = packId;
+    }
+
     public String getUrl() {
         return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getHash() {
         return hash;
     }
 
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
     public boolean isRequired() {
         return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 
     public Component getPrompt() {

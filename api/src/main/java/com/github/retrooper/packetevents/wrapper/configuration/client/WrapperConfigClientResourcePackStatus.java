@@ -19,11 +19,16 @@
 package com.github.retrooper.packetevents.wrapper.configuration.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.security.Provider;
+import java.util.UUID;
+
 public class WrapperConfigClientResourcePackStatus extends PacketWrapper<WrapperConfigClientResourcePackStatus> {
 
+    private UUID packId;
     private Result result;
 
     public WrapperConfigClientResourcePackStatus(PacketReceiveEvent event) {
@@ -31,23 +36,42 @@ public class WrapperConfigClientResourcePackStatus extends PacketWrapper<Wrapper
     }
 
     public WrapperConfigClientResourcePackStatus(Result result) {
+        this(UUID.randomUUID(), result);
+    }
+
+    public WrapperConfigClientResourcePackStatus(UUID packId, Result result) {
         super(PacketType.Configuration.Client.RESOURCE_PACK_STATUS);
+        this.packId = packId;
         this.result = result;
     }
 
     @Override
     public void read() {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            this.packId = this.readUUID();
+        }
         this.result = Result.VALUES[this.readVarInt()];
     }
 
     @Override
     public void write() {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            this.writeUUID(this.packId);
+        }
         this.writeVarInt(this.result.ordinal());
     }
 
     @Override
     public void copy(WrapperConfigClientResourcePackStatus wrapper) {
         this.result = wrapper.result;
+    }
+
+    public UUID getPackId() {
+        return this.packId;
+    }
+
+    public void setPackId(UUID packId) {
+        this.packId = packId;
     }
 
     public Result getResult() {
@@ -59,10 +83,14 @@ public class WrapperConfigClientResourcePackStatus extends PacketWrapper<Wrapper
     }
 
     public enum Result {
+
         SUCCESSFULLY_LOADED,
         DECLINED,
         FAILED_DOWNLOAD,
-        ACCEPTED;
+        ACCEPTED,
+        INVALID_URL,
+        FAILED_RELOAD,
+        DISCARDED;
 
         public static final Result[] VALUES = values();
     }
