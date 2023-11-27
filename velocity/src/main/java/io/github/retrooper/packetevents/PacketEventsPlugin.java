@@ -56,6 +56,7 @@ public class PacketEventsPlugin {
         logger.info("Injecting packetevents...");
         PacketEvents.setAPI(VelocityPacketEventsBuilder.build(server, pluginContainer));
         PacketEvents.getAPI().load();
+        PacketEvents.getAPI().getSettings().reEncodeByDefault(false);
         // It should only be enabled in a development environment, not globally
         // PacketEvents.getAPI().getSettings().debug(true);
         PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
