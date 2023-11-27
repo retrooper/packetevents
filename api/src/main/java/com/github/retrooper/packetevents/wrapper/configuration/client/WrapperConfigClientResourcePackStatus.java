@@ -88,6 +88,7 @@ public class WrapperConfigClientResourcePackStatus extends PacketWrapper<Wrapper
         DECLINED,
         FAILED_DOWNLOAD,
         ACCEPTED,
+        DOWNLOADED,
         INVALID_URL,
         FAILED_RELOAD,
         DISCARDED;

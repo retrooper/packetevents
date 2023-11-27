@@ -117,6 +117,7 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
         DECLINED,
         FAILED_DOWNLOAD,
         ACCEPTED,
+        DOWNLOADED,
         INVALID_URL,
         FAILED_RELOAD,
         DISCARDED;
