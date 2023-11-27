@@ -34,6 +34,7 @@ import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityMetadataProvider;
 import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
@@ -771,6 +772,10 @@ public class PacketWrapper<T extends PacketWrapper> {
             }
             writeByte(127); // End of metadata array
         }
+    }
+
+    public void writeEntityMetadata(EntityMetadataProvider metadata) {
+        writeEntityMetadata(metadata.entityData());
     }
 
     public Dimension readDimension() {

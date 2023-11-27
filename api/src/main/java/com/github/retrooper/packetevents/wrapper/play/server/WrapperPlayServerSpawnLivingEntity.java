@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityMetadataProvider;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -64,12 +65,24 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.entityMetadata = entityMetadata;
     }
 
+    public WrapperPlayServerSpawnLivingEntity(int entityID, UUID entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity, EntityMetadataProvider metadata) {
+        this(entityID, entityUUID, entityType, position, yaw, pitch, headPitch, velocity, metadata.entityData());
+    }
+
     public WrapperPlayServerSpawnLivingEntity(int entityId, UUID entityUUID,
                                               EntityType entityType, Location location, float headPitch,
                                               Vector3d velocity,
                                               List<EntityData> entityMetadata) {
         this(entityId, entityUUID, entityType, location.getPosition(), location.getYaw(), location.getPitch(),
                 headPitch, velocity, entityMetadata);
+    }
+
+    public WrapperPlayServerSpawnLivingEntity(int entityId, UUID entityUUID,
+                                              EntityType entityType, Location location, float headPitch,
+                                              Vector3d velocity,
+                                              EntityMetadataProvider metadata) {
+        this(entityId, entityUUID, entityType, location.getPosition(), location.getYaw(), location.getPitch(),
+                headPitch, velocity, metadata.entityData());
     }
 
     @Override
@@ -219,5 +232,9 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
 
     public void setEntityMetadata(List<EntityData> entityMetadata) {
         this.entityMetadata = entityMetadata;
+    }
+
+    public void setEntityMetadata(EntityMetadataProvider metadata) {
+        this.entityMetadata = metadata.entityData();
     }
 }

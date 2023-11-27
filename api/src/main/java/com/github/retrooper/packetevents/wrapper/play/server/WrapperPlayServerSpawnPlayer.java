@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityMetadataProvider;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -50,6 +51,10 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
+    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, EntityMetadataProvider metadata) {
+        this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), metadata.entityData());
+    }
+
     public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, List<EntityData> entityMetadata) {
         this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), entityMetadata);
     }
@@ -67,6 +72,10 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         this.pitch = pitch;
         this.entityMetadata = entityMetadata;
         this.item = ItemTypes.AIR;
+    }
+
+    public WrapperPlayServerSpawnPlayer(int entityID, UUID uuid, Vector3d position, float yaw, float pitch, EntityMetadataProvider metadata) {
+        this(entityID, uuid, position, yaw, pitch, metadata.entityData());
     }
 
     @Override
@@ -174,6 +183,11 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
     @Deprecated
     public void setEntityMetadata(List<EntityData> entityMetadata) {
         this.entityMetadata = entityMetadata;
+    }
+
+    @Deprecated
+    public void setEntityMetadata(EntityMetadataProvider metadata) {
+        this.entityMetadata = metadata.entityData();
     }
 
     @Deprecated
