@@ -77,7 +77,7 @@ public final class AdventureNBTSerializer {
                     .key(nbt.getStringTagValueOrThrow("translate"));
 
             NBTList<NBTCompound> withNbt = nbt.getTagListOfTypeOrNull("with", NBTCompound.class);
-            if (!withNbt.isEmpty()) {
+            if (withNbt != null && !withNbt.isEmpty()) {
                 List<Component> args = new ArrayList<>(withNbt.size());
                 for (NBTCompound argNbt : withNbt.getTags()) {
                     args.add(asComponent(argNbt));
