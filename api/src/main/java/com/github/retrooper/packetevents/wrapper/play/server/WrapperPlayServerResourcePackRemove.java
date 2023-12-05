@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.wrapper.play.client;
+package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -25,15 +25,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class WrapperConfigServerResourcePackRemove extends PacketWrapper<WrapperConfigServerResourcePackRemove> {
+public class WrapperPlayServerResourcePackRemove extends PacketWrapper<WrapperPlayServerResourcePackRemove> {
 
     private @Nullable UUID packId;
 
-    public WrapperConfigServerResourcePackRemove(PacketSendEvent event) {
+    public WrapperPlayServerResourcePackRemove(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperConfigServerResourcePackRemove(@Nullable UUID packId) {
+    public WrapperPlayServerResourcePackRemove(@Nullable UUID packId) {
         super(PacketType.Play.Server.RESOURCE_PACK_REMOVE);
         this.packId = packId;
     }
@@ -49,7 +49,7 @@ public class WrapperConfigServerResourcePackRemove extends PacketWrapper<Wrapper
     }
 
     @Override
-    public void copy(WrapperConfigServerResourcePackRemove wrapper) {
+    public void copy(WrapperPlayServerResourcePackRemove wrapper) {
         this.packId = wrapper.packId;
     }
 

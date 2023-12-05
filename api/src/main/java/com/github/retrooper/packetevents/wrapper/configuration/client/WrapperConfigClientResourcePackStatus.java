@@ -63,6 +63,7 @@ public class WrapperConfigClientResourcePackStatus extends PacketWrapper<Wrapper
 
     @Override
     public void copy(WrapperConfigClientResourcePackStatus wrapper) {
+        this.packId = wrapper.packId;
         this.result = wrapper.result;
     }
 

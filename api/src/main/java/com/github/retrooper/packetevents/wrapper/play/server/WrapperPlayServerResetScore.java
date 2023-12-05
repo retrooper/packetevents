@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 public class WrapperPlayServerResetScore extends PacketWrapper<WrapperPlayServerResetScore> {
 
     private String targetName;
-    private String objective;
+    private @Nullable String objective;
 
     public WrapperPlayServerResetScore(PacketSendEvent event) {
         super(event);
