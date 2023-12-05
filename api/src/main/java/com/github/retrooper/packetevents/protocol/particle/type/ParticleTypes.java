@@ -45,7 +45,8 @@ public class ParticleTypes {
             ClientVersion.V_1_18,
             ClientVersion.V_1_19,
             ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20);
+            ClientVersion.V_1_20,
+            ClientVersion.V_1_20_3);
 
     public static ParticleType define(String key, Function<PacketWrapper<?>, ParticleData> readDataFunction, BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction) {
         TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
