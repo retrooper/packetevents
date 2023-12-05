@@ -460,7 +460,7 @@ public final class PacketType {
                 int index = INDEX;
                 for (Enum<?> constant : enumConstants) {
                     int id = constant.ordinal();
-                    Play.Server value = Play.Server.valueOf(constant.name());
+                    Configuration.Server value = Configuration.Server.valueOf(constant.name());
                     value.ids[index] = id;
                     Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
                     packetIdMap.put(id, value);
@@ -476,7 +476,7 @@ public final class PacketType {
                 if (!PREPARED) {
                     PacketType.prepare();
                 }
-                int index = CLIENTBOUND_PLAY_VERSION_MAPPER.getIndex(version);
+                int index = CLIENTBOUND_CONFIG_VERSION_MAPPER.getIndex(version);
                 Map<Integer, PacketTypeCommon> map = PACKET_TYPE_ID_MAP.get((byte) index);
                 return map.get(packetId);
             }
