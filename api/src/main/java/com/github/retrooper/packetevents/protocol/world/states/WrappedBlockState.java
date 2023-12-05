@@ -1115,6 +1115,36 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
+    public boolean isCracked() {
+        return (boolean) data.get(StateValue.CRACKED);
+    }
+
+    public void setCracked(boolean cracked) {
+        checkIfCloneNeeded();
+        data.put(StateValue.CRACKED, cracked);
+        checkIsStillValid();
+    }
+
+    public boolean isCrafting() {
+        return (boolean) data.get(StateValue.CRAFTING);
+    }
+
+    public void setCrafting(boolean crafting) {
+        checkIfCloneNeeded();
+        data.put(StateValue.CRAFTING, crafting);
+        checkIsStillValid();
+    }
+
+    public TrialSpawnerState getTrialSpawnerState() {
+        return (TrialSpawnerState) data.get(StateValue.TRIAL_SPAWNER_STATE);
+    }
+
+    public void setTrialSpawnerState(TrialSpawnerState trialSpawnerState) {
+        checkIfCloneNeeded();
+        data.put(StateValue.TRIAL_SPAWNER_STATE, trialSpawnerState);
+        checkIsStillValid();
+    }
+
     // End all block data types
 
     /**

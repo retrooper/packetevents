@@ -105,7 +105,9 @@ public enum StateValue {
     VERTICAL_DIRECTION("vertical_direction", VerticalDirection::valueOf),
     WATERLOGGED("waterlogged", Boolean::parseBoolean),
     WEST("west", West::valueOf),
-    CRACKED("cracked", Boolean::parseBoolean);
+    CRACKED("cracked", Boolean::parseBoolean),
+    CRAFTING("crafting", Boolean::parseBoolean),
+    TRIAL_SPAWNER_STATE("trial_spawner_state", TrialSpawnerState::valueOf);
 
     private final String name;
     private final Function<String, Object> parser;
