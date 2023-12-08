@@ -63,7 +63,7 @@ public final class AdventureNBTSerializer {
         return asComponent((NBTCompound) nbt);
     }
 
-    @SuppressWarnings("PatternValidation") // idc
+    @SuppressWarnings("PatternValidation")
     public static Component asComponent(NBTCompound nbt) {
         Set<String> tagNames = nbt.getTagNames();
 

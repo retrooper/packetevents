@@ -24,37 +24,37 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerTickingStep extends PacketWrapper<WrapperPlayServerTickingStep> {
 
-    private int ticks;
+    private int tickSteps;
 
     public WrapperPlayServerTickingStep(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerTickingStep(int ticks) {
+    public WrapperPlayServerTickingStep(int tickSteps) {
         super(PacketType.Play.Server.TICKING_STEP);
-        this.ticks = ticks;
+        this.tickSteps = tickSteps;
     }
 
     @Override
     public void read() {
-        this.ticks = this.readVarInt();
+        this.tickSteps = this.readVarInt();
     }
 
     @Override
     public void write() {
-        this.writeVarInt(this.ticks);
+        this.writeVarInt(this.tickSteps);
     }
 
     @Override
     public void copy(WrapperPlayServerTickingStep wrapper) {
-        this.ticks = wrapper.ticks;
+        this.tickSteps = wrapper.tickSteps;
     }
 
-    public int getTicks() {
-        return this.ticks;
+    public int getTickSteps() {
+        return this.tickSteps;
     }
 
-    public void setTicks(int ticks) {
-        this.ticks = ticks;
+    public void setTickSteps(int tickSteps) {
+        this.tickSteps = tickSteps;
     }
 }

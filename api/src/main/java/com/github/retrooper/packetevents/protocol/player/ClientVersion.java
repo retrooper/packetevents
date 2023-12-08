@@ -84,6 +84,9 @@ public enum ClientVersion {
     V_1_19_4(762),
     V_1_20(763),
     V_1_20_2(764),
+    /**
+     * 1.20.3 and 1.20.4 have the same protocol version.
+     */
     V_1_20_3(765),
     //TODO UPDATE Add new protocol version field
 
@@ -168,7 +171,6 @@ public enum ClientVersion {
                 if (version.protocolVersion > protocolVersion) {
                     break;
                 } else if (version.protocolVersion == protocolVersion) {
-                    //Cache for next time
                     return version;
                 }
             }

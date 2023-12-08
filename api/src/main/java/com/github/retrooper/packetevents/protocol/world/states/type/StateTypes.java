@@ -202,7 +202,15 @@ public class StateTypes {
     public static StateType CHISELED_SANDSTONE = StateTypes.builder().name("CHISELED_SANDSTONE").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType CUT_SANDSTONE = StateTypes.builder().name("CUT_SANDSTONE").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType COBWEB = StateTypes.builder().name("COBWEB").blastResistance(4.0f).hardness(4.0f).isBlocking(false).requiresCorrectTool(true).isSolid(false).setMaterial(MaterialType.WEB).build();
-    public static StateType GRASS = StateTypes.builder().name("SHORT_GRASS").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
+    public static StateType SHORT_GRASS = StateTypes.builder().name("SHORT_GRASS").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
+
+    /**
+     * This is short grass.
+     * @deprecated Please use SHORT_GRASS instead of GRASS, this is now deprecated.
+     * */
+    @Deprecated
+    public static StateType GRASS = SHORT_GRASS;
+
     public static StateType FERN = StateTypes.builder().name("FERN").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
     public static StateType AZALEA = StateTypes.builder().name("AZALEA").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.PLANT).build();
     public static StateType FLOWERING_AZALEA = StateTypes.builder().name("FLOWERING_AZALEA").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.PLANT).build();

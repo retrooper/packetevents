@@ -791,7 +791,7 @@ public final class PacketType {
             //Added in 1.20.3
             RESET_SCORE,
             RESOURCE_PACK_REMOVE,
-            TICKING_INFO,
+            TICKING_STATE,
             TICKING_STEP;
 
             private static int INDEX = 0;

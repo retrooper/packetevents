@@ -636,7 +636,11 @@ public class ItemTypes {
     public static final ItemType RAW_COPPER_BLOCK = builder("raw_copper_block").setMaxAmount(64).setPlacedType(StateTypes.RAW_COPPER_BLOCK).build();
     public static final ItemType LIGHT_GRAY_CARPET = builder("light_gray_carpet").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.LIGHT_GRAY_CARPET).build();
     public static final ItemType MUSIC_DISC_WARD = builder("music_disc_ward").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).build();
-    public static final ItemType GRASS = builder("short_grass").setMaxAmount(64).setPlacedType(StateTypes.GRASS).build();
+    public static final ItemType SHORT_GRASS = builder("short_grass").setMaxAmount(64).setPlacedType(StateTypes.SHORT_GRASS).build();
+
+    @Deprecated
+    public static final ItemType GRASS = SHORT_GRASS;
+
     public static final ItemType END_CRYSTAL = builder("end_crystal").setMaxAmount(64).build();
     public static final ItemType VINDICATOR_SPAWN_EGG = builder("vindicator_spawn_egg").setMaxAmount(64).build();
     public static final ItemType WHEAT = builder("wheat").setMaxAmount(64).build();

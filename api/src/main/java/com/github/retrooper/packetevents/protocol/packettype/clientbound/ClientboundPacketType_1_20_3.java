@@ -130,7 +130,7 @@ public enum ClientboundPacketType_1_20_3 {
     NBT_QUERY_RESPONSE,
     COLLECT_ITEM,
     ENTITY_TELEPORT,
-    TICKING_INFO, // New packet
+    TICKING_STATE, // New packet
     TICKING_STEP, // New packet
     UPDATE_ADVANCEMENTS,
     UPDATE_ATTRIBUTES,

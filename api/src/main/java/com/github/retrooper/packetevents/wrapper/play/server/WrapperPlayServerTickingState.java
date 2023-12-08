@@ -21,53 +21,52 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.Nullable;
 
-public class WrapperPlayServerTickingInfo extends PacketWrapper<WrapperPlayServerTickingInfo> {
+public class WrapperPlayServerTickingState extends PacketWrapper<WrapperPlayServerTickingState> {
 
-    private float tickrate;
+    private float tickRate;
     private boolean frozen;
 
-    public WrapperPlayServerTickingInfo(PacketSendEvent event) {
+    public WrapperPlayServerTickingState(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerTickingInfo(float tickrate, boolean frozen) {
-        super(PacketType.Play.Server.TICKING_INFO);
-        this.tickrate = tickrate;
+    public WrapperPlayServerTickingState(float tickRate, boolean frozen) {
+        super(PacketType.Play.Server.TICKING_STATE);
+        this.tickRate = tickRate;
         this.frozen = frozen;
     }
 
     @Override
     public void read() {
-        this.tickrate = this.readFloat();
+        this.tickRate = this.readFloat();
         this.frozen = this.readBoolean();
     }
 
     @Override
     public void write() {
-        this.writeFloat(this.tickrate);
+        this.writeFloat(this.tickRate);
         this.writeBoolean(this.frozen);
     }
 
     @Override
-    public void copy(WrapperPlayServerTickingInfo wrapper) {
-        this.tickrate = wrapper.tickrate;
+    public void copy(WrapperPlayServerTickingState wrapper) {
+        this.tickRate = wrapper.tickRate;
         this.frozen = wrapper.frozen;
     }
 
     /**
-     * Tickrate is measured in ticks per second.
+     * The tick rate is measured in ticks per second.
      */
-    public float getTickrate() {
-        return this.tickrate;
+    public float getTickRate() {
+        return this.tickRate;
     }
 
     /**
-     * Tickrate is measured in ticks per second.
+     * The tick rate is measured in ticks per second.
      */
-    public void setTickrate(float tickrate) {
-        this.tickrate = tickrate;
+    public void setTickRate(float tickRate) {
+        this.tickRate = tickRate;
     }
 
     public boolean isFrozen() {
