@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufOutputStream;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
@@ -60,7 +61,7 @@ import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
-import com.github.retrooper.packetevents.util.adventure.AdventureNBTSerializer;
+import com.github.retrooper.packetevents.util.adventure.AdventureNBTSerialization;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
@@ -71,6 +72,7 @@ import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.time.Instant;
@@ -517,7 +519,11 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public Component readComponentAsNBT() {
-        return AdventureNBTSerializer.asComponent(this.readDirectNBT());
+        try {
+            return AdventureNBTSerialization.readComponent(this.buffer);
+        } catch (IOException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 
     public Component readComponentAsJSON() {
@@ -534,7 +540,11 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeComponentAsNBT(Component component) {
-        this.writeDirectNBT(AdventureNBTSerializer.asNbt(component));
+        try {
+            AdventureNBTSerialization.writeComponent(new ByteBufOutputStream(this.buffer), component);
+        } catch (IOException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 
     public void writeComponentAsJSON(Component component) {
