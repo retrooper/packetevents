@@ -210,6 +210,9 @@ public final class AdventureNBTSerialization {
         while ((type = resolveNbtType(input.readByte())) != TagType.END) {
             String key = input.readUTF();
             switch (key) {
+                // this case resolves an edge-case where a simple component would
+                // be serialized to an unnamed compound because of nbt lists
+                case "":
                 case TEXT:
                     requireType(type, TagType.STRING);
                     requireState(text == null);
@@ -249,7 +252,7 @@ public final class AdventureNBTSerialization {
                                 scoreObjective = input.readUTF();
                                 break;
                             default:
-                                throw new IllegalStateException("Invalid nbt key read for score key: " + scoreKey);
+                                throw new IllegalStateException("Invalid nbt key read for score key: '" + scoreKey + "'");
                         }
                     }
                     requireState(scoreName != null && scoreObjective != null);
@@ -368,7 +371,7 @@ public final class AdventureNBTSerialization {
                                         clickEventAction = ClickEvent.Action.COPY_TO_CLIPBOARD;
                                         break;
                                     default:
-                                        throw new IllegalStateException("Illegal click event action read: " + actionId);
+                                        throw new IllegalStateException("Illegal click event action read: '" + actionId + "'");
                                 }
                                 break;
                             case CLICK_EVENT_VALUE:
@@ -377,7 +380,7 @@ public final class AdventureNBTSerialization {
                                 clickEventValue = input.readUTF();
                                 break;
                             default:
-                                throw new IllegalStateException("Illegal click event nbt key read: " + clickKey);
+                                throw new IllegalStateException("Illegal click event nbt key read: '" + clickKey + "'");
                         }
                     }
                     requireState(clickEventAction != null && clickEventValue != null);
@@ -406,7 +409,7 @@ public final class AdventureNBTSerialization {
                                         hoverEventAction = HoverEvent.Action.SHOW_ENTITY;
                                         break;
                                     default:
-                                        throw new IllegalStateException("Illegal hover event action read: " + actionId);
+                                        throw new IllegalStateException("Illegal hover event action read: '" + actionId + "'");
                                 }
                                 break;
                             case HOVER_EVENT_CONTENTS:
@@ -489,13 +492,13 @@ public final class AdventureNBTSerialization {
                                 }
                                 break;
                             default:
-                                throw new IllegalStateException("Illegal hover event nbt key read: " + hoverKey);
+                                throw new IllegalStateException("Illegal hover event nbt key read: '" + hoverKey + "'");
                         }
                     }
                     requireState(hoverEventContents != null);
                     break;
                 default:
-                    throw new IllegalStateException("Illegal component nbt key read: " + key);
+                    throw new IllegalStateException("Illegal component nbt key read: '" + key + "'");
             }
         }
 
