@@ -25,12 +25,18 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
 public class WrapperPlayServerSetTitleSubtitle extends PacketWrapper<WrapperPlayServerSetTitleSubtitle> {
+
+    @Deprecated
     public static boolean HANDLE_JSON = true;
-    private String subtitleJson;
+
     private Component subtitle;
 
     public WrapperPlayServerSetTitleSubtitle(PacketSendEvent event) {
         super(event);
+    }
+
+    public WrapperPlayServerSetTitleSubtitle(String subtitleJson) {
+        this(AdventureSerializer.parseComponent(subtitleJson));
     }
 
     public WrapperPlayServerSetTitleSubtitle(Component subtitle) {
@@ -38,46 +44,36 @@ public class WrapperPlayServerSetTitleSubtitle extends PacketWrapper<WrapperPlay
         this.subtitle = subtitle;
     }
 
-    public WrapperPlayServerSetTitleSubtitle(String subtitleJson) {
-        super(PacketType.Play.Server.SET_TITLE_SUBTITLE);
-        this.subtitleJson = subtitleJson;
-    }
-
     @Override
     public void read() {
-        subtitleJson = readComponentJSON();
-        if (HANDLE_JSON) {
-            subtitle = AdventureSerializer.parseComponent(subtitleJson);
-        }
+        this.subtitle = this.readComponent();
     }
 
     @Override
     public void write() {
-        if (HANDLE_JSON && subtitle != null) {
-            subtitleJson = AdventureSerializer.toJson(subtitle);
-        }
-        writeComponentJSON(subtitleJson);
+        this.writeComponent(this.subtitle);
     }
 
     @Override
     public void copy(WrapperPlayServerSetTitleSubtitle wrapper) {
-        subtitleJson = wrapper.subtitleJson;
-        subtitle = wrapper.subtitle;
+        this.subtitle = wrapper.subtitle;
     }
 
     public Component getSubtitle() {
-        return subtitle;
+        return this.subtitle;
     }
 
     public void setSubtitle(Component subtitle) {
         this.subtitle = subtitle;
     }
 
+    @Deprecated
     public String getSubtitleJson() {
-        return subtitleJson;
+        return AdventureSerializer.toJson(this.getSubtitle());
     }
 
+    @Deprecated
     public void setSubtitleJson(String subtitleJson) {
-        this.subtitleJson = subtitleJson;
+        this.setSubtitle(AdventureSerializer.parseComponent(subtitleJson));
     }
 }

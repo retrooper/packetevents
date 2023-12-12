@@ -88,7 +88,9 @@ public class WrapperPlayServerChangeGameState extends PacketWrapper<WrapperPlayS
         THUNDER_LEVEL_CHANGE,
         PLAY_PUFFER_FISH_STING_SOUND,
         PLAY_ELDER_GUARDIAN_MOB_APPEARANCE,
-        ENABLE_RESPAWN_SCREEN;
+        ENABLE_RESPAWN_SCREEN,
+        LIMITED_CRAFTING,
+        START_LOADING_CHUNKS;
 
         private static final Reason[] VALUES = values();
 

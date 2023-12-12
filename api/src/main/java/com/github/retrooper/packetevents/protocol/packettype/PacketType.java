@@ -20,8 +20,46 @@ package com.github.retrooper.packetevents.protocol.packettype;
 
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.protocol.packettype.clientbound.*;
-import com.github.retrooper.packetevents.protocol.packettype.serverbound.*;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_12;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_12_1;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_13;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_14;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_14_4;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_15;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_15_2;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_16;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_16_2;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_17;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_18;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_19;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_19_1;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_19_3;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_19_4;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_20_2;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_20_3;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_7_10;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_8;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_9;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_9_3;
+import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_20_2;
+import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_20_3;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_12;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_12_1;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_13;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_14;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_15_2;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_16;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_16_2;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_17;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_19;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_19_1;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_19_3;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_19_4;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_20_2;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_20_3;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_7_10;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_8;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_9;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.VersionMapper;
 import org.jetbrains.annotations.Nullable;
@@ -53,7 +91,8 @@ public final class PacketType {
             ClientVersion.V_1_19_1,
             ClientVersion.V_1_19_3,
             ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20_2);
+            ClientVersion.V_1_20_2,
+            ClientVersion.V_1_20_3);
 
     //TODO UPDATE Update packet type mappings (serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
@@ -72,11 +111,18 @@ public final class PacketType {
             ClientVersion.V_1_19_1,
             ClientVersion.V_1_19_3,
             ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20_2);
+            ClientVersion.V_1_20_2,
+            ClientVersion.V_1_20_3);
+
+    //TODO UPDATE Update packet type mappings (config clientbound pt. 1)
+    private static final VersionMapper CLIENTBOUND_CONFIG_VERSION_MAPPER = new VersionMapper(
+            ClientVersion.V_1_20_2,
+            ClientVersion.V_1_20_3);
 
     public static void prepare() {
         PacketType.Play.Client.load();
         PacketType.Play.Server.load();
+        PacketType.Configuration.Server.load();
         PREPARED = true;
     }
 
@@ -114,7 +160,7 @@ public final class PacketType {
                 if (side == PacketSide.CLIENT) {
                     return Configuration.Client.getById(packetID);
                 } else {
-                    return Configuration.Server.getById(packetID);
+                    return Configuration.Server.getById(version, packetID);
                 }
             default:
                 return null;
@@ -330,7 +376,7 @@ public final class PacketType {
             }
         }
     }
-   
+
     // Added in 1.20.2
     public static class Configuration {
 
@@ -379,57 +425,79 @@ public final class PacketType {
             }
         }
 
-        public enum Server implements PacketTypeConstant, ClientBoundPacket {
+        public enum Server implements PacketTypeCommon, ClientBoundPacket {
 
-            PLUGIN_MESSAGE(0x00),
-            DISCONNECT(0x01),
-            CONFIGURATION_END(0x02),
-            KEEP_ALIVE(0x03),
-            PING(0x04),
-            REGISTRY_DATA(0x05),
-            RESOURCE_PACK_SEND(0x06),
-            UPDATE_ENABLED_FEATURES(0x07),
-            UPDATE_TAGS(0x08);
+            PLUGIN_MESSAGE,
+            DISCONNECT,
+            CONFIGURATION_END,
+            KEEP_ALIVE,
+            PING,
+            REGISTRY_DATA,
+            RESOURCE_PACK_SEND,
+            UPDATE_ENABLED_FEATURES,
+            UPDATE_TAGS,
 
-            private final int id;
+            // added in 1.20.3
+            RESOURCE_PACK_REMOVE;
 
-            Server(int id) {
-                this.id = id;
+            private static int INDEX = 0;
+            private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
+            private final int[] ids;
+
+            Server() {
+                this.ids = new int[CLIENTBOUND_CONFIG_VERSION_MAPPER.getVersions().length];
+                Arrays.fill(this.ids, -1);
+            }
+
+            public static void load() {
+                INDEX = 0;
+                loadPacketIds(ClientboundConfigPacketType_1_20_2.values());
+                loadPacketIds(ClientboundConfigPacketType_1_20_3.values());
+                // TODO UPDATE Update packet type mappings (config clientbound pt. 2)
+            }
+
+            private static void loadPacketIds(Enum<?>[] enumConstants) {
+                int index = INDEX;
+                for (Enum<?> constant : enumConstants) {
+                    int id = constant.ordinal();
+                    Configuration.Server value = Configuration.Server.valueOf(constant.name());
+                    value.ids[index] = id;
+                    Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
+                    packetIdMap.put(id, value);
+                }
+                INDEX++;
             }
 
             public static @Nullable PacketTypeCommon getById(int packetId) {
-                switch (packetId) {
-                    case 0x00:
-                        return PLUGIN_MESSAGE;
-                    case 0x01:
-                        return DISCONNECT;
-                    case 0x02:
-                        return CONFIGURATION_END;
-                    case 0x03:
-                        return KEEP_ALIVE;
-                    case 0x04:
-                        return PING;
-                    case 0x05:
-                        return REGISTRY_DATA;
-                    case 0x06:
-                        return RESOURCE_PACK_SEND;
-                    case 0x07:
-                        return UPDATE_ENABLED_FEATURES;
-                    case 0x08:
-                        return UPDATE_TAGS;
-                    default:
-                        return null;
+                return getById(ClientVersion.getLatest(), packetId);
+            }
+
+            public static @Nullable PacketTypeCommon getById(ClientVersion version, int packetId) {
+                if (!PREPARED) {
+                    PacketType.prepare();
                 }
+                int index = CLIENTBOUND_CONFIG_VERSION_MAPPER.getIndex(version);
+                Map<Integer, PacketTypeCommon> map = PACKET_TYPE_ID_MAP.get((byte) index);
+                return map.get(packetId);
+            }
+
+            @Deprecated
+            public int getId() {
+                return this.getId(ClientVersion.getLatest());
             }
 
             @Override
-            public int getId() {
-                return this.id;
+            public int getId(ClientVersion version) {
+                if (!PREPARED) {
+                    PacketType.prepare();
+                }
+                int index = CLIENTBOUND_CONFIG_VERSION_MAPPER.getIndex(version);
+                return this.ids[index];
             }
 
             @Override
             public PacketSide getSide() {
-                return PacketSide.CLIENT;
+                return PacketSide.SERVER;
             }
         }
     }
@@ -498,7 +566,9 @@ public final class PacketType {
             //Added in 1.20.2
             CHUNK_BATCH_ACK,
             CONFIGURATION_ACK,
-            DEBUG_PING;
+            DEBUG_PING,
+            //Added in 1.20.3
+            SLOT_STATE_CHANGE;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -515,7 +585,7 @@ public final class PacketType {
                     PacketType.prepare();
                 }
                 int index = SERVERBOUND_PLAY_VERSION_MAPPER.getIndex(version);
-                Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte)index, k -> new HashMap<>());
+                Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
                 return packetIdMap.get(packetId);
             }
 
@@ -550,6 +620,7 @@ public final class PacketType {
                 loadPacketIds(ServerboundPacketType_1_19_3.values());
                 loadPacketIds(ServerboundPacketType_1_19_4.values());
                 loadPacketIds(ServerboundPacketType_1_20_2.values());
+                loadPacketIds(ServerboundPacketType_1_20_3.values());
                 //TODO UPDATE Update packet type mappings (serverbound pt. 2)
             }
 
@@ -704,16 +775,24 @@ public final class PacketType {
             DISGUISED_CHAT,
             PLAYER_INFO_REMOVE,
             PLAYER_INFO_UPDATE,
+
             //Added in 1.19.4
             DAMAGE_EVENT,
             HURT_ANIMATION,
             BUNDLE,
             CHUNK_BIOMES,
+
             //Added in 1.20.2
             CHUNK_BATCH_END,
             CHUNK_BATCH_BEGIN,
             DEBUG_PONG,
-            CONFIGURATION_START;
+            CONFIGURATION_START,
+
+            //Added in 1.20.3
+            RESET_SCORE,
+            RESOURCE_PACK_REMOVE,
+            TICKING_STATE,
+            TICKING_STEP;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -781,6 +860,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_19_3.values());
                 loadPacketIds(ClientboundPacketType_1_19_4.values());
                 loadPacketIds(ClientboundPacketType_1_20_2.values());
+                loadPacketIds(ClientboundPacketType_1_20_3.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }

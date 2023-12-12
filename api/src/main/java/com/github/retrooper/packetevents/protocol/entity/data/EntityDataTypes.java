@@ -32,8 +32,13 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.*;
+import com.github.retrooper.packetevents.util.Quaternion4f;
+import com.github.retrooper.packetevents.util.TypesBuilder;
+import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.Vector3f;
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,9 +89,13 @@ public class EntityDataTypes {
 
     public static final EntityDataType<String> STRING = define("string", PacketWrapper::readString, PacketWrapper::writeString);
 
+    @Deprecated
     public static final EntityDataType<String> COMPONENT = define("component", PacketWrapper::readComponentJSON, PacketWrapper::writeComponentJSON);
+    public static final EntityDataType<Component> ADV_COMPONENT = define("component", PacketWrapper::readComponent, PacketWrapper::writeComponent);
 
-    public static final EntityDataType<Optional<String>> OPTIONAL_COMPONENT = define("optional_component", readOptionalComponentDeserializer(), writeOptionalComponentSerializer());
+    @Deprecated
+    public static final EntityDataType<Optional<String>> OPTIONAL_COMPONENT = define("optional_component", readOptionalComponentJSONDeserializer(), writeOptionalComponentJSONSerializer());
+    public static final EntityDataType<Optional<Component>> OPTIONAL_ADV_COMPONENT = define("optional_component", readOptionalComponentDeserializer(), writeOptionalComponentSerializer());
 
     public static final EntityDataType<ItemStack> ITEMSTACK = define("itemstack", PacketWrapper::readItemStack, PacketWrapper::writeItemStack);
 
@@ -256,26 +265,44 @@ public class EntityDataTypes {
         };
     }
 
-    private static <T> Function<PacketWrapper<?>, T> readOptionalComponentDeserializer() {
+    @Deprecated
+    private static Function<PacketWrapper<?>, Optional<String>> readOptionalComponentJSONDeserializer() {
         return (PacketWrapper<?> wrapper) -> {
             if (wrapper.readBoolean()) {
-                return (T) Optional.of(wrapper.readString());
+                return Optional.of(wrapper.readComponentJSON());
             } else {
-                return (T) Optional.empty();
+                return Optional.empty();
             }
         };
     }
 
-    private static <T> BiConsumer<PacketWrapper<?>, T> writeOptionalComponentSerializer() {
-        return (PacketWrapper<?> wrapper, T value) -> {
-            if (value instanceof Optional) {
-                Optional<String> optional = (Optional<String>) value;
-                if (optional.isPresent()) {
-                    wrapper.writeBoolean(true);
-                    wrapper.writeString(optional.get());
-                } else {
-                    wrapper.writeBoolean(false);
-                }
+    @Deprecated
+    private static BiConsumer<PacketWrapper<?>, Optional<String>> writeOptionalComponentJSONSerializer() {
+        return (PacketWrapper<?> wrapper, Optional<String> value) -> {
+            if (value != null && value.isPresent()) {
+                wrapper.writeBoolean(true);
+                wrapper.writeComponentJSON(value.get());
+            } else {
+                wrapper.writeBoolean(false);
+            }
+        };
+    }
+
+    private static Function<PacketWrapper<?>, Optional<Component>> readOptionalComponentDeserializer() {
+        return (PacketWrapper<?> wrapper) -> {
+            if (wrapper.readBoolean()) {
+                return Optional.of(wrapper.readComponent());
+            } else {
+                return Optional.empty();
+            }
+        };
+    }
+
+    private static BiConsumer<PacketWrapper<?>, Optional<Component>> writeOptionalComponentSerializer() {
+        return (PacketWrapper<?> wrapper, Optional<Component> value) -> {
+            if (value != null && value.isPresent()) {
+                wrapper.writeBoolean(true);
+                wrapper.writeComponent(value.get());
             } else {
                 wrapper.writeBoolean(false);
             }

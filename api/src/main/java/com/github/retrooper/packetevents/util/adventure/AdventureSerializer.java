@@ -56,11 +56,15 @@ public class AdventureSerializer {
     }
 
     public static Component fromLegacyFormat(String legacyMessage) {
-        return getLegacyGsonSerializer().deserialize(legacyMessage);
+        return getLegacyGsonSerializer().deserializeOrNull(legacyMessage);
+    }
+
+    public static String toLegacyFormat(Component component) {
+        return getLegacyGsonSerializer().serializeOrNull(component);
     }
 
     public static Component parseComponent(String json) {
-        return getGsonSerializer().deserialize(json);
+        return getGsonSerializer().deserializeOrNull(json);
     }
 
     public static Component parseJsonTree(JsonElement json) {
@@ -68,7 +72,7 @@ public class AdventureSerializer {
     }
 
     public static String toJson(Component component) {
-        return getGsonSerializer().serialize(component);
+        return getGsonSerializer().serializeOrNull(component);
     }
 
     public static JsonElement toJsonTree(Component component) {

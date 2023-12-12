@@ -84,11 +84,15 @@ public enum ClientVersion {
     V_1_19_4(762),
     V_1_20(763),
     V_1_20_2(764),
+    /**
+     * 1.20.3 and 1.20.4 have the same protocol version.
+     */
+    V_1_20_3(765),
     //TODO UPDATE Add new protocol version field
 
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
-    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_20_2.protocolVersion + 1, true),
+    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_20_3.protocolVersion + 1, true),
 
     UNKNOWN(-1, true);
 
@@ -167,7 +171,6 @@ public enum ClientVersion {
                 if (version.protocolVersion > protocolVersion) {
                     break;
                 } else if (version.protocolVersion == protocolVersion) {
-                    //Cache for next time
                     return version;
                 }
             }

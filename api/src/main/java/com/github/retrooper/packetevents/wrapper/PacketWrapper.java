@@ -25,9 +25,17 @@ import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufOutputStream;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.protocol.chat.*;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
+import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
+import com.github.retrooper.packetevents.protocol.chat.MessageSignature;
+import com.github.retrooper.packetevents.protocol.chat.Node;
+import com.github.retrooper.packetevents.protocol.chat.Parsers;
+import com.github.retrooper.packetevents.protocol.chat.RemoteChatSession;
+import com.github.retrooper.packetevents.protocol.chat.SignedCommandArgument;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
@@ -39,6 +47,7 @@ import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -53,6 +62,7 @@ import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.adventure.AdventureNBTSerialization;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
@@ -63,10 +73,19 @@ import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -185,8 +204,7 @@ public class PacketWrapper<T extends PacketWrapper> {
             serverVersion = user.getClientVersion().toServerVersion();
             int id = packetTypeData.getPacketType().getId(user.getClientVersion());
             writeVarInt(id);
-        }
-        else {
+        } else {
             writeVarInt(packetTypeData.getNativePacketId());
         }
         write();
@@ -240,8 +258,9 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     /**
      * Gets the Packet ID for the current platform version
-     * @deprecated Use {@link #getNativePacketId()}
+     *
      * @return Packet ID
+     * @deprecated Use {@link #getNativePacketId()}
      */
     @Deprecated
     public int getPacketId() {
@@ -250,6 +269,7 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     /**
      * Sets the Packet ID for the current platform version
+     *
      * @deprecated Use {@link #setNativePacketId(int)}
      */
     @Deprecated
@@ -424,10 +444,18 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public NBTCompound readNBT() {
+        return (NBTCompound) this.readDirectNBT();
+    }
+
+    public NBT readDirectNBT() {
         return NBTCodec.readNBTFromBuffer(buffer, serverVersion);
     }
 
     public void writeNBT(NBTCompound nbt) {
+        this.writeDirectNBT((NBT) nbt);
+    }
+
+    public void writeDirectNBT(NBT nbt) {
         NBTCodec.writeNBTToBuffer(buffer, serverVersion, nbt);
     }
 
@@ -453,8 +481,10 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
+    @Deprecated
     public String readComponentJSON() {
-        return readString(getMaxMessageLength());
+        // needs to be converted to nbt as of 1.20.3
+        return AdventureSerializer.asVanilla(this.readComponent());
     }
 
     public void writeString(String s) {
@@ -478,16 +508,49 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
+    @Deprecated
     public void writeComponentJSON(String json) {
-        writeString(json, getMaxMessageLength());
+        // needs to be converted to nbt as of 1.20.3
+        this.writeComponent(AdventureSerializer.parseComponent(json));
     }
 
     public Component readComponent() {
-        return AdventureSerializer.parseComponent(readComponentJSON());
+        return this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)
+                ? this.readComponentAsNBT() : this.readComponentAsJSON();
+    }
+
+    public Component readComponentAsNBT() {
+        try {
+            return AdventureNBTSerialization.readComponent(this.buffer);
+        } catch (IOException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    public Component readComponentAsJSON() {
+        String jsonString = this.readString(this.getMaxMessageLength());
+        return AdventureSerializer.parseComponent(jsonString);
     }
 
     public void writeComponent(Component component) {
-        writeComponentJSON(AdventureSerializer.toJson(component));
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            this.writeComponentAsNBT(component);
+        } else {
+            this.writeComponentAsJSON(component);
+        }
+    }
+
+    public void writeComponentAsNBT(Component component) {
+        try {
+            AdventureNBTSerialization.writeComponent(new ByteBufOutputStream(this.buffer), component);
+        } catch (IOException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    public void writeComponentAsJSON(Component component) {
+        String jsonString = AdventureSerializer.toJson(component);
+        this.writeString(jsonString, this.getMaxMessageLength());
     }
 
     public ResourceLocation readIdentifier(int maxLen) {

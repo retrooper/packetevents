@@ -21,10 +21,16 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.particle.Particle;
+import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
+import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
+import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,16 +42,36 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     private List<Vector3i> records;
     private Vector3f playerMotion;
 
+    private Particle smallExplosionParticles;
+    private Particle largeExplosionParticles;
+    private BlockInteraction blockInteraction;
+    private ResourceLocation explosionSoundKey;
+    private @Nullable Float explosionSoundRange;
+
     public WrapperPlayServerExplosion(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperPlayServerExplosion(Vector3d position, float strength, List<Vector3i> records, Vector3f playerMotion) {
+        this(position, strength, records, playerMotion, new Particle(ParticleTypes.EXPLOSION),
+                new Particle(ParticleTypes.EXPLOSION_EMITTER), BlockInteraction.DESTROY_BLOCKS,
+                new ResourceLocation("minecraft:entity.generic.explode"), null);
+    }
+
+    public WrapperPlayServerExplosion(Vector3d position, float strength, List<Vector3i> records, Vector3f playerMotion,
+                                      Particle smallExplosionParticles, Particle largeExplosionParticles,
+                                      BlockInteraction blockInteraction, ResourceLocation explosionSoundKey,
+                                      @Nullable Float explosionSoundRange) {
         super(PacketType.Play.Server.EXPLOSION);
         this.position = position;
         this.strength = strength;
         this.records = records;
         this.playerMotion = playerMotion;
+        this.smallExplosionParticles = smallExplosionParticles;
+        this.largeExplosionParticles = largeExplosionParticles;
+        this.blockInteraction = blockInteraction;
+        this.explosionSoundKey = explosionSoundKey;
+        this.explosionSoundRange = explosionSoundRange;
     }
 
     @Override
@@ -72,6 +98,21 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         float motY = readFloat();
         float motZ = readFloat();
         playerMotion = new Vector3f(motX, motY, motZ);
+
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            this.blockInteraction = BlockInteraction.values()[this.readVarInt()];
+
+            ParticleType smallPartType = ParticleTypes.getById(this.serverVersion.toClientVersion(), this.readVarInt());
+            ParticleData smallPartData = smallPartType.readDataFunction().apply(this);
+            this.smallExplosionParticles = new Particle(smallPartType, smallPartData);
+
+            ParticleType largePartType = ParticleTypes.getById(this.serverVersion.toClientVersion(), this.readVarInt());
+            ParticleData largePartData = largePartType.readDataFunction().apply(this);
+            this.largeExplosionParticles = new Particle(largePartType, largePartData);
+
+            this.explosionSoundKey = this.readIdentifier();
+            this.explosionSoundRange = this.readOptional(PacketWrapper::readFloat);
+        }
     }
 
     @Override
@@ -104,6 +145,19 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         writeFloat(playerMotion.x);
         writeFloat(playerMotion.y);
         writeFloat(playerMotion.z);
+
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            this.writeVarInt(this.blockInteraction.ordinal());
+
+            this.writeVarInt(this.smallExplosionParticles.getType().getId(this.serverVersion.toClientVersion()));
+            this.smallExplosionParticles.getType().writeDataFunction().accept(this, this.smallExplosionParticles.getData());
+
+            this.writeVarInt(this.largeExplosionParticles.getType().getId(this.serverVersion.toClientVersion()));
+            this.largeExplosionParticles.getType().writeDataFunction().accept(this, this.largeExplosionParticles.getData());
+
+            this.writeIdentifier(this.explosionSoundKey);
+            this.writeOptional(this.explosionSoundRange, PacketWrapper::writeFloat);
+        }
     }
 
     @Override
@@ -112,6 +166,11 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         strength = wrapper.strength;
         records = wrapper.records;
         playerMotion = wrapper.playerMotion;
+        smallExplosionParticles = wrapper.smallExplosionParticles;
+        largeExplosionParticles = wrapper.largeExplosionParticles;
+        blockInteraction = wrapper.blockInteraction;
+        explosionSoundKey = wrapper.explosionSoundKey;
+        explosionSoundRange = wrapper.explosionSoundRange;
     }
 
     private Vector3i toFloor(Vector3d position) {
@@ -160,5 +219,52 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
 
     public void setPlayerMotion(Vector3f playerMotion) {
         this.playerMotion = playerMotion;
+    }
+
+    public Particle getSmallExplosionParticles() {
+        return this.smallExplosionParticles;
+    }
+
+    public void setSmallExplosionParticles(Particle smallExplosionParticles) {
+        this.smallExplosionParticles = smallExplosionParticles;
+    }
+
+    public Particle getLargeExplosionParticles() {
+        return this.largeExplosionParticles;
+    }
+
+    public void setLargeExplosionParticles(Particle largeExplosionParticles) {
+        this.largeExplosionParticles = largeExplosionParticles;
+    }
+
+    public BlockInteraction getBlockInteraction() {
+        return this.blockInteraction;
+    }
+
+    public void setBlockInteraction(BlockInteraction blockInteraction) {
+        this.blockInteraction = blockInteraction;
+    }
+
+    public ResourceLocation getExplosionSoundKey() {
+        return this.explosionSoundKey;
+    }
+
+    public void setExplosionSoundKey(ResourceLocation explosionSoundKey) {
+        this.explosionSoundKey = explosionSoundKey;
+    }
+
+    public @Nullable Float getExplosionSoundRange() {
+        return this.explosionSoundRange;
+    }
+
+    public void setExplosionSoundRange(@Nullable Float explosionSoundRange) {
+        this.explosionSoundRange = explosionSoundRange;
+    }
+
+    public enum BlockInteraction {
+        KEEP_BLOCKS,
+        DESTROY_BLOCKS,
+        DECAY_DESTROYED_BLOCKS,
+        TRIGGER_BLOCKS,
     }
 }

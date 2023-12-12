@@ -41,12 +41,12 @@ public class WrapperLoginServerDisconnect extends PacketWrapper<WrapperLoginServ
 
     @Override
     public void read() {
-        this.reason = readComponent();
+        this.reason = this.readComponentAsJSON();
     }
 
     @Override
     public void write() {
-        writeComponent(reason);
+        this.writeComponentAsJSON(this.reason);
     }
 
     @Override

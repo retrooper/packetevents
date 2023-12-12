@@ -161,8 +161,11 @@ public class WrappedBlockState {
             return 10;
         } else if (version.isOlderThanOrEquals(ClientVersion.V_1_20)) {
             return 11;
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_20_2)) {
+            return 12;
         }
-        return 12;
+        // TODO UPDATE increment index (and add previous above)
+        return 13;
     }
 
     private static void loadLegacy() {
@@ -1109,6 +1112,36 @@ public class WrappedBlockState {
     public void setBloom(Bloom bloom) {
         checkIfCloneNeeded();
         data.put(StateValue.BLOOM, bloom);
+        checkIsStillValid();
+    }
+
+    public boolean isCracked() {
+        return (boolean) data.get(StateValue.CRACKED);
+    }
+
+    public void setCracked(boolean cracked) {
+        checkIfCloneNeeded();
+        data.put(StateValue.CRACKED, cracked);
+        checkIsStillValid();
+    }
+
+    public boolean isCrafting() {
+        return (boolean) data.get(StateValue.CRAFTING);
+    }
+
+    public void setCrafting(boolean crafting) {
+        checkIfCloneNeeded();
+        data.put(StateValue.CRAFTING, crafting);
+        checkIsStillValid();
+    }
+
+    public TrialSpawnerState getTrialSpawnerState() {
+        return (TrialSpawnerState) data.get(StateValue.TRIAL_SPAWNER_STATE);
+    }
+
+    public void setTrialSpawnerState(TrialSpawnerState trialSpawnerState) {
+        checkIfCloneNeeded();
+        data.put(StateValue.TRIAL_SPAWNER_STATE, trialSpawnerState);
         checkIsStillValid();
     }
 

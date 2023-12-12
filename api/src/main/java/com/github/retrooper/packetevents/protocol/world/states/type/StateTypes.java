@@ -202,7 +202,15 @@ public class StateTypes {
     public static StateType CHISELED_SANDSTONE = StateTypes.builder().name("CHISELED_SANDSTONE").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType CUT_SANDSTONE = StateTypes.builder().name("CUT_SANDSTONE").blastResistance(0.8f).hardness(0.8f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType COBWEB = StateTypes.builder().name("COBWEB").blastResistance(4.0f).hardness(4.0f).isBlocking(false).requiresCorrectTool(true).isSolid(false).setMaterial(MaterialType.WEB).build();
-    public static StateType GRASS = StateTypes.builder().name("GRASS").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
+    public static StateType SHORT_GRASS = StateTypes.builder().name("SHORT_GRASS").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
+
+    /**
+     * This is short grass.
+     * @deprecated Please use SHORT_GRASS instead of GRASS, this is now deprecated.
+     * */
+    @Deprecated
+    public static StateType GRASS = SHORT_GRASS;
+
     public static StateType FERN = StateTypes.builder().name("FERN").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
     public static StateType AZALEA = StateTypes.builder().name("AZALEA").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.PLANT).build();
     public static StateType FLOWERING_AZALEA = StateTypes.builder().name("FLOWERING_AZALEA").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.PLANT).build();
@@ -1043,6 +1051,63 @@ public class StateTypes {
             .blastResistance(1.5f).hardness(1.5f).isBlocking(true).requiresCorrectTool(false)
             .isSolid(true).setMaterial(MaterialType.SCULK).build();
 
+    //1.20.3 added types
+    public static StateType TUFF_SLAB = StateTypes.builder().name("TUFF_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType TUFF_STAIRS = StateTypes.builder().name("TUFF_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType TUFF_WALL = StateTypes.builder().name("TUFF_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType POLISHED_TUFF = StateTypes.builder().name("POLISHED_TUFF").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType POLISHED_TUFF_SLAB = StateTypes.builder().name("POLISHED_TUFF_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType POLISHED_TUFF_STAIRS = StateTypes.builder().name("POLISHED_TUFF_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType POLISHED_TUFF_WALL = StateTypes.builder().name("POLISHED_TUFF_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType CHISELED_TUFF = StateTypes.builder().name("CHISELED_TUFF").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType TUFF_BRICKS = StateTypes.builder().name("TUFF_BRICKS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType TUFF_BRICK_SLAB = StateTypes.builder().name("TUFF_BRICK_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType TUFF_BRICK_STAIRS = StateTypes.builder().name("TUFF_BRICK_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType TUFF_BRICK_WALL = StateTypes.builder().name("TUFF_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType CHISELED_TUFF_BRICKS = StateTypes.builder().name("CHISELED_TUFF_BRICKS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType OXIDIZED_CHISELED_COPPER = StateTypes.builder().name("OXIDIZED_CHISELED_COPPER").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WEATHERED_CHISELED_COPPER = StateTypes.builder().name("WEATHERED_CHISELED_COPPER").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType EXPOSED_CHISELED_COPPER = StateTypes.builder().name("EXPOSED_CHISELED_COPPER").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType CHISELED_COPPER = StateTypes.builder().name("CHISELED_COPPER").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_OXIDIZED_CHISELED_COPPER = StateTypes.builder().name("WAXED_OXIDIZED_CHISELED_COPPER").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_WEATHERED_CHISELED_COPPER = StateTypes.builder().name("WAXED_WEATHERED_CHISELED_COPPER").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_EXPOSED_CHISELED_COPPER = StateTypes.builder().name("WAXED_EXPOSED_CHISELED_COPPER").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_CHISELED_COPPER = StateTypes.builder().name("WAXED_CHISELED_COPPER").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType COPPER_DOOR = StateTypes.builder().name("COPPER_DOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType EXPOSED_COPPER_DOOR = StateTypes.builder().name("EXPOSED_COPPER_DOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType OXIDIZED_COPPER_DOOR = StateTypes.builder().name("OXIDIZED_COPPER_DOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WEATHERED_COPPER_DOOR = StateTypes.builder().name("WEATHERED_COPPER_DOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_COPPER_DOOR = StateTypes.builder().name("WAXED_COPPER_DOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_EXPOSED_COPPER_DOOR = StateTypes.builder().name("WAXED_EXPOSED_COPPER_DOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_OXIDIZED_COPPER_DOOR = StateTypes.builder().name("WAXED_OXIDIZED_COPPER_DOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_WEATHERED_COPPER_DOOR = StateTypes.builder().name("WAXED_WEATHERED_COPPER_DOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType COPPER_TRAPDOOR = StateTypes.builder().name("COPPER_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType EXPOSED_COPPER_TRAPDOOR = StateTypes.builder().name("EXPOSED_COPPER_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType OXIDIZED_COPPER_TRAPDOOR = StateTypes.builder().name("OXIDIZED_COPPER_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WEATHERED_COPPER_TRAPDOOR = StateTypes.builder().name("WEATHERED_COPPER_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_COPPER_TRAPDOOR = StateTypes.builder().name("WAXED_COPPER_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_EXPOSED_COPPER_TRAPDOOR = StateTypes.builder().name("WAXED_EXPOSED_COPPER_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_OXIDIZED_COPPER_TRAPDOOR = StateTypes.builder().name("WAXED_OXIDIZED_COPPER_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_WEATHERED_COPPER_TRAPDOOR = StateTypes.builder().name("WAXED_WEATHERED_COPPER_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType COPPER_GRATE = StateTypes.builder().name("COPPER_GRATE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType EXPOSED_COPPER_GRATE = StateTypes.builder().name("EXPOSED_COPPER_GRATE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WEATHERED_COPPER_GRATE = StateTypes.builder().name("WEATHERED_COPPER_GRATE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType OXIDIZED_COPPER_GRATE = StateTypes.builder().name("OXIDIZED_COPPER_GRATE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_COPPER_GRATE = StateTypes.builder().name("WAXED_COPPER_GRATE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_EXPOSED_COPPER_GRATE = StateTypes.builder().name("WAXED_EXPOSED_COPPER_GRATE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_WEATHERED_COPPER_GRATE = StateTypes.builder().name("WAXED_WEATHERED_COPPER_GRATE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_OXIDIZED_COPPER_GRATE = StateTypes.builder().name("WAXED_OXIDIZED_COPPER_GRATE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType COPPER_BULB = StateTypes.builder().name("COPPER_BULB").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType EXPOSED_COPPER_BULB = StateTypes.builder().name("EXPOSED_COPPER_BULB").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WEATHERED_COPPER_BULB = StateTypes.builder().name("WEATHERED_COPPER_BULB").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType OXIDIZED_COPPER_BULB = StateTypes.builder().name("OXIDIZED_COPPER_BULB").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_COPPER_BULB = StateTypes.builder().name("WAXED_COPPER_BULB").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_EXPOSED_COPPER_BULB = StateTypes.builder().name("WAXED_EXPOSED_COPPER_BULB").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_WEATHERED_COPPER_BULB = StateTypes.builder().name("WAXED_WEATHERED_COPPER_BULB").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_OXIDIZED_COPPER_BULB = StateTypes.builder().name("WAXED_OXIDIZED_COPPER_BULB").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType CRAFTER = StateTypes.builder().name("CRAFTER").blastResistance(3.5f).hardness(1.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType TRIAL_SPAWNER = StateTypes.builder().name("TRIAL_SPAWNER").blastResistance(50.0f).hardness(50.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+
     public static Builder builder() {
         return new Builder();
     }
@@ -1110,6 +1175,7 @@ public class StateTypes {
             this.isShapeExceedsCube = b;
             return this;
         }
+
         public StateType build() {
             StateType type = new StateType(name, blastResistance, hardness, isSolid, isBlocking, isAir, requiresCorrectTool, isShapeExceedsCube, materialType);
             BY_NAME.put(name, type);

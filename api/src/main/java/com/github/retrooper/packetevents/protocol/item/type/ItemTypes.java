@@ -27,7 +27,14 @@ import com.github.retrooper.packetevents.util.TypesBuilderData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ItemTypes {
@@ -47,7 +54,8 @@ public class ItemTypes {
             ClientVersion.V_1_19,
             ClientVersion.V_1_19_3,
             ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20);
+            ClientVersion.V_1_20,
+            ClientVersion.V_1_20_3);
 
     public static final ItemType GILDED_BLACKSTONE = builder("gilded_blackstone").setMaxAmount(64).setPlacedType(StateTypes.GILDED_BLACKSTONE).build();
     public static final ItemType NETHER_BRICK_SLAB = builder("nether_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.NETHER_BRICK_SLAB).build();
@@ -628,7 +636,11 @@ public class ItemTypes {
     public static final ItemType RAW_COPPER_BLOCK = builder("raw_copper_block").setMaxAmount(64).setPlacedType(StateTypes.RAW_COPPER_BLOCK).build();
     public static final ItemType LIGHT_GRAY_CARPET = builder("light_gray_carpet").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.LIGHT_GRAY_CARPET).build();
     public static final ItemType MUSIC_DISC_WARD = builder("music_disc_ward").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).build();
-    public static final ItemType GRASS = builder("grass").setMaxAmount(64).setPlacedType(StateTypes.GRASS).build();
+    public static final ItemType SHORT_GRASS = builder("short_grass").setMaxAmount(64).setPlacedType(StateTypes.SHORT_GRASS).build();
+
+    @Deprecated
+    public static final ItemType GRASS = SHORT_GRASS;
+
     public static final ItemType END_CRYSTAL = builder("end_crystal").setMaxAmount(64).build();
     public static final ItemType VINDICATOR_SPAWN_EGG = builder("vindicator_spawn_egg").setMaxAmount(64).build();
     public static final ItemType WHEAT = builder("wheat").setMaxAmount(64).build();
@@ -1310,6 +1322,66 @@ public class ItemTypes {
     public static ItemType SHELTER_POTTERY_SHERD = builder("SHELTER_POTTERY_SHERD").setMaxAmount(64).build();
     public static ItemType SKULL_POTTERY_SHERD = builder("SKULL_POTTERY_SHERD").setMaxAmount(64).build();
     public static ItemType SNORT_POTTERY_SHERD = builder("SNORT_POTTERY_SHERD").setMaxAmount(64).build();
+
+    // 1.20.3 items
+    public static ItemType TUFF_SLAB = builder("tuff_slab").setMaxAmount(64).setPlacedType(StateTypes.TUFF_SLAB).build();
+    public static ItemType TUFF_STAIRS = builder("tuff_stairs").setMaxAmount(64).setPlacedType(StateTypes.TUFF_STAIRS).build();
+    public static ItemType TUFF_WALL = builder("tuff_wall").setMaxAmount(64).setPlacedType(StateTypes.TUFF_WALL).build();
+    public static ItemType CHISELED_TUFF = builder("chiseled_tuff").setMaxAmount(64).setPlacedType(StateTypes.CHISELED_TUFF).build();
+    public static ItemType POLISHED_TUFF = builder("polished_tuff").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_TUFF).build();
+    public static ItemType POLISHED_TUFF_SLAB = builder("polished_tuff_slab").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_TUFF_SLAB).build();
+    public static ItemType POLISHED_TUFF_STAIRS = builder("polished_tuff_stairs").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_TUFF_STAIRS).build();
+    public static ItemType POLISHED_TUFF_WALL = builder("polished_tuff_wall").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_TUFF_WALL).build();
+    public static ItemType TUFF_BRICKS = builder("tuff_bricks").setMaxAmount(64).setPlacedType(StateTypes.TUFF_BRICKS).build();
+    public static ItemType TUFF_BRICK_SLAB = builder("tuff_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.TUFF_BRICK_SLAB).build();
+    public static ItemType TUFF_BRICK_STAIRS = builder("tuff_brick_stairs").setMaxAmount(64).setPlacedType(StateTypes.TUFF_BRICK_STAIRS).build();
+    public static ItemType TUFF_BRICK_WALL = builder("tuff_brick_wall").setMaxAmount(64).setPlacedType(StateTypes.TUFF_BRICK_WALL).build();
+    public static ItemType CHISELED_TUFF_BRICKS = builder("chiseled_tuff_bricks").setMaxAmount(64).setPlacedType(StateTypes.CHISELED_TUFF_BRICKS).build();
+    public static ItemType CHISELED_COPPER = builder("chiseled_copper").setMaxAmount(64).setPlacedType(StateTypes.CHISELED_COPPER).build();
+    public static ItemType EXPOSED_CHISELED_COPPER = builder("exposed_chiseled_copper").setMaxAmount(64).setPlacedType(StateTypes.EXPOSED_CHISELED_COPPER).build();
+    public static ItemType WEATHERED_CHISELED_COPPER = builder("weathered_chiseled_copper").setMaxAmount(64).setPlacedType(StateTypes.WEATHERED_CHISELED_COPPER).build();
+    public static ItemType OXIDIZED_CHISELED_COPPER = builder("oxidized_chiseled_copper").setMaxAmount(64).setPlacedType(StateTypes.OXIDIZED_CHISELED_COPPER).build();
+    public static ItemType WAXED_CHISELED_COPPER = builder("waxed_chiseled_copper").setMaxAmount(64).setPlacedType(StateTypes.WAXED_CHISELED_COPPER).build();
+    public static ItemType WAXED_EXPOSED_CHISELED_COPPER = builder("waxed_exposed_chiseled_copper").setMaxAmount(64).setPlacedType(StateTypes.WAXED_EXPOSED_CHISELED_COPPER).build();
+    public static ItemType WAXED_WEATHERED_CHISELED_COPPER = builder("waxed_weathered_chiseled_copper").setMaxAmount(64).setPlacedType(StateTypes.WAXED_WEATHERED_CHISELED_COPPER).build();
+    public static ItemType WAXED_OXIDIZED_CHISELED_COPPER = builder("waxed_oxidized_chiseled_copper").setMaxAmount(64).setPlacedType(StateTypes.WAXED_OXIDIZED_CHISELED_COPPER).build();
+    public static ItemType COPPER_DOOR = builder("copper_door").setMaxAmount(64).setPlacedType(StateTypes.COPPER_DOOR).build();
+    public static ItemType EXPOSED_COPPER_DOOR = builder("exposed_copper_door").setMaxAmount(64).setPlacedType(StateTypes.EXPOSED_COPPER_DOOR).build();
+    public static ItemType WEATHERED_COPPER_DOOR = builder("weathered_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WEATHERED_COPPER_DOOR).build();
+    public static ItemType OXIDIZED_COPPER_DOOR = builder("oxidized_copper_door").setMaxAmount(64).setPlacedType(StateTypes.OXIDIZED_COPPER_DOOR).build();
+    public static ItemType WAXED_COPPER_DOOR = builder("waxed_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_COPPER_DOOR).build();
+    public static ItemType WAXED_EXPOSED_COPPER_DOOR = builder("waxed_exposed_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_EXPOSED_COPPER_DOOR).build();
+    public static ItemType WAXED_WEATHERED_COPPER_DOOR = builder("waxed_weathered_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_WEATHERED_COPPER_DOOR).build();
+    public static ItemType WAXED_OXIDIZED_COPPER_DOOR = builder("waxed_oxidized_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_OXIDIZED_COPPER_DOOR).build();
+    public static ItemType COPPER_TRAPDOOR = builder("copper_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.COPPER_TRAPDOOR).build();
+    public static ItemType EXPOSED_COPPER_TRAPDOOR = builder("exposed_copper_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.EXPOSED_COPPER_TRAPDOOR).build();
+    public static ItemType WEATHERED_COPPER_TRAPDOOR = builder("weathered_copper_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.WEATHERED_COPPER_TRAPDOOR).build();
+    public static ItemType OXIDIZED_COPPER_TRAPDOOR = builder("oxidized_copper_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.OXIDIZED_COPPER_TRAPDOOR).build();
+    public static ItemType WAXED_COPPER_TRAPDOOR = builder("waxed_copper_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.WAXED_COPPER_TRAPDOOR).build();
+    public static ItemType WAXED_EXPOSED_COPPER_TRAPDOOR = builder("waxed_exposed_copper_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.WAXED_EXPOSED_COPPER_TRAPDOOR).build();
+    public static ItemType WAXED_WEATHERED_COPPER_TRAPDOOR = builder("waxed_weathered_copper_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.WAXED_WEATHERED_COPPER_TRAPDOOR).build();
+    public static ItemType WAXED_OXIDIZED_COPPER_TRAPDOOR = builder("waxed_oxidized_copper_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.WAXED_OXIDIZED_COPPER_TRAPDOOR).build();
+    public static ItemType CRAFTER = builder("crafter").setMaxAmount(64).setPlacedType(StateTypes.CRAFTER).build();
+    public static ItemType BREEZE_SPAWN_EGG = builder("breeze_spawn_egg").setMaxAmount(64).build();
+    public static ItemType COPPER_GRATE = builder("copper_grate").setMaxAmount(64).setPlacedType(StateTypes.COPPER_GRATE).build();
+    public static ItemType EXPOSED_COPPER_GRATE = builder("exposed_copper_grate").setMaxAmount(64).setPlacedType(StateTypes.EXPOSED_COPPER_GRATE).build();
+    public static ItemType WEATHERED_COPPER_GRATE = builder("weathered_copper_grate").setMaxAmount(64).setPlacedType(StateTypes.WEATHERED_COPPER_GRATE).build();
+    public static ItemType OXIDIZED_COPPER_GRATE = builder("oxidized_copper_grate").setMaxAmount(64).setPlacedType(StateTypes.OXIDIZED_COPPER_GRATE).build();
+    public static ItemType WAXED_COPPER_GRATE = builder("waxed_copper_grate").setMaxAmount(64).setPlacedType(StateTypes.WAXED_COPPER_GRATE).build();
+    public static ItemType WAXED_EXPOSED_COPPER_GRATE = builder("waxed_exposed_copper_grate").setMaxAmount(64).setPlacedType(StateTypes.WAXED_EXPOSED_COPPER_GRATE).build();
+    public static ItemType WAXED_WEATHERED_COPPER_GRATE = builder("waxed_weathered_copper_grate").setMaxAmount(64).setPlacedType(StateTypes.WAXED_WEATHERED_COPPER_GRATE).build();
+    public static ItemType WAXED_OXIDIZED_COPPER_GRATE = builder("waxed_oxidized_copper_grate").setMaxAmount(64).setPlacedType(StateTypes.WAXED_OXIDIZED_COPPER_GRATE).build();
+    public static ItemType COPPER_BULB = builder("copper_bulb").setMaxAmount(64).setPlacedType(StateTypes.COPPER_BULB).build();
+    public static ItemType EXPOSED_COPPER_BULB = builder("exposed_copper_bulb").setMaxAmount(64).setPlacedType(StateTypes.EXPOSED_COPPER_BULB).build();
+    public static ItemType WEATHERED_COPPER_BULB = builder("weathered_copper_bulb").setMaxAmount(64).setPlacedType(StateTypes.WEATHERED_COPPER_BULB).build();
+    public static ItemType OXIDIZED_COPPER_BULB = builder("oxidized_copper_bulb").setMaxAmount(64).setPlacedType(StateTypes.OXIDIZED_COPPER_BULB).build();
+    public static ItemType WAXED_COPPER_BULB = builder("waxed_copper_bulb").setMaxAmount(64).setPlacedType(StateTypes.WAXED_COPPER_BULB).build();
+    public static ItemType WAXED_EXPOSED_COPPER_BULB = builder("waxed_exposed_copper_bulb").setMaxAmount(64).setPlacedType(StateTypes.WAXED_EXPOSED_COPPER_BULB).build();
+    public static ItemType WAXED_WEATHERED_COPPER_BULB = builder("waxed_weathered_copper_bulb").setMaxAmount(64).setPlacedType(StateTypes.WAXED_WEATHERED_COPPER_BULB).build();
+    public static ItemType WAXED_OXIDIZED_COPPER_BULB = builder("waxed_oxidized_copper_bulb").setMaxAmount(64).setPlacedType(StateTypes.WAXED_OXIDIZED_COPPER_BULB).build();
+    public static ItemType TRIAL_SPAWNER = builder("trial_spawner").setMaxAmount(64).setPlacedType(StateTypes.TRIAL_SPAWNER).build();
+    public static ItemType TRIAL_KEY = builder("trial_key").setMaxAmount(64).build();
+
     /**
      * @deprecated Burning furnace shows up as a missing texture, removed in 1.9
      */
@@ -1318,14 +1390,17 @@ public class ItemTypes {
     /**
      * @deprecated Fire was removed in 1.8 as an item
      */
+    @Deprecated
     public static final ItemType FIRE = builder("fire").setMaxAmount(64).build();
     /**
      * @deprecated Nether portals were removed in 1.8 as an item
      */
+    @Deprecated
     public static final ItemType NETHER_PORTAL = builder("nether_portal").setMaxAmount(1).build();
     /**
      * @deprecated End portals were removed in 1.8 as an item
      */
+    @Deprecated
     public static final ItemType END_PORTAL = builder("end_portal").setMaxAmount(1).build();
 
     public static Collection<ItemType> values() {
