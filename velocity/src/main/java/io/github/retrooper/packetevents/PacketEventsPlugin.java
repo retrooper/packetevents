@@ -61,7 +61,7 @@ public class PacketEventsPlugin {
         PacketEvents.getAPI().getSettings().reEncodeByDefault(false);
         // It should only be enabled in a development environment, not globally
         // PacketEvents.getAPI().getSettings().debug(true);
-        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+        PacketListenerAbstract listener = new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 //System.out.println("Incoming: " + event.getPacketType().getName());
@@ -86,7 +86,8 @@ public class PacketEventsPlugin {
                     System.out.println("After processing: " + msg.getMessage());
                 }*/
             }
-        });
+        };
+        //PacketEvents.getAPI().getEventManager().registerListener(listener);
         PacketEvents.getAPI().init();
     }
 
