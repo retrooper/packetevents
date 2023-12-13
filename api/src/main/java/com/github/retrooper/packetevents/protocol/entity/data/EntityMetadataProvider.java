@@ -8,7 +8,7 @@ import java.util.List;
  * This is an interface that provides a list of entity data.
  * This allows custom addon libraries to implement metadata classes for various entities
  * which can then be used in our API.
- * @since 2.2.0
+ * @since 2.1.0
  */
 public interface EntityMetadataProvider {
     /**
