@@ -35,7 +35,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
-import io.github.retrooper.packetevents.PacketEventsPlugin;
+import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
@@ -205,7 +205,11 @@ public class BungeePacketEventsBuilder {
                     }
 
                     if (settings.isbStatsEnabled()) {
-                        // TODO: Cross-platform metrics?
+                        Metrics metrics = new Metrics(plugin, 11327);
+                        //Just to have an idea of which versions of packetevents people use
+                        metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
+                            return getVersion().toString();
+                        }));
                     }
 
                     PacketType.Play.Client.load();

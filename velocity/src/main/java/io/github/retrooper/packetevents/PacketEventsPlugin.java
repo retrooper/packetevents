@@ -29,26 +29,28 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.ProxyServer;
+import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.velocity.factory.VelocityPacketEventsBuilder;
 
 import java.util.logging.Logger;
 
-@Plugin(id = "packetevents", name = "PacketEvents", version = "2.0.2")
+@Plugin(id = "packetevents", name = "PacketEvents", version = "2.2.0") //TODO UPDATE
 public class PacketEventsPlugin {
     private final ProxyServer server;
     private final Logger logger;
     private final PluginContainer pluginContainer;
+    public final Metrics.Factory metricsFactory;
 
     @Inject
-    public PacketEventsPlugin(
-            final ProxyServer server,
-            final Logger logger,
-            final PluginContainer pluginContainer
-    ) {
+    public PacketEventsPlugin(final ProxyServer server,
+                              final Logger logger,
+                              final PluginContainer pluginContainer, final Metrics.Factory metricsFactory) {
         this.server = server;
         this.logger = logger;
         this.pluginContainer = pluginContainer;
+        this.metricsFactory = metricsFactory;
         logger.info("Plugin started");
+
     }
 
     @Subscribe

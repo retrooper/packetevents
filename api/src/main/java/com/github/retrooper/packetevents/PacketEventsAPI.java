@@ -38,7 +38,7 @@ public abstract class PacketEventsAPI<T> {
     private final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
     private static final LogManager LOG_MANAGER = new LogManager();
     //TODO UPDATE
-    private static final PEVersion VERSION = new PEVersion(2, 1, 0);
+    private static final PEVersion VERSION = new PEVersion(2, 2, 0);
     
     public EventManager getEventManager() {
         return EVENT_MANAGER;

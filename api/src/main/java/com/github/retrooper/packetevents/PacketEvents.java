@@ -18,10 +18,13 @@
 
 package com.github.retrooper.packetevents;
 
+import org.jetbrains.annotations.ApiStatus;
+
 public final class PacketEvents {
     private static PacketEventsAPI<?> API;
 
     //Put these variable names anywhere else, they are really only for the injectors
+    @ApiStatus.Internal
     public static String IDENTIFIER, ENCODER_NAME, DECODER_NAME, CONNECTION_HANDLER_NAME, SERVER_CHANNEL_HANDLER_NAME,
     TIMEOUT_HANDLER_NAME;
 

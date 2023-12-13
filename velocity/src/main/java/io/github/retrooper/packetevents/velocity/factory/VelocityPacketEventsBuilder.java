@@ -20,6 +20,8 @@ package io.github.retrooper.packetevents.velocity.factory;
 
 import java.util.logging.Level;
 
+import io.github.retrooper.packetevents.PacketEventsPlugin;
+import io.github.retrooper.packetevents.bstats.Metrics;
 import org.jetbrains.annotations.Nullable;
 
 import com.github.retrooper.packetevents.PacketEvents;
@@ -169,7 +171,14 @@ public class VelocityPacketEventsBuilder {
                     }
 
                     if (settings.isbStatsEnabled()) {
-                        // TODO: Velocity bstats
+                        PacketEventsPlugin instance = (PacketEventsPlugin) plugin.getInstance().orElse(null);
+                        if (instance != null) {
+                            Metrics metrics = instance.metricsFactory.make(plugin, 11327);
+                            //Just to have an idea of which versions of packetevents people use
+                            metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
+                                return getVersion().toString();
+                            }));
+                        }
                     }
 
                     PacketType.Play.Client.load();
