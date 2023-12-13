@@ -838,11 +838,11 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeEntityMetadata(EntityMetadataProvider metadata) {
-        writeEntityMetadata(metadata.entityData());
+        writeEntityMetadata(metadata.entityData(serverVersion.toClientVersion()));
     }
 
     public Dimension readDimension() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             Dimension dimension = new Dimension(new NBTCompound());
             dimension.setDimensionName(readIdentifier().toString());
             return dimension;
@@ -852,8 +852,8 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeDimension(Dimension dimension) {
-        boolean v1_19 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19);
-        boolean v1_16_2 = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2);
+        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
+        boolean v1_16_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
         if (v1_19 || !v1_16_2) {
             writeString(dimension.getDimensionName(), 32767);
         } else {

@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
@@ -29,6 +30,7 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +54,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
     }
 
     public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, EntityMetadataProvider metadata) {
-        this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), metadata.entityData());
+        this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), metadata.entityData(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
     }
 
     public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, List<EntityData> entityMetadata) {
@@ -75,7 +77,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
     }
 
     public WrapperPlayServerSpawnPlayer(int entityID, UUID uuid, Vector3d position, float yaw, float pitch, EntityMetadataProvider metadata) {
-        this(entityID, uuid, position, yaw, pitch, metadata.entityData());
+        this(entityID, uuid, position, yaw, pitch, metadata.entityData(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
     }
 
     @Override
@@ -187,7 +189,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
 
     @Deprecated
     public void setEntityMetadata(EntityMetadataProvider metadata) {
-        this.entityMetadata = metadata.entityData();
+        this.entityMetadata = metadata.entityData(serverVersion.toClientVersion());
     }
 
     @Deprecated

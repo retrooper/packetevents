@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
@@ -42,7 +43,7 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
     }
 
     public WrapperPlayServerEntityMetadata(int entityID, EntityMetadataProvider metadata) {
-        this(entityID, metadata.entityData());
+        this(entityID, metadata.entityData(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
     }
 
     @Override
@@ -84,6 +85,6 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
     }
 
     public void setEntityMetadata(EntityMetadataProvider metadata) {
-        this.entityMetadata = metadata.entityData();
+        this.entityMetadata = metadata.entityData(serverVersion.toClientVersion());
     }
 }
