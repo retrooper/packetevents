@@ -20,4 +20,16 @@ public interface EntityMetadataProvider {
      * @return Metadata (list of entity data)
      */
     List<EntityData> entityData(ClientVersion version);
+
+    /**
+     * Similar to {@link #entityData(ClientVersion)} but does not provide a protocol version.
+     * It is not advised to use nor implement this.
+     * It is deprecated because it restricts you by not providing you the format in which the metadata should be.
+     * @return Metadata (list of entity data)
+     * @deprecated Does not specify format of metadata, therefore not advised to use this. It will assume the current latest version.
+     */
+    @Deprecated
+    default List<EntityData> entityData() {
+        return entityData(ClientVersion.getLatest());
+    }
 }
