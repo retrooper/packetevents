@@ -232,15 +232,12 @@ public class BlockTags {
         BlockTags.WOODEN_STAIRS.add(StateTypes.OAK_STAIRS, StateTypes.SPRUCE_STAIRS, StateTypes.BIRCH_STAIRS, StateTypes.JUNGLE_STAIRS, StateTypes.ACACIA_STAIRS, StateTypes.DARK_OAK_STAIRS, StateTypes.CRIMSON_STAIRS, StateTypes.WARPED_STAIRS, StateTypes.MANGROVE_STAIRS, StateTypes.BAMBOO_STAIRS, StateTypes.CHERRY_STAIRS);
         BlockTags.WOODEN_SLABS.add(StateTypes.OAK_SLAB, StateTypes.SPRUCE_SLAB, StateTypes.BIRCH_SLAB, StateTypes.JUNGLE_SLAB, StateTypes.ACACIA_SLAB, StateTypes.DARK_OAK_SLAB, StateTypes.CRIMSON_SLAB, StateTypes.WARPED_SLAB, StateTypes.MANGROVE_SLAB, StateTypes.BAMBOO_SLAB, StateTypes.CHERRY_SLAB);
         BlockTags.WOODEN_FENCES.add(StateTypes.OAK_FENCE, StateTypes.ACACIA_FENCE, StateTypes.DARK_OAK_FENCE, StateTypes.SPRUCE_FENCE, StateTypes.BIRCH_FENCE, StateTypes.JUNGLE_FENCE, StateTypes.CRIMSON_FENCE, StateTypes.WARPED_FENCE, StateTypes.MANGROVE_FENCE, StateTypes.BAMBOO_FENCE, StateTypes.CHERRY_FENCE);
-        BlockTags.PRESSURE_PLATES.addTag(BlockTags.WOODEN_PRESSURE_PLATES).addTag(BlockTags.STONE_PRESSURE_PLATES).add(StateTypes.LIGHT_WEIGHTED_PRESSURE_PLATE, StateTypes.HEAVY_WEIGHTED_PRESSURE_PLATE);
         BlockTags.WOODEN_PRESSURE_PLATES.add(StateTypes.OAK_PRESSURE_PLATE, StateTypes.SPRUCE_PRESSURE_PLATE, StateTypes.BIRCH_PRESSURE_PLATE, StateTypes.JUNGLE_PRESSURE_PLATE, StateTypes.ACACIA_PRESSURE_PLATE, StateTypes.DARK_OAK_PRESSURE_PLATE, StateTypes.CRIMSON_PRESSURE_PLATE, StateTypes.WARPED_PRESSURE_PLATE, StateTypes.MANGROVE_PRESSURE_PLATE, StateTypes.BAMBOO_PRESSURE_PLATE, StateTypes.CHERRY_PRESSURE_PLATE);
         BlockTags.STONE_PRESSURE_PLATES.add(StateTypes.STONE_PRESSURE_PLATE, StateTypes.POLISHED_BLACKSTONE_PRESSURE_PLATE);
+        BlockTags.PRESSURE_PLATES.addTag(BlockTags.WOODEN_PRESSURE_PLATES).addTag(BlockTags.STONE_PRESSURE_PLATES).add(StateTypes.LIGHT_WEIGHTED_PRESSURE_PLATE, StateTypes.HEAVY_WEIGHTED_PRESSURE_PLATE);
         BlockTags.WOODEN_TRAPDOORS.add(StateTypes.ACACIA_TRAPDOOR, StateTypes.BIRCH_TRAPDOOR, StateTypes.DARK_OAK_TRAPDOOR, StateTypes.JUNGLE_TRAPDOOR, StateTypes.OAK_TRAPDOOR, StateTypes.SPRUCE_TRAPDOOR, StateTypes.CRIMSON_TRAPDOOR, StateTypes.WARPED_TRAPDOOR, StateTypes.MANGROVE_TRAPDOOR, StateTypes.BAMBOO_TRAPDOOR, StateTypes.CHERRY_TRAPDOOR);
         BlockTags.DOORS.addTag(BlockTags.WOODEN_DOORS).add(StateTypes.IRON_DOOR);
         BlockTags.SAPLINGS.add(StateTypes.OAK_SAPLING, StateTypes.SPRUCE_SAPLING, StateTypes.BIRCH_SAPLING, StateTypes.JUNGLE_SAPLING, StateTypes.ACACIA_SAPLING, StateTypes.DARK_OAK_SAPLING, StateTypes.AZALEA, StateTypes.FLOWERING_AZALEA, StateTypes.MANGROVE_PROPAGULE, StateTypes.CHERRY_SAPLING);
-        BlockTags.LOGS_THAT_BURN.addTag(BlockTags.DARK_OAK_LOGS).addTag(BlockTags.OAK_LOGS).addTag(BlockTags.ACACIA_LOGS).addTag(BlockTags.BIRCH_LOGS).addTag(BlockTags.JUNGLE_LOGS).addTag(BlockTags.SPRUCE_LOGS).addTag(BlockTags.MANGROVE_LOGS).addTag(BlockTags.CHERRY_LOGS);
-        BlockTags.OVERWORLD_NATURAL_LOGS.add(StateTypes.ACACIA_LOG, StateTypes.BIRCH_LOG, StateTypes.OAK_LOG, StateTypes.JUNGLE_LOG, StateTypes.SPRUCE_LOG, StateTypes.DARK_OAK_LOG, StateTypes.MANGROVE_LOG, StateTypes.CHERRY_LOG);
-        BlockTags.LOGS.addTag(BlockTags.LOGS_THAT_BURN).addTag(BlockTags.CRIMSON_STEMS).addTag(BlockTags.WARPED_STEMS);
         BlockTags.DARK_OAK_LOGS.add(StateTypes.DARK_OAK_LOG, StateTypes.DARK_OAK_WOOD, StateTypes.STRIPPED_DARK_OAK_LOG, StateTypes.STRIPPED_DARK_OAK_WOOD);
         BlockTags.OAK_LOGS.add(StateTypes.OAK_LOG, StateTypes.OAK_WOOD, StateTypes.STRIPPED_OAK_LOG, StateTypes.STRIPPED_OAK_WOOD);
         BlockTags.BIRCH_LOGS.add(StateTypes.BIRCH_LOG, StateTypes.BIRCH_WOOD, StateTypes.STRIPPED_BIRCH_LOG, StateTypes.STRIPPED_BIRCH_WOOD);
@@ -251,6 +248,9 @@ public class BlockTags {
         BlockTags.MANGROVE_LOGS.add(StateTypes.MANGROVE_LOG, StateTypes.MANGROVE_WOOD, StateTypes.STRIPPED_MANGROVE_LOG, StateTypes.STRIPPED_MANGROVE_WOOD);
         BlockTags.CRIMSON_STEMS.add(StateTypes.CRIMSON_STEM, StateTypes.STRIPPED_CRIMSON_STEM, StateTypes.CRIMSON_HYPHAE, StateTypes.STRIPPED_CRIMSON_HYPHAE);
         BlockTags.WARPED_STEMS.add(StateTypes.WARPED_STEM, StateTypes.STRIPPED_WARPED_STEM, StateTypes.WARPED_HYPHAE, StateTypes.STRIPPED_WARPED_HYPHAE);
+        BlockTags.LOGS_THAT_BURN.addTag(BlockTags.DARK_OAK_LOGS).addTag(BlockTags.OAK_LOGS).addTag(BlockTags.ACACIA_LOGS).addTag(BlockTags.BIRCH_LOGS).addTag(BlockTags.JUNGLE_LOGS).addTag(BlockTags.SPRUCE_LOGS).addTag(BlockTags.MANGROVE_LOGS).addTag(BlockTags.CHERRY_LOGS);
+        BlockTags.OVERWORLD_NATURAL_LOGS.add(StateTypes.ACACIA_LOG, StateTypes.BIRCH_LOG, StateTypes.OAK_LOG, StateTypes.JUNGLE_LOG, StateTypes.SPRUCE_LOG, StateTypes.DARK_OAK_LOG, StateTypes.MANGROVE_LOG, StateTypes.CHERRY_LOG);
+        BlockTags.LOGS.addTag(BlockTags.LOGS_THAT_BURN).addTag(BlockTags.CRIMSON_STEMS).addTag(BlockTags.WARPED_STEMS);
         BlockTags.BAMBOO_BLOCKS.add(StateTypes.BAMBOO_BLOCK, StateTypes.STRIPPED_BAMBOO_BLOCK);
         BlockTags.WART_BLOCKS.add(StateTypes.NETHER_WART_BLOCK, StateTypes.WARPED_WART_BLOCK);
         BlockTags.BANNERS.add(StateTypes.WHITE_BANNER, StateTypes.ORANGE_BANNER, StateTypes.MAGENTA_BANNER, StateTypes.LIGHT_BLUE_BANNER, StateTypes.YELLOW_BANNER, StateTypes.LIME_BANNER, StateTypes.PINK_BANNER, StateTypes.GRAY_BANNER, StateTypes.LIGHT_GRAY_BANNER, StateTypes.CYAN_BANNER, StateTypes.PURPLE_BANNER, StateTypes.BLUE_BANNER, StateTypes.BROWN_BANNER, StateTypes.GREEN_BANNER, StateTypes.RED_BANNER, StateTypes.BLACK_BANNER, StateTypes.WHITE_WALL_BANNER, StateTypes.ORANGE_WALL_BANNER, StateTypes.MAGENTA_WALL_BANNER, StateTypes.LIGHT_BLUE_WALL_BANNER, StateTypes.YELLOW_WALL_BANNER, StateTypes.LIME_WALL_BANNER, StateTypes.PINK_WALL_BANNER, StateTypes.GRAY_WALL_BANNER, StateTypes.LIGHT_GRAY_WALL_BANNER, StateTypes.CYAN_WALL_BANNER, StateTypes.PURPLE_WALL_BANNER, StateTypes.BLUE_WALL_BANNER, StateTypes.BROWN_WALL_BANNER, StateTypes.GREEN_WALL_BANNER, StateTypes.RED_WALL_BANNER, StateTypes.BLACK_WALL_BANNER);
@@ -287,11 +287,11 @@ public class BlockTags {
         BlockTags.ICE.add(StateTypes.ICE, StateTypes.PACKED_ICE, StateTypes.BLUE_ICE, StateTypes.FROSTED_ICE);
         BlockTags.VALID_SPAWN.add(StateTypes.GRASS_BLOCK, StateTypes.PODZOL);
         BlockTags.IMPERMEABLE.add(StateTypes.GLASS, StateTypes.WHITE_STAINED_GLASS, StateTypes.ORANGE_STAINED_GLASS, StateTypes.MAGENTA_STAINED_GLASS, StateTypes.LIGHT_BLUE_STAINED_GLASS, StateTypes.YELLOW_STAINED_GLASS, StateTypes.LIME_STAINED_GLASS, StateTypes.PINK_STAINED_GLASS, StateTypes.GRAY_STAINED_GLASS, StateTypes.LIGHT_GRAY_STAINED_GLASS, StateTypes.CYAN_STAINED_GLASS, StateTypes.PURPLE_STAINED_GLASS, StateTypes.BLUE_STAINED_GLASS, StateTypes.BROWN_STAINED_GLASS, StateTypes.GREEN_STAINED_GLASS, StateTypes.RED_STAINED_GLASS, StateTypes.BLACK_STAINED_GLASS, StateTypes.TINTED_GLASS);
-        BlockTags.UNDERWATER_BONEMEALS.addTag(BlockTags.CORALS).addTag(BlockTags.WALL_CORALS).add(StateTypes.SEAGRASS);
         BlockTags.CORAL_BLOCKS.add(StateTypes.TUBE_CORAL_BLOCK, StateTypes.BRAIN_CORAL_BLOCK, StateTypes.BUBBLE_CORAL_BLOCK, StateTypes.FIRE_CORAL_BLOCK, StateTypes.HORN_CORAL_BLOCK);
         BlockTags.WALL_CORALS.add(StateTypes.TUBE_CORAL_WALL_FAN, StateTypes.BRAIN_CORAL_WALL_FAN, StateTypes.BUBBLE_CORAL_WALL_FAN, StateTypes.FIRE_CORAL_WALL_FAN, StateTypes.HORN_CORAL_WALL_FAN);
         BlockTags.CORAL_PLANTS.add(StateTypes.TUBE_CORAL, StateTypes.BRAIN_CORAL, StateTypes.BUBBLE_CORAL, StateTypes.FIRE_CORAL, StateTypes.HORN_CORAL);
         BlockTags.CORALS.addTag(BlockTags.CORAL_PLANTS).add(StateTypes.TUBE_CORAL_FAN, StateTypes.BRAIN_CORAL_FAN, StateTypes.BUBBLE_CORAL_FAN, StateTypes.FIRE_CORAL_FAN, StateTypes.HORN_CORAL_FAN);
+        BlockTags.UNDERWATER_BONEMEALS.addTag(BlockTags.CORALS).addTag(BlockTags.WALL_CORALS).add(StateTypes.SEAGRASS);
         BlockTags.BAMBOO_PLANTABLE_ON.addTag(BlockTags.SAND).addTag(BlockTags.DIRT).add(StateTypes.BAMBOO, StateTypes.BAMBOO_SAPLING, StateTypes.GRAVEL, StateTypes.SUSPICIOUS_GRAVEL);
         BlockTags.STANDING_SIGNS.add(StateTypes.OAK_SIGN, StateTypes.SPRUCE_SIGN, StateTypes.BIRCH_SIGN, StateTypes.ACACIA_SIGN, StateTypes.JUNGLE_SIGN, StateTypes.DARK_OAK_SIGN, StateTypes.CRIMSON_SIGN, StateTypes.WARPED_SIGN, StateTypes.MANGROVE_SIGN, StateTypes.BAMBOO_SIGN, StateTypes.CHERRY_SIGN);
         BlockTags.WALL_SIGNS.add(StateTypes.OAK_WALL_SIGN, StateTypes.SPRUCE_WALL_SIGN, StateTypes.BIRCH_WALL_SIGN, StateTypes.ACACIA_WALL_SIGN, StateTypes.JUNGLE_WALL_SIGN, StateTypes.DARK_OAK_WALL_SIGN, StateTypes.CRIMSON_WALL_SIGN, StateTypes.WARPED_WALL_SIGN, StateTypes.MANGROVE_WALL_SIGN, StateTypes.BAMBOO_WALL_SIGN, StateTypes.CHERRY_WALL_SIGN);
@@ -300,15 +300,15 @@ public class BlockTags {
         BlockTags.WALL_HANGING_SIGNS.add(StateTypes.OAK_WALL_HANGING_SIGN, StateTypes.SPRUCE_WALL_HANGING_SIGN, StateTypes.BIRCH_WALL_HANGING_SIGN, StateTypes.ACACIA_WALL_HANGING_SIGN, StateTypes.CHERRY_WALL_HANGING_SIGN, StateTypes.JUNGLE_WALL_HANGING_SIGN, StateTypes.DARK_OAK_WALL_HANGING_SIGN, StateTypes.CRIMSON_WALL_HANGING_SIGN, StateTypes.WARPED_WALL_HANGING_SIGN, StateTypes.MANGROVE_WALL_HANGING_SIGN, StateTypes.BAMBOO_WALL_HANGING_SIGN);
         BlockTags.ALL_HANGING_SIGNS.addTag(BlockTags.CEILING_HANGING_SIGNS).addTag(BlockTags.WALL_HANGING_SIGNS);
         BlockTags.ALL_SIGNS.addTag(BlockTags.SIGNS).addTag(BlockTags.ALL_HANGING_SIGNS);
-        BlockTags.DRAGON_IMMUNE.add(StateTypes.BARRIER, StateTypes.BEDROCK, StateTypes.END_PORTAL, StateTypes.END_PORTAL_FRAME, StateTypes.END_GATEWAY, StateTypes.COMMAND_BLOCK, StateTypes.REPEATING_COMMAND_BLOCK, StateTypes.CHAIN_COMMAND_BLOCK, StateTypes.STRUCTURE_BLOCK, StateTypes.JIGSAW, StateTypes.MOVING_PISTON, StateTypes.OBSIDIAN, StateTypes.CRYING_OBSIDIAN, StateTypes.END_STONE, StateTypes.IRON_BARS, StateTypes.RESPAWN_ANCHOR, StateTypes.REINFORCED_DEEPSLATE);
-        BlockTags.DRAGON_TRANSPARENT.addTag(BlockTags.FIRE).add(StateTypes.LIGHT);
-        BlockTags.WITHER_IMMUNE.add(StateTypes.BARRIER, StateTypes.BEDROCK, StateTypes.END_PORTAL, StateTypes.END_PORTAL_FRAME, StateTypes.END_GATEWAY, StateTypes.COMMAND_BLOCK, StateTypes.REPEATING_COMMAND_BLOCK, StateTypes.CHAIN_COMMAND_BLOCK, StateTypes.STRUCTURE_BLOCK, StateTypes.JIGSAW, StateTypes.MOVING_PISTON, StateTypes.LIGHT, StateTypes.REINFORCED_DEEPSLATE);
-        BlockTags.WITHER_SUMMON_BASE_BLOCKS.add(StateTypes.SOUL_SAND, StateTypes.SOUL_SOIL);
         BlockTags.BEEHIVES.add(StateTypes.BEE_NEST, StateTypes.BEEHIVE);
         BlockTags.CROPS.add(StateTypes.BEETROOTS, StateTypes.CARROTS, StateTypes.POTATOES, StateTypes.WHEAT, StateTypes.MELON_STEM, StateTypes.PUMPKIN_STEM, StateTypes.TORCHFLOWER_CROP, StateTypes.PITCHER_CROP);
         BlockTags.BEE_GROWABLES.addTag(BlockTags.CROPS).add(StateTypes.SWEET_BERRY_BUSH, StateTypes.CAVE_VINES, StateTypes.CAVE_VINES_PLANT);
         BlockTags.PORTALS.add(StateTypes.NETHER_PORTAL, StateTypes.END_PORTAL, StateTypes.END_GATEWAY);
         BlockTags.FIRE.add(StateTypes.FIRE, StateTypes.SOUL_FIRE);
+        BlockTags.WITHER_IMMUNE.add(StateTypes.BARRIER, StateTypes.BEDROCK, StateTypes.END_PORTAL, StateTypes.END_PORTAL_FRAME, StateTypes.END_GATEWAY, StateTypes.COMMAND_BLOCK, StateTypes.REPEATING_COMMAND_BLOCK, StateTypes.CHAIN_COMMAND_BLOCK, StateTypes.STRUCTURE_BLOCK, StateTypes.JIGSAW, StateTypes.MOVING_PISTON, StateTypes.LIGHT, StateTypes.REINFORCED_DEEPSLATE);
+        BlockTags.WITHER_SUMMON_BASE_BLOCKS.add(StateTypes.SOUL_SAND, StateTypes.SOUL_SOIL);
+        BlockTags.DRAGON_IMMUNE.add(StateTypes.BARRIER, StateTypes.BEDROCK, StateTypes.END_PORTAL, StateTypes.END_PORTAL_FRAME, StateTypes.END_GATEWAY, StateTypes.COMMAND_BLOCK, StateTypes.REPEATING_COMMAND_BLOCK, StateTypes.CHAIN_COMMAND_BLOCK, StateTypes.STRUCTURE_BLOCK, StateTypes.JIGSAW, StateTypes.MOVING_PISTON, StateTypes.OBSIDIAN, StateTypes.CRYING_OBSIDIAN, StateTypes.END_STONE, StateTypes.IRON_BARS, StateTypes.RESPAWN_ANCHOR, StateTypes.REINFORCED_DEEPSLATE);
+        BlockTags.DRAGON_TRANSPARENT.addTag(BlockTags.FIRE).add(StateTypes.LIGHT);
         BlockTags.NYLIUM.add(StateTypes.CRIMSON_NYLIUM, StateTypes.WARPED_NYLIUM);
         BlockTags.BEACON_BASE_BLOCKS.add(StateTypes.NETHERITE_BLOCK, StateTypes.EMERALD_BLOCK, StateTypes.DIAMOND_BLOCK, StateTypes.GOLD_BLOCK, StateTypes.IRON_BLOCK);
         BlockTags.SOUL_SPEED_BLOCKS.add(StateTypes.SOUL_SAND, StateTypes.SOUL_SOIL);
@@ -416,6 +416,9 @@ public class BlockTags {
     }
 
     private BlockTags addTag(BlockTags tags) {
+        if (tags.states.isEmpty()) {
+            throw new IllegalArgumentException("Tag " + tags.name + " is empty when adding to " + this.name + ", you (packetevents updater) probably messed up the block tags order!!");
+        }
         this.states.addAll(tags.states);
         return this;
     }
