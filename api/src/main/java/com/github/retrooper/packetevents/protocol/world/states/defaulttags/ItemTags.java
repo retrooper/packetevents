@@ -138,14 +138,14 @@ public class ItemTags {
         copy(BlockTags.STONE_BUTTONS, ItemTags.STONE_BUTTONS);
         copy(BlockTags.BUTTONS, ItemTags.BUTTONS);
         copy(BlockTags.WOOL_CARPETS, ItemTags.WOOL_CARPETS);
-        copy(BlockTags.WOODEN_DOORS, ItemTags.WOODEN_DOORS);
+        ItemTags.WOODEN_DOORS.add(ItemTypes.OAK_DOOR, ItemTypes.SPRUCE_DOOR, ItemTypes.BIRCH_DOOR, ItemTypes.JUNGLE_DOOR, ItemTypes.ACACIA_DOOR, ItemTypes.DARK_OAK_DOOR, ItemTypes.CRIMSON_DOOR, ItemTypes.WARPED_DOOR, ItemTypes.MANGROVE_DOOR, ItemTypes.BAMBOO_DOOR, ItemTypes.CHERRY_DOOR);
         copy(BlockTags.WOODEN_STAIRS, ItemTags.WOODEN_STAIRS);
         copy(BlockTags.WOODEN_SLABS, ItemTags.WOODEN_SLABS);
         copy(BlockTags.WOODEN_FENCES, ItemTags.WOODEN_FENCES);
         copy(BlockTags.FENCE_GATES, ItemTags.FENCE_GATES);
         copy(BlockTags.WOODEN_PRESSURE_PLATES, ItemTags.WOODEN_PRESSURE_PLATES);
         copy(BlockTags.WOODEN_TRAPDOORS, ItemTags.WOODEN_TRAPDOORS);
-        copy(BlockTags.DOORS, ItemTags.DOORS);
+        ItemTags.DOORS.addTag(ItemTags.WOODEN_DOORS).add(ItemTypes.IRON_DOOR);
         copy(BlockTags.SAPLINGS, ItemTags.SAPLINGS);
         copy(BlockTags.LOGS_THAT_BURN, ItemTags.LOGS_THAT_BURN);
         copy(BlockTags.LOGS, ItemTags.LOGS);
@@ -170,7 +170,7 @@ public class ItemTags {
         copy(BlockTags.ANVIL, ItemTags.ANVIL);
         copy(BlockTags.RAILS, ItemTags.RAILS);
         copy(BlockTags.LEAVES, ItemTags.LEAVES);
-        copy(BlockTags.TRAPDOORS, ItemTags.TRAPDOORS);
+        ItemTags.TRAPDOORS.addTag(ItemTags.WOODEN_TRAPDOORS).add(ItemTypes.IRON_TRAPDOOR);
         copy(BlockTags.SMALL_FLOWERS, ItemTags.SMALL_FLOWERS);
         copy(BlockTags.BEDS, ItemTags.BEDS);
         copy(BlockTags.FENCES, ItemTags.FENCES);
