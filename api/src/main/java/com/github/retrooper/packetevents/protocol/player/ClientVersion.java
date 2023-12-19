@@ -88,11 +88,12 @@ public enum ClientVersion {
      * 1.20.3 and 1.20.4 have the same protocol version.
      */
     V_1_20_3(765),
+    V_1_20_5(766),
     //TODO UPDATE Add new protocol version field
 
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
-    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_20_3.protocolVersion + 1, true),
+    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_20_5.protocolVersion + 1, true),
 
     UNKNOWN(-1, true);
 
