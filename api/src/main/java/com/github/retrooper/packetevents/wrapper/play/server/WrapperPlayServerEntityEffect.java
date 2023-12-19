@@ -69,8 +69,9 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
             writeByte(flags);
         }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeOptional(factorData, PacketWrapper::writeNBT);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                && this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
+            this.writeOptional(this.factorData, PacketWrapper::writeNBT);
         }
     }
 
@@ -81,6 +82,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         effectAmplifier = wrapper.effectAmplifier;
         effectDurationTicks = wrapper.effectDurationTicks;
         flags = wrapper.flags;
+        factorData = wrapper.factorData;
     }
 
     public PotionType getPotionType() {
