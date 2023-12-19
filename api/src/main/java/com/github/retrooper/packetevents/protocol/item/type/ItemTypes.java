@@ -55,7 +55,8 @@ public class ItemTypes {
             ClientVersion.V_1_19_3,
             ClientVersion.V_1_19_4,
             ClientVersion.V_1_20,
-            ClientVersion.V_1_20_3);
+            ClientVersion.V_1_20_3,
+            ClientVersion.V_1_20_5);
 
     public static final ItemType GILDED_BLACKSTONE = builder("gilded_blackstone").setMaxAmount(64).setPlacedType(StateTypes.GILDED_BLACKSTONE).build();
     public static final ItemType NETHER_BRICK_SLAB = builder("nether_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.NETHER_BRICK_SLAB).build();
@@ -1381,6 +1382,12 @@ public class ItemTypes {
     public static ItemType WAXED_OXIDIZED_COPPER_BULB = builder("waxed_oxidized_copper_bulb").setMaxAmount(64).setPlacedType(StateTypes.WAXED_OXIDIZED_COPPER_BULB).build();
     public static ItemType TRIAL_SPAWNER = builder("trial_spawner").setMaxAmount(64).setPlacedType(StateTypes.TRIAL_SPAWNER).build();
     public static ItemType TRIAL_KEY = builder("trial_key").setMaxAmount(64).build();
+
+    // 1.20.5 items
+    public static ItemType TURTLE_SCUTE = builder("turtle_scute").setMaxAmount(64).build();
+    public static ItemType ARMADILLO_SCUTE = builder("armadillo_scute").setMaxAmount(64).build();
+    public static ItemType WOLF_ARMOR = builder("wolf_armor").setMaxAmount(1).build();
+    public static ItemType ARMADILLO_SPAWN_EGG = builder("armadillo_spawn_egg").setMaxAmount(64).build();
 
     /**
      * @deprecated Burning furnace shows up as a missing texture, removed in 1.9
