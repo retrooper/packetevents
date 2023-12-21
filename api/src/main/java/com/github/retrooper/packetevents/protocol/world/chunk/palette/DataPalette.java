@@ -27,7 +27,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class DataPalette {
-    public static final int GLOBAL_PALETTE_BITS_PER_ENTRY = 14;
+
+    // this is the amount of bits required to store the biggest state id number
+    public static final int GLOBAL_PALETTE_BITS_PER_ENTRY = 15;
 
     public @NotNull Palette palette;
     public BaseStorage storage;
