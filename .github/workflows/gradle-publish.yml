@@ -22,7 +22,7 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Build with Gradle
-        run: chmod +x gradlew && ./gradlew build
+        run: chmod +x gradlew && ./gradlew shadowJar
 
       - name: Upload build artifacts api
         uses: actions/upload-artifact@v3
