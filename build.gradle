@@ -2,13 +2,14 @@ plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '8.1.1' apply(false)
+    id 'com.github.johnrengelman.shadow' version '7.1.0' apply(false)
 }
 
 wrapper {
-    gradleVersion = "8.5"
+    gradleVersion = "7.3.1"
     distributionType = Wrapper.DistributionType.ALL
 }
+
 
 subprojects {
     apply plugin: 'java'
