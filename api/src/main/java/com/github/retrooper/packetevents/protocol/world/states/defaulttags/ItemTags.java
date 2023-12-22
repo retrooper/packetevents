@@ -258,7 +258,7 @@ public class ItemTags {
 
     private ItemTags addTag(ItemTags tags) {
         if (tags.states.isEmpty()) {
-            throw new IllegalArgumentException("Tag " + tags.name + " is empty when adding to " + this.name + ", you (packetevents updater) probably messed up the block tags order!!");
+            throw new IllegalArgumentException("Tag " + tags.name + " is empty when adding to " + this.name + ", you (packetevents updater) probably messed up the item tags order!!");
         }
         this.states.addAll(tags.states);
         return this;

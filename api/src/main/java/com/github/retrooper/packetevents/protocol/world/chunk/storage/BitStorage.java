@@ -107,6 +107,10 @@ public class BitStorage extends BaseStorage {
 
     @Override
     public int get(int index) {
+        if (index < 0 || index > this.size - 1L) {
+            throw new IllegalStateException("Illegal index: " + index + " < 0 || " + index + " > " + this.size + " - 1");
+        }
+
         int cellIndex = cellIndex(index);
         int bitIndex = bitIndex(index, cellIndex);
         return (int) (this.data[cellIndex] >> bitIndex & this.maxValue);
@@ -114,6 +118,13 @@ public class BitStorage extends BaseStorage {
 
     @Override
     public void set(int index, int value) {
+        if (index < 0 || index > this.size - 1L) {
+            throw new IllegalStateException("Illegal index: " + index + " < 0 || " + index + " > " + this.size + " - 1");
+        }
+        if (value < 0 || value > this.maxValue) {
+            throw new IllegalStateException("Illegal value: " + value + " < 0 || " + value + " > " + this.maxValue);
+        }
+
         int cellIndex = cellIndex(index);
         int bitIndex = bitIndex(index, cellIndex);
         this.data[cellIndex] = this.data[cellIndex] & ~(this.maxValue << bitIndex) | ((long) value & this.maxValue) << bitIndex;
