@@ -23,9 +23,11 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -58,6 +60,19 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         this.headYaw = headYaw;
         this.data = data;
         this.velocity = velocity;
+    }
+
+    public WrapperPlayServerSpawnEntity(int entityID, @Nullable UUID uuid, EntityType entityType, Location location, float headYaw, int data, @Nullable Vector3d velocity) {
+        super(PacketType.Play.Server.SPAWN_ENTITY);
+        this.entityID = entityID;
+        this.uuid = Optional.ofNullable(uuid);
+        this.entityType = entityType;
+        this.position = location.getPosition();
+        this.pitch = location.getPitch();
+        this.yaw = location.getYaw();
+        this.headYaw = headYaw;
+        this.data = data;
+        this.velocity = Optional.ofNullable(velocity);
     }
 
     @Override
