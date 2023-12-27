@@ -81,7 +81,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
                 chunkPosConstructor = chunkPosClass.getConstructor(int.class, int.class, int.class);
             }
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            //1.20.4 or newer
         }
     }
 
