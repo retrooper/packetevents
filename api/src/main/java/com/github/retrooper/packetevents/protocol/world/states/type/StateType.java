@@ -23,6 +23,8 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.MaterialType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
+import java.util.Objects;
+
 public class StateType {
     private final String name;
     private final float blastResistance;
@@ -111,5 +113,26 @@ public class StateType {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StateType stateType = (StateType) o;
+        return Float.compare(blastResistance, stateType.blastResistance) == 0
+                && Float.compare(hardness, stateType.hardness) == 0
+                && isSolid == stateType.isSolid
+                && isBlocking == stateType.isBlocking
+                && isAir == stateType.isAir
+                && requiresCorrectTool == stateType.requiresCorrectTool
+                && exceedsCube == stateType.exceedsCube
+                && Objects.equals(name, stateType.name)
+                && materialType == stateType.materialType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, blastResistance, hardness, isSolid, isBlocking, isAir, requiresCorrectTool, exceedsCube, materialType);
     }
 }
