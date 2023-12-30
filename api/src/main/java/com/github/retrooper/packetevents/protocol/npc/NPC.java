@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.npc;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.player.*;
 import com.github.retrooper.packetevents.protocol.world.Location;
@@ -86,10 +87,17 @@ public class NPC {
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
 
         //TODO Later if we want entity metadata, its not supported on newer server versions though(confirm if its mandatory on older versions)
-        WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(getId(),
-                getProfile().getUUID(),
-                getLocation());
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPlayer);
+
+        PacketWrapper<?> spawnPacket;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+            spawnPacket = new WrapperPlayServerSpawnEntity(getId(), getProfile().getUUID(), EntityTypes.PLAYER, getLocation(), getLocation().getYaw(), 0, null);
+        }
+        else {
+            spawnPacket = new WrapperPlayServerSpawnPlayer(getId(),
+                    getProfile().getUUID(),
+                    getLocation());
+        }
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPacket);
 
         //Create team
         if (getNameColor() != null || getPrefixName() != null
