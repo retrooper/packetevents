@@ -13,6 +13,9 @@ our [Discord Server](https://discord.me/packetevents) for help.
 ### Setup
 [How to Setup PacketEvents](https://github.com/retrooper/packetevents/wiki/Depending-on-pre%E2%80%90built-PacketEvents)
 
+### Examples / How to use PacketEvents
+[Example repository](https://github.com/retrooper/packetevents-example)
+
 ### Sponsorships
 [![](https://www.ej-technologies.com/images/product_banners/jprofiler_small.png)](https://www.ej-technologies.com/products/jprofiler/overview.html)
 
