@@ -51,7 +51,11 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
 
     @Override
     public void read() {
-        name = readString();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            name = readString();
+        } else {
+            name = readString(16);
+        }
         mode = ObjectiveMode.getById(readByte());
         if (mode != ObjectiveMode.CREATE && mode != ObjectiveMode.UPDATE) {
             displayName = Component.empty();
@@ -71,7 +75,11 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
 
     @Override
     public void write() {
-        writeString(name);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            writeString(name);
+        } else {
+            writeString(name, 16);
+        }
         writeByte((byte) mode.ordinal());
         if (this.mode == ObjectiveMode.CREATE || this.mode == ObjectiveMode.UPDATE) {
             if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {

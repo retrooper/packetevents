@@ -80,9 +80,17 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
                 value = Optional.empty();
             }
         } else {
-            entityName = readString(40);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+                entityName = readString();
+            } else {
+                entityName = readString(40);
+            }
             action = Action.VALUES[readByte()];
-            objectiveName = readString(16);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+                objectiveName = readString();
+            } else {
+                objectiveName = readString(16);
+            }
             if (action != Action.REMOVE_ITEM) {
                 value = Optional.of(readVarInt());
             } else {
@@ -111,9 +119,17 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
                 value = Optional.empty();
             }
         } else {
-            writeString(entityName, 40);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+                writeString(entityName);
+            } else {
+                writeString(entityName, 40);
+            }
             writeByte(action.ordinal());
-            writeString(objectiveName, 16);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+                writeString(objectiveName);
+            } else {
+                writeString(objectiveName, 16);
+            }
             if (action != Action.REMOVE_ITEM) {
                 writeVarInt(value.orElse(-1));
             }
