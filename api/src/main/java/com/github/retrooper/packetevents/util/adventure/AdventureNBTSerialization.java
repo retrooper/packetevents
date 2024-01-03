@@ -403,6 +403,7 @@ public final class AdventureNBTSerialization {
         TagType tagType = TagType.COMPOUND;
         output.writeByte(tagType.getId());
         writeStyle(output, style, tagType);
+        output.writeByte(TagType.END.getId()); // ends style tag
     }
 
     private static void writeStyle(DataOutput output, Style style, TagType rootType) throws IOException {

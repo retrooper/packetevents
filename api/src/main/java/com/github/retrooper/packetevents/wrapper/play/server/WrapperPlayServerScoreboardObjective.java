@@ -134,6 +134,14 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
         this.renderType = renderType;
     }
 
+    public @Nullable ScoreFormat getScoreFormat() {
+        return this.scoreFormat;
+    }
+
+    public void setScoreFormat(@Nullable ScoreFormat scoreFormat) {
+        this.scoreFormat = scoreFormat;
+    }
+
     public enum ObjectiveMode {
         CREATE,
         REMOVE,

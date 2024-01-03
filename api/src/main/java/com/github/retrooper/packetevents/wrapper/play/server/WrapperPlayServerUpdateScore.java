@@ -94,7 +94,13 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            this.writeString(this.entityName);
+            this.writeString(this.objectiveName);
+            this.writeVarInt(this.value.orElse(0));
+            this.writeOptional(this.entityDisplayName, PacketWrapper::writeComponent);
+            this.writeOptional(this.scoreFormat, ScoreFormatTypes::write);
+        } else if (this.serverVersion == ServerVersion.V_1_7_10) {
             writeString(entityName, 16);
             writeByte(action.ordinal());
             if (action != Action.REMOVE_ITEM) {
