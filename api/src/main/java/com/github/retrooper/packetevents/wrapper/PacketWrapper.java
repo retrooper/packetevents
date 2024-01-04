@@ -25,7 +25,6 @@ import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufOutputStream;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
@@ -68,6 +67,7 @@ import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
@@ -542,7 +542,7 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeComponentAsNBT(Component component) {
         try {
-            AdventureNBTSerialization.writeComponent(new ByteBufOutputStream(this.buffer), component);
+            AdventureNBTSerialization.writeComponent(this.buffer, component);
         } catch (IOException exception) {
             throw new IllegalStateException(exception);
         }
@@ -551,6 +551,22 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void writeComponentAsJSON(Component component) {
         String jsonString = AdventureSerializer.toJson(component);
         this.writeString(jsonString, this.getMaxMessageLength());
+    }
+
+    public Style readStyle() {
+        try {
+            return AdventureNBTSerialization.readStyle(this.buffer);
+        } catch (IOException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    public void writeStyle(Style style) {
+        try {
+            AdventureNBTSerialization.writeStyle(this.buffer, style);
+        } catch (IOException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 
     public ResourceLocation readIdentifier(int maxLen) {
