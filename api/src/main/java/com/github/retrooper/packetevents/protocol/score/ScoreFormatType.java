@@ -18,10 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.score;
 
-import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.mapper.StaticMappedEntity;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public interface ScoreFormatType extends MappedEntity {
+public interface ScoreFormatType extends StaticMappedEntity {
 
     ScoreFormat read(PacketWrapper<?> wrapper);
 

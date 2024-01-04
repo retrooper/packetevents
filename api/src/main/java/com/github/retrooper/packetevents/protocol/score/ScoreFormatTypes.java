@@ -83,7 +83,7 @@ public final class ScoreFormatTypes {
             }
 
             @Override
-            public int getId(ClientVersion version) {
+            public int getId() {
                 return id;
             }
         };
