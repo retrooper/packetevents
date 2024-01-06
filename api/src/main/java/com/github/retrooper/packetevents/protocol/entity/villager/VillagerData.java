@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.entity.villager;
 
+import com.github.retrooper.packetevents.protocol.entity.villager.level.VillagerLevel;
 import com.github.retrooper.packetevents.protocol.entity.villager.profession.VillagerProfession;
 import com.github.retrooper.packetevents.protocol.entity.villager.profession.VillagerProfessions;
 import com.github.retrooper.packetevents.protocol.entity.villager.type.VillagerType;
@@ -26,12 +27,16 @@ import com.github.retrooper.packetevents.protocol.entity.villager.type.VillagerT
 public class VillagerData {
     private VillagerType type;
     private VillagerProfession profession;
-    private int level;
+    private VillagerLevel level;
 
-    public VillagerData(VillagerType type, VillagerProfession profession, int level) {
+    public VillagerData(VillagerType type, VillagerProfession profession, VillagerLevel level) {
         this.type = type;
         this.profession = profession;
         this.level = level;
+    }
+
+    public VillagerData(VillagerType type, VillagerProfession profession, int level) {
+        this(type, profession, VillagerLevel.getById(level));
     }
 
     public VillagerData(int typeId, int professionId, int level) {
@@ -55,10 +60,19 @@ public class VillagerData {
     }
 
     public int getLevel() {
+        return level.getId();
+    }
+
+    public VillagerLevel getLevelEnum() {
         return level;
     }
 
     public void setLevel(int level) {
+        this.level = VillagerLevel.getById(level);
+    }
+
+    public void setLevel(VillagerLevel level) {
         this.level = level;
     }
+
 }
