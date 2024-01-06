@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.particle.data;
 
+import com.github.retrooper.packetevents.protocol.color.Color;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -51,6 +52,10 @@ public class ParticleDustColorTransitionData extends ParticleData {
         this(scale, startRGB.getX(), startRGB.getY(), startRGB.getZ(), endRGB.getX(), endRGB.getY(), endRGB.getZ());
     }
 
+    public ParticleDustColorTransitionData(float scale, Color start, Color end) {
+        this(scale, start.red(), start.green(), start.blue(), end.red(), end.green(), end.blue());
+    }
+    
     public float getScale() {
         return scale;
     }
