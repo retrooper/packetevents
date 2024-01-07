@@ -1,3 +1,5 @@
+import com.github.retrooper.MappingCompressionTask
+
 // papermc repo + disableAutoTargetJvm needed for mockbukkit
 repositories {
     maven { url 'https://repo.papermc.io/repository/maven-public/' }
@@ -5,6 +7,19 @@ repositories {
 
 java {
     disableAutoTargetJvm()
+    sourceSets {
+        main {
+            resources {
+                srcDirs += ["$buildDir.canonicalPath/mappings/generated"]
+            }
+        }
+
+        test {
+            resources {
+                srcDirs += ["$buildDir.canonicalPath/mappings/generated"]
+            }
+        }
+    }
 }
 
 dependencies {
@@ -21,3 +36,10 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+task generateMapping(type: MappingCompressionTask) {
+    mappingsDir = rootDir.toPath().resolve("mappings")
+    outDir = project.buildDir.toPath().resolve("mappings/generated/assets/mappings")
+}
+
+tasks.assemble.dependsOn(generateMapping)
