@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.util;
+package com.github.retrooper.packetevents.util.mappings;
 
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 

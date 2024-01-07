@@ -21,8 +21,8 @@ package com.github.retrooper.packetevents.protocol.particle.type;
 import com.github.retrooper.packetevents.protocol.particle.data.*;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.HashMap;
@@ -33,23 +33,10 @@ import java.util.function.Function;
 public class ParticleTypes {
     private static final Map<String, ParticleType> PARTICLE_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, ParticleType>> PARTICLE_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("particle/particle_type_mappings",
-            ClientVersion.V_1_12_2,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_13_2,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_15,
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_16_2,
-            ClientVersion.V_1_17,
-            ClientVersion.V_1_18,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20,
-            ClientVersion.V_1_20_3);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("particle/particle_type_mappings");
 
     public static ParticleType define(String key, Function<PacketWrapper<?>, ParticleData> readDataFunction, BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         ParticleType particleType = new ParticleType() {
             private final int[] ids = data.getData();
             @Override
