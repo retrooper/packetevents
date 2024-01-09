@@ -55,7 +55,7 @@ public class ParticleDustColorTransitionData extends ParticleData {
     public ParticleDustColorTransitionData(float scale, Color start, Color end) {
         this(scale, start.red(), start.green(), start.blue(), end.red(), end.green(), end.blue());
     }
-    
+
     public float getScale() {
         return scale;
     }
