@@ -74,5 +74,4 @@ public class VillagerData {
     public void setLevel(VillagerLevel level) {
         this.level = level;
     }
-
 }
