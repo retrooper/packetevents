@@ -63,7 +63,7 @@ public class VillagerData {
         return level.getId();
     }
 
-    public VillagerLevel getLevelEnum() {
+    public VillagerLevel getVillagerLevel() {
         return level;
     }
 
