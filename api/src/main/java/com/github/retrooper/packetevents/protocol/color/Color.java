@@ -1,10 +1,3 @@
-package com.github.retrooper.packetevents.protocol.color;
-
-import net.kyori.adventure.util.RGBLike;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
-
-
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
  * Copyright (C) 2024 retrooper and contributors
@@ -22,6 +15,13 @@ import org.jetbrains.annotations.Range;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+package com.github.retrooper.packetevents.protocol.color;
+
+import net.kyori.adventure.util.RGBLike;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
+
 public final class Color implements RGBLike {
 
     private static final int BIT_MASK = 0xFF;

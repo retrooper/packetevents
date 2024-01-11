@@ -1,9 +1,3 @@
-package com.github.retrooper.packetevents.protocol.color;
-
-import net.kyori.adventure.util.RGBLike;
-import org.jetbrains.annotations.NotNull;
-
-
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
  * Copyright (C) 2024 retrooper and contributors
@@ -21,6 +15,12 @@ import org.jetbrains.annotations.NotNull;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+package com.github.retrooper.packetevents.protocol.color;
+
+import net.kyori.adventure.util.RGBLike;
+import org.jetbrains.annotations.NotNull;
+
 public enum DyeColor implements RGBLike {
     WHITE(new Color(0xf9fffe), new Color(0xffffff), new Color(0xf0f0f0), 8),
 

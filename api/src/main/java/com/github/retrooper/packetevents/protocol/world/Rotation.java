@@ -1,5 +1,3 @@
-package com.github.retrooper.packetevents.protocol.world;
-
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
  * Copyright (C) 2024 retrooper and contributors
@@ -17,6 +15,9 @@ package com.github.retrooper.packetevents.protocol.world;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+package com.github.retrooper.packetevents.protocol.world;
+
 public enum Rotation {
 
     /**
