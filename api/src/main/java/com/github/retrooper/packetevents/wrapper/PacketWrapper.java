@@ -185,7 +185,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     @ApiStatus.Internal
-    public final void prepareForSend(Object channel, boolean outgoing) {
+    public final void prepareForSend(Object channel, boolean outgoing, boolean proxy) {
         // Null means the packet was manually created and wasn't sent by the server itself
         // A reference count of 0 means that the packet was freed (it was already sent)
         if (buffer == null || ByteBufHelper.refCnt(buffer) == 0) {
@@ -193,7 +193,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
 
         //On proxies, we must rewrite the packet ID in a format compatible for the targeted client version
-        if (PacketEvents.getAPI().getInjector().isProxy()) {
+        if (proxy) {
             User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
             if (packetTypeData.getPacketType() == null) {
                 //Get the packet type with the local version packet type mappings.
@@ -208,6 +208,11 @@ public class PacketWrapper<T extends PacketWrapper> {
             writeVarInt(packetTypeData.getNativePacketId());
         }
         write();
+    }
+
+    @ApiStatus.Internal
+    public final void prepareForSend(Object channel, boolean outgoing) {
+        prepareForSend(channel, outgoing, PacketEvents.getAPI().getInjector().isProxy());
     }
 
     public void read() {
