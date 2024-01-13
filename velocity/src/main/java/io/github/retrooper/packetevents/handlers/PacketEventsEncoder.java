@@ -64,8 +64,12 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
         if (!msg.isReadable()) return;
 
         ByteBuf transformed = ctx.alloc().buffer().writeBytes(msg);
-        read(ctx, transformed);
-        out.writeBytes(transformed);
+        try {
+            read(ctx, transformed);
+            out.writeBytes(transformed);
+        } finally {
+            transformed.release();
+        }
     }
 
     @Override
