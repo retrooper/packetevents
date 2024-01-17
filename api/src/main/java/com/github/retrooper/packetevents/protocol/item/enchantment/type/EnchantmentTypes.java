@@ -102,7 +102,7 @@ public class EnchantmentTypes {
     public static final EnchantmentType KNOCKBACK = define("knockback");
     public static final EnchantmentType FIRE_ASPECT = define("fire_aspect");
     public static final EnchantmentType MOB_LOOTING = define("looting");
-    public static final EnchantmentType SWEEPING_EDGE = define("sweeping");
+    public static final EnchantmentType SWEEPING_EDGE = define("sweeping_edge");
     public static final EnchantmentType BLOCK_EFFICIENCY = define("efficiency");
     public static final EnchantmentType SILK_TOUCH = define("silk_touch");
     public static final EnchantmentType UNBREAKING = define("unbreaking");
