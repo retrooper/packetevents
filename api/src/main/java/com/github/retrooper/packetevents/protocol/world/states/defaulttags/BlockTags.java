@@ -221,6 +221,10 @@ public class BlockTags {
     public static final BlockTags ENCHANTMENT_POWER_PROVIDER = bind("enchantment_power_provider");
     public static final BlockTags ENCHANTMENT_POWER_TRANSMITTER = bind("enchantment_power_transmitter");
     public static final BlockTags MAINTAINS_FARMLAND = bind("maintains_farmland");
+
+    // Added in 1.20.5
+    public static final BlockTags ARMADILLO_SPAWNABLE_ON = bind("armadillo_spawnable_on");
+
     /**
      * Unofficial tag for all glass blocks
      */
@@ -301,11 +305,11 @@ public class BlockTags {
         BlockTags.FIRE.add(StateTypes.FIRE, StateTypes.SOUL_FIRE);
         BlockTags.NYLIUM.add(StateTypes.CRIMSON_NYLIUM, StateTypes.WARPED_NYLIUM);
         BlockTags.BEACON_BASE_BLOCKS.add(StateTypes.NETHERITE_BLOCK, StateTypes.EMERALD_BLOCK, StateTypes.DIAMOND_BLOCK, StateTypes.GOLD_BLOCK, StateTypes.IRON_BLOCK);
-        BlockTags.SOUL_SPEED_BLOCKS.add(StateTypes.SOUL_SAND, StateTypes.SOUL_SOIL);
+        copy(BlockTags.WITHER_SUMMON_BASE_BLOCKS, BlockTags.SOUL_SPEED_BLOCKS);
         BlockTags.CLIMBABLE.add(StateTypes.LADDER, StateTypes.VINE, StateTypes.SCAFFOLDING, StateTypes.WEEPING_VINES, StateTypes.WEEPING_VINES_PLANT, StateTypes.TWISTING_VINES, StateTypes.TWISTING_VINES_PLANT, StateTypes.CAVE_VINES, StateTypes.CAVE_VINES_PLANT);
         BlockTags.SHULKER_BOXES.add(StateTypes.SHULKER_BOX, StateTypes.BLACK_SHULKER_BOX, StateTypes.BLUE_SHULKER_BOX, StateTypes.BROWN_SHULKER_BOX, StateTypes.CYAN_SHULKER_BOX, StateTypes.GRAY_SHULKER_BOX, StateTypes.GREEN_SHULKER_BOX, StateTypes.LIGHT_BLUE_SHULKER_BOX, StateTypes.LIGHT_GRAY_SHULKER_BOX, StateTypes.LIME_SHULKER_BOX, StateTypes.MAGENTA_SHULKER_BOX, StateTypes.ORANGE_SHULKER_BOX, StateTypes.PINK_SHULKER_BOX, StateTypes.PURPLE_SHULKER_BOX, StateTypes.RED_SHULKER_BOX, StateTypes.WHITE_SHULKER_BOX, StateTypes.YELLOW_SHULKER_BOX);
         BlockTags.HOGLIN_REPELLENTS.add(StateTypes.WARPED_FUNGUS, StateTypes.POTTED_WARPED_FUNGUS, StateTypes.NETHER_PORTAL, StateTypes.RESPAWN_ANCHOR);
-        BlockTags.SOUL_FIRE_BASE_BLOCKS.add(StateTypes.SOUL_SAND, StateTypes.SOUL_SOIL);
+        copy(BlockTags.WITHER_SUMMON_BASE_BLOCKS, BlockTags.SOUL_FIRE_BASE_BLOCKS);
         BlockTags.STRIDER_WARM_BLOCKS.add(StateTypes.LAVA);
         BlockTags.CAMPFIRES.add(StateTypes.CAMPFIRE, StateTypes.SOUL_CAMPFIRE);
         BlockTags.FENCE_GATES.add(StateTypes.ACACIA_FENCE_GATE, StateTypes.BIRCH_FENCE_GATE, StateTypes.DARK_OAK_FENCE_GATE, StateTypes.JUNGLE_FENCE_GATE, StateTypes.OAK_FENCE_GATE, StateTypes.SPRUCE_FENCE_GATE, StateTypes.CRIMSON_FENCE_GATE, StateTypes.WARPED_FENCE_GATE, StateTypes.MANGROVE_FENCE_GATE, StateTypes.BAMBOO_FENCE_GATE, StateTypes.CHERRY_FENCE_GATE);
@@ -387,6 +391,7 @@ public class BlockTags {
         BlockTags.MINEABLE_SHOVEL.addTag(BlockTags.CONCRETE_POWDER).add(StateTypes.CLAY, StateTypes.DIRT, StateTypes.COARSE_DIRT, StateTypes.PODZOL, StateTypes.FARMLAND, StateTypes.GRASS_BLOCK, StateTypes.GRAVEL, StateTypes.MYCELIUM, StateTypes.SAND, StateTypes.RED_SAND, StateTypes.SNOW_BLOCK, StateTypes.SNOW, StateTypes.SOUL_SAND, StateTypes.DIRT_PATH, StateTypes.SOUL_SOIL, StateTypes.ROOTED_DIRT, StateTypes.MUDDY_MANGROVE_ROOTS, StateTypes.MUD, StateTypes.SUSPICIOUS_SAND, StateTypes.SUSPICIOUS_GRAVEL);
         BlockTags.SWORD_EFFICIENT.addTag(BlockTags.LEAVES).addTag(BlockTags.SAPLINGS).addTag(BlockTags.SMALL_FLOWERS).addTag(BlockTags.CROPS).add(StateTypes.SHORT_GRASS, StateTypes.FERN, StateTypes.DEAD_BUSH, StateTypes.VINE, StateTypes.GLOW_LICHEN, StateTypes.SUNFLOWER, StateTypes.LILAC, StateTypes.ROSE_BUSH, StateTypes.PEONY, StateTypes.TALL_GRASS, StateTypes.LARGE_FERN, StateTypes.HANGING_ROOTS, StateTypes.PITCHER_PLANT, StateTypes.BROWN_MUSHROOM, StateTypes.RED_MUSHROOM, StateTypes.SUGAR_CANE, StateTypes.PUMPKIN, StateTypes.CARVED_PUMPKIN, StateTypes.JACK_O_LANTERN, StateTypes.MELON, StateTypes.ATTACHED_PUMPKIN_STEM, StateTypes.ATTACHED_MELON_STEM, StateTypes.LILY_PAD, StateTypes.COCOA, StateTypes.PITCHER_CROP, StateTypes.SWEET_BERRY_BUSH, StateTypes.CAVE_VINES, StateTypes.CAVE_VINES_PLANT, StateTypes.SPORE_BLOSSOM, StateTypes.MOSS_CARPET, StateTypes.PINK_PETALS, StateTypes.BIG_DRIPLEAF, StateTypes.BIG_DRIPLEAF_STEM, StateTypes.SMALL_DRIPLEAF, StateTypes.NETHER_WART, StateTypes.WARPED_FUNGUS, StateTypes.WARPED_ROOTS, StateTypes.NETHER_SPROUTS, StateTypes.CRIMSON_FUNGUS, StateTypes.WEEPING_VINES, StateTypes.WEEPING_VINES_PLANT, StateTypes.TWISTING_VINES, StateTypes.TWISTING_VINES_PLANT, StateTypes.CRIMSON_ROOTS, StateTypes.CHORUS_PLANT, StateTypes.CHORUS_FLOWER);
         BlockTags.SCULK_REPLACEABLE.addTag(BlockTags.BASE_STONE_OVERWORLD).addTag(BlockTags.DIRT).addTag(BlockTags.TERRACOTTA).addTag(BlockTags.NYLIUM).addTag(BlockTags.BASE_STONE_NETHER).add(StateTypes.SAND, StateTypes.RED_SAND, StateTypes.GRAVEL, StateTypes.SOUL_SAND, StateTypes.SOUL_SOIL, StateTypes.CALCITE, StateTypes.SMOOTH_BASALT, StateTypes.CLAY, StateTypes.DRIPSTONE_BLOCK, StateTypes.END_STONE, StateTypes.RED_SANDSTONE, StateTypes.SANDSTONE);
+        BlockTags.ARMADILLO_SPAWNABLE_ON.addTag(BlockTags.ANIMALS_SPAWNABLE_ON).addTag(BlockTags.TERRACOTTA).add(StateTypes.RED_SAND, StateTypes.COARSE_DIRT);
         BlockTags.GOATS_SPAWNABLE_ON.addTag(BlockTags.ANIMALS_SPAWNABLE_ON).add(StateTypes.STONE, StateTypes.SNOW, StateTypes.SNOW_BLOCK, StateTypes.PACKED_ICE, StateTypes.GRAVEL);
         BlockTags.AZALEA_GROWS_ON.addTag(BlockTags.DIRT).addTag(BlockTags.SAND).addTag(BlockTags.TERRACOTTA).add(StateTypes.SNOW_BLOCK, StateTypes.POWDER_SNOW);
         BlockTags.DEAD_BUSH_MAY_PLACE_ON.addTag(BlockTags.SAND).addTag(BlockTags.TERRACOTTA).addTag(BlockTags.DIRT);
@@ -421,6 +426,10 @@ public class BlockTags {
 
     private static BlockTags bind(final String s) {
         return new BlockTags(s);
+    }
+
+    private static void copy(BlockTags src, BlockTags dst) {
+        dst.states.addAll(src.states);
     }
 
     private BlockTags add(StateType... state) {
