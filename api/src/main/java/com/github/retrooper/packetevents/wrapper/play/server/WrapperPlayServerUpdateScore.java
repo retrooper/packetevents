@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,22 +21,22 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
+import com.github.retrooper.packetevents.protocol.score.ScoreFormatTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
 public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServerUpdateScore> {
+
     private String entityName;
     private Action action;
     private String objectiveName;
     private Optional<Integer> value;
-
-    public enum Action {
-        CREATE_OR_UPDATE_ITEM,
-        REMOVE_ITEM;
-
-        public static final Action[] VALUES = values();
-    }
+    private @Nullable Component entityDisplayName;
+    private @Nullable ScoreFormat scoreFormat;
 
     public WrapperPlayServerUpdateScore(PacketSendEvent event) {
         super(event);
@@ -50,9 +50,26 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
         this.value = value;
     }
 
+    public WrapperPlayServerUpdateScore(String entityName, Action action, String objectiveName, int value,
+                                        @Nullable Component entityDisplayName, @Nullable ScoreFormat scoreFormat) {
+        super(PacketType.Play.Server.UPDATE_SCORE);
+        this.entityName = entityName;
+        this.action = action;
+        this.objectiveName = objectiveName;
+        this.value = Optional.of(value);
+        this.entityDisplayName = entityDisplayName;
+        this.scoreFormat = scoreFormat;
+    }
+
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            this.entityName = this.readString();
+            this.objectiveName = this.readString();
+            this.value = Optional.of(this.readVarInt());
+            this.entityDisplayName = this.readOptional(PacketWrapper::readComponent);
+            this.scoreFormat = this.readOptional(ScoreFormatTypes::read);
+        } else if (this.serverVersion == ServerVersion.V_1_7_10) {
             entityName = readString(16);
             action = Action.VALUES[readByte()];
             if (action != Action.REMOVE_ITEM) {
@@ -63,9 +80,17 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
                 value = Optional.empty();
             }
         } else {
-            entityName = readString(40);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+                entityName = readString();
+            } else {
+                entityName = readString(40);
+            }
             action = Action.VALUES[readByte()];
-            objectiveName = readString(16);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+                objectiveName = readString();
+            } else {
+                objectiveName = readString(16);
+            }
             if (action != Action.REMOVE_ITEM) {
                 value = Optional.of(readVarInt());
             } else {
@@ -77,7 +102,13 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            this.writeString(this.entityName);
+            this.writeString(this.objectiveName);
+            this.writeVarInt(this.value.orElse(0));
+            this.writeOptional(this.entityDisplayName, PacketWrapper::writeComponent);
+            this.writeOptional(this.scoreFormat, ScoreFormatTypes::write);
+        } else if (this.serverVersion == ServerVersion.V_1_7_10) {
             writeString(entityName, 16);
             writeByte(action.ordinal());
             if (action != Action.REMOVE_ITEM) {
@@ -88,9 +119,17 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
                 value = Optional.empty();
             }
         } else {
-            writeString(entityName, 40);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+                writeString(entityName);
+            } else {
+                writeString(entityName, 40);
+            }
             writeByte(action.ordinal());
-            writeString(objectiveName, 16);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+                writeString(objectiveName);
+            } else {
+                writeString(objectiveName, 16);
+            }
             if (action != Action.REMOVE_ITEM) {
                 writeVarInt(value.orElse(-1));
             }
@@ -104,6 +143,8 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
         action = wrapper.action;
         objectiveName = wrapper.objectiveName;
         value = wrapper.value;
+        entityDisplayName = wrapper.entityDisplayName;
+        scoreFormat = wrapper.scoreFormat;
     }
 
     public String getEntityName() {
@@ -130,11 +171,41 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
         this.objectiveName = objectiveName;
     }
 
+    /**
+     * Always present for >=1.20.3
+     */
     public Optional<Integer> getValue() {
         return value;
     }
 
+    /**
+     * Always present for >=1.20.3
+     */
     public void setValue(Optional<Integer> value) {
         this.value = value;
+    }
+
+    public @Nullable Component getEntityDisplayName() {
+        return this.entityDisplayName;
+    }
+
+    public void setEntityDisplayName(@Nullable Component entityDisplayName) {
+        this.entityDisplayName = entityDisplayName;
+    }
+
+    public @Nullable ScoreFormat getScoreFormat() {
+        return this.scoreFormat;
+    }
+
+    public void setScoreFormat(@Nullable ScoreFormat scoreFormat) {
+        this.scoreFormat = scoreFormat;
+    }
+
+    public enum Action {
+
+        CREATE_OR_UPDATE_ITEM,
+        REMOVE_ITEM;
+
+        public static final Action[] VALUES = values();
     }
 }

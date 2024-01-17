@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,22 +21,27 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
+import com.github.retrooper.packetevents.protocol.score.ScoreFormatTypes;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperPlayServerScoreboardObjective> {
+
     private String name;
     private ObjectiveMode mode;
     private Component displayName;
     private @Nullable RenderType renderType;
+    private @Nullable ScoreFormat scoreFormat;
 
     public WrapperPlayServerScoreboardObjective(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerScoreboardObjective(String name, ObjectiveMode mode, Component displayName, @Nullable RenderType renderType) {
+    public WrapperPlayServerScoreboardObjective(String name, ObjectiveMode mode, Component displayName,
+                                                @Nullable RenderType renderType) {
         super(PacketType.Play.Server.SCOREBOARD_OBJECTIVE);
         this.name = name;
         this.mode = mode;
@@ -46,11 +51,16 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
 
     @Override
     public void read() {
-        name = readString();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            name = readString();
+        } else {
+            name = readString(16);
+        }
         mode = ObjectiveMode.getById(readByte());
         if (mode != ObjectiveMode.CREATE && mode != ObjectiveMode.UPDATE) {
             displayName = Component.empty();
             renderType = RenderType.INTEGER;
+            scoreFormat = null;
         } else {
             if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
                 displayName = AdventureSerializer.fromLegacyFormat(readString(32));
@@ -58,13 +68,18 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
             } else {
                 displayName = readComponent();
                 renderType = RenderType.getById(readVarInt());
+                scoreFormat = readOptional(ScoreFormatTypes::read);
             }
         }
     }
 
     @Override
     public void write() {
-        writeString(name);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            writeString(name);
+        } else {
+            writeString(name, 16);
+        }
         writeByte((byte) mode.ordinal());
         if (this.mode == ObjectiveMode.CREATE || this.mode == ObjectiveMode.UPDATE) {
             if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
@@ -81,6 +96,7 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
                 } else {
                     writeVarInt(RenderType.INTEGER.ordinal());
                 }
+                writeOptional(scoreFormat, ScoreFormatTypes::write);
             }
         }
     }
@@ -91,6 +107,7 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
         mode = wrapper.mode;
         displayName = wrapper.displayName;
         renderType = wrapper.renderType;
+        scoreFormat = wrapper.scoreFormat;
     }
 
     public String getName() {
@@ -123,6 +140,14 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
 
     public void setRenderType(@Nullable RenderType renderType) {
         this.renderType = renderType;
+    }
+
+    public @Nullable ScoreFormat getScoreFormat() {
+        return this.scoreFormat;
+    }
+
+    public void setScoreFormat(@Nullable ScoreFormat scoreFormat) {
+        this.scoreFormat = scoreFormat;
     }
 
     public enum ObjectiveMode {

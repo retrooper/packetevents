@@ -202,7 +202,7 @@ public class Vector3i {
     }
 
     public Vector3i subtract(int x, int y, int z) {
-        return new Vector3i(this.x + x, this.y + y, this.z + z);
+        return new Vector3i(this.x - x, this.y - y, this.z - z);
     }
 
     public Vector3i subtract(Vector3i other) {

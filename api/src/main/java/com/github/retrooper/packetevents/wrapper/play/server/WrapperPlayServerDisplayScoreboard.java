@@ -44,7 +44,11 @@ public class WrapperPlayServerDisplayScoreboard extends PacketWrapper<WrapperPla
         } else {
             position = readByte();
         }
-        scoreName = readString(16);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            scoreName = readString();
+        } else {
+            scoreName = readString(16);
+        }
     }
 
     @Override
@@ -54,7 +58,11 @@ public class WrapperPlayServerDisplayScoreboard extends PacketWrapper<WrapperPla
         } else {
             writeByte(position);
         }
-        writeString(scoreName, 16);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            writeString(scoreName); // length limit removed
+        } else {
+            writeString(scoreName, 16);
+        }
     }
 
     @Override

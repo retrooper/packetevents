@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2023 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.util.adventure;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufInputStream;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufOutputStream;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.BlockNBTComponent;
@@ -35,8 +36,10 @@ import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.format.TextDecoration.State;
 import net.kyori.adventure.text.serializer.json.JSONComponentConstants;
 
 import java.io.DataInput;
@@ -56,6 +59,7 @@ import static net.kyori.adventure.text.Component.score;
 import static net.kyori.adventure.text.Component.storageNBT;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.event.ClickEvent.clickEvent;
 import static net.kyori.adventure.text.event.HoverEvent.ShowEntity.showEntity;
 import static net.kyori.adventure.text.event.HoverEvent.ShowItem.showItem;
 import static net.kyori.adventure.text.serializer.json.JSONComponentConstants.CLICK_EVENT;
@@ -148,6 +152,445 @@ public final class AdventureNBTSerialization {
         }
     }
 
+    public static Style readStyle(Object byteBuf) throws IOException {
+        return readStyle(new ByteBufInputStream(byteBuf));
+    }
+
+    public static Style readStyle(DataInput input) throws IOException {
+        TagType type = resolveNbtType(input.readByte());
+        return readStyle(input, type);
+    }
+
+    private static Style readStyle(DataInput input, TagType rootType) throws IOException {
+        return readStyle(input, rootType, 0);
+    }
+
+    private static Style readStyle(DataInput input, TagType rootType, int depth) throws IOException {
+        if (depth > DEPTH_LIMIT) {
+            throw new RuntimeException("Depth limit reached while decoding style: " + depth + " > " + DEPTH_LIMIT);
+        }
+        if (rootType != TagType.COMPOUND) {
+            throw new RuntimeException("Unsupported nbt tag type for style: " + rootType);
+        }
+
+        Style.Builder style = null;
+
+        // read until end
+        TagType type;
+        while ((type = resolveNbtType(input.readByte())) != TagType.END) {
+            String key = input.readUTF();
+
+            if (style == null) {
+                style = Style.style();
+            }
+            readStyle(style, key, type, input, depth);
+        }
+
+        return style == null ? Style.empty() : style.build();
+    }
+
+    @SuppressWarnings({"PatternValidation", "unchecked"}) // Key and HoverEvent
+    private static void readStyle(Style.Builder style, String key, TagType type,
+                                  DataInput input, int depth) throws IOException {
+        switch (key) {
+            case FONT:
+                requireType(type, TagType.STRING);
+                style.font(key(input.readUTF()));
+                break;
+            case COLOR:
+                requireType(type, TagType.STRING);
+                style.color(parseColor(input.readUTF()));
+                break;
+            case BOLD:
+                requireType(type, TagType.BYTE);
+                style.decoration(TextDecoration.BOLD, State.byBoolean(input.readBoolean()));
+                break;
+            case ITALIC:
+                requireType(type, TagType.BYTE);
+                style.decoration(TextDecoration.ITALIC, State.byBoolean(input.readBoolean()));
+                break;
+            case UNDERLINED:
+                requireType(type, TagType.BYTE);
+                style.decoration(TextDecoration.UNDERLINED, State.byBoolean(input.readBoolean()));
+                break;
+            case STRIKETHROUGH:
+                requireType(type, TagType.BYTE);
+                style.decoration(TextDecoration.STRIKETHROUGH, State.byBoolean(input.readBoolean()));
+                break;
+            case OBFUSCATED:
+                requireType(type, TagType.BYTE);
+                style.decoration(TextDecoration.OBFUSCATED, State.byBoolean(input.readBoolean()));
+                break;
+            case INSERTION:
+                requireType(type, TagType.STRING);
+                style.insertion(input.readUTF());
+                break;
+            case CLICK_EVENT:
+                requireType(type, TagType.COMPOUND);
+
+                ClickEvent.Action clickEventAction = null;
+                String clickEventValue = null;
+
+                TagType clickType;
+                while ((clickType = resolveNbtType(input.readByte())) != TagType.END) {
+                    String clickKey = input.readUTF();
+                    switch (clickKey) {
+                        case CLICK_EVENT_ACTION:
+                            requireType(clickType, TagType.STRING);
+                            requireState(clickEventAction == null);
+
+                            String actionId = input.readUTF();
+                            switch (actionId) {
+                                case OPEN_URL:
+                                    clickEventAction = ClickEvent.Action.OPEN_URL;
+                                    break;
+                                case RUN_COMMAND:
+                                    clickEventAction = ClickEvent.Action.RUN_COMMAND;
+                                    break;
+                                case SUGGEST_COMMAND:
+                                    clickEventAction = ClickEvent.Action.SUGGEST_COMMAND;
+                                    break;
+                                case CHANGE_PAGE:
+                                    clickEventAction = ClickEvent.Action.CHANGE_PAGE;
+                                    break;
+                                case COPY_TO_CLIPBOARD:
+                                    clickEventAction = ClickEvent.Action.COPY_TO_CLIPBOARD;
+                                    break;
+                                default:
+                                    throw new IllegalStateException("Illegal click event action read: '" + actionId + "'");
+                            }
+                            break;
+                        case CLICK_EVENT_VALUE:
+                            requireType(clickType, TagType.STRING);
+                            requireState(clickEventValue == null);
+                            clickEventValue = input.readUTF();
+                            break;
+                        default:
+                            throw new IllegalStateException("Illegal click event nbt key read: '" + clickKey + "'");
+                    }
+                }
+                requireState(clickEventAction != null && clickEventValue != null);
+                style.clickEvent(clickEvent(clickEventAction, clickEventValue));
+                break;
+            case HOVER_EVENT:
+                requireType(type, TagType.COMPOUND);
+
+                HoverEvent.Action<?> hoverEventAction = null;
+                Object hoverEventContents = null;
+
+                TagType hoverType;
+                while ((hoverType = resolveNbtType(input.readByte())) != TagType.END) {
+                    String hoverKey = input.readUTF();
+                    switch (hoverKey) {
+                        case HOVER_EVENT_ACTION:
+                            requireType(hoverType, TagType.STRING);
+                            requireState(hoverEventAction == null);
+
+                            String actionId = input.readUTF();
+                            switch (actionId) {
+                                case SHOW_TEXT:
+                                    hoverEventAction = HoverEvent.Action.SHOW_TEXT;
+                                    break;
+                                case SHOW_ITEM:
+                                    hoverEventAction = HoverEvent.Action.SHOW_ITEM;
+                                    break;
+                                case SHOW_ENTITY:
+                                    hoverEventAction = HoverEvent.Action.SHOW_ENTITY;
+                                    break;
+                                default:
+                                    throw new IllegalStateException("Illegal hover event action read: '" + actionId + "'");
+                            }
+                            break;
+                        case HOVER_EVENT_CONTENTS:
+                            requireState(hoverEventContents == null);
+                            requireState(hoverEventAction != null);
+
+                            switch (hoverEventAction.toString()) {
+                                case SHOW_TEXT:
+                                    requireComponentType(hoverType);
+                                    hoverEventContents = readComponent(input, hoverType, depth + 1);
+                                    break;
+                                case SHOW_ITEM:
+                                    if (hoverType == TagType.STRING) {
+                                        String itemId = input.readUTF();
+                                        hoverEventContents = showItem(key(itemId), 1);
+                                    } else {
+                                        requireType(hoverType, TagType.COMPOUND);
+
+                                        String itemId = null;
+                                        int count = 1;
+                                        String tag = null;
+
+                                        TagType itemType;
+                                        while ((itemType = resolveNbtType(input.readByte())) != TagType.END) {
+                                            String itemKey = input.readUTF();
+                                            switch (itemKey) {
+                                                case ITEM_ID:
+                                                    requireType(itemType, TagType.STRING);
+                                                    requireState(itemId == null);
+                                                    itemId = input.readUTF();
+                                                    break;
+                                                case ITEM_COUNT:
+                                                    requireType(itemType, TagType.INT);
+                                                    count = input.readInt();
+                                                    break;
+                                                case ITEM_TAG:
+                                                    requireType(itemType, TagType.STRING);
+                                                    tag = input.readUTF();
+                                                    break;
+                                            }
+                                        }
+
+                                        requireState(itemId != null);
+                                        hoverEventContents = showItem(key(itemId), count,
+                                                tag == null ? null : binaryTagHolder(tag));
+                                    }
+                                    break;
+                                case SHOW_ENTITY:
+                                    requireType(hoverType, TagType.COMPOUND);
+
+                                    String entityType = null;
+                                    UUID entityId = null;
+                                    Component entityName = null;
+
+                                    TagType itemType;
+                                    while ((itemType = resolveNbtType(input.readByte())) != TagType.END) {
+                                        String itemKey = input.readUTF();
+                                        switch (itemKey) {
+                                            case ENTITY_TYPE:
+                                                requireType(itemType, TagType.STRING);
+                                                requireState(entityType == null);
+                                                entityType = input.readUTF();
+                                                break;
+                                            case ENTITY_ID:
+                                                requireType(itemType, TagType.INT_ARRAY);
+                                                requireState(entityId == null);
+                                                entityId = readUniqueId(input);
+                                                break;
+                                            case ENTITY_NAME:
+                                                requireComponentType(itemType);
+                                                requireState(entityName == null);
+                                                entityName = readComponent(input, itemType, depth + 1);
+                                                break;
+                                        }
+                                    }
+
+                                    requireState(entityType != null && entityId != null);
+                                    hoverEventContents = showEntity(key(entityType), entityId, entityName);
+                                    break;
+                            }
+                            break;
+                        default:
+                            throw new IllegalStateException("Illegal hover event nbt key read: '" + hoverKey + "'");
+                    }
+                }
+                requireState(hoverEventContents != null);
+
+                // this is not unchecked, as it will 100% never fail - validated while reading
+                HoverEvent.Action<? super Object> unsafeAction = (HoverEvent.Action<? super Object>) hoverEventAction;
+                style.hoverEvent(HoverEvent.hoverEvent(unsafeAction, hoverEventContents));
+                break;
+            default:
+                throw new IllegalStateException("Illegal component nbt key read: '" + key + "'");
+        }
+    }
+
+    public static void writeStyle(Object byteBuf, Style style) throws IOException {
+        writeStyle(new ByteBufOutputStream(byteBuf), style);
+    }
+
+    public static void writeStyle(DataOutput output, Style style) throws IOException {
+        TagType tagType = TagType.COMPOUND;
+        output.writeByte(tagType.getId());
+        writeStyle(output, style, tagType);
+        output.writeByte(TagType.END.getId()); // ends style tag
+    }
+
+    private static void writeStyle(DataOutput output, Style style, TagType rootType) throws IOException {
+        if (rootType != TagType.COMPOUND) {
+            throw new UnsupportedEncodingException();
+        }
+        if (style.isEmpty()) {
+            return;
+        }
+
+        // font
+        Key font = style.font();
+        if (font != null) {
+            output.writeByte(TagType.STRING.getId());
+            output.writeUTF(FONT);
+            output.writeUTF(font.asString());
+        }
+
+        // color
+        TextColor color = style.color();
+        if (color != null) {
+            output.writeByte(TagType.STRING.getId());
+            output.writeUTF(COLOR);
+            output.writeUTF(stringifyColor(color));
+        }
+
+        // bold
+        State bold = style.decoration(TextDecoration.BOLD);
+        if (bold != State.NOT_SET) {
+            output.writeByte(TagType.BYTE.getId());
+            output.writeUTF(BOLD);
+            output.writeBoolean(bold == State.TRUE);
+        }
+        // italic
+        State italic = style.decoration(TextDecoration.ITALIC);
+        if (italic != State.NOT_SET) {
+            output.writeByte(TagType.BYTE.getId());
+            output.writeUTF(ITALIC);
+            output.writeBoolean(italic == State.TRUE);
+        }
+        // underlined
+        State underlined = style.decoration(TextDecoration.UNDERLINED);
+        if (underlined != State.NOT_SET) {
+            output.writeByte(TagType.BYTE.getId());
+            output.writeUTF(UNDERLINED);
+            output.writeBoolean(underlined == State.TRUE);
+        }
+        // strikethrough
+        State strikethrough = style.decoration(TextDecoration.STRIKETHROUGH);
+        if (strikethrough != State.NOT_SET) {
+            output.writeByte(TagType.BYTE.getId());
+            output.writeUTF(STRIKETHROUGH);
+            output.writeBoolean(strikethrough == State.TRUE);
+        }
+        // obfuscated
+        State obfuscated = style.decoration(TextDecoration.OBFUSCATED);
+        if (obfuscated != State.NOT_SET) {
+            output.writeByte(TagType.BYTE.getId());
+            output.writeUTF(OBFUSCATED);
+            output.writeBoolean(obfuscated == State.TRUE);
+        }
+
+        // insertion
+        String insertion = style.insertion();
+        if (insertion != null) {
+            output.writeByte(TagType.STRING.getId());
+            output.writeUTF(INSERTION);
+            output.writeUTF(insertion);
+        }
+
+        // click event
+        ClickEvent clickEvent = style.clickEvent();
+        if (clickEvent != null) {
+            // nested compound
+            output.writeByte(TagType.COMPOUND.getId());
+            output.writeUTF(CLICK_EVENT);
+
+            // click event action
+            ClickEvent.Action action = clickEvent.action();
+            output.writeByte(TagType.STRING.getId());
+            output.writeUTF(CLICK_EVENT_ACTION);
+            output.writeUTF(action.toString());
+
+            // click event value
+            String value = clickEvent.value();
+            output.writeByte(TagType.STRING.getId());
+            output.writeUTF(CLICK_EVENT_VALUE);
+            output.writeUTF(value);
+
+            output.writeByte(TagType.END.getId()); // ends compound
+        }
+
+        // hover event
+        HoverEvent<?> hoverEvent = style.hoverEvent();
+        if (hoverEvent != null) {
+            // nested compound
+            output.writeByte(TagType.COMPOUND.getId());
+            output.writeUTF(HOVER_EVENT);
+
+            // hover event action
+            HoverEvent.Action<?> action = hoverEvent.action();
+            output.writeByte(TagType.STRING.getId());
+            output.writeUTF(HOVER_EVENT_ACTION);
+            output.writeUTF(action.toString());
+
+            // hover event contents
+            switch (action.toString()) {
+                case SHOW_TEXT:
+                    Component text = (Component) hoverEvent.value();
+                    TagType textTagType = getComponentTagType(text);
+                    output.writeByte(textTagType.getId());
+                    output.writeUTF(HOVER_EVENT_CONTENTS);
+                    writeComponent(output, text, textTagType);
+                    break;
+                case SHOW_ITEM:
+                    HoverEvent.ShowItem item = (HoverEvent.ShowItem) hoverEvent.value();
+                    Key itemId = item.item();
+                    int count = item.count();
+                    BinaryTagHolder nbt = item.nbt();
+
+                    if (count == 1 && nbt == null) {
+                        output.writeByte(TagType.STRING.getId());
+                        output.writeUTF(HOVER_EVENT_CONTENTS);
+                        output.writeUTF(itemId.asString());
+                    } else {
+                        // nested compound
+                        output.writeByte(TagType.COMPOUND.getId());
+                        output.writeUTF(HOVER_EVENT_CONTENTS);
+
+                        // item id
+                        output.writeByte(TagType.STRING.getId());
+                        output.writeUTF(ITEM_ID);
+                        output.writeUTF(itemId.asString());
+
+                        // item count
+                        if (count != 1) {
+                            output.writeByte(TagType.INT.getId());
+                            output.writeUTF(ITEM_COUNT);
+                            output.writeInt(count);
+                        }
+
+                        // item nbt
+                        if (nbt != null) {
+                            output.writeByte(TagType.STRING.getId());
+                            output.writeUTF(ITEM_TAG);
+                            output.writeUTF(nbt.string());
+                        }
+
+                        output.writeByte(TagType.END.getId()); // ends compound
+                    }
+                    break;
+                case SHOW_ENTITY:
+                    HoverEvent.ShowEntity entity = (HoverEvent.ShowEntity) hoverEvent.value();
+                    Key entityType = entity.type();
+                    UUID entityId = entity.id();
+                    Component entityName = entity.name();
+
+                    // nested compound
+                    output.writeByte(TagType.COMPOUND.getId());
+                    output.writeUTF(HOVER_EVENT_CONTENTS);
+
+                    // entity type
+                    output.writeByte(TagType.STRING.getId());
+                    output.writeUTF(ENTITY_TYPE);
+                    output.writeUTF(entityType.asString());
+
+                    // entity uuid
+                    output.writeByte(TagType.INT_ARRAY.getId());
+                    output.writeUTF(ENTITY_ID);
+                    writeUniqueId(output, entityId);
+
+                    // entity name
+                    if (entityName != null) {
+                        TagType nameTagType = getComponentTagType(entityName);
+                        output.writeByte(nameTagType.getId());
+                        output.writeUTF(ENTITY_NAME);
+                        writeComponent(output, entityName, nameTagType);
+                    }
+
+                    output.writeByte(TagType.END.getId()); // ends compound
+                    break;
+            }
+
+            output.writeByte(TagType.END.getId()); // ends compound
+        }
+    }
+
     public static Component readComponent(Object byteBuf) throws IOException {
         return readComponent(new ByteBufInputStream(byteBuf));
     }
@@ -161,7 +604,7 @@ public final class AdventureNBTSerialization {
         return readComponent(input, rootType, 0);
     }
 
-    @SuppressWarnings({"PatternValidation", "unchecked"}) // Key and HoverEvent
+    @SuppressWarnings({"PatternValidation"}) // Key
     private static Component readComponent(DataInput input, TagType rootType, int depth) throws IOException {
         if (depth > DEPTH_LIMIT) {
             throw new RuntimeException("Depth limit reached while decoding component: " + depth + " > " + DEPTH_LIMIT);
@@ -191,19 +634,7 @@ public final class AdventureNBTSerialization {
         String nbtStorage = null;
         Component separator = null;
 
-        // style
-        String font = null;
-        String color = null;
-        TextDecoration.State obfuscated = TextDecoration.State.NOT_SET;
-        TextDecoration.State bold = TextDecoration.State.NOT_SET;
-        TextDecoration.State strikethrough = TextDecoration.State.NOT_SET;
-        TextDecoration.State underlined = TextDecoration.State.NOT_SET;
-        TextDecoration.State italic = TextDecoration.State.NOT_SET;
-        String insertion = null;
-        ClickEvent.Action clickEventAction = null;
-        String clickEventValue = null;
-        HoverEvent.Action<?> hoverEventAction = null;
-        Object hoverEventContents = null;
+        Style.Builder style = null;
 
         // read until end
         TagType type;
@@ -301,204 +732,12 @@ public final class AdventureNBTSerialization {
                     requireState(separator == null);
                     separator = readComponent(input, type, depth + 1);
                     break;
-                case FONT:
-                    requireType(type, TagType.STRING);
-                    requireState(font == null);
-                    font = input.readUTF();
-                    break;
-                case COLOR:
-                    requireType(type, TagType.STRING);
-                    requireState(color == null);
-                    color = input.readUTF();
-                    break;
-                case BOLD:
-                    requireType(type, TagType.BYTE);
-                    requireState(bold == TextDecoration.State.NOT_SET);
-                    bold = TextDecoration.State.byBoolean(input.readBoolean());
-                    break;
-                case ITALIC:
-                    requireType(type, TagType.BYTE);
-                    requireState(italic == TextDecoration.State.NOT_SET);
-                    italic = TextDecoration.State.byBoolean(input.readBoolean());
-                    break;
-                case UNDERLINED:
-                    requireType(type, TagType.BYTE);
-                    requireState(underlined == TextDecoration.State.NOT_SET);
-                    underlined = TextDecoration.State.byBoolean(input.readBoolean());
-                    break;
-                case STRIKETHROUGH:
-                    requireType(type, TagType.BYTE);
-                    requireState(strikethrough == TextDecoration.State.NOT_SET);
-                    strikethrough = TextDecoration.State.byBoolean(input.readBoolean());
-                    break;
-                case OBFUSCATED:
-                    requireType(type, TagType.BYTE);
-                    requireState(obfuscated == TextDecoration.State.NOT_SET);
-                    obfuscated = TextDecoration.State.byBoolean(input.readBoolean());
-                    break;
-                case INSERTION:
-                    requireType(type, TagType.STRING);
-                    requireState(insertion == null);
-                    insertion = input.readUTF();
-                    break;
-                case CLICK_EVENT:
-                    requireType(type, TagType.COMPOUND);
-                    requireState(clickEventAction == null && clickEventValue == null);
-
-                    TagType clickType;
-                    while ((clickType = resolveNbtType(input.readByte())) != TagType.END) {
-                        String clickKey = input.readUTF();
-                        switch (clickKey) {
-                            case CLICK_EVENT_ACTION:
-                                requireType(clickType, TagType.STRING);
-                                requireState(clickEventAction == null);
-
-                                String actionId = input.readUTF();
-                                switch (actionId) {
-                                    case OPEN_URL:
-                                        clickEventAction = ClickEvent.Action.OPEN_URL;
-                                        break;
-                                    case RUN_COMMAND:
-                                        clickEventAction = ClickEvent.Action.RUN_COMMAND;
-                                        break;
-                                    case SUGGEST_COMMAND:
-                                        clickEventAction = ClickEvent.Action.SUGGEST_COMMAND;
-                                        break;
-                                    case CHANGE_PAGE:
-                                        clickEventAction = ClickEvent.Action.CHANGE_PAGE;
-                                        break;
-                                    case COPY_TO_CLIPBOARD:
-                                        clickEventAction = ClickEvent.Action.COPY_TO_CLIPBOARD;
-                                        break;
-                                    default:
-                                        throw new IllegalStateException("Illegal click event action read: '" + actionId + "'");
-                                }
-                                break;
-                            case CLICK_EVENT_VALUE:
-                                requireType(clickType, TagType.STRING);
-                                requireState(clickEventValue == null);
-                                clickEventValue = input.readUTF();
-                                break;
-                            default:
-                                throw new IllegalStateException("Illegal click event nbt key read: '" + clickKey + "'");
-                        }
-                    }
-                    requireState(clickEventAction != null && clickEventValue != null);
-                    break;
-                case HOVER_EVENT:
-                    requireType(type, TagType.COMPOUND);
-                    requireState(hoverEventAction == null);
-
-                    TagType hoverType;
-                    while ((hoverType = resolveNbtType(input.readByte())) != TagType.END) {
-                        String hoverKey = input.readUTF();
-                        switch (hoverKey) {
-                            case HOVER_EVENT_ACTION:
-                                requireType(hoverType, TagType.STRING);
-                                requireState(hoverEventAction == null);
-
-                                String actionId = input.readUTF();
-                                switch (actionId) {
-                                    case SHOW_TEXT:
-                                        hoverEventAction = HoverEvent.Action.SHOW_TEXT;
-                                        break;
-                                    case SHOW_ITEM:
-                                        hoverEventAction = HoverEvent.Action.SHOW_ITEM;
-                                        break;
-                                    case SHOW_ENTITY:
-                                        hoverEventAction = HoverEvent.Action.SHOW_ENTITY;
-                                        break;
-                                    default:
-                                        throw new IllegalStateException("Illegal hover event action read: '" + actionId + "'");
-                                }
-                                break;
-                            case HOVER_EVENT_CONTENTS:
-                                requireState(hoverEventContents == null);
-                                requireState(hoverEventAction != null);
-
-                                switch (hoverEventAction.toString()) {
-                                    case SHOW_TEXT:
-                                        requireComponentType(hoverType);
-                                        hoverEventContents = readComponent(input, hoverType, depth + 1);
-                                        break;
-                                    case SHOW_ITEM:
-                                        if (hoverType == TagType.STRING) {
-                                            String itemId = input.readUTF();
-                                            hoverEventContents = showItem(key(itemId), 1);
-                                        } else {
-                                            requireType(hoverType, TagType.COMPOUND);
-
-                                            String itemId = null;
-                                            int count = 1;
-                                            String tag = null;
-
-                                            TagType itemType;
-                                            while ((itemType = resolveNbtType(input.readByte())) != TagType.END) {
-                                                String itemKey = input.readUTF();
-                                                switch (itemKey) {
-                                                    case ITEM_ID:
-                                                        requireType(itemType, TagType.STRING);
-                                                        requireState(itemId == null);
-                                                        itemId = input.readUTF();
-                                                        break;
-                                                    case ITEM_COUNT:
-                                                        requireType(itemType, TagType.INT);
-                                                        count = input.readInt();
-                                                        break;
-                                                    case ITEM_TAG:
-                                                        requireType(itemType, TagType.STRING);
-                                                        tag = input.readUTF();
-                                                        break;
-                                                }
-                                            }
-
-                                            requireState(itemId != null);
-                                            hoverEventContents = showItem(key(itemId), count,
-                                                    tag == null ? null : binaryTagHolder(tag));
-                                        }
-                                        break;
-                                    case SHOW_ENTITY:
-                                        requireType(hoverType, TagType.COMPOUND);
-
-                                        String entityType = null;
-                                        UUID entityId = null;
-                                        Component entityName = null;
-
-                                        TagType itemType;
-                                        while ((itemType = resolveNbtType(input.readByte())) != TagType.END) {
-                                            String itemKey = input.readUTF();
-                                            switch (itemKey) {
-                                                case ENTITY_TYPE:
-                                                    requireType(itemType, TagType.STRING);
-                                                    requireState(entityType == null);
-                                                    entityType = input.readUTF();
-                                                    break;
-                                                case ENTITY_ID:
-                                                    requireType(itemType, TagType.INT_ARRAY);
-                                                    requireState(entityId == null);
-                                                    entityId = readUniqueId(input);
-                                                    break;
-                                                case ENTITY_NAME:
-                                                    requireComponentType(itemType);
-                                                    requireState(entityName == null);
-                                                    entityName = readComponent(input, itemType, depth + 1);
-                                                    break;
-                                            }
-                                        }
-
-                                        requireState(entityType != null && entityId != null);
-                                        hoverEventContents = showEntity(key(entityType), entityId, entityName);
-                                        break;
-                                }
-                                break;
-                            default:
-                                throw new IllegalStateException("Illegal hover event nbt key read: '" + hoverKey + "'");
-                        }
-                    }
-                    requireState(hoverEventContents != null);
-                    break;
                 default:
-                    throw new IllegalStateException("Illegal component nbt key read: '" + key + "'");
+                    if (style == null) {
+                        style = Style.style();
+                    }
+                    readStyle(style, key, type, input, depth);
+                    break;
             }
         }
 
@@ -538,43 +777,18 @@ public final class AdventureNBTSerialization {
             throw new IllegalStateException("Illegal nbt component, component type could not be determined");
         }
 
-        if (font != null) {
-            builder.font(key(font));
-        }
-        if (color != null) {
-            builder.color(parseColor(color));
-        }
-        if (obfuscated != TextDecoration.State.NOT_SET) {
-            builder.decoration(TextDecoration.OBFUSCATED, obfuscated);
-        }
-        if (bold != TextDecoration.State.NOT_SET) {
-            builder.decoration(TextDecoration.BOLD, bold);
-        }
-        if (strikethrough != TextDecoration.State.NOT_SET) {
-            builder.decoration(TextDecoration.STRIKETHROUGH, strikethrough);
-        }
-        if (underlined != TextDecoration.State.NOT_SET) {
-            builder.decoration(TextDecoration.UNDERLINED, underlined);
-        }
-        if (italic != TextDecoration.State.NOT_SET) {
-            builder.decoration(TextDecoration.ITALIC, italic);
-        }
-        if (insertion != null) {
-            builder.insertion(insertion);
-        }
-        if (clickEventAction != null) {
-            builder.clickEvent(ClickEvent.clickEvent(clickEventAction, clickEventValue));
-        }
-        if (hoverEventAction != null) {
-            // this is not unchecked, as it will 100% never fail - validated while reading
-            HoverEvent.Action<? super Object> unsafeAction = (HoverEvent.Action<? super Object>) hoverEventAction;
-            builder.hoverEvent(HoverEvent.hoverEvent(unsafeAction, hoverEventContents));
+        if (style != null) {
+            builder.style(style.build());
         }
 
         if (extra != null) {
             builder.append(extra);
         }
         return builder.build();
+    }
+
+    public static void writeComponent(Object byteBuf, Component component) throws IOException {
+        writeComponent(new ByteBufOutputStream(byteBuf), component);
     }
 
     public static void writeComponent(DataOutput output, Component component) throws IOException {
@@ -706,181 +920,7 @@ public final class AdventureNBTSerialization {
         }
 
         if (component.hasStyling()) {
-            // font
-            Key font = component.font();
-            if (font != null) {
-                output.writeByte(TagType.STRING.getId());
-                output.writeUTF(FONT);
-                output.writeUTF(font.asString());
-            }
-
-            // color
-            TextColor color = component.color();
-            if (color != null) {
-                output.writeByte(TagType.STRING.getId());
-                output.writeUTF(COLOR);
-                output.writeUTF(stringifyColor(color));
-            }
-
-            // bold
-            TextDecoration.State bold = component.decoration(TextDecoration.BOLD);
-            if (bold != TextDecoration.State.NOT_SET) {
-                output.writeByte(TagType.BYTE.getId());
-                output.writeUTF(BOLD);
-                output.writeBoolean(bold == TextDecoration.State.TRUE);
-            }
-            // italic
-            TextDecoration.State italic = component.decoration(TextDecoration.ITALIC);
-            if (italic != TextDecoration.State.NOT_SET) {
-                output.writeByte(TagType.BYTE.getId());
-                output.writeUTF(ITALIC);
-                output.writeBoolean(italic == TextDecoration.State.TRUE);
-            }
-            // underlined
-            TextDecoration.State underlined = component.decoration(TextDecoration.UNDERLINED);
-            if (underlined != TextDecoration.State.NOT_SET) {
-                output.writeByte(TagType.BYTE.getId());
-                output.writeUTF(UNDERLINED);
-                output.writeBoolean(underlined == TextDecoration.State.TRUE);
-            }
-            // strikethrough
-            TextDecoration.State strikethrough = component.decoration(TextDecoration.STRIKETHROUGH);
-            if (strikethrough != TextDecoration.State.NOT_SET) {
-                output.writeByte(TagType.BYTE.getId());
-                output.writeUTF(STRIKETHROUGH);
-                output.writeBoolean(strikethrough == TextDecoration.State.TRUE);
-            }
-            // obfuscated
-            TextDecoration.State obfuscated = component.decoration(TextDecoration.OBFUSCATED);
-            if (obfuscated != TextDecoration.State.NOT_SET) {
-                output.writeByte(TagType.BYTE.getId());
-                output.writeUTF(OBFUSCATED);
-                output.writeBoolean(obfuscated == TextDecoration.State.TRUE);
-            }
-
-            // insertion
-            String insertion = component.insertion();
-            if (insertion != null) {
-                output.writeByte(TagType.STRING.getId());
-                output.writeUTF(INSERTION);
-                output.writeUTF(insertion);
-            }
-
-            // click event
-            ClickEvent clickEvent = component.clickEvent();
-            if (clickEvent != null) {
-                // nested compound
-                output.writeByte(TagType.COMPOUND.getId());
-                output.writeUTF(CLICK_EVENT);
-
-                // click event action
-                ClickEvent.Action action = clickEvent.action();
-                output.writeByte(TagType.STRING.getId());
-                output.writeUTF(CLICK_EVENT_ACTION);
-                output.writeUTF(action.toString());
-
-                // click event value
-                String value = clickEvent.value();
-                output.writeByte(TagType.STRING.getId());
-                output.writeUTF(CLICK_EVENT_VALUE);
-                output.writeUTF(value);
-
-                output.writeByte(TagType.END.getId()); // ends compound
-            }
-
-            // hover event
-            HoverEvent<?> hoverEvent = component.hoverEvent();
-            if (hoverEvent != null) {
-                // nested compound
-                output.writeByte(TagType.COMPOUND.getId());
-                output.writeUTF(HOVER_EVENT);
-
-                // hover event action
-                HoverEvent.Action<?> action = hoverEvent.action();
-                output.writeByte(TagType.STRING.getId());
-                output.writeUTF(HOVER_EVENT_ACTION);
-                output.writeUTF(action.toString());
-
-                // hover event contents
-                switch (action.toString()) {
-                    case SHOW_TEXT:
-                        Component text = (Component) hoverEvent.value();
-                        TagType textTagType = getComponentTagType(text);
-                        output.writeByte(textTagType.getId());
-                        output.writeUTF(HOVER_EVENT_CONTENTS);
-                        writeComponent(output, text, textTagType);
-                        break;
-                    case SHOW_ITEM:
-                        HoverEvent.ShowItem item = (HoverEvent.ShowItem) hoverEvent.value();
-                        Key itemId = item.item();
-                        int count = item.count();
-                        BinaryTagHolder nbt = item.nbt();
-
-                        if (count == 1 && nbt == null) {
-                            output.writeByte(TagType.STRING.getId());
-                            output.writeUTF(HOVER_EVENT_CONTENTS);
-                            output.writeUTF(itemId.asString());
-                        } else {
-                            // nested compound
-                            output.writeByte(TagType.COMPOUND.getId());
-                            output.writeUTF(HOVER_EVENT_CONTENTS);
-
-                            // item id
-                            output.writeByte(TagType.STRING.getId());
-                            output.writeUTF(ITEM_ID);
-                            output.writeUTF(itemId.asString());
-
-                            // item count
-                            if (count != 1) {
-                                output.writeByte(TagType.INT.getId());
-                                output.writeUTF(ITEM_COUNT);
-                                output.writeInt(count);
-                            }
-
-                            // item nbt
-                            if (nbt != null) {
-                                output.writeByte(TagType.STRING.getId());
-                                output.writeUTF(ITEM_TAG);
-                                output.writeUTF(nbt.string());
-                            }
-
-                            output.writeByte(TagType.END.getId()); // ends compound
-                        }
-                        break;
-                    case SHOW_ENTITY:
-                        HoverEvent.ShowEntity entity = (HoverEvent.ShowEntity) hoverEvent.value();
-                        Key entityType = entity.type();
-                        UUID entityId = entity.id();
-                        Component entityName = entity.name();
-
-                        // nested compound
-                        output.writeByte(TagType.COMPOUND.getId());
-                        output.writeUTF(HOVER_EVENT_CONTENTS);
-
-                        // entity type
-                        output.writeByte(TagType.STRING.getId());
-                        output.writeUTF(ENTITY_TYPE);
-                        output.writeUTF(entityType.asString());
-
-                        // entity uuid
-                        output.writeByte(TagType.INT_ARRAY.getId());
-                        output.writeUTF(ENTITY_ID);
-                        writeUniqueId(output, entityId);
-
-                        // entity name
-                        if (entityName != null) {
-                            TagType nameTagType = getComponentTagType(entityName);
-                            output.writeByte(nameTagType.getId());
-                            output.writeUTF(ENTITY_NAME);
-                            writeComponent(output, entityName, nameTagType);
-                        }
-
-                        output.writeByte(TagType.END.getId()); // ends compound
-                        break;
-                }
-
-                output.writeByte(TagType.END.getId()); // ends compound
-            }
+            writeStyle(output, component.style(), TagType.COMPOUND);
         }
 
         // component children
