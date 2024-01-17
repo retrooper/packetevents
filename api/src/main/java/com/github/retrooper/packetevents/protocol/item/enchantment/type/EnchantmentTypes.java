@@ -28,6 +28,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EnchantmentTypes {
+
+    private static final Map<String, String> STRING_UPDATER = new HashMap<>();
+
+    static {
+        // renamed in 24w03a, during the 1.20.5 update
+        STRING_UPDATER.put("minecraft:sweeping", "minecraft:sweeping_edge");
+    }
+
     private static final Map<String, EnchantmentType> ENCHANTMENT_TYPE_MAPPINGS = new HashMap<>();
     private static final Map<Byte, Map<Integer, EnchantmentType>> ENCHANTMENT_TYPE_ID_MAPPINGS = new HashMap<>();
     private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("enchantment/enchantment_type_mappings",
@@ -73,7 +81,8 @@ public class EnchantmentTypes {
 
     @Nullable
     public static EnchantmentType getByName(String name) {
-        return ENCHANTMENT_TYPE_MAPPINGS.get(name);
+        String fixedName = STRING_UPDATER.getOrDefault(name, name);
+        return ENCHANTMENT_TYPE_MAPPINGS.get(fixedName);
     }
 
     @Nullable
