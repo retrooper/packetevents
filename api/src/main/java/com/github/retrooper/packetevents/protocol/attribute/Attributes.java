@@ -95,8 +95,8 @@ public class Attributes {
     public static final Attribute ZOMBIE_SPAWN_REINFORCEMENTS = define("zombie.spawn_reinforcements");
 
     // added in 1.20.5
-    public static final Attribute GENERIC_BLOCK_INTERACTION_RANGE = define("generic.block_interaction_range");
-    public static final Attribute GENERIC_ENTITY_INTERACTION_RANGE = define("generic.entity_interaction_range");
+    public static final Attribute PLAYER_BLOCK_INTERACTION_RANGE = define("player.block_interaction_range");
+    public static final Attribute PLAYER_ENTITY_INTERACTION_RANGE = define("player.entity_interaction_range");
     public static final Attribute GENERIC_SCALE = define("generic.scale");
     public static final Attribute GENERIC_STEP_HEIGHT = define("generic.step_height");
 
