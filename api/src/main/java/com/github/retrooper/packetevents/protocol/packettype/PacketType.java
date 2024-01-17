@@ -506,7 +506,9 @@ public final class PacketType {
             RESOURCE_PACK_REMOVE,
 
             // Added in 1.20.5
-            COOKIE_REQUEST;
+            COOKIE_REQUEST,
+            STORE_COOKIE,
+            TRANSFER;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
