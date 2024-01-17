@@ -42,6 +42,7 @@ public enum ClientboundPacketType_1_20_5 {
     WINDOW_ITEMS,
     WINDOW_PROPERTY,
     SET_SLOT,
+    COOKIE_REQUEST, // New packet
     SET_COOLDOWN,
     CUSTOM_CHAT_COMPLETIONS,
     PLUGIN_MESSAGE,

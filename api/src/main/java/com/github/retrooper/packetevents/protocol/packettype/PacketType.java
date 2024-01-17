@@ -336,16 +336,19 @@ public final class PacketType {
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
-                if (packetID == 0) {
-                    return LOGIN_START;
-                } else if (packetID == 1) {
-                    return ENCRYPTION_RESPONSE;
-                } else if (packetID == 2) {
-                    return LOGIN_PLUGIN_RESPONSE;
-                } else if (packetID == 3) {
-                    return LOGIN_SUCCESS_ACK;
-                } else {
-                    return null;
+                switch (packetID) {
+                    case 0x00:
+                        return LOGIN_START;
+                    case 0x01:
+                        return ENCRYPTION_RESPONSE;
+                    case 0x02:
+                        return LOGIN_PLUGIN_RESPONSE;
+                    case 0x03:
+                        return LOGIN_SUCCESS_ACK;
+                    case 0x04:
+                        return COOKIE_RESPONSE;
+                    default:
+                        return null;
                 }
             }
 
@@ -383,16 +386,18 @@ public final class PacketType {
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
                 switch (packetID) {
-                    case 0:
+                    case 0x00:
                         return DISCONNECT;
-                    case 1:
+                    case 0x01:
                         return ENCRYPTION_REQUEST;
-                    case 2:
+                    case 0x02:
                         return LOGIN_SUCCESS;
-                    case 3:
+                    case 0x03:
                         return SET_COMPRESSION;
-                    case 4:
+                    case 0x04:
                         return LOGIN_PLUGIN_REQUEST;
+                    case 0x05:
+                        return COOKIE_REQUEST;
                     default:
                         return null;
                 }
@@ -871,6 +876,7 @@ public final class PacketType {
             TICKING_STEP,
 
             // Added in 1.20.5
+            COOKIE_REQUEST,
             STORE_COOKIE,
             TRANSFER;
 
