@@ -21,57 +21,16 @@ package com.github.retrooper.packetevents.wrapper.login.client;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.common.client.WrapperCommonCookieResponse;
 import org.jetbrains.annotations.Nullable;
 
-public class WrapperLoginClientCookieResponse extends PacketWrapper<WrapperLoginClientCookieResponse> {
-
-    public static final int MAX_PAYLOAD_SIZE = 1024 * 5;
-
-    private ResourceLocation key;
-    private byte @Nullable [] payload;
+public class WrapperLoginClientCookieResponse extends WrapperCommonCookieResponse<WrapperLoginClientCookieResponse> {
 
     public WrapperLoginClientCookieResponse(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperLoginClientCookieResponse(ResourceLocation key, byte @Nullable [] payload) {
-        super(PacketType.Login.Client.COOKIE_RESPONSE);
-        this.key = key;
-        this.payload = payload;
-    }
-
-    @Override
-    public void read() {
-        this.key = this.readIdentifier();
-        this.payload = this.readOptional(wrapper -> wrapper.readByteArray(MAX_PAYLOAD_SIZE));
-    }
-
-    @Override
-    public void write() {
-        this.writeIdentifier(this.key);
-        this.writeOptional(this.payload, PacketWrapper::writeByteArray);
-    }
-
-    @Override
-    public void copy(WrapperLoginClientCookieResponse wrapper) {
-        this.key = wrapper.key;
-        this.payload = wrapper.payload;
-    }
-
-    public ResourceLocation getKey() {
-        return this.key;
-    }
-
-    public void setKey(ResourceLocation key) {
-        this.key = key;
-    }
-
-    public byte @Nullable [] getPayload() {
-        return this.payload;
-    }
-
-    public void setPayload(byte @Nullable [] payload) {
-        this.payload = payload;
+        super(PacketType.Login.Client.COOKIE_RESPONSE, key, payload);
     }
 }
