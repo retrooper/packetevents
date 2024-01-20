@@ -60,7 +60,9 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
         if (mode != ObjectiveMode.CREATE && mode != ObjectiveMode.UPDATE) {
             displayName = Component.empty();
             renderType = RenderType.INTEGER;
-            scoreFormat = null;
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+                scoreFormat = null;
+            }
         } else {
             if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
                 displayName = AdventureSerializer.fromLegacyFormat(readString(32));
@@ -68,7 +70,9 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
             } else {
                 displayName = readComponent();
                 renderType = RenderType.getById(readVarInt());
-                scoreFormat = readOptional(ScoreFormatTypes::read);
+                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+                    scoreFormat = readOptional(ScoreFormatTypes::read);
+                }
             }
         }
     }
@@ -96,7 +100,9 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
                 } else {
                     writeVarInt(RenderType.INTEGER.ordinal());
                 }
-                writeOptional(scoreFormat, ScoreFormatTypes::write);
+                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+                    writeOptional(scoreFormat, ScoreFormatTypes::write);
+                }
             }
         }
     }
