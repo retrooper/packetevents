@@ -26,7 +26,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerOpenSignEditor extends PacketWrapper<WrapperPlayServerOpenSignEditor> {
     private Vector3i position;
-    private boolean isFrontText = true;
+    private boolean isFrontText;
 
     public WrapperPlayServerOpenSignEditor(PacketSendEvent event) {
         super(event);
@@ -50,6 +50,8 @@ public class WrapperPlayServerOpenSignEditor extends PacketWrapper<WrapperPlaySe
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
             isFrontText = readBoolean();
+        } else {
+            isFrontText = true;
         }
     }
 

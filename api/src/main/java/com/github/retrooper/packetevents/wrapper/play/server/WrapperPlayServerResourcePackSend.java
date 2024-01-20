@@ -67,7 +67,7 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
 
         url = readString();
         hash = readString(MAX_HASH_LENGTH);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             required = readBoolean();
             boolean hasPrompt = readBoolean();
             if (hasPrompt) {
@@ -84,7 +84,7 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
 
         writeString(url);
         writeString(hash, MAX_HASH_LENGTH);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             writeBoolean(required);
             writeBoolean(prompt != null);
             if (prompt != null) {
