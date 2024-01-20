@@ -42,11 +42,17 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
 
     public WrapperPlayServerScoreboardObjective(String name, ObjectiveMode mode, Component displayName,
                                                 @Nullable RenderType renderType) {
+        this(name, mode, displayName, renderType, null);
+    }
+
+    public WrapperPlayServerScoreboardObjective(String name, ObjectiveMode mode, Component displayName,
+                                                @Nullable RenderType renderType, @Nullable ScoreFormat scoreFormat) {
         super(PacketType.Play.Server.SCOREBOARD_OBJECTIVE);
         this.name = name;
         this.mode = mode;
         this.displayName = displayName;
         this.renderType = renderType;
+        this.scoreFormat = scoreFormat;
     }
 
     @Override
