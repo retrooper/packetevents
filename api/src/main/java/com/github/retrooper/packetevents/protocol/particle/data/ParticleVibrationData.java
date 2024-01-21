@@ -80,6 +80,7 @@ public class ParticleVibrationData extends ParticleData {
     private PositionType type;
     private @Nullable Vector3i blockPosition;
     private @Nullable Integer entityId;
+    private @Nullable Float entityEyeHeight; // Added in 1.19
     private int ticks;
 
     public ParticleVibrationData(Vector3i startingPosition, @Nullable Vector3i blockPosition, int ticks) {
@@ -95,6 +96,16 @@ public class ParticleVibrationData extends ParticleData {
         this.type = PositionType.ENTITY;
         this.blockPosition = null;
         this.entityId = entityId;
+        this.entityEyeHeight = null;
+        this.ticks = ticks;
+    }
+
+    public ParticleVibrationData(Vector3i startingPosition, int entityId, float entityEyeHeight, int ticks) {
+        this.startingPosition = startingPosition;
+        this.type = PositionType.ENTITY;
+        this.blockPosition = null;
+        this.entityId = entityId;
+        this.entityEyeHeight = entityEyeHeight;
         this.ticks = ticks;
     }
 
@@ -126,6 +137,14 @@ public class ParticleVibrationData extends ParticleData {
         this.entityId = entityId;
     }
 
+    public Optional<Float> getEntityEyeHeight() {
+        return Optional.ofNullable(entityEyeHeight);
+    }
+
+    public void setEntityEyeHeight(@Nullable Float entityEyeHeight) {
+        this.entityEyeHeight = entityEyeHeight;
+    }
+
     public int getTicks() {
         return ticks;
     }
@@ -153,7 +172,12 @@ public class ParticleVibrationData extends ParticleData {
             case BLOCK:
                 return new ParticleVibrationData(startingPos, wrapper.readBlockPosition(), wrapper.readVarInt());
             case ENTITY:
-                return new ParticleVibrationData(startingPos, wrapper.readVarInt(), wrapper.readVarInt());
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
+                    return new ParticleVibrationData(startingPos, wrapper.readVarInt(),
+                                                     wrapper.readFloat(), wrapper.readVarInt());
+                } else {
+                    return new ParticleVibrationData(startingPos, wrapper.readVarInt(), wrapper.readVarInt());
+                }
             default:
                 throw new IllegalArgumentException("Illegal position type: " + positionType);
         }
@@ -174,6 +198,9 @@ public class ParticleVibrationData extends ParticleData {
             wrapper.writeBlockPosition(data.getBlockPosition().get());
         } else if (data.getType() == PositionType.ENTITY) {
             wrapper.writeVarInt(data.getEntityId().get());
+            if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
+                wrapper.writeFloat(data.getEntityEyeHeight().orElse(0f));
+            }
         }
         wrapper.writeVarInt(data.getTicks());
     }
