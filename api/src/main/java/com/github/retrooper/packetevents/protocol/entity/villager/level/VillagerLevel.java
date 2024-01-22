@@ -18,7 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.entity.villager.level;
 
-public enum VillagerLevel  {
+import org.jetbrains.annotations.Nullable;
+
+public enum VillagerLevel {
 
     NOVICE,
     APPRENTICE,
@@ -28,13 +30,15 @@ public enum VillagerLevel  {
 
     private static final VillagerLevel[] VALUES = values();
 
-    public static VillagerLevel getById(int id) {
-        return VALUES[id];
+    public static @Nullable VillagerLevel getById(int id) {
+        if (id >= 1 && id <= VALUES.length) {
+            return VALUES[id - 1];
+        }
+        return null;
     }
 
     public int getId() {
-        return ordinal();
+        return this.ordinal() + 1;
     }
-
 }
 
