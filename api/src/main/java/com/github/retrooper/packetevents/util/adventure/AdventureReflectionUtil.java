@@ -55,8 +55,18 @@ public class AdventureReflectionUtil {
             Constructor<?> SHOW_ENTITY_SERIALIZER_CONSTRUCTOR = Reflection.getConstructor(SHOW_ENTITY_SERIALIZER, 0);
             SHOW_ENTITY_SERIALIZER_CREATE = gson -> invokeSafe(SHOW_ENTITY_SERIALIZER_CONSTRUCTOR);
         } else {
-            Method COMPONENT_SERIALIZER_CREATE_METHOD = Reflection.getMethod(COMPONENT_SERIALIZER, "create", Gson.class);
-            COMPONENT_SERIALIZER_CREATE = gson -> invokeSafe(COMPONENT_SERIALIZER_CREATE_METHOD, gson);
+            try {
+                // adventure >= v4.15; add empty option state for serializer construction
+                Class<?> optionStateCls = Class.forName("net.kyori.option.OptionState");
+                Object optionState = invokeSafe(Reflection.getMethod(optionStateCls, "emptyOptionState"));
+
+                Method COMPONENT_SERIALIZER_CREATE_METHOD = Reflection.getMethod(COMPONENT_SERIALIZER, "create", optionStateCls, Gson.class);
+                COMPONENT_SERIALIZER_CREATE = gson -> invokeSafe(COMPONENT_SERIALIZER_CREATE_METHOD, optionState, gson);
+            } catch (ClassNotFoundException exception) {
+                // adventure < 4.15; no option states available
+                Method COMPONENT_SERIALIZER_CREATE_METHOD = Reflection.getMethod(COMPONENT_SERIALIZER, "create", Gson.class);
+                COMPONENT_SERIALIZER_CREATE = gson -> invokeSafe(COMPONENT_SERIALIZER_CREATE_METHOD, gson);
+            }
 
             Class<?> CLICK_EVENT_ACTION_SERIALIZER = Reflection.getClassByNameWithoutException("net.kyori.adventure.text.serializer.gson.ClickEventActionSerializer");
             Field CLICK_EVENT_ACTION_SERIALIZER_INSTANCE_FIELD = Reflection.getField(CLICK_EVENT_ACTION_SERIALIZER, "INSTANCE");
