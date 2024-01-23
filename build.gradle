@@ -20,7 +20,7 @@ subprojects {
     description = project.name
     version = '2.2.0'//TODO UPDATE - ADD "-SNAPSHOT" if we are dealing with snapshot versions
     project.ext.nettyVersion = '4.1.72.Final'
-    project.ext.adventureVersion = '4.14.0'
+    project.ext.adventureVersion = '4.15.0'
     project.ext.adventureDependencies=["net.kyori:adventure-api:${adventureVersion}",
                                        "net.kyori:adventure-text-serializer-gson:${adventureVersion}",
                                        "net.kyori:adventure-text-serializer-legacy:${adventureVersion}",
