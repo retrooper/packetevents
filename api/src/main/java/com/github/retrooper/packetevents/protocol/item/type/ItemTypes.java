@@ -130,7 +130,7 @@ public class ItemTypes {
     public static final ItemType STRIPPED_OAK_LOG = builder("stripped_oak_log").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.STRIPPED_OAK_LOG).build();
     public static final ItemType LIGHT_GRAY_CONCRETE_POWDER = builder("light_gray_concrete_powder").setMaxAmount(64).setPlacedType(StateTypes.LIGHT_GRAY_CONCRETE_POWDER).build();
     public static final ItemType COOKED_PORKCHOP = builder("cooked_porkchop").setMaxAmount(64).setAttributes(ItemAttribute.EDIBLE).build();
-    public static final ItemType NETHERITE_HELMET = builder("netherite_helmet").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT).build();
+    public static final ItemType NETHERITE_HELMET = builder("netherite_helmet").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT).setMaxDurability(407).build();
     public static final ItemType BLACK_CANDLE = builder("black_candle").setMaxAmount(64).setPlacedType(StateTypes.BLACK_CANDLE).build();
     public static final ItemType CYAN_CONCRETE_POWDER = builder("cyan_concrete_powder").setMaxAmount(64).setPlacedType(StateTypes.CYAN_CONCRETE_POWDER).build();
     public static final ItemType SADDLE = builder("saddle").setMaxAmount(1).build();
@@ -573,7 +573,7 @@ public class ItemTypes {
     public static final ItemType GREEN_GLAZED_TERRACOTTA = builder("green_glazed_terracotta").setMaxAmount(64).setPlacedType(StateTypes.GREEN_GLAZED_TERRACOTTA).build();
     public static final ItemType SCUTE = builder("scute").setMaxAmount(64).build();
     public static final ItemType GOLDEN_CHESTPLATE = builder("golden_chestplate").setMaxAmount(1).setMaxDurability(112).build();
-    public static final ItemType NETHERITE_LEGGINGS = builder("netherite_leggings").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT).build();
+    public static final ItemType NETHERITE_LEGGINGS = builder("netherite_leggings").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT).setMaxDurability(555).build();
     public static final ItemType GOLDEN_SHOVEL = builder("golden_shovel").setMaxAmount(1).setAttributes(ItemAttribute.SHOVEL, ItemAttribute.GOLD_TIER).setMaxDurability(32).build();
     public static final ItemType SPRUCE_STAIRS = builder("spruce_stairs").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.SPRUCE_STAIRS).build();
     public static final ItemType BIRCH_PLANKS = builder("birch_planks").setMaxAmount(64).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.BIRCH_PLANKS).build();
@@ -788,7 +788,7 @@ public class ItemTypes {
     public static final ItemType MOOSHROOM_SPAWN_EGG = builder("mooshroom_spawn_egg").setMaxAmount(64).build();
     public static final ItemType MAP = builder("map").setMaxAmount(64).build();
     public static final ItemType DARK_OAK_SIGN = builder("dark_oak_sign").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.DARK_OAK_SIGN).build();
-    public static final ItemType NETHERITE_BOOTS = builder("netherite_boots").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT).build();
+    public static final ItemType NETHERITE_BOOTS = builder("netherite_boots").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT).setMaxDurability(481).build();
     public static final ItemType BREAD = builder("bread").setMaxAmount(64).setAttributes(ItemAttribute.EDIBLE).build();
     public static final ItemType DEEPSLATE_TILE_SLAB = builder("deepslate_tile_slab").setMaxAmount(64).setPlacedType(StateTypes.DEEPSLATE_TILE_SLAB).build();
     public static final ItemType POLISHED_BLACKSTONE_BUTTON = builder("polished_blackstone_button").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_BLACKSTONE_BUTTON).build();
@@ -871,7 +871,7 @@ public class ItemTypes {
     public static final ItemType YELLOW_DYE = builder("yellow_dye").setMaxAmount(64).build();
     public static final ItemType CYAN_STAINED_GLASS = builder("cyan_stained_glass").setMaxAmount(64).setPlacedType(StateTypes.CYAN_STAINED_GLASS).build();
     public static final ItemType BRICKS = builder("bricks").setMaxAmount(64).setPlacedType(StateTypes.BRICKS).build();
-    public static final ItemType NETHERITE_CHESTPLATE = builder("netherite_chestplate").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT).build();
+    public static final ItemType NETHERITE_CHESTPLATE = builder("netherite_chestplate").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT).setMaxDurability(592).build();
     public static final ItemType ORANGE_BED = builder("orange_bed").setMaxAmount(1).setPlacedType(StateTypes.ORANGE_BED).build();
     public static final ItemType PETRIFIED_OAK_SLAB = builder("petrified_oak_slab").setMaxAmount(64).setPlacedType(StateTypes.PETRIFIED_OAK_SLAB).build();
     public static final ItemType SALMON_SPAWN_EGG = builder("salmon_spawn_egg").setMaxAmount(64).build();
