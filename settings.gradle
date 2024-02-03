@@ -3,6 +3,7 @@ include 'api'
 include 'netty-common'
 //Real modules
 include 'spigot'
+include 'sponge'
 include 'bungeecord'
 include 'velocity'
 

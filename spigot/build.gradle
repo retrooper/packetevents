@@ -4,9 +4,6 @@ repositories {
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-java.targetCompatibility = JavaVersion.VERSION_1_8
-
 shadowJar {
     relocate 'net.kyori.adventure.text.serializer.gson', 'io.github.retrooper.packetevents.adventure.serializer.gson'
     relocate 'net.kyori.adventure.text.serializer.legacy', 'io.github.retrooper.packetevents.adventure.serializer.legacy'

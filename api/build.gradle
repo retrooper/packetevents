@@ -3,10 +3,6 @@ repositories {
     maven { url 'https://repo.papermc.io/repository/maven-public/' }
 }
 
-java {
-    disableAutoTargetJvm()
-}
-
 dependencies {
     compileOnly(adventureDependencies)
 
