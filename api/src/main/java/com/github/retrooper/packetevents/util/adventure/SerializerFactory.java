@@ -25,11 +25,14 @@ import com.google.gson.reflect.TypeToken;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.BlockNBTComponent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslationArgument;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+
+import java.util.UUID;
 
 public class SerializerFactory implements TypeAdapterFactory {
 
@@ -67,9 +70,15 @@ public class SerializerFactory implements TypeAdapterFactory {
             return (TypeAdapter<T>) AdventureReflectionUtil.TEXT_DECORATION_SERIALIZER_INSTANCE;
         } else if (BlockNBTComponent.Pos.class.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) AdventureReflectionUtil.BLOCK_NBT_POS_SERIALIZER_INSTANCE;
-        } else {
-            return null;
+        } else if (AdventureReflectionUtil.IS_4_15_0_OR_NEWER) {
+            if (UUID.class.isAssignableFrom(rawType)) {
+                return (TypeAdapter<T>) AdventureReflectionUtil.UUID_SERIALIZER_INSTANCE;
+            } else if (TranslationArgument.class.isAssignableFrom(rawType)) {
+                return (TypeAdapter<T>) AdventureReflectionUtil.TRANSLATION_ARGUMENT_SERIALIZER_CREATE.apply(gson);
+            }
         }
+
+        return null;
     }
 
 }
