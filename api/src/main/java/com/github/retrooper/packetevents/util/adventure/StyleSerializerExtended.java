@@ -242,7 +242,7 @@ public class StyleSerializerExtended extends TypeAdapter<Style> {
             if (this.emitLegacyHover) {
                 out.name(HOVER_EVENT_VALUE);
                 this.serializeLegacyHoverEvent(hoverEvent, out);
-            } else {
+            } else if (!action.toString().equals("show_achievement")) { // Using string because the variable for SHOW_ACHIEVEMENT is not available in version before 4.14.0
                 out.name(HOVER_EVENT_CONTENTS);
                 if (action == HoverEvent.Action.SHOW_ITEM) {
                     this.gson.toJson(hoverEvent.value(), HoverEvent.ShowItem.class, out);
@@ -270,6 +270,9 @@ public class StyleSerializerExtended extends TypeAdapter<Style> {
     private void serializeLegacyHoverEvent(final HoverEvent<?> hoverEvent, final JsonWriter out) throws IOException {
         if (hoverEvent.action() == HoverEvent.Action.SHOW_TEXT) { // serialization is the same
             this.gson.toJson(hoverEvent.value(), Component.class, out);
+            return;
+        } else if (hoverEvent.action().toString().equals("show_achievement")) {
+            this.gson.toJson(hoverEvent.value(), String.class, out);
             return;
         }
 

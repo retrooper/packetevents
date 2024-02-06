@@ -18,7 +18,6 @@
 
 package com.github.retrooper.packetevents.util.adventure;
 
-import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -42,13 +41,11 @@ import java.util.function.UnaryOperator;
  */
 public class GsonComponentSerializerExtended implements GsonComponentSerializer {
 
-    static boolean LEGACY_ADVENTURE = Reflection.getClassByNameWithoutException("net.kyori.adventure.text.serializer.gson.SerializerFactory") == null;
-
     private final Gson serializer;
     private final UnaryOperator<GsonBuilder> populator;
 
     public GsonComponentSerializerExtended(final boolean downsampleColor, final boolean emitLegacyHover) {
-        if (LEGACY_ADVENTURE) {
+        if (AdventureReflectionUtil.IS_LEGACY_ADVENTURE) {
             this.populator = builder -> {
                 builder.registerTypeHierarchyAdapter(Key.class, AdventureReflectionUtil.KEY_SERIALIZER_INSTANCE);
                 builder.registerTypeHierarchyAdapter(Component.class, AdventureReflectionUtil.COMPONENT_SERIALIZER_CREATE.apply(null));
@@ -69,7 +66,7 @@ public class GsonComponentSerializerExtended implements GsonComponentSerializer 
                 return builder;
             };
         }
-        this.serializer = this.populator.apply(new GsonBuilder()).create();
+        this.serializer = this.populator.apply(new GsonBuilder().disableHtmlEscaping()).create();
     }
 
     @Override
