@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.BlockNBTComponent;
-import net.kyori.adventure.text.TranslationArgument;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextColor;
@@ -25,7 +24,7 @@ import java.util.function.Function;
 public class AdventureReflectionUtil {
 
     static boolean IS_LEGACY_ADVENTURE;
-    static boolean IS_1_15_0_OR_NEWER = false;
+    static boolean IS_4_15_0_OR_NEWER = false;
     static TypeAdapter<Key> KEY_SERIALIZER_INSTANCE;
     static Function<Gson, Object> COMPONENT_SERIALIZER_CREATE;
     static TypeAdapter<ClickEvent.Action> CLICK_EVENT_ACTION_SERIALIZER_INSTANCE;
@@ -66,10 +65,10 @@ public class AdventureReflectionUtil {
             Constructor<?> SHOW_ENTITY_SERIALIZER_CONSTRUCTOR = Reflection.getConstructor(SHOW_ENTITY_SERIALIZER, 0);
             SHOW_ENTITY_SERIALIZER_CREATE = gson -> invokeSafe(SHOW_ENTITY_SERIALIZER_CONSTRUCTOR);
         } else {
-            IS_1_15_0_OR_NEWER = Reflection.getClassByNameWithoutException("net.kyori.option.OptionState") != null;
+            IS_4_15_0_OR_NEWER = Reflection.getClassByNameWithoutException("net.kyori.option.OptionState") != null;
 
             final Object optionState;
-            if (IS_1_15_0_OR_NEWER) {
+            if (IS_4_15_0_OR_NEWER) {
                 // adventure >= v4.15; add option state for serializer construction
                 optionState = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16)
                         ? JSONOptions.byDataVersion() : JSONOptions.byDataVersion().at(2525);
@@ -100,7 +99,7 @@ public class AdventureReflectionUtil {
             Method SHOW_ENTITY_SERIALIZER_CREATE_METHOD = Reflection.getMethod(SHOW_ENTITY_SERIALIZER, "create", Gson.class);
             SHOW_ENTITY_SERIALIZER_CREATE = gson -> invokeSafe(SHOW_ENTITY_SERIALIZER_CREATE_METHOD, gson);
 
-            if (IS_1_15_0_OR_NEWER) {
+            if (IS_4_15_0_OR_NEWER) {
                 Class<?> UUID_SERIALIZER = Reflection.getClassByNameWithoutException("net.kyori.adventure.text.serializer.gson.UUIDSerializer");
                 Method UUID_SERIALIZER_CREATE = Reflection.getMethod(UUID_SERIALIZER, "uuidSerializer", OptionState.class);
                 UUID_SERIALIZER_INSTANCE = (TypeAdapter<UUID>) invokeSafe(UUID_SERIALIZER_CREATE, optionState);
