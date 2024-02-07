@@ -25,7 +25,6 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
 public class WrapperPlayServerActionBar extends PacketWrapper<WrapperPlayServerActionBar> {
-
     private Component actionBarText;
 
     public WrapperPlayServerActionBar(PacketSendEvent event) {
