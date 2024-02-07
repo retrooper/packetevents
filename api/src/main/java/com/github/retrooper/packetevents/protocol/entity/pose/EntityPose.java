@@ -36,6 +36,7 @@ public enum EntityPose {
     SNIFFING,
     EMERGING,
     DIGGING,
+    //Added in 1.20.4
     SLIDING,
     SHOOTING,
     INHALING;
