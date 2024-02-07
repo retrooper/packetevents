@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,56 +24,39 @@ import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
-public class WrapperPlayServerSetActionBarText extends PacketWrapper<WrapperPlayServerSetActionBarText> {
+public class WrapperPlayServerActionBar extends PacketWrapper<WrapperPlayServerActionBar> {
 
-    @Deprecated
-    public static boolean HANDLE_JSON = true;
+    private Component actionBarText;
 
-    private Component actionBar;
-
-    public WrapperPlayServerSetActionBarText(PacketSendEvent event) {
+    public WrapperPlayServerActionBar(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerSetActionBarText(String actionBarJson) {
-        this(AdventureSerializer.parseComponent(actionBarJson));
-    }
-
-    public WrapperPlayServerSetActionBarText(Component actionBar) {
+    public WrapperPlayServerActionBar(Component actionBarText) {
         super(PacketType.Play.Server.ACTION_BAR);
-        this.actionBar = actionBar;
+        this.actionBarText = actionBarText;
     }
 
     @Override
     public void read() {
-        this.actionBar = this.readComponent();
+        this.actionBarText = this.readComponent();
     }
 
     @Override
     public void write() {
-        this.writeComponent(this.actionBar);
+        this.writeComponent(this.actionBarText);
     }
 
     @Override
-    public void copy(WrapperPlayServerSetActionBarText wrapper) {
-        this.actionBar = wrapper.actionBar;
+    public void copy(WrapperPlayServerActionBar wrapper) {
+        this.actionBarText = wrapper.actionBarText;
     }
 
-    public Component getActionBar() {
-        return actionBar;
+    public Component getActionBarText() {
+        return actionBarText;
     }
 
-    public void setActionBar(Component actionBar) {
-        this.actionBar = actionBar;
-    }
-
-    @Deprecated
-    public String getActionBarJson() {
-        return AdventureSerializer.toJson(this.getActionBar());
-    }
-
-    @Deprecated
-    public void setActionBarJson(String titleJson) {
-        this.setActionBar(AdventureSerializer.parseComponent(titleJson));
+    public void setActionBarText(Component actionBarText) {
+        this.actionBarText = actionBarText;
     }
 }
