@@ -65,7 +65,7 @@ public class AdventureReflectionUtil {
             Constructor<?> SHOW_ENTITY_SERIALIZER_CONSTRUCTOR = Reflection.getConstructor(SHOW_ENTITY_SERIALIZER, 0);
             SHOW_ENTITY_SERIALIZER_CREATE = gson -> invokeSafe(SHOW_ENTITY_SERIALIZER_CONSTRUCTOR);
         } else {
-            IS_4_15_0_OR_NEWER = Reflection.getClassByNameWithoutException("net.kyori.option.OptionState") != null;
+            IS_4_15_0_OR_NEWER = Reflection.getClassByNameWithoutException("net.kyori.adventure.text.serializer.gson.TranslationArgumentSerializer") != null;
 
             final Object optionState;
             if (IS_4_15_0_OR_NEWER) {
