@@ -253,10 +253,20 @@ public class WrapperPlayServerUnlockRecipes extends PacketWrapper<WrapperPlaySer
         this.elements = elements;
     }
 
+    /**
+     * On version 1.13 and above, the recipe ids are read as ResourceLocation, otherwise they are read as integers.
+     *
+     * @return The recipe ids
+     */
     public List<RecipeId<?>> getRecipeIds() {
         return recipeIds;
     }
 
+    /**
+     * On version 1.13 and above, the recipe ids are written as ResourceLocation, otherwise they are written as integers.
+     *
+     * @param recipeIds The recipe ids
+     */
     public void setRecipeIds(List<RecipeId<?>> recipeIds) {
         this.recipeIds = recipeIds;
     }
@@ -269,10 +279,21 @@ public class WrapperPlayServerUnlockRecipes extends PacketWrapper<WrapperPlaySer
         this.elementsInit = elementsInit;
     }
 
+    /**
+     * On version 1.13 and above, the recipe ids are read as ResourceLocation, otherwise they are read as integers.
+     *
+     * @return The recipe ids init
+     */
     public List<RecipeId<?>> getRecipeIdsInit() {
         return recipeIdsInit;
     }
 
+
+    /**
+     * On version 1.13 and above, the recipe ids are written as ResourceLocation, otherwise they are written as integers.
+     *
+     * @param recipeIdsInit The recipe ids init
+     */
     public void setRecipeIdsInit(List<RecipeId<?>> recipeIdsInit) {
         this.recipeIdsInit = recipeIdsInit;
     }
