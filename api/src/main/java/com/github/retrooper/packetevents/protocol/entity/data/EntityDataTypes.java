@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.entity.data;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.entity.armadillo.ArmadilloState;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.entity.sniffer.SnifferState;
 import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
@@ -63,7 +64,8 @@ public class EntityDataTypes {
             ClientVersion.V_1_14,
             ClientVersion.V_1_19,
             ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4);
+            ClientVersion.V_1_19_4,
+            ClientVersion.V_1_20_5);
 
     public static final EntityDataType<Byte> BYTE = define("byte", PacketWrapper::readByte, PacketWrapper::writeByte);
 
@@ -194,6 +196,10 @@ public class EntityDataTypes {
         return SnifferState.values()[id];
     }, (PacketWrapper<?> wrapper, SnifferState value) -> wrapper.writeVarInt(value.ordinal()));
 
+    public static final EntityDataType<ArmadilloState> ARMADILLO_STATE = define("armadillo_state", (PacketWrapper<?> wrapper) -> {
+        int id = wrapper.readVarInt();
+        return ArmadilloState.values()[id];
+    }, (PacketWrapper<?> wrapper, ArmadilloState value) -> wrapper.writeVarInt(value.ordinal()));
 
     public static final EntityDataType<Vector3f> VECTOR3F = define("vector3f",
             (PacketWrapper<?> wrapper) -> new Vector3f(wrapper.readFloat(), wrapper.readFloat(), wrapper.readFloat()),

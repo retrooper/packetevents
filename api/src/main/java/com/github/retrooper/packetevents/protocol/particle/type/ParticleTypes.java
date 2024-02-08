@@ -46,7 +46,8 @@ public class ParticleTypes {
             ClientVersion.V_1_19,
             ClientVersion.V_1_19_4,
             ClientVersion.V_1_20,
-            ClientVersion.V_1_20_3);
+            ClientVersion.V_1_20_3,
+            ClientVersion.V_1_20_5);
 
     public static ParticleType define(String key, Function<PacketWrapper<?>, ParticleData> readDataFunction, BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction) {
         TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
@@ -209,11 +210,13 @@ public class ParticleTypes {
     public static final ParticleType DRIPPING_CHERRY_LEAVES = define("dripping_cherry_leaves");
     public static final ParticleType FALLING_CHERRY_LEAVES = define("falling_cherry_leaves");
     public static final ParticleType LANDING_CHERRY_LEAVES = define("landing_cherry_leaves");
-    //Added in 1.20
+
+    // Added in 1.20
     public static final ParticleType CHERRY_LEAVES = define("cherry_leaves");
     public static final ParticleType EGG_CRACK = define("egg_crack");
-    //Added in 1.20.3
-    public static final ParticleType GUST = define("gust");
+
+    // Added in 1.20.3
+    public static final ParticleType GUST = define("gust"); // Removed in 1.20.5
     public static final ParticleType GUST_EMITTER = define("gust_emitter");
     public static final ParticleType WHITE_SMOKE = define("white_smoke");
     public static final ParticleType DUST_PLUME = define("dust_plume");

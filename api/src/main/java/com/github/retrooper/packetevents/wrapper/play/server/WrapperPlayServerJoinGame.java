@@ -55,6 +55,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     private boolean isFlat;
     private WorldBlockPosition lastDeathPosition;
     private Integer portalCooldown;
+    private boolean enforcesSecureChat;
 
     public WrapperPlayServerJoinGame(PacketSendEvent event) {
         super(event);
@@ -79,6 +80,20 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                                      int maxPlayers, int viewDistance, int simulationDistance,
                                      boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
                                      boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition, @Nullable Integer portalCooldown) {
+        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, dimension, difficulty,
+                worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo,
+                enableRespawnScreen, limitedCrafting, isDebug, isFlat, lastDeathPosition,
+                portalCooldown, false);
+    }
+
+    public WrapperPlayServerJoinGame(int entityID, boolean hardcore, GameMode gameMode,
+                                     @Nullable GameMode previousGameMode, List<String> worldNames,
+                                     NBTCompound dimensionCodec, Dimension dimension,
+                                     Difficulty difficulty, String worldName, long hashedSeed,
+                                     int maxPlayers, int viewDistance, int simulationDistance,
+                                     boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
+                                     boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
+                                     @Nullable Integer portalCooldown, boolean enforcesSecureChat) {
         super(PacketType.Play.Server.JOIN_GAME);
         this.entityID = entityID;
         this.hardcore = hardcore;
@@ -100,6 +115,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         this.isFlat = isFlat;
         this.lastDeathPosition = lastDeathPosition;
         this.portalCooldown = portalCooldown;
+        this.enforcesSecureChat = enforcesSecureChat;
     }
 
     @Override
@@ -180,6 +196,9 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
             portalCooldown = readVarInt();
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            enableRespawnScreen = readBoolean();
         }
     }
 
@@ -277,6 +296,9 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             int pCooldown = portalCooldown != null ? portalCooldown : 0;
             writeVarInt(pCooldown);
         }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            writeBoolean(enforcesSecureChat);
+        }
     }
 
     @Override
@@ -301,6 +323,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         isFlat = wrapper.isFlat;
         lastDeathPosition = wrapper.lastDeathPosition;
         portalCooldown = wrapper.portalCooldown;
+        enforcesSecureChat = wrapper.enforcesSecureChat;
     }
 
     public int getEntityId() {
@@ -462,5 +485,13 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
 
     public void setPortalCooldown(int portalCooldown) {
         this.portalCooldown = portalCooldown;
+    }
+
+    public boolean isEnforcesSecureChat() {
+        return this.enforcesSecureChat;
+    }
+
+    public void setEnforcesSecureChat(boolean enforcesSecureChat) {
+        this.enforcesSecureChat = enforcesSecureChat;
     }
 }

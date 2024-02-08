@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.attribute.Attribute;
+import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -57,10 +59,17 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
         }
         properties = new ArrayList<>(propertyCount);
         for (int i = 0; i < propertyCount; i++) {
-            //NOTE: Some people report errors that this limit check breaks for them, lets try removing it
-            //int maxKeyLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
-            int maxKeyLength = 32767;
-            String key = readString(maxKeyLength);
+            Attribute attribute;
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                attribute = Attributes.getById(this.serverVersion.toClientVersion(), this.readVarInt());
+            } else {
+                //NOTE: Some people report errors that this limit check breaks for them, lets try removing it
+                //int maxKeyLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
+                int maxKeyLength = 32767;
+                String key = this.readString(maxKeyLength);
+                attribute = Attributes.getByName(key);
+            }
+
             double value = readDouble();
             int modifiersLength;
             if (serverVersion == ServerVersion.V_1_7_10) {
@@ -78,7 +87,7 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
                 PropertyModifier.Operation operation = PropertyModifier.Operation.VALUES[operationIndex];
                 modifiers.add(new PropertyModifier(uuid, amount, operation));
             }
-            properties.add(new Property(key, value, modifiers));
+            this.properties.add(new Property(attribute, value, modifiers));
         }
     }
 
@@ -96,8 +105,13 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
             writeInt(properties.size());
         }
         for (Property property : properties) {
-            int maxKeyLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
-            writeString(property.key, maxKeyLength);
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                this.writeVarInt(property.getAttribute().getId(this.serverVersion.toClientVersion()));
+            } else {
+                int maxKeyLength = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
+                this.writeString(property.getKey(), maxKeyLength);
+            }
+
             writeDouble(property.value);
             if (serverVersion == ServerVersion.V_1_7_10) {
                 writeShort(property.modifiers.size());
@@ -179,22 +193,38 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
     }
 
     public static class Property {
-        private String key;
+
+        private Attribute attribute;
         private double value;
         private List<PropertyModifier> modifiers;
 
+        @Deprecated
         public Property(String key, double value, List<PropertyModifier> modifiers) {
-            this.key = key;
+            this(Attributes.getByName(key), value, modifiers);
+        }
+
+        public Property(Attribute attribute, double value, List<PropertyModifier> modifiers) {
+            this.attribute = attribute;
             this.value = value;
             this.modifiers = modifiers;
         }
 
-        public String getKey() {
-            return key;
+        public Attribute getAttribute() {
+            return this.attribute;
         }
 
+        public void setAttribute(Attribute attribute) {
+            this.attribute = attribute;
+        }
+
+        @Deprecated
+        public String getKey() {
+            return this.getAttribute().getName().toString();
+        }
+
+        @Deprecated
         public void setKey(String key) {
-            this.key = key;
+            this.setAttribute(Attributes.getByName(key));
         }
 
         public double getValue() {
