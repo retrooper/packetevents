@@ -92,7 +92,7 @@ import static net.kyori.adventure.text.serializer.json.JSONComponentConstants.TR
 public final class AdventureNBTSerialization {
 
     private static final TagType[] NBT_TYPES = TagType.values();
-    private static final int DEPTH_LIMIT = 13;
+    private static final int DEPTH_LIMIT = 512;
 
     // more constants
     // decorations
