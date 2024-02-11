@@ -90,8 +90,10 @@ public enum ClientVersion {
     V_1_20_3(765),
     //TODO UPDATE Add new protocol version field
 
+    @Deprecated
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
+    @Deprecated
     HIGHER_THAN_SUPPORTED_VERSIONS(V_1_20_3.protocolVersion + 1, true),
 
     UNKNOWN(-1, true);
