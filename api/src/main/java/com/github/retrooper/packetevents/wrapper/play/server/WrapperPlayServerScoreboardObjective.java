@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
 import com.github.retrooper.packetevents.protocol.score.ScoreFormatTypes;
+import com.github.retrooper.packetevents.util.LegacyFormat;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -93,7 +94,7 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
         writeByte((byte) mode.ordinal());
         if (this.mode == ObjectiveMode.CREATE || this.mode == ObjectiveMode.UPDATE) {
             if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-                writeString(AdventureSerializer.asVanilla(displayName));
+                writeString(LegacyFormat.trimLegacyFormat(AdventureSerializer.asVanilla(displayName), 32));
                 if (renderType != null) {
                     writeString(renderType.name().toLowerCase());
                 } else {
