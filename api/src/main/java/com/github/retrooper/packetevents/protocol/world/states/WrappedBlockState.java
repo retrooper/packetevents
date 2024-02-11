@@ -34,25 +34,13 @@ public class WrappedBlockState {
 
     private static final Map<String, String> STRING_UPDATER = new HashMap<>();
 
-    // Try to reduce memory footprint by re-using hashmaps when they are equal
-    // We do this by setting the key and value equal to one another
-    // this.data = cache.computeIfAbsent(this.data, (key) -> key);
-    // This will get an equal value if present, otherwise it will add the key to the cache
-    // Once this is done, we remove this cache to save memory
-    // A HashMap is used instead of another data type because a hashmap is o(1)
-    //
-    // 4845 total combinations, last updated with 1.18.2 (which uses 1.17 block mappings)
-    // This brings total memory usage from 62 MB to 34 MB, a 28 MB reduction
-    // Using a HashMap reduces memory usage to less than a megabyte, I can't get precise numbers because hard to see on a heapdump
-    private static Map<Map<StateValue, Object>, Map<StateValue, Object>> cache = new HashMap<>(4845, 70);
-
     static {
         STRING_UPDATER.put("grass_path", "dirt_path"); // 1.16 -> 1.17
 
         loadLegacy();
+        System.out.println("Completed load legacy");
         loadModern();
-
-        cache = null; // Everything is loaded, there is no need to cache anymore
+        System.out.println("Completed lod modern");
     }
 
     int globalID;
@@ -79,8 +67,6 @@ public class WrappedBlockState {
             }
         }
 
-
-        this.data = cache.computeIfAbsent(this.data, (key) -> key);
         this.mappingsIndex = mappingsIndex;
     }
 
@@ -173,6 +159,7 @@ public class WrappedBlockState {
         final NBTCompound compound = MappingHelper.decompress("mappings/block/legacy_block_mappings");
 
         for (Map.Entry<String, NBT> entry : compound.getTags().entrySet()) {
+            if (entry.getKey().equals("version")) continue;
             NBTCompound inner = (NBTCompound) entry.getValue();
 
             StateType type = StateTypes.getByName(entry.getKey());
@@ -258,6 +245,7 @@ public class WrappedBlockState {
         final NBTCompound compound = MappingHelper.decompress("mappings/block/modern_block_mappings");
 
         for (Map.Entry<String, NBT> versionEntry : compound.getTags().entrySet()) {
+            if (versionEntry.getKey().equals("version")) continue;
             ClientVersion version = ClientVersion.valueOf(versionEntry.getKey());
             byte mappingIndex = getMappingsIndex(version);
             NBTList<NBTCompound> list = (NBTList<NBTCompound>) versionEntry.getValue();
@@ -280,7 +268,12 @@ public class WrappedBlockState {
                     }
                 }
 
-                int defaultIdx = element.getNumberTagOrThrow("def").getAsInt();
+                int defaultIdx = 0;
+                if (element.getTagOrNull("def") == null) {
+                    PacketEvents.getAPI().getLogger().warning("No default state for " + type + " using 0");
+                } else {
+                    defaultIdx = element.getNumberTagOrThrow("def").getAsInt();
+                }
 
                 int index = 0;
                 for (NBTCompound dataContent : element.getCompoundListTagOrThrow("entries").getTags()) {
@@ -1255,4 +1248,6 @@ public class WrappedBlockState {
     public String toString() {
         return INTO_STRING.get(mappingsIndex).get(this);
     }
+
+    public static void ensureLoad() {}
 }
