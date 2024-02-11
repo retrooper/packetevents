@@ -38,9 +38,7 @@ public class WrappedBlockState {
         STRING_UPDATER.put("grass_path", "dirt_path"); // 1.16 -> 1.17
 
         loadLegacy();
-        System.out.println("Completed load legacy");
         loadModern();
-        System.out.println("Completed lod modern");
     }
 
     int globalID;
