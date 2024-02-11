@@ -37,7 +37,7 @@ import java.nio.file.Path;
 
 @Plugin(id = "packetevents", name = "PacketEvents",
         description = "Packet library.", authors = {"retrooper"},
-        version = "2.2.0") //TODO UPDATE
+        version = "2.2.1") //TODO UPDATE
 public class PacketEventsPlugin {
     private final ProxyServer server;
     private final Logger logger;
