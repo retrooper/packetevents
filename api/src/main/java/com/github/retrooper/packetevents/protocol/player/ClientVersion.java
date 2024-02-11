@@ -90,8 +90,10 @@ public enum ClientVersion {
     V_1_20_3(765),
     //TODO UPDATE Add new protocol version field
 
+    @Deprecated
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
+    @Deprecated
     HIGHER_THAN_SUPPORTED_VERSIONS(V_1_20_3.protocolVersion + 1, true),
 
     UNKNOWN(-1, true);
@@ -163,9 +165,9 @@ public enum ClientVersion {
     @NotNull
     public static ClientVersion getById(int protocolVersion) {
         if (protocolVersion < LOWEST_SUPPORTED_PROTOCOL_VERSION) {
-            return LOWER_THAN_SUPPORTED_VERSIONS;
+            return V_1_7_10;
         } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
-            return HIGHER_THAN_SUPPORTED_VERSIONS;
+            return V_1_20_3;
         } else {
             for (ClientVersion version : VALUES) {
                 if (version.protocolVersion > protocolVersion) {
