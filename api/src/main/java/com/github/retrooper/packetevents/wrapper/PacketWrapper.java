@@ -1138,24 +1138,29 @@ public class PacketWrapper<T extends PacketWrapper> {
     public Node readNode() {
         byte flags = readByte();
         int nodeType = flags & 0x03; // 0: root, 1: literal, 2: argument
-        boolean hasRedirect = (flags & 0x08) != 0;
-        boolean hasSuggestionsType = nodeType == 2 && ((flags & 0x10) != 0);
 
         List<Integer> children = readList(PacketWrapper::readVarInt);
 
-        Integer redirectNodeIndex = hasRedirect ? readVarInt() : null;
-        String name = nodeType == 1 || nodeType == 2 ? readString() : null;
-        Integer parserID = nodeType == 2 ? readVarInt() : null;
-        List<Object> properties = nodeType == 2 ? Parsers.getParsers().get(parserID).readProperties(this).orElse(null) : null;
-        ResourceLocation suggestionType = hasSuggestionsType ? readIdentifier() : null;
-
-        return new Node(flags, children, redirectNodeIndex, name, parserID, properties, suggestionType);
+        int redirectNodeIndex = ((flags & 0x08) != 0) ? readVarInt() : 0;
+        if (nodeType == 2) {
+            String name = readString();
+            int parserID = readVarInt();
+            List<Object> properties = Parsers.getParsers().get(parserID).readProperties(this).orElse(null);
+            ResourceLocation suggestionType = ((flags & 0x10) != 0) ? readIdentifier() : null;
+            return new Node(flags, children, redirectNodeIndex, name, parserID, properties, suggestionType);
+        } else if (nodeType == 1) {
+            return new Node(flags, children, redirectNodeIndex, readString(), null, null, null);
+        } else {
+            return new Node(flags, children, redirectNodeIndex, null, null, null, null);
+        }
     }
 
     public void writeNode(Node node) {
         writeByte(node.getFlags());
         writeList(node.getChildren(), PacketWrapper::writeVarInt);
-        node.getRedirectNodeIndex().ifPresent(this::writeVarInt);
+        if ((node.getFlags() & 0x08) != 0) {
+            writeVarInt(node.getRedirectNodeIndex());
+        }
         node.getName().ifPresent(this::writeString);
         node.getParserID().ifPresent(this::writeVarInt);
         if (node.getProperties().isPresent())
