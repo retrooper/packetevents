@@ -1,3 +1,21 @@
+/*
+ * This file is part of ProtocolSupport - https://github.com/ProtocolSupport/ProtocolSupport
+ * Copyright (C) 2021 ProtocolSupport
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.github.retrooper.packetevents.util.adventure;
 
 import com.github.retrooper.packetevents.protocol.nbt.*;
@@ -159,7 +177,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
 
             // interpret
             boolean interpret = ((NBTComponent<?, ?>) component).interpret();
-            if (interpret) { // defaults to true
+            if (interpret) {
                 writer.writeBoolean("interpret", true);
             }
 
@@ -208,11 +226,10 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             TextColor color = deserializeColor(value);
             if (color != null) style.color(color);
         });
-        reader.useBoolean("bold", value -> style.decoration(TextDecoration.BOLD, TextDecoration.State.byBoolean(value)));
-        reader.useBoolean("italic", value -> style.decoration(TextDecoration.ITALIC, TextDecoration.State.byBoolean(value)));
-        reader.useBoolean("underlined", value -> style.decoration(TextDecoration.UNDERLINED, TextDecoration.State.byBoolean(value)));
-        reader.useBoolean("strikethrough", value -> style.decoration(TextDecoration.STRIKETHROUGH, TextDecoration.State.byBoolean(value)));
-        reader.useBoolean("obfuscated", value -> style.decoration(TextDecoration.OBFUSCATED, TextDecoration.State.byBoolean(value)));
+
+        for (Map.Entry<TextDecoration, String> decoration : TextDecoration.NAMES.valueToKey().entrySet()) {
+            reader.useBoolean(decoration.getValue(), value -> style.decoration(decoration.getKey(), TextDecoration.State.byBoolean(value)));
+        }
         reader.useUTF("insertion", style::insertion);
 
         NBTReader clickEvent = reader.child("clickEvent");
@@ -263,20 +280,12 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         TextColor color = style.color();
         if (color != null) writer.writeUTF("color", serializeColor(color));
 
-        TextDecoration.State bold = style.decoration(TextDecoration.BOLD);
-        if (bold != TextDecoration.State.NOT_SET) writer.writeBoolean("bold", bold == TextDecoration.State.TRUE);
-
-        TextDecoration.State italic = style.decoration(TextDecoration.ITALIC);
-        if (italic != TextDecoration.State.NOT_SET) writer.writeBoolean("italic", italic == TextDecoration.State.TRUE);
-
-        TextDecoration.State underlined = style.decoration(TextDecoration.UNDERLINED);
-        if (underlined != TextDecoration.State.NOT_SET) writer.writeBoolean("underlined", underlined == TextDecoration.State.TRUE);
-
-        TextDecoration.State strikethrough = style.decoration(TextDecoration.STRIKETHROUGH);
-        if (strikethrough != TextDecoration.State.NOT_SET) writer.writeBoolean("strikethrough", strikethrough == TextDecoration.State.TRUE);
-
-        TextDecoration.State obfuscated = style.decoration(TextDecoration.OBFUSCATED);
-        if (obfuscated != TextDecoration.State.NOT_SET) writer.writeBoolean("obfuscated", obfuscated == TextDecoration.State.TRUE);
+        for (Map.Entry<TextDecoration, String> decoration : TextDecoration.NAMES.valueToKey().entrySet()) {
+            TextDecoration.State state = style.decoration(decoration.getKey());
+            if (state != TextDecoration.State.NOT_SET) {
+                writer.writeBoolean(decoration.getValue(), state == TextDecoration.State.TRUE);
+            }
+        }
 
         String insertion = style.insertion();
         if (insertion != null) writer.writeUTF("insertion", insertion);
