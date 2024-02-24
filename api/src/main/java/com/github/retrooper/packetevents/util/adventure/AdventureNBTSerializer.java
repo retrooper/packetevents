@@ -90,7 +90,9 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             throw new IllegalStateException("Illegal nbt component, component type could not be determined");
         }
 
-        builder.style(style);
+        if (style != null) {
+            builder.style(style);
+        }
 
         if (extra != null) {
             builder.append(extra);
