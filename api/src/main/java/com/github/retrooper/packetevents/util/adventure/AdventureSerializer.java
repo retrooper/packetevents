@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.util.adventure;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.google.gson.JsonElement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -29,6 +30,7 @@ public class AdventureSerializer {
 
     private static GsonComponentSerializer GSON;
     private static LegacyComponentSerializer LEGACY;
+    private static AdventureNBTSerializer NBT;
 
     public static GsonComponentSerializer getGsonSerializer() {
         if (GSON == null) {
@@ -41,7 +43,12 @@ public class AdventureSerializer {
         return GSON;
     }
 
+    @Deprecated
     public static LegacyComponentSerializer getLegacyGsonSerializer() {
+        return getLegacySerializer();
+    }
+
+    public static LegacyComponentSerializer getLegacySerializer() {
         if (LEGACY == null) {
             LegacyComponentSerializer.Builder builder = LegacyComponentSerializer.builder();
             if (!PacketEvents.getAPI().getSettings().shouldDownsampleColors() || PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16))
@@ -51,16 +58,25 @@ public class AdventureSerializer {
         return LEGACY;
     }
 
+    public static AdventureNBTSerializer getNBTSerializer() {
+        if (NBT == null) {
+            NBT = new AdventureNBTSerializer(
+                    PacketEvents.getAPI().getSettings().shouldDownsampleColors()
+            );
+        }
+        return NBT;
+    }
+
     public static String asVanilla(Component component) {
-        return getLegacyGsonSerializer().serialize(component);
+        return getLegacySerializer().serialize(component);
     }
 
     public static Component fromLegacyFormat(String legacyMessage) {
-        return getLegacyGsonSerializer().deserializeOrNull(legacyMessage);
+        return getLegacySerializer().deserializeOrNull(legacyMessage);
     }
 
     public static String toLegacyFormat(Component component) {
-        return getLegacyGsonSerializer().serializeOrNull(component);
+        return getLegacySerializer().serializeOrNull(component);
     }
 
     public static Component parseComponent(String json) {
@@ -77,6 +93,14 @@ public class AdventureSerializer {
 
     public static JsonElement toJsonTree(Component component) {
         return getGsonSerializer().serializeToTree(component);
+    }
+
+    public static Component fromNbt(NBT nbt) {
+        return getNBTSerializer().deserialize(nbt);
+    }
+
+    public static NBT toNbt(Component component) {
+        return getNBTSerializer().serialize(component);
     }
 
 }
