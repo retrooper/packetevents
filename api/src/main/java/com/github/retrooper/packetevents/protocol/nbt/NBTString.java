@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.nbt;
 
+import org.intellij.lang.annotations.Subst;
+
 import java.util.Objects;
 
 public class NBTString extends NBT {
@@ -60,5 +62,10 @@ public class NBTString extends NBT {
     @Override
     public NBTString copy() {
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "String(" + string + ")";
     }
 }

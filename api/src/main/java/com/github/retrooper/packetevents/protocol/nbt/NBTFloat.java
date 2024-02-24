@@ -90,4 +90,9 @@ public class NBTFloat extends NBTNumber {
     public NBTFloat copy() {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "Float(" + value + ")";
+    }
 }

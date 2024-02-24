@@ -63,4 +63,9 @@ public class NBTLongArray extends NBT {
         System.arraycopy(this.array, 0, along, 0, this.array.length);
         return new NBTLongArray(along);
     }
+
+    @Override
+    public String toString() {
+        return "LongArray(" + Arrays.toString(array) + ")";
+    }
 }

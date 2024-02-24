@@ -89,4 +89,9 @@ public class NBTShort extends NBTNumber {
     public NBTShort copy() {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "Short(" + value + ")";
+    }
 }

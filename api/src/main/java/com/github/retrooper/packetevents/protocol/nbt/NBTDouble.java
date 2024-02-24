@@ -90,4 +90,9 @@ public class NBTDouble extends NBTNumber {
     public NBTDouble copy() {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "Double(" + value + ")";
+    }
 }
