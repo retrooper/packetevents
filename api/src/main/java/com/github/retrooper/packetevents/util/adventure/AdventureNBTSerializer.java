@@ -62,8 +62,20 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         NBTCompound compound = requireType(input, NBTType.COMPOUND);
         NBTReader reader = new NBTReader(compound);
 
-        String text = reader.readUTF("text", Function.identity());
-        if (text == null) text = reader.readUTF("", Function.identity());
+        Function<NBT, String> textFunction = nbt -> {
+            if (nbt.getType() == NBTType.STRING) {
+                return ((NBTString) nbt).getValue();
+            } else if (nbt.getType() == NBTType.BYTE && ((NBTByte) nbt).getAsByte() < 2) {
+                return String.valueOf(((NBTByte) nbt).getAsByte() == 1);
+            } else if (nbt instanceof NBTNumber) {
+                return String.valueOf(((NBTNumber) nbt).getAsInt());
+            } else {
+                throw new IllegalStateException("Don't know how to deserialize " + nbt.getType() + " to text");
+            }
+        };
+        String text = reader.read("text", textFunction);
+        if (text == null) text = reader.read("", textFunction);
+
         String translate = reader.readUTF("translate", Function.identity());
         String translateFallback = reader.readUTF("fallback", Function.identity());
         List<Component> translateWith = reader.readList("with", this::deserializeComponentList);
