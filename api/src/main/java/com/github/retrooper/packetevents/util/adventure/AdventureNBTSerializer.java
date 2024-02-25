@@ -46,10 +46,19 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
 
     @Override
     public @NotNull Component deserialize(@NotNull NBT input) {
-        if (input.getType() == NBTType.STRING) {
+        if (input.getType() == NBTType.STRING) { // Serialized as string
             return Component.text(((NBTString) input).getValue());
         }
 
+        if (input.getType() == NBTType.BYTE && ((NBTByte) input).getAsByte() < 2) { // Serialized as boolean
+            return Component.text(((NBTByte) input).getAsByte() == 1);
+        }
+
+        if (input instanceof NBTNumber) { // Serialized as number
+            return Component.text(((NBTNumber) input).getAsInt());
+        }
+
+        // Serialized as tree
         NBTCompound compound = requireType(input, NBTType.COMPOUND);
         NBTReader reader = new NBTReader(compound);
 
