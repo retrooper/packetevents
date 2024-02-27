@@ -80,14 +80,16 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
 
             if (PacketEvents.getAPI().getSettings().isKickOnPacketExceptionEnabled()) {
                 try {
-                    user.sendPacket(new WrapperPlayServerDisconnect(Component.empty()));
+                    user.sendPacket(new WrapperPlayServerDisconnect(Component.text("Invalid packet")));
                 } catch (Exception ignored) { // There may (?) be an exception if the player is in the wrong state...
-                    PacketEvents.getAPI().getLogManager().warn("Failed to send disconnect packet to disconnect " + user.getProfile().getName() + " due to invalid packet! Disconnecting anyways.");
+                    // Do nothing.
                 }
                 user.closeConnection();
                 if (player != null) {
-                    FoliaCompatUtil.runTaskForEntity(player, (Plugin) PacketEvents.getAPI().getPlugin(), () -> player.kickPlayer(""), null, 1);
+                    FoliaCompatUtil.runTaskForEntity(player, (Plugin) PacketEvents.getAPI().getPlugin(), () -> player.kickPlayer("Invalid packet"), null, 1);
                 }
+
+                PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to invalid packet!");
             }
         }
     }
