@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.injector.handlers;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -67,7 +68,11 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         if (ExceptionUtil.isException(cause, PacketProcessException.class)
                 && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
                 && (user != null && user.getDecoderState() != ConnectionState.HANDSHAKING)) {
-            cause.printStackTrace();
+            if (PacketEvents.getAPI().getSettings().isDebugEnabled()) {
+                cause.printStackTrace();
+            } else {
+                PacketEvents.getAPI().getLogManager().warn(cause.getMessage());
+            }
         }
     }
 
