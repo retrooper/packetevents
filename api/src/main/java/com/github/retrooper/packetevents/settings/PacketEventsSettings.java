@@ -37,6 +37,8 @@ public class PacketEventsSettings {
     private boolean downsampleColors = true;
     private boolean bStatsEnabled = true;
     private boolean debugEnabled = false;
+    private boolean fullStackTraceEnabled = false;
+    private boolean kickOnPacketExceptionEnabled = true;
     private Function<String, InputStream> resourceProvider = path -> PacketEventsSettings.class
             .getClassLoader()
             .getResourceAsStream(path);
@@ -114,6 +116,28 @@ public class PacketEventsSettings {
     }
 
     /**
+     * This decides if PacketEvents should print packets error stacktrace
+     *
+     * @param fullStackTraceEnabled Value
+     * @return Settings instance.
+     */
+    public PacketEventsSettings fullStackTrace(boolean fullStackTraceEnabled) {
+        this.fullStackTraceEnabled = fullStackTraceEnabled;
+        return this;
+    }
+
+    /**
+     * This decides if PacketEvents should kick the player in case a packet exception occurs.
+     *
+     * @param kickOnPacketExceptionEnabled Value
+     * @return Settings instance.
+     */
+    public PacketEventsSettings kickOnPacketException(boolean kickOnPacketExceptionEnabled) {
+        this.kickOnPacketExceptionEnabled = kickOnPacketExceptionEnabled;
+        return this;
+    }
+
+    /**
      * Some projects may want to implement a CDN with resources like asset mappings
      * By default, all resources are retrieved from the ClassLoader
      *
@@ -168,6 +192,24 @@ public class PacketEventsSettings {
      */
     public boolean isDebugEnabled() {
         return debugEnabled;
+    }
+
+    /**
+     * Should packetevents send packet exception Stacktraces to the console?
+     *
+     * @return Getter for {@link #fullStackTrace}
+     */
+    public boolean isFullStackTraceEnabled() {
+        return fullStackTraceEnabled;
+    }
+
+    /**
+     * Should packetevents kick the player due to an packet exception?
+     *
+     * @return Getter for {@link #kickOnPacketException}
+     */
+    public boolean isKickOnPacketExceptionEnabled() {
+        return kickOnPacketExceptionEnabled;
     }
 
     /**
