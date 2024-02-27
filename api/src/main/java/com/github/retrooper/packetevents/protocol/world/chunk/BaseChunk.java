@@ -35,11 +35,19 @@ public interface BaseChunk {
     int getBlockId(int x, int y, int z);
 
     default WrappedBlockState get(ClientVersion version, int x, int y, int z) {
-        return WrappedBlockState.getByGlobalId(version, getBlockId(x, y, z));
+        return get(version, x, y, z, true);
+    }
+
+    default WrappedBlockState get(ClientVersion version, int x, int y, int z, boolean clone) {
+        return WrappedBlockState.getByGlobalId(version, getBlockId(x, y, z), clone);
     }
 
     default WrappedBlockState get(int x, int y, int z) {
-        return get(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), x, y, z);
+        return get(x, y, z, true);
+    }
+
+    default WrappedBlockState get(int x, int y, int z, boolean clone) {
+        return get(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), x, y, z, clone);
     }
 
     default void set(int x, int y, int z, WrappedBlockState state) {
