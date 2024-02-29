@@ -18,8 +18,6 @@
 
 package com.github.retrooper.packetevents.protocol.nbt;
 
-import org.intellij.lang.annotations.Subst;
-
 import java.util.Objects;
 
 public class NBTString extends NBT {
