@@ -27,14 +27,7 @@ import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.protocol.chat.ChatType;
-import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
-import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
-import com.github.retrooper.packetevents.protocol.chat.MessageSignature;
-import com.github.retrooper.packetevents.protocol.chat.Node;
-import com.github.retrooper.packetevents.protocol.chat.Parsers;
-import com.github.retrooper.packetevents.protocol.chat.RemoteChatSession;
-import com.github.retrooper.packetevents.protocol.chat.SignedCommandArgument;
+import com.github.retrooper.packetevents.protocol.chat.*;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
@@ -61,7 +54,6 @@ import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
-import com.github.retrooper.packetevents.util.adventure.AdventureNBTSerialization;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
@@ -73,24 +65,15 @@ import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
-public class PacketWrapper<T extends PacketWrapper> {
+public class PacketWrapper<T extends PacketWrapper<T>> {
     @Nullable
     public Object buffer;
 
@@ -449,18 +432,18 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public NBTCompound readNBT() {
-        return (NBTCompound) this.readDirectNBT();
+        return (NBTCompound) this.readNBTRaw();
     }
 
-    public NBT readDirectNBT() {
+    public NBT readNBTRaw() {
         return NBTCodec.readNBTFromBuffer(buffer, serverVersion);
     }
 
     public void writeNBT(NBTCompound nbt) {
-        this.writeDirectNBT((NBT) nbt);
+        this.writeNBTRaw(nbt);
     }
 
-    public void writeDirectNBT(NBT nbt) {
+    public void writeNBTRaw(NBT nbt) {
         NBTCodec.writeNBTToBuffer(buffer, serverVersion, nbt);
     }
 
@@ -525,11 +508,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public Component readComponentAsNBT() {
-        try {
-            return AdventureNBTSerialization.readComponent(this.buffer);
-        } catch (IOException exception) {
-            throw new IllegalStateException(exception);
-        }
+        return AdventureSerializer.fromNbt(readNBTRaw());
     }
 
     public Component readComponentAsJSON() {
@@ -546,11 +525,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeComponentAsNBT(Component component) {
-        try {
-            AdventureNBTSerialization.writeComponent(this.buffer, component);
-        } catch (IOException exception) {
-            throw new IllegalStateException(exception);
-        }
+        writeNBTRaw(AdventureSerializer.toNbt(component));
     }
 
     public void writeComponentAsJSON(Component component) {
@@ -559,19 +534,11 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public Style readStyle() {
-        try {
-            return AdventureNBTSerialization.readStyle(this.buffer);
-        } catch (IOException exception) {
-            throw new IllegalStateException(exception);
-        }
+        return AdventureSerializer.getNBTSerializer().deserializeStyle(readNBT());
     }
 
     public void writeStyle(Style style) {
-        try {
-            AdventureNBTSerialization.writeStyle(this.buffer, style);
-        } catch (IOException exception) {
-            throw new IllegalStateException(exception);
-        }
+        writeNBT(AdventureSerializer.getNBTSerializer().serializeStyle(style));
     }
 
     public ResourceLocation readIdentifier(int maxLen) {

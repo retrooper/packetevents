@@ -90,4 +90,9 @@ public class NBTLong extends NBTNumber {
     public NBTLong copy() {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "Long(" + value + ")";
+    }
 }
