@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.injector.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
@@ -53,8 +54,8 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
-        PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, true);
-        out.add(input.retain());
+        Object buffer = PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, true);
+        out.add(ByteBufHelper.retain(buffer));
     }
 
     @Override

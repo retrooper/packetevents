@@ -243,6 +243,9 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         return buffer;
     }
 
+    public void setBuffer(Object buffer) {
+        this.buffer = buffer;
+    }
 
     /**
      * Gets the Packet ID for the current platform version
