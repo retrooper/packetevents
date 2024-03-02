@@ -2,9 +2,9 @@ package com.github.retrooper.packetevents.protocol.chat;
 
 public class SignedCommandArgument {
     private String argument;
-    private byte[] signature;
+    private MessageSignature signature;
 
-    public SignedCommandArgument(String argument, byte[] signature) {
+    public SignedCommandArgument(String argument, MessageSignature signature) {
         this.argument = argument;
         this.signature = signature;
     }
@@ -17,11 +17,11 @@ public class SignedCommandArgument {
         this.argument = argument;
     }
 
-    public byte[] getSignature() {
+    public MessageSignature getSignature() {
         return signature;
     }
 
-    public void setSignature(byte[] signature) {
+    public void setSignature(MessageSignature signature) {
         this.signature = signature;
     }
 }
