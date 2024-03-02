@@ -27,14 +27,21 @@ import java.util.Objects;
 public class NBTList<T extends NBT> extends NBT {
 
     protected final NBTType<T> type;
-    protected final List<T> tags = new ArrayList<>();
+    protected final List<T> tags;
 
     public NBTList(NBTType<T> type) {
         this.type = type;
+        this.tags = new ArrayList<>();
+    }
+
+    public NBTList(NBTType<T> type, int size) {
+        this.type = type;
+        this.tags = new ArrayList<>(size);
     }
 
     public NBTList(NBTType<T> type, List<T> tags) {
         this.type = type;
+        this.tags = new ArrayList<>();
         this.tags.addAll(tags);
     }
 

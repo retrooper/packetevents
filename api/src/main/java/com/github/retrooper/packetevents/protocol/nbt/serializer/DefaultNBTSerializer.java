@@ -31,20 +31,61 @@ public class DefaultNBTSerializer extends NBTSerializer<DataInput, DataOutput> {
 
     @SuppressWarnings("unchecked")
     public DefaultNBTSerializer() {
-        super(DataInput::readByte, DataOutput::writeByte, DataInput::readUTF, DataOutput::writeUTF);
-        registerType(NBTType.END, 0, stream -> NBTEnd.INSTANCE, (stream, tag) -> {
+        super(
+                (limiter, dataInput) -> {
+                    limiter.increment(1);
+                    return dataInput.readByte();
+                },
+                DataOutput::writeByte,
+                (limiter, dataInput) -> {
+                    String name = dataInput.readUTF();
+                    limiter.increment(name.length() * 2 + 28);
+                    return name;
+                },
+                DataOutput::writeUTF
+        );
+        registerType(NBTType.END, 0, (limiter, stream) -> {
+            limiter.increment(8);
+            return NBTEnd.INSTANCE;
+        }, (stream, tag) -> {
         });
-        registerType(NBTType.BYTE, 1, stream -> new NBTByte(stream.readByte()), (stream, tag) -> stream.writeByte(tag.getAsByte()));
-        registerType(NBTType.SHORT, 2, stream -> new NBTShort(stream.readShort()), (stream, tag) -> stream.writeShort(tag.getAsShort()));
-        registerType(NBTType.INT, 3, stream -> new NBTInt(stream.readInt()), (stream, tag) -> stream.writeInt(tag.getAsInt()));
-        registerType(NBTType.LONG, 4, stream -> new NBTLong(stream.readLong()), (stream, tag) -> stream.writeLong(tag.getAsLong()));
-        registerType(NBTType.FLOAT, 5, stream -> new NBTFloat(stream.readFloat()), (stream, tag) -> stream.writeFloat(tag.getAsFloat()));
-        registerType(NBTType.DOUBLE, 6, stream -> new NBTDouble(stream.readDouble()), (stream, tag) -> stream.writeDouble(tag.getAsDouble()));
-        registerType(NBTType.STRING, 8, stream -> new NBTString(stream.readUTF()), (stream, tag) -> stream.writeUTF(tag.getValue()));
+        registerType(NBTType.BYTE, 1, (limiter, stream) -> {
+            limiter.increment(9);
+            return new NBTByte(stream.readByte());
+        }, (stream, tag) -> stream.writeByte(tag.getAsByte()));
+        registerType(NBTType.SHORT, 2, (limiter, stream) -> {
+            limiter.increment(10);
+            return new NBTShort(stream.readShort());
+        }, (stream, tag) -> stream.writeShort(tag.getAsShort()));
+        registerType(NBTType.INT, 3, (limiter, stream) -> {
+            limiter.increment(12);
+            return new NBTInt(stream.readInt());
+        }, (stream, tag) -> stream.writeInt(tag.getAsInt()));
+        registerType(NBTType.LONG, 4, (limiter, stream) -> {
+            limiter.increment(16);
+            return new NBTLong(stream.readLong());
+        }, (stream, tag) -> stream.writeLong(tag.getAsLong()));
+        registerType(NBTType.FLOAT, 5, (limiter, stream) -> {
+            limiter.increment(12);
+            return new NBTFloat(stream.readFloat());
+        }, (stream, tag) -> stream.writeFloat(tag.getAsFloat()));
+        registerType(NBTType.DOUBLE, 6, (limiter, stream) -> {
+            limiter.increment(16);
+            return new NBTDouble(stream.readDouble());
+        }, (stream, tag) -> stream.writeDouble(tag.getAsDouble()));
         registerType(
                 NBTType.BYTE_ARRAY, 7,
-                stream -> {
-                    byte[] array = new byte[stream.readInt()];
+                (limiter, stream) -> {
+                    limiter.increment(24);
+                    int length = stream.readInt();
+
+                    if (length >= 1 << 24)
+                        throw new IllegalArgumentException("Byte array length is too large: " + length);
+
+                    limiter.checkReadability(length);
+                    limiter.increment(length);
+
+                    byte[] array = new byte[length];
                     stream.readFully(array);
                     return new NBTByteArray(array);
                 },
@@ -54,10 +95,76 @@ public class DefaultNBTSerializer extends NBTSerializer<DataInput, DataOutput> {
                     stream.write(array);
                 }
         );
+        registerType(NBTType.STRING, 8, (limiter, stream) -> {
+            limiter.increment(36);
+            String string = stream.readUTF();
+            limiter.increment(string.length() * 2);
+            return new NBTString(string);
+        }, (stream, tag) -> stream.writeUTF(tag.getValue()));
+        registerType(
+                NBTType.LIST, 9,
+                (limiter, stream) -> {
+                    limiter.increment(37);
+
+                    NBTType<? extends NBT> valueType = readTagType(limiter, stream);
+                    int size = stream.readInt();
+
+                    if ((valueType == NBTType.END) && (size > 0)) {
+                        throw new IllegalStateException("Missing nbt list values tag type");
+                    }
+                    limiter.increment(4 * size);
+                    NBTList<NBT> list = new NBTList<>((NBTType<NBT>) valueType, size);
+                    for (int i = 0; i < size; i++) {
+                        list.addTag(readTag(limiter, stream, valueType));
+                    }
+                    return list;
+                },
+                (stream, tag) -> {
+                    writeTagType(stream, tag.getTagsType());
+                    stream.writeInt(tag.size());
+                    for (NBT value : ((List<NBT>) tag.getTags())) {
+                        writeTag(stream, value);
+                    }
+                }
+        );
+        registerType(
+                NBTType.COMPOUND, 10,
+                (limiter, stream) -> {
+                    limiter.increment(48);
+
+                    NBTCompound compound = new NBTCompound();
+                    NBTType<?> valueType;
+                    while ((valueType = readTagType(limiter, stream)) != NBTType.END) {
+                        String name = readTagName(limiter, stream);
+                        NBT nbt = readTag(limiter, stream, valueType);
+                        if(!compound.getTags().containsKey(name)) limiter.increment(36);
+                        compound.setTag(name, nbt);
+                    }
+                    return compound;
+                },
+                (stream, tag) -> {
+                    for (Entry<String, NBT> entry : tag.getTags().entrySet()) {
+                        NBT value = entry.getValue();
+                        writeTagType(stream, value.getType());
+                        writeTagName(stream, entry.getKey());
+                        writeTag(stream, value);
+                    }
+                    writeTagType(stream, NBTType.END);
+                }
+        );
         registerType(
                 NBTType.INT_ARRAY, 11,
-                stream -> {
-                    int[] array = new int[stream.readInt()];
+                (limiter, stream) -> {
+                    limiter.increment(24);
+                    int length = stream.readInt();
+
+                    if (length >= 1 << 24)
+                        throw new IllegalArgumentException("Int array length is too large: " + length);
+
+                    limiter.checkReadability(length * 4);
+                    limiter.increment(length * 4);
+
+                    int[] array = new int[length];
                     for (int i = 0; i < array.length; i++) {
                         array[i] = stream.readInt();
                     }
@@ -73,8 +180,14 @@ public class DefaultNBTSerializer extends NBTSerializer<DataInput, DataOutput> {
         );
         registerType(
                 NBTType.LONG_ARRAY, 12,
-                stream -> {
-                    long[] array = new long[stream.readInt()];
+                (limiter, stream) -> {
+                    limiter.increment(24);
+                    int length = stream.readInt();
+
+                    limiter.checkReadability(length * 8);
+                    limiter.increment(length * 8);
+
+                    long[] array = new long[length];
                     for (int i = 0; i < array.length; i++) {
                         array[i] = stream.readLong();
                     }
@@ -85,48 +198,6 @@ public class DefaultNBTSerializer extends NBTSerializer<DataInput, DataOutput> {
                     stream.writeInt(array.length);
                     for (long i : array) {
                         stream.writeLong(i);
-                    }
-                }
-        );
-        registerType(
-                NBTType.COMPOUND, 10,
-                stream -> {
-                    NBTCompound compound = new NBTCompound();
-                    NBTType<?> valueType = null;
-                    while ((valueType = readTagType(stream)) != NBTType.END) {
-                        compound.setTag(readTagName(stream), readTag(stream, valueType));
-                    }
-                    return compound;
-                },
-                (stream, tag) -> {
-                    for (Entry<String, NBT> entry : tag.getTags().entrySet()) {
-                        NBT value = entry.getValue();
-                        writeTagType(stream, value.getType());
-                        writeTagName(stream, entry.getKey());
-                        writeTag(stream, value);
-                    }
-                    writeTagType(stream, NBTType.END);
-                }
-        );
-        registerType(
-                NBTType.LIST, 9,
-                stream -> {
-                    NBTType<? extends NBT> valueType = readTagType(stream);
-                    int size = stream.readInt();
-                    if ((valueType == NBTType.END) && (size > 0)) {
-                        throw new IllegalStateException("Missing nbt list values tag type");
-                    }
-                    NBTList<NBT> list = new NBTList<>((NBTType<NBT>) valueType);
-                    for (int i = 0; i < size; i++) {
-                        list.addTag(readTag(stream, valueType));
-                    }
-                    return list;
-                },
-                (stream, tag) -> {
-                    writeTagType(stream, tag.getTagsType());
-                    stream.writeInt(tag.size());
-                    for (NBT value : ((List<NBT>) tag.getTags())) {
-                        writeTag(stream, value);
                     }
                 }
         );
