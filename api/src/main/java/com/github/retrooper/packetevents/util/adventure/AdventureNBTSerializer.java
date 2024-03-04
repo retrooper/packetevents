@@ -73,6 +73,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                 throw new IllegalStateException("Don't know how to deserialize " + nbt.getType() + " to text");
             }
         };
+
         String text = reader.read("text", textFunction);
         if (text == null) text = reader.read("", textFunction);
 
@@ -89,7 +90,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         Key nbtStorage = reader.readUTF("storage", Key::key);
         List<Component> extra = reader.readList("extra", this::deserializeComponentList);
         Component separator = reader.read("separator", this::deserialize);
-        Style style = reader.readCompound("style", this::deserializeStyle);
+        Style style = this.deserializeStyle(compound);
 
         // build component from read values
         ComponentBuilder<?, ?> builder;
@@ -129,13 +130,12 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             throw new IllegalStateException("Illegal nbt component, component type could not be determined");
         }
 
-        if (style != null) {
-            builder.style(style);
-        }
+        builder.style(style);
 
         if (extra != null) {
             builder.append(extra);
         }
+
         return builder.build();
     }
 
@@ -222,7 +222,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         }
 
         if (component.hasStyling()) {
-            writer.writeCompound("style", serializeStyle(component.style()));
+            serializeStyle(component.style()).getTags().forEach(writer::write);
         }
 
         // component children
