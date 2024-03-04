@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -149,11 +148,7 @@ public class NBTCodec {
     }
     //PacketEvents end
 
-    public static NBTCompound readNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
-        return (NBTCompound) readRawNBTFromBuffer(byteBuf, serverVersion);
-    }
-
-    public static NBT readRawNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
+    public static NBT readNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try {
                 final boolean named = serverVersion.isOlderThan(ServerVersion.V_1_20_2);
