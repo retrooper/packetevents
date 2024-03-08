@@ -507,6 +507,16 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
+    public boolean isDusted() {
+        return (boolean) data.get(StateValue.DUSTED);
+    }
+
+    public void setDusted(boolean dusted) {
+        checkIfCloneNeeded();
+        data.put(StateValue.DUSTED, dusted);
+        checkIsStillValid();
+    }
+
     public int getEggs() {
         return (int) data.get(StateValue.EGGS);
     }
@@ -564,6 +574,16 @@ public class WrappedBlockState {
     public void setFacing(BlockFace facing) {
         checkIfCloneNeeded();
         data.put(StateValue.FACING, facing);
+        checkIsStillValid();
+    }
+
+    public int getFlowerAmount() {
+        return (int) data.get(StateValue.FLOWER_AMOUNT);
+    }
+
+    public void setFlowerAmount(int flowerAmount) {
+        checkIfCloneNeeded();
+        data.put(StateValue.FLOWER_AMOUNT, flowerAmount);
         checkIsStillValid();
     }
 
