@@ -1476,7 +1476,7 @@ public class ItemTypes {
                 return false;
             }
         };
-        ITEM_TYPE_MAP.put(type.getName().toString(), type);
+        ITEM_TYPE_MAP.put(type.getName().getKey(), type);
         for (ClientVersion version : TYPES_BUILDER.getVersions()) {
             int index = TYPES_BUILDER.getDataIndex(version);
             Map<Integer, ItemType> typeIdMap = ITEM_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
