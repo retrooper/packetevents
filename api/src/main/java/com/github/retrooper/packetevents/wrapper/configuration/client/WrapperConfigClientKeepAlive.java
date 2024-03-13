@@ -19,42 +19,17 @@
 package com.github.retrooper.packetevents.wrapper.configuration.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.wrapper.common.client.WrapperClientKeepAlive;
 
-public class WrapperConfigClientKeepAlive extends PacketWrapper<WrapperConfigClientKeepAlive> {
-
-    private long id;
+@Deprecated
+public class WrapperConfigClientKeepAlive extends WrapperClientKeepAlive {
 
     public WrapperConfigClientKeepAlive(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperConfigClientKeepAlive(long id) {
-        super(PacketType.Configuration.Client.KEEP_ALIVE);
-        this.id = id;
-    }
-
-    @Override
-    public void read() {
-        this.id = this.readLong();
-    }
-
-    @Override
-    public void write() {
-        this.writeLong(this.id);
-    }
-
-    @Override
-    public void copy(WrapperConfigClientKeepAlive wrapper) {
-        this.id = wrapper.id;
-    }
-
-    public long getId() {
-        return this.id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+        super(ConnectionState.CONFIGURATION, id);
     }
 }

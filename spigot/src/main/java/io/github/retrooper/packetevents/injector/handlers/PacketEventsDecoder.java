@@ -24,7 +24,7 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
+import com.github.retrooper.packetevents.wrapper.common.server.WrapperServerDisconnect;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.FoliaCompatUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
@@ -80,7 +80,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
 
             if (PacketEvents.getAPI().getSettings().isKickOnPacketExceptionEnabled()) {
                 try {
-                    user.sendPacket(new WrapperPlayServerDisconnect(Component.text("Invalid packet")));
+                    user.sendPacket(new WrapperServerDisconnect(ConnectionState.PLAY, Component.text("Invalid packet")));
                 } catch (Exception ignored) { // There may (?) be an exception if the player is in the wrong state...
                     // Do nothing.
                 }

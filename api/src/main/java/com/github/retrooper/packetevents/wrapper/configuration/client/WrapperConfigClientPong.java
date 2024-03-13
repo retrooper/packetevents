@@ -19,42 +19,16 @@
 package com.github.retrooper.packetevents.wrapper.configuration.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.wrapper.common.client.WrapperClientPong;
 
-public class WrapperConfigClientPong extends PacketWrapper<WrapperConfigClientPong> {
-
-    private int id;
+public class WrapperConfigClientPong extends WrapperClientPong {
 
     public WrapperConfigClientPong(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperConfigClientPong(int id) {
-        super(PacketType.Configuration.Client.PONG);
-        this.id = id;
-    }
-
-    @Override
-    public void read() {
-        this.id = this.readInt();
-    }
-
-    @Override
-    public void write() {
-        this.writeInt(this.id);
-    }
-
-    @Override
-    public void copy(WrapperConfigClientPong wrapper) {
-        this.id = wrapper.id;
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        super(ConnectionState.CONFIGURATION, id);
     }
 }

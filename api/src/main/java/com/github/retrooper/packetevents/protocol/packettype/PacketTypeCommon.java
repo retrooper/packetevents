@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.packettype;
 
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
@@ -30,4 +31,6 @@ public interface PacketTypeCommon {
     int getId(ClientVersion version);
 
     PacketSide getSide();
+
+    ConnectionState getState();
 }

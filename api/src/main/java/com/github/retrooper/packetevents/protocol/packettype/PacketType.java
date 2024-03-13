@@ -201,6 +201,11 @@ public final class PacketType {
             public PacketSide getSide() {
                 return PacketSide.CLIENT;
             }
+
+            @Override
+            public ConnectionState getState() {
+                return ConnectionState.HANDSHAKING;
+            }
         }
 
         public enum Server implements PacketTypeConstant, ClientBoundPacket {
@@ -224,6 +229,11 @@ public final class PacketType {
             @Override
             public PacketSide getSide() {
                 return PacketSide.SERVER;
+            }
+
+            @Override
+            public ConnectionState getState() {
+                return ConnectionState.HANDSHAKING;
             }
         }
     }
@@ -259,6 +269,11 @@ public final class PacketType {
             public PacketSide getSide() {
                 return PacketSide.CLIENT;
             }
+
+            @Override
+            public ConnectionState getState() {
+                return ConnectionState.STATUS;
+            }
         }
 
         public enum Server implements PacketTypeConstant, ClientBoundPacket {
@@ -289,6 +304,11 @@ public final class PacketType {
             @Override
             public PacketSide getSide() {
                 return PacketSide.SERVER;
+            }
+
+            @Override
+            public ConnectionState getState() {
+                return ConnectionState.STATUS;
             }
         }
     }
@@ -330,6 +350,11 @@ public final class PacketType {
             @Override
             public PacketSide getSide() {
                 return PacketSide.CLIENT;
+            }
+
+            @Override
+            public ConnectionState getState() {
+                return ConnectionState.LOGIN;
             }
         }
 
@@ -373,6 +398,11 @@ public final class PacketType {
             @Override
             public PacketSide getSide() {
                 return PacketSide.SERVER;
+            }
+
+            @Override
+            public ConnectionState getState() {
+                return ConnectionState.LOGIN;
             }
         }
     }
@@ -422,6 +452,11 @@ public final class PacketType {
             @Override
             public PacketSide getSide() {
                 return PacketSide.CLIENT;
+            }
+
+            @Override
+            public ConnectionState getState() {
+                return ConnectionState.CONFIGURATION;
             }
         }
 
@@ -498,6 +533,11 @@ public final class PacketType {
             @Override
             public PacketSide getSide() {
                 return PacketSide.SERVER;
+            }
+
+            @Override
+            public ConnectionState getState() {
+                return ConnectionState.CONFIGURATION;
             }
         }
     }
@@ -635,6 +675,11 @@ public final class PacketType {
             @Override
             public PacketSide getSide() {
                 return PacketSide.CLIENT;
+            }
+
+            @Override
+            public ConnectionState getState() {
+                return ConnectionState.PLAY;
             }
         }
 
@@ -824,6 +869,11 @@ public final class PacketType {
             @Override
             public PacketSide getSide() {
                 return PacketSide.SERVER;
+            }
+
+            @Override
+            public ConnectionState getState() {
+                return ConnectionState.PLAY;
             }
 
             private static void loadPacketIds(Enum<?>[] enumConstants) {

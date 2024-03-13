@@ -19,49 +19,17 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPong;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.wrapper.common.server.WrapperServerPing;
 
-/**
- * This packet is currently used by mods to synchronize the client with the server.
- * It is not used by the vanilla server.
- * Most likely added as a replacement to the removed Window Confirmation packet.
- *
- * @see WrapperPlayClientPong
- */
-public class WrapperPlayServerPing extends PacketWrapper<WrapperPlayServerPing> {
-    private int id;
+@Deprecated
+public class WrapperPlayServerPing extends WrapperServerPing {
 
     public WrapperPlayServerPing(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperPlayServerPing(int id) {
-        super(PacketType.Play.Server.PING);
-        this.id = id;
-    }
-
-    @Override
-    public void read() {
-        this.id = readInt();
-    }
-
-    @Override
-    public void write() {
-        writeInt(id);
-    }
-
-    @Override
-    public void copy(WrapperPlayServerPing wrapper) {
-        this.id = wrapper.id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        super(ConnectionState.PLAY, id);
     }
 }

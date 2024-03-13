@@ -19,45 +19,20 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.wrapper.common.server.WrapperServerResourcePackRemove;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class WrapperPlayServerResourcePackRemove extends PacketWrapper<WrapperPlayServerResourcePackRemove> {
-
-    private @Nullable UUID packId;
+@Deprecated
+public class WrapperPlayServerResourcePackRemove extends WrapperServerResourcePackRemove {
 
     public WrapperPlayServerResourcePackRemove(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperPlayServerResourcePackRemove(@Nullable UUID packId) {
-        super(PacketType.Play.Server.RESOURCE_PACK_REMOVE);
-        this.packId = packId;
-    }
-
-    @Override
-    public void read() {
-        this.packId = this.readOptional(PacketWrapper::readUUID);
-    }
-
-    @Override
-    public void write() {
-        this.writeOptional(this.packId, PacketWrapper::writeUUID);
-    }
-
-    @Override
-    public void copy(WrapperPlayServerResourcePackRemove wrapper) {
-        this.packId = wrapper.packId;
-    }
-
-    public @Nullable UUID getPackId() {
-        return this.packId;
-    }
-
-    public void setPackId(@Nullable UUID packId) {
-        this.packId = packId;
+        super(ConnectionState.PLAY, packId);
     }
 }
