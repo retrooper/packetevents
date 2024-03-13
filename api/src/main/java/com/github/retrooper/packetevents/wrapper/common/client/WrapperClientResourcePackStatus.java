@@ -81,7 +81,7 @@ public class WrapperClientResourcePackStatus extends CommonPacketWrapper<Wrapper
         if (serverVersion.isOlderThan(ServerVersion.V_1_10)) {
             writeString(hash, 40);
         }
-        writeVarInt(result.ordinal());
+        writeVarInt(getResultOrdinal());
     }
 
     @Override
@@ -108,6 +108,13 @@ public class WrapperClientResourcePackStatus extends CommonPacketWrapper<Wrapper
         return result;
     }
 
+    public int getResultOrdinal() {
+        if (result.ordinal() >= 4 && serverVersion.isOlderThan(ServerVersion.V_1_20_3)) {
+            return result.getFallback();
+        }
+        return result.ordinal();
+    }
+
     public void setResult(Result result) {
         this.result = result;
     }
@@ -126,11 +133,25 @@ public class WrapperClientResourcePackStatus extends CommonPacketWrapper<Wrapper
         DECLINED,
         FAILED_DOWNLOAD,
         ACCEPTED,
-        DOWNLOADED,
-        INVALID_URL,
-        FAILED_RELOAD,
-        DISCARDED;
+        DOWNLOADED(0),
+        INVALID_URL(2),
+        FAILED_RELOAD(2),
+        DISCARDED(1);
 
         public static final Result[] VALUES = values();
+
+        private final int fallback;
+
+        Result() {
+            this.fallback = 0;
+        }
+
+        Result(int fallback) {
+            this.fallback = fallback;
+        }
+
+        public int getFallback() {
+            return fallback;
+        }
     }
 }

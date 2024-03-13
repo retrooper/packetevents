@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.wrapper.common.client.WrapperClientPong;
 
+@Deprecated
 public class WrapperConfigClientPong extends WrapperClientPong {
 
     public WrapperConfigClientPong(PacketReceiveEvent event) {
