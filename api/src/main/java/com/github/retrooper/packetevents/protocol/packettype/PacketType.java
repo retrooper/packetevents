@@ -792,7 +792,8 @@ public final class PacketType {
             RESET_SCORE,
             RESOURCE_PACK_REMOVE,
             TICKING_STATE,
-            TICKING_STEP;
+            TICKING_STEP,
+            WORLD_EVENT;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
