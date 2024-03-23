@@ -70,8 +70,15 @@ public class AdventureReflectionUtil {
             final Object optionState;
             if (IS_4_15_0_OR_NEWER) {
                 // adventure >= v4.15; add option state for serializer construction
-                optionState = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16)
-                        ? JSONOptions.byDataVersion() : JSONOptions.byDataVersion().at(2525);
+                if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16)) {
+                    if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+                        optionState = JSONOptions.byDataVersion();
+                    } else {
+                        optionState = JSONOptions.byDataVersion().at(2526);
+                    }
+                } else {
+                    optionState = JSONOptions.byDataVersion().at(2525);
+                }
                 Method COMPONENT_SERIALIZER_CREATE_METHOD = Reflection.getMethod(COMPONENT_SERIALIZER, "create", OptionState.class, Gson.class);
                 COMPONENT_SERIALIZER_CREATE = gson -> invokeSafe(COMPONENT_SERIALIZER_CREATE_METHOD, optionState, gson);
             } else {
