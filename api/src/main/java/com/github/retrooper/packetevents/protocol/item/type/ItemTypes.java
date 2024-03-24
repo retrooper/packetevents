@@ -22,8 +22,8 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,21 +41,7 @@ public class ItemTypes {
     private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, ItemType>> ITEM_TYPE_ID_MAP = new HashMap<>();
     private static final Map<StateType, ItemType> HELD_TO_PLACED_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_type_mappings",
-            ClientVersion.V_1_12,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_13_2,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_15,
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_16_2,
-            ClientVersion.V_1_17,
-            ClientVersion.V_1_18,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20,
-            ClientVersion.V_1_20_3);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_type_mappings");
 
     public static final ItemType GILDED_BLACKSTONE = builder("gilded_blackstone").setMaxAmount(64).setPlacedType(StateTypes.GILDED_BLACKSTONE).build();
     public static final ItemType NETHER_BRICK_SLAB = builder("nether_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.NETHER_BRICK_SLAB).build();

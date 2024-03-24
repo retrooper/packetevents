@@ -45,6 +45,10 @@ public class NBTCompound extends NBT {
         return Collections.unmodifiableMap(tags);
     }
 
+    public int size() {
+        return tags.size();
+    }
+
     public NBT getTagOrThrow(String key) {
         NBT tag = getTagOrNull(key);
         if (tag == null) {

@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.protocol.entity.villager.profession;
 
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
