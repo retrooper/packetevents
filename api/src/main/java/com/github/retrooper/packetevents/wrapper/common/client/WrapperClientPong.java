@@ -1,0 +1,78 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2022 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.github.retrooper.packetevents.wrapper.common.client;
+
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.CommonPacketWrapper;
+import com.github.retrooper.packetevents.wrapper.common.server.WrapperServerPing;
+
+/**
+ * A response to the ping packet.
+ * The vanilla server doesn't seem to send the Ping packet.
+ * Most likely added as a replacement to the removed Window Confirmation packet.
+ *
+ * @see WrapperServerPing
+ */
+public class WrapperClientPong extends CommonPacketWrapper<WrapperClientPong> {
+    private int id;
+
+    public WrapperClientPong(PacketReceiveEvent event) {
+        super(event);
+    }
+
+    public WrapperClientPong(ConnectionState state, int id) {
+        super(state == ConnectionState.CONFIGURATION ? PacketType.Configuration.Client.PONG : PacketType.Play.Client.PONG);
+        this.id = id;
+    }
+
+    @Override
+    public void read() {
+        this.id = readInt();
+    }
+
+    @Override
+    public void write() {
+        writeInt(id);
+    }
+
+    @Override
+    public void copy(WrapperClientPong wrapper) {
+        this.id = wrapper.id;
+    }
+
+    @Override
+    public WrapperClientPong copy(ConnectionState state) {
+        return new WrapperClientPong(state, this.id);
+    }
+
+    /**
+     * ID of the last sent Ping packet.
+     *
+     * @return ID
+     */
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+}

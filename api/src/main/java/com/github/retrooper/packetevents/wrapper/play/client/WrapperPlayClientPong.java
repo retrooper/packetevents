@@ -19,54 +19,17 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPing;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.wrapper.common.client.WrapperClientPong;
 
-/**
- * A response to the ping packet.
- * The vanilla server doesn't seem to send the Ping packet.
- * Most likely added as a replacement to the removed Window Confirmation packet.
- *
- * @see WrapperPlayServerPing
- */
-public class WrapperPlayClientPong extends PacketWrapper<WrapperPlayClientPong> {
-    private int id;
+@Deprecated
+public class WrapperPlayClientPong extends WrapperClientPong {
 
     public WrapperPlayClientPong(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperPlayClientPong(int id) {
-        super(PacketType.Play.Client.PONG);
-        this.id = id;
-    }
-
-    @Override
-    public void read() {
-        this.id = readInt();
-    }
-
-    @Override
-    public void write() {
-        writeInt(id);
-    }
-
-    @Override
-    public void copy(WrapperPlayClientPong wrapper) {
-        this.id = wrapper.id;
-    }
-
-    /**
-     * ID of the last sent Ping packet.
-     *
-     * @return ID
-     */
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        super(ConnectionState.PLAY, id);
     }
 }

@@ -19,123 +19,27 @@
 package com.github.retrooper.packetevents.wrapper.configuration.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.wrapper.common.server.WrapperServerResourcePackSend;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class WrapperConfigServerResourcePackSend extends PacketWrapper<WrapperConfigServerResourcePackSend> {
+@Deprecated
+public class WrapperConfigServerResourcePackSend extends WrapperServerResourcePackSend {
 
     public static final int MAX_HASH_LENGTH = 40;
-
-    private UUID packId;
-    private String url;
-    private String hash;
-    private boolean required;
-    private Component prompt;
 
     public WrapperConfigServerResourcePackSend(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperConfigServerResourcePackSend(String url, String hash, boolean required, @Nullable Component prompt) {
-        this(UUID.randomUUID(), url, hash, required, prompt);
+        super(ConnectionState.CONFIGURATION, url, hash, required, prompt);
     }
 
     public WrapperConfigServerResourcePackSend(UUID packId, String url, String hash, boolean required, @Nullable Component prompt) {
-        super(PacketType.Configuration.Server.RESOURCE_PACK_SEND);
-
-        if (hash.length() > MAX_HASH_LENGTH) {
-            throw new IllegalArgumentException("Hash is too long (max " + MAX_HASH_LENGTH + ", was " + hash.length() + ")");
-        }
-
-        this.packId = packId;
-        this.url = url;
-        this.hash = hash;
-        this.required = required;
-        this.prompt = prompt;
-    }
-
-    @Override
-    public void read() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.packId = this.readUUID();
-        }
-
-        this.url = this.readString();
-        this.hash = this.readString(MAX_HASH_LENGTH);
-        this.required = this.readBoolean();
-        if (this.readBoolean()) {
-            this.prompt = this.readComponent();
-        }
-    }
-
-    @Override
-    public void write() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.writeUUID(this.packId);
-        }
-
-        this.writeString(this.url);
-        this.writeString(this.hash, MAX_HASH_LENGTH);
-        this.writeBoolean(this.required);
-        if (this.prompt != null) {
-            this.writeBoolean(true);
-            this.writeComponent(this.prompt);
-        } else {
-            this.writeBoolean(false);
-        }
-    }
-
-    @Override
-    public void copy(WrapperConfigServerResourcePackSend wrapper) {
-        this.packId = wrapper.packId;
-        this.url = wrapper.url;
-        this.hash = wrapper.hash;
-        this.required = wrapper.required;
-        this.prompt = wrapper.prompt;
-    }
-
-    public UUID getPackId() {
-        return this.packId;
-    }
-
-    public void setPackId(UUID packId) {
-        this.packId = packId;
-    }
-
-    public String getUrl() {
-        return this.url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getHash() {
-        return this.hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
-
-    public boolean isRequired() {
-        return this.required;
-    }
-
-    public void setRequired(boolean required) {
-        this.required = required;
-    }
-
-    public Component getPrompt() {
-        return this.prompt;
-    }
-
-    public void setPrompt(Component prompt) {
-        this.prompt = prompt;
+        super(ConnectionState.CONFIGURATION, packId, url, hash, required, prompt);
     }
 }

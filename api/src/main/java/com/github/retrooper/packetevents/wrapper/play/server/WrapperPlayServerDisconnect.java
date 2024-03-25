@@ -19,42 +19,18 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.wrapper.common.server.WrapperServerDisconnect;
 import net.kyori.adventure.text.Component;
 
-public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServerDisconnect> {
-    private Component reason;
+@Deprecated
+public class WrapperPlayServerDisconnect extends WrapperServerDisconnect {
 
     public WrapperPlayServerDisconnect(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperPlayServerDisconnect(Component reason) {
-        super(PacketType.Play.Server.DISCONNECT);
-        this.reason = reason;
-    }
-
-    @Override
-    public void read() {
-        reason = readComponent();
-    }
-
-    @Override
-    public void write() {
-        writeComponent(reason);
-    }
-
-    @Override
-    public void copy(WrapperPlayServerDisconnect wrapper) {
-        this.reason = wrapper.reason;
-    }
-
-    public Component getReason() {
-        return reason;
-    }
-
-    public void setReason(Component reason) {
-        this.reason = reason;
+        super(ConnectionState.PLAY, reason);
     }
 }

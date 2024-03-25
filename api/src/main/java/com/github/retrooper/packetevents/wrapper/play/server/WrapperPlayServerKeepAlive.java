@@ -19,59 +19,17 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.wrapper.common.server.WrapperServerKeepAlive;
 
-/**
- * This is the server-bound keep-alive packet.
- * The server will frequently send out a (client-bound) keep-alive, each containing a random ID.
- * The client is expected to respond with a (server-bound) keep-alive, containing the same ID that the server sent out.
- */
-public class WrapperPlayServerKeepAlive extends PacketWrapper<WrapperPlayServerKeepAlive> {
-    private long id;
+@Deprecated
+public class WrapperPlayServerKeepAlive extends WrapperServerKeepAlive {
 
     public WrapperPlayServerKeepAlive(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperPlayServerKeepAlive(long id) {
-        super(PacketType.Play.Server.KEEP_ALIVE);
-        this.id = id;
-    }
-
-    @Override
-    public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
-            this.id = readLong();
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.id = readVarInt();
-        } else {
-            this.id = readInt();
-        }
-    }
-
-    @Override
-    public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
-            writeLong(id);
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            writeVarInt((int) id);
-        } else {
-            writeInt((int) id);
-        }
-    }
-
-    @Override
-    public void copy(WrapperPlayServerKeepAlive wrapper) {
-        this.id = wrapper.id;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+        super(ConnectionState.PLAY, id);
     }
 }
