@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,7 +71,7 @@ public class PacketEventsImplHelper {
         return packetSendEvent;
     }
 
-    public static PacketReceiveEvent handleServerBoundPacket(Object channel, User user,
+    public static Object handleServerBoundPacket(Object channel, User user,
                                                              Object player,
                                                              Object buffer,
                                                              boolean autoProtocolTranslation) throws Exception {
@@ -79,14 +80,17 @@ public class PacketEventsImplHelper {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);
+        Object finalBuffer = buffer;
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
-            ByteBufHelper.readerIndex(buffer, processIndex);
+            ByteBufHelper.readerIndex(finalBuffer, processIndex);
         });
         if (!packetReceiveEvent.isCancelled()) {
             //Did they ever use a wrapper?
             if (packetReceiveEvent.getLastUsedWrapper() != null) {
                 //Rewrite the buffer
                 ByteBufHelper.clear(buffer);
+                buffer = UnpooledByteBufAllocationHelper.buffer();
+                packetReceiveEvent.getLastUsedWrapper().setBuffer(buffer);
                 packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
                 packetReceiveEvent.getLastUsedWrapper().write();
             } else {
@@ -103,7 +107,7 @@ public class PacketEventsImplHelper {
                 task.run();
             }
         }
-        return packetReceiveEvent;
+        return buffer;
     }
 
     public static void handleDisconnection(Object channel, @Nullable UUID uuid) {
