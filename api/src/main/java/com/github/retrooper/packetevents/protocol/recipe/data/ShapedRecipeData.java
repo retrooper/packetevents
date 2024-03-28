@@ -21,18 +21,21 @@ package com.github.retrooper.packetevents.protocol.recipe.data;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.recipe.Ingredient;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ShapedRecipeData implements RecipeData {
     private final int width;
     private final int height;
     private final @NotNull String group;
+    private CraftingBookCategory category;
     private final @NotNull Ingredient[] ingredients;
     private final ItemStack result;
 
-    public ShapedRecipeData(final int width, final int height, final @NotNull String group, final @NotNull Ingredient[] ingredients, final ItemStack result) {
+    public ShapedRecipeData(final int width, final int height, final @NotNull String group, final @NotNull CraftingBookCategory category, final @NotNull Ingredient[] ingredients, final ItemStack result) {
         this.width = width;
         this.height = height;
         this.group = group;
+        this.category = category;
         this.ingredients = ingredients;
         this.result = result;
     }
@@ -47,6 +50,10 @@ public class ShapedRecipeData implements RecipeData {
 
     public @NotNull String getGroup() {
         return this.group;
+    }
+
+    public @Nullable CraftingBookCategory getCategory() {
+        return this.category;
     }
 
     public @NotNull Ingredient[] getIngredients() {
