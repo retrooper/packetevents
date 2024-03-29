@@ -74,7 +74,6 @@ public class Location {
     }
 
     public Vector3f getDirection() {
-        Vector3f vector = new Vector3f();
         double rotX = (double)this.getYaw();
         double rotY = (double)this.getPitch();
         float y = (float) -Math.sin(Math.toRadians(rotY));
