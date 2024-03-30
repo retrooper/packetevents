@@ -36,7 +36,7 @@ public class AdventureSerializer {
         if (GSON == null) {
             ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
             GSON = new GsonComponentSerializerExtended(
-                    version.isOlderThan(ServerVersion.V_1_16) && PacketEvents.getAPI().getSettings().shouldDownsampleColors(),
+                    version.isOlderThan(ServerVersion.V_1_16) || PacketEvents.getAPI().getSettings().shouldDownsampleColors(),
                     version.isOlderThanOrEquals(ServerVersion.V_1_12_2)
             );
         }
@@ -51,7 +51,7 @@ public class AdventureSerializer {
     public static LegacyComponentSerializer getLegacySerializer() {
         if (LEGACY == null) {
             LegacyComponentSerializer.Builder builder = LegacyComponentSerializer.builder();
-            if (!PacketEvents.getAPI().getSettings().shouldDownsampleColors() || PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16))
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16))
                 builder = builder.hexColors();
             LEGACY = builder.build();
         }
@@ -61,7 +61,8 @@ public class AdventureSerializer {
     public static AdventureNBTSerializer getNBTSerializer() {
         if (NBT == null) {
             NBT = new AdventureNBTSerializer(
-                    PacketEvents.getAPI().getSettings().shouldDownsampleColors()
+                    PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_16) ||
+                            PacketEvents.getAPI().getSettings().shouldDownsampleColors()
             );
         }
         return NBT;
