@@ -82,7 +82,7 @@ public final class SpigotReflectionUtil {
             ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS, NMS_ENUM_PARTICLE_CLASS,
             MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, NMS_WORLD_CLASS, WORLD_SERVER_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
             GAME_PROFILE_CLASS, CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS, CRAFT_PARTICLE_CLASS,
-            LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
+            LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
             BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS, PROPERTY_MAP_CLASS, DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, MOJANG_ENCODER_CLASS, DATA_RESULT_CLASS,
             DYNAMIC_OPS_NBT_CLASS, NMS_NBT_COMPOUND_CLASS, NBT_COMPRESSION_STREAM_TOOLS_CLASS;
 
@@ -109,6 +109,8 @@ public final class SpigotReflectionUtil {
 
     private static Object MINECRAFT_SERVER_INSTANCE;
     private static Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
+
+    private static boolean PAPER_ENTITY_LOOKUP_EXISTS = false;
 
     //Cache entities right after we request/find them for faster search.
     public static Map<Integer, Entity> ENTITY_ID_CACHE = new MapMaker().weakValues().makeMap();
@@ -209,6 +211,8 @@ public final class SpigotReflectionUtil {
             DIMENSION_CODEC_FIELD = Reflection.getField(DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, 0);
             DYNAMIC_OPS_NBT_INSTANCE_FIELD = Reflection.getField(DYNAMIC_OPS_NBT_CLASS, DYNAMIC_OPS_NBT_CLASS, 0);
         }
+
+        PAPER_ENTITY_LOOKUP_EXISTS = Reflection.getField(WORLD_SERVER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) != null;
     }
 
     private static void initClasses() {
@@ -237,6 +241,7 @@ public final class SpigotReflectionUtil {
         if (V_1_17_OR_HIGHER) {
             LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
             PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
+            PAPER_ENTITY_LOOKUP_CLASS = Reflection.getClassByNameWithoutException("io.papermc.paper.chunk.system.entity.EntityLookup");
         }
         DIMENSION_MANAGER_CLASS = getServerClass("world.level.dimension.DimensionManager", "DimensionManager");
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
@@ -827,9 +832,15 @@ public final class SpigotReflectionUtil {
             //On 1.17 we need this to bypass
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
                 ReflectionObject reflectWorldServer = new ReflectionObject(worldServer);
-                Object entitySectionManager = reflectWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
-                ReflectionObject reflectEntitySectionManager = new ReflectionObject(entitySectionManager);
-                Object levelEntityGetter = reflectEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
+                Object levelEntityGetter;
+                if (PAPER_ENTITY_LOOKUP_EXISTS) {
+                    levelEntityGetter = reflectWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
+                }
+                else {
+                    Object entitySectionManager = reflectWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
+                    ReflectionObject reflectEntitySectionManager = new ReflectionObject(entitySectionManager);
+                    levelEntityGetter = reflectEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
+                }
                 nmsEntity = GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD.invoke(levelEntityGetter, id);
             } else {
                 nmsEntity = GET_ENTITY_BY_ID_METHOD.invoke(worldServer, id);
@@ -873,9 +884,15 @@ public final class SpigotReflectionUtil {
         if (V_1_17_OR_HIGHER) {
             Object worldServer = convertBukkitWorldToWorldServer(world);
             ReflectionObject wrappedWorldServer = new ReflectionObject(worldServer);
-            Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
-            ReflectionObject wrappedPersistentEntitySectionManager = new ReflectionObject(persistentEntitySectionManager);
-            Object levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
+            Object levelEntityGetter;
+            if (PAPER_ENTITY_LOOKUP_EXISTS) {
+                levelEntityGetter = wrappedWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
+            }
+            else {
+                Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
+                ReflectionObject wrappedPersistentEntitySectionManager = new ReflectionObject(persistentEntitySectionManager);
+                levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
+            }
             Iterable<Object> nmsEntitiesIterable = null;
             try {
                 nmsEntitiesIterable = (Iterable<Object>) GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD.invoke(levelEntityGetter);
