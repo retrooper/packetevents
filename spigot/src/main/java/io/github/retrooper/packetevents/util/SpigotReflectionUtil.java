@@ -858,6 +858,11 @@ public final class SpigotReflectionUtil {
     }
 
     @Nullable
+    @Deprecated
+    /**
+     * Get the entity by the id.
+     * @deprecated Please resort to {@link SpigotConversionUtil#getEntityById(World, int)} since the reflection util is not API.
+     */
     public static Entity getEntityById(@Nullable World origin, int id) {
         if (origin != null) {
             Entity e = getEntityByIdWithWorldUnsafe(origin, id);
@@ -876,6 +881,11 @@ public final class SpigotReflectionUtil {
     }
 
     @Nullable
+    @Deprecated
+    /**
+     * Get the entity by the id.
+     * @deprecated Please resort to {@link SpigotConversionUtil#getEntityById(World, int)} since the reflection util is not API.
+     */
     public static Entity getEntityById(int entityID) {
         return getEntityById(null, entityID);
     }

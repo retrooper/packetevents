@@ -151,6 +151,12 @@ public class SpigotConversionUtil {
         return SpigotReflectionUtil.fromPacketEventsParticle(particle);
     }
 
+    /**
+     * Access the Bukkit Entity associated to the Entity ID.
+     * @param world The world they are in. This field is optional, but is recommended as it could boost performance.
+     * @param entityId The associated Entity ID
+     * @return The Bukkit Entity
+     */
     public static org.bukkit.entity.Entity getEntityById(@Nullable World world, int entityId) {
         return SpigotReflectionUtil.getEntityById(world, entityId);
     }
