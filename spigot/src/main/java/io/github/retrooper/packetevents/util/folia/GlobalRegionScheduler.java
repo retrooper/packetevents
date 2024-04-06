@@ -35,7 +35,7 @@ public class GlobalRegionScheduler {
                 globalRunMethod = globalRegionSchedulerClass.getMethod("run", Plugin.class, Consumer.class);
                 globalRunDelayedMethod = globalRegionSchedulerClass.getMethod("runDelayed", Plugin.class, Consumer.class, long.class);
                 globalRunAtFixedRateMethod = globalRegionSchedulerClass.getMethod("runAtFixedRate", Plugin.class, Consumer.class, long.class, long.class);
-                globalCancelMethod = globalRegionSchedulerClass.getMethod("cancel", Plugin.class);
+                globalCancelMethod = globalRegionSchedulerClass.getMethod("cancelTasks", Plugin.class);
             }
         } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
             throw new RuntimeException(e);

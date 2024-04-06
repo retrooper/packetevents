@@ -34,7 +34,7 @@ public class AsyncScheduler {
                 asyncRunNowMethod = asyncSchedulerClass.getMethod("runNow", Plugin.class, Consumer.class);
                 asyncRunDelayedMethod = asyncSchedulerClass.getMethod("runDelayed", Plugin.class, Consumer.class, long.class, TimeUnit.class);
                 asyncRunAtFixedRateMethod = asyncSchedulerClass.getMethod("runAtFixedRate", Plugin.class, Consumer.class, long.class, long.class, TimeUnit.class);
-                asyncCancelMethod = asyncSchedulerClass.getMethod("cancel", Plugin.class);
+                asyncCancelMethod = asyncSchedulerClass.getMethod("cancelTasks", Plugin.class);
             }
         } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
             throw new RuntimeException(e);
