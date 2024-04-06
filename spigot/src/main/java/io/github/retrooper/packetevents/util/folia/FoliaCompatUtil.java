@@ -40,7 +40,9 @@ public class FoliaCompatUtil {
     }
 
     /**
-     * @return an instance of AsyncScheduler.
+     * Returns the async scheduler.
+     *
+     * @return async scheduler instance of {@link AsyncScheduler}
      */
     public static AsyncScheduler getAsyncScheduler() {
         if (asyncScheduler == null) {
@@ -50,7 +52,9 @@ public class FoliaCompatUtil {
     }
 
     /**
-     * @return an instance of EntityScheduler.
+     * Returns the entity scheduler.
+     *
+     * @return entity scheduler instance of {@link EntityScheduler}
      */
     public static EntityScheduler getEntityScheduler() {
         if (entityScheduler == null) {
@@ -60,7 +64,9 @@ public class FoliaCompatUtil {
     }
 
     /**
-     * @return an instance of GlobalRegionScheduler.
+     * Returns the global region scheduler.
+     *
+     * @return global region scheduler instance of {@link GlobalRegionScheduler}
      */
     public static GlobalRegionScheduler getGlobalRegionScheduler() {
         if (globalRegionScheduler == null) {
@@ -70,7 +76,9 @@ public class FoliaCompatUtil {
     }
 
     /**
-     * @return an instance of RegionScheduler.
+     * Returns the region scheduler.
+     *
+     * @return region scheduler instance of {@link RegionScheduler}
      */
     public static RegionScheduler getRegionScheduler() {
         if (regionScheduler == null) {

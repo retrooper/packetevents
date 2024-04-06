@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
 /**
- * Represents a scheduler for executing tasks asynchronously.
+ * Represents a scheduler for executing region tasks
  */
 class RegionScheduler {
     private final boolean isFolia = FoliaCompatUtil.isFolia();
