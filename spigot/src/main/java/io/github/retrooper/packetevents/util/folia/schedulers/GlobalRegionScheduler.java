@@ -1,0 +1,148 @@
+package io.github.retrooper.packetevents.util.folia.schedulers;
+
+import com.github.retrooper.packetevents.util.reflection.Reflection;
+import io.github.retrooper.packetevents.util.folia.FoliaCompatUtil;
+import io.github.retrooper.packetevents.util.folia.TaskWrapper;
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.function.Consumer;
+
+/**
+ * Represents a scheduler for executing tasks asynchronously.
+ */
+public class GlobalRegionScheduler {
+    private static final boolean isFolia = FoliaCompatUtil.isFolia();
+
+    private static Object globalRegionScheduler;
+
+    private static Method globalExecuteMethod;
+    private static Method globalRunMethod;
+    private static Method globalRunDelayedMethod;
+    private static Method globalRunAtFixedRateMethod;
+    private static Method globalCancelMethod;
+
+    static {
+        try {
+            if (isFolia) {
+                Method getGlobalRegionSchedulerMethod = Reflection.getMethod(Server.class, "getGlobalRegionScheduler", 0);
+                globalRegionScheduler = getGlobalRegionSchedulerMethod.invoke(Bukkit.getServer());
+                Class<?> globalRegionSchedulerClass = globalRegionScheduler.getClass();
+
+                globalExecuteMethod = globalRegionSchedulerClass.getMethod("execute", Plugin.class, Runnable.class);
+                globalRunMethod = globalRegionSchedulerClass.getMethod("run", Plugin.class, Consumer.class);
+                globalRunDelayedMethod = globalRegionSchedulerClass.getMethod("runDelayed", Plugin.class, Consumer.class, long.class);
+                globalRunAtFixedRateMethod = globalRegionSchedulerClass.getMethod("runAtFixedRate", Plugin.class, Consumer.class, long.class, long.class);
+                globalCancelMethod = globalRegionSchedulerClass.getMethod("cancel", Plugin.class);
+            }
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Schedules a task to be executed on the global region.
+     *
+     * @param plugin The plugin that owns the task
+     * @param run    The task to execute
+     */
+    private static void execute(@NotNull Plugin plugin, @NotNull Runnable run) {
+        if (!isFolia) {
+            Bukkit.getScheduler().runTask(plugin, run);
+        }
+
+        try {
+            globalExecuteMethod.invoke(globalRegionScheduler, plugin, run);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Schedules a task to be executed on the global region.
+     *
+     * @param plugin The plugin that owns the task
+     * @param task   The task to execute
+     * @return {@link TaskWrapper} instance representing a wrapped task
+     */
+    public static TaskWrapper run(@NotNull Plugin plugin, @NotNull Consumer<Object> task) {
+        if (!isFolia) {
+            return new TaskWrapper(Bukkit.getScheduler().runTask(plugin, () -> task.accept(null)));
+        }
+
+        try {
+            return new TaskWrapper(globalRunMethod.invoke(globalRegionScheduler, plugin, task));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Schedules a task to be executed on the global region after the specified delay in ticks.
+     *
+     * @param plugin The plugin that owns the task
+     * @param task   The task to execute
+     * @param delay  The delay, in ticks.
+     * @return {@link TaskWrapper} instance representing a wrapped task
+     */
+    public static TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay) {
+        if (!isFolia) {
+            return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, () -> task.accept(null), delay));
+        }
+
+        try {
+            return new TaskWrapper(globalRunDelayedMethod.invoke(globalRegionScheduler, plugin, task, delay));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Schedules a repeating task to be executed on the global region after the initial delay with the specified period.
+     *
+     * @param plugin            The plugin that owns the task
+     * @param task              The task to execute
+     * @param initialDelayTicks The initial delay, in ticks.
+     * @param periodTicks       The period, in ticks.
+     * @return {@link TaskWrapper} instance representing a wrapped task
+     */
+    public static TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
+        if (!isFolia) {
+            return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
+        }
+
+        try {
+            return new TaskWrapper(globalRunAtFixedRateMethod.invoke(globalRegionScheduler, plugin, task, initialDelayTicks, periodTicks));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Attempts to cancel all tasks scheduled by the specified plugin.
+     *
+     * @param plugin Specified plugin.
+     */
+    public static void cancel(@NotNull Plugin plugin) {
+        if (!isFolia) {
+            Bukkit.getScheduler().cancelTasks(plugin);
+            return;
+        }
+
+        try {
+            globalCancelMethod.invoke(globalRegionScheduler, plugin);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+}
