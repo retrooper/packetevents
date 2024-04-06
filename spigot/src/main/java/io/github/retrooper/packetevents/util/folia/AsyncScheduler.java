@@ -1,8 +1,6 @@
-package io.github.retrooper.packetevents.util.folia.schedulers;
+package io.github.retrooper.packetevents.util.folia;
 
 import com.github.retrooper.packetevents.util.reflection.Reflection;
-import io.github.retrooper.packetevents.util.folia.FoliaCompatUtil;
-import io.github.retrooper.packetevents.util.folia.TaskWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
@@ -17,16 +15,16 @@ import java.util.function.Consumer;
  * Represents a scheduler for executing tasks asynchronously.
  */
 public class AsyncScheduler {
-    private static final boolean isFolia = FoliaCompatUtil.isFolia();
+    private final boolean isFolia = FoliaCompatUtil.isFolia();
 
-    private static Object asyncScheduler;
+    private Object asyncScheduler;
 
-    private static Method asyncRunNowMethod;
-    private static Method asyncRunDelayedMethod;
-    private static Method asyncRunAtFixedRateMethod;
-    private static Method asyncCancelMethod;
+    private Method asyncRunNowMethod;
+    private Method asyncRunDelayedMethod;
+    private Method asyncRunAtFixedRateMethod;
+    private Method asyncCancelMethod;
 
-    static {
+    protected AsyncScheduler() {
         try {
             if (isFolia) {
                 Method getAsyncSchedulerMethod = Reflection.getMethod(Server.class, "getAsyncScheduler", 0);
@@ -50,7 +48,7 @@ public class AsyncScheduler {
      * @param task   Specified task.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper runNow(@NotNull Plugin plugin, @NotNull Consumer<Object> task) {
+    public TaskWrapper runNow(@NotNull Plugin plugin, @NotNull Consumer<Object> task) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> task.accept(null)));
         }
@@ -72,7 +70,7 @@ public class AsyncScheduler {
      * @param timeUnit The time unit for the time delay.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay, @NotNull TimeUnit timeUnit) {
+    public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay, @NotNull TimeUnit timeUnit) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> task.accept(null), timeUnit.ordinal()));
         }
@@ -95,7 +93,7 @@ public class AsyncScheduler {
      * @param timeUnit The time unit for the initial delay and period.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay, long period, @NotNull TimeUnit timeUnit) {
+    public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay, long period, @NotNull TimeUnit timeUnit) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> task.accept(null), delay, period));
         }
@@ -114,7 +112,7 @@ public class AsyncScheduler {
      *
      * @param plugin Specified plugin.
      */
-    public static void cancel(@NotNull Plugin plugin) {
+    public void cancel(@NotNull Plugin plugin) {
         if (!isFolia) {
             Bukkit.getScheduler().cancelTasks(plugin);
             return;

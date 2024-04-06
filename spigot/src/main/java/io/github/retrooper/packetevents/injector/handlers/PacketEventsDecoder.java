@@ -86,7 +86,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
                 }
                 user.closeConnection();
                 if (player != null) {
-                    FoliaCompatUtil.runTaskForEntity(player, (Plugin) PacketEvents.getAPI().getPlugin(), () -> player.kickPlayer("Invalid packet"), null, 1);
+                    FoliaCompatUtil.getEntityScheduler().runDelayed(player, (Plugin) PacketEvents.getAPI().getPlugin(), (o) -> player.kickPlayer("PacketEvents 2.0 failed to inject"), null, 1);
                 }
 
                 PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to invalid packet!");

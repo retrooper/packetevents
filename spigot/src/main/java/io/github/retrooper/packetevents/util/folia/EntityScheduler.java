@@ -1,10 +1,8 @@
-package io.github.retrooper.packetevents.util.folia.schedulers;
+package io.github.retrooper.packetevents.util.folia;
 
 import com.github.retrooper.packetevents.util.reflection.Reflection;
-import io.github.retrooper.packetevents.util.folia.FoliaCompatUtil;
-import io.github.retrooper.packetevents.util.folia.TaskWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,29 +15,13 @@ import java.util.function.Consumer;
  * Represents a scheduler for executing entity tasks.
  */
 public class EntityScheduler {
-    private static final boolean isFolia = FoliaCompatUtil.isFolia();
+    private final boolean isFolia = FoliaCompatUtil.isFolia();
 
-    private static Object entityScheduler;
+    private Method getEntitySchedulerMethod = Reflection.getMethod(Entity.class, "getEntityScheduler", 0);
 
-    private static Method entityExecuteMethod;
-    private static Method entityRunMethod;
-    private static Method entityRunDelayedMethod;
-    private static Method entityRunAtFixedRateMethod;
-
-    static {
-        try {
-            if (isFolia) {
-                Method getEntitySchedulerMethod = Reflection.getMethod(Server.class, "getEntityScheduler", 0);
-                entityScheduler = getEntitySchedulerMethod.invoke(Bukkit.getServer());
-                Class<?> entitySchedulerClass = entityScheduler.getClass();
-
-                entityExecuteMethod = entitySchedulerClass.getMethod("execute", Plugin.class, Runnable.class, Runnable.class, long.class);
-                entityRunMethod = entitySchedulerClass.getMethod("run", Plugin.class, Consumer.class, Runnable.class);
-                entityRunDelayedMethod = entitySchedulerClass.getMethod("runDelayed", Plugin.class, Consumer.class, Runnable.class, long.class);
-                entityRunAtFixedRateMethod = entitySchedulerClass.getMethod("runAtFixedRate", Plugin.class, Consumer.class, Runnable.class, long.class, long.class);
-            }
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
+    protected EntityScheduler() {
+        if (isFolia) {
+            getEntitySchedulerMethod = Reflection.getMethod(Entity.class, "getEntityScheduler", 0);
         }
     }
 
@@ -56,15 +38,20 @@ public class EntityScheduler {
      * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
      * @param delay   The delay in ticks before the run callback is invoked. Any value less-than 1 is treated as 1.
      */
-    public static void execute(@NotNull Plugin plugin, @NotNull Runnable run, @Nullable Runnable retired, long delay) {
+    public void execute(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Runnable run, @Nullable Runnable retired, long delay) {
         if (!isFolia) {
             if (delay < 1) delay = 1;
             Bukkit.getScheduler().runTaskLater(plugin, run, delay);
+            return;
         }
 
         try {
+            Object entityScheduler = getEntitySchedulerMethod.invoke(entity);
+            Class<?> entitySchedulerClass = entityScheduler.getClass();
+            Method entityExecuteMethod = entitySchedulerClass.getMethod("execute", Plugin.class, Runnable.class, Runnable.class, long.class);
+
             entityExecuteMethod.invoke(entityScheduler, plugin, run, retired, delay);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
@@ -83,14 +70,18 @@ public class EntityScheduler {
      * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper run(@NotNull Plugin plugin, @NotNull Consumer<Object> task, @Nullable Runnable retired) {
+    public TaskWrapper run(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Consumer<Object> task, @Nullable Runnable retired) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTask(plugin, () -> task.accept(null)));
         }
 
         try {
+            Object entityScheduler = getEntitySchedulerMethod.invoke(entity);
+            Class<?> entitySchedulerClass = entityScheduler.getClass();
+            Method entityRunMethod = entitySchedulerClass.getMethod("run", Plugin.class, Consumer.class, Runnable.class);
+
             return new TaskWrapper(entityRunMethod.invoke(entityScheduler, plugin, task, retired));
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
         return null;
@@ -110,16 +101,21 @@ public class EntityScheduler {
      * @param delayTicks The delay, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, @Nullable Runnable retired, long delayTicks) {
+    public TaskWrapper runDelayed(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Consumer<Object> task, @Nullable Runnable retired, long delayTicks) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, () -> task.accept(null), delayTicks));
         }
 
         try {
+            Object entityScheduler = getEntitySchedulerMethod.invoke(entity);
+            Class<?> entitySchedulerClass = entityScheduler.getClass();
+            Method entityRunDelayedMethod = entitySchedulerClass.getMethod("runDelayed", Plugin.class, Consumer.class, Runnable.class, long.class);
+
             return new TaskWrapper(entityRunDelayedMethod.invoke(entityScheduler, plugin, task, retired, delayTicks));
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
@@ -138,14 +134,18 @@ public class EntityScheduler {
      * @param periodTicks       The period, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, @Nullable Runnable retired, long initialDelayTicks, long periodTicks) {
+    public TaskWrapper runAtFixedRate(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Consumer<Object> task, @Nullable Runnable retired, long initialDelayTicks, long periodTicks) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
 
         try {
+            Object entityScheduler = getEntitySchedulerMethod.invoke(entity);
+            Class<?> entitySchedulerClass = entityScheduler.getClass();
+            Method entityRunAtFixedRateMethod = entitySchedulerClass.getMethod("runAtFixedRate", Plugin.class, Consumer.class, Runnable.class, long.class, long.class);
+
             return new TaskWrapper(entityRunAtFixedRateMethod.invoke(entityScheduler, plugin, task, retired, initialDelayTicks, periodTicks));
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
         return null;

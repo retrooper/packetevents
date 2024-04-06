@@ -1,8 +1,6 @@
-package io.github.retrooper.packetevents.util.folia.schedulers;
+package io.github.retrooper.packetevents.util.folia;
 
 import com.github.retrooper.packetevents.util.reflection.Reflection;
-import io.github.retrooper.packetevents.util.folia.FoliaCompatUtil;
-import io.github.retrooper.packetevents.util.folia.TaskWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
@@ -16,17 +14,17 @@ import java.util.function.Consumer;
  * Represents a scheduler for executing tasks asynchronously.
  */
 public class GlobalRegionScheduler {
-    private static final boolean isFolia = FoliaCompatUtil.isFolia();
+    private final boolean isFolia = FoliaCompatUtil.isFolia();
 
-    private static Object globalRegionScheduler;
+    private Object globalRegionScheduler;
 
-    private static Method globalExecuteMethod;
-    private static Method globalRunMethod;
-    private static Method globalRunDelayedMethod;
-    private static Method globalRunAtFixedRateMethod;
-    private static Method globalCancelMethod;
+    private Method globalExecuteMethod;
+    private Method globalRunMethod;
+    private Method globalRunDelayedMethod;
+    private Method globalRunAtFixedRateMethod;
+    private Method globalCancelMethod;
 
-    static {
+    protected GlobalRegionScheduler() {
         try {
             if (isFolia) {
                 Method getGlobalRegionSchedulerMethod = Reflection.getMethod(Server.class, "getGlobalRegionScheduler", 0);
@@ -50,7 +48,7 @@ public class GlobalRegionScheduler {
      * @param plugin The plugin that owns the task
      * @param run    The task to execute
      */
-    private static void execute(@NotNull Plugin plugin, @NotNull Runnable run) {
+    private void execute(@NotNull Plugin plugin, @NotNull Runnable run) {
         if (!isFolia) {
             Bukkit.getScheduler().runTask(plugin, run);
         }
@@ -69,7 +67,7 @@ public class GlobalRegionScheduler {
      * @param task   The task to execute
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper run(@NotNull Plugin plugin, @NotNull Consumer<Object> task) {
+    public TaskWrapper run(@NotNull Plugin plugin, @NotNull Consumer<Object> task) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTask(plugin, () -> task.accept(null)));
         }
@@ -91,7 +89,7 @@ public class GlobalRegionScheduler {
      * @param delay  The delay, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay) {
+    public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, () -> task.accept(null), delay));
         }
@@ -114,7 +112,7 @@ public class GlobalRegionScheduler {
      * @param periodTicks       The period, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
+    public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
@@ -133,7 +131,7 @@ public class GlobalRegionScheduler {
      *
      * @param plugin Specified plugin.
      */
-    public static void cancel(@NotNull Plugin plugin) {
+    public void cancel(@NotNull Plugin plugin) {
         if (!isFolia) {
             Bukkit.getScheduler().cancelTasks(plugin);
             return;

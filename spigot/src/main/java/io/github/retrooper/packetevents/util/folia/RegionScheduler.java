@@ -1,8 +1,6 @@
-package io.github.retrooper.packetevents.util.folia.schedulers;
+package io.github.retrooper.packetevents.util.folia;
 
 import com.github.retrooper.packetevents.util.reflection.Reflection;
-import io.github.retrooper.packetevents.util.folia.FoliaCompatUtil;
-import io.github.retrooper.packetevents.util.folia.TaskWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -17,21 +15,21 @@ import java.util.function.Consumer;
 /**
  * Represents a scheduler for executing tasks asynchronously.
  */
-public class RegionScheduler {
-    private static final boolean isFolia = FoliaCompatUtil.isFolia();
+class RegionScheduler {
+    private final boolean isFolia = FoliaCompatUtil.isFolia();
 
-    private static Object regionScheduler;
+    private Object regionScheduler;
 
-    private static Method regionExecuteWorldMethod;
-    private static Method regionExecuteLocationMethod;
-    private static Method regionRunWorldMethod;
-    private static Method regionRunLocationMethod;
-    private static Method regionRunDelayedWorldMethod;
-    private static Method regionRunDelayedLocationMethod;
-    private static Method regionRunAtFixedRateWorldMethod;
-    private static Method regionRunAtFixedRateLocationMethod;
+    private Method regionExecuteWorldMethod;
+    private Method regionExecuteLocationMethod;
+    private Method regionRunWorldMethod;
+    private Method regionRunLocationMethod;
+    private Method regionRunDelayedWorldMethod;
+    private Method regionRunDelayedLocationMethod;
+    private Method regionRunAtFixedRateWorldMethod;
+    private Method regionRunAtFixedRateLocationMethod;
 
-    static {
+    protected RegionScheduler() {
         try {
             if (isFolia) {
                 Method getRegionSchedulerMethod = Reflection.getMethod(Server.class, "getRegionScheduler", 0);
@@ -59,7 +57,7 @@ public class RegionScheduler {
      * @param world  The world of the region that owns the task
      * @param run    The task to execute
      */
-    public static void execute(@NotNull Plugin plugin, @NotNull World world, @NotNull Runnable run) {
+    public void execute(@NotNull Plugin plugin, @NotNull World world, @NotNull Runnable run) {
         if (!isFolia) {
             Bukkit.getScheduler().runTask(plugin, run);
         }
@@ -78,7 +76,7 @@ public class RegionScheduler {
      * @param location The location at which the region executing should own
      * @param run      The task to execute
      */
-    public static void execute(@NotNull Plugin plugin, @NotNull Location location, @NotNull Runnable run) {
+    public void execute(@NotNull Plugin plugin, @NotNull Location location, @NotNull Runnable run) {
         if (!isFolia) {
             Bukkit.getScheduler().runTask(plugin, run);
         }
@@ -98,7 +96,7 @@ public class RegionScheduler {
      * @param task   The task to execute
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper run(@NotNull Plugin plugin, @NotNull World world, @NotNull Consumer<Object> task) {
+    public TaskWrapper run(@NotNull Plugin plugin, @NotNull World world, @NotNull Consumer<Object> task) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTask(plugin, () -> task.accept(null)));
         }
@@ -120,7 +118,7 @@ public class RegionScheduler {
      * @param task     The task to execute
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper run(@NotNull Plugin plugin, @NotNull Location location, @NotNull Consumer<Object> task) {
+    public TaskWrapper run(@NotNull Plugin plugin, @NotNull Location location, @NotNull Consumer<Object> task) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTask(plugin, () -> task.accept(null)));
         }
@@ -143,7 +141,7 @@ public class RegionScheduler {
      * @param delayTicks The delay, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull World world, @NotNull Consumer<Object> task, long delayTicks) {
+    public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull World world, @NotNull Consumer<Object> task, long delayTicks) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, () -> task.accept(null), delayTicks));
         }
@@ -166,7 +164,7 @@ public class RegionScheduler {
      * @param delayTicks The delay, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Location location, @NotNull Consumer<Object> task, long delayTicks) {
+    public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Location location, @NotNull Consumer<Object> task, long delayTicks) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, () -> task.accept(null), delayTicks));
         }
@@ -190,7 +188,7 @@ public class RegionScheduler {
      * @param periodTicks       The period, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull World world, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
+    public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull World world, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
@@ -214,7 +212,7 @@ public class RegionScheduler {
      * @param periodTicks       The period, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public static TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Location location, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
+    public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Location location, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
