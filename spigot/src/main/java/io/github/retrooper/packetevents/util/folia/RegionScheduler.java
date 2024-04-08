@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 /**
  * Represents a scheduler for executing region tasks
  */
-class RegionScheduler {
+public class RegionScheduler {
     private final boolean isFolia = FoliaCompatUtil.isFolia();
 
     private Object regionScheduler;
