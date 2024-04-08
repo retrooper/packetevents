@@ -22,7 +22,6 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
-import io.github.retrooper.packetevents.util.folia.EntityScheduler;
 import io.github.retrooper.packetevents.util.folia.FoliaCompatUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
