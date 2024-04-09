@@ -54,13 +54,13 @@ public class RegionScheduler {
                 regionScheduler = getRegionSchedulerMethod.invoke(Bukkit.getServer());
                 Class<?> regionSchedulerClass = regionScheduler.getClass();
 
-                regionExecuteWorldMethod = regionSchedulerClass.getMethod("execute", Plugin.class, World.class, Runnable.class);
+                regionExecuteWorldMethod = regionSchedulerClass.getMethod("execute", Plugin.class, World.class, int.class, int.class, Runnable.class);
                 regionExecuteLocationMethod = regionSchedulerClass.getMethod("execute", Plugin.class, Location.class, Runnable.class);
-                regionRunWorldMethod = regionSchedulerClass.getMethod("run", Plugin.class, World.class, Consumer.class);
+                regionRunWorldMethod = regionSchedulerClass.getMethod("run", Plugin.class, World.class, int.class, int.class, Consumer.class);
                 regionRunLocationMethod = regionSchedulerClass.getMethod("run", Plugin.class, Location.class, Consumer.class);
-                regionRunDelayedWorldMethod = regionSchedulerClass.getMethod("runDelayed", Plugin.class, World.class, Consumer.class, long.class);
+                regionRunDelayedWorldMethod = regionSchedulerClass.getMethod("runDelayed", Plugin.class, World.class, int.class, int.class, Consumer.class, long.class);
                 regionRunDelayedLocationMethod = regionSchedulerClass.getMethod("runDelayed", Plugin.class, Location.class, Consumer.class, long.class);
-                regionRunAtFixedRateWorldMethod = regionSchedulerClass.getMethod("runAtFixedRate", Plugin.class, World.class, Consumer.class, long.class, long.class);
+                regionRunAtFixedRateWorldMethod = regionSchedulerClass.getMethod("runAtFixedRate", Plugin.class, World.class, int.class, int.class, Consumer.class, long.class, long.class);
                 regionRunAtFixedRateLocationMethod = regionSchedulerClass.getMethod("runAtFixedRate", Plugin.class, Location.class, Consumer.class, long.class, long.class);
             }
         } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
@@ -73,15 +73,17 @@ public class RegionScheduler {
      *
      * @param plugin The plugin that owns the task
      * @param world  The world of the region that owns the task
+     * @param chunkX The chunk X coordinate of the region that owns the task
+     * @param chunkZ The chunk Z coordinate of the region that owns the task
      * @param run    The task to execute
      */
-    public void execute(@NotNull Plugin plugin, @NotNull World world, @NotNull Runnable run) {
+    public void execute(@NotNull Plugin plugin, @NotNull World world, int chunkX, int chunkZ, @NotNull Runnable run) {
         if (!isFolia) {
             Bukkit.getScheduler().runTask(plugin, run);
         }
 
         try {
-            regionExecuteWorldMethod.invoke(regionScheduler, plugin, world, run);
+            regionExecuteWorldMethod.invoke(regionScheduler, plugin, world, chunkX, chunkZ, run);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
@@ -111,16 +113,18 @@ public class RegionScheduler {
      *
      * @param plugin The plugin that owns the task
      * @param world  The world of the region that owns the task
+     * @param chunkX The chunk X coordinate of the region that owns the task
+     * @param chunkZ The chunk Z coordinate of the region that owns the task
      * @param task   The task to execute
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public TaskWrapper run(@NotNull Plugin plugin, @NotNull World world, @NotNull Consumer<Object> task) {
+    public TaskWrapper run(@NotNull Plugin plugin, @NotNull World world, int chunkX, int chunkZ, @NotNull Consumer<Object> task) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTask(plugin, () -> task.accept(null)));
         }
 
         try {
-            return new TaskWrapper(regionRunWorldMethod.invoke(regionScheduler, plugin, world, task));
+            return new TaskWrapper(regionRunWorldMethod.invoke(regionScheduler, plugin, world, chunkX, chunkZ, task));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -155,17 +159,19 @@ public class RegionScheduler {
      *
      * @param plugin     The plugin that owns the task
      * @param world      The world of the region that owns the task
+     * @param chunkX The chunk X coordinate of the region that owns the task
+     * @param chunkZ The chunk Z coordinate of the region that owns the task
      * @param task       The task to execute
      * @param delayTicks The delay, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull World world, @NotNull Consumer<Object> task, long delayTicks) {
+    public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull World world, int chunkX, int chunkZ, @NotNull Consumer<Object> task, long delayTicks) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, () -> task.accept(null), delayTicks));
         }
 
         try {
-            return new TaskWrapper(regionRunDelayedWorldMethod.invoke(regionScheduler, plugin, world, task, delayTicks));
+            return new TaskWrapper(regionRunDelayedWorldMethod.invoke(regionScheduler, plugin, world, chunkX, chunkZ, task, delayTicks));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -201,18 +207,20 @@ public class RegionScheduler {
      *
      * @param plugin            The plugin that owns the task
      * @param world             The world of the region that owns the task
+     * @param chunkX The chunk X coordinate of the region that owns the task
+     * @param chunkZ The chunk Z coordinate of the region that owns the task
      * @param task              The task to execute
      * @param initialDelayTicks The initial delay, in ticks.
      * @param periodTicks       The period, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
-    public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull World world, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
+    public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull World world, int chunkX, int chunkZ, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
 
         try {
-            return new TaskWrapper(regionRunAtFixedRateWorldMethod.invoke(regionScheduler, plugin, world, task, initialDelayTicks, periodTicks));
+            return new TaskWrapper(regionRunAtFixedRateWorldMethod.invoke(regionScheduler, plugin, world, chunkX, chunkZ, task, initialDelayTicks, periodTicks));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
