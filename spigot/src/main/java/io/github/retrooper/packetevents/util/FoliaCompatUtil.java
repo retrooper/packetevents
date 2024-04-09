@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 
 /**
  * @deprecated This class has been moved to {@link io.github.retrooper.packetevents.util.folia.FoliaCompatUtil}.
- * This class will be removed in a future release.
  */
 @Deprecated()
 public class FoliaCompatUtil {
@@ -55,7 +54,6 @@ public class FoliaCompatUtil {
     /**
      * @return Whether the server is running Folia
      * @deprecated This method has been moved to {@link io.github.retrooper.packetevents.util.folia.FoliaCompatUtil#isFolia()}.
-     * This method will be removed in a future release.
      */
     public static boolean isFolia() {
         return folia;
@@ -68,7 +66,6 @@ public class FoliaCompatUtil {
      * @param run    Runnable to run
      * @deprecated This method is deprecated, and it's recommended to use
      * {@link io.github.retrooper.packetevents.util.folia.FoliaCompatUtil#getAsyncScheduler()} instead.
-     * This method will be removed in a future release.
      */
     public static void runTaskAsync(Plugin plugin, Runnable run) {
         if (!folia) {
@@ -91,7 +88,6 @@ public class FoliaCompatUtil {
      * @param period Period in ticks
      * @deprecated This method is deprecated, and it's recommended to use
      * {@link io.github.retrooper.packetevents.util.folia.FoliaCompatUtil#getAsyncScheduler()} instead.
-     * This method will be removed in a future release.
      */
     public static void runTaskTimerAsync(Plugin plugin, Consumer<Object> run, long delay, long period) {
         if (!folia) {
@@ -112,7 +108,6 @@ public class FoliaCompatUtil {
      * @param run    Consumer that accepts an object or null, for Folia or Paper/Spigot respectively
      * @deprecated This method is deprecated, and it's recommended to use
      * {@link io.github.retrooper.packetevents.util.folia.FoliaCompatUtil#getGlobalRegionScheduler()} or another suitable scheduler instead.
-     * This method will be removed in a future release.
      */
     public static void runTask(Plugin plugin, Consumer<Object> run) {
         if (!folia) {
@@ -134,7 +129,6 @@ public class FoliaCompatUtil {
      * @param plugin Your plugin or PacketEvents
      * @param run    The task to run
      * @deprecated This method has been moved to {@link io.github.retrooper.packetevents.util.folia.FoliaCompatUtil#runTaskOnInit(Plugin, Runnable)}.
-     * This method will be removed in a future release.
      */
     public static void runTaskOnInit(Plugin plugin, Runnable run) {
         if (!folia) {
@@ -155,7 +149,6 @@ public class FoliaCompatUtil {
      * @param retired The task to run if entity is retired before the task is run
      * @param delay   Delay in ticks
      * @deprecated This method is deprecated, and it's recommended to use {@link io.github.retrooper.packetevents.util.folia.FoliaCompatUtil#getEntityScheduler()}.
-     * This method will be removed in a future release.
      */
     public static void runTaskForEntity(Entity entity, Plugin plugin, Runnable run, Runnable retired, long delay) {
         if (!folia) {
