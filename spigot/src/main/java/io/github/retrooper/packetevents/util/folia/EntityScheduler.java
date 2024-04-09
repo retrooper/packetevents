@@ -35,11 +35,11 @@ import java.util.function.Consumer;
 public class EntityScheduler {
     private final boolean isFolia = FoliaCompatUtil.isFolia();
 
-    private Method getEntitySchedulerMethod = Reflection.getMethod(Entity.class, "getEntityScheduler", 0);
+    private Method getEntitySchedulerMethod;
 
     protected EntityScheduler() {
         if (isFolia) {
-            getEntitySchedulerMethod = Reflection.getMethod(Entity.class, "getEntityScheduler", 0);
+            getEntitySchedulerMethod = Reflection.getMethod(Entity.class, "getScheduler", 0);
         }
     }
 
@@ -57,8 +57,9 @@ public class EntityScheduler {
      * @param delay   The delay in ticks before the run callback is invoked. Any value less-than 1 is treated as 1.
      */
     public void execute(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Runnable run, @Nullable Runnable retired, long delay) {
+        if (delay < 1) delay = 1;
+
         if (!isFolia) {
-            if (delay < 1) delay = 1;
             Bukkit.getScheduler().runTaskLater(plugin, run, delay);
             return;
         }
@@ -116,10 +117,12 @@ public class EntityScheduler {
      * @param plugin     The plugin that owns the task
      * @param task       The task to execute
      * @param retired    Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
-     * @param delayTicks The delay, in ticks.
+     * @param delayTicks The delay in ticks before the run callback is invoked. Any value less-than 1 is treated as 1.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runDelayed(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Consumer<Object> task, @Nullable Runnable retired, long delayTicks) {
+        if (delayTicks < 1) delayTicks = 1;
+
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, () -> task.accept(null), delayTicks));
         }
@@ -148,11 +151,13 @@ public class EntityScheduler {
      * @param plugin            The plugin that owns the task
      * @param task              The task to execute
      * @param retired           Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
-     * @param initialDelayTicks The initial delay, in ticks.
+     * @param initialDelayTicks The initial delay, in ticks before the method is invoked. Any value less-than 1 is treated as 1.
      * @param periodTicks       The period, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runAtFixedRate(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Consumer<Object> task, @Nullable Runnable retired, long initialDelayTicks, long periodTicks) {
+        if (initialDelayTicks < 1) initialDelayTicks = 1;
+
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
