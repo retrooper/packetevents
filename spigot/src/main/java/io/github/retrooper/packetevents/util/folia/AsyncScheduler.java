@@ -90,7 +90,7 @@ public class AsyncScheduler {
      */
     public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay, @NotNull TimeUnit timeUnit) {
         if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> task.accept(null), timeUnit.ordinal()));
+            return new TaskWrapper(Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit)));
         }
 
         try {
@@ -113,7 +113,7 @@ public class AsyncScheduler {
      */
     public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay, long period, @NotNull TimeUnit timeUnit) {
         if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> task.accept(null), delay, period));
+            return new TaskWrapper(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit), convertTimeToTicks(period, timeUnit)));
         }
 
         try {
@@ -141,5 +141,16 @@ public class AsyncScheduler {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Converts the specified time to ticks.
+     *
+     * @param time     The time to convert.
+     * @param timeUnit The time unit of the time.
+     * @return The time converted to ticks.
+     */
+    private long convertTimeToTicks(long time, TimeUnit timeUnit) {
+        return timeUnit.toMillis(time) / 50;
     }
 }

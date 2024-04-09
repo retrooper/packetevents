@@ -159,13 +159,15 @@ public class RegionScheduler {
      *
      * @param plugin     The plugin that owns the task
      * @param world      The world of the region that owns the task
-     * @param chunkX The chunk X coordinate of the region that owns the task
-     * @param chunkZ The chunk Z coordinate of the region that owns the task
+     * @param chunkX     The chunk X coordinate of the region that owns the task
+     * @param chunkZ     The chunk Z coordinate of the region that owns the task
      * @param task       The task to execute
-     * @param delayTicks The delay, in ticks.
+     * @param delayTicks The delay, in ticks before the method is invoked. Any value less-than 1 is treated as 1.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull World world, int chunkX, int chunkZ, @NotNull Consumer<Object> task, long delayTicks) {
+        if (delayTicks < 1) delayTicks = 1;
+
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, () -> task.accept(null), delayTicks));
         }
@@ -185,10 +187,12 @@ public class RegionScheduler {
      * @param plugin     The plugin that owns the task
      * @param location   The location at which the region executing should own
      * @param task       The task to execute
-     * @param delayTicks The delay, in ticks.
+     * @param delayTicks The delay, in ticks before the method is invoked. Any value less-than 1 is treated as 1.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Location location, @NotNull Consumer<Object> task, long delayTicks) {
+        if (delayTicks < 1) delayTicks = 1;
+
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, () -> task.accept(null), delayTicks));
         }
@@ -207,14 +211,16 @@ public class RegionScheduler {
      *
      * @param plugin            The plugin that owns the task
      * @param world             The world of the region that owns the task
-     * @param chunkX The chunk X coordinate of the region that owns the task
-     * @param chunkZ The chunk Z coordinate of the region that owns the task
+     * @param chunkX            The chunk X coordinate of the region that owns the task
+     * @param chunkZ            The chunk Z coordinate of the region that owns the task
      * @param task              The task to execute
-     * @param initialDelayTicks The initial delay, in ticks.
+     * @param initialDelayTicks The initial delay, in ticks before the method is invoked. Any value less-than 1 is treated as 1.
      * @param periodTicks       The period, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull World world, int chunkX, int chunkZ, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
+        if (initialDelayTicks < 1) initialDelayTicks = 1;
+
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
@@ -234,11 +240,13 @@ public class RegionScheduler {
      * @param plugin            The plugin that owns the task
      * @param location          The location at which the region executing should own
      * @param task              The task to execute
-     * @param initialDelayTicks The initial delay, in ticks.
+     * @param initialDelayTicks The initial delay, in ticks before the method is invoked. Any value less-than 1 is treated as 1.
      * @param periodTicks       The period, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Location location, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
+        if (initialDelayTicks < 1) initialDelayTicks = 1;
+
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }

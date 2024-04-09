@@ -104,10 +104,12 @@ public class GlobalRegionScheduler {
      *
      * @param plugin The plugin that owns the task
      * @param task   The task to execute
-     * @param delay  The delay, in ticks.
+     * @param delay  The delay, in ticks before the method is invoked. Any value less-than 1 is treated as 1.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay) {
+        if (delay < 1) delay = 1;
+
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, () -> task.accept(null), delay));
         }
@@ -126,11 +128,13 @@ public class GlobalRegionScheduler {
      *
      * @param plugin            The plugin that owns the task
      * @param task              The task to execute
-     * @param initialDelayTicks The initial delay, in ticks.
+     * @param initialDelayTicks The initial delay, in ticks before the method is invoked. Any value less-than 1 is treated as 1.
      * @param periodTicks       The period, in ticks.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
+        if (initialDelayTicks < 1) initialDelayTicks = 1;
+
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
