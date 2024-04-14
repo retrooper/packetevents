@@ -314,8 +314,12 @@ public class EntityTypes {
 
     // Added in 1.20.3
     public static final EntityType BREEZE = define("breeze", ABSTRACT_MONSTER);
-    public static final EntityType WIND_CHARGE = define("wind_charge", PROJECTILE_ABSTRACT);
+    public static final EntityType ABSTRACT_WIND_CHARGE = define("abstract_wind_charge", PROJECTILE_ABSTRACT);
+    public static final EntityType WIND_CHARGE = define("wind_charge", ABSTRACT_WIND_CHARGE);
 
     // Added in 1.20.5
     public static final EntityType ARMADILLO = define("armadillo", ABSTRACT_ANIMAL);
+    public static final EntityType BOGGED = define("bogged", ABSTRACT_SKELETON);
+    public static final EntityType BREEZE_WIND_CHARGE = define("breeze_wind_charge", ABSTRACT_WIND_CHARGE);
+    public static final EntityType OMINOUS_ITEM_SPAWNER = define("ominous_item_spawner", ENTITY);
 }
