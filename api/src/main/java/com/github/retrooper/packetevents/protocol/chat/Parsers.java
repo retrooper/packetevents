@@ -127,6 +127,7 @@ public class Parsers {
             new Parser("minecraft:swizzle", null, null),
             new Parser("minecraft:team", null, null),
             new Parser("minecraft:item_slot", null, null),
+            new Parser("minecraft:item_slots", null, null),
             new Parser("minecraft:resource_location", null, null),
             new Parser("minecraft:function", null, null),
             new Parser("minecraft:entity_anchor", null, null),
@@ -157,6 +158,9 @@ public class Parsers {
             new Parser("minecraft:template_mirror", null, null),
             new Parser("minecraft:template_rotation", null, null),
             new Parser("minecraft:heightmap", null, null),
+            new Parser("minecraft:loot_table", null, null),
+            new Parser("minecraft:loot_predicate", null, null),
+            new Parser("minecraft:loot_modifier", null, null),
             new Parser("minecraft:uuid", null, null)
     );
 
