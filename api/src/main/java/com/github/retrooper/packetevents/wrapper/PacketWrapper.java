@@ -27,7 +27,14 @@ import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.protocol.chat.*;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
+import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
+import com.github.retrooper.packetevents.protocol.chat.MessageSignature;
+import com.github.retrooper.packetevents.protocol.chat.Node;
+import com.github.retrooper.packetevents.protocol.chat.Parsers;
+import com.github.retrooper.packetevents.protocol.chat.RemoteChatSession;
+import com.github.retrooper.packetevents.protocol.chat.SignedCommandArgument;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
@@ -69,7 +76,15 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -1120,7 +1135,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         if (nodeType == 2) {
             String name = readString();
             int parserID = readVarInt();
-            List<Object> properties = Parsers.getParsers().get(parserID).readProperties(this).orElse(null);
+            List<Object> properties = Parsers.getById(this.serverVersion.toClientVersion(), parserID)
+                    .readProperties(this).orElse(null);
             ResourceLocation suggestionType = ((flags & 0x10) != 0) ? readIdentifier() : null;
             return new Node(flags, children, redirectNodeIndex, name, parserID, properties, suggestionType);
         } else if (nodeType == 1) {
@@ -1138,8 +1154,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         }
         node.getName().ifPresent(this::writeString);
         node.getParserID().ifPresent(this::writeVarInt);
-        if (node.getProperties().isPresent())
-            Parsers.getParsers().get(node.getParserID().get()).writeProperties(this, node.getProperties().get());
+        if (node.getProperties().isPresent()) {
+            Parsers.getById(this.serverVersion.toClientVersion(), node.getParserID().get())
+                    .writeProperties(this, node.getProperties().get());
+        }
         node.getSuggestionsType().ifPresent(this::writeIdentifier);
     }
 
