@@ -47,6 +47,7 @@ public enum ClientboundPacketType_1_20_5 {
     CUSTOM_CHAT_COMPLETIONS,
     PLUGIN_MESSAGE,
     DAMAGE_EVENT,
+    DEBUG_SAMPLE, // New packet
     DELETE_CHAT,
     DISCONNECT,
     DISGUISED_CHAT,
@@ -140,4 +141,5 @@ public enum ClientboundPacketType_1_20_5 {
     ENTITY_EFFECT,
     DECLARE_RECIPES,
     TAGS,
+    PROJECTILE_POWER, // New packet
 }

@@ -26,6 +26,7 @@ public enum ClientboundConfigPacketType_1_20_5 {
     CONFIGURATION_END,
     KEEP_ALIVE,
     PING,
+    RESET_CHAT, // New packet
     REGISTRY_DATA,
     RESOURCE_PACK_REMOVE,
     RESOURCE_PACK_SEND,
@@ -33,4 +34,5 @@ public enum ClientboundConfigPacketType_1_20_5 {
     TRANSFER, // New packet
     UPDATE_ENABLED_FEATURES,
     UPDATE_TAGS,
+    SELECT_KNOWN_PACKS, // New packet
 }

@@ -24,6 +24,7 @@ public enum ServerboundPacketType_1_20_5 {
     QUERY_BLOCK_NBT,
     SET_DIFFICULTY,
     CHAT_ACK,
+    CHAT_COMMAND_UNSIGNED, // "New" packet
     CHAT_COMMAND,
     CHAT_MESSAGE,
     CHAT_SESSION_UPDATE,
@@ -38,6 +39,7 @@ public enum ServerboundPacketType_1_20_5 {
     SLOT_STATE_CHANGE,
     COOKIE_RESPONSE, // New packet
     PLUGIN_MESSAGE,
+    DEBUG_SAMPLE_SUBSCRIPTION, // New packet
     EDIT_BOOK,
     QUERY_ENTITY_NBT,
     INTERACT_ENTITY,

@@ -27,4 +27,5 @@ public enum ServerboundConfigPacketType_1_20_5 {
     KEEP_ALIVE,
     PONG,
     RESOURCE_PACK_STATUS,
+    SELECT_KNOWN_PACKS, // New packet
 }
