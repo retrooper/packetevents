@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.world.states.defaulttags;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -437,6 +438,7 @@ public class BlockTags {
 
     String name;
     Set<StateType> states = new HashSet<>(); // o(1)
+    boolean reallyEmpty;
 
     public BlockTags(final String name) {
         byName.put(name, this);
@@ -450,6 +452,8 @@ public class BlockTags {
     private static void copy(@Nullable BlockTags src, BlockTags dst) {
         if (src != null) {
             dst.states.addAll(src.states);
+        } else {
+            dst.reallyEmpty = true;
         }
     }
 
@@ -480,5 +484,10 @@ public class BlockTags {
 
     public Set<StateType> getStates() {
         return this.states;
+    }
+
+    @VisibleForTesting
+    public boolean isReallyEmpty() {
+        return this.reallyEmpty;
     }
 }

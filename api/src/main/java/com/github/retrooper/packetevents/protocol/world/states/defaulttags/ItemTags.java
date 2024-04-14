@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.world.states.defaulttags;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -108,7 +109,6 @@ public class ItemTags {
     public static final ItemTags STONE_TOOL_MATERIALS = bind("stone_tool_materials");
     public static final ItemTags STONE_CRAFTING_MATERIALS = bind("stone_crafting_materials");
     public static final ItemTags FREEZE_IMMUNE_WEARABLES = bind("freeze_immune_wearables");
-    public static final ItemTags AXOLOTL_TEMPT_ITEMS = bind("axolotl_tempt_items");
     public static final ItemTags DAMPENS_VIBRATIONS = bind("dampens_vibrations");
     public static final ItemTags CLUSTER_MAX_HARVESTABLES = bind("cluster_max_harvestables");
     public static final ItemTags COMPASSES = bind("compasses");
@@ -126,13 +126,16 @@ public class ItemTags {
     public static final ItemTags HOES = bind("hoes");
     public static final ItemTags PICKAXES = bind("pickaxes");
     public static final ItemTags SHOVELS = bind("shovels");
-    public static final ItemTags TOOLS = bind("tools");
     public static final ItemTags BREAKS_DECORATED_POTS = bind("breaks_decorated_pots");
+    @Deprecated // removed in 1.20.5 as "duplicate"
+    public static final ItemTags TOOLS = BREAKS_DECORATED_POTS;
     public static final ItemTags VILLAGER_PLANTABLE_SEEDS = bind("villager_plantable_seeds");
 
     // Added in 1.20.5
     public static final ItemTags ARMADILLO_FOOD = bind("armadillo_food");
     public static final ItemTags AXOLOTL_FOOD = bind("axolotl_food");
+    @Deprecated // renamed in 1.20.5
+    public static final ItemTags AXOLOTL_TEMPT_ITEMS = AXOLOTL_FOOD;
     public static final ItemTags BEE_FOOD = bind("bee_food");
     public static final ItemTags CAMEL_FOOD = bind("camel_food");
     public static final ItemTags CAT_FOOD = bind("cat_food");
@@ -336,6 +339,7 @@ public class ItemTags {
 
     String name;
     Set<ItemType> states = new HashSet<>(); // o(1);
+    boolean reallyEmpty;
 
     public ItemTags(final String name) {
         byName.put(name, this);
@@ -384,5 +388,10 @@ public class ItemTags {
 
     public Set<ItemType> getStates() {
         return this.states;
+    }
+
+    @VisibleForTesting
+    public boolean isReallyEmpty() {
+        return this.reallyEmpty;
     }
 }
