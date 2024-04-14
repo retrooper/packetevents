@@ -1,6 +1,5 @@
 {
   "V_1_20_5": [
-    "ambient_entity_effect",
     "angry_villager",
     "block",
     "block_marker",
@@ -25,12 +24,15 @@
     "explosion_emitter",
     "explosion",
     "gust",
-    "gust_emitter",
+    "small_gust",
+    "gust_emitter_large",
+    "gust_emitter_small",
     "sonic_boom",
     "falling_dust",
     "firework",
     "fishing",
     "flame",
+    "infested",
     "cherry_leaves",
     "sculk_soul",
     "sculk_charge",
@@ -45,6 +47,7 @@
     "item",
     "vibration",
     "item_slime",
+    "item_cobweb",
     "item_snowball",
     "large_smoke",
     "lava",
@@ -99,7 +102,13 @@
     "shriek",
     "egg_crack",
     "dust_plume",
-    "trial_spawner_detection"
+    "trial_spawner_detection",
+    "trial_spawner_detection_ominous",
+    "vault_connection",
+    "dust_pillar",
+    "ominous_spawning",
+    "raid_omen",
+    "trial_omen"
   ],
   "V_1_20_3": [
     "ambient_entity_effect",
