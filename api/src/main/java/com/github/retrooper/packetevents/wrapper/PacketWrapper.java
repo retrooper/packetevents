@@ -52,6 +52,7 @@ import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.KnownPack;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
@@ -1133,6 +1134,19 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         if (node.getProperties().isPresent())
             Parsers.getParsers().get(node.getParserID().get()).writeProperties(this, node.getProperties().get());
         node.getSuggestionsType().ifPresent(this::writeIdentifier);
+    }
+
+    public KnownPack readKnownPack() {
+        String namespace = this.readString();
+        String id = this.readString();
+        String version = this.readString();
+        return new KnownPack(namespace, id, version);
+    }
+
+    public void writeKnownPack(KnownPack knownPack) {
+        this.writeString(knownPack.getNamespace());
+        this.writeString(knownPack.getId());
+        this.writeString(knownPack.getVersion());
     }
 
     public <T extends Enum<T>> EnumSet<T> readEnumSet(Class<T> enumClazz) {

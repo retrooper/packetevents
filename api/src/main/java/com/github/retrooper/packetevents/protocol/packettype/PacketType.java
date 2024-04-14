@@ -427,7 +427,8 @@ public final class PacketType {
             RESOURCE_PACK_STATUS,
 
             // Added in 1.20.5
-            COOKIE_RESPONSE;
+            COOKIE_RESPONSE,
+            SELECT_KNOWN_PACKS;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -507,8 +508,10 @@ public final class PacketType {
 
             // Added in 1.20.5
             COOKIE_REQUEST,
+            RESET_CHAT,
             STORE_COOKIE,
-            TRANSFER;
+            TRANSFER,
+            SELECT_KNOWN_PACKS;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -649,7 +652,9 @@ public final class PacketType {
             SLOT_STATE_CHANGE,
 
             // Added in 1.20.5
-            COOKIE_RESPONSE;
+            CHAT_COMMAND_UNSIGNED,
+            COOKIE_RESPONSE,
+            DEBUG_SAMPLE_SUBSCRIPTION;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -879,8 +884,10 @@ public final class PacketType {
 
             // Added in 1.20.5
             COOKIE_REQUEST,
+            DEBUG_SAMPLE,
             STORE_COOKIE,
-            TRANSFER;
+            TRANSFER,
+            PROJECTILE_POWER;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
