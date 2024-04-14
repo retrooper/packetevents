@@ -24,7 +24,7 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class WrapperCommonCookieResponse<T extends WrapperCommonCookieResponse<?>> extends PacketWrapper<T> {
+public abstract class WrapperCommonCookieResponse<T extends WrapperCommonCookieResponse<T>> extends PacketWrapper<T> {
 
     public static final int MAX_PAYLOAD_SIZE = 1024 * 5;
 
