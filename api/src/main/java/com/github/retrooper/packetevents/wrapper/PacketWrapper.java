@@ -831,6 +831,9 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public Dimension readDimension() {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            return new Dimension(this.readVarInt());
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             Dimension dimension = new Dimension(new NBTCompound());
             dimension.setDimensionName(readIdentifier().toString());
@@ -841,6 +844,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeDimension(Dimension dimension) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.writeVarInt(dimension.getId());
+            return;
+        }
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         boolean v1_16_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
         if (v1_19 || !v1_16_2) {
