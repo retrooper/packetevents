@@ -43,7 +43,8 @@ public class EnchantmentTypes {
             ClientVersion.V_1_13,
             ClientVersion.V_1_14,
             ClientVersion.V_1_16,
-            ClientVersion.V_1_19);
+            ClientVersion.V_1_19,
+            ClientVersion.V_1_20_5);
 
     public static EnchantmentType define(String key) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
@@ -131,6 +132,11 @@ public class EnchantmentTypes {
     public static final EnchantmentType PIERCING = define("piercing");
     public static final EnchantmentType MENDING = define("mending");
     public static final EnchantmentType VANISHING_CURSE = define("vanishing_curse");
+
+    // Added in 1.20.5
+    public static final EnchantmentType DENSITY = define("density");
+    public static final EnchantmentType BREACH = define("breach");
+    public static final EnchantmentType WIND_BURST = define("wind_burst");
 
     static {
         TYPES_BUILDER.unloadFileMappings();

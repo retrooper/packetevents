@@ -572,7 +572,9 @@ public class ItemTypes {
     public static final ItemType CUT_COPPER = builder("cut_copper").setMaxAmount(64).setPlacedType(StateTypes.CUT_COPPER).build();
     public static final ItemType JUNGLE_SIGN = builder("jungle_sign").setMaxAmount(16).setAttributes(ItemAttribute.FUEL).setPlacedType(StateTypes.JUNGLE_SIGN).build();
     public static final ItemType GREEN_GLAZED_TERRACOTTA = builder("green_glazed_terracotta").setMaxAmount(64).setPlacedType(StateTypes.GREEN_GLAZED_TERRACOTTA).build();
-    public static final ItemType SCUTE = builder("scute").setMaxAmount(64).build();
+    public static final ItemType TURTLE_SCUTE = builder("turtle_scute").setMaxAmount(64).build();
+    @Deprecated // renamed in 1.20.5
+    public static final ItemType SCUTE = TURTLE_SCUTE;
     public static final ItemType GOLDEN_CHESTPLATE = builder("golden_chestplate").setMaxAmount(1).setMaxDurability(112).build();
     public static final ItemType NETHERITE_LEGGINGS = builder("netherite_leggings").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT).setMaxDurability(555).build();
     public static final ItemType GOLDEN_SHOVEL = builder("golden_shovel").setMaxAmount(1).setAttributes(ItemAttribute.SHOVEL, ItemAttribute.GOLD_TIER).setMaxDurability(32).build();
@@ -1384,10 +1386,24 @@ public class ItemTypes {
     public static ItemType TRIAL_KEY = builder("trial_key").setMaxAmount(64).build();
 
     // 1.20.5 items
-    public static ItemType TURTLE_SCUTE = builder("turtle_scute").setMaxAmount(64).build();
     public static ItemType ARMADILLO_SCUTE = builder("armadillo_scute").setMaxAmount(64).build();
     public static ItemType WOLF_ARMOR = builder("wolf_armor").setMaxAmount(1).build();
     public static ItemType ARMADILLO_SPAWN_EGG = builder("armadillo_spawn_egg").setMaxAmount(64).build();
+    public static ItemType HEAVY_CORE = builder("heavy_core").setMaxAmount(64).setPlacedType(StateTypes.HEAVY_CORE).build();
+    public static ItemType BOGGED_SPAWN_EGG = builder("bogged_spawn_egg").setMaxAmount(64).build();
+    public static ItemType WIND_CHARGE = builder("wind_charge").setMaxAmount(64).build();
+    public static ItemType MACE = builder("mace").setMaxAmount(1).setMaxDurability(250).build();
+    public static ItemType FLOW_BANNER_PATTERN = builder("flow_banner_pattern").setMaxAmount(1).build();
+    public static ItemType GUSTER_BANNER_PATTERN = builder("guster_banner_pattern").setMaxAmount(1).build();
+    public static ItemType FLOW_ARMOR_TRIM_SMITHING_TEMPLATE = builder("flow_armor_trim_smithing_template").setMaxAmount(64).build();
+    public static ItemType BOLT_ARMOR_TRIM_SMITHING_TEMPLATE = builder("bolt_armor_trim_smithing_template").setMaxAmount(64).build();
+    public static ItemType FLOW_POTTERY_SHERD = builder("flow_pottery_sherd").setMaxAmount(64).build();
+    public static ItemType GUSTER_POTTERY_SHERD = builder("guster_pottery_sherd").setMaxAmount(64).build();
+    public static ItemType SCRAPE_POTTERY_SHERD = builder("scrape_pottery_sherd").setMaxAmount(64).build();
+    public static ItemType OMINOUS_TRIAL_KEY = builder("ominous_trial_key").setMaxAmount(64).build();
+    public static ItemType VAULT = builder("vault").setMaxAmount(64).setPlacedType(StateTypes.VAULT).build();
+    public static ItemType OMINOUS_BOTTLE = builder("ominous_bottle").setMaxAmount(64).setAttributes(ItemAttribute.EDIBLE).build();
+    public static ItemType BREEZE_ROD = builder("breeze_rod").setMaxAmount(64).build();
 
     /**
      * @deprecated Burning furnace shows up as a missing texture, removed in 1.9

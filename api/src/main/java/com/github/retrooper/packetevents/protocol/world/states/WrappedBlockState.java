@@ -185,9 +185,11 @@ public class WrappedBlockState {
             return 11;
         } else if (version.isOlderThanOrEquals(ClientVersion.V_1_20_2)) {
             return 12;
+        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_20_5)) {
+            return 13;
         }
         // TODO UPDATE increment index (and add previous above)
-        return 13;
+        return 14;
     }
 
     private static void loadLegacy() {

@@ -1108,6 +1108,10 @@ public class StateTypes {
     public static StateType CRAFTER = StateTypes.builder().name("CRAFTER").blastResistance(3.5f).hardness(1.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType TRIAL_SPAWNER = StateTypes.builder().name("TRIAL_SPAWNER").blastResistance(50.0f).hardness(50.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
 
+    // 1.20.5 added types
+    public static StateType VAULT = StateTypes.builder().name("vault").blastResistance(50.0f).hardness(50.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).build();
+    public static StateType HEAVY_CORE = StateTypes.builder().name("heavy_core").blastResistance(1200.0f).hardness(10.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).build();
+
     public static Builder builder() {
         return new Builder();
     }

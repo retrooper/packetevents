@@ -86,6 +86,7 @@ public class Attributes {
     public static final Attribute GENERIC_ATTACK_SPEED = define("generic.attack_speed");
     public static final Attribute GENERIC_FLYING_SPEED = define("generic.flying_speed");
     public static final Attribute GENERIC_FOLLOW_RANGE = define("generic.follow_range");
+    @Deprecated // removed in 1.20.5
     public static final Attribute HORSE_JUMP_STRENGTH = define("horse.jump_strength");
     public static final Attribute GENERIC_KNOCKBACK_RESISTANCE = define("generic.knockback_resistance");
     public static final Attribute GENERIC_LUCK = define("generic.luck");
@@ -95,9 +96,13 @@ public class Attributes {
     public static final Attribute ZOMBIE_SPAWN_REINFORCEMENTS = define("zombie.spawn_reinforcements");
 
     // added in 1.20.5
+    public static final Attribute PLAYER_BLOCK_BREAK_SPEED = define("player.block_break_speed");
     public static final Attribute PLAYER_BLOCK_INTERACTION_RANGE = define("player.block_interaction_range");
     public static final Attribute PLAYER_ENTITY_INTERACTION_RANGE = define("player.entity_interaction_range");
+    public static final Attribute GENERIC_FALL_DAMAGE_MULTIPLIER = define("generic.fall_damage_multiplier");
+    public static final Attribute GENERIC_GRAVITY = define("generic.scale");
     public static final Attribute GENERIC_SCALE = define("generic.scale");
+    public static final Attribute GENERIC_SAFE_FALL_DISTANCE = define("generic.safe_fall_distance");
     public static final Attribute GENERIC_STEP_HEIGHT = define("generic.step_height");
 
     static {
