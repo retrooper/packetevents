@@ -118,4 +118,10 @@ public class PotionTypes {
     public static final PotionType BAD_OMEN = define("bad_omen", 30);
     public static final PotionType HERO_OF_THE_VILLAGE = define("hero_of_the_village", 31);
     public static final PotionType DARKNESS = define("darkness", 32);
+    public static final PotionType TRIAL_OMEN = define("darkness", 33);
+    public static final PotionType RAID_OMEN = define("darkness", 34);
+    public static final PotionType WIND_CHARGED = define("darkness", 35);
+    public static final PotionType WEAVING = define("darkness", 36);
+    public static final PotionType OOZING = define("darkness", 37);
+    public static final PotionType INFESTED = define("darkness", 38);
 }
