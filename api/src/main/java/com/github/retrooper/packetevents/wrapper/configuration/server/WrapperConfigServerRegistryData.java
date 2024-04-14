@@ -19,43 +19,151 @@
 package com.github.retrooper.packetevents.wrapper.configuration.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * The packet has been completely repurposed with 1.20.5. Before 1.20.5,
+ * all registries would be sent with this one packet, encoded with nbt.
+ * With 1.20.5, this packet gets sent for every registry which needs
+ * to be synchronized.
+ */
 public class WrapperConfigServerRegistryData extends PacketWrapper<WrapperConfigServerRegistryData> {
 
+    // before 1.20.5
     private NBTCompound registryData;
+    // with 1.20.5
+    private ResourceLocation registryKey;
+    private List<RegistryElement> elements;
 
     public WrapperConfigServerRegistryData(PacketSendEvent event) {
         super(event);
     }
 
+    @Deprecated
     public WrapperConfigServerRegistryData(NBTCompound registryData) {
+        this(registryData, null, null);
+    }
+
+    public WrapperConfigServerRegistryData(ResourceLocation registryKey, List<RegistryElement> elements) {
+        this(null, registryKey, elements);
+    }
+
+    @Deprecated
+    public WrapperConfigServerRegistryData(
+            NBTCompound registryData, ResourceLocation registryKey, List<RegistryElement> elements
+    ) {
         super(PacketType.Configuration.Server.REGISTRY_DATA);
         this.registryData = registryData;
+        this.registryKey = registryKey;
+        this.elements = elements;
     }
 
     @Override
     public void read() {
-        this.registryData = this.readNBT();
+        if (!this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.registryData = this.readNBT();
+            return;
+        }
+        this.registryKey = this.readIdentifier();
+        this.elements = this.readList(wrapper -> {
+            ResourceLocation id = wrapper.readIdentifier();
+            NBT data = wrapper.readOptional(PacketWrapper::readNBTRaw);
+            return new RegistryElement(id, data);
+        });
     }
 
     @Override
     public void write() {
-        this.writeNBT(this.registryData);
+        if (!this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.writeNBT(this.registryData);
+            return;
+        }
+        this.writeIdentifier(this.registryKey);
+        this.writeList(this.elements, (wrapper, element) -> {
+            wrapper.writeIdentifier(element.getId());
+            wrapper.writeOptional(element.getData(), PacketWrapper::writeNBTRaw);
+        });
     }
 
     @Override
     public void copy(WrapperConfigServerRegistryData wrapper) {
         this.registryData = wrapper.registryData;
+        this.registryKey = wrapper.registryKey;
+        this.elements = wrapper.elements;
     }
 
+    @Deprecated
     public NBTCompound getRegistryData() {
         return this.registryData;
     }
 
+    @Deprecated
     public void setRegistryData(NBTCompound registryData) {
         this.registryData = registryData;
+    }
+
+    public ResourceLocation getRegistryKey() {
+        return this.registryKey;
+    }
+
+    public void setRegistryKey(ResourceLocation registryKey) {
+        this.registryKey = registryKey;
+    }
+
+    public List<RegistryElement> getElements() {
+        return this.elements;
+    }
+
+    public void setElements(List<RegistryElement> elements) {
+        this.elements = elements;
+    }
+
+    public static class RegistryElement {
+
+        private final ResourceLocation id;
+        private final @Nullable NBT data;
+
+        public RegistryElement(ResourceLocation id, @Nullable NBT data) {
+            this.id = id;
+            this.data = data;
+        }
+
+        public ResourceLocation getId() {
+            return this.id;
+        }
+
+        public @Nullable NBT getData() {
+            return this.data;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof RegistryElement)) return false;
+            RegistryElement that = (RegistryElement) obj;
+            if (!this.id.equals(that.id)) return false;
+            return Objects.equals(this.data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = this.id.hashCode();
+            result = 31 * result + (this.data != null ? this.data.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "RegistryElement{id=" + this.id + ", data=" + this.data + '}';
+        }
     }
 }
