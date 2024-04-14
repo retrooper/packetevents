@@ -39,7 +39,7 @@ public class MojangAPIUtil {
         String uuidStr = UUIDUtil.toStringWithoutDashes(uuid);
         try {
             List<TextureProperty> textureProperties = new ArrayList<>();
-            URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr);
+            URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr + "?unsigned=false");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             //Bad request, this UUID is not valid

@@ -45,6 +45,7 @@ import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -162,6 +163,13 @@ public class SpigotPacketEventsBuilder {
                     // Let people override this, at their own risk
                     if (!"true".equalsIgnoreCase(System.getenv("PE_IGNORE_INCOMPATIBILITY"))) {
                         checkCompatibility();
+                    }
+
+                    //Map player instances to the already registered channels (likely a reload)
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+                        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+                        injector.updatePlayer(user, player);
                     }
 
                     initialized = true;

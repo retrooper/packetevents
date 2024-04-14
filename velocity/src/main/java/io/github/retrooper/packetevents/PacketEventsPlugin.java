@@ -28,27 +28,30 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.velocity.factory.VelocityPacketEventsBuilder;
+import org.slf4j.Logger;
 
-import java.util.logging.Logger;
+import java.nio.file.Path;
 
-@Plugin(id = "packetevents", name = "PacketEvents", version = "2.2.0") //TODO UPDATE
+@Plugin(id = "packetevents", name = "PacketEvents",
+        description = "Packet library.", authors = {"retrooper"},
+        version = "2.2.1") //TODO UPDATE
 public class PacketEventsPlugin {
     private final ProxyServer server;
     private final Logger logger;
     private final PluginContainer pluginContainer;
-    public final Metrics.Factory metricsFactory;
+    private final Path dataDirectory;
 
     @Inject
     public PacketEventsPlugin(final ProxyServer server,
                               final Logger logger,
-                              final PluginContainer pluginContainer, final Metrics.Factory metricsFactory) {
+                              final PluginContainer pluginContainer, @DataDirectory Path dataDirectory) {
         this.server = server;
         this.logger = logger;
         this.pluginContainer = pluginContainer;
-        this.metricsFactory = metricsFactory;
+        this.dataDirectory = dataDirectory;
         logger.info("Plugin started");
 
     }
@@ -56,9 +59,8 @@ public class PacketEventsPlugin {
     @Subscribe
     public void onProxyInitialize(ProxyInitializeEvent event) {
         logger.info("Injecting packetevents...");
-        PacketEvents.setAPI(VelocityPacketEventsBuilder.build(server, pluginContainer));
+        PacketEvents.setAPI(VelocityPacketEventsBuilder.build(server, pluginContainer, logger, dataDirectory));
         PacketEvents.getAPI().load();
-        PacketEvents.getAPI().getSettings().reEncodeByDefault(false);
         // It should only be enabled in a development environment, not globally
         // PacketEvents.getAPI().getSettings().debug(true);
         PacketListenerAbstract listener = new PacketListenerAbstract() {

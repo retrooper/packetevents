@@ -35,7 +35,11 @@ public enum EntityPose {
     ROARING,
     SNIFFING,
     EMERGING,
-    DIGGING;
+    DIGGING,
+    //Added in 1.20.4
+    SLIDING,
+    SHOOTING,
+    INHALING;
 
    public int getId(ClientVersion version) {
        if (this == DYING && version.isOlderThan(ClientVersion.V_1_17)) {

@@ -79,7 +79,7 @@ public class WrappedBlockState {
                     this.data.put(value, value.getParser().apply(split[1].toUpperCase(Locale.ROOT)));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    System.out.println("Failed to parse block state: " + s);
+                    PacketEvents.getAPI().getLogManager().warn("Failed to parse block state: " + s);
                 }
             }
         }
@@ -98,14 +98,25 @@ public class WrappedBlockState {
 
     @NotNull
     public static WrappedBlockState getByGlobalId(int globalID) {
-        return getByGlobalId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), globalID);
+        return getByGlobalId(globalID, true);
+    }
+
+    @NotNull
+    public static WrappedBlockState getByGlobalId(int globalID, boolean clone) {
+        return getByGlobalId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), globalID, clone);
     }
 
     @NotNull
     public static WrappedBlockState getByGlobalId(ClientVersion version, int globalID) {
+        return getByGlobalId(version, globalID, true);
+    }
+
+    @NotNull
+    public static WrappedBlockState getByGlobalId(ClientVersion version, int globalID, boolean clone) {
         if (globalID == 0) return AIR; // Hardcode for performance
         byte mappingsIndex = getMappingsIndex(version);
-        return BY_ID.get(mappingsIndex).getOrDefault(globalID, AIR).clone();
+        final WrappedBlockState state = BY_ID.get(mappingsIndex).getOrDefault(globalID, AIR);
+        return clone ? state.clone() : state;
     }
 
     @NotNull
@@ -115,8 +126,14 @@ public class WrappedBlockState {
 
     @NotNull
     public static WrappedBlockState getByString(ClientVersion version, String string) {
+        return getByString(version, string, true);
+    }
+
+    @NotNull
+    public static WrappedBlockState getByString(ClientVersion version, String string, boolean clone) {
         byte mappingsIndex = getMappingsIndex(version);
-        return BY_STRING.get(mappingsIndex).getOrDefault(string.replace("minecraft:", ""), AIR).clone();
+        final WrappedBlockState state = BY_STRING.get(mappingsIndex).getOrDefault(string.replace("minecraft:", ""), AIR);
+        return clone ? state.clone() : state;
     }
 
     @NotNull
@@ -126,6 +143,11 @@ public class WrappedBlockState {
 
     @NotNull
     public static WrappedBlockState getDefaultState(ClientVersion version, StateType type) {
+        return getDefaultState(version, type, true);
+    }
+
+    @NotNull
+    public static WrappedBlockState getDefaultState(ClientVersion version, StateType type, boolean clone) {
         if (type == StateTypes.AIR) return AIR;
         byte mappingsIndex = getMappingsIndex(version);
         WrappedBlockState state = DEFAULT_STATES.get(mappingsIndex).get(type);
@@ -133,7 +155,7 @@ public class WrappedBlockState {
             PacketEvents.getAPI().getLogger().config("Default state for " + type.getName() + " is null. Returning AIR");
             return AIR;
         }
-        return state.clone();
+        return clone ? state.clone() : state;
     }
 
     private static byte getMappingsIndex(ClientVersion version) {
@@ -485,6 +507,16 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
+    public boolean isDusted() {
+        return (boolean) data.get(StateValue.DUSTED);
+    }
+
+    public void setDusted(boolean dusted) {
+        checkIfCloneNeeded();
+        data.put(StateValue.DUSTED, dusted);
+        checkIsStillValid();
+    }
+
     public int getEggs() {
         return (int) data.get(StateValue.EGGS);
     }
@@ -542,6 +574,16 @@ public class WrappedBlockState {
     public void setFacing(BlockFace facing) {
         checkIfCloneNeeded();
         data.put(StateValue.FACING, facing);
+        checkIsStillValid();
+    }
+
+    public int getFlowerAmount() {
+        return (int) data.get(StateValue.FLOWER_AMOUNT);
+    }
+
+    public void setFlowerAmount(int flowerAmount) {
+        checkIfCloneNeeded();
+        data.put(StateValue.FLOWER_AMOUNT, flowerAmount);
         checkIsStillValid();
     }
 

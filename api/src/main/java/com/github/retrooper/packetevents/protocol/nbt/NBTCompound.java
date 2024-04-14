@@ -222,4 +222,8 @@ public class NBTCompound extends NBT {
         return tags.hashCode();
     }
 
+    @Override
+    public String toString() {
+        return "Compound{" + tags + "}";
+    }
 }

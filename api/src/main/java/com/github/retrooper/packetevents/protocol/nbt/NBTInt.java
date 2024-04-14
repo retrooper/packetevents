@@ -90,4 +90,9 @@ public class NBTInt extends NBTNumber {
     public NBTInt copy() {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "Int(" + value + ")";
+    }
 }

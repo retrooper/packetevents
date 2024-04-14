@@ -18,12 +18,6 @@
 
 package io.github.retrooper.packetevents.velocity.factory;
 
-import java.util.logging.Level;
-
-import io.github.retrooper.packetevents.PacketEventsPlugin;
-import io.github.retrooper.packetevents.bstats.Metrics;
-import org.jetbrains.annotations.Nullable;
-
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
@@ -43,7 +37,7 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-
+import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
@@ -51,6 +45,11 @@ import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerA
 import io.github.retrooper.packetevents.injector.VelocityPipelineInjector;
 import io.github.retrooper.packetevents.manager.PlayerManagerImpl;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+
+import java.nio.file.Path;
+import java.util.logging.Level;
 
 public class VelocityPacketEventsBuilder {
     private static PacketEventsAPI<PluginContainer> INSTANCE;
@@ -59,26 +58,26 @@ public class VelocityPacketEventsBuilder {
         INSTANCE = null;
     }
 
-    public static PacketEventsAPI<PluginContainer> build(ProxyServer server, PluginContainer plugin) {
+    public static PacketEventsAPI<PluginContainer> build(ProxyServer server, PluginContainer plugin, Logger logger, Path dataDirectory) {
         if (INSTANCE == null) {
-            INSTANCE = buildNoCache(server, plugin);
+            INSTANCE = buildNoCache(server, plugin, logger, dataDirectory);
         }
         return INSTANCE;
     }
 
-    public static PacketEventsAPI<PluginContainer> build(ProxyServer server, PluginContainer plugin,
+    public static PacketEventsAPI<PluginContainer> build(ProxyServer server, PluginContainer plugin, Logger logger, Path dataDirectory,
             PacketEventsSettings settings) {
         if (INSTANCE == null) {
-            INSTANCE = buildNoCache(server, plugin, settings);
+            INSTANCE = buildNoCache(server, plugin, logger, dataDirectory, settings);
         }
         return INSTANCE;
     }
 
-    public static PacketEventsAPI<PluginContainer> buildNoCache(ProxyServer server, PluginContainer plugin) {
-        return buildNoCache(server, plugin, new PacketEventsSettings());
+    public static PacketEventsAPI<PluginContainer> buildNoCache(ProxyServer server, PluginContainer plugin, Logger logger, Path dataDirectory) {
+        return buildNoCache(server, plugin, logger, dataDirectory, new PacketEventsSettings());
     }
 
-    public static PacketEventsAPI<PluginContainer> buildNoCache(ProxyServer server, PluginContainer plugin,
+    public static PacketEventsAPI<PluginContainer> buildNoCache(ProxyServer server, PluginContainer plugin, Logger logger, Path dataDirectory,
             PacketEventsSettings inSettings) {
         return new PacketEventsAPI<PluginContainer>() {
             private final PacketEventsSettings settings = inSettings;
@@ -171,9 +170,9 @@ public class VelocityPacketEventsBuilder {
                     }
 
                     if (settings.isbStatsEnabled()) {
-                        PacketEventsPlugin instance = (PacketEventsPlugin) plugin.getInstance().orElse(null);
+                        Object instance = plugin.getInstance().orElse(null);
                         if (instance != null) {
-                            Metrics metrics = instance.metricsFactory.make(plugin, 11327);
+                            Metrics metrics = Metrics.createInstance(plugin, server, logger, dataDirectory, 11327);
                             //Just to have an idea of which versions of packetevents people use
                             metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
                                 return getVersion().toString();

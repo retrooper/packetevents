@@ -65,6 +65,12 @@ public class Metrics {
         }
     }
 
+    //PacketEvents - Start
+    public static Metrics createInstance(Object plugin, ProxyServer server, Logger logger, Path dataDirectory, int serviceId) {
+        return new Metrics(plugin, server, logger, dataDirectory, serviceId);
+    }
+    //PacketEvents - End
+
     private final PluginContainer pluginContainer;
     private final ProxyServer server;
     private final MetricsBase metricsBase;

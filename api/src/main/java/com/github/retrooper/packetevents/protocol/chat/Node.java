@@ -28,16 +28,16 @@ import java.util.Optional;
 public class Node {
     private byte flags;
     private List<Integer> children;
-    private Optional<Integer> redirectNodeIndex;
+    private int redirectNodeIndex;
     private Optional<String> name;
     private Optional<Integer> parserID;
     private Optional<List<Object>> properties;
     private Optional<ResourceLocation> suggestionsType;
 
-    public Node(byte flags, List<Integer> children, @Nullable Integer redirectNodeIndex, @Nullable String name, @Nullable Integer parserID, @Nullable List<Object> properties, @Nullable ResourceLocation suggestionsType) {
+    public Node(byte flags, List<Integer> children, int redirectNodeIndex, @Nullable String name, @Nullable Integer parserID, @Nullable List<Object> properties, @Nullable ResourceLocation suggestionsType) {
         this.flags = flags;
         this.children = children;
-        this.redirectNodeIndex = Optional.ofNullable(redirectNodeIndex);
+        this.redirectNodeIndex = redirectNodeIndex;
         this.name = Optional.ofNullable(name);
         this.parserID = Optional.ofNullable(parserID);
         this.properties = Optional.ofNullable(properties);
@@ -60,11 +60,11 @@ public class Node {
         this.children = children;
     }
 
-    public Optional<Integer> getRedirectNodeIndex() {
+    public int getRedirectNodeIndex() {
         return redirectNodeIndex;
     }
 
-    public void setRedirectNodeIndex(Optional<Integer> redirectNodeIndex) {
+    public void setRedirectNodeIndex(int redirectNodeIndex) {
         this.redirectNodeIndex = redirectNodeIndex;
     }
 

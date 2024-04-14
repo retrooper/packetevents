@@ -94,4 +94,9 @@ public class NBTByte extends NBTNumber {
     public NBTByte copy() {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "Byte(" + value + ")";
+    }
 }

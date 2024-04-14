@@ -50,12 +50,27 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class SpigotReflectionUtil {
-    private static final String MODIFIED_PACKAGE_NAME = Bukkit.getServer().getClass().getPackage().getName()
-            .replace(".", ",").split(",")[3];
+    private static final String MODIFIED_PACKAGE_NAME;
     //Example: net.minecraft.server.v1_8_R3.
-    public static final String LEGACY_NMS_PACKAGE = "net.minecraft.server." + MODIFIED_PACKAGE_NAME + ".";
+    public static final String LEGACY_NMS_PACKAGE;
     //Example: org.bukkit.craftbukkit.v1_8_R3.
-    public static final String OBC_PACKAGE = "org.bukkit.craftbukkit." + MODIFIED_PACKAGE_NAME + ".";
+    public static final String OBC_PACKAGE;
+
+    static {
+        String temp;
+        try {
+            temp = Bukkit.getServer().getClass().getPackage().getName()
+                    .replace(".", ",").split(",")[3];
+        } catch (Exception ex) {
+            temp = "";
+        }
+        MODIFIED_PACKAGE_NAME = temp;
+
+        LEGACY_NMS_PACKAGE = "net.minecraft.server." + MODIFIED_PACKAGE_NAME + ".";
+        //Example: org.bukkit.craftbukkit.v1_8_R3.
+        OBC_PACKAGE = "org.bukkit.craftbukkit." + MODIFIED_PACKAGE_NAME + ".";
+    }
+
     public static ServerVersion VERSION;
     //Booleans
     public static boolean V_1_19_OR_HIGHER;
@@ -67,7 +82,7 @@ public final class SpigotReflectionUtil {
             ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS, NMS_ENUM_PARTICLE_CLASS,
             MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, NMS_WORLD_CLASS, WORLD_SERVER_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
             GAME_PROFILE_CLASS, CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS, CRAFT_PARTICLE_CLASS,
-            LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
+            LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
             BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS, PROPERTY_MAP_CLASS, DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, MOJANG_ENCODER_CLASS, DATA_RESULT_CLASS,
             DYNAMIC_OPS_NBT_CLASS, NMS_NBT_COMPOUND_CLASS, NBT_COMPRESSION_STREAM_TOOLS_CLASS;
 
@@ -81,7 +96,7 @@ public final class SpigotReflectionUtil {
     //Methods
     public static Method IS_DEBUGGING, GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
             GET_MOB_EFFECT_LIST_ID_METHOD, GET_MOB_EFFECT_LIST_BY_ID_METHOD, GET_ITEM_ID_METHOD, GET_ITEM_BY_ID_METHOD,
-            GET_BUKKIT_ENTITY_METHOD, GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD, GET_ENTITY_BY_ID_METHOD,
+            GET_BUKKIT_ENTITY_METHOD, GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD, GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD, GET_ENTITY_BY_ID_METHOD,
             CRAFT_ITEM_STACK_AS_BUKKIT_COPY, CRAFT_ITEM_STACK_AS_NMS_COPY, BUKKIT_PARTICLE_TO_NMS_ENUM_PARTICLE, NMS_ENUM_PARTICLE_TO_BUKKIT_PARTICLE,
             READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD,
             WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD, GET_COMBINED_ID,
@@ -94,6 +109,8 @@ public final class SpigotReflectionUtil {
 
     private static Object MINECRAFT_SERVER_INSTANCE;
     private static Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
+
+    private static boolean PAPER_ENTITY_LOOKUP_EXISTS = false;
 
     //Cache entities right after we request/find them for faster search.
     public static Map<Integer, Entity> ENTITY_ID_CACHE = new MapMaker().weakValues().makeMap();
@@ -124,6 +141,7 @@ public final class SpigotReflectionUtil {
         GET_ITEM_BY_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, NMS_ITEM_CLASS, 0);
         if (V_1_17_OR_HIGHER) {
             GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, Iterable.class, 0);
+            GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, "a", int.class);
         }
         if (DIMENSION_MANAGER_CLASS != null) {
             if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16
@@ -137,9 +155,9 @@ public final class SpigotReflectionUtil {
             CODEC_ENCODE_METHOD = Reflection.getMethod(MOJANG_ENCODER_CLASS, "encodeStart", 0);
             DATA_RESULT_GET_METHOD = Reflection.getMethod(DATA_RESULT_CLASS, "result", 0);
         }
-        String getEntityByIdMethodName = (VERSION.getProtocolVersion() == (short) 47 || V_1_19_OR_HIGHER) // Back to these stupid mappings, thanks MD_5
-                ? "a" : "getEntity";
-        GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(WORLD_SERVER_CLASS, getEntityByIdMethodName, NMS_ENTITY_CLASS, int.class);
+        String entityIdMethodName = VERSION.isOlderThan(ServerVersion.V_1_9) ? "a" :
+                VERSION.isOlderThan(ServerVersion.V_1_17) ? "getEntity" : "b";
+        GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(WORLD_SERVER_CLASS, entityIdMethodName, NMS_ENTITY_CLASS, int.class);
         if (GET_ENTITY_BY_ID_METHOD == null) {
             GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(WORLD_SERVER_CLASS, "getEntity", NMS_ENTITY_CLASS, int.class);
         }
@@ -193,6 +211,8 @@ public final class SpigotReflectionUtil {
             DIMENSION_CODEC_FIELD = Reflection.getField(DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, 0);
             DYNAMIC_OPS_NBT_INSTANCE_FIELD = Reflection.getField(DYNAMIC_OPS_NBT_CLASS, DYNAMIC_OPS_NBT_CLASS, 0);
         }
+
+        PAPER_ENTITY_LOOKUP_EXISTS = Reflection.getField(WORLD_SERVER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) != null;
     }
 
     private static void initClasses() {
@@ -221,6 +241,7 @@ public final class SpigotReflectionUtil {
         if (V_1_17_OR_HIGHER) {
             LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
             PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
+            PAPER_ENTITY_LOOKUP_CLASS = Reflection.getClassByNameWithoutException("io.papermc.paper.chunk.system.entity.EntityLookup");
         }
         DIMENSION_MANAGER_CLASS = getServerClass("world.level.dimension.DimensionManager", "DimensionManager");
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
@@ -443,8 +464,7 @@ public final class SpigotReflectionUtil {
                 playerConnection = wrapper.read(0, PLAYER_CONNECTION_CLASS);
                 wrapper = new ReflectionObject(playerConnection, PLAYER_CONNECTION_CLASS);
                 return wrapper.readObject(0, NETWORK_MANAGER_CLASS);
-            }
-            catch (Exception ex2) {
+            } catch (Exception ex2) {
                 //Print the original error!
                 ex.printStackTrace();
             }
@@ -802,93 +822,70 @@ public final class SpigotReflectionUtil {
         if (world == null) {
             return null;
         }
-
-        Object craftWorld = CRAFT_WORLD_CLASS.cast(world);
-
+        Entity e = ENTITY_ID_CACHE.getOrDefault(id, null);
+        if (e != null) {
+            return e;
+        }
         try {
-            Object worldServer = GET_CRAFT_WORLD_HANDLE_METHOD.invoke(craftWorld);
-            Object nmsEntity = GET_ENTITY_BY_ID_METHOD.invoke(worldServer, id);
+            Object worldServer = GET_CRAFT_WORLD_HANDLE_METHOD.invoke(world);
+            Object nmsEntity;
+            //On 1.17 we need this to bypass
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
+                ReflectionObject reflectWorldServer = new ReflectionObject(worldServer);
+                Object levelEntityGetter;
+                if (PAPER_ENTITY_LOOKUP_EXISTS) {
+                    levelEntityGetter = reflectWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
+                }
+                else {
+                    Object entitySectionManager = reflectWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
+                    ReflectionObject reflectEntitySectionManager = new ReflectionObject(entitySectionManager);
+                    levelEntityGetter = reflectEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
+                }
+                nmsEntity = GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD.invoke(levelEntityGetter, id);
+            } else {
+                nmsEntity = GET_ENTITY_BY_ID_METHOD.invoke(worldServer, id);
+            }
             if (nmsEntity == null) {
                 return null;
             }
-            return getBukkitEntity(nmsEntity);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            e = getBukkitEntity(nmsEntity);
+            ENTITY_ID_CACHE.put(id, e);
+            return e;
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
 
     @Nullable
-    private static Entity getEntityByIdUnsafe(World origin, int id) {
-        //This is bad code!
-        Entity e = getEntityByIdWithWorldUnsafe(origin, id);
-        if (e != null) {
-            return e;
+    @Deprecated
+    /**
+     * Get the entity by the id.
+     * @deprecated Please resort to {@link SpigotConversionUtil#getEntityById(World, int)} since the reflection util is not API.
+     */
+    public static Entity getEntityById(@Nullable World origin, int id) {
+        if (origin != null) {
+            Entity e = getEntityByIdWithWorldUnsafe(origin, id);
+            if (e != null) {
+                return e;
+            }
         }
+        //They specified the wrong world
         for (World world : Bukkit.getWorlds()) {
             Entity entity = getEntityByIdWithWorldUnsafe(world, id);
             if (entity != null) {
                 return entity;
             }
         }
-        for (World world : Bukkit.getWorlds()) {
-            try {
-                for (Entity entity : world.getEntities()) {
-                    if (entity.getEntityId() == id) {
-                        return entity;
-                    }
-                }
-            } catch (ConcurrentModificationException ex) {
-                return null;
-            }
-        }
         return null;
     }
 
     @Nullable
-    public static Entity getEntityById(@Nullable World world, int entityID) {
-        Entity e = ENTITY_ID_CACHE.get(entityID);
-        if (e != null) {
-            return e;
-        }
-
-        if (V_1_17_OR_HIGHER) {
-            try {
-                if (world != null) {
-                    //On 1.17 we have to use hacks to get the entity list bypassing Spigot's checks
-                    //We strongly do not recommend finding entity objects asynchronously.
-                    for (Entity entity : getEntityList(world)) {
-                        if (entity.getEntityId() == entityID) {
-                            ENTITY_ID_CACHE.putIfAbsent(entity.getEntityId(), entity);
-                            return entity;
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                System.out.println("Failed to find entity by id on 1.19.3!");
-                throw ex;
-                //We are retrying below
-            }
-            try {
-                for (World w : Bukkit.getWorlds()) {
-                    for (Entity entity : getEntityList(w)) {
-                        if (entity.getEntityId() == entityID) {
-                            ENTITY_ID_CACHE.putIfAbsent(entity.getEntityId(), entity);
-                            return entity;
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                //No entity found
-                return null;
-            }
-        } else {
-            return getEntityByIdUnsafe(world, entityID);
-        }
-        return null;
-    }
-
-    @Nullable
+    @Deprecated
+    /**
+     * Get the entity by the id.
+     * @deprecated Please resort to {@link SpigotConversionUtil#getEntityById(World, int)} since the reflection util is not API.
+     */
     public static Entity getEntityById(int entityID) {
         return getEntityById(null, entityID);
     }
@@ -897,9 +894,15 @@ public final class SpigotReflectionUtil {
         if (V_1_17_OR_HIGHER) {
             Object worldServer = convertBukkitWorldToWorldServer(world);
             ReflectionObject wrappedWorldServer = new ReflectionObject(worldServer);
-            Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
-            ReflectionObject wrappedPersistentEntitySectionManager = new ReflectionObject(persistentEntitySectionManager);
-            Object levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
+            Object levelEntityGetter;
+            if (PAPER_ENTITY_LOOKUP_EXISTS) {
+                levelEntityGetter = wrappedWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
+            }
+            else {
+                Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
+                ReflectionObject wrappedPersistentEntitySectionManager = new ReflectionObject(persistentEntitySectionManager);
+                levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
+            }
             Iterable<Object> nmsEntitiesIterable = null;
             try {
                 nmsEntitiesIterable = (Iterable<Object>) GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD.invoke(levelEntityGetter);
