@@ -46,7 +46,8 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
             effectId = readByte();
         }
         this.potionType = PotionTypes.getById(effectId, this.serverVersion);
-        this.effectAmplifier = readByte();
+        this.effectAmplifier = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)
+                ? this.readVarInt() : this.readByte();
         this.effectDurationTicks = readVarInt();
         if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
             this.flags = readByte();
@@ -64,7 +65,11 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         } else {
             writeByte(potionType.getId(serverVersion.toClientVersion()));
         }
-        writeByte(effectAmplifier);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.writeVarInt(this.effectAmplifier);
+        } else {
+            this.writeByte(this.effectAmplifier);
+        }
         writeVarInt(effectDurationTicks);
         if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
             writeByte(flags);
