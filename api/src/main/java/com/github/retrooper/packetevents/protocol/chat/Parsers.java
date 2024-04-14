@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -186,8 +187,13 @@ public class Parsers {
     public static final Parser DIMENSION = define("dimension", null, null);
     public static final Parser GAMEMODE = define("gamemode", null, null);
     public static final Parser TIME = define("time",
-            packetWrapper -> Collections.singletonList(packetWrapper.readInt()),
-            (packetWrapper, properties) -> packetWrapper.writeInt((int) properties.get(0))
+            wrapper -> Collections.singletonList(wrapper.getServerVersion()
+                    .isNewerThanOrEquals(ServerVersion.V_1_19_4) ? wrapper.readInt() : 0),
+            (wrapper, properties) -> {
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
+                    wrapper.writeInt((int) properties.get(0));
+                }
+            }
     );
     public static final Parser RESOURCE_OR_TAG = define("resource_or_tag",
             packetWrapper -> Collections.singletonList(packetWrapper.readIdentifier()),
