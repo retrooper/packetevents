@@ -28,8 +28,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClientTabComplete> {
-    private Optional<Integer> transactionId = Optional.empty();
-    private boolean assumeCommand = true;
+
+    private Optional<Integer> transactionId;
+    private boolean assumeCommand;
     private String text;
     private @Nullable Vector3i blockPosition;
 
@@ -40,6 +41,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
     public WrapperPlayClientTabComplete(int transactionId, String text, @Nullable Vector3i blockPosition) {
         super(PacketType.Play.Client.TAB_COMPLETE);
         this.transactionId = Optional.of(transactionId);
+        this.assumeCommand = true;
         this.text = text;
         this.blockPosition = blockPosition;
     }
