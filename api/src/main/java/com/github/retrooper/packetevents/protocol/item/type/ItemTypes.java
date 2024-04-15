@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.item.type;
 
+import com.github.retrooper.packetevents.protocol.item.component.ComponentType;
+import com.github.retrooper.packetevents.protocol.item.component.StaticComponentMap;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
@@ -1450,12 +1452,17 @@ public class ItemTypes {
         return new Builder(key.toLowerCase());
     }
 
-    public static final ItemType define(int maxAmount, String key, ItemType craftRemainder, StateType placedType, int maxDurability, List<ItemAttribute> attributesArr) {
+    public static ItemType define(int maxAmount, String key, ItemType craftRemainder, StateType placedType, int maxDurability, List<ItemAttribute> attributesArr) {
+        return define(maxAmount, key, craftRemainder, placedType, maxDurability, attributesArr, Collections.emptyMap());
+    }
+    
+    public static ItemType define(int maxAmount, String key, ItemType craftRemainder, StateType placedType, int maxDurability, List<ItemAttribute> attributesArr, Map<ComponentType<?>, ?> componentMap) {
         // Creates an immutable set
         Set<ItemAttribute> attributes = attributesArr == null ? Collections.emptySet() :
                 Collections.unmodifiableSet(new HashSet<>(attributesArr));
 
         TypesBuilderData data = TYPES_BUILDER.define(key);
+        StaticComponentMap components = new StaticComponentMap(componentMap);
 
         ItemType type = new ItemType() {
             private final int[] ids = data.getData();
@@ -1508,6 +1515,11 @@ public class ItemTypes {
             }
 
             @Override
+            public StaticComponentMap getComponents() {
+                return components;
+            }
+
+            @Override
             public boolean equals(Object obj) {
                 if (obj instanceof ItemType) {
                     return getName().equals(((ItemType) obj).getName());
@@ -1525,18 +1537,18 @@ public class ItemTypes {
     }
 
     @Nullable
-    public static final ItemType getByName(String name) {
+    public static ItemType getByName(String name) {
         return ITEM_TYPE_MAP.get(name);
     }
 
     @NotNull
-    public static final ItemType getById(ClientVersion version, int id) {
+    public static ItemType getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);
         Map<Integer, ItemType> typeIdMap = ITEM_TYPE_ID_MAP.get((byte) index);
         return typeIdMap.getOrDefault(id, ItemTypes.AIR);
     }
 
-    public static final ItemType getTypePlacingState(StateType type) {
+    public static ItemType getTypePlacingState(StateType type) {
         return HELD_TO_PLACED_MAP.get(type);
     }
 
@@ -1552,13 +1564,14 @@ public class ItemTypes {
         ItemType craftRemainder;
         int maxDurability;
         List<ItemAttribute> attributes;
+        Map<ComponentType<?>, ?> components;
 
         public Builder(String key) {
             this.key = key;
         }
 
         public ItemType build() {
-            ItemType define = ItemTypes.define(maxAmount, key, craftRemainder, placedType, maxDurability, attributes);
+            ItemType define = ItemTypes.define(maxAmount, key, craftRemainder, placedType, maxDurability, attributes, components);
             if (placedType != null) {
                 HELD_TO_PLACED_MAP.put(placedType, define);
             }
@@ -1587,6 +1600,11 @@ public class ItemTypes {
 
         public Builder setPlacedType(StateType type) {
             placedType = type;
+            return this;
+        }
+
+        public Builder setComponents(Map<ComponentType<?>, ?> components) {
+            this.components = components;
             return this;
         }
     }
