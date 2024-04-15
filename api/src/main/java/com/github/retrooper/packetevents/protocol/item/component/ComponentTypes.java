@@ -18,14 +18,20 @@
 
 package com.github.retrooper.packetevents.protocol.item.component;
 
+import com.github.retrooper.packetevents.protocol.item.component.builtin.AdventureModePredicate;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemEnchantments;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemRarity;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.TypesBuilder;
 import com.github.retrooper.packetevents.util.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -91,18 +97,33 @@ public class ComponentTypes {
         return idMap.get(id);
     }
 
-    public static final ComponentType<Void> CUSTOM_DATA = define("custom_data");
-    public static final ComponentType<Void> MAX_STACK_SIZE = define("max_stack_size");
-    public static final ComponentType<Void> MAX_DAMAGE = define("max_damage");
-    public static final ComponentType<Void> DAMAGE = define("damage");
-    public static final ComponentType<Void> UNBREAKABLE = define("unbreakable");
-    public static final ComponentType<Void> CUSTOM_NAME = define("custom_name");
-    public static final ComponentType<Void> ITEM_NAME = define("item_name");
-    public static final ComponentType<Void> LORE = define("lore");
-    public static final ComponentType<Void> RARITY = define("rarity");
-    public static final ComponentType<Void> ENCHANTMENTS = define("enchantments");
-    public static final ComponentType<Void> CAN_PLACE_ON = define("can_place_on");
-    public static final ComponentType<Void> CAN_BREAK = define("can_break");
+    public static final ComponentType<NBTCompound> CUSTOM_DATA = define("custom_data"); // not synchronized
+    public static final ComponentType<Integer> MAX_STACK_SIZE = define("max_stack_size",
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
+    public static final ComponentType<Integer> MAX_DAMAGE = define("max_damage",
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
+    public static final ComponentType<Integer> DAMAGE = define("damage",
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
+    public static final ComponentType<Boolean> UNBREAKABLE = define("unbreakable",
+            PacketWrapper::readBoolean, PacketWrapper::writeBoolean);
+    public static final ComponentType<Component> CUSTOM_NAME = define("custom_name",
+            PacketWrapper::readComponent, PacketWrapper::writeComponent);
+    public static final ComponentType<Component> ITEM_NAME = define("item_name",
+            PacketWrapper::readComponent, PacketWrapper::writeComponent);
+    public static final ComponentType<List<Component>> LORE = define("lore",
+            wrapper -> wrapper.readList(PacketWrapper::readComponent),
+            (wrapper, lines) -> wrapper.writeList(lines, PacketWrapper::writeComponent)
+    );
+    public static final ComponentType<ItemRarity> RARITY = define("rarity",
+            wrapper -> ItemRarity.values()[wrapper.readVarInt()],
+            (wrapper, rarity) -> wrapper.writeVarInt(rarity.ordinal())
+    );
+    public static final ComponentType<ItemEnchantments> ENCHANTMENTS = define("enchantments",
+            ItemEnchantments::read, ItemEnchantments::write);
+    public static final ComponentType<AdventureModePredicate> CAN_PLACE_ON = define("can_place_on",
+            AdventureModePredicate::read, AdventureModePredicate::write);
+    public static final ComponentType<AdventureModePredicate> CAN_BREAK = define("can_break",
+            AdventureModePredicate::read, AdventureModePredicate::write);
     public static final ComponentType<Void> ATTRIBUTE_MODIFIERS = define("attribute_modifiers");
     public static final ComponentType<Void> CUSTOM_MODEL_DATA = define("custom_model_data");
     public static final ComponentType<Void> HIDE_ADDITIONAL_TOOLTIP = define("hide_additional_tooltip");
