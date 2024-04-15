@@ -18,18 +18,27 @@
 
 package com.github.retrooper.packetevents.protocol.item;
 
+import com.github.retrooper.packetevents.protocol.item.component.ComponentType;
+import com.github.retrooper.packetevents.protocol.item.component.PatchableComponentMap;
 import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
-import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class ItemStack {
     public static final ItemStack EMPTY = new ItemStack(ItemTypes.AIR, 0, new NBTCompound(), 0);
@@ -37,14 +46,27 @@ public class ItemStack {
     private int amount;
     @Nullable
     private NBTCompound nbt;
+    @Nullable // lazy loaded
+    private PatchableComponentMap components; // Added in 1.20.5
     private int legacyData = -1;
 
     private boolean cachedIsEmpty = false;
 
     private ItemStack(ItemType type, int amount, @Nullable NBTCompound nbt, int legacyData) {
+        this(type, amount, nbt, null, legacyData);
+    }
+
+    private ItemStack(
+            ItemType type,
+            int amount,
+            @Nullable NBTCompound nbt,
+            @Nullable PatchableComponentMap components,
+            int legacyData
+    ) {
         this.type = type;
         this.amount = amount;
         this.nbt = nbt;
+        this.components = components;
         this.legacyData = legacyData;
         updateCachedEmptyStatus();
     }
@@ -125,7 +147,12 @@ public class ItemStack {
     }
 
     public ItemStack copy() {
-        return cachedIsEmpty ? EMPTY : new ItemStack(type, amount, nbt == null ? null : nbt.copy(), legacyData);
+        return cachedIsEmpty ? EMPTY : new ItemStack(
+                type, amount,
+                nbt == null ? null : nbt.copy(),
+                components == null ? null : components.copy(),
+                legacyData
+        );
     }
 
     @Nullable
@@ -135,6 +162,45 @@ public class ItemStack {
 
     public void setNBT(NBTCompound nbt) {
         this.nbt = nbt;
+    }
+
+    public <T> Optional<T> getComponent(ComponentType<T> type) {
+        return this.getComponents().getOptional(type);
+    }
+
+    public <T> void setComponent(ComponentType<T> type, T value) {
+        this.getComponents().set(type, value);
+    }
+
+    public <T> void unsetComponent(ComponentType<T> type) {
+        this.getComponents().unset(type);
+    }
+
+    public <T> void setComponent(ComponentType<T> type, Optional<T> value) {
+        this.getComponents().set(type, value);
+    }
+
+    public boolean hasComponent(ComponentType<?> type) {
+        return this.getComponents().has(type);
+    }
+
+    public boolean hasComponentPatches() {
+        return this.components != null && !this.components.getPatches().isEmpty();
+    }
+
+    public PatchableComponentMap getComponents() {
+        if (this.components == null) { // lazy load on access
+            this.components = new PatchableComponentMap(
+                    this.type.getComponents(), new HashMap<>(4));
+        }
+        return this.components;
+    }
+
+    /**
+     * @param components if set null will reset to components of {@link ItemType}
+     */
+    public void setComponents(@Nullable PatchableComponentMap components) {
+        this.components = components;
     }
 
     public int getLegacyData() {
@@ -310,6 +376,7 @@ public class ItemStack {
         private ItemType type;
         private int amount = 1;
         private NBTCompound nbt = null;
+        private PatchableComponentMap components = null;
         private int legacyData = -1;
 
         public Builder type(ItemType type) {
@@ -327,13 +394,18 @@ public class ItemStack {
             return this;
         }
 
+        public Builder components(@Nullable PatchableComponentMap components) {
+            this.components = components;
+            return this;
+        }
+
         public Builder legacyData(int legacyData) {
             this.legacyData = legacyData;
             return this;
         }
 
         public ItemStack build() {
-            return new ItemStack(type, amount, nbt, legacyData);
+            return new ItemStack(type, amount, nbt, components, legacyData);
         }
 
     }

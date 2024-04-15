@@ -44,6 +44,9 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityMetadataProvider;
 import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.component.ComponentType;
+import com.github.retrooper.packetevents.protocol.item.component.ComponentTypes;
+import com.github.retrooper.packetevents.protocol.item.component.PatchableComponentMap;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
@@ -84,6 +87,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -395,8 +399,41 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         writeVarInt(data.getLevel());
     }
 
-    @NotNull
-    public ItemStack readItemStack() {
+    // item stack serialization was basically completely rewritten in 1.20.5
+    @SuppressWarnings("unchecked")
+    public ItemStack readItemStackModern() {
+        int count = this.readVarInt();
+        if (count <= 0) {
+            return ItemStack.EMPTY;
+        }
+        ClientVersion version = this.serverVersion.toClientVersion();
+        ItemType itemType = ItemTypes.getById(version, this.readVarInt());
+
+        // read component patch counts
+        int presentCount = this.readVarInt();
+        int absentCount = this.readVarInt();
+        if (presentCount == 0 && absentCount == 0) {
+            return ItemStack.builder().type(itemType).amount(count).build();
+        }
+
+        PatchableComponentMap components = new PatchableComponentMap(
+                itemType.getComponents(), new HashMap<>(4));
+        for (int i = 0; i < presentCount; i++) {
+            ComponentType<?> type = ComponentTypes.getById(version, this.readVarInt());
+            components.set((ComponentType<Object>) type, type.read(this));
+        }
+        for (int i = 0; i < absentCount; i++) {
+            components.unset(ComponentTypes.getById(version, this.readVarInt()));
+        }
+
+        return ItemStack.builder().type(itemType).amount(count).components(components).build();
+    }
+
+    public @NotNull ItemStack readItemStack() {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            return this.readItemStackModern();
+        }
+
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
             if (!readBoolean()) {
@@ -419,10 +456,61 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
                 .build();
     }
 
+    // item stack serialization was basically completely rewritten in 1.20.5
+    @SuppressWarnings("unchecked")
+    public void writeItemStackModern(ItemStack itemStack) {
+        if (itemStack.isEmpty()) {
+            this.writeByte(0);
+            return;
+        }
+        int typeId = itemStack.getType().getId(this.serverVersion.toClientVersion());
+        this.writeVarInt(itemStack.getAmount());
+        this.writeVarInt(typeId);
+
+        if (!itemStack.hasComponentPatches()) {
+            this.writeShort(0);
+            return; // early return
+        }
+
+        // write component patch counts
+        Map<ComponentType<?>, Optional<?>> allPatches = itemStack.getComponents().getPatches();
+        int presentCount = 0, absentCount = 0;
+        for (Map.Entry<ComponentType<?>, Optional<?>> patch : allPatches.entrySet()) {
+            if (patch.getValue().isPresent()) {
+                presentCount++;
+            } else {
+                absentCount++;
+            }
+        }
+        this.writeVarInt(presentCount);
+        this.writeVarInt(absentCount);
+
+        // write present patches
+        for (Map.Entry<ComponentType<?>, Optional<?>> patch : allPatches.entrySet()) {
+            if (patch.getValue().isPresent()) {
+                this.writeVarInt(patch.getKey().getId(this.serverVersion.toClientVersion()));
+                ((ComponentType<Object>) patch.getKey()).write(this, patch.getValue());
+            }
+        }
+
+        // write absent patches
+        for (Map.Entry<ComponentType<?>, Optional<?>> patch : allPatches.entrySet()) {
+            if (!patch.getValue().isPresent()) {
+                this.writeVarInt(patch.getKey().getId(this.serverVersion.toClientVersion()));
+            }
+        }
+    }
+
     public void writeItemStack(ItemStack itemStack) {
         if (itemStack == null) {
             itemStack = ItemStack.EMPTY;
         }
+
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.writeItemStackModern(itemStack);
+            return;
+        }
+
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
             if (itemStack.isEmpty()) {
