@@ -156,4 +156,8 @@ public class PotionTypes {
     public static final PotionType WEAVING = define("darkness");
     public static final PotionType OOZING = define("darkness");
     public static final PotionType INFESTED = define("darkness");
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
+    }
 }
