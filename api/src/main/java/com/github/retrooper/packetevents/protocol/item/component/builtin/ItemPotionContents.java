@@ -18,22 +18,22 @@
 
 package com.github.retrooper.packetevents.protocol.item.component.builtin;
 
-import com.github.retrooper.packetevents.protocol.mapper.GenericMappedEntity;
+import com.github.retrooper.packetevents.protocol.potion.Potion;
 import com.github.retrooper.packetevents.protocol.potion.PotionEffect;
+import com.github.retrooper.packetevents.protocol.potion.Potions;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-// TODO: GenericMappedEntity -> minecraft:potion registry
 public class ItemPotionContents {
 
-    private final @Nullable GenericMappedEntity potion;
+    private final @Nullable Potion potion;
     private final @Nullable Integer customColor;
     private final List<PotionEffect> customEffects;
 
     public ItemPotionContents(
-            @Nullable GenericMappedEntity potion,
+            @Nullable Potion potion,
             @Nullable Integer customColor,
             List<PotionEffect> customEffects
     ) {
@@ -43,7 +43,7 @@ public class ItemPotionContents {
     }
 
     public static ItemPotionContents read(PacketWrapper<?> wrapper) {
-        GenericMappedEntity potionId = wrapper.readOptional(GenericMappedEntity::read);
+        Potion potionId = wrapper.readOptional(ew -> ew.readMappedEntity(Potions::getById));
         Integer customColor = wrapper.readOptional(PacketWrapper::readInt);
         List<PotionEffect> customEffects = wrapper.readList(PotionEffect::read);
         return new ItemPotionContents(potionId, customColor, customEffects);

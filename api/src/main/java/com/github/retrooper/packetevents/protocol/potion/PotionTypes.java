@@ -51,8 +51,6 @@ public class PotionTypes {
     public static PotionType define(String key) {
         TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
         PotionType potionType = new PotionType() {
-            private final int[] ids = data.getData();
-
             @Override
             public ResourceLocation getName() {
                 return data.getName();
@@ -60,8 +58,7 @@ public class PotionTypes {
 
             @Override
             public int getId(ClientVersion version) {
-                int index = TYPES_BUILDER.getDataIndex(version);
-                return this.ids[index];
+                return TYPES_BUILDER.getId(version, data);
             }
 
             @Override
@@ -72,14 +69,7 @@ public class PotionTypes {
                 return false;
             }
         };
-
-        POTION_TYPE_MAP.put(potionType.getName().toString(), potionType);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, PotionType> idMap = POTION_TYPE_ID_MAP.computeIfAbsent(
-                    (byte) index, k -> new HashMap<>());
-            idMap.put(potionType.getId(version), potionType);
-        }
+        TYPES_BUILDER.register(POTION_TYPE_MAP, POTION_TYPE_ID_MAP, potionType);
         return potionType;
     }
 
