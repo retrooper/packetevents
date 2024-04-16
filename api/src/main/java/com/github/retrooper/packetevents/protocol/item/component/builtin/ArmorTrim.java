@@ -18,9 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.item.component.builtin;
 
+import com.github.retrooper.packetevents.protocol.item.armormaterial.ArmorMaterial;
+import com.github.retrooper.packetevents.protocol.item.armormaterial.ArmorMaterials;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
-import com.github.retrooper.packetevents.protocol.mapper.GenericMappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -52,18 +53,17 @@ public class ArmorTrim {
         wrapper.writeBoolean(trim.showInTooltip);
     }
 
-    // TODO: GenericMappedEntity -> minecraft:armor_material registry
     public static class Material {
 
         private final String assetName;
         private final ItemType ingredient;
         private final float itemModelIndex;
-        private final Map<GenericMappedEntity, String> overrideArmorMaterials;
+        private final Map<ArmorMaterial, String> overrideArmorMaterials;
         private final Component description;
 
         public Material(
                 String assetName, ItemType ingredient, float itemModelIndex,
-                Map<GenericMappedEntity, String> overrideArmorMaterials, Component description
+                Map<ArmorMaterial, String> overrideArmorMaterials, Component description
         ) {
             this.assetName = assetName;
             this.ingredient = ingredient;
@@ -76,8 +76,9 @@ public class ArmorTrim {
             String assetName = wrapper.readString();
             ItemType ingredient = wrapper.readMappedEntity(ItemTypes::getById);
             float itemModelIndex = wrapper.readFloat();
-            Map<GenericMappedEntity, String> overrideArmorMaterials = wrapper.readMap(
-                    GenericMappedEntity::read, PacketWrapper::readString);
+            Map<ArmorMaterial, String> overrideArmorMaterials = wrapper.readMap(
+                    ew -> ew.readMappedEntity(ArmorMaterials::getById),
+                    PacketWrapper::readString);
             Component description = wrapper.readComponent();
             return new Material(assetName, ingredient, itemModelIndex, overrideArmorMaterials, description);
         }
