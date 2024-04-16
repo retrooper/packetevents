@@ -19,7 +19,7 @@
 package com.github.retrooper.packetevents.protocol.potion;
 
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 

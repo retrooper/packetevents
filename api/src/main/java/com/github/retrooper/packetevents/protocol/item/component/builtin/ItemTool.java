@@ -21,7 +21,7 @@ package com.github.retrooper.packetevents.protocol.item.component.builtin;
 import com.github.retrooper.packetevents.protocol.mapper.GenericMappedEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 

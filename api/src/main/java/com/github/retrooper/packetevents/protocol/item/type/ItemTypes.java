@@ -1455,14 +1455,15 @@ public class ItemTypes {
     public static ItemType define(int maxAmount, String key, ItemType craftRemainder, StateType placedType, int maxDurability, List<ItemAttribute> attributesArr) {
         return define(maxAmount, key, craftRemainder, placedType, maxDurability, attributesArr, Collections.emptyMap());
     }
-    
+
     public static ItemType define(int maxAmount, String key, ItemType craftRemainder, StateType placedType, int maxDurability, List<ItemAttribute> attributesArr, Map<ComponentType<?>, ?> componentMap) {
         // Creates an immutable set
         Set<ItemAttribute> attributes = attributesArr == null ? Collections.emptySet() :
                 Collections.unmodifiableSet(new HashSet<>(attributesArr));
 
         TypesBuilderData data = TYPES_BUILDER.define(key);
-        StaticComponentMap components = new StaticComponentMap(componentMap);
+        StaticComponentMap components = componentMap == null ? StaticComponentMap.EMPTY
+                : new StaticComponentMap(componentMap);
 
         ItemType type = new ItemType() {
             private final int[] ids = data.getData();
