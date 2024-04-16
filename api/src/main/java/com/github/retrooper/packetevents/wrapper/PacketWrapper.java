@@ -409,7 +409,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
             return ItemStack.EMPTY;
         }
         ClientVersion version = this.serverVersion.toClientVersion();
-        ItemType itemType = ItemTypes.getById(version, this.readVarInt());
+        ItemType itemType = this.readMappedEntity(ItemTypes::getById);
 
         // read component patch counts
         int presentCount = this.readVarInt();
@@ -429,6 +429,14 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         }
 
         return ItemStack.builder().type(itemType).amount(count).components(components).build();
+    }
+
+    public ItemStack readPresentItemStack() {
+        ItemStack itemStack = this.readItemStack();
+        if (itemStack.isEmpty()) {
+            throw new RuntimeException("Empty ItemStack not allowed");
+        }
+        return itemStack;
     }
 
     public @NotNull ItemStack readItemStack() {
@@ -465,9 +473,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
             this.writeByte(0);
             return;
         }
-        int typeId = itemStack.getType().getId(this.serverVersion.toClientVersion());
         this.writeVarInt(itemStack.getAmount());
-        this.writeVarInt(typeId);
+        this.writeMappedEntity(itemStack.getType());
 
         if (!itemStack.hasComponentPatches()) {
             this.writeShort(0);
@@ -501,6 +508,13 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
                 this.writeVarInt(patch.getKey().getId(this.serverVersion.toClientVersion()));
             }
         }
+    }
+
+    public void writePresentItemStack(ItemStack itemStack) {
+        if (itemStack == null || itemStack.isEmpty()) {
+            throw new RuntimeException("Empty ItemStack not allowed");
+        }
+        this.writeItemStack(itemStack);
     }
 
     public void writeItemStack(ItemStack itemStack) {
@@ -1364,8 +1378,31 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         return getter.apply(this.serverVersion.toClientVersion(), this.readVarInt());
     }
 
+    public <Z extends MappedEntity> Z readMappedEntityOrDirect(
+            BiFunction<ClientVersion, Integer, Z> getter, Reader<Z> directReader) {
+        int id = this.readVarInt();
+        if (id != 0) { // registered in registry
+            return getter.apply(this.serverVersion.toClientVersion(), id + 1);
+        }
+        return directReader.apply(this);
+    }
+
     public void writeMappedEntity(MappedEntity entity) {
+        if (!entity.isRegistered()) {
+            throw new IllegalArgumentException("Can't write id of unregistered entity "
+                    + entity.getName() + " (" + entity + ")");
+        }
         this.writeVarInt(entity.getId(this.serverVersion.toClientVersion()));
+    }
+
+    public <Z extends MappedEntity> void writeMappedEntityOrDirect(Z entity, Writer<Z> writer) {
+        if (!entity.isRegistered()) {
+            this.writeVarInt(0);
+            writer.accept(this, entity);
+            return;
+        }
+        int id = entity.getId(this.serverVersion.toClientVersion());
+        this.writeVarInt(id + 1);
     }
 
     @FunctionalInterface

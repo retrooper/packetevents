@@ -16,18 +16,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.mapper;
+package com.github.retrooper.packetevents.protocol.item.component.builtin;
 
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public interface MappedEntity {
+import java.util.List;
 
-    ResourceLocation getName();
+public class BundleContents {
 
-    int getId(ClientVersion version);
+    private final List<ItemStack> items;
 
-    default boolean isRegistered() {
-        return true;
+    public BundleContents(List<ItemStack> items) {
+        this.items = items;
+    }
+
+    public static BundleContents read(PacketWrapper<?> wrapper) {
+        List<ItemStack> items = wrapper.readList(PacketWrapper::readPresentItemStack);
+        return new BundleContents(items);
+    }
+
+    public static void write(PacketWrapper<?> wrapper, BundleContents projectiles) {
+        wrapper.writeList(projectiles.items, PacketWrapper::writePresentItemStack);
     }
 }

@@ -16,18 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.mapper;
+package com.github.retrooper.packetevents.protocol.item.component.builtin;
 
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
-
-public interface MappedEntity {
-
-    ResourceLocation getName();
-
-    int getId(ClientVersion version);
-
-    default boolean isRegistered() {
-        return true;
-    }
+public enum ItemMapPostProcessingState {
+    LOCKED,
+    SCALED,
 }

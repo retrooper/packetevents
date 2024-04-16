@@ -23,7 +23,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.List;
 
-public class ItemFoodProperties {
+public class FoodProperties {
 
     private final int nutrition;
     private final float saturation;
@@ -31,7 +31,7 @@ public class ItemFoodProperties {
     private final float eatSeconds;
     private final List<PossibleEffect> effects;
 
-    public ItemFoodProperties(int nutrition, float saturation, boolean canAlwaysEat, float eatSeconds, List<PossibleEffect> effects) {
+    public FoodProperties(int nutrition, float saturation, boolean canAlwaysEat, float eatSeconds, List<PossibleEffect> effects) {
         this.nutrition = nutrition;
         this.saturation = saturation;
         this.canAlwaysEat = canAlwaysEat;
@@ -39,16 +39,16 @@ public class ItemFoodProperties {
         this.effects = effects;
     }
 
-    public static ItemFoodProperties read(PacketWrapper<?> wrapper) {
+    public static FoodProperties read(PacketWrapper<?> wrapper) {
         int nutrition = wrapper.readVarInt();
         float saturation = wrapper.readFloat();
         boolean canAlwaysEat = wrapper.readBoolean();
         float eatSeconds = wrapper.readFloat();
         List<PossibleEffect> effects = wrapper.readList(PossibleEffect::read);
-        return new ItemFoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, effects);
+        return new FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, effects);
     }
 
-    public static void write(PacketWrapper<?> wrapper, ItemFoodProperties props) {
+    public static void write(PacketWrapper<?> wrapper, FoodProperties props) {
         wrapper.writeVarInt(props.nutrition);
         wrapper.writeFloat(props.saturation);
         wrapper.writeBoolean(props.canAlwaysEat);

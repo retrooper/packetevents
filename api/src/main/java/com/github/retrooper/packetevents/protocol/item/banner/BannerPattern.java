@@ -16,18 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.mapper;
+package com.github.retrooper.packetevents.protocol.item.banner;
 
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public interface MappedEntity {
+public interface BannerPattern extends MappedEntity {
 
-    ResourceLocation getName();
+    ResourceLocation getAssetId();
 
-    int getId(ClientVersion version);
+    String getTranslationKey();
 
-    default boolean isRegistered() {
-        return true;
+    static BannerPattern readDirect(PacketWrapper<?> wrapper) {
+        ResourceLocation assetId = wrapper.readIdentifier();
+        String translationKey = wrapper.readString();
+        return new StaticBannerPattern(assetId, translationKey);
+    }
+
+    static void writeDirect(PacketWrapper<?> wrapper, BannerPattern pattern) {
+        wrapper.writeIdentifier(pattern.getAssetId());
+        wrapper.writeString(pattern.getTranslationKey());
     }
 }

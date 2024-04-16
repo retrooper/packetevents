@@ -16,18 +16,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.mapper;
+package com.github.retrooper.packetevents.protocol.item.banner;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 
-public interface MappedEntity {
+public class StaticBannerPattern implements BannerPattern {
 
-    ResourceLocation getName();
+    private final ResourceLocation assetId;
+    private final String translationKey;
 
-    int getId(ClientVersion version);
+    public StaticBannerPattern(ResourceLocation assetId, String translationKey) {
+        this.assetId = assetId;
+        this.translationKey = translationKey;
+    }
 
-    default boolean isRegistered() {
-        return true;
+    @Override
+    public ResourceLocation getAssetId() {
+        return this.assetId;
+    }
+
+    @Override
+    public String getTranslationKey() {
+        return this.translationKey;
+    }
+
+    @Override
+    public ResourceLocation getName() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getId(ClientVersion version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isRegistered() {
+        return false;
     }
 }
