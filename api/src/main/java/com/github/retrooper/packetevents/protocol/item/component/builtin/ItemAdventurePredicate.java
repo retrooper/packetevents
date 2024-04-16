@@ -18,10 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.item.component.builtin;
 
-import com.github.retrooper.packetevents.protocol.mapper.GenericMappedEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,12 +72,12 @@ public class ItemAdventurePredicate {
 
     public static class BlockPredicate {
 
-        private @Nullable MappedEntitySet<StateType> blocks;
+        private @Nullable MappedEntitySet<StateType.Mapped> blocks;
         private @Nullable List<PropertyMatcher> properties;
         private @Nullable NBTCompound nbt;
 
         public BlockPredicate(
-                @Nullable MappedEntitySet<StateType> blocks,
+                @Nullable MappedEntitySet<StateType.Mapped> blocks,
                 @Nullable List<PropertyMatcher> properties,
                 @Nullable NBTCompound nbt
         ) {
@@ -87,8 +87,8 @@ public class ItemAdventurePredicate {
         }
 
         public static BlockPredicate read(PacketWrapper<?> wrapper) {
-            MappedEntitySet<StateType> blocks = wrapper.readOptional(
-                    ew -> MappedEntitySet.read(ew, GenericMappedEntity::getById));
+            MappedEntitySet<StateType.Mapped> blocks = wrapper.readOptional(
+                    ew -> MappedEntitySet.read(ew, StateTypes::getMappedById));
             List<PropertyMatcher> properties = wrapper.readList(PropertyMatcher::read);
             NBTCompound nbt = wrapper.readNBT();
             return new BlockPredicate(blocks, properties, nbt);
@@ -101,11 +101,11 @@ public class ItemAdventurePredicate {
             wrapper.writeOptional(predicate.nbt, PacketWrapper::writeNBT);
         }
 
-        public @Nullable MappedEntitySet<StateType> getBlocks() {
+        public @Nullable MappedEntitySet<StateType.Mapped> getBlocks() {
             return this.blocks;
         }
 
-        public void setBlocks(@Nullable MappedEntitySet<StateType> blocks) {
+        public void setBlocks(@Nullable MappedEntitySet<StateType.Mapped> blocks) {
             this.blocks = blocks;
         }
 

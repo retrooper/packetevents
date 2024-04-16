@@ -18,9 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.item.component.builtin;
 
-import com.github.retrooper.packetevents.protocol.mapper.GenericMappedEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,18 +81,22 @@ public class ItemTool {
 
     public static class Rule {
 
-        private MappedEntitySet<StateType> blocks;
+        private MappedEntitySet<StateType.Mapped> blocks;
         private @Nullable Float speed;
         private @Nullable Boolean correctForDrops;
 
-        public Rule(MappedEntitySet<StateType> blocks, @Nullable Float speed, @Nullable Boolean correctForDrops) {
+        public Rule(
+                MappedEntitySet<StateType.Mapped> blocks,
+                @Nullable Float speed,
+                @Nullable Boolean correctForDrops
+        ) {
             this.blocks = blocks;
             this.speed = speed;
             this.correctForDrops = correctForDrops;
         }
 
-        public static Rule read(PacketWrapper<?> wrapper) { // TODO - implement registry for StateTypes
-            MappedEntitySet<StateType> blocks = MappedEntitySet.read(wrapper, GenericMappedEntity::getById);
+        public static Rule read(PacketWrapper<?> wrapper) {
+            MappedEntitySet<StateType.Mapped> blocks = MappedEntitySet.read(wrapper, StateTypes::getMappedById);
             Float speed = wrapper.readOptional(PacketWrapper::readFloat);
             Boolean correctForDrops = wrapper.readOptional(PacketWrapper::readBoolean);
             return new Rule(blocks, speed, correctForDrops);
@@ -104,11 +108,11 @@ public class ItemTool {
             wrapper.writeOptional(rule.correctForDrops, PacketWrapper::writeBoolean);
         }
 
-        public MappedEntitySet<StateType> getBlocks() {
+        public MappedEntitySet<StateType.Mapped> getBlocks() {
             return this.blocks;
         }
 
-        public void setBlocks(MappedEntitySet<StateType> blocks) {
+        public void setBlocks(MappedEntitySet<StateType.Mapped> blocks) {
             this.blocks = blocks;
         }
 

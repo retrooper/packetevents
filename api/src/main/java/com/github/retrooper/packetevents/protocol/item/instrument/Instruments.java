@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.protocol.item.instrument;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.TypesBuilder;
 import com.github.retrooper.packetevents.util.TypesBuilderData;
@@ -44,7 +43,7 @@ public class Instruments {
 
             @Override
             public int getId(ClientVersion version) {
-                return TYPES_BUILDER.getDataIndex(version);
+                return TYPES_BUILDER.getId(version, data);
             }
 
             @Override
