@@ -96,6 +96,10 @@ public class PotionTypes {
         return getById(id, version.toClientVersion());
     }
 
+    public static @Nullable PotionType getById(ClientVersion version, int id) {
+        return getById(id, version);
+    }
+
     public static @Nullable PotionType getById(int id, ClientVersion version) {
         int index = TYPES_BUILDER.getDataIndex(version);
         Map<Integer, PotionType> idMap = POTION_TYPE_ID_MAP.get((byte) index);

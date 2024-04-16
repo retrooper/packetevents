@@ -18,9 +18,13 @@
 
 package com.github.retrooper.packetevents.protocol.item.component;
 
-import com.github.retrooper.packetevents.protocol.item.component.builtin.AdventureModePredicate;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemAdventurePredicate;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemAttributeModifiers;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemDyeColor;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemEnchantments;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemFoodProperties;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemRarity;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemTool;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -115,31 +119,39 @@ public class ComponentTypes {
             (wrapper, lines) -> wrapper.writeList(lines, PacketWrapper::writeComponent)
     );
     public static final ComponentType<ItemRarity> RARITY = define("rarity",
-            wrapper -> ItemRarity.values()[wrapper.readVarInt()],
-            (wrapper, rarity) -> wrapper.writeVarInt(rarity.ordinal())
-    );
+            wrapper -> wrapper.readEnum(ItemRarity.values()), PacketWrapper::writeEnum);
     public static final ComponentType<ItemEnchantments> ENCHANTMENTS = define("enchantments",
             ItemEnchantments::read, ItemEnchantments::write);
-    public static final ComponentType<AdventureModePredicate> CAN_PLACE_ON = define("can_place_on",
-            AdventureModePredicate::read, AdventureModePredicate::write);
-    public static final ComponentType<AdventureModePredicate> CAN_BREAK = define("can_break",
-            AdventureModePredicate::read, AdventureModePredicate::write);
-    public static final ComponentType<Void> ATTRIBUTE_MODIFIERS = define("attribute_modifiers");
-    public static final ComponentType<Void> CUSTOM_MODEL_DATA = define("custom_model_data");
+    public static final ComponentType<ItemAdventurePredicate> CAN_PLACE_ON = define("can_place_on",
+            ItemAdventurePredicate::read, ItemAdventurePredicate::write);
+    public static final ComponentType<ItemAdventurePredicate> CAN_BREAK = define("can_break",
+            ItemAdventurePredicate::read, ItemAdventurePredicate::write);
+    public static final ComponentType<ItemAttributeModifiers> ATTRIBUTE_MODIFIERS = define("attribute_modifiers",
+            ItemAttributeModifiers::read, ItemAttributeModifiers::write);
+    public static final ComponentType<Integer> CUSTOM_MODEL_DATA = define("custom_model_data",
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
     public static final ComponentType<Void> HIDE_ADDITIONAL_TOOLTIP = define("hide_additional_tooltip");
     public static final ComponentType<Void> HIDE_TOOLTIP = define("hide_tooltip");
-    public static final ComponentType<Void> REPAIR_COST = define("repair_cost");
+    public static final ComponentType<Integer> REPAIR_COST = define("repair_cost",
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
     public static final ComponentType<Void> CREATIVE_SLOT_LOCK = define("creative_slot_lock");
-    public static final ComponentType<Void> ENCHANTMENT_GLINT_OVERRIDE = define("enchantment_glint_override");
-    public static final ComponentType<Void> INTANGIBLE_PROJECTILE = define("intangible_projectile");
-    public static final ComponentType<Void> FOOD = define("food");
+    public static final ComponentType<Boolean> ENCHANTMENT_GLINT_OVERRIDE = define("enchantment_glint_override",
+            PacketWrapper::readBoolean, PacketWrapper::writeBoolean);
+    public static final ComponentType<Void> INTANGIBLE_PROJECTILE = define("intangible_projectile"); // not synchronized
+    public static final ComponentType<ItemFoodProperties> FOOD = define("food",
+            ItemFoodProperties::read, ItemFoodProperties::write);
     public static final ComponentType<Void> FIRE_RESISTANT = define("fire_resistant");
-    public static final ComponentType<Void> TOOL = define("tool");
-    public static final ComponentType<Void> STORED_ENCHANTMENTS = define("stored_enchantments");
-    public static final ComponentType<Void> DYED_COLOR = define("dyed_color");
-    public static final ComponentType<Void> MAP_COLOR = define("map_color");
-    public static final ComponentType<Void> MAP_ID = define("map_id");
-    public static final ComponentType<Void> MAP_DECORATIONS = define("map_decorations");
+    public static final ComponentType<ItemTool> TOOL = define("tool",
+            ItemTool::read, ItemTool::write);
+    public static final ComponentType<ItemEnchantments> STORED_ENCHANTMENTS = define("stored_enchantments",
+            ItemEnchantments::read, ItemEnchantments::write);
+    public static final ComponentType<ItemDyeColor> DYED_COLOR = define("dyed_color",
+            ItemDyeColor::read, ItemDyeColor::write);
+    public static final ComponentType<Integer> MAP_COLOR = define("map_color",
+            PacketWrapper::readInt, PacketWrapper::writeInt);
+    public static final ComponentType<Integer> MAP_ID = define("map_id",
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
+    public static final ComponentType<Void> MAP_DECORATIONS = define("map_decorations"); // not synchronized
     public static final ComponentType<Void> MAP_POST_PROCESSING = define("map_post_processing");
     public static final ComponentType<Void> CHARGED_PROJECTILES = define("charged_projectiles");
     public static final ComponentType<Void> BUNDLE_CONTENTS = define("bundle_contents");
@@ -148,13 +160,13 @@ public class ComponentTypes {
     public static final ComponentType<Void> WRITABLE_BOOK_CONTENT = define("writable_book_content");
     public static final ComponentType<Void> WRITTEN_BOOK_CONTENT = define("written_book_content");
     public static final ComponentType<Void> TRIM = define("trim");
-    public static final ComponentType<Void> DEBUG_STICK_STATE = define("debug_stick_state");
+    public static final ComponentType<Void> DEBUG_STICK_STATE = define("debug_stick_state"); // not synchronized
     public static final ComponentType<Void> ENTITY_DATA = define("entity_data");
     public static final ComponentType<Void> BUCKET_ENTITY_DATA = define("bucket_entity_data");
     public static final ComponentType<Void> BLOCK_ENTITY_DATA = define("block_entity_data");
     public static final ComponentType<Void> INSTRUMENT = define("instrument");
     public static final ComponentType<Void> OMINOUS_BOTTLE_AMPLIFIER = define("ominous_bottle_amplifier");
-    public static final ComponentType<Void> RECIPES = define("recipes");
+    public static final ComponentType<Void> RECIPES = define("recipes"); // not synchronized
     public static final ComponentType<Void> LODESTONE_TRACKER = define("lodestone_tracker");
     public static final ComponentType<Void> FIREWORK_EXPLOSION = define("firework_explosion");
     public static final ComponentType<Void> FIREWORKS = define("fireworks");
@@ -166,8 +178,8 @@ public class ComponentTypes {
     public static final ComponentType<Void> CONTAINER = define("container");
     public static final ComponentType<Void> BLOCK_STATE = define("block_state");
     public static final ComponentType<Void> BEES = define("bees");
-    public static final ComponentType<Void> LOCK = define("lock");
-    public static final ComponentType<Void> CONTAINER_LOOT = define("container_loot");
+    public static final ComponentType<Void> LOCK = define("lock"); // not synchronized
+    public static final ComponentType<Void> CONTAINER_LOOT = define("container_loot"); // not synchronized
 
     static {
         TYPES_BUILDER.unloadFileMappings();

@@ -49,6 +49,7 @@ import com.github.retrooper.packetevents.protocol.item.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.item.component.PatchableComponentMap;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
@@ -90,6 +91,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
@@ -1305,11 +1307,11 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         }
     }
 
-    public <R> R readOptional(Reader<R> reader) {
+    public <R> @Nullable R readOptional(Reader<R> reader) {
         return this.readBoolean() ? reader.apply(this) : null;
     }
 
-    public <V> void writeOptional(V value, Writer<V> writer) {
+    public <V> void writeOptional(@Nullable V value, Writer<V> writer) {
         if (value != null) {
             this.writeBoolean(true);
             writer.accept(this, value);
@@ -1344,6 +1346,26 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         for (K key : list) {
             writer.accept(this, key);
         }
+    }
+
+    public <Z extends Enum<?>> Z readEnum(Class<Z> clazz) {
+        return this.readEnum(clazz.getEnumConstants());
+    }
+
+    public <Z extends Enum<?>> Z readEnum(Z[] values) {
+        return values[this.readVarInt()];
+    }
+
+    public void writeEnum(Enum<?> value) {
+        this.writeVarInt(value.ordinal());
+    }
+
+    public <Z extends MappedEntity> Z readMappedEntity(BiFunction<ClientVersion, Integer, Z> getter) {
+        return getter.apply(this.serverVersion.toClientVersion(), this.readVarInt());
+    }
+
+    public void writeMappedEntity(MappedEntity entity) {
+        this.writeVarInt(entity.getId(this.serverVersion.toClientVersion()));
     }
 
     @FunctionalInterface

@@ -18,46 +18,44 @@
 
 package com.github.retrooper.packetevents.protocol.item.component.builtin;
 
+import com.github.retrooper.packetevents.protocol.mapper.GenericMappedEntity;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// comment before implementing this: why do I have to implement this mess, I just want to deserialize items
-// comment after implementing this: why did I have to implement this mess, I just want to deserialize items
-public class AdventureModePredicate {
+// why do I have to implement this mess, I just want to deserialize items
+public class ItemAdventurePredicate {
 
     private final List<BlockPredicate> predicates;
     private final boolean showInTooltip;
 
-    public AdventureModePredicate(List<BlockPredicate> predicates, boolean showInTooltip) {
+    public ItemAdventurePredicate(List<BlockPredicate> predicates, boolean showInTooltip) {
         this.predicates = predicates;
         this.showInTooltip = showInTooltip;
     }
 
-    public static AdventureModePredicate read(PacketWrapper<?> wrapper) {
+    public static ItemAdventurePredicate read(PacketWrapper<?> wrapper) {
         List<BlockPredicate> predicates = wrapper.readList(BlockPredicate::read);
         boolean showInTooltip = wrapper.readBoolean();
-        return new AdventureModePredicate(predicates, showInTooltip);
+        return new ItemAdventurePredicate(predicates, showInTooltip);
     }
 
-    public static void write(PacketWrapper<?> wrapper, AdventureModePredicate predicate) {
+    public static void write(PacketWrapper<?> wrapper, ItemAdventurePredicate predicate) {
         wrapper.writeList(predicate.predicates, BlockPredicate::write);
         wrapper.writeBoolean(predicate.showInTooltip);
     }
 
     public static class BlockPredicate {
 
-        private final Optional<GenericHolderSet> blocks;
+        private final Optional<MappedEntitySet> blocks;
         private final Optional<List<PropertyMatcher>> properties;
         private final Optional<NBTCompound> nbt;
 
         public BlockPredicate(
-                Optional<GenericHolderSet> blocks,
+                Optional<MappedEntitySet> blocks,
                 Optional<List<PropertyMatcher>> properties,
                 Optional<NBTCompound> nbt
         ) {
@@ -67,8 +65,9 @@ public class AdventureModePredicate {
         }
 
         public static BlockPredicate read(PacketWrapper<?> wrapper) {
-            Optional<GenericHolderSet> blocks = Optional.ofNullable(
-                    wrapper.readOptional(GenericHolderSet::read));
+            Optional<MappedEntitySet> blocks = Optional.ofNullable(
+                    wrapper.readOptional(ew -> MappedEntitySet.read(ew,
+                            GenericMappedEntity::getById)));
             Optional<List<PropertyMatcher>> properties = Optional.ofNullable(
                     wrapper.readList(PropertyMatcher::read));
             Optional<NBTCompound> nbt = Optional.ofNullable(wrapper.readNBT());
@@ -76,50 +75,10 @@ public class AdventureModePredicate {
         }
 
         public static void write(PacketWrapper<?> wrapper, BlockPredicate predicate) {
-            wrapper.writeOptional(predicate.blocks.orElse(null), GenericHolderSet::write);
+            wrapper.writeOptional(predicate.blocks.orElse(null), MappedEntitySet::write);
             wrapper.writeOptional(predicate.properties.orElse(null),
                     (ew, val) -> ew.writeList(val, PropertyMatcher::write));
             wrapper.writeOptional(predicate.nbt.orElse(null), PacketWrapper::writeNBT);
-        }
-    }
-
-    public static class GenericHolderSet {
-
-        private final @Nullable ResourceLocation tagLoc;
-        private final @Nullable List<Integer> holderIds;
-
-        public GenericHolderSet(@Nullable ResourceLocation tagLoc, @Nullable List<Integer> holderIds) {
-            if (tagLoc == null && holderIds == null) {
-                throw new IllegalArgumentException("Illegal generic holder set: one of tagLoc or holderIds has to be set");
-            }
-            this.tagLoc = tagLoc;
-            this.holderIds = holderIds;
-        }
-
-        public static GenericHolderSet read(PacketWrapper<?> wrapper) {
-            int count = wrapper.readVarInt() - 1;
-            if (count == -1) {
-                return new GenericHolderSet(wrapper.readIdentifier(), null);
-            }
-            List<Integer> holderIds = new ArrayList<>(Math.min(count, 65536));
-            for (int i = 0; i < count; i++) {
-                holderIds.add(wrapper.readVarInt());
-            }
-            return new GenericHolderSet(null, holderIds);
-        }
-
-        public static void write(PacketWrapper<?> wrapper, GenericHolderSet set) {
-            if (set.tagLoc != null) {
-                wrapper.writeByte(0);
-                wrapper.writeIdentifier(set.tagLoc);
-                return;
-            }
-
-            assert set.holderIds != null; // can't be null, verified in ctor
-            wrapper.writeVarInt(set.holderIds.size() + 1);
-            for (int holderId : set.holderIds) {
-                wrapper.writeVarInt(holderId);
-            }
         }
     }
 
