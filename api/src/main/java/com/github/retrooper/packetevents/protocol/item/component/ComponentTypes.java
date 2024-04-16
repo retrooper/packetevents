@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.item.component;
 
+import com.github.retrooper.packetevents.protocol.color.DyeColor;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ArmorTrim;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.BannerLayers;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.BundleContents;
@@ -26,6 +27,9 @@ import com.github.retrooper.packetevents.protocol.item.component.builtin.Firewor
 import com.github.retrooper.packetevents.protocol.item.component.builtin.FoodProperties;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemAdventurePredicate;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemAttributeModifiers;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemBees;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemBlockStateProperties;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemContainerContents;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemDyeColor;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemEnchantments;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemFireworks;
@@ -35,6 +39,7 @@ import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemPro
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemRarity;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemTool;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.LodestoneTracker;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.PotDecorations;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.SuspiciousStewEffects;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.WritableBookContent;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.WrittenBookContent;
@@ -207,11 +212,16 @@ public class ComponentTypes {
             PacketWrapper::readIdentifier, PacketWrapper::writeIdentifier);
     public static final ComponentType<BannerLayers> BANNER_PATTERNS = define("banner_patterns",
             BannerLayers::read, BannerLayers::write);
-    public static final ComponentType<Void> BASE_COLOR = define("base_color");
-    public static final ComponentType<Void> POT_DECORATIONS = define("pot_decorations");
-    public static final ComponentType<Void> CONTAINER = define("container");
-    public static final ComponentType<Void> BLOCK_STATE = define("block_state");
-    public static final ComponentType<Void> BEES = define("bees");
+    public static final ComponentType<DyeColor> BASE_COLOR = define("base_color",
+            wrapper -> wrapper.readEnum(DyeColor.values()), PacketWrapper::writeEnum);
+    public static final ComponentType<PotDecorations> POT_DECORATIONS = define("pot_decorations",
+            PotDecorations::read, PotDecorations::write);
+    public static final ComponentType<ItemContainerContents> CONTAINER = define("container",
+            ItemContainerContents::read, ItemContainerContents::write);
+    public static final ComponentType<ItemBlockStateProperties> BLOCK_STATE = define("block_state",
+            ItemBlockStateProperties::read, ItemBlockStateProperties::write);
+    public static final ComponentType<ItemBees> BEES = define("bees",
+            ItemBees::read, ItemBees::write);
     public static final ComponentType<Void> LOCK = define("lock"); // not synchronized
     public static final ComponentType<Void> CONTAINER_LOOT = define("container_loot"); // not synchronized
 
