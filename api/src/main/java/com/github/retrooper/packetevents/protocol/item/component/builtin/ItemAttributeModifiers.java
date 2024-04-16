@@ -28,8 +28,8 @@ import java.util.UUID;
 
 public class ItemAttributeModifiers {
 
-    private final List<ModifierEntry> modifiers;
-    private final boolean showInTooltip;
+    private List<ModifierEntry> modifiers;
+    private boolean showInTooltip;
 
     public ItemAttributeModifiers(List<ModifierEntry> modifiers, boolean showInTooltip) {
         this.modifiers = modifiers;
@@ -47,11 +47,31 @@ public class ItemAttributeModifiers {
         wrapper.writeBoolean(modifiers.showInTooltip);
     }
 
+    public void addModifier(ModifierEntry modifier) {
+        this.modifiers.add(modifier);
+    }
+
+    public List<ModifierEntry> getModifiers() {
+        return this.modifiers;
+    }
+
+    public void setModifiers(List<ModifierEntry> modifiers) {
+        this.modifiers = modifiers;
+    }
+
+    public boolean isShowInTooltip() {
+        return this.showInTooltip;
+    }
+
+    public void setShowInTooltip(boolean showInTooltip) {
+        this.showInTooltip = showInTooltip;
+    }
+
     public static class ModifierEntry {
 
-        private final Attribute attribute;
-        private final Modifier modifier;
-        private final EquipmentSlotGroup slotGroup;
+        private Attribute attribute;
+        private Modifier modifier;
+        private EquipmentSlotGroup slotGroup;
 
         public ModifierEntry(Attribute attribute, Modifier modifier, EquipmentSlotGroup slotGroup) {
             this.attribute = attribute;
@@ -71,14 +91,38 @@ public class ItemAttributeModifiers {
             Modifier.write(wrapper, entry.modifier);
             wrapper.writeEnum(entry.slotGroup);
         }
+
+        public Attribute getAttribute() {
+            return this.attribute;
+        }
+
+        public void setAttribute(Attribute attribute) {
+            this.attribute = attribute;
+        }
+
+        public Modifier getModifier() {
+            return this.modifier;
+        }
+
+        public void setModifier(Modifier modifier) {
+            this.modifier = modifier;
+        }
+
+        public EquipmentSlotGroup getSlotGroup() {
+            return this.slotGroup;
+        }
+
+        public void setSlotGroup(EquipmentSlotGroup slotGroup) {
+            this.slotGroup = slotGroup;
+        }
     }
 
     public static class Modifier {
 
-        private final UUID id;
-        private final String name;
-        private final double value;
-        private final AttributeOperation operation;
+        private UUID id;
+        private String name;
+        private double value;
+        private AttributeOperation operation;
 
         public Modifier(UUID id, String name, double value, AttributeOperation operation) {
             this.id = id;
@@ -100,6 +144,38 @@ public class ItemAttributeModifiers {
             wrapper.writeString(modifier.name);
             wrapper.writeDouble(modifier.value);
             wrapper.writeEnum(modifier.operation);
+        }
+
+        public UUID getId() {
+            return this.id;
+        }
+
+        public void setId(UUID id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public double getValue() {
+            return this.value;
+        }
+
+        public void setValue(double value) {
+            this.value = value;
+        }
+
+        public AttributeOperation getOperation() {
+            return this.operation;
+        }
+
+        public void setOperation(AttributeOperation operation) {
+            this.operation = operation;
         }
     }
 

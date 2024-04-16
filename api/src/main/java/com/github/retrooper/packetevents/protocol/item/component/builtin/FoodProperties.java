@@ -25,11 +25,11 @@ import java.util.List;
 
 public class FoodProperties {
 
-    private final int nutrition;
-    private final float saturation;
-    private final boolean canAlwaysEat;
-    private final float eatSeconds;
-    private final List<PossibleEffect> effects;
+    private int nutrition;
+    private float saturation;
+    private boolean canAlwaysEat;
+    private float eatSeconds;
+    private List<PossibleEffect> effects;
 
     public FoodProperties(int nutrition, float saturation, boolean canAlwaysEat, float eatSeconds, List<PossibleEffect> effects) {
         this.nutrition = nutrition;
@@ -56,10 +56,54 @@ public class FoodProperties {
         wrapper.writeList(props.effects, PossibleEffect::write);
     }
 
+    public int getNutrition() {
+        return this.nutrition;
+    }
+
+    public void setNutrition(int nutrition) {
+        this.nutrition = nutrition;
+    }
+
+    public float getSaturation() {
+        return this.saturation;
+    }
+
+    public void setSaturation(float saturation) {
+        this.saturation = saturation;
+    }
+
+    public boolean isCanAlwaysEat() {
+        return this.canAlwaysEat;
+    }
+
+    public void setCanAlwaysEat(boolean canAlwaysEat) {
+        this.canAlwaysEat = canAlwaysEat;
+    }
+
+    public float getEatSeconds() {
+        return this.eatSeconds;
+    }
+
+    public void setEatSeconds(float eatSeconds) {
+        this.eatSeconds = eatSeconds;
+    }
+
+    public void addEffect(PossibleEffect effect) {
+        this.effects.add(effect);
+    }
+
+    public List<PossibleEffect> getEffects() {
+        return this.effects;
+    }
+
+    public void setEffects(List<PossibleEffect> effects) {
+        this.effects = effects;
+    }
+
     public static class PossibleEffect {
 
-        private final PotionEffect effect;
-        private final float probability;
+        private PotionEffect effect;
+        private float probability;
 
         public PossibleEffect(PotionEffect effect, float probability) {
             this.effect = effect;
@@ -75,6 +119,22 @@ public class FoodProperties {
         public static void write(PacketWrapper<?> wrapper, PossibleEffect effect) {
             PotionEffect.write(wrapper, effect.effect);
             wrapper.writeFloat(effect.probability);
+        }
+
+        public PotionEffect getEffect() {
+            return this.effect;
+        }
+
+        public void setEffect(PotionEffect effect) {
+            this.effect = effect;
+        }
+
+        public float getProbability() {
+            return this.probability;
+        }
+
+        public void setProbability(float probability) {
+            this.probability = probability;
         }
     }
 }

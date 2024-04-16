@@ -25,7 +25,7 @@ import java.util.List;
 
 public class ChargedProjectiles {
 
-    private final List<ItemStack> items;
+    private List<ItemStack> items;
 
     public ChargedProjectiles(List<ItemStack> items) {
         this.items = items;
@@ -38,5 +38,17 @@ public class ChargedProjectiles {
 
     public static void write(PacketWrapper<?> wrapper, ChargedProjectiles projectiles) {
         wrapper.writeList(projectiles.items, PacketWrapper::writePresentItemStack);
+    }
+
+    public void addItem(ItemStack itemStack) {
+        this.items.add(itemStack);
+    }
+
+    public List<ItemStack> getItems() {
+        return this.items;
+    }
+
+    public void setItems(List<ItemStack> items) {
+        this.items = items;
     }
 }

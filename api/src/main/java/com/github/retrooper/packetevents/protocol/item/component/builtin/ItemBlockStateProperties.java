@@ -18,13 +18,15 @@
 
 package com.github.retrooper.packetevents.protocol.item.component.builtin;
 
+import com.github.retrooper.packetevents.protocol.world.states.type.StateValue;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
 public class ItemBlockStateProperties {
 
-    private final Map<String, String> properties;
+    private Map<String, String> properties;
 
     public ItemBlockStateProperties(Map<String, String> properties) {
         this.properties = properties;
@@ -40,5 +42,45 @@ public class ItemBlockStateProperties {
         wrapper.writeMap(props.properties,
                 PacketWrapper::writeString,
                 PacketWrapper::writeString);
+    }
+
+    public @Nullable Object getProperty(StateValue stateValue) {
+        String value = this.getProperty(stateValue.getName());
+        if (value != null) {
+            return stateValue.getParser().apply(value);
+        }
+        return null;
+    }
+
+    public @Nullable String getProperty(String key) {
+        return this.properties.get(key);
+    }
+
+    public void setProperty(StateValue stateValue, @Nullable Object value) {
+        this.setProperty(stateValue.getName(), value == null ? null : value.toString());
+    }
+
+    public void setProperty(String key, @Nullable String value) {
+        if (value == null) {
+            this.properties.remove(key);
+        } else {
+            this.properties.put(key, value);
+        }
+    }
+
+    public void unsetProperty(StateValue stateValue) {
+        this.unsetProperty(stateValue.getName());
+    }
+
+    public void unsetProperty(String key) {
+        this.setProperty(key, null);
+    }
+
+    public Map<String, String> getProperties() {
+        return this.properties;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
     }
 }

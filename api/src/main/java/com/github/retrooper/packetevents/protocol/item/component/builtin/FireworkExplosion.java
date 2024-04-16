@@ -24,11 +24,11 @@ import java.util.List;
 
 public class FireworkExplosion {
 
-    private final Shape shape;
-    private final List<Integer> colors;
-    private final List<Integer> fadeColors;
-    private final boolean hasTrail;
-    private final boolean hasTwinkle;
+    private Shape shape;
+    private List<Integer> colors;
+    private List<Integer> fadeColors;
+    private boolean hasTrail;
+    private boolean hasTwinkle;
 
     public FireworkExplosion(
             Shape shape, List<Integer> colors, List<Integer> fadeColors,
@@ -56,6 +56,54 @@ public class FireworkExplosion {
         wrapper.writeList(explosion.fadeColors, PacketWrapper::writeInt);
         wrapper.writeBoolean(explosion.hasTrail);
         wrapper.writeBoolean(explosion.hasTwinkle);
+    }
+
+    public Shape getShape() {
+        return this.shape;
+    }
+
+    public void setShape(Shape shape) {
+        this.shape = shape;
+    }
+
+    public void addColor(int color) {
+        this.colors.add(color);
+    }
+
+    public List<Integer> getColors() {
+        return this.colors;
+    }
+
+    public void setColors(List<Integer> colors) {
+        this.colors = colors;
+    }
+
+    public void addFadeColor(int color) {
+        this.fadeColors.add(color);
+    }
+
+    public List<Integer> getFadeColors() {
+        return this.fadeColors;
+    }
+
+    public void setFadeColors(List<Integer> fadeColors) {
+        this.fadeColors = fadeColors;
+    }
+
+    public boolean isHasTrail() {
+        return this.hasTrail;
+    }
+
+    public void setHasTrail(boolean hasTrail) {
+        this.hasTrail = hasTrail;
+    }
+
+    public boolean isHasTwinkle() {
+        return this.hasTwinkle;
+    }
+
+    public void setHasTwinkle(boolean hasTwinkle) {
+        this.hasTwinkle = hasTwinkle;
     }
 
     public enum Shape {

@@ -25,14 +25,15 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
 public class ArmorTrim {
 
-    private final Material material;
-    private final Pattern pattern;
-    private final boolean showInTooltip;
+    private Material material;
+    private Pattern pattern;
+    private boolean showInTooltip;
 
     public ArmorTrim(Material material, Pattern pattern, boolean showInTooltip) {
         this.material = material;
@@ -53,13 +54,37 @@ public class ArmorTrim {
         wrapper.writeBoolean(trim.showInTooltip);
     }
 
+    public Material getMaterial() {
+        return this.material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
+
+    public Pattern getPattern() {
+        return this.pattern;
+    }
+
+    public void setPattern(Pattern pattern) {
+        this.pattern = pattern;
+    }
+
+    public boolean isShowInTooltip() {
+        return this.showInTooltip;
+    }
+
+    public void setShowInTooltip(boolean showInTooltip) {
+        this.showInTooltip = showInTooltip;
+    }
+
     public static class Material {
 
-        private final String assetName;
-        private final ItemType ingredient;
-        private final float itemModelIndex;
-        private final Map<ArmorMaterial, String> overrideArmorMaterials;
-        private final Component description;
+        private String assetName;
+        private ItemType ingredient;
+        private float itemModelIndex;
+        private Map<ArmorMaterial, String> overrideArmorMaterials;
+        private Component description;
 
         public Material(
                 String assetName, ItemType ingredient, float itemModelIndex,
@@ -91,14 +116,66 @@ public class ArmorTrim {
                     PacketWrapper::writeMappedEntity, PacketWrapper::writeString);
             wrapper.writeComponent(material.description);
         }
+
+        public String getAssetName() {
+            return this.assetName;
+        }
+
+        public void setAssetName(String assetName) {
+            this.assetName = assetName;
+        }
+
+        public ItemType getIngredient() {
+            return this.ingredient;
+        }
+
+        public void setIngredient(ItemType ingredient) {
+            this.ingredient = ingredient;
+        }
+
+        public float getItemModelIndex() {
+            return this.itemModelIndex;
+        }
+
+        public void setItemModelIndex(float itemModelIndex) {
+            this.itemModelIndex = itemModelIndex;
+        }
+
+        public @Nullable String getArmorMaterialOverride(ArmorMaterial armorMaterial) {
+            return this.overrideArmorMaterials.get(armorMaterial);
+        }
+
+        public void setArmorMaterialOverride(ArmorMaterial armorMaterial, @Nullable String override) {
+            if (override == null) {
+                this.overrideArmorMaterials.remove(armorMaterial);
+            } else {
+                this.overrideArmorMaterials.put(armorMaterial, override);
+            }
+        }
+
+        public Map<ArmorMaterial, String> getOverrideArmorMaterials() {
+            return this.overrideArmorMaterials;
+        }
+
+        public void setOverrideArmorMaterials(Map<ArmorMaterial, String> overrideArmorMaterials) {
+            this.overrideArmorMaterials = overrideArmorMaterials;
+        }
+
+        public Component getDescription() {
+            return this.description;
+        }
+
+        public void setDescription(Component description) {
+            this.description = description;
+        }
     }
 
     public static class Pattern {
 
-        private final ResourceLocation assetId;
-        private final ItemType templateItem;
-        private final Component description;
-        private final boolean decal;
+        private ResourceLocation assetId;
+        private ItemType templateItem;
+        private Component description;
+        private boolean decal;
 
         public Pattern(
                 ResourceLocation assetId, ItemType templateItem,
@@ -123,6 +200,38 @@ public class ArmorTrim {
             wrapper.writeMappedEntity(pattern.templateItem);
             wrapper.writeComponent(pattern.description);
             wrapper.writeBoolean(pattern.decal);
+        }
+
+        public ResourceLocation getAssetId() {
+            return this.assetId;
+        }
+
+        public void setAssetId(ResourceLocation assetId) {
+            this.assetId = assetId;
+        }
+
+        public ItemType getTemplateItem() {
+            return this.templateItem;
+        }
+
+        public void setTemplateItem(ItemType templateItem) {
+            this.templateItem = templateItem;
+        }
+
+        public Component getDescription() {
+            return this.description;
+        }
+
+        public void setDescription(Component description) {
+            this.description = description;
+        }
+
+        public boolean isDecal() {
+            return this.decal;
+        }
+
+        public void setDecal(boolean decal) {
+            this.decal = decal;
         }
     }
 }

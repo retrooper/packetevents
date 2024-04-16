@@ -25,7 +25,7 @@ import java.util.List;
 
 public class ItemBees {
 
-    private final List<BeeEntry> bees;
+    private List<BeeEntry> bees;
 
     public ItemBees(List<BeeEntry> bees) {
         this.bees = bees;
@@ -40,11 +40,23 @@ public class ItemBees {
         wrapper.writeList(bees.bees, BeeEntry::write);
     }
 
+    public void addBee(BeeEntry bee) {
+        this.bees.add(bee);
+    }
+
+    public List<BeeEntry> getBees() {
+        return this.bees;
+    }
+
+    public void setBees(List<BeeEntry> bees) {
+        this.bees = bees;
+    }
+
     public static class BeeEntry {
 
-        private final NBTCompound entityData;
-        private final int ticksInHive;
-        private final int minTicksInHive;
+        private NBTCompound entityData;
+        private int ticksInHive;
+        private int minTicksInHive;
 
         public BeeEntry(NBTCompound entityData, int ticksInHive, int minTicksInHive) {
             this.entityData = entityData;
@@ -63,6 +75,30 @@ public class ItemBees {
             wrapper.writeNBT(bee.entityData);
             wrapper.writeVarInt(bee.ticksInHive);
             wrapper.writeVarInt(bee.minTicksInHive);
+        }
+
+        public NBTCompound getEntityData() {
+            return this.entityData;
+        }
+
+        public void setEntityData(NBTCompound entityData) {
+            this.entityData = entityData;
+        }
+
+        public int getTicksInHive() {
+            return this.ticksInHive;
+        }
+
+        public void setTicksInHive(int ticksInHive) {
+            this.ticksInHive = ticksInHive;
+        }
+
+        public int getMinTicksInHive() {
+            return this.minTicksInHive;
+        }
+
+        public void setMinTicksInHive(int minTicksInHive) {
+            this.minTicksInHive = minTicksInHive;
         }
     }
 }

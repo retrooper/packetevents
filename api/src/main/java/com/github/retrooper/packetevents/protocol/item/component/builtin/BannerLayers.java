@@ -27,7 +27,7 @@ import java.util.List;
 
 public class BannerLayers {
 
-    private final List<Layer> layers;
+    private List<Layer> layers;
 
     public BannerLayers(List<Layer> layers) {
         this.layers = layers;
@@ -42,10 +42,22 @@ public class BannerLayers {
         wrapper.writeList(patterns.layers, Layer::write);
     }
 
+    public void addLayer(Layer layer) {
+        this.layers.add(layer);
+    }
+
+    public List<Layer> getLayers() {
+        return this.layers;
+    }
+
+    public void setLayers(List<Layer> layers) {
+        this.layers = layers;
+    }
+
     public static class Layer {
 
-        private final BannerPattern pattern;
-        private final DyeColor color;
+        private BannerPattern pattern;
+        private DyeColor color;
 
         public Layer(BannerPattern pattern, DyeColor color) {
             this.pattern = pattern;
@@ -62,6 +74,22 @@ public class BannerLayers {
         public static void write(PacketWrapper<?> wrapper, Layer layer) {
             wrapper.writeMappedEntityOrDirect(layer.pattern, BannerPattern::writeDirect);
             wrapper.writeEnum(layer.color);
+        }
+
+        public BannerPattern getPattern() {
+            return this.pattern;
+        }
+
+        public void setPattern(BannerPattern pattern) {
+            this.pattern = pattern;
+        }
+
+        public DyeColor getColor() {
+            return this.color;
+        }
+
+        public void setColor(DyeColor color) {
+            this.color = color;
         }
     }
 }

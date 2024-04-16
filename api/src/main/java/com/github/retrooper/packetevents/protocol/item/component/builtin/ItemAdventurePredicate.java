@@ -21,16 +21,18 @@ package com.github.retrooper.packetevents.protocol.item.component.builtin;
 import com.github.retrooper.packetevents.protocol.mapper.GenericMappedEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 // why do I have to implement this mess, I just want to deserialize items
 public class ItemAdventurePredicate {
 
-    private final List<BlockPredicate> predicates;
-    private final boolean showInTooltip;
+    private List<BlockPredicate> predicates;
+    private boolean showInTooltip;
 
     public ItemAdventurePredicate(List<BlockPredicate> predicates, boolean showInTooltip) {
         this.predicates = predicates;
@@ -48,16 +50,36 @@ public class ItemAdventurePredicate {
         wrapper.writeBoolean(predicate.showInTooltip);
     }
 
+    public void addPredicate(BlockPredicate predicate) {
+        this.predicates.add(predicate);
+    }
+
+    public List<BlockPredicate> getPredicates() {
+        return this.predicates;
+    }
+
+    public void setPredicates(List<BlockPredicate> predicates) {
+        this.predicates = predicates;
+    }
+
+    public boolean isShowInTooltip() {
+        return this.showInTooltip;
+    }
+
+    public void setShowInTooltip(boolean showInTooltip) {
+        this.showInTooltip = showInTooltip;
+    }
+
     public static class BlockPredicate {
 
-        private final Optional<MappedEntitySet> blocks;
-        private final Optional<List<PropertyMatcher>> properties;
-        private final Optional<NBTCompound> nbt;
+        private @Nullable MappedEntitySet<StateType> blocks;
+        private @Nullable List<PropertyMatcher> properties;
+        private @Nullable NBTCompound nbt;
 
         public BlockPredicate(
-                Optional<MappedEntitySet> blocks,
-                Optional<List<PropertyMatcher>> properties,
-                Optional<NBTCompound> nbt
+                @Nullable MappedEntitySet<StateType> blocks,
+                @Nullable List<PropertyMatcher> properties,
+                @Nullable NBTCompound nbt
         ) {
             this.blocks = blocks;
             this.properties = properties;
@@ -65,27 +87,56 @@ public class ItemAdventurePredicate {
         }
 
         public static BlockPredicate read(PacketWrapper<?> wrapper) {
-            Optional<MappedEntitySet> blocks = Optional.ofNullable(
-                    wrapper.readOptional(ew -> MappedEntitySet.read(ew,
-                            GenericMappedEntity::getById)));
-            Optional<List<PropertyMatcher>> properties = Optional.ofNullable(
-                    wrapper.readList(PropertyMatcher::read));
-            Optional<NBTCompound> nbt = Optional.ofNullable(wrapper.readNBT());
+            MappedEntitySet<StateType> blocks = wrapper.readOptional(
+                    ew -> MappedEntitySet.read(ew, GenericMappedEntity::getById));
+            List<PropertyMatcher> properties = wrapper.readList(PropertyMatcher::read);
+            NBTCompound nbt = wrapper.readNBT();
             return new BlockPredicate(blocks, properties, nbt);
         }
 
         public static void write(PacketWrapper<?> wrapper, BlockPredicate predicate) {
-            wrapper.writeOptional(predicate.blocks.orElse(null), MappedEntitySet::write);
-            wrapper.writeOptional(predicate.properties.orElse(null),
+            wrapper.writeOptional(predicate.blocks, MappedEntitySet::write);
+            wrapper.writeOptional(predicate.properties,
                     (ew, val) -> ew.writeList(val, PropertyMatcher::write));
-            wrapper.writeOptional(predicate.nbt.orElse(null), PacketWrapper::writeNBT);
+            wrapper.writeOptional(predicate.nbt, PacketWrapper::writeNBT);
+        }
+
+        public @Nullable MappedEntitySet<StateType> getBlocks() {
+            return this.blocks;
+        }
+
+        public void setBlocks(@Nullable MappedEntitySet<StateType> blocks) {
+            this.blocks = blocks;
+        }
+
+        public void addProperty(PropertyMatcher propertyMatcher) {
+            if (this.properties == null) {
+                this.properties = new ArrayList<>(4);
+            }
+            this.properties.add(propertyMatcher);
+        }
+
+        public @Nullable List<PropertyMatcher> getProperties() {
+            return this.properties;
+        }
+
+        public void setProperties(@Nullable List<PropertyMatcher> properties) {
+            this.properties = properties;
+        }
+
+        public @Nullable NBTCompound getNbt() {
+            return this.nbt;
+        }
+
+        public void setNbt(@Nullable NBTCompound nbt) {
+            this.nbt = nbt;
         }
     }
 
     public static class PropertyMatcher {
 
-        private final String name;
-        private final ValueMatcher matcher;
+        private String name;
+        private ValueMatcher matcher;
 
         public PropertyMatcher(String name, ValueMatcher matcher) {
             this.name = name;
@@ -101,6 +152,22 @@ public class ItemAdventurePredicate {
         public static void write(PacketWrapper<?> wrapper, PropertyMatcher matcher) {
             wrapper.writeString(matcher.name);
             ValueMatcher.write(wrapper, matcher.matcher);
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public ValueMatcher getMatcher() {
+            return this.matcher;
+        }
+
+        public void setMatcher(ValueMatcher matcher) {
+            this.matcher = matcher;
         }
     }
 
@@ -128,7 +195,7 @@ public class ItemAdventurePredicate {
 
     public static class ExactValueMatcher implements ValueMatcher {
 
-        private final String value;
+        private String value;
 
         public ExactValueMatcher(String value) {
             this.value = value;
@@ -141,28 +208,51 @@ public class ItemAdventurePredicate {
         public static void write(PacketWrapper<?> wrapper, ExactValueMatcher matcher) {
             wrapper.writeString(matcher.value);
         }
+
+        public String getValue() {
+            return this.value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 
     public static class RangedValueMatcher implements ValueMatcher {
 
-        private final Optional<String> minValue;
-        private final Optional<String> maxValue;
+        private @Nullable String minValue;
+        private @Nullable String maxValue;
 
-        public RangedValueMatcher(Optional<String> minValue, Optional<String> maxValue) {
+        public RangedValueMatcher(@Nullable String minValue, @Nullable String maxValue) {
             this.minValue = minValue;
             this.maxValue = maxValue;
         }
 
         public static RangedValueMatcher read(PacketWrapper<?> wrapper) {
-            return new RangedValueMatcher(
-                    Optional.ofNullable(wrapper.readOptional(PacketWrapper::readString)),
-                    Optional.ofNullable(wrapper.readOptional(PacketWrapper::readString))
-            );
+            String minValue = wrapper.readOptional(PacketWrapper::readString);
+            String maxValue = wrapper.readOptional(PacketWrapper::readString);
+            return new RangedValueMatcher(minValue, maxValue);
         }
 
         public static void write(PacketWrapper<?> wrapper, RangedValueMatcher matcher) {
-            wrapper.writeOptional(matcher.minValue.orElse(null), PacketWrapper::writeString);
-            wrapper.writeOptional(matcher.maxValue.orElse(null), PacketWrapper::writeString);
+            wrapper.writeOptional(matcher.minValue, PacketWrapper::writeString);
+            wrapper.writeOptional(matcher.maxValue, PacketWrapper::writeString);
+        }
+
+        public @Nullable String getMinValue() {
+            return this.minValue;
+        }
+
+        public void setMinValue(@Nullable String minValue) {
+            this.minValue = minValue;
+        }
+
+        public @Nullable String getMaxValue() {
+            return this.maxValue;
+        }
+
+        public void setMaxValue(@Nullable String maxValue) {
+            this.maxValue = maxValue;
         }
     }
 }
