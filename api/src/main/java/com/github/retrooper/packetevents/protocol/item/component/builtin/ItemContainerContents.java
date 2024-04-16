@@ -25,7 +25,7 @@ import java.util.List;
 
 public class ItemContainerContents {
 
-    private final List<ItemStack> items;
+    private List<ItemStack> items;
 
     public ItemContainerContents(List<ItemStack> items) {
         this.items = items;
@@ -38,5 +38,17 @@ public class ItemContainerContents {
 
     public static void write(PacketWrapper<?> wrapper, ItemContainerContents contents) {
         wrapper.writeList(contents.items, PacketWrapper::writeItemStack);
+    }
+
+    public void addItem(ItemStack itemStack) {
+        this.items.add(itemStack);
+    }
+
+    public List<ItemStack> getItems() {
+        return this.items;
+    }
+
+    public void setItems(List<ItemStack> items) {
+        this.items = items;
     }
 }

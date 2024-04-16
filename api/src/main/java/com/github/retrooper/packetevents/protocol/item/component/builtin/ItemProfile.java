@@ -26,9 +26,9 @@ import java.util.UUID;
 
 public class ItemProfile {
 
-    private final @Nullable String name;
-    private final @Nullable UUID id;
-    private final List<Property> properties;
+    private @Nullable String name;
+    private @Nullable UUID id;
+    private List<Property> properties;
 
     public ItemProfile(@Nullable String name, @Nullable UUID id, List<Property> properties) {
         this.name = name;
@@ -49,11 +49,39 @@ public class ItemProfile {
         wrapper.writeList(profile.properties, Property::write);
     }
 
+    public @Nullable String getName() {
+        return this.name;
+    }
+
+    public void setName(@Nullable String name) {
+        this.name = name;
+    }
+
+    public @Nullable UUID getId() {
+        return this.id;
+    }
+
+    public void setId(@Nullable UUID id) {
+        this.id = id;
+    }
+
+    public void addProperty(Property property) {
+        this.properties.add(property);
+    }
+
+    public List<Property> getProperties() {
+        return this.properties;
+    }
+
+    public void setProperties(List<Property> properties) {
+        this.properties = properties;
+    }
+
     public static class Property {
 
-        private final String name;
-        private final String value;
-        private final @Nullable String signature;
+        private String name;
+        private String value;
+        private @Nullable String signature;
 
         public Property(String name, String value, @Nullable String signature) {
             this.name = name;
@@ -73,6 +101,30 @@ public class ItemProfile {
             wrapper.writeString(property.value, 32767);
             wrapper.writeOptional(property.signature,
                     (ew, signature) -> ew.writeString(signature, 1024));
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getValue() {
+            return this.value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public @Nullable String getSignature() {
+            return this.signature;
+        }
+
+        public void setSignature(@Nullable String signature) {
+            this.signature = signature;
         }
     }
 }

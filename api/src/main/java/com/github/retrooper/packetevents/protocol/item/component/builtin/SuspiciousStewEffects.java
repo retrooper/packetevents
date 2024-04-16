@@ -26,7 +26,7 @@ import java.util.List;
 
 public class SuspiciousStewEffects {
 
-    private final List<EffectEntry> effects;
+    private List<EffectEntry> effects;
 
     public SuspiciousStewEffects(List<EffectEntry> effects) {
         this.effects = effects;
@@ -41,10 +41,22 @@ public class SuspiciousStewEffects {
         wrapper.writeList(effects.effects, EffectEntry::write);
     }
 
+    public void addEffect(EffectEntry effect) {
+        this.effects.add(effect);
+    }
+
+    public List<EffectEntry> getEffects() {
+        return this.effects;
+    }
+
+    public void setEffects(List<EffectEntry> effects) {
+        this.effects = effects;
+    }
+
     public static class EffectEntry {
 
-        private final PotionType type;
-        private final int duration;
+        private PotionType type;
+        private int duration;
 
         public EffectEntry(PotionType type, int duration) {
             this.type = type;
@@ -60,6 +72,22 @@ public class SuspiciousStewEffects {
         public static void write(PacketWrapper<?> wrapper, EffectEntry effect) {
             wrapper.writeMappedEntity(effect.type);
             wrapper.writeVarInt(effect.duration);
+        }
+
+        public PotionType getType() {
+            return this.type;
+        }
+
+        public void setType(PotionType type) {
+            this.type = type;
+        }
+
+        public int getDuration() {
+            return this.duration;
+        }
+
+        public void setDuration(int duration) {
+            this.duration = duration;
         }
     }
 }

@@ -26,8 +26,8 @@ import java.util.Optional;
 
 public class Filterable<T> {
 
-    private final T raw;
-    private final @Nullable T filtered;
+    private T raw;
+    private @Nullable T filtered;
 
     public Filterable(T raw) {
         this(raw, (T) null);
@@ -64,7 +64,15 @@ public class Filterable<T> {
         return this.raw;
     }
 
+    public void setRaw(T raw) {
+        this.raw = raw;
+    }
+
     public @Nullable T getFiltered() {
         return this.filtered;
+    }
+
+    public void setFiltered(@Nullable T filtered) {
+        this.filtered = filtered;
     }
 }

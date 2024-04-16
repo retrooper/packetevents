@@ -24,8 +24,8 @@ import java.util.List;
 
 public class ItemFireworks {
 
-    private final int flightDuration;
-    private final List<FireworkExplosion> explosions;
+    private int flightDuration;
+    private List<FireworkExplosion> explosions;
 
     public ItemFireworks(int flightDuration, List<FireworkExplosion> explosions) {
         this.flightDuration = flightDuration;
@@ -41,5 +41,25 @@ public class ItemFireworks {
     public static void write(PacketWrapper<?> wrapper, ItemFireworks fireworks) {
         wrapper.writeVarInt(fireworks.flightDuration);
         wrapper.writeList(fireworks.explosions, FireworkExplosion::write);
+    }
+
+    public int getFlightDuration() {
+        return this.flightDuration;
+    }
+
+    public void setFlightDuration(int flightDuration) {
+        this.flightDuration = flightDuration;
+    }
+
+    public void addExplosion(FireworkExplosion explosion) {
+        this.explosions.add(explosion);
+    }
+
+    public List<FireworkExplosion> getExplosions() {
+        return this.explosions;
+    }
+
+    public void setExplosions(List<FireworkExplosion> explosions) {
+        this.explosions = explosions;
     }
 }

@@ -28,9 +28,9 @@ import java.util.List;
 
 public class ItemPotionContents {
 
-    private final @Nullable Potion potion;
-    private final @Nullable Integer customColor;
-    private final List<PotionEffect> customEffects;
+    private @Nullable Potion potion;
+    private @Nullable Integer customColor;
+    private List<PotionEffect> customEffects;
 
     public ItemPotionContents(
             @Nullable Potion potion,
@@ -53,5 +53,33 @@ public class ItemPotionContents {
         wrapper.writeOptional(contents.potion, PacketWrapper::writeMappedEntity);
         wrapper.writeOptional(contents.customColor, PacketWrapper::writeInt);
         wrapper.writeList(contents.customEffects, PotionEffect::write);
+    }
+
+    public @Nullable Potion getPotion() {
+        return this.potion;
+    }
+
+    public void setPotion(@Nullable Potion potion) {
+        this.potion = potion;
+    }
+
+    public @Nullable Integer getCustomColor() {
+        return this.customColor;
+    }
+
+    public void setCustomColor(@Nullable Integer customColor) {
+        this.customColor = customColor;
+    }
+
+    private void addCustomEffect(PotionEffect effect) {
+        this.customEffects.add(effect);
+    }
+
+    public List<PotionEffect> getCustomEffects() {
+        return this.customEffects;
+    }
+
+    public void setCustomEffects(List<PotionEffect> customEffects) {
+        this.customEffects = customEffects;
     }
 }

@@ -30,10 +30,10 @@ import java.util.Queue;
 
 public class PotDecorations {
 
-    private final @Nullable ItemType back;
-    private final @Nullable ItemType left;
-    private final @Nullable ItemType right;
-    private final @Nullable ItemType front;
+    private @Nullable ItemType back;
+    private @Nullable ItemType left;
+    private @Nullable ItemType right;
+    private @Nullable ItemType front;
 
     private PotDecorations(Queue<ItemType> items) {
         this(items.poll(), items.poll(), items.poll(), items.poll());
@@ -72,5 +72,37 @@ public class PotDecorations {
 
     public static void write(PacketWrapper<?> wrapper, PotDecorations decorations) {
         wrapper.writeList(decorations.asList(), PotDecorations::writeItem);
+    }
+
+    public @Nullable ItemType getBack() {
+        return this.back;
+    }
+
+    public void setBack(@Nullable ItemType back) {
+        this.back = back;
+    }
+
+    public @Nullable ItemType getLeft() {
+        return this.left;
+    }
+
+    public void setLeft(@Nullable ItemType left) {
+        this.left = left;
+    }
+
+    public @Nullable ItemType getRight() {
+        return this.right;
+    }
+
+    public void setRight(@Nullable ItemType right) {
+        this.right = right;
+    }
+
+    public @Nullable ItemType getFront() {
+        return this.front;
+    }
+
+    public void setFront(@Nullable ItemType front) {
+        this.front = front;
     }
 }

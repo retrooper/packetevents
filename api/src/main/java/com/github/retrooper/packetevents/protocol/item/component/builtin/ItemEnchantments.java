@@ -28,8 +28,8 @@ import java.util.Map;
 
 public class ItemEnchantments {
 
-    private final Map<EnchantmentType, Integer> enchantments;
-    private final boolean showInTooltip;
+    private Map<EnchantmentType, Integer> enchantments;
+    private boolean showInTooltip;
 
     public ItemEnchantments(Map<EnchantmentType, Integer> enchantments, boolean showInTooltip) {
         this.enchantments = Collections.unmodifiableMap(enchantments);
@@ -55,11 +55,31 @@ public class ItemEnchantments {
         wrapper.writeBoolean(enchantments.isShowInTooltip());
     }
 
+    public int getEnchantmentLevel(EnchantmentType enchantment) {
+        return this.enchantments.getOrDefault(enchantment, 0);
+    }
+
+    public void setEnchantmentLevel(EnchantmentType enchantment, int level) {
+        if (level == 0) {
+            this.enchantments.remove(enchantment);
+        } else {
+            this.enchantments.put(enchantment, level);
+        }
+    }
+
     public Map<EnchantmentType, Integer> getEnchantments() {
         return this.enchantments;
     }
 
+    public void setEnchantments(Map<EnchantmentType, Integer> enchantments) {
+        this.enchantments = enchantments;
+    }
+
     public boolean isShowInTooltip() {
         return this.showInTooltip;
+    }
+
+    public void setShowInTooltip(boolean showInTooltip) {
+        this.showInTooltip = showInTooltip;
     }
 }

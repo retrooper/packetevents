@@ -22,8 +22,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class ItemDyeColor {
 
-    private final int rgb;
-    private final boolean showInTooltip;
+    private int rgb;
+    private boolean showInTooltip;
 
     public ItemDyeColor(int rgb, boolean showInTooltip) {
         this.rgb = rgb;
@@ -39,5 +39,21 @@ public class ItemDyeColor {
     public static void write(PacketWrapper<?> wrapper, ItemDyeColor color) {
         wrapper.writeInt(color.rgb);
         wrapper.writeBoolean(color.showInTooltip);
+    }
+
+    public int getRgb() {
+        return this.rgb;
+    }
+
+    public void setRgb(int rgb) {
+        this.rgb = rgb;
+    }
+
+    public boolean isShowInTooltip() {
+        return this.showInTooltip;
+    }
+
+    public void setShowInTooltip(boolean showInTooltip) {
+        this.showInTooltip = showInTooltip;
     }
 }

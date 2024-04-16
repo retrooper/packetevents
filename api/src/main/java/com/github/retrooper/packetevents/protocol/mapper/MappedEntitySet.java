@@ -30,14 +30,22 @@ import java.util.function.BiFunction;
 /**
  * Either a key to a specific tag or a list of possible entities.
  */
-public class MappedEntitySet {
+public class MappedEntitySet<T> {
 
     private final @Nullable ResourceLocation tagKey;
-    private final @Nullable List<MappedEntity> entities;
+    private final @Nullable List<T> entities;
+
+    public MappedEntitySet(ResourceLocation tagKey) {
+        this(tagKey, null);
+    }
+
+    public MappedEntitySet(List<T> entities) {
+        this(null, entities);
+    }
 
     public MappedEntitySet(
             @Nullable ResourceLocation tagKey,
-            @Nullable List<MappedEntity> entities
+            @Nullable List<T> entities
     ) {
         if (tagKey == null && entities == null) {
             throw new IllegalArgumentException("Illegal generic holder set: either tag key or holder ids have to be set");
@@ -46,20 +54,20 @@ public class MappedEntitySet {
         this.entities = entities;
     }
 
-    public static <Z extends MappedEntity> MappedEntitySet read(
+    public static <Z extends MappedEntity> MappedEntitySet<Z> read(
             PacketWrapper<?> wrapper, BiFunction<ClientVersion, Integer, Z> getter) {
         int count = wrapper.readVarInt() - 1;
         if (count == -1) {
-            return new MappedEntitySet(wrapper.readIdentifier(), null);
+            return new MappedEntitySet<>(wrapper.readIdentifier(), null);
         }
-        List<MappedEntity> entities = new ArrayList<>(Math.min(count, 65536));
+        List<Z> entities = new ArrayList<>(Math.min(count, 65536));
         for (int i = 0; i < count; i++) {
             entities.add(wrapper.readMappedEntity(getter));
         }
-        return new MappedEntitySet(null, entities);
+        return new MappedEntitySet<>(null, entities);
     }
 
-    public static void write(PacketWrapper<?> wrapper, MappedEntitySet set) {
+    public static <Z extends MappedEntity> void write(PacketWrapper<?> wrapper, MappedEntitySet<Z> set) {
         if (set.tagKey != null) {
             wrapper.writeByte(0);
             wrapper.writeIdentifier(set.tagKey);
@@ -68,7 +76,7 @@ public class MappedEntitySet {
 
         assert set.entities != null; // can't be null, verified in ctor
         wrapper.writeVarInt(set.entities.size() + 1);
-        for (MappedEntity entity : set.entities) {
+        for (Z entity : set.entities) {
             wrapper.writeMappedEntity(entity);
         }
     }

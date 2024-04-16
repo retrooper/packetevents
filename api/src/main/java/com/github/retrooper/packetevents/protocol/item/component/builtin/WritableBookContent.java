@@ -20,12 +20,13 @@ package com.github.retrooper.packetevents.protocol.item.component.builtin;
 
 import com.github.retrooper.packetevents.util.Filterable;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class WritableBookContent {
 
-    private final List<Filterable<String>> pages;
+    private List<Filterable<String>> pages;
 
     public WritableBookContent(List<Filterable<String>> pages) {
         this.pages = pages;
@@ -40,5 +41,21 @@ public class WritableBookContent {
     public static void write(PacketWrapper<?> wrapper, WritableBookContent content) {
         wrapper.writeList(content.pages, (ew, page) -> Filterable.write(
                 ew, page, (eew, text) -> eew.writeString(text, 1024)));
+    }
+
+    public @Nullable Filterable<String> getPage(int index) {
+        return index >= 0 && index < this.pages.size() ? this.pages.get(index) : null;
+    }
+
+    public void addPage(Filterable<String> page) {
+        this.pages.add(page);
+    }
+
+    public List<Filterable<String>> getPages() {
+        return this.pages;
+    }
+
+    public void setPages(List<Filterable<String>> pages) {
+        this.pages = pages;
     }
 }

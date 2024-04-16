@@ -21,16 +21,17 @@ package com.github.retrooper.packetevents.protocol.item.component.builtin;
 import com.github.retrooper.packetevents.util.Filterable;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class WrittenBookContent {
 
-    private final Filterable<String> title;
-    private final String author;
-    private final int generation;
-    private final List<Filterable<Component>> pages;
-    private final boolean resolved;
+    private Filterable<String> title;
+    private String author;
+    private int generation;
+    private List<Filterable<Component>> pages;
+    private boolean resolved;
 
     public WrittenBookContent(
             Filterable<String> title, String author, int generation,
@@ -60,5 +61,53 @@ public class WrittenBookContent {
         wrapper.writeList(content.pages, (ew, page) -> Filterable.write(
                 ew, page, PacketWrapper::writeComponent));
         wrapper.writeBoolean(content.resolved);
+    }
+
+    public Filterable<String> getTitle() {
+        return this.title;
+    }
+
+    public void setTitle(Filterable<String> title) {
+        this.title = title;
+    }
+
+    public String getAuthor() {
+        return this.author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public int getGeneration() {
+        return this.generation;
+    }
+
+    public void setGeneration(int generation) {
+        this.generation = generation;
+    }
+
+    public @Nullable Filterable<Component> getPage(int index) {
+        return index >= 0 && index < this.pages.size() ? this.pages.get(index) : null;
+    }
+
+    public void addPage(Filterable<Component> page) {
+        this.pages.add(page);
+    }
+
+    public List<Filterable<Component>> getPages() {
+        return this.pages;
+    }
+
+    public void setPages(List<Filterable<Component>> pages) {
+        this.pages = pages;
+    }
+
+    public boolean isResolved() {
+        return this.resolved;
+    }
+
+    public void setResolved(boolean resolved) {
+        this.resolved = resolved;
     }
 }

@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.item.component.builtin;
 
 import com.github.retrooper.packetevents.protocol.mapper.GenericMappedEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,9 +28,9 @@ import java.util.List;
 
 public class ItemTool {
 
-    private final List<Rule> rules;
-    private final float defaultMiningSpeed;
-    private final int damagePerBlock;
+    private List<Rule> rules;
+    private float defaultMiningSpeed;
+    private int damagePerBlock;
 
     public ItemTool(List<Rule> rules, float defaultMiningSpeed, int damagePerBlock) {
         this.rules = rules;
@@ -50,20 +51,48 @@ public class ItemTool {
         wrapper.writeVarInt(tool.damagePerBlock);
     }
 
+    public void addRule(Rule rule) {
+        this.rules.add(rule);
+    }
+
+    public List<Rule> getRules() {
+        return this.rules;
+    }
+
+    public void setRules(List<Rule> rules) {
+        this.rules = rules;
+    }
+
+    public float getDefaultMiningSpeed() {
+        return this.defaultMiningSpeed;
+    }
+
+    public void setDefaultMiningSpeed(float defaultMiningSpeed) {
+        this.defaultMiningSpeed = defaultMiningSpeed;
+    }
+
+    public int getDamagePerBlock() {
+        return this.damagePerBlock;
+    }
+
+    public void setDamagePerBlock(int damagePerBlock) {
+        this.damagePerBlock = damagePerBlock;
+    }
+
     public static class Rule {
 
-        private final MappedEntitySet blocks;
-        private final @Nullable Float speed;
-        private final @Nullable Boolean correctForDrops;
+        private MappedEntitySet<StateType> blocks;
+        private @Nullable Float speed;
+        private @Nullable Boolean correctForDrops;
 
-        public Rule(MappedEntitySet blocks, @Nullable Float speed, @Nullable Boolean correctForDrops) {
+        public Rule(MappedEntitySet<StateType> blocks, @Nullable Float speed, @Nullable Boolean correctForDrops) {
             this.blocks = blocks;
             this.speed = speed;
             this.correctForDrops = correctForDrops;
         }
 
-        public static Rule read(PacketWrapper<?> wrapper) {
-            MappedEntitySet blocks = MappedEntitySet.read(wrapper, GenericMappedEntity::getById);
+        public static Rule read(PacketWrapper<?> wrapper) { // TODO - implement registry for StateTypes
+            MappedEntitySet<StateType> blocks = MappedEntitySet.read(wrapper, GenericMappedEntity::getById);
             Float speed = wrapper.readOptional(PacketWrapper::readFloat);
             Boolean correctForDrops = wrapper.readOptional(PacketWrapper::readBoolean);
             return new Rule(blocks, speed, correctForDrops);
@@ -73,6 +102,30 @@ public class ItemTool {
             MappedEntitySet.write(wrapper, rule.blocks);
             wrapper.writeOptional(rule.speed, PacketWrapper::writeFloat);
             wrapper.writeOptional(rule.correctForDrops, PacketWrapper::writeBoolean);
+        }
+
+        public MappedEntitySet<StateType> getBlocks() {
+            return this.blocks;
+        }
+
+        public void setBlocks(MappedEntitySet<StateType> blocks) {
+            this.blocks = blocks;
+        }
+
+        public @Nullable Float getSpeed() {
+            return this.speed;
+        }
+
+        public void setSpeed(@Nullable Float speed) {
+            this.speed = speed;
+        }
+
+        public @Nullable Boolean getCorrectForDrops() {
+            return this.correctForDrops;
+        }
+
+        public void setCorrectForDrops(@Nullable Boolean correctForDrops) {
+            this.correctForDrops = correctForDrops;
         }
     }
 }

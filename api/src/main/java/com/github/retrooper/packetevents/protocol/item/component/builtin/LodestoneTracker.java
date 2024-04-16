@@ -24,8 +24,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class LodestoneTracker {
 
-    private final @Nullable WorldBlockPosition target;
-    private final boolean tracked;
+    private @Nullable WorldBlockPosition target;
+    private boolean tracked;
 
     public LodestoneTracker(@Nullable WorldBlockPosition target, boolean tracked) {
         this.target = target;
@@ -41,5 +41,21 @@ public class LodestoneTracker {
     public static void write(PacketWrapper<?> wrapper, LodestoneTracker tracker) {
         wrapper.writeOptional(tracker.target, PacketWrapper::writeWorldBlockPosition);
         wrapper.writeBoolean(tracker.tracked);
+    }
+
+    public @Nullable WorldBlockPosition getTarget() {
+        return this.target;
+    }
+
+    public void setTarget(@Nullable WorldBlockPosition target) {
+        this.target = target;
+    }
+
+    public boolean isTracked() {
+        return this.tracked;
+    }
+
+    public void setTracked(boolean tracked) {
+        this.tracked = tracked;
     }
 }
