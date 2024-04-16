@@ -28,6 +28,14 @@ import java.util.Map;
 
 public class ItemEnchantments {
 
+    public static final ItemEnchantments EMPTY = new ItemEnchantments(
+            Collections.emptyMap(), false) {
+        @Override
+        public void setShowInTooltip(boolean showInTooltip) {
+            throw new UnsupportedOperationException();
+        }
+    };
+
     private Map<EnchantmentType, Integer> enchantments;
     private boolean showInTooltip;
 

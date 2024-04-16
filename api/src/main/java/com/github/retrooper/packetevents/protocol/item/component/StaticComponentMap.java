@@ -18,6 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.item.component;
 
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemAttributeModifiers;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemEnchantments;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemLore;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemRarity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -28,6 +32,14 @@ import java.util.Optional;
 public class StaticComponentMap implements IComponentMap {
 
     public static final StaticComponentMap EMPTY = new StaticComponentMap(Collections.emptyMap());
+    public static final StaticComponentMap SHARED_ITEM_COMPONENTS = builder()
+            .set(ComponentTypes.MAX_STACK_SIZE, 64)
+            .set(ComponentTypes.LORE, ItemLore.EMPTY)
+            .set(ComponentTypes.ENCHANTMENTS, ItemEnchantments.EMPTY)
+            .set(ComponentTypes.REPAIR_COST, 0)
+            .set(ComponentTypes.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY)
+            .set(ComponentTypes.RARITY, ItemRarity.COMMON)
+            .build();
 
     private final boolean empty;
     private final Map<ComponentType<?>, ?> delegate;
@@ -36,6 +48,10 @@ public class StaticComponentMap implements IComponentMap {
         this.empty = delegate.isEmpty();
         this.delegate = this.empty ? Collections.emptyMap()
                 : Collections.unmodifiableMap(new HashMap<>(delegate));
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     @Override
@@ -56,5 +72,30 @@ public class StaticComponentMap implements IComponentMap {
 
     public Map<ComponentType<?>, ?> getDelegate() {
         return this.delegate;
+    }
+
+    public static class Builder {
+
+        private final Map<ComponentType<?>, Object> map = new HashMap<>();
+
+        public Builder() {
+        }
+
+        public StaticComponentMap build() {
+            return new StaticComponentMap(this.map);
+        }
+
+        public <T> Builder set(ComponentType<T> type, Optional<T> value) {
+            return this.set(type, value.orElse(null));
+        }
+
+        public <T> Builder set(ComponentType<T> type, @Nullable T value) {
+            if (value == null) {
+                this.map.remove(type);
+            } else {
+                this.map.put(type, value);
+            }
+            return this;
+        }
     }
 }

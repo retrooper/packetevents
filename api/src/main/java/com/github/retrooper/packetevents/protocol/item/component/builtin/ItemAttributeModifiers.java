@@ -23,10 +23,19 @@ import com.github.retrooper.packetevents.protocol.attribute.AttributeOperation;
 import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class ItemAttributeModifiers {
+
+    public static final ItemAttributeModifiers EMPTY = new ItemAttributeModifiers(
+            Collections.emptyList(), true) {
+        @Override
+        public void setShowInTooltip(boolean showInTooltip) {
+            throw new UnsupportedOperationException();
+        }
+    };
 
     private List<ModifierEntry> modifiers;
     private boolean showInTooltip;
