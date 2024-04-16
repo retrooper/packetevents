@@ -29,7 +29,7 @@ import java.util.Map;
 public class ItemEnchantments {
 
     public static final ItemEnchantments EMPTY = new ItemEnchantments(
-            Collections.emptyMap(), false) {
+            Collections.emptyMap(), true) {
         @Override
         public void setShowInTooltip(boolean showInTooltip) {
             throw new UnsupportedOperationException();

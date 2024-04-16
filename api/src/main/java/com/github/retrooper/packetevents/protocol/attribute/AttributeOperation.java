@@ -17,7 +17,6 @@
  */
 
 package com.github.retrooper.packetevents.protocol.attribute;
-// Created by booky10 in packetevents (12:55 16.04.2024.)
 
 public enum AttributeOperation {
     ADDITION,
