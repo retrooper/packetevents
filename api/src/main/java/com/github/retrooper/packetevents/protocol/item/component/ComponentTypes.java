@@ -33,6 +33,7 @@ import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemCon
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemDyeColor;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemEnchantments;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemFireworks;
+import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemLore;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemMapPostProcessingState;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemPotionContents;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemProfile;
@@ -55,7 +56,6 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -142,10 +142,8 @@ public class ComponentTypes {
             PacketWrapper::readComponent, PacketWrapper::writeComponent);
     public static final ComponentType<Component> ITEM_NAME = define("item_name",
             PacketWrapper::readComponent, PacketWrapper::writeComponent);
-    public static final ComponentType<List<Component>> LORE = define("lore",
-            wrapper -> wrapper.readList(PacketWrapper::readComponent),
-            (wrapper, lines) -> wrapper.writeList(lines, PacketWrapper::writeComponent)
-    );
+    public static final ComponentType<ItemLore> LORE = define("lore",
+            ItemLore::read, ItemLore::write);
     public static final ComponentType<ItemRarity> RARITY = define("rarity",
             wrapper -> wrapper.readEnum(ItemRarity.values()), PacketWrapper::writeEnum);
     public static final ComponentType<ItemEnchantments> ENCHANTMENTS = define("enchantments",
