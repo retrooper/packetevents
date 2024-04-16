@@ -70,8 +70,16 @@ public class StaticComponentMap implements IComponentMap {
         throw new UnsupportedOperationException();
     }
 
+    public StaticComponentMap merge(StaticComponentMap prioritizedMap) {
+        return builder().setAll(this).setAll(prioritizedMap).build();
+    }
+
     public Map<ComponentType<?>, ?> getDelegate() {
         return this.delegate;
+    }
+
+    public boolean isEmpty() {
+        return this.empty;
     }
 
     public static class Builder {
@@ -83,6 +91,18 @@ public class StaticComponentMap implements IComponentMap {
 
         public StaticComponentMap build() {
             return new StaticComponentMap(this.map);
+        }
+
+        public Builder setAll(StaticComponentMap map) {
+            return this.setAll(map.getDelegate());
+        }
+
+        @SuppressWarnings("unchecked")
+        public Builder setAll(Map<ComponentType<?>, ?> map) {
+            for (Map.Entry<ComponentType<?>, ?> entry : map.entrySet()) {
+                this.set((ComponentType<Object>) entry.getKey(), entry.getValue());
+            }
+            return this;
         }
 
         public <T> Builder set(ComponentType<T> type, Optional<T> value) {

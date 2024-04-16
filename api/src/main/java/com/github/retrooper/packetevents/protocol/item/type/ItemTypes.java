@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.item.type;
 
 import com.github.retrooper.packetevents.protocol.item.component.ComponentType;
+import com.github.retrooper.packetevents.protocol.item.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.item.component.StaticComponentMap;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
@@ -1453,18 +1454,26 @@ public class ItemTypes {
     }
 
     public static ItemType define(int maxAmount, String key, ItemType craftRemainder, StateType placedType, int maxDurability, List<ItemAttribute> attributesArr) {
-        return define(maxAmount, key, craftRemainder, placedType, maxDurability, attributesArr, Collections.emptyMap());
+        return define(maxAmount, key, craftRemainder, placedType, maxDurability, attributesArr, StaticComponentMap.EMPTY);
     }
 
-    public static ItemType define(int maxAmount, String key, ItemType craftRemainder, StateType placedType, int maxDurability, List<ItemAttribute> attributesArr, Map<ComponentType<?>, ?> componentMap) {
+    public static ItemType define(
+            int maxAmount, String key, ItemType craftRemainder, StateType placedType,
+            int maxDurability, List<ItemAttribute> attributesArr, StaticComponentMap componentMap
+    ) {
         // Creates an immutable set
         Set<ItemAttribute> attributes = attributesArr == null ? Collections.emptySet() :
                 Collections.unmodifiableSet(new HashSet<>(attributesArr));
 
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        StaticComponentMap components = componentMap == null ? StaticComponentMap.EMPTY
-                : new StaticComponentMap(componentMap);
+        // build static item type components
+        StaticComponentMap.Builder mapBuilder = StaticComponentMap.builder()
+                .setAll(StaticComponentMap.SHARED_ITEM_COMPONENTS);
+        if (componentMap != null && !componentMap.isEmpty()) {
+            mapBuilder.setAll(componentMap);
+        }
+        StaticComponentMap components = mapBuilder.build();
 
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         ItemType type = new ItemType() {
             private final int[] ids = data.getData();
 
@@ -1528,12 +1537,7 @@ public class ItemTypes {
                 return false;
             }
         };
-        ITEM_TYPE_MAP.put(type.getName().getKey(), type);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, ItemType> typeIdMap = ITEM_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
-            typeIdMap.put(type.getId(version), type);
-        }
+        TYPES_BUILDER.register(ITEM_TYPE_MAP, ITEM_TYPE_ID_MAP, type);
         return type;
     }
 
@@ -1565,14 +1569,18 @@ public class ItemTypes {
         ItemType craftRemainder;
         int maxDurability;
         List<ItemAttribute> attributes;
-        Map<ComponentType<?>, ?> components;
+        StaticComponentMap.Builder components = StaticComponentMap.builder();
 
         public Builder(String key) {
             this.key = key;
         }
 
         public ItemType build() {
-            ItemType define = ItemTypes.define(maxAmount, key, craftRemainder, placedType, maxDurability, attributes, components);
+            ItemType define = ItemTypes.define(
+                    this.maxAmount, this.key, this.craftRemainder,
+                    this.placedType, this.maxDurability, this.attributes,
+                    this.components.build()
+            );
             if (placedType != null) {
                 HELD_TO_PLACED_MAP.put(placedType, define);
             }
@@ -1581,7 +1589,7 @@ public class ItemTypes {
 
         public Builder setMaxAmount(int maxAmount) {
             this.maxAmount = maxAmount;
-            return this;
+            return this.setComponent(ComponentTypes.MAX_STACK_SIZE, maxAmount);
         }
 
         public Builder setCraftRemainder(ItemType craftRemainder) {
@@ -1591,7 +1599,7 @@ public class ItemTypes {
 
         public Builder setMaxDurability(int maxDurability) {
             this.maxDurability = maxDurability;
-            return this;
+            return this.setComponent(ComponentTypes.MAX_DAMAGE, maxDurability);
         }
 
         public Builder setAttributes(ItemAttribute... attributes) {
@@ -1604,8 +1612,8 @@ public class ItemTypes {
             return this;
         }
 
-        public Builder setComponents(Map<ComponentType<?>, ?> components) {
-            this.components = components;
+        public <T> Builder setComponent(ComponentType<T> type, @Nullable T value) {
+            this.components.set(type, value);
             return this;
         }
     }
