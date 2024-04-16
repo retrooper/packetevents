@@ -43,7 +43,8 @@ import com.github.retrooper.packetevents.protocol.item.component.builtin.PotDeco
 import com.github.retrooper.packetevents.protocol.item.component.builtin.SuspiciousStewEffects;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.WritableBookContent;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.WrittenBookContent;
-import com.github.retrooper.packetevents.protocol.mapper.GenericMappedEntity;
+import com.github.retrooper.packetevents.protocol.item.instrument.Instrument;
+import com.github.retrooper.packetevents.protocol.item.instrument.Instruments;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -194,9 +195,8 @@ public class ComponentTypes {
             PacketWrapper::readNBT, PacketWrapper::writeNBT);
     public static final ComponentType<NBTCompound> BLOCK_ENTITY_DATA = define("block_entity_data",
             PacketWrapper::readNBT, PacketWrapper::writeNBT);
-    // TODO: GenericMappedEntity -> minecraft:instrument registry
-    public static final ComponentType<GenericMappedEntity> INSTRUMENT = define("instrument",
-            GenericMappedEntity::read, PacketWrapper::writeMappedEntity);
+    public static final ComponentType<Instrument> INSTRUMENT = define("instrument",
+            wrapper -> wrapper.readMappedEntity(Instruments::getById), PacketWrapper::writeMappedEntity);
     public static final ComponentType<Integer> OMINOUS_BOTTLE_AMPLIFIER = define("ominous_bottle_amplifier",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
     public static final ComponentType<Void> RECIPES = define("recipes"); // not synchronized
