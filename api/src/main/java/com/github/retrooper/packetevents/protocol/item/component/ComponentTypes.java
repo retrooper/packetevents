@@ -98,6 +98,14 @@ public class ComponentTypes {
                 int index = TYPES_BUILDER.getDataIndex(version);
                 return this.ids[index];
             }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (obj instanceof ComponentType<?>) {
+                    return getName().equals(((ComponentType<?>) obj).getName());
+                }
+                return false;
+            }
         };
 
         COMPONENT_TYPE_MAP.put(type.getName().toString(), type);

@@ -48,6 +48,14 @@ public class ArmorMaterials {
             public int getId(ClientVersion version) {
                 return TYPES_BUILDER.getDataIndex(version);
             }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (obj instanceof ArmorMaterial) {
+                    return getName().equals(((ArmorMaterial) obj).getName());
+                }
+                return false;
+            }
         };
         TYPES_BUILDER.register(MATERIAL_MAP, MATERIAL_ID_MAP, instrument);
         return instrument;

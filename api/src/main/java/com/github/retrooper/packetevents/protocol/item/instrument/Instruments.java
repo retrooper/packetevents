@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.item.instrument;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.TypesBuilder;
 import com.github.retrooper.packetevents.util.TypesBuilderData;
@@ -44,6 +45,14 @@ public class Instruments {
             @Override
             public int getId(ClientVersion version) {
                 return TYPES_BUILDER.getDataIndex(version);
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (obj instanceof Instrument) {
+                    return getName().equals(((Instrument) obj).getName());
+                }
+                return false;
             }
         };
         TYPES_BUILDER.register(INSTRUMENT_MAP, INSTRUMENT_ID_MAP, instrument);

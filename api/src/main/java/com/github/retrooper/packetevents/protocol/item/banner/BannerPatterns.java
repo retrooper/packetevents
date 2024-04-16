@@ -61,6 +61,14 @@ public class BannerPatterns {
             public int getId(ClientVersion version) {
                 return TYPES_BUILDER.getDataIndex(version);
             }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (obj instanceof BannerPattern) {
+                    return getName().equals(((BannerPattern) obj).getName());
+                }
+                return false;
+            }
         };
         TYPES_BUILDER.register(PATTERN_TYPE_MAP, PATTERN_TYPE_ID_MAP, pattern);
         return pattern;
