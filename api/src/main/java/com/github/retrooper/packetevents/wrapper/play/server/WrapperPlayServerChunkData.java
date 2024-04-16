@@ -402,6 +402,14 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         this.column = column;
     }
 
+    public LightData getLightData() {
+        return lightData;
+    }
+
+    public void setLightData(LightData lightData) {
+        this.lightData = lightData;
+    }
+
     public boolean isIgnoreOldData() {
         return ignoreOldData;
     }
