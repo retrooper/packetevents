@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ItemAttributeModifiers {
@@ -76,6 +77,20 @@ public class ItemAttributeModifiers {
         this.showInTooltip = showInTooltip;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemAttributeModifiers)) return false;
+        ItemAttributeModifiers that = (ItemAttributeModifiers) obj;
+        if (this.showInTooltip != that.showInTooltip) return false;
+        return this.modifiers.equals(that.modifiers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.modifiers, this.showInTooltip);
+    }
+
     public static class ModifierEntry {
 
         private Attribute attribute;
@@ -123,6 +138,21 @@ public class ItemAttributeModifiers {
 
         public void setSlotGroup(EquipmentSlotGroup slotGroup) {
             this.slotGroup = slotGroup;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof ModifierEntry)) return false;
+            ModifierEntry that = (ModifierEntry) obj;
+            if (!this.attribute.equals(that.attribute)) return false;
+            if (!this.modifier.equals(that.modifier)) return false;
+            return this.slotGroup == that.slotGroup;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.attribute, this.modifier, this.slotGroup);
         }
     }
 
@@ -185,6 +215,22 @@ public class ItemAttributeModifiers {
 
         public void setOperation(AttributeOperation operation) {
             this.operation = operation;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Modifier)) return false;
+            Modifier modifier = (Modifier) obj;
+            if (Double.compare(modifier.value, this.value) != 0) return false;
+            if (!this.id.equals(modifier.id)) return false;
+            if (!this.name.equals(modifier.name)) return false;
+            return this.operation == modifier.operation;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.id, this.name, this.value, this.operation);
         }
     }
 

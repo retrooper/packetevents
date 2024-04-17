@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class StaticSound implements Sound {
 
     private final ResourceLocation soundId;
@@ -55,5 +57,19 @@ public class StaticSound implements Sound {
     @Override
     public boolean isRegistered() {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticSound)) return false;
+        StaticSound that = (StaticSound) obj;
+        if (!this.soundId.equals(that.soundId)) return false;
+        return Objects.equals(this.range, that.range);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.soundId, this.range);
     }
 }

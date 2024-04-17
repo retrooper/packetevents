@@ -24,6 +24,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class WrittenBookContent {
 
@@ -109,5 +110,22 @@ public class WrittenBookContent {
 
     public void setResolved(boolean resolved) {
         this.resolved = resolved;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof WrittenBookContent)) return false;
+        WrittenBookContent that = (WrittenBookContent) obj;
+        if (this.generation != that.generation) return false;
+        if (this.resolved != that.resolved) return false;
+        if (!this.title.equals(that.title)) return false;
+        if (!this.author.equals(that.author)) return false;
+        return this.pages.equals(that.pages);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.title, this.author, this.generation, this.pages, this.resolved);
     }
 }

@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ItemTool {
 
@@ -79,6 +80,21 @@ public class ItemTool {
         this.damagePerBlock = damagePerBlock;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemTool)) return false;
+        ItemTool itemTool = (ItemTool) obj;
+        if (Float.compare(itemTool.defaultMiningSpeed, this.defaultMiningSpeed) != 0) return false;
+        if (this.damagePerBlock != itemTool.damagePerBlock) return false;
+        return this.rules.equals(itemTool.rules);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.rules, this.defaultMiningSpeed, this.damagePerBlock);
+    }
+
     public static class Rule {
 
         private MappedEntitySet<StateType.Mapped> blocks;
@@ -130,6 +146,21 @@ public class ItemTool {
 
         public void setCorrectForDrops(@Nullable Boolean correctForDrops) {
             this.correctForDrops = correctForDrops;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Rule)) return false;
+            Rule rule = (Rule) obj;
+            if (!this.blocks.equals(rule.blocks)) return false;
+            if (!Objects.equals(this.speed, rule.speed)) return false;
+            return Objects.equals(this.correctForDrops, rule.correctForDrops);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.blocks, this.speed, this.correctForDrops);
         }
     }
 }

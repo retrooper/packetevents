@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SuspiciousStewEffects {
 
@@ -51,6 +52,19 @@ public class SuspiciousStewEffects {
 
     public void setEffects(List<EffectEntry> effects) {
         this.effects = effects;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof SuspiciousStewEffects)) return false;
+        SuspiciousStewEffects that = (SuspiciousStewEffects) obj;
+        return this.effects.equals(that.effects);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.effects);
     }
 
     public static class EffectEntry {
@@ -88,6 +102,20 @@ public class SuspiciousStewEffects {
 
         public void setDuration(int duration) {
             this.duration = duration;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof EffectEntry)) return false;
+            EffectEntry that = (EffectEntry) obj;
+            if (this.duration != that.duration) return false;
+            return this.type.equals(that.type);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.type, this.duration);
         }
     }
 }

@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ItemBees {
 
@@ -50,6 +51,19 @@ public class ItemBees {
 
     public void setBees(List<BeeEntry> bees) {
         this.bees = bees;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemBees)) return false;
+        ItemBees itemBees = (ItemBees) obj;
+        return this.bees.equals(itemBees.bees);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.bees);
     }
 
     public static class BeeEntry {
@@ -99,6 +113,21 @@ public class ItemBees {
 
         public void setMinTicksInHive(int minTicksInHive) {
             this.minTicksInHive = minTicksInHive;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof BeeEntry)) return false;
+            BeeEntry beeEntry = (BeeEntry) obj;
+            if (this.ticksInHive != beeEntry.ticksInHive) return false;
+            if (this.minTicksInHive != beeEntry.minTicksInHive) return false;
+            return this.entityData.equals(beeEntry.entityData);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.entityData, this.ticksInHive, this.minTicksInHive);
         }
     }
 }

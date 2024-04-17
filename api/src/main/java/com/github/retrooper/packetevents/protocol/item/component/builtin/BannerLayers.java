@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.List;
+import java.util.Objects;
 
 public class BannerLayers {
 
@@ -52,6 +53,19 @@ public class BannerLayers {
 
     public void setLayers(List<Layer> layers) {
         this.layers = layers;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof BannerLayers)) return false;
+        BannerLayers that = (BannerLayers) obj;
+        return this.layers.equals(that.layers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.layers);
     }
 
     public static class Layer {
@@ -90,6 +104,20 @@ public class BannerLayers {
 
         public void setColor(DyeColor color) {
             this.color = color;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Layer)) return false;
+            Layer layer = (Layer) obj;
+            if (!this.pattern.equals(layer.pattern)) return false;
+            return this.color == layer.color;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.pattern, this.color);
         }
     }
 }

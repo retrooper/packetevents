@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.protocol.potion.PotionEffect;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.List;
+import java.util.Objects;
 
 public class FoodProperties {
 
@@ -100,6 +101,23 @@ public class FoodProperties {
         this.effects = effects;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof FoodProperties)) return false;
+        FoodProperties that = (FoodProperties) obj;
+        if (this.nutrition != that.nutrition) return false;
+        if (Float.compare(that.saturation, this.saturation) != 0) return false;
+        if (this.canAlwaysEat != that.canAlwaysEat) return false;
+        if (Float.compare(that.eatSeconds, this.eatSeconds) != 0) return false;
+        return this.effects.equals(that.effects);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.nutrition, this.saturation, this.canAlwaysEat, this.eatSeconds, this.effects);
+    }
+
     public static class PossibleEffect {
 
         private PotionEffect effect;
@@ -135,6 +153,20 @@ public class FoodProperties {
 
         public void setProbability(float probability) {
             this.probability = probability;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof PossibleEffect)) return false;
+            PossibleEffect that = (PossibleEffect) obj;
+            if (Float.compare(that.probability, this.probability) != 0) return false;
+            return this.effect.equals(that.effect);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.effect, this.probability);
         }
     }
 }

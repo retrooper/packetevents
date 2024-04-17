@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 
+import java.util.Objects;
+
 public class StaticInstrument implements Instrument {
 
     private final Sound sound;
@@ -62,5 +64,20 @@ public class StaticInstrument implements Instrument {
     @Override
     public boolean isRegistered() {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticInstrument)) return false;
+        StaticInstrument that = (StaticInstrument) obj;
+        if (this.useDuration != that.useDuration) return false;
+        if (Float.compare(that.range, this.range) != 0) return false;
+        return this.sound.equals(that.sound);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.sound, this.useDuration, this.range);
     }
 }

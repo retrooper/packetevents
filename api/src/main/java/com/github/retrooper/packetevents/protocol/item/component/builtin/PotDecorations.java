@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 
 public class PotDecorations {
@@ -104,5 +105,21 @@ public class PotDecorations {
 
     public void setFront(@Nullable ItemType front) {
         this.front = front;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof PotDecorations)) return false;
+        PotDecorations that = (PotDecorations) obj;
+        if (!Objects.equals(this.back, that.back)) return false;
+        if (!Objects.equals(this.left, that.left)) return false;
+        if (!Objects.equals(this.right, that.right)) return false;
+        return Objects.equals(this.front, that.front);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.back, this.left, this.right, this.front);
     }
 }

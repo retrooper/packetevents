@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 public class ItemEnchantments {
 
@@ -89,5 +90,19 @@ public class ItemEnchantments {
 
     public void setShowInTooltip(boolean showInTooltip) {
         this.showInTooltip = showInTooltip;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemEnchantments)) return false;
+        ItemEnchantments that = (ItemEnchantments) obj;
+        if (this.showInTooltip != that.showInTooltip) return false;
+        return this.enchantments.equals(that.enchantments);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.enchantments, this.showInTooltip);
     }
 }

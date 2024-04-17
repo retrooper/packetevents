@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class LodestoneTracker {
 
     private @Nullable WorldBlockPosition target;
@@ -57,5 +59,19 @@ public class LodestoneTracker {
 
     public void setTracked(boolean tracked) {
         this.tracked = tracked;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof LodestoneTracker)) return false;
+        LodestoneTracker that = (LodestoneTracker) obj;
+        if (this.tracked != that.tracked) return false;
+        return Objects.equals(this.target, that.target);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.target, this.tracked);
     }
 }

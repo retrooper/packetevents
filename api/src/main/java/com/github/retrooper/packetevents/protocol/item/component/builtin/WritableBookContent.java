@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class WritableBookContent {
 
@@ -57,5 +58,18 @@ public class WritableBookContent {
 
     public void setPages(List<Filterable<String>> pages) {
         this.pages = pages;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof WritableBookContent)) return false;
+        WritableBookContent that = (WritableBookContent) obj;
+        return this.pages.equals(that.pages);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.pages);
     }
 }

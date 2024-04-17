@@ -28,6 +28,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class ArmorTrim {
 
@@ -76,6 +77,21 @@ public class ArmorTrim {
 
     public void setShowInTooltip(boolean showInTooltip) {
         this.showInTooltip = showInTooltip;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ArmorTrim)) return false;
+        ArmorTrim armorTrim = (ArmorTrim) obj;
+        if (this.showInTooltip != armorTrim.showInTooltip) return false;
+        if (!this.material.equals(armorTrim.material)) return false;
+        return this.pattern.equals(armorTrim.pattern);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.material, this.pattern, this.showInTooltip);
     }
 
     public static class Material {
@@ -168,6 +184,23 @@ public class ArmorTrim {
         public void setDescription(Component description) {
             this.description = description;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Material)) return false;
+            Material material = (Material) obj;
+            if (Float.compare(material.itemModelIndex, this.itemModelIndex) != 0) return false;
+            if (!this.assetName.equals(material.assetName)) return false;
+            if (!this.ingredient.equals(material.ingredient)) return false;
+            if (!this.overrideArmorMaterials.equals(material.overrideArmorMaterials)) return false;
+            return this.description.equals(material.description);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.assetName, this.ingredient, this.itemModelIndex, this.overrideArmorMaterials, this.description);
+        }
     }
 
     public static class Pattern {
@@ -232,6 +265,22 @@ public class ArmorTrim {
 
         public void setDecal(boolean decal) {
             this.decal = decal;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Pattern)) return false;
+            Pattern pattern = (Pattern) obj;
+            if (this.decal != pattern.decal) return false;
+            if (!this.assetId.equals(pattern.assetId)) return false;
+            if (!this.templateItem.equals(pattern.templateItem)) return false;
+            return this.description.equals(pattern.description);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.assetId, this.templateItem, this.description, this.decal);
         }
     }
 }

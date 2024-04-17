@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ItemProfile {
@@ -30,7 +31,11 @@ public class ItemProfile {
     private @Nullable UUID id;
     private List<Property> properties;
 
-    public ItemProfile(@Nullable String name, @Nullable UUID id, List<Property> properties) {
+    public ItemProfile(
+            @Nullable String name,
+            @Nullable UUID id,
+            List<Property> properties
+    ) {
         this.name = name;
         this.id = id;
         this.properties = properties;
@@ -75,6 +80,21 @@ public class ItemProfile {
 
     public void setProperties(List<Property> properties) {
         this.properties = properties;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemProfile)) return false;
+        ItemProfile that = (ItemProfile) obj;
+        if (!Objects.equals(this.name, that.name)) return false;
+        if (!Objects.equals(this.id, that.id)) return false;
+        return this.properties.equals(that.properties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.name, this.id, this.properties);
     }
 
     public static class Property {
@@ -125,6 +145,21 @@ public class ItemProfile {
 
         public void setSignature(@Nullable String signature) {
             this.signature = signature;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Property)) return false;
+            Property property = (Property) obj;
+            if (!this.name.equals(property.name)) return false;
+            if (!this.value.equals(property.value)) return false;
+            return Objects.equals(this.signature, property.signature);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.name, this.value, this.signature);
         }
     }
 }

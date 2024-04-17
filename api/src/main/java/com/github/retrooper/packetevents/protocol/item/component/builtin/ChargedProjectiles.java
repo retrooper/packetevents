@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ChargedProjectiles {
 
@@ -50,5 +51,18 @@ public class ChargedProjectiles {
 
     public void setItems(List<ItemStack> items) {
         this.items = items;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ChargedProjectiles)) return false;
+        ChargedProjectiles that = (ChargedProjectiles) obj;
+        return this.items.equals(that.items);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.items);
     }
 }

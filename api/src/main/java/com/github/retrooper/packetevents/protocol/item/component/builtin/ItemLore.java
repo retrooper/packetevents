@@ -23,6 +23,7 @@ import net.kyori.adventure.text.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class ItemLore {
 
@@ -53,5 +54,18 @@ public class ItemLore {
 
     public void setLines(List<Component> lines) {
         this.lines = lines;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemLore)) return false;
+        ItemLore itemLore = (ItemLore) obj;
+        return this.lines.equals(itemLore.lines);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lines);
     }
 }

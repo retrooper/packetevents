@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.item.component.builtin;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.List;
+import java.util.Objects;
 
 public class FireworkExplosion {
 
@@ -104,6 +105,23 @@ public class FireworkExplosion {
 
     public void setHasTwinkle(boolean hasTwinkle) {
         this.hasTwinkle = hasTwinkle;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof FireworkExplosion)) return false;
+        FireworkExplosion that = (FireworkExplosion) obj;
+        if (this.hasTrail != that.hasTrail) return false;
+        if (this.hasTwinkle != that.hasTwinkle) return false;
+        if (this.shape != that.shape) return false;
+        if (!this.colors.equals(that.colors)) return false;
+        return this.fadeColors.equals(that.fadeColors);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.shape, this.colors, this.fadeColors, this.hasTrail, this.hasTwinkle);
     }
 
     public enum Shape {

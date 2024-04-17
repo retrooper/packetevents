@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.protocol.item.component.builtin;
 
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.Objects;
+
 public class ItemDyeColor {
 
     private int rgb;
@@ -55,5 +57,19 @@ public class ItemDyeColor {
 
     public void setShowInTooltip(boolean showInTooltip) {
         this.showInTooltip = showInTooltip;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemDyeColor)) return false;
+        ItemDyeColor that = (ItemDyeColor) obj;
+        if (this.rgb != that.rgb) return false;
+        return this.showInTooltip == that.showInTooltip;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.rgb, this.showInTooltip);
     }
 }

@@ -22,6 +22,7 @@ package com.github.retrooper.packetevents.util;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class Filterable<T> {
@@ -74,5 +75,19 @@ public class Filterable<T> {
 
     public void setFiltered(@Nullable T filtered) {
         this.filtered = filtered;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Filterable)) return false;
+        Filterable<?> that = (Filterable<?>) obj;
+        if (!this.raw.equals(that.raw)) return false;
+        return Objects.equals(this.filtered, that.filtered);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.raw, this.filtered);
     }
 }

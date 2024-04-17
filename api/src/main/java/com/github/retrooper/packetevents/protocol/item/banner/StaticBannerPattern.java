@@ -21,6 +21,8 @@ package com.github.retrooper.packetevents.protocol.item.banner;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 
+import java.util.Objects;
+
 public class StaticBannerPattern implements BannerPattern {
 
     private final ResourceLocation assetId;
@@ -54,5 +56,19 @@ public class StaticBannerPattern implements BannerPattern {
     @Override
     public boolean isRegistered() {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticBannerPattern)) return false;
+        StaticBannerPattern that = (StaticBannerPattern) obj;
+        if (!this.assetId.equals(that.assetId)) return false;
+        return this.translationKey.equals(that.translationKey);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.assetId, this.translationKey);
     }
 }

@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 // why do I have to implement this mess, I just want to deserialize items
 public class ItemAdventurePredicate {
@@ -68,6 +69,20 @@ public class ItemAdventurePredicate {
 
     public void setShowInTooltip(boolean showInTooltip) {
         this.showInTooltip = showInTooltip;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemAdventurePredicate)) return false;
+        ItemAdventurePredicate that = (ItemAdventurePredicate) obj;
+        if (this.showInTooltip != that.showInTooltip) return false;
+        return this.predicates.equals(that.predicates);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.predicates, this.showInTooltip);
     }
 
     public static class BlockPredicate {
@@ -131,6 +146,21 @@ public class ItemAdventurePredicate {
         public void setNbt(@Nullable NBTCompound nbt) {
             this.nbt = nbt;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof BlockPredicate)) return false;
+            BlockPredicate that = (BlockPredicate) obj;
+            if (!Objects.equals(this.blocks, that.blocks)) return false;
+            if (!Objects.equals(this.properties, that.properties)) return false;
+            return Objects.equals(this.nbt, that.nbt);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.blocks, this.properties, this.nbt);
+        }
     }
 
     public static class PropertyMatcher {
@@ -168,6 +198,20 @@ public class ItemAdventurePredicate {
 
         public void setMatcher(ValueMatcher matcher) {
             this.matcher = matcher;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof PropertyMatcher)) return false;
+            PropertyMatcher that = (PropertyMatcher) obj;
+            if (!this.name.equals(that.name)) return false;
+            return this.matcher.equals(that.matcher);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.name, this.matcher);
         }
     }
 
@@ -216,6 +260,19 @@ public class ItemAdventurePredicate {
         public void setValue(String value) {
             this.value = value;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof ExactValueMatcher)) return false;
+            ExactValueMatcher that = (ExactValueMatcher) obj;
+            return this.value.equals(that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(this.value);
+        }
     }
 
     public static class RangedValueMatcher implements ValueMatcher {
@@ -253,6 +310,20 @@ public class ItemAdventurePredicate {
 
         public void setMaxValue(@Nullable String maxValue) {
             this.maxValue = maxValue;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof RangedValueMatcher)) return false;
+            RangedValueMatcher that = (RangedValueMatcher) obj;
+            if (!Objects.equals(this.minValue, that.minValue)) return false;
+            return Objects.equals(this.maxValue, that.maxValue);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.minValue, this.maxValue);
         }
     }
 }

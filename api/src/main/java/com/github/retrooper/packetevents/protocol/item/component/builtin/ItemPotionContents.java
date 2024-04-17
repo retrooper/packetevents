@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ItemPotionContents {
 
@@ -81,5 +82,20 @@ public class ItemPotionContents {
 
     public void setCustomEffects(List<PotionEffect> customEffects) {
         this.customEffects = customEffects;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemPotionContents)) return false;
+        ItemPotionContents that = (ItemPotionContents) obj;
+        if (!Objects.equals(this.potion, that.potion)) return false;
+        if (!Objects.equals(this.customColor, that.customColor)) return false;
+        return this.customEffects.equals(that.customEffects);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.potion, this.customColor, this.customEffects);
     }
 }

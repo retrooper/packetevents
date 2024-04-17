@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.item.component.builtin;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ItemFireworks {
 
@@ -61,5 +62,19 @@ public class ItemFireworks {
 
     public void setExplosions(List<FireworkExplosion> explosions) {
         this.explosions = explosions;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemFireworks)) return false;
+        ItemFireworks that = (ItemFireworks) obj;
+        if (this.flightDuration != that.flightDuration) return false;
+        return this.explosions.equals(that.explosions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.flightDuration, this.explosions);
     }
 }

@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class ItemBlockStateProperties {
 
@@ -82,5 +83,18 @@ public class ItemBlockStateProperties {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemBlockStateProperties)) return false;
+        ItemBlockStateProperties that = (ItemBlockStateProperties) obj;
+        return this.properties.equals(that.properties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.properties);
     }
 }
