@@ -19,6 +19,35 @@
 package com.github.retrooper.packetevents.protocol.item.instrument;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.sound.Sound;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public interface Instrument extends MappedEntity {
+
+    Sound getSound();
+
+    int getUseDuration();
+
+    float getRange();
+
+    static Instrument read(PacketWrapper<?> wrapper) {
+        return wrapper.readMappedEntityOrDirect(Instruments::getById, Instrument::readDirect);
+    }
+
+    static Instrument readDirect(PacketWrapper<?> wrapper) {
+        Sound sound = Sound.read(wrapper);
+        int useDuration = wrapper.readVarInt();
+        float range = wrapper.readFloat();
+        return new StaticInstrument(sound, useDuration, range);
+    }
+
+    static void write(PacketWrapper<?> wrapper, Instrument instrument) {
+        wrapper.writeMappedEntityOrDirect(instrument, Instrument::writeDirect);
+    }
+
+    static void writeDirect(PacketWrapper<?> wrapper, Instrument instrument) {
+        Sound.write(wrapper, instrument.getSound());
+        wrapper.writeVarInt(instrument.getUseDuration());
+        wrapper.writeFloat(instrument.getRange());
+    }
 }
