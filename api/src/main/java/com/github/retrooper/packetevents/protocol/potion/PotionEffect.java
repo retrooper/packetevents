@@ -21,12 +21,18 @@ package com.github.retrooper.packetevents.protocol.potion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-
 public class PotionEffect {
 
     private final PotionType type;
     private final Properties properties;
+
+    public PotionEffect(
+            PotionType type, int amplifier, int duration, boolean ambient, boolean showParticles,
+            boolean showIcon, @Nullable Properties hiddenEffect
+    ) {
+        this(type, new Properties(amplifier, duration,
+                ambient, showParticles, showIcon, hiddenEffect));
+    }
 
     public PotionEffect(PotionType type, Properties properties) {
         this.type = type;
@@ -52,16 +58,6 @@ public class PotionEffect {
         private final boolean showParticles;
         private final boolean showIcon;
         private final @Nullable Properties hiddenEffect;
-
-        public Properties(
-                int amplifier, int duration, boolean ambient, boolean showParticles,
-                boolean showIcon, Optional<Properties> hiddenEffect
-        ) {
-            this(
-                    amplifier, duration, ambient, showParticles,
-                    showIcon, hiddenEffect.orElse(null)
-            );
-        }
 
         public Properties(
                 int amplifier, int duration, boolean ambient, boolean showParticles,
