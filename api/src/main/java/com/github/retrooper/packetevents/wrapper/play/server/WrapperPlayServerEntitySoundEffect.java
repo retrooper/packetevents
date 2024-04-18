@@ -18,13 +18,18 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
+import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPlayServerEntitySoundEffect> {
-    private int soundId;
+
+    private Sound sound;
     private SoundCategory soundCategory;
     private int entityId;
     private float volume;
@@ -35,8 +40,13 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
     }
 
     public WrapperPlayServerEntitySoundEffect(int soundId, SoundCategory soundCategory, int entityId, float volume, float pitch) {
+        this(Sounds.getById(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), soundId),
+                soundCategory, entityId, volume, pitch);
+    }
+
+    public WrapperPlayServerEntitySoundEffect(Sound sound, SoundCategory soundCategory, int entityId, float volume, float pitch) {
         super(PacketType.Play.Server.ENTITY_SOUND_EFFECT);
-        this.soundId = soundId;
+        this.sound = sound;
         this.soundCategory = soundCategory;
         this.entityId = entityId;
         this.volume = volume;
@@ -45,7 +55,8 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
 
     @Override
     public void read() {
-        this.soundId = readVarInt();
+        this.sound = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3) ? Sound.read(this)
+                : Sounds.getById(this.serverVersion.toClientVersion(), this.readVarInt());
         this.soundCategory = SoundCategory.fromId(readVarInt());
         this.entityId = readVarInt();
         this.volume = readFloat();
@@ -54,7 +65,11 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
 
     @Override
     public void write() {
-        writeVarInt(this.soundId);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            Sound.write(this, this.sound);
+        } else {
+            this.writeVarInt(this.sound.getId(this.serverVersion.toClientVersion()));
+        }
         writeVarInt(this.soundCategory.ordinal());
         writeVarInt(this.entityId);
         writeFloat(this.volume);
@@ -63,19 +78,29 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
 
     @Override
     public void copy(WrapperPlayServerEntitySoundEffect wrapper) {
-        this.soundId = wrapper.soundId;
+        this.sound = wrapper.sound;
         this.soundCategory = wrapper.soundCategory;
         this.entityId = wrapper.entityId;
         this.volume = wrapper.volume;
         this.pitch = wrapper.pitch;
     }
 
-    public int getSoundId() {
-        return soundId;
+    public Sound getSound() {
+        return this.sound;
     }
 
+    public void setSound(Sound sound) {
+        this.sound = sound;
+    }
+
+    @Deprecated
+    public int getSoundId() {
+        return this.getSound().getId(this.serverVersion.toClientVersion());
+    }
+
+    @Deprecated
     public void setSoundId(int soundId) {
-        this.soundId = soundId;
+        this.setSound(Sounds.getById(this.serverVersion.toClientVersion(), soundId));
     }
 
     public SoundCategory getSoundCategory() {
