@@ -73,8 +73,6 @@ public class ComponentTypes {
     public static <T> ComponentType<T> define(String key, @Nullable Reader<T> reader, @Nullable Writer<T> writer) {
         TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
         ComponentType<T> type = new ComponentType<T>() {
-            private final int[] ids = data.getData();
-
             @Override
             public T read(PacketWrapper<?> wrapper) {
                 return reader == null ? null : reader.apply(wrapper);
@@ -94,26 +92,18 @@ public class ComponentTypes {
 
             @Override
             public int getId(ClientVersion version) {
-                int index = TYPES_BUILDER.getDataIndex(version);
-                return this.ids[index];
+                return TYPES_BUILDER.getId(version, data);
             }
 
             @Override
             public boolean equals(Object obj) {
                 if (obj instanceof ComponentType<?>) {
-                    return getName().equals(((ComponentType<?>) obj).getName());
+                    return this.getName().equals(((ComponentType<?>) obj).getName());
                 }
                 return false;
             }
         };
-
-        COMPONENT_TYPE_MAP.put(type.getName().toString(), type);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, ComponentType<?>> idMap = COMPONENT_TYPE_ID_MAP.computeIfAbsent(
-                    (byte) index, k -> new HashMap<>());
-            idMap.put(type.getId(version), type);
-        }
+        TYPES_BUILDER.register(COMPONENT_TYPE_MAP, COMPONENT_TYPE_ID_MAP, type);
         return type;
     }
 
