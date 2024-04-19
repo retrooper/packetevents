@@ -136,6 +136,7 @@ public final class PacketType {
     public static void prepare() {
         PacketType.Play.Client.load();
         PacketType.Play.Server.load();
+        PacketType.Configuration.Client.load();
         PacketType.Configuration.Server.load();
         PREPARED = true;
     }
@@ -172,7 +173,7 @@ public final class PacketType {
                 }
             case CONFIGURATION:
                 if (side == PacketSide.CLIENT) {
-                    return Configuration.Client.getById(packetID);
+                    return Configuration.Client.getById(version, packetID);
                 } else {
                     return Configuration.Server.getById(version, packetID);
                 }
