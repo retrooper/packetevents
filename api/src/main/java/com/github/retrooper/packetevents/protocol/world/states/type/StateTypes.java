@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class StateTypes {
@@ -1236,7 +1237,7 @@ public class StateTypes {
         }
 
         public StateType build() {
-            TypesBuilderData data = TYPES_BUILDER.defineFromArray(this.name.getKey());
+            TypesBuilderData data = TYPES_BUILDER.defineFromArray(this.name.getKey().toLowerCase(Locale.ROOT));
             StateType type = new StateType(
                     TYPES_BUILDER, data, blastResistance, hardness, isSolid,
                     isBlocking, isAir, requiresCorrectTool, isShapeExceedsCube, materialType);
