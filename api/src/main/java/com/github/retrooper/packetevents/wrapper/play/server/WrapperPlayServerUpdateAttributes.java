@@ -25,11 +25,43 @@ import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlayServerUpdateAttributes> {
+
+    private static final List<Map.Entry<String, Attribute>> PRE_1_16_ATTRIBUTES = Collections.unmodifiableList(Arrays.asList(
+            new SimpleEntry<>("generic.maxHealth", Attributes.GENERIC_MAX_HEALTH),
+            new SimpleEntry<>("Max Health", Attributes.GENERIC_MAX_HEALTH),
+            new SimpleEntry<>("zombie.spawnReinforcements", Attributes.ZOMBIE_SPAWN_REINFORCEMENTS),
+            new SimpleEntry<>("Spawn Reinforcements Chance", Attributes.ZOMBIE_SPAWN_REINFORCEMENTS),
+            new SimpleEntry<>("horse.jumpStrength", Attributes.HORSE_JUMP_STRENGTH),
+            new SimpleEntry<>("Jump Strength", Attributes.HORSE_JUMP_STRENGTH),
+            new SimpleEntry<>("generic.followRange", Attributes.GENERIC_FOLLOW_RANGE),
+            new SimpleEntry<>("Follow Range", Attributes.GENERIC_FOLLOW_RANGE),
+            new SimpleEntry<>("generic.knockbackResistance", Attributes.GENERIC_KNOCKBACK_RESISTANCE),
+            new SimpleEntry<>("Knockback Resistance", Attributes.GENERIC_KNOCKBACK_RESISTANCE),
+            new SimpleEntry<>("generic.movementSpeed", Attributes.GENERIC_MOVEMENT_SPEED),
+            new SimpleEntry<>("Movement Speed", Attributes.GENERIC_MOVEMENT_SPEED),
+            new SimpleEntry<>("generic.flyingSpeed", Attributes.GENERIC_FLYING_SPEED),
+            new SimpleEntry<>("Flying Speed", Attributes.GENERIC_FLYING_SPEED),
+            new SimpleEntry<>("generic.attackDamage", Attributes.GENERIC_ATTACK_DAMAGE),
+            new SimpleEntry<>("generic.attackKnockback", Attributes.GENERIC_ATTACK_KNOCKBACK),
+            new SimpleEntry<>("generic.attackSpeed", Attributes.GENERIC_ATTACK_SPEED),
+            new SimpleEntry<>("generic.armorToughness", Attributes.GENERIC_ARMOR_TOUGHNESS)
+    ));
+    private static final Map<String, Attribute> PRE_1_16_ATTRIBUTES_MAP = PRE_1_16_ATTRIBUTES.stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    private static final Map<Attribute, String> PRE_1_16_ATTRIBUTES_RMAP = PRE_1_16_ATTRIBUTES.stream()
+            .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey,
+                    (s1, s2) -> s1));
+
     private int entityID;
     private List<Property> properties;
 
@@ -62,12 +94,10 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
             Attribute attribute;
             if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
                 attribute = Attributes.getById(this.serverVersion.toClientVersion(), this.readVarInt());
+            } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+                attribute = Attributes.getByName(this.readIdentifier().toString());
             } else {
-                //NOTE: Some people report errors that this limit check breaks for them, lets try removing it
-                //int maxKeyLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
-                int maxKeyLength = 32767;
-                String key = this.readString(maxKeyLength);
-                attribute = Attributes.getByName(key);
+                attribute = PRE_1_16_ATTRIBUTES_MAP.get(this.readString(64));
             }
 
             double value = readDouble();
@@ -107,9 +137,10 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
         for (Property property : properties) {
             if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
                 this.writeVarInt(property.getAttribute().getId(this.serverVersion.toClientVersion()));
+            } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+                this.writeIdentifier(property.getAttribute().getName());
             } else {
-                int maxKeyLength = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
-                this.writeString(property.getKey(), maxKeyLength);
+                this.writeString(PRE_1_16_ATTRIBUTES_RMAP.get(property.getAttribute()));
             }
 
             writeDouble(property.value);

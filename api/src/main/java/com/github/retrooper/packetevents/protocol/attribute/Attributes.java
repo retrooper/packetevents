@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.TypesBuilder;
 import com.github.retrooper.packetevents.util.TypesBuilderData;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,8 @@ public class Attributes {
     private static final Map<String, Attribute> ATTRIBUTE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, Attribute>> ATTRIBUTE_ID_MAP = new HashMap<>();
     private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("attribute/attribute_mappings",
+            ClientVersion.V_1_16,
+            ClientVersion.V_1_20_2,
             ClientVersion.V_1_20_3,
             ClientVersion.V_1_20_5);
 
@@ -86,14 +89,16 @@ public class Attributes {
     public static final Attribute GENERIC_ATTACK_SPEED = define("generic.attack_speed");
     public static final Attribute GENERIC_FLYING_SPEED = define("generic.flying_speed");
     public static final Attribute GENERIC_FOLLOW_RANGE = define("generic.follow_range");
-    @Deprecated // removed in 1.20.5
+    @ApiStatus.Obsolete // renamed in 1.20.5
     public static final Attribute HORSE_JUMP_STRENGTH = define("horse.jump_strength");
     public static final Attribute GENERIC_KNOCKBACK_RESISTANCE = define("generic.knockback_resistance");
     public static final Attribute GENERIC_LUCK = define("generic.luck");
-    public static final Attribute GENERIC_MAX_ABSORPTION = define("generic.max_absorption");
     public static final Attribute GENERIC_MAX_HEALTH = define("generic.max_health");
     public static final Attribute GENERIC_MOVEMENT_SPEED = define("generic.movement_speed");
     public static final Attribute ZOMBIE_SPAWN_REINFORCEMENTS = define("zombie.spawn_reinforcements");
+
+    // Added in 1.20.2
+    public static final Attribute GENERIC_MAX_ABSORPTION = define("generic.max_absorption");
 
     // added in 1.20.5
     public static final Attribute PLAYER_BLOCK_BREAK_SPEED = define("player.block_break_speed");
@@ -101,8 +106,9 @@ public class Attributes {
     public static final Attribute PLAYER_ENTITY_INTERACTION_RANGE = define("player.entity_interaction_range");
     public static final Attribute GENERIC_FALL_DAMAGE_MULTIPLIER = define("generic.fall_damage_multiplier");
     public static final Attribute GENERIC_GRAVITY = define("generic.scale");
-    public static final Attribute GENERIC_SCALE = define("generic.scale");
+    public static final Attribute GENERIC_JUMP_STRENGTH = define("generic.jump_strength");
     public static final Attribute GENERIC_SAFE_FALL_DISTANCE = define("generic.safe_fall_distance");
+    public static final Attribute GENERIC_SCALE = define("generic.scale");
     public static final Attribute GENERIC_STEP_HEIGHT = define("generic.step_height");
 
     static {
