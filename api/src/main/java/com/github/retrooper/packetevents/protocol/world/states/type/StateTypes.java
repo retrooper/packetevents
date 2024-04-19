@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.protocol.world.MaterialType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.TypesBuilder;
 import com.github.retrooper.packetevents.util.TypesBuilderData;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,19 +58,21 @@ public class StateTypes {
         return Collections.unmodifiableCollection(ALL_STATE_TYPES);
     }
 
-    public static StateType getByName(String blockString) {
-        return getMappedByName(blockString).getStateType();
+    public static @Nullable StateType getByName(String blockString) {
+        StateType.Mapped mapped = getMappedByName(blockString);
+        return mapped == null ? null : mapped.getStateType();
     }
 
-    public static StateType.Mapped getMappedByName(String blockString) {
+    public static StateType.@Nullable Mapped getMappedByName(String blockString) {
         return getMappedByName(new ResourceLocation(blockString));
     }
 
-    public static StateType getByName(ResourceLocation blockKey) {
-        return getMappedByName(blockKey).getStateType();
+    public static @Nullable StateType getByName(ResourceLocation blockKey) {
+        StateType.Mapped mapped = getMappedByName(blockKey);
+        return mapped == null ? null : mapped.getStateType();
     }
 
-    public static StateType.Mapped getMappedByName(ResourceLocation blockKey) {
+    public static StateType.@Nullable Mapped getMappedByName(ResourceLocation blockKey) {
         return BY_NAME.get(blockKey.toString());
     }
 
