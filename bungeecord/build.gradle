@@ -6,9 +6,7 @@ dependencies {
 }
 
 shadowJar {
-    relocate 'net.kyori.adventure.text.serializer.gson', 'io.github.retrooper.packetevents.adventure.serializer.gson'
-    relocate 'net.kyori.adventure.text.serializer.legacy', 'io.github.retrooper.packetevents.adventure.serializer.legacy'
-    relocate 'net.kyori.adventure.util.Codec', 'io.github.retrooper.packetevents.adventure.util.Codec'
+    relocate 'net.kyori', 'io.github.retrooper.packetevents.kyori'
     dependencies {
         exclude(dependency('com.google.code.gson:gson:2.8.0'))
     }

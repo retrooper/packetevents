@@ -9,9 +9,7 @@ repositories {
 }
 
 shadowJar {
-    relocate 'net.kyori.adventure.text.serializer.gson.legacyimpl',
-            'io.github.retrooper.packetevents.adventure.serializer.gson.legacyimpl'
-    relocate 'net.kyori.adventure.util.Codec', 'io.github.retrooper.packetevents.adventure.util.Codec'
+    relocate 'net.kyori', 'io.github.retrooper.packetevents.kyori'
 }
 
 dependencies {
