@@ -33,6 +33,23 @@ public class Sounds {
     private static final Map<Byte, Map<Integer, Sound>> POTION_TYPE_ID_MAP = new HashMap<>();
 
     private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("sound/sound_mappings",
+            ClientVersion.V_1_9_3,
+            ClientVersion.V_1_10,
+            ClientVersion.V_1_11,
+            ClientVersion.V_1_12,
+            ClientVersion.V_1_13,
+            ClientVersion.V_1_13_2,
+            ClientVersion.V_1_14,
+            ClientVersion.V_1_15,
+            ClientVersion.V_1_16,
+            ClientVersion.V_1_16_2,
+            ClientVersion.V_1_17,
+            ClientVersion.V_1_18,
+            ClientVersion.V_1_19,
+            ClientVersion.V_1_19_3,
+            ClientVersion.V_1_20,
+            ClientVersion.V_1_20_2,
+            ClientVersion.V_1_20_3,
             ClientVersion.V_1_20_5);
 
     public static Sound define(String key) {
