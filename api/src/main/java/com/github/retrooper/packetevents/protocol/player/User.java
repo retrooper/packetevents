@@ -27,25 +27,44 @@ import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
+import com.github.retrooper.packetevents.protocol.color.DyeColor;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.identity.Identified;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.resource.ResourcePackInfo;
+import net.kyori.adventure.resource.ResourcePackInfoLike;
+import net.kyori.adventure.resource.ResourcePackRequest;
+import net.kyori.adventure.resource.ResourcePackRequestLike;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.title.TitlePart;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
+import java.sql.Wrapper;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
-public class User {
+public class User implements Audience, Identified {
     private final Object channel;
     private ConnectionState decoderState;
     private ConnectionState encoderState;
     private ClientVersion clientVersion;
     private final UserProfile profile;
+    private final Identity identity;
     private int entityId = -1;
     private int minWorldHeight = 0;
     private int totalWorldHeight = 256;
@@ -60,6 +79,7 @@ public class User {
         this.encoderState = connectionState;
         this.clientVersion = clientVersion;
         this.profile = profile;
+        this.identity = Identity.identity(profile.getUUID());
     }
 
     public Object getChannel() {
@@ -82,6 +102,151 @@ public class User {
     public void setConnectionState(ConnectionState connectionState) {
         this.setDecoderState(connectionState);
         this.setEncoderState(connectionState);
+    }
+
+    @Override
+    public Identity identity() {
+        return identity;
+    }
+
+    @Override
+    public <T> void sendTitlePart(@NotNull TitlePart<T> part, @NotNull T value) {
+        Component title = null, subtitle = null;
+        Title.Times times = null;
+        if (part == TitlePart.TITLE) {
+            title = (Component) value;
+        }
+        else if (part == TitlePart.SUBTITLE) {
+            subtitle = (Component) value;
+        }
+        else if (part == TitlePart.TIMES) {
+            times = (Title.Times) value;
+        }
+        int stay, out, in;
+        if (times != null) {
+            stay = (int) (times.stay().toMillis() / 20);
+            out = (int) (times.fadeOut().toMillis() / 20);
+            in = (int) (times.fadeIn().toMillis() / 20);
+        }
+        else {
+            stay = 20;
+            out = 20;
+            in = 20;
+        }
+        sendTitle(title, subtitle, in, stay, out);
+    }
+
+    @Override
+    public void sendActionBar(@NotNull Component message) {
+        WrapperPlayServerSystemChatMessage wrapper = new WrapperPlayServerSystemChatMessage(true, message);
+        sendPacket(wrapper);
+    }
+
+    @Override
+    public void sendResourcePacks(@NotNull ResourcePackRequest request) {
+        for (ResourcePackInfo info : request.packs()) {
+            WrapperPlayServerResourcePackSend wrapper = new WrapperPlayServerResourcePackSend(
+                    info.id(), info.uri().toString(), info.hash(), true, null
+            );
+            sendPacket(wrapper);
+        }
+    }
+
+    @Override
+    public void clearTitle() {
+        sendPacket(new WrapperPlayServerClearTitles(false));
+    }
+
+    @Override
+    public void resetTitle() {
+        sendPacket(new WrapperPlayServerClearTitles(true));
+    }
+
+    /**
+     * PacketEvents is not responsible for keeping track of the boss bars you show and hide.
+     */
+    @Override
+    public void showBossBar(@NotNull BossBar bar) {
+        boolean darkenScreen = false, playBossMusic = false, createWorldFog = false;
+        Set<BossBar.Flag> barFlags = bar.flags();
+        if (barFlags.contains(BossBar.Flag.DARKEN_SCREEN)) {
+            darkenScreen = true;
+        }
+        if (barFlags.contains(BossBar.Flag.PLAY_BOSS_MUSIC)) {
+            playBossMusic = true;
+        }
+        if (barFlags.contains(BossBar.Flag.CREATE_WORLD_FOG)) {
+            createWorldFog = true;
+        }
+        WrapperPlayServerBossBar wrapper = new WrapperPlayServerBossBar(
+                UUID.randomUUID(),
+                WrapperPlayServerBossBar.Action.add(
+                        bar.name(),
+                        bar.progress(),
+                        WrapperPlayServerBossBar.Color.values()[bar.color().ordinal()],
+                        WrapperPlayServerBossBar.Division.VALUES[bar.overlay().ordinal()],
+                        WrapperPlayServerBossBar.createFlags(darkenScreen, playBossMusic, createWorldFog)
+                )
+        );
+        sendPacket(wrapper);
+    }
+
+    @Override
+    public void hideBossBar(@NotNull BossBar bar) {
+        hideBossBar((UUID) null);
+    }
+
+    public void hideBossBar(UUID bossBarId) {
+        if (bossBarId == null) {
+            throw new IllegalArgumentException("Boss bar id cannot be null! You need to keep track of boss bars you create.");
+        }
+        sendPacket(new WrapperPlayServerBossBar(bossBarId, WrapperPlayServerBossBar.Action.remove()));
+    }
+
+    @Override
+    public void playSound(@NotNull Sound sound) {
+    }
+
+    @Override
+    public void playSound(@NotNull Sound sound, Sound.Emitter emitter) {
+        Audience.super.playSound(sound, emitter);
+    }
+
+    @Override
+    public void playSound(@NotNull Sound sound, double x, double y, double z) {
+        Audience.super.playSound(sound, x, y, z);
+    }
+
+    @Override
+    public void stopSound(@NotNull Sound sound) {
+        Audience.super.stopSound(sound);
+    }
+
+    @Override
+    public void stopSound(@NotNull SoundStop stop) {
+        Audience.super.stopSound(stop);
+    }
+
+    @Override
+    public void showTitle(@NotNull Title title) {
+        int fadeIn = 20, stay = 20, fadeOut = 20;
+        if (title.times() != null) {
+            fadeIn = (int) (title.times().fadeIn().toMillis() / 20);
+            stay = (int) (title.times().stay().toMillis() / 20);
+            fadeOut = (int) (title.times().fadeOut().toMillis() / 20);
+        }
+        sendTitle(title.title(), title.subtitle(), fadeIn, stay, fadeOut);
+    }
+
+    @Override
+    public void clearResourcePacks() {
+        sendPacket(new WrapperPlayServerResourcePackRemove((UUID) null));
+    }
+
+    @Override
+    public void sendPlayerListHeaderAndFooter(@NotNull Component header, @NotNull Component footer) {
+        WrapperPlayServerPlayerListHeaderAndFooter wrapper = new WrapperPlayServerPlayerListHeaderAndFooter(header, footer);
+        sendPacket(wrapper);
     }
 
     public ConnectionState getDecoderState() {
@@ -173,9 +338,11 @@ public class User {
         sendMessage(component);
     }
 
+    @Override
     public void sendMessage(Component component) {
         sendMessage(component, ChatTypes.CHAT);
     }
+
 
     public void sendMessage(Component component, ChatType type) {
         ServerVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion().toServerVersion() :
