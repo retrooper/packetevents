@@ -498,7 +498,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         for (Map.Entry<ComponentType<?>, Optional<?>> patch : allPatches.entrySet()) {
             if (patch.getValue().isPresent()) {
                 this.writeVarInt(patch.getKey().getId(this.serverVersion.toClientVersion()));
-                ((ComponentType<Object>) patch.getKey()).write(this, patch.getValue());
+                ((ComponentType<Object>) patch.getKey()).write(this, patch.getValue().get());
             }
         }
 
