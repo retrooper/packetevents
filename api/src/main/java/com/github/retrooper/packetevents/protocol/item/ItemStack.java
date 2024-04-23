@@ -360,7 +360,8 @@ public class ItemStack {
             String identifier = type == null ? "null" : type.getName().toString();
             int maxAmount = getType().getMaxAmount();
             return "ItemStack[type=" + identifier + ", amount=" + amount + "/" + maxAmount
-                    + ", nbt tag names: " + (nbt != null ? nbt.getTagNames() : "[null]") + ", legacyData=" + legacyData + "]";
+                    + ", nbt tag names: " + (nbt != null ? nbt.getTagNames() : "[null]")
+                    + ", legacyData=" + legacyData + ", components=" + components + "]";
         }
     }
 

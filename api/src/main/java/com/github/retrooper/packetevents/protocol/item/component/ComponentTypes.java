@@ -102,6 +102,11 @@ public class ComponentTypes {
                 }
                 return false;
             }
+
+            @Override
+            public String toString() {
+                return "Component[" + this.getName() + "]";
+            }
         };
         TYPES_BUILDER.register(COMPONENT_TYPE_MAP, COMPONENT_TYPE_ID_MAP, type);
         return type;

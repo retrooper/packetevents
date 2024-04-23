@@ -95,4 +95,9 @@ public class PatchableComponentMap implements IComponentMap {
     public Map<ComponentType<?>, Optional<?>> getPatches() {
         return this.patches;
     }
+
+    @Override
+    public String toString() {
+        return "PatchableComponentMap{base=" + this.base + ", patches=" + this.patches + '}';
+    }
 }
