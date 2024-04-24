@@ -1382,7 +1382,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
             BiFunction<ClientVersion, Integer, Z> getter, Reader<Z> directReader) {
         int id = this.readVarInt();
         if (id != 0) { // registered in registry
-            return getter.apply(this.serverVersion.toClientVersion(), id + 1);
+            return getter.apply(this.serverVersion.toClientVersion(), id - 1);
         }
         return directReader.apply(this);
     }
