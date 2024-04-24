@@ -33,8 +33,9 @@ public class WrapperConfigServerSelectKnownPacks extends PacketWrapper<WrapperCo
         super(event);
     }
 
-    public WrapperConfigServerSelectKnownPacks() {
+    public WrapperConfigServerSelectKnownPacks(List<KnownPack> knownPacks) {
         super(PacketType.Configuration.Server.SELECT_KNOWN_PACKS);
+        this.knownPacks = knownPacks;
     }
 
     @Override
