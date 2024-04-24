@@ -105,7 +105,7 @@ public class Attributes {
     public static final Attribute PLAYER_BLOCK_INTERACTION_RANGE = define("player.block_interaction_range");
     public static final Attribute PLAYER_ENTITY_INTERACTION_RANGE = define("player.entity_interaction_range");
     public static final Attribute GENERIC_FALL_DAMAGE_MULTIPLIER = define("generic.fall_damage_multiplier");
-    public static final Attribute GENERIC_GRAVITY = define("generic.scale");
+    public static final Attribute GENERIC_GRAVITY = define("generic.gravity");
     public static final Attribute GENERIC_JUMP_STRENGTH = define("generic.jump_strength");
     public static final Attribute GENERIC_SAFE_FALL_DISTANCE = define("generic.safe_fall_distance");
     public static final Attribute GENERIC_SCALE = define("generic.scale");
