@@ -52,7 +52,8 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
             this.flags = readByte();
         }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                && this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
             factorData = readOptional(PacketWrapper::readNBT);
         }
     }
