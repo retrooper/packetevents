@@ -113,7 +113,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
                         NBTCompound tag = new NBTCompound();
                         tag.setTag("name", new NBTString(element.getId().toString()));
                         tag.setTag("id", new NBTInt(i++));
-                        if (element.getData() != null) { // may be null because of known packs (I think)
+                        if (element.getData() != null) { // may be null because of known packs not being sent
                             tag.setTag("element", element.getData());
                         }
                         list.addTag(tag);
@@ -147,8 +147,13 @@ public class InternalPacketListener extends PacketListenerAbstract {
             NBTCompound dimension = user.getWorldNBT(joinGame.getDimension());
             if (dimension != null) {
                 NBTCompound worldNBT = dimension.getCompoundTagOrNull("element");
-                user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-                user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+                if (worldNBT != null) {
+                    user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
+                    user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+                } else {
+                    PacketEvents.getAPI().getLogger().warning(
+                            "No data was sent for dimension " + dimension + " to " + user.getName());
+                }
             }
         }
 
@@ -163,8 +168,13 @@ public class InternalPacketListener extends PacketListenerAbstract {
             NBTCompound dimension = user.getWorldNBT(respawn.getDimension());
             if (dimension != null) {
                 NBTCompound worldNBT = dimension.getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
-                user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-                user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+                if (worldNBT != null) {
+                    user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
+                    user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+                } else {
+                    PacketEvents.getAPI().getLogger().warning(
+                            "No data was sent for dimension " + dimension + " to " + user.getName());
+                }
             }
         } else if (event.getPacketType() == PacketType.Play.Server.CONFIGURATION_START) {
             user.setEncoderState(ConnectionState.CONFIGURATION);
