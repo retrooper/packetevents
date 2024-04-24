@@ -32,7 +32,13 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.server.*;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleSubtitle;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleText;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleTimes;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTitle;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -282,5 +288,24 @@ public class User {
             }
         }
         return null;
+    }
+
+    public @Nullable NBTCompound getWorldNBT(int worldId) {
+        if (this.worldNBT == null) {
+            return null;
+        }
+        for (NBTCompound element : this.worldNBT) {
+            if (element.getNumberTagOrNull("id").getAsInt() == worldId) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    public @Nullable NBTCompound getWorldNBT(Dimension dimension) {
+        if (dimension.getAttributes() != null) {
+            return this.getWorldNBT(dimension.getDimensionName());
+        }
+        return this.getWorldNBT(dimension.getId());
     }
 }

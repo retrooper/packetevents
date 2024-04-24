@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class WrapperConfigServerRegistryData extends PacketWrapper<WrapperConfig
         super(event);
     }
 
-    @Deprecated
+    @ApiStatus.Obsolete
     public WrapperConfigServerRegistryData(NBTCompound registryData) {
         this(registryData, null, null);
     }
@@ -57,9 +58,11 @@ public class WrapperConfigServerRegistryData extends PacketWrapper<WrapperConfig
         this(null, registryKey, elements);
     }
 
-    @Deprecated
+    @ApiStatus.Obsolete
     public WrapperConfigServerRegistryData(
-            NBTCompound registryData, ResourceLocation registryKey, List<RegistryElement> elements
+            @Nullable NBTCompound registryData,
+            @Nullable ResourceLocation registryKey,
+            @Nullable List<RegistryElement> elements
     ) {
         super(PacketType.Configuration.Server.REGISTRY_DATA);
         this.registryData = registryData;
@@ -101,17 +104,17 @@ public class WrapperConfigServerRegistryData extends PacketWrapper<WrapperConfig
         this.elements = wrapper.elements;
     }
 
-    @Deprecated
-    public NBTCompound getRegistryData() {
+    @ApiStatus.Obsolete
+    public @Nullable NBTCompound getRegistryData() {
         return this.registryData;
     }
 
-    @Deprecated
+    @ApiStatus.Obsolete
     public void setRegistryData(NBTCompound registryData) {
         this.registryData = registryData;
     }
 
-    public ResourceLocation getRegistryKey() {
+    public @Nullable ResourceLocation getRegistryKey() {
         return this.registryKey;
     }
 
@@ -119,7 +122,7 @@ public class WrapperConfigServerRegistryData extends PacketWrapper<WrapperConfig
         this.registryKey = registryKey;
     }
 
-    public List<RegistryElement> getElements() {
+    public @Nullable List<RegistryElement> getElements() {
         return this.elements;
     }
 
