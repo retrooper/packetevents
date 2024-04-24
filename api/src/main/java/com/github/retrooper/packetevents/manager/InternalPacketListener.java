@@ -103,7 +103,6 @@ public class InternalPacketListener extends PacketListenerAbstract {
                 list = registryDataTag
                         .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString())
                         .getCompoundListTagOrNull("value");
-                user.setWorldNBT(list);
             } else if (DIMENSION_TYPE_REGISTRY_KEY.equals(registryData.getRegistryKey())) { // >=1.20.5
                 // remap to legacy format
                 list = new NBTList<>(NBTType.COMPOUND);

@@ -303,8 +303,9 @@ public class User {
     }
 
     public @Nullable NBTCompound getWorldNBT(Dimension dimension) {
-        if (dimension.getAttributes() != null) {
-            return this.getWorldNBT(dimension.getDimensionName());
+        String dimensionName = dimension.getDimensionName();
+        if (!dimensionName.isEmpty()) {
+            return this.getWorldNBT(dimensionName);
         }
         return this.getWorldNBT(dimension.getId());
     }
