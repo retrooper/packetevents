@@ -72,7 +72,7 @@ public class PatchableComponentMap implements IComponentMap {
         Object baseVal = this.base.get(type);
         T newVal = value.orElse(null);
         if (Objects.equals(baseVal, newVal)) {
-            this.patches.remove(type);
+            this.patches.remove(type); // fallback to base
         } else {
             this.patches.put(type, value);
         }

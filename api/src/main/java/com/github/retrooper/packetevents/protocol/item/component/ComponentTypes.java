@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.protocol.item.component.builtin.ArmorTr
 import com.github.retrooper.packetevents.protocol.item.component.builtin.BannerLayers;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.BundleContents;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ChargedProjectiles;
+import com.github.retrooper.packetevents.util.Dummy;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.FireworkExplosion;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.FoodProperties;
 import com.github.retrooper.packetevents.protocol.item.component.builtin.ItemAdventurePredicate;
@@ -150,17 +151,21 @@ public class ComponentTypes {
             ItemAttributeModifiers::read, ItemAttributeModifiers::write);
     public static final ComponentType<Integer> CUSTOM_MODEL_DATA = define("custom_model_data",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
-    public static final ComponentType<Void> HIDE_ADDITIONAL_TOOLTIP = define("hide_additional_tooltip");
-    public static final ComponentType<Void> HIDE_TOOLTIP = define("hide_tooltip");
+    public static final ComponentType<Dummy> HIDE_ADDITIONAL_TOOLTIP = define("hide_additional_tooltip",
+            Dummy::dummyRead, Dummy::dummyWrite);
+    public static final ComponentType<Dummy> HIDE_TOOLTIP = define("hide_tooltip",
+            Dummy::dummyRead, Dummy::dummyWrite);
     public static final ComponentType<Integer> REPAIR_COST = define("repair_cost",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
-    public static final ComponentType<Void> CREATIVE_SLOT_LOCK = define("creative_slot_lock");
+    public static final ComponentType<Dummy> CREATIVE_SLOT_LOCK = define("creative_slot_lock",
+            Dummy::dummyRead, Dummy::dummyWrite);
     public static final ComponentType<Boolean> ENCHANTMENT_GLINT_OVERRIDE = define("enchantment_glint_override",
             PacketWrapper::readBoolean, PacketWrapper::writeBoolean);
     public static final ComponentType<Void> INTANGIBLE_PROJECTILE = define("intangible_projectile"); // not synchronized
     public static final ComponentType<FoodProperties> FOOD = define("food",
             FoodProperties::read, FoodProperties::write);
-    public static final ComponentType<Void> FIRE_RESISTANT = define("fire_resistant");
+    public static final ComponentType<Dummy> FIRE_RESISTANT = define("fire_resistant",
+            Dummy::dummyRead, Dummy::dummyWrite);
     public static final ComponentType<ItemTool> TOOL = define("tool",
             ItemTool::read, ItemTool::write);
     public static final ComponentType<ItemEnchantments> STORED_ENCHANTMENTS = define("stored_enchantments",
