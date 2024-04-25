@@ -624,7 +624,11 @@ public class ItemTypes {
     public static final ItemType JUNGLE_SIGN = builder("jungle_sign").setMaxAmount(16).setPlacedType(StateTypes.JUNGLE_SIGN).setAttributes(ItemAttribute.FUEL).build();
     public static final ItemType GREEN_GLAZED_TERRACOTTA = builder("green_glazed_terracotta").setMaxAmount(64).setPlacedType(StateTypes.GREEN_GLAZED_TERRACOTTA).build();
     public static final ItemType TURTLE_SCUTE = builder("turtle_scute").setMaxAmount(64).build();
-    public static final ItemType SCUTE = builder("scute").build(); // TODO: MISSING FROM REGISTRY
+    /**
+     * @deprecated replaced with {@link #TURTLE_SCUTE} in 1.20.5
+     */
+    @Deprecated
+    public static final ItemType SCUTE = TURTLE_SCUTE;
     public static final ItemType GOLDEN_CHESTPLATE = builder("golden_chestplate").setMaxAmount(1).setMaxDurability(112).setComponent(DAMAGE, 0).build();
     public static final ItemType NETHERITE_LEGGINGS = builder("netherite_leggings").setMaxAmount(1).setMaxDurability(555).setAttributes(ItemAttribute.FIRE_RESISTANT).setComponent(DAMAGE, 0).setComponent(FIRE_RESISTANT, null).build();
     public static final ItemType GOLDEN_SHOVEL = builder("golden_shovel").setMaxAmount(1).setMaxDurability(32).setAttributes(ItemAttribute.GOLD_TIER, ItemAttribute.SHOVEL).setComponent(DAMAGE, 0).setComponent(ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(Arrays.asList(new ItemAttributeModifiers.ModifierEntry(Attributes.GENERIC_ATTACK_DAMAGE, new ItemAttributeModifiers.Modifier(TOOL_MODIFIER_ATTACK_DAMAGE_UUID, "Tool modifier", 1.5d, AttributeOperation.ADDITION), ItemAttributeModifiers.EquipmentSlotGroup.MAINHAND), new ItemAttributeModifiers.ModifierEntry(Attributes.GENERIC_ATTACK_SPEED, new ItemAttributeModifiers.Modifier(TOOL_MODIFIER_ATTACK_SPEED_UUID, "Tool modifier", -3.0d, AttributeOperation.ADDITION), ItemAttributeModifiers.EquipmentSlotGroup.MAINHAND)), true)).setComponent(TOOL, new ItemTool(Arrays.asList(new ItemTool.Rule(new MappedEntitySet<>(ResourceLocation.minecraft("incorrect_for_gold_tool")), null, false), new ItemTool.Rule(new MappedEntitySet<>(ResourceLocation.minecraft("mineable/shovel")), 12.0f, true)), 1.0f, 1)).build();
@@ -690,7 +694,11 @@ public class ItemTypes {
     public static final ItemType LIGHT_GRAY_CARPET = builder("light_gray_carpet").setMaxAmount(64).setPlacedType(StateTypes.LIGHT_GRAY_CARPET).setAttributes(ItemAttribute.FUEL).build();
     public static final ItemType MUSIC_DISC_WARD = builder("music_disc_ward").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).setComponent(RARITY, ItemRarity.RARE).build();
     public static final ItemType SHORT_GRASS = builder("short_grass").setMaxAmount(64).setPlacedType(StateTypes.SHORT_GRASS).build();
-    public static final ItemType GRASS = builder("grass").build(); // TODO: MISSING FROM REGISTRY
+    /**
+     * @deprecated replaced with {@link #SHORT_GRASS} in 1.20.3
+     */
+    @Deprecated
+    public static final ItemType GRASS = SHORT_GRASS;
     public static final ItemType END_CRYSTAL = builder("end_crystal").setMaxAmount(64).setComponent(RARITY, ItemRarity.RARE).setComponent(ENCHANTMENT_GLINT_OVERRIDE, true).build();
     public static final ItemType VINDICATOR_SPAWN_EGG = builder("vindicator_spawn_egg").setMaxAmount(64).build();
     public static final ItemType WHEAT = builder("wheat").setMaxAmount(64).build();
