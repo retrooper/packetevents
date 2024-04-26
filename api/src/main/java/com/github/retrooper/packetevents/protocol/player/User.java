@@ -133,7 +133,43 @@ public class User implements Audience, Identified {
             out = 20;
             in = 20;
         }
-        sendTitle(title, subtitle, in, stay, out);
+
+        ServerVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion().toServerVersion() :
+                PacketEvents.getAPI().getServerManager().getVersion();
+        boolean modern = version.isNewerThanOrEquals(ServerVersion.V_1_17);
+        PacketWrapper<?> animation;
+        PacketWrapper<?> setTitle = null;
+        PacketWrapper<?> setSubtitle = null;
+        if (modern) {
+            animation = new WrapperPlayServerSetTitleTimes(in, stay, out);
+            if (title != null) {
+                setTitle = new WrapperPlayServerSetTitleText(title);
+            }
+            if (subtitle != null) {
+                setSubtitle = new WrapperPlayServerSetTitleSubtitle(subtitle);
+            }
+        } else {
+            animation = new WrapperPlayServerTitle(WrapperPlayServerTitle.
+                    TitleAction.SET_TIMES_AND_DISPLAY, (Component) null, null, null,
+                    in, stay, out);
+            if (title != null) {
+                setTitle = new WrapperPlayServerTitle(WrapperPlayServerTitle.
+                        TitleAction.SET_TITLE, title, null, null,
+                        0, 0, 0);
+            }
+            if (subtitle != null) {
+                setSubtitle = new WrapperPlayServerTitle(WrapperPlayServerTitle.
+                        TitleAction.SET_SUBTITLE, null, subtitle, null,
+                        0, 0, 0);
+            }
+        }
+        sendPacket(animation);
+        if (setTitle != null) {
+            sendPacket(setTitle);
+        }
+        if (setSubtitle != null) {
+            sendPacket(setSubtitle);
+        }
     }
 
     @Override
