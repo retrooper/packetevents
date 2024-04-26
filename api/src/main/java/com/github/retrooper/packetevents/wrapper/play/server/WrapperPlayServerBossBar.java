@@ -95,6 +95,10 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
         return action;
     }
 
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
     public UUID getUuid() {
         return uuid;
     }
