@@ -48,7 +48,7 @@ public class PacketTypeClasses {
                     PREFIX  = "net.minecraft.network.protocol.status.";
                 }
                 else {
-                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                    PREFIX = ServerVersion.getNMSDirectory();
                 }
                 Client.START = Reflection.getClassByNameWithoutException(PREFIX + "PacketStatusInStart");
                 Client.PING = Reflection.getClassByNameWithoutException(PREFIX + "PacketStatusInPing");
@@ -64,7 +64,7 @@ public class PacketTypeClasses {
                     PREFIX  = "net.minecraft.network.protocol.status.";
                 }
                 else {
-                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                    PREFIX = ServerVersion.getNMSDirectory();
                 }
                 Server.PONG = Reflection.getClassByNameWithoutException(PREFIX + "PacketStatusOutPong");
                 Server.SERVER_INFO = Reflection.getClassByNameWithoutException(PREFIX + "PacketStatusOutServerInfo");
@@ -82,7 +82,7 @@ public class PacketTypeClasses {
                     PREFIX  = "net.minecraft.network.protocol.handshake.";
                 }
                 else {
-                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                    PREFIX = ServerVersion.getNMSDirectory();
                 }
                 Handshaking.Client.SET_PROTOCOL = Reflection.getClassByNameWithoutException(PREFIX + "PacketHandshakingInSetProtocol");
             }
@@ -99,7 +99,7 @@ public class PacketTypeClasses {
                     PREFIX  = "net.minecraft.network.protocol.login.";
                 }
                 else {
-                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                    PREFIX = ServerVersion.getNMSDirectory();
                 }
                 //In and Out custom payload login packets have been here since 1.13
                 if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
@@ -119,7 +119,7 @@ public class PacketTypeClasses {
                     PREFIX  = "net.minecraft.network.protocol.login.";
                 }
                 else {
-                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                    PREFIX = ServerVersion.getNMSDirectory();
                 }
                 //In and Out custom payload login packets have been here since 1.13
                 if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
@@ -161,7 +161,7 @@ public class PacketTypeClasses {
                     }
                 }
                 else {
-                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                    PREFIX = ServerVersion.getNMSDirectory();
                 }
                 COMMON_PREFIX  = PREFIX + "PacketPlayIn";
                 FLYING = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Flying");
@@ -294,7 +294,7 @@ public class PacketTypeClasses {
                     }
                 }
                 else {
-                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                    PREFIX = ServerVersion.getNMSDirectory();
                 }
                 COMMON_PREFIX  = PREFIX + "PacketPlayOut";
                 SPAWN_ENTITY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SpawnEntity");

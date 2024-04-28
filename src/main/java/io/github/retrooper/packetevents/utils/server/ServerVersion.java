@@ -44,14 +44,26 @@ public enum ServerVersion {
     v_1_16(735), v_1_16_1(736), v_1_16_2(751), v_1_16_3(753), v_1_16_4(754), v_1_16_5(754),
     v_1_17(755), v_1_17_1(756),
     v_1_18(757), v_1_18_1(757), v_1_18_2(758),
-    //TODO Update (checkpoint)
     v_1_19(759), v_1_19_1(760), v_1_19_2(760), v_1_19_3(761), v_1_19_4(762),
     //Same protocol version for 1.20 and 1.20.1. Same protocol version for 1.20.3 and 1.20.4.
-    v_1_20(763), v_1_20_1(763), v_1_20_2(764), v_1_20_3(765), v_1_20_4(765),
+    //Same protocol version for 1.20.5 and 1.20.6.
+    v_1_20(763), v_1_20_1(763), v_1_20_2(764), v_1_20_3(765), v_1_20_4(765), v_1_20_5(766), v_1_20_6(766),
+    //TODO Update (checkpoint)
     ERROR(-1);
 
-    private static final String NMS_VERSION_SUFFIX = Bukkit.getServer().getClass().getPackage().getName()
-            .replace(".", ",").split(",")[3];
+    private static final String NMS_VERSION_SUFFIX;
+    
+    static {
+        String temp;
+        try {
+            temp = Bukkit.getServer().getClass().getPackage().getName()
+                    .replace(".", ",").split(",")[3] + ".";
+        }
+        catch (Exception ex) {
+            temp = "";
+        }
+        NMS_VERSION_SUFFIX = temp;
+    }
     private static final ServerVersion[] VALUES = values();
     public static ServerVersion[] reversedValues = new ServerVersion[VALUES.length];
     private static ServerVersion cachedVersion;

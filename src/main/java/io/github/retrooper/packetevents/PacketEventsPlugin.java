@@ -26,6 +26,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entityeffect.WrappedPacketOutEntityEffect;
+import io.github.retrooper.packetevents.packetwrappers.play.out.entityvelocity.WrappedPacketOutEntityVelocity;
 import io.github.retrooper.packetevents.packetwrappers.play.out.setslot.WrappedPacketOutSetSlot;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -86,6 +87,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrappedPacketOutEntityEffect eff = new WrappedPacketOutEntityEffect(event.getNMSPacket());
                     eff.setEffectId(eff.getEffectId());
                     System.out.println("eff: " + eff.getEffectId() + ", ampl: " + eff.getAmplifier() + ", dur:" + eff.getDuration());
+                }
+                else if (event.getPacketId() == PacketType.Play.Server.ENTITY_VELOCITY) {
+                    WrappedPacketOutEntityVelocity ev = new WrappedPacketOutEntityVelocity(event.getNMSPacket());
                 }
             }
         });*/

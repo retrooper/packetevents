@@ -26,6 +26,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
+
 @ChannelHandler.Sharable
 public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
     /**

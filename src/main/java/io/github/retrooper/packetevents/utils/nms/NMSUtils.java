@@ -45,8 +45,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class NMSUtils {
-    public static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
-    public static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     private static final ThreadLocal<Random> randomThreadLocal = ThreadLocal.withInitial(Random::new);
     public static boolean legacyNettyImportMode;
     public static ServerVersion version;
@@ -186,6 +184,9 @@ public final class NMSUtils {
         dataWatcherClass = getNMSClassWithoutException("DataWatcher");
         if (dataWatcherClass == null) {
             dataWatcherClass = getNMClassWithoutException("network.syncher.DataWatcher");
+            if (dataWatcherClass == null) {
+                dataWatcherClass = getNMClassWithoutException("network.syncher.SynchedEntityData");
+            }
         }
         nmsItemClass = getNMSClassWithoutException("Item");
         if (nmsItemClass == null) {
@@ -226,6 +227,9 @@ public final class NMSUtils {
         iChatBaseComponentClass = NMSUtils.getNMSClassWithoutException("IChatBaseComponent");
         if (iChatBaseComponentClass == null) {
             iChatBaseComponentClass = getNMClassWithoutException("network.chat.IChatBaseComponent");
+            if (iChatBaseComponentClass == null) {
+                iChatBaseComponentClass = getNMClassWithoutException("network.chat.Component");
+            }
         }
 
         tileEntityCommandClass = NMSUtils.getNMSClassWithoutException("TileEntityCommand");
@@ -281,7 +285,11 @@ public final class NMSUtils {
             }
 
             if (dataWatcherClass != null) {
-                dataWatcherConstructor = dataWatcherClass.getConstructor(nmsEntityClass);
+                try {
+                    dataWatcherConstructor = dataWatcherClass.getConstructor(nmsEntityClass);
+                } catch (Exception ex) {
+                    dataWatcherConstructor = dataWatcherClass.getDeclaredConstructors()[0];
+                }
             }
 
             if (nmsItemStackClass != null && iMaterialClass != null) {
@@ -324,6 +332,9 @@ public final class NMSUtils {
             } catch (ClassNotFoundException e) {
                 //That is fine, it is probably a subclass
                 chatSerializerClass = SubclassUtil.getSubClass(iChatBaseComponentClass, "ChatSerializer");
+                if (chatSerializerClass == null) {
+                    chatSerializerClass = SubclassUtil.getSubClass(iChatBaseComponentClass, "Serializer");
+                }
             }
             craftMagicNumbersClass = NMSUtils.getOBCClass("util.CraftMagicNumbers");
 
@@ -376,7 +387,7 @@ public final class NMSUtils {
 
         if (registryMaterials != null) {
             getRegistryId = Reflection.getMethod(registryMaterials, int.class, 0, 1);
-            getRegistryById = Reflection.getMethod(registryMaterials, Optional.class, true,0, int.class);
+            getRegistryById = Reflection.getMethod(registryMaterials, Optional.class, true, 0, int.class);
         }
 
         worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
@@ -405,8 +416,13 @@ public final class NMSUtils {
     public static Object getMinecraftServerInstance(Server server) {
         if (minecraftServer == null) {
             try {
-                minecraftServer = Reflection.getField(craftServerClass, minecraftServerClass, 0)
-                        .get(server);
+                Field f = Reflection.getField(craftServerClass, minecraftServerClass, 0);
+                if (f == null) {
+                    //1.20.5 way
+                    minecraftServer = Reflection.getField(minecraftServerClass, minecraftServerClass, 0).get(null);
+                } else {
+                    minecraftServer = f.get(server);
+                }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -433,7 +449,7 @@ public final class NMSUtils {
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
-        return Class.forName(NMS_DIR + name);
+        return Class.forName(ServerVersion.getNMSDirectory() + name);
     }
 
     public static Class<?> getNMClass(String name) throws ClassNotFoundException {
@@ -457,7 +473,7 @@ public final class NMSUtils {
     }
 
     public static Class<? extends Enum<?>> getNMSEnumClass(String name) throws ClassNotFoundException {
-        return (Class<? extends Enum<?>>) Class.forName(NMS_DIR + name);
+        return (Class<? extends Enum<?>>) Class.forName(ServerVersion.getNMSDirectory() + name);
     }
 
     public static Class<? extends Enum<?>> getNMSEnumClassWithoutException(String name) {
@@ -478,7 +494,7 @@ public final class NMSUtils {
     }
 
     public static Class<?> getOBCClass(String name) throws ClassNotFoundException {
-        return Class.forName(OBC_DIR + name);
+        return Class.forName(ServerVersion.getOBCDirectory() + name);
     }
 
     public static Class<?> getNettyClass(String name) throws ClassNotFoundException {
@@ -539,7 +555,7 @@ public final class NMSUtils {
         Class<?> entityPlayerClass = entityPlayer != null ? entityPlayer.getClass() : null;
         String className = entityPlayer != null ? ClassUtil.getClassSimpleName(entityPlayerClass) : "";
         if (entityPlayer == null
-        || className.contains("Fake")) {
+                || className.contains("Fake")) {
             return null;
         }
         //If we need to get the superclass, we get it
@@ -576,8 +592,7 @@ public final class NMSUtils {
                     playerConnection = wrapper.read(0, playerConnectionClass);
                     wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
                     return wrapper.readObject(0, networkManagerClass);
-                }
-                catch (Exception ex3) {
+                } catch (Exception ex3) {
                     //Print the original exception!
                     ex.printStackTrace();
                 }
@@ -786,7 +801,12 @@ public final class NMSUtils {
 
     public static Object generateDataWatcher(Object nmsEntity) {
         try {
-            return dataWatcherConstructor.newInstance(nmsEntity);
+            if (dataWatcherConstructor.getParameterCount() == 2) {
+                return dataWatcherConstructor.newInstance(nmsEntity, null);
+            }
+            else {
+                return dataWatcherConstructor.newInstance(nmsEntity);
+            }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
