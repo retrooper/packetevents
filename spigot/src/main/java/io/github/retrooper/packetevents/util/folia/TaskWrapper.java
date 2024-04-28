@@ -36,7 +36,7 @@ public class TaskWrapper {
     private static Method cancelMethod;
 
     static {
-        if (FoliaCompatUtil.isFolia()) {
+        if (FoliaScheduler.isFolia()) {
             // When Folia is being used, we initialize the reflection methods for Paper's ScheduledTask on startup
             // to avoid reflection overhead during runtime.
             Class<?> scheduledTaskClass = Reflection.getClassByNameWithoutException("io.papermc.paper.threadedregions.scheduler.ScheduledTask");

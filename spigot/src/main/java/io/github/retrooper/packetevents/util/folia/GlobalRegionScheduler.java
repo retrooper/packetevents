@@ -32,7 +32,7 @@ import java.util.function.Consumer;
  * Represents a scheduler for executing global region tasks.
  */
 public class GlobalRegionScheduler {
-    private final boolean isFolia = FoliaCompatUtil.isFolia();
+    private final boolean isFolia = FoliaScheduler.isFolia();
 
     private Object globalRegionScheduler;
 

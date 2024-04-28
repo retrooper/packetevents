@@ -33,7 +33,7 @@ import java.util.function.Consumer;
  * Represents a scheduler for executing tasks asynchronously.
  */
 public class AsyncScheduler {
-    private final boolean isFolia = FoliaCompatUtil.isFolia();
+    private final boolean isFolia = FoliaScheduler.isFolia();
 
     private Object asyncScheduler;
 

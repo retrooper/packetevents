@@ -33,7 +33,7 @@ import java.util.function.Consumer;
  * Represents a scheduler for executing entity tasks.
  */
 public class EntityScheduler {
-    private final boolean isFolia = FoliaCompatUtil.isFolia();
+    private final boolean isFolia = FoliaScheduler.isFolia();
 
     private Method getEntitySchedulerMethod;
 

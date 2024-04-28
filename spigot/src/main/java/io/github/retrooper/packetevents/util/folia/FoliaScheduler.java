@@ -29,7 +29,7 @@ import org.bukkit.plugin.Plugin;
  * It uses Paper's threaded-regions schedulers if Folia is used,
  * otherwise it falls back to the default Bukkit scheduler.
  */
-public class FoliaCompatUtil {
+public class FoliaScheduler {
     private static boolean folia;
     private static Class<? extends Event> serverInitEventClass = null;
 
