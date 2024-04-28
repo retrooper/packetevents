@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.color;
 
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.util.RGBLike;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,6 +54,8 @@ public enum DyeColor implements RGBLike {
     RED(new Color(0xb02e26), new Color(0xff0000), new Color(0xb3312c), 28),
 
     BLACK(new Color(0x1d1d21), new Color(0x0), new Color(0x1e1b1b), 29);
+
+    public static final DyeColor[] VALUES = values();
 
     private final Color textureDiffuseColor;
 

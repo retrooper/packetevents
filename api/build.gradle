@@ -8,7 +8,7 @@ java {
 }
 
 dependencies {
-    compileOnly(adventureDependencies)
+    compileOnlyApi(adventureDependencies)
 
     testImplementation(adventureDependencies)
     testImplementation(project(":netty-common"))
