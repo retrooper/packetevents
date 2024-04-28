@@ -41,22 +41,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class SpigotReflectionUtil {
@@ -357,8 +347,14 @@ public final class SpigotReflectionUtil {
     public static Object getMinecraftServerInstance(Server server) {
         if (MINECRAFT_SERVER_INSTANCE == null) {
             try {
-                MINECRAFT_SERVER_INSTANCE = Reflection.getField(CRAFT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0)
-                        .get(server);
+                Field f = Reflection.getField(CRAFT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0);
+                if (f == null) {
+                    //1.20.5 way
+                    MINECRAFT_SERVER_INSTANCE = Reflection.getField(MINECRAFT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0).get(null);
+                }
+                else {
+                    MINECRAFT_SERVER_INSTANCE = f.get(server);
+                }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
