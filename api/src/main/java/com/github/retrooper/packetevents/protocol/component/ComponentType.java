@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,32 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.item.type;
+package com.github.retrooper.packetevents.protocol.component;
 
-import com.github.retrooper.packetevents.protocol.component.StaticComponentMap;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
-import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
-import org.jetbrains.annotations.Nullable;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.util.Set;
+public interface ComponentType<T> extends MappedEntity {
 
-public interface ItemType extends MappedEntity {
-    int getMaxAmount();
+    T read(PacketWrapper<?> wrapper);
 
-    int getMaxDurability();
-
-    boolean isMusicDisc();
-
-    ItemType getCraftRemainder();
-
-    @Nullable
-    StateType getPlacedType();
-
-    Set<ItemTypes.ItemAttribute> getAttributes();
-
-    boolean hasAttribute(ItemTypes.ItemAttribute attribute);
-
-    default StaticComponentMap getComponents() {
-        return StaticComponentMap.EMPTY;
-    }
+    void write(PacketWrapper<?> wrapper, T content);
 }

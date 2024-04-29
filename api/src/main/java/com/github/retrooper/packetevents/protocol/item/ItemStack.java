@@ -18,8 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.item;
 
-import com.github.retrooper.packetevents.protocol.item.component.ComponentType;
-import com.github.retrooper.packetevents.protocol.item.component.PatchableComponentMap;
+import com.github.retrooper.packetevents.protocol.component.ComponentType;
+import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
 import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;

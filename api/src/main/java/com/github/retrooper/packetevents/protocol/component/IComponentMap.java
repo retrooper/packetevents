@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,32 +16,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.item.type;
+package com.github.retrooper.packetevents.protocol.component;
 
-import com.github.retrooper.packetevents.protocol.component.StaticComponentMap;
-import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
-import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
+import java.util.Optional;
 
-public interface ItemType extends MappedEntity {
-    int getMaxAmount();
+public interface IComponentMap {
 
-    int getMaxDurability();
-
-    boolean isMusicDisc();
-
-    ItemType getCraftRemainder();
-
-    @Nullable
-    StateType getPlacedType();
-
-    Set<ItemTypes.ItemAttribute> getAttributes();
-
-    boolean hasAttribute(ItemTypes.ItemAttribute attribute);
-
-    default StaticComponentMap getComponents() {
-        return StaticComponentMap.EMPTY;
+    default <T> Optional<T> getOptional(ComponentType<T> type) {
+        return Optional.ofNullable(this.get(type));
     }
+
+    boolean has(ComponentType<?> type);
+
+    <T> @Nullable T get(ComponentType<T> type);
+
+    default <T> void set(ComponentType<T> type, @Nullable T value) {
+        this.set(type, Optional.ofNullable(value));
+    }
+
+    default <T> void unset(ComponentType<T> type) {
+        this.set(type, Optional.empty());
+    }
+
+    <T> void set(ComponentType<T> type, Optional<T> value);
 }
