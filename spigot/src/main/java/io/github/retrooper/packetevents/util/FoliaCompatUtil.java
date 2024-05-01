@@ -154,6 +154,7 @@ public class FoliaCompatUtil {
     public static void runTaskForEntity(Entity entity, Plugin plugin, Runnable run, Runnable retired, long delay) {
         if (!folia) {
             Bukkit.getScheduler().runTaskLater(plugin, run, delay);
+            return;
         }
 
         // Gradle doesn't allow us to use java 17 APIs, so we have to use reflection instead...
