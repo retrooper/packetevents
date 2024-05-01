@@ -18,8 +18,10 @@
 
 package io.github.retrooper.packetevents.util.viaversion;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import io.netty.channel.Channel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -77,9 +79,10 @@ public class ViaVersionUtil {
             Object viaEncoder = ((Channel) user.getChannel()).pipeline().get("via-encoder");
             Object connection = Reflection.getField(viaEncoder.getClass(), "connection").get(viaEncoder);
             Object protocolInfo = Reflection.getField(connection.getClass(), "protocolInfo").get(connection);
-            return (int) Reflection.getField(protocolInfo.getClass(), "protocolVersion").get(protocolInfo);
+            Object protocolVersion = Reflection.getField(protocolInfo.getClass(), "protocolVersion").get(protocolInfo);
+            return protocolVersion instanceof Integer ? (int) protocolVersion : ((ProtocolVersion) protocolVersion).getVersion();
         } catch (Exception e) {
-            System.out.println("Unable to grab ViaVersion client version for player!");
+            PacketEvents.getAPI().getLogManager().warn("Unable to grab ViaVersion client version for player!");
             return -1;
         }
     }

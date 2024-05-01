@@ -61,4 +61,9 @@ public class NBTString extends NBT {
     public NBTString copy() {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "String(" + string + ")";
+    }
 }

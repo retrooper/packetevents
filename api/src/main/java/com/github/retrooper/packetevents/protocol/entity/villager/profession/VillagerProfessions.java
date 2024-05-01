@@ -49,7 +49,6 @@ public class VillagerProfessions {
         return VILLAGER_PROFESSION_ID_MAP.get((byte)id);
     }
 
-
     public static VillagerProfession getByName(String name) {
         return VILLAGER_PROFESSION_MAP.get(name);
     }

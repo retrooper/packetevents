@@ -18,15 +18,22 @@
 
 package com.github.retrooper.packetevents.protocol.entity.villager;
 
+import com.github.retrooper.packetevents.protocol.entity.villager.level.VillagerLevel;
 import com.github.retrooper.packetevents.protocol.entity.villager.profession.VillagerProfession;
 import com.github.retrooper.packetevents.protocol.entity.villager.profession.VillagerProfessions;
 import com.github.retrooper.packetevents.protocol.entity.villager.type.VillagerType;
 import com.github.retrooper.packetevents.protocol.entity.villager.type.VillagerTypes;
+import org.jetbrains.annotations.Nullable;
 
 public class VillagerData {
+
     private VillagerType type;
     private VillagerProfession profession;
     private int level;
+
+    public VillagerData(VillagerType type, VillagerProfession profession, VillagerLevel level) {
+        this(type, profession, level.getId());
+    }
 
     public VillagerData(VillagerType type, VillagerProfession profession, int level) {
         this.type = type;
@@ -55,10 +62,18 @@ public class VillagerData {
     }
 
     public int getLevel() {
-        return level;
+        return this.level;
+    }
+
+    public @Nullable VillagerLevel getVillagerLevel() {
+        return VillagerLevel.getById(this.level);
     }
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public void setLevel(VillagerLevel level) {
+        this.level = level.getId();
     }
 }

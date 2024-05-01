@@ -82,17 +82,26 @@ public enum ClientVersion {
     V_1_19_1(760),
     V_1_19_3(761),
     V_1_19_4(762),
+    /**
+     * 1.20 and 1.20.1 have the same protocol version.
+     */
     V_1_20(763),
     V_1_20_2(764),
     /**
      * 1.20.3 and 1.20.4 have the same protocol version.
      */
     V_1_20_3(765),
+    /**
+     * 1.20.5 and 1.20.6 have the same protocol version.
+     */
+    V_1_20_5(766),
     //TODO UPDATE Add new protocol version field
 
+    @Deprecated
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
-    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_20_3.protocolVersion + 1, true),
+    @Deprecated
+    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_20_5.protocolVersion + 1, true),
 
     UNKNOWN(-1, true);
 
@@ -163,9 +172,9 @@ public enum ClientVersion {
     @NotNull
     public static ClientVersion getById(int protocolVersion) {
         if (protocolVersion < LOWEST_SUPPORTED_PROTOCOL_VERSION) {
-            return LOWER_THAN_SUPPORTED_VERSIONS;
+            return V_1_7_10;
         } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
-            return HIGHER_THAN_SUPPORTED_VERSIONS;
+            return V_1_20_3;
         } else {
             for (ClientVersion version : VALUES) {
                 if (version.protocolVersion > protocolVersion) {

@@ -30,7 +30,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClientUpdateSign> {
     private Vector3i blockPosition;
     private String[] textLines;
-    private boolean isFrontText = true;
+    private boolean isFrontText;
 
     public WrapperPlayClientUpdateSign(PacketReceiveEvent event) {
         super(event);
@@ -55,6 +55,8 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
             isFrontText = readBoolean();
+        } else {
+            isFrontText = true;
         }
         textLines = new String[4];
         for (int i = 0; i < 4; i++) {

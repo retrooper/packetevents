@@ -27,20 +27,29 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData.RegistryElement;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 public class InternalPacketListener extends PacketListenerAbstract {
+
+    private static final ResourceLocation DIMENSION_TYPE_REGISTRY_KEY =
+            ResourceLocation.minecraft("dimension_type");
 
     public InternalPacketListener() {
         this(PacketListenerPriority.LOWEST);
@@ -89,10 +98,29 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
             // Store world data
             NBTCompound registryDataTag = registryData.getRegistryData();
-            if (registryDataTag != null) {
-                NBTList<NBTCompound> list = registryDataTag
-                        .getCompoundTagOrNull("minecraft:dimension_type")
+            NBTList<NBTCompound> list = null;
+            if (registryDataTag != null) { // <1.20.5
+                list = registryDataTag
+                        .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString())
                         .getCompoundListTagOrNull("value");
+            } else if (DIMENSION_TYPE_REGISTRY_KEY.equals(registryData.getRegistryKey())) { // >=1.20.5
+                // remap to legacy format
+                list = new NBTList<>(NBTType.COMPOUND);
+                List<RegistryElement> elements = registryData.getElements();
+                if (elements != null) {
+                    int i = 0;
+                    for (RegistryElement element : elements) {
+                        NBTCompound tag = new NBTCompound();
+                        tag.setTag("name", new NBTString(element.getId().toString()));
+                        tag.setTag("id", new NBTInt(i++));
+                        if (element.getData() != null) { // may be null because of known packs not being sent
+                            tag.setTag("element", element.getData());
+                        }
+                        list.addTag(tag);
+                    }
+                }
+            }
+            if (list != null) {
                 user.setWorldNBT(list);
             }
         }
@@ -110,17 +138,22 @@ public class InternalPacketListener extends PacketListenerAbstract {
             NBTCompound dimensionCodec = joinGame.getDimensionCodec();
             if (dimensionCodec != null) {
                 NBTList<NBTCompound> list = dimensionCodec
-                        .getCompoundTagOrNull("minecraft:dimension_type")
+                        .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString())
                         .getCompoundListTagOrNull("value");
                 user.setWorldNBT(list);
             }
 
             // Update world height
-            NBTCompound dimension = user.getWorldNBT(joinGame.getDimension().getDimensionName());
+            NBTCompound dimension = user.getWorldNBT(joinGame.getDimension());
             if (dimension != null) {
                 NBTCompound worldNBT = dimension.getCompoundTagOrNull("element");
-                user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-                user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+                if (worldNBT != null) {
+                    user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
+                    user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+                } else {
+                    PacketEvents.getAPI().getLogger().warning(
+                            "No data was sent for dimension " + dimension + " to " + user.getName());
+                }
             }
         }
 
@@ -132,11 +165,16 @@ public class InternalPacketListener extends PacketListenerAbstract {
                 return; // Fixed world height, no tags are sent to the client
             }
 
-            NBTCompound dimension = user.getWorldNBT(respawn.getDimension().getDimensionName());
+            NBTCompound dimension = user.getWorldNBT(respawn.getDimension());
             if (dimension != null) {
                 NBTCompound worldNBT = dimension.getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
-                user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-                user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+                if (worldNBT != null) {
+                    user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
+                    user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+                } else {
+                    PacketEvents.getAPI().getLogger().warning(
+                            "No data was sent for dimension " + dimension + " to " + user.getName());
+                }
             }
         } else if (event.getPacketType() == PacketType.Play.Server.CONFIGURATION_START) {
             user.setEncoderState(ConnectionState.CONFIGURATION);

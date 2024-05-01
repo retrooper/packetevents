@@ -34,6 +34,7 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
+import org.jetbrains.annotations.Nullable;
 
 public class SpigotConversionUtil {
     public static Location fromBukkitLocation(org.bukkit.Location location) {
@@ -150,4 +151,13 @@ public class SpigotConversionUtil {
         return SpigotReflectionUtil.fromPacketEventsParticle(particle);
     }
 
+    /**
+     * Access the Bukkit Entity associated to the Entity ID.
+     * @param world The world they are in. This field is optional, but is recommended as it could boost performance.
+     * @param entityId The associated Entity ID
+     * @return The Bukkit Entity
+     */
+    public static org.bukkit.entity.Entity getEntityById(@Nullable World world, int entityId) {
+        return SpigotReflectionUtil.getEntityById(world, entityId);
+    }
 }

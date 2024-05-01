@@ -85,11 +85,11 @@ public enum BlockFace {
 
     public static BlockFace getLegacyBlockFaceByValue(int face) {
         if (face == 255) return OTHER;
-        return VALUES[face % VALUES.length];
+        return CARTESIAN_VALUES[face % CARTESIAN_VALUES.length];
     }
 
     public static BlockFace getBlockFaceByValue(int face) {
-        return VALUES[face % VALUES.length];
+        return CARTESIAN_VALUES[face % CARTESIAN_VALUES.length];
     }
 
     public int getModX() {

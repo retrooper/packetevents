@@ -24,9 +24,11 @@ import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.handlers.PacketEventsEncoder;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 
 public class ServerConnectionInitializer {
     public static void addChannelHandlers(Channel channel, PacketEventsDecoder decoder, PacketEventsEncoder encoder) {
@@ -45,13 +47,11 @@ public class ServerConnectionInitializer {
         PacketEventsDecoder decoder = new PacketEventsDecoder(user);
         PacketEventsEncoder encoder = new PacketEventsEncoder(user);
         addChannelHandlers(channel, decoder, encoder);
+        channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
         PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
     }
 
     public static void destroyChannel(Channel channel) {
-        User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
-        UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
-        PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
         channel.pipeline().remove(PacketEvents.DECODER_NAME);
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
     }
