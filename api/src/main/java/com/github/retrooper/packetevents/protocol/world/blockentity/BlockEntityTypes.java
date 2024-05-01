@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.protocol.world.blockentity;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,15 +30,10 @@ public class BlockEntityTypes {
 
     private static final Map<String, BlockEntityType> BLOCK_ENTITY_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, BlockEntityType>> BLOCK_ENTITY_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("block/block_entity_type_mappings",
-            ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20_2,
-            ClientVersion.V_1_20_3,
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("block/block_entity_type_mappings");
 
     public static BlockEntityType define(String key) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         BlockEntityType blockEntityType = new BlockEntityType() {
             private final int[] ids = data.getData();
 

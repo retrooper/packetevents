@@ -19,12 +19,15 @@
 package com.github.retrooper.packetevents.util.mappings;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
@@ -102,5 +105,18 @@ public class MappingHelper {
         }
 
         return diffs;
+    }
+
+    public static  <T extends MappedEntity> void registerMapping(TypesBuilder builder, Map<String, T> typeMap, Map<Byte, Map<Integer, T>> typeIdMap, T type) {
+        typeMap.put(type.getName().toString(), type);
+        for (ClientVersion version : builder.getVersions()) {
+            int index = builder.getDataIndex(version);
+            Map<Integer, T> idMap = typeIdMap.computeIfAbsent((byte) index, k -> new HashMap<>());
+            idMap.put(type.getId(version), type);
+        }
+    }
+
+    public static int getId(ClientVersion version, TypesBuilder builder, TypesBuilderData data) {
+        return data.getData()[builder.getDataIndex(version)];
     }
 }

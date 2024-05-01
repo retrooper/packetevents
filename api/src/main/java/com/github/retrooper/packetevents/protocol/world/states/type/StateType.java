@@ -24,8 +24,9 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.MaterialType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 
 import java.util.Objects;
 
@@ -167,7 +168,7 @@ public class StateType {
 
         @Override
         public int getId(ClientVersion version) {
-            return typesBuilder.getId(version, typeData);
+            return MappingHelper.getId(version, typesBuilder, typeData);
         }
     }
 }

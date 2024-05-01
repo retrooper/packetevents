@@ -20,8 +20,9 @@ package com.github.retrooper.packetevents.protocol.sound;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -32,32 +33,14 @@ public class Sounds {
     private static final Map<String, Sound> POTION_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, Sound>> POTION_TYPE_ID_MAP = new HashMap<>();
 
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("sound/sound_mappings",
-            ClientVersion.V_1_9_3,
-            ClientVersion.V_1_10,
-            ClientVersion.V_1_11,
-            ClientVersion.V_1_12,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_13_2,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_15,
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_16_2,
-            ClientVersion.V_1_17,
-            ClientVersion.V_1_18,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_3,
-            ClientVersion.V_1_20,
-            ClientVersion.V_1_20_2,
-            ClientVersion.V_1_20_3,
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("sound/sound_mappings");
 
     public static Sound define(String key) {
         return define(key, new ResourceLocation(key), null);
     }
 
     public static Sound define(String key, ResourceLocation soundId, @Nullable Float range) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         Sound potionType = new Sound() {
             @Override
             public ResourceLocation getSoundId() {
@@ -76,7 +59,7 @@ public class Sounds {
 
             @Override
             public int getId(ClientVersion version) {
-                return TYPES_BUILDER.getId(version, data);
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
 
             @Override
@@ -87,7 +70,7 @@ public class Sounds {
                 return false;
             }
         };
-        TYPES_BUILDER.register(POTION_TYPE_MAP, POTION_TYPE_ID_MAP, potionType);
+        MappingHelper.registerMapping(TYPES_BUILDER, POTION_TYPE_MAP, POTION_TYPE_ID_MAP, potionType);
         return potionType;
     }
 

@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.chat;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 
@@ -35,8 +36,6 @@ public class ChatTypes {
     public static ChatType define(String key) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
         ChatType chatType = new ChatType() {
-            private final int[] ids = data.getData();
-
             @Override
             public ResourceLocation getName() {
                 return data.getName();
@@ -44,16 +43,10 @@ public class ChatTypes {
 
             @Override
             public int getId(ClientVersion version) {
-                int index = TYPES_BUILDER.getDataIndex(version);
-                return ids[index];
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
         };
-        CHAT_TYPE_MAP.put(chatType.getName().toString(), chatType);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, ChatType> typeIdMap = CHAT_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
-            typeIdMap.put(chatType.getId(version), chatType);
-        }
+        MappingHelper.registerMapping(TYPES_BUILDER, CHAT_TYPE_MAP, CHAT_TYPE_ID_MAP, chatType);
         return chatType;
     }
 

@@ -24,8 +24,9 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
@@ -38,8 +39,7 @@ public class TrimMaterials {
 
     private static final Map<String, TrimMaterial> PATTERN_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, TrimMaterial>> PATTERN_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_trim_material_mappings",
-            ClientVersion.V_1_19_4);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_trim_material_mappings");
 
     public static TrimMaterial define(String key, ItemType ingredient, float itemModelIndex, int color) {
         // darken own armor material - if present
@@ -58,7 +58,7 @@ public class TrimMaterials {
             String key, String assetName, ItemType ingredient, float itemModelIndex,
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         TrimMaterial pattern = new TrimMaterial() {
             @Override
             public String getAssetName() {
@@ -103,7 +103,7 @@ public class TrimMaterials {
                 return false;
             }
         };
-        TYPES_BUILDER.register(PATTERN_TYPE_MAP, PATTERN_TYPE_ID_MAP, pattern);
+        MappingHelper.registerMapping(TYPES_BUILDER, PATTERN_TYPE_MAP, PATTERN_TYPE_ID_MAP, pattern);
         return pattern;
     }
 

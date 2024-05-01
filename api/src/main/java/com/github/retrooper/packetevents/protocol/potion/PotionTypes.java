@@ -22,8 +22,9 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -35,13 +36,7 @@ public class PotionTypes {
     private static final Map<Byte, Map<Integer, PotionType>> POTION_TYPE_ID_MAP = new HashMap<>();
 
     // initial mappings based upon https://minecraft.wiki/w/Effect#History
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("entity/entity_effect_mappings",
-            ClientVersion.V_1_7_10,
-            ClientVersion.V_1_9,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("entity/entity_effect_mappings");
 
     @Deprecated
     public static PotionType define(String key, int ignoredId) {
@@ -49,7 +44,7 @@ public class PotionTypes {
     }
 
     public static PotionType define(String key) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         PotionType potionType = new PotionType() {
             @Override
             public ResourceLocation getName() {
@@ -58,7 +53,7 @@ public class PotionTypes {
 
             @Override
             public int getId(ClientVersion version) {
-                return TYPES_BUILDER.getId(version, data);
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
 
             @Override
@@ -69,7 +64,7 @@ public class PotionTypes {
                 return false;
             }
         };
-        TYPES_BUILDER.register(POTION_TYPE_MAP, POTION_TYPE_ID_MAP, potionType);
+        MappingHelper.registerMapping(TYPES_BUILDER, POTION_TYPE_MAP, POTION_TYPE_ID_MAP, potionType);
         return potionType;
     }
 

@@ -32,9 +32,15 @@ public class TypesBuilder {
     private Map<ClientVersion, Map<String, Integer>> entries = new HashMap<>();
     private VersionMapper versionMapper;
 
-    public TypesBuilder(String mapPath) {
+    public TypesBuilder(String mapPath, boolean lazy) {
         this.mapPath = mapPath;
-        load();
+        if (!lazy) {
+            load();
+        }
+    }
+
+    public TypesBuilder(String mapPath) {
+        this(mapPath, false);
     }
 
     public void load() {
