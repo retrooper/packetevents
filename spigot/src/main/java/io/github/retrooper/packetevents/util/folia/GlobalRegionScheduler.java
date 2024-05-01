@@ -66,9 +66,10 @@ public class GlobalRegionScheduler {
      * @param plugin The plugin that owns the task
      * @param run    The task to execute
      */
-    private void execute(@NotNull Plugin plugin, @NotNull Runnable run) {
+    public void execute(@NotNull Plugin plugin, @NotNull Runnable run) {
         if (!isFolia) {
             Bukkit.getScheduler().runTask(plugin, run);
+            return;
         }
 
         try {

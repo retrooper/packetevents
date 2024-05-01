@@ -80,6 +80,7 @@ public class RegionScheduler {
     public void execute(@NotNull Plugin plugin, @NotNull World world, int chunkX, int chunkZ, @NotNull Runnable run) {
         if (!isFolia) {
             Bukkit.getScheduler().runTask(plugin, run);
+            return;
         }
 
         try {
@@ -99,6 +100,7 @@ public class RegionScheduler {
     public void execute(@NotNull Plugin plugin, @NotNull Location location, @NotNull Runnable run) {
         if (!isFolia) {
             Bukkit.getScheduler().runTask(plugin, run);
+            return;
         }
 
         try {
