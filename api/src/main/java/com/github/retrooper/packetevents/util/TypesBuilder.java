@@ -18,11 +18,15 @@
 
 package com.github.retrooper.packetevents.util;
 
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TypesBuilder {
     private final String mapPath;
@@ -33,6 +37,21 @@ public class TypesBuilder {
                         ClientVersion... versions) {
         this.mapPath = mapPath;
         this.versionMapper = new VersionMapper(versions);
+    }
+
+    public <T extends MappedEntity> void register(
+            Map<String, T> typeMap, Map<Byte, Map<Integer, T>> typeIdMap, T type) {
+        typeMap.put(type.getName().toString(), type);
+        for (ClientVersion version : this.getVersions()) {
+            int index = this.getDataIndex(version);
+            Map<Integer, T> idMap = typeIdMap.computeIfAbsent(
+                    (byte) index, k -> new HashMap<>());
+            idMap.put(type.getId(version), type);
+        }
+    }
+
+    public int getId(ClientVersion version, TypesBuilderData data) {
+        return data.getData()[this.getDataIndex(version)];
     }
 
     public JsonObject getFileMappings() {
@@ -93,8 +112,7 @@ public class TypesBuilder {
                 if (jsonMap.has(key)) {
                     int id = jsonMap.get(key).getAsInt();
                     ids[index] = id;
-                }
-                else {
+                } else {
                     ids[index] = -1;
                 }
             }

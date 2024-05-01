@@ -18,15 +18,74 @@
 
 package com.github.retrooper.packetevents.protocol.world.states.type;
 
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.MaterialType;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.TypesBuilder;
+import com.github.retrooper.packetevents.util.TypesBuilderData;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class StateTypes {
-    private static final Map<String, StateType> BY_NAME = new HashMap<>();
+
+    private static final List<StateType> ALL_STATE_TYPES = new ArrayList<>();
+    private static final Map<String, StateType.Mapped> BY_NAME = new HashMap<>();
+    private static final Map<Byte, Map<Integer, StateType.Mapped>> BY_ID = new HashMap<>();
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("block/block_type_mappings",
+            ClientVersion.V_1_7_10,
+            ClientVersion.V_1_13,
+            ClientVersion.V_1_13_2,
+            ClientVersion.V_1_14,
+            ClientVersion.V_1_15,
+            ClientVersion.V_1_16,
+            ClientVersion.V_1_16_2,
+            ClientVersion.V_1_17,
+            ClientVersion.V_1_19,
+            ClientVersion.V_1_19_3,
+            ClientVersion.V_1_19_4,
+            ClientVersion.V_1_20,
+            ClientVersion.V_1_20_2,
+            ClientVersion.V_1_20_3,
+            ClientVersion.V_1_20_5);
+
+    public static Collection<StateType> values() {
+        return Collections.unmodifiableCollection(ALL_STATE_TYPES);
+    }
+
+    public static @Nullable StateType getByName(String blockString) {
+        StateType.Mapped mapped = getMappedByName(blockString);
+        return mapped == null ? null : mapped.getStateType();
+    }
+
+    public static StateType.@Nullable Mapped getMappedByName(String blockString) {
+        return getMappedByName(new ResourceLocation(blockString));
+    }
+
+    public static @Nullable StateType getByName(ResourceLocation blockKey) {
+        StateType.Mapped mapped = getMappedByName(blockKey);
+        return mapped == null ? null : mapped.getStateType();
+    }
+
+    public static StateType.@Nullable Mapped getMappedByName(ResourceLocation blockKey) {
+        return BY_NAME.get(blockKey.toString());
+    }
+
+    public static StateType getById(ClientVersion version, int id) {
+        return getMappedById(version, id).getStateType();
+    }
+
+    public static StateType.Mapped getMappedById(ClientVersion version, int id) {
+        int index = TYPES_BUILDER.getDataIndex(version);
+        Map<Integer, StateType.Mapped> idMap = BY_ID.get((byte) index);
+        return idMap.get(id);
+    }
 
     public static StateType AIR = StateTypes.builder().name("AIR").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).isAir(true).setMaterial(MaterialType.AIR).build();
     public static StateType STONE = StateTypes.builder().name("STONE").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
@@ -206,8 +265,9 @@ public class StateTypes {
 
     /**
      * This is short grass.
+     *
      * @deprecated Please use SHORT_GRASS instead of GRASS, this is now deprecated.
-     * */
+     */
     @Deprecated
     public static StateType GRASS = SHORT_GRASS;
 
@@ -1108,20 +1168,20 @@ public class StateTypes {
     public static StateType CRAFTER = StateTypes.builder().name("CRAFTER").blastResistance(3.5f).hardness(1.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType TRIAL_SPAWNER = StateTypes.builder().name("TRIAL_SPAWNER").blastResistance(50.0f).hardness(50.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
 
+    // 1.20.5 added types
+    public static StateType VAULT = StateTypes.builder().name("vault").blastResistance(50.0f).hardness(50.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).build();
+    public static StateType HEAVY_CORE = StateTypes.builder().name("heavy_core").blastResistance(1200.0f).hardness(10.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).build();
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
+    }
+
     public static Builder builder() {
         return new Builder();
     }
 
-    public static Collection<StateType> values() {
-        return BY_NAME.values();
-    }
-
-    public static StateType getByName(String blockString) {
-        return BY_NAME.get(blockString.toLowerCase(Locale.ROOT));
-    }
-
     public static class Builder {
-        String name;
+        ResourceLocation name;
         float blastResistance = 0F;
         float hardness = 0F;
         boolean isSolid;
@@ -1132,7 +1192,7 @@ public class StateTypes {
         MaterialType materialType;
 
         public Builder name(String name) {
-            this.name = name.toLowerCase(Locale.ROOT); // TODO: Rethink whether all names are lowercase
+            this.name = new ResourceLocation(name);
             return this;
         }
 
@@ -1177,8 +1237,12 @@ public class StateTypes {
         }
 
         public StateType build() {
-            StateType type = new StateType(name, blastResistance, hardness, isSolid, isBlocking, isAir, requiresCorrectTool, isShapeExceedsCube, materialType);
-            BY_NAME.put(name, type);
+            TypesBuilderData data = TYPES_BUILDER.defineFromArray(this.name.getKey().toLowerCase(Locale.ROOT));
+            StateType type = new StateType(
+                    TYPES_BUILDER, data, blastResistance, hardness, isSolid,
+                    isBlocking, isAir, requiresCorrectTool, isShapeExceedsCube, materialType);
+            ALL_STATE_TYPES.add(type);
+            TYPES_BUILDER.register(BY_NAME, BY_ID, type.getMapped());
             return type;
         }
     }

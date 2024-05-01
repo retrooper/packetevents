@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -39,7 +40,8 @@ public class WrapperPlayClientCreativeInventoryAction extends PacketWrapper<Wrap
 
     @Override
     public void read() {
-        this.slot = readShort();
+        this.slot = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)
+                ? this.readUnsignedShort() : this.readShort();
         this.itemStack = readItemStack();
     }
 
