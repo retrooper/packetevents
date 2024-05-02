@@ -20,8 +20,9 @@ package com.github.retrooper.packetevents.protocol.chat;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,20 +31,11 @@ public class ChatTypes {
     private static final Map<String, ChatType> CHAT_TYPE_MAP = new HashMap<>();
     //Key - mappings version, value - map with chat type ids and chat types
     private static final Map<Byte, Map<Integer, ChatType>> CHAT_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("chat/chat_type_mappings",
-            ClientVersion.V_1_18_2,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_1);
-
-    static {
-        TYPES_BUILDER.unloadFileMappings();
-    }
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("chat/chat_type_mappings");
 
     public static ChatType define(String key) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
         ChatType chatType = new ChatType() {
-            private final int[] ids = data.getData();
-
             @Override
             public ResourceLocation getName() {
                 return data.getName();
@@ -51,16 +43,10 @@ public class ChatTypes {
 
             @Override
             public int getId(ClientVersion version) {
-                int index = TYPES_BUILDER.getDataIndex(version);
-                return ids[index];
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
         };
-        CHAT_TYPE_MAP.put(chatType.getName().toString(), chatType);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, ChatType> typeIdMap = CHAT_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
-            typeIdMap.put(chatType.getId(version), chatType);
-        }
+        MappingHelper.registerMapping(TYPES_BUILDER, CHAT_TYPE_MAP, CHAT_TYPE_ID_MAP, chatType);
         return chatType;
     }
 
@@ -91,4 +77,8 @@ public class ChatTypes {
     public static final ChatType MSG_COMMAND = define("msg_command");
     @Deprecated
     public static final ChatType TEAM_MSG_COMMAND = define("team_msg_command");
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
+    }
 }

@@ -84,7 +84,8 @@ public final class SpigotReflectionUtil {
             GAME_PROFILE_CLASS, CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS, CRAFT_PARTICLE_CLASS,
             LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
             BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS, PROPERTY_MAP_CLASS, DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, MOJANG_ENCODER_CLASS, DATA_RESULT_CLASS,
-            DYNAMIC_OPS_NBT_CLASS, NMS_NBT_COMPOUND_CLASS, NBT_COMPRESSION_STREAM_TOOLS_CLASS;
+            DYNAMIC_OPS_NBT_CLASS, NMS_NBT_COMPOUND_CLASS, NBT_COMPRESSION_STREAM_TOOLS_CLASS,
+            STREAM_CODEC, STREAM_DECODER, STREAM_ENCODER, REGISTRY_FRIENDLY_BYTE_BUF, REGISTRY_ACCESS, REGISTRY_ACCESS_FROZEN;
 
     //Netty classes
     public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS, BYTE_TO_MESSAGE_DECODER, MESSAGE_TO_BYTE_ENCODER;
@@ -102,13 +103,16 @@ public final class SpigotReflectionUtil {
             WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD, GET_COMBINED_ID,
             GET_BY_COMBINED_ID, GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA, PROPERTY_MAP_GET_METHOD,
             GET_DIMENSION_MANAGER, GET_DIMENSION_ID, GET_DIMENSION_KEY, CODEC_ENCODE_METHOD, DATA_RESULT_GET_METHOD,
-            READ_NBT_FROM_STREAM_METHOD, WRITE_NBT_TO_STREAM_METHOD;
+            READ_NBT_FROM_STREAM_METHOD, WRITE_NBT_TO_STREAM_METHOD, STREAM_DECODER_DECODE, STREAM_ENCODER_ENCODE;
 
     //Constructors
-    private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR, NMS_MINECRAFT_KEY_CONSTRUCTOR;
+    private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR,
+            NMS_MINECRAFT_KEY_CONSTRUCTOR, REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR;
 
     private static Object MINECRAFT_SERVER_INSTANCE;
     private static Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
+    private static Object MINECRAFT_SERVER_REGISTRY_ACCESS;
+    private static Object ITEM_STACK_OPTIONAL_STREAM_CODEC;
 
     private static boolean PAPER_ENTITY_LOOKUP_EXISTS = false;
 
@@ -121,8 +125,12 @@ public final class SpigotReflectionUtil {
             NMS_ITEM_STACK_CONSTRUCTOR = NMS_ITEM_STACK_CLASS.getConstructor(itemClass, int.class);
             NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR = NMS_PACKET_DATA_SERIALIZER_CLASS.getConstructor(BYTE_BUF_CLASS);
             // This constructor doesn't exist on 1.8 - when was it added?
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_9)) {
                 NMS_MINECRAFT_KEY_CONSTRUCTOR = NMS_MINECRAFT_KEY_CLASS.getConstructor(String.class, String.class);
+            }
+            if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR = REGISTRY_FRIENDLY_BYTE_BUF.getConstructor(
+                        BYTE_BUF_CLASS, REGISTRY_ACCESS);
             }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -195,6 +203,11 @@ public final class SpigotReflectionUtil {
             READ_NBT_FROM_STREAM_METHOD = Reflection.getMethod(NBT_COMPRESSION_STREAM_TOOLS_CLASS, 0, DataInput.class);
         }
         WRITE_NBT_TO_STREAM_METHOD = Reflection.getMethod(NBT_COMPRESSION_STREAM_TOOLS_CLASS, 0, NMS_NBT_COMPOUND_CLASS, DataOutput.class);
+
+        if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            STREAM_DECODER_DECODE = STREAM_DECODER.getMethods()[0];
+            STREAM_ENCODER_ENCODE = STREAM_ENCODER.getMethods()[0];
+        }
     }
 
     private static void initFields() {
@@ -275,6 +288,25 @@ public final class SpigotReflectionUtil {
         MESSAGE_TO_BYTE_ENCODER = getNettyClass("handler.codec.MessageToByteEncoder");
         NMS_NBT_COMPOUND_CLASS = getServerClass("nbt.NBTTagCompound", "NBTTagCompound");
         NBT_COMPRESSION_STREAM_TOOLS_CLASS = getServerClass("nbt.NBTCompressedStreamTools", "NBTCompressedStreamTools");
+
+        if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            STREAM_CODEC = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamCodec");
+            STREAM_DECODER = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamDecoder");
+            STREAM_ENCODER = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamEncoder");
+            REGISTRY_FRIENDLY_BYTE_BUF = Reflection.getClassByNameWithoutException("net.minecraft.network.RegistryFriendlyByteBuf");
+            REGISTRY_ACCESS = Reflection.getClassByNameWithoutException("net.minecraft.core.IRegistryCustom");
+            REGISTRY_ACCESS_FROZEN = Reflection.getClassByNameWithoutException("net.minecraft.core.IRegistryCustom$Dimension");
+        }
+    }
+
+    private static void initObjects() {
+        try {
+            if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                ITEM_STACK_OPTIONAL_STREAM_CODEC = Reflection.getField(NMS_ITEM_STACK_CLASS, STREAM_CODEC, 0).get(null);
+            }
+        } catch (IllegalAccessException exception) {
+            exception.printStackTrace();
+        }
     }
 
     public static void init() {
@@ -287,8 +319,8 @@ public final class SpigotReflectionUtil {
         initFields();
         initMethods();
         initConstructors();
+        initObjects();
     }
-
 
     @Nullable
     public static Class<?> getServerClass(String modern, String legacy) {
@@ -315,8 +347,14 @@ public final class SpigotReflectionUtil {
     public static Object getMinecraftServerInstance(Server server) {
         if (MINECRAFT_SERVER_INSTANCE == null) {
             try {
-                MINECRAFT_SERVER_INSTANCE = Reflection.getField(CRAFT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0)
-                        .get(server);
+                Field f = Reflection.getField(CRAFT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0);
+                if (f == null) {
+                    //1.20.5 way
+                    MINECRAFT_SERVER_INSTANCE = Reflection.getField(MINECRAFT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0).get(null);
+                }
+                else {
+                    MINECRAFT_SERVER_INSTANCE = f.get(server);
+                }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -724,11 +762,26 @@ public final class SpigotReflectionUtil {
 
     public static Object createPacketDataSerializer(Object byteBuf) {
         try {
+            if (REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR != null) {
+                return REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR.newInstance(byteBuf, getFrozenRegistryAccess());
+            }
             return NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR.newInstance(byteBuf);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Object getFrozenRegistryAccess() {
+        if (MINECRAFT_SERVER_REGISTRY_ACCESS == null) {
+            try {
+                MINECRAFT_SERVER_REGISTRY_ACCESS = Reflection.getMethod(MINECRAFT_SERVER_CLASS, REGISTRY_ACCESS_FROZEN, 0)
+                        .invoke(getMinecraftServerInstance(Bukkit.getServer()));
+            } catch (IllegalAccessException | InvocationTargetException exception) {
+                exception.printStackTrace();
+            }
+        }
+        return MINECRAFT_SERVER_REGISTRY_ACCESS;
     }
 
     public static ItemStack toBukkitItemStack(Object nmsItemStack) {
@@ -752,7 +805,10 @@ public final class SpigotReflectionUtil {
 
     public static Object readNMSItemStackPacketDataSerializer(Object packetDataSerializer) {
         try {
-            return READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD.invoke(packetDataSerializer);
+            if (READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD != null) {
+                return READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD.invoke(packetDataSerializer);
+            }
+            return STREAM_DECODER_DECODE.invoke(ITEM_STACK_OPTIONAL_STREAM_CODEC, packetDataSerializer);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -761,7 +817,10 @@ public final class SpigotReflectionUtil {
 
     public static Object writeNMSItemStackPacketDataSerializer(Object packetDataSerializer, Object nmsItemStack) {
         try {
-            return WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD.invoke(packetDataSerializer, nmsItemStack);
+            if (WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD != null) {
+                return WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD.invoke(packetDataSerializer, nmsItemStack);
+            }
+            return STREAM_ENCODER_ENCODE.invoke(ITEM_STACK_OPTIONAL_STREAM_CODEC, packetDataSerializer, nmsItemStack);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -835,8 +894,7 @@ public final class SpigotReflectionUtil {
                 Object levelEntityGetter;
                 if (PAPER_ENTITY_LOOKUP_EXISTS) {
                     levelEntityGetter = reflectWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
-                }
-                else {
+                } else {
                     Object entitySectionManager = reflectWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
                     ReflectionObject reflectEntitySectionManager = new ReflectionObject(entitySectionManager);
                     levelEntityGetter = reflectEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
@@ -897,8 +955,7 @@ public final class SpigotReflectionUtil {
             Object levelEntityGetter;
             if (PAPER_ENTITY_LOOKUP_EXISTS) {
                 levelEntityGetter = wrappedWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
-            }
-            else {
+            } else {
                 Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
                 ReflectionObject wrappedPersistentEntitySectionManager = new ReflectionObject(persistentEntitySectionManager);
                 levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);

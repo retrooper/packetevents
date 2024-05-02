@@ -21,8 +21,8 @@ package com.github.retrooper.packetevents.protocol.particle.type;
 import com.github.retrooper.packetevents.protocol.particle.data.*;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.HashMap;
@@ -33,23 +33,10 @@ import java.util.function.Function;
 public class ParticleTypes {
     private static final Map<String, ParticleType> PARTICLE_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, ParticleType>> PARTICLE_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("particle/particle_type_mappings",
-            ClientVersion.V_1_12_2,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_13_2,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_15,
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_16_2,
-            ClientVersion.V_1_17,
-            ClientVersion.V_1_18,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20,
-            ClientVersion.V_1_20_3);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("particle/particle_type_mappings");
 
     public static ParticleType define(String key, Function<PacketWrapper<?>, ParticleData> readDataFunction, BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         ParticleType particleType = new ParticleType() {
             private final int[] ids = data.getData();
             @Override
@@ -112,6 +99,7 @@ public class ParticleTypes {
         return typeIdMap.get(id);
     }
 
+    @Deprecated // Removed in 1.20.5
     public static final ParticleType AMBIENT_ENTITY_EFFECT = define("ambient_entity_effect");
     public static final ParticleType ANGRY_VILLAGER = define("angry_villager");
     public static final ParticleType BLOCK = define("block", ParticleBlockStateData::read, (wrapper, data) -> ParticleBlockStateData.write(wrapper, (ParticleBlockStateData) data));
@@ -209,16 +197,32 @@ public class ParticleTypes {
     public static final ParticleType DRIPPING_CHERRY_LEAVES = define("dripping_cherry_leaves");
     public static final ParticleType FALLING_CHERRY_LEAVES = define("falling_cherry_leaves");
     public static final ParticleType LANDING_CHERRY_LEAVES = define("landing_cherry_leaves");
-    //Added in 1.20
+
+    // Added in 1.20
     public static final ParticleType CHERRY_LEAVES = define("cherry_leaves");
     public static final ParticleType EGG_CRACK = define("egg_crack");
-    //Added in 1.20.3
+
+    // Added in 1.20.3
     public static final ParticleType GUST = define("gust");
+    @Deprecated // Replaced with GUST_EMITTER_LARGE/GUST_EMITTER_SMALL in 1.20.5
     public static final ParticleType GUST_EMITTER = define("gust_emitter");
     public static final ParticleType WHITE_SMOKE = define("white_smoke");
     public static final ParticleType DUST_PLUME = define("dust_plume");
     public static final ParticleType GUST_DUST = define("gust_dust");
     public static final ParticleType TRIAL_SPAWNER_DETECTION = define("trial_spawner_detection");
+
+    // Added in 1.20.5
+    public static final ParticleType SMALL_GUST = define("small_gust");
+    public static final ParticleType GUST_EMITTER_LARGE = define("gust_emitter_large");
+    public static final ParticleType GUST_EMITTER_SMALL = define("gust_emitter_small");
+    public static final ParticleType INFESTED = define("infested");
+    public static final ParticleType ITEM_COBWEB = define("item_cobweb");
+    public static final ParticleType TRIAL_SPAWNER_DETECTION_OMINOUS = define("trial_spawner_detection_ominous");
+    public static final ParticleType VAULT_CONNECTION = define("vault_connection");
+    public static final ParticleType DUST_PILLAR = define("dust_pillar");
+    public static final ParticleType OMINOUS_SPAWNING = define("ominous_spawning");
+    public static final ParticleType RAID_OMEN = define("raid_omen");
+    public static final ParticleType TRIAL_OMEN = define("trial_omen");
 
     static {
         TYPES_BUILDER.unloadFileMappings();

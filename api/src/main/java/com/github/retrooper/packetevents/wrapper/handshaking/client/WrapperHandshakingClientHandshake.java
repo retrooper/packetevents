@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.wrapper.handshaking.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
-import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -31,23 +30,30 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
  * It contains important data such as the client's protocol version.
  */
 public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHandshakingClientHandshake> {
+
     private int protocolVersion;
     private ClientVersion clientVersion;
     private String serverAddress;
     private int serverPort;
-    private ConnectionState nextConnectionState;
+    private ConnectionIntention intention;
 
     public WrapperHandshakingClientHandshake(PacketReceiveEvent event) {
         super(event);
     }
 
+    @Deprecated
     public WrapperHandshakingClientHandshake(int protocolVersion, String serverAddress, int serverPort, ConnectionState nextConnectionState) {
+        this(protocolVersion, serverAddress, serverPort, ConnectionIntention.LOGIN);
+        this.setNextConnectionState(nextConnectionState);
+    }
+
+    public WrapperHandshakingClientHandshake(int protocolVersion, String serverAddress, int serverPort, ConnectionIntention intention) {
         super(PacketType.Handshaking.Client.HANDSHAKE);
         this.protocolVersion = protocolVersion;
         this.clientVersion = ClientVersion.getById(protocolVersion);
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
-        this.nextConnectionState = nextConnectionState;
+        this.intention = intention;
     }
 
     @Override
@@ -60,7 +66,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
             this.serverAddress = readString(Short.MAX_VALUE); // Should be 255, but :shrug: someone reported issues
             this.serverPort = readUnsignedShort();
             int nextStateIndex = readVarInt();
-            this.nextConnectionState = ConnectionState.getById(nextStateIndex);
+            this.intention = ConnectionIntention.fromId(nextStateIndex);
         } catch (Exception e) {
             throw new InvalidHandshakeException();
         }
@@ -71,7 +77,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
         writeVarInt(protocolVersion);
         writeString(serverAddress, Short.MAX_VALUE); // Should be 255, but spigot changes this
         writeShort(serverPort);
-        writeVarInt(nextConnectionState.ordinal());
+        writeVarInt(intention.getId());
     }
 
     @Override
@@ -80,7 +86,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
         this.clientVersion = wrapper.clientVersion;
         this.serverAddress = wrapper.serverAddress;
         this.serverPort = wrapper.serverPort;
-        this.nextConnectionState = wrapper.nextConnectionState;
+        this.intention = wrapper.intention;
     }
 
     /**
@@ -146,10 +152,64 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
      * @return Next connection state
      */
     public ConnectionState getNextConnectionState() {
-        return nextConnectionState;
+        return this.intention.getTargetState();
     }
 
+    /**
+     * @deprecated use {@link #setIntention(ConnectionIntention)}
+     */
     public void setNextConnectionState(ConnectionState nextConnectionState) {
-        this.nextConnectionState = nextConnectionState;
+        switch (nextConnectionState) {
+            case LOGIN:
+                this.intention = ConnectionIntention.LOGIN;
+            case STATUS:
+                this.intention = ConnectionIntention.STATUS;
+            default:
+                throw new IllegalArgumentException("Illegal next connection state: " + nextConnectionState);
+        }
+    }
+
+    public ConnectionIntention getIntention() {
+        return this.intention;
+    }
+
+    public void setIntention(ConnectionIntention intention) {
+        this.intention = intention;
+    }
+
+    public enum ConnectionIntention {
+
+        STATUS(1, ConnectionState.STATUS),
+        LOGIN(2, ConnectionState.LOGIN),
+        TRANSFER(3, ConnectionState.LOGIN);
+
+        private final int id;
+        private final ConnectionState targetState;
+
+        ConnectionIntention(int id, ConnectionState targetState) {
+            this.id = id;
+            this.targetState = targetState;
+        }
+
+        public static ConnectionIntention fromId(int id) {
+            switch (id) {
+                case 2:
+                    return LOGIN;
+                case 1:
+                    return STATUS;
+                case 3:
+                    return TRANSFER;
+                default:
+                    throw new IllegalArgumentException("Illegal connection intention: " + id);
+            }
+        }
+
+        public int getId() {
+            return this.id;
+        }
+
+        public ConnectionState getTargetState() {
+            return this.targetState;
+        }
     }
 }

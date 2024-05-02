@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.entity.data;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.entity.armadillo.ArmadilloState;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.entity.sniffer.SnifferState;
 import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
@@ -33,14 +34,15 @@ import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Quaternion4f;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,15 +57,7 @@ public class EntityDataTypes {
 
     private static final Map<String, EntityDataType<?>> ENTITY_DATA_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, EntityDataType<?>>> ENTITY_DATA_TYPE_ID_MAP = new HashMap<>();
-    protected static final TypesBuilder TYPES_BUILDER = new TypesBuilder("entity/entity_data_type_mappings",
-            ClientVersion.V_1_8,
-            ClientVersion.V_1_9,
-            ClientVersion.V_1_11,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4);
+    protected static final TypesBuilder TYPES_BUILDER = new TypesBuilder("entity/entity_data_type_mappings");
 
     public static final EntityDataType<Byte> BYTE = define("byte", PacketWrapper::readByte, PacketWrapper::writeByte);
 
@@ -194,7 +188,6 @@ public class EntityDataTypes {
         return SnifferState.values()[id];
     }, (PacketWrapper<?> wrapper, SnifferState value) -> wrapper.writeVarInt(value.ordinal()));
 
-
     public static final EntityDataType<Vector3f> VECTOR3F = define("vector3f",
             (PacketWrapper<?> wrapper) -> new Vector3f(wrapper.readFloat(), wrapper.readFloat(), wrapper.readFloat()),
             (PacketWrapper<?> wrapper, Vector3f value) -> {
@@ -211,6 +204,20 @@ public class EntityDataTypes {
                 wrapper.writeFloat(value.getZ());
                 wrapper.writeFloat(value.getW());
             });
+
+    // Added in 1.20.5
+    public static final EntityDataType<ArmadilloState> ARMADILLO_STATE = define("armadillo_state",
+            (PacketWrapper<?> wrapper) -> ArmadilloState.values()[ wrapper.readVarInt()],
+            (PacketWrapper<?> wrapper, ArmadilloState value) -> wrapper.writeVarInt(value.ordinal())
+    );
+
+    public static final EntityDataType<List<Particle>> PARTICLES = define("particles",
+            wrapper -> wrapper.readList(PARTICLE.getDataDeserializer()::apply),
+            (wrapper, particles) -> wrapper.writeList(particles, PARTICLE.getDataSerializer()::accept)
+    );
+
+    public static final EntityDataType<Integer> WOLF_VARIANT =
+            define("wolf_variant_type", readIntDeserializer(), writeIntSerializer());
 
     public static EntityDataType<?> getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);
@@ -365,6 +372,10 @@ public class EntityDataTypes {
                 }
             };
         }
+    }
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
     }
 
 }

@@ -33,11 +33,17 @@ public class EnsureCorrectTagsTest extends BaseDummyAPITest {
     public void testTagsAreNotEmpty() throws ReflectiveOperationException {
         for (Field field : ItemTags.class.getFields()) {
             final ItemTags tags = (ItemTags) field.get(ItemTags.class);
+            if (tags.isReallyEmpty()) {
+                continue;
+            }
             assertFalse(tags.getStates().isEmpty(), "Item tag " + tags.getName() + " has nothing inside it! Did you forget to add types to it?");
         }
 
         for (Field field : BlockTags.class.getFields()) {
             final BlockTags tags = (BlockTags) field.get(BlockTags.class);
+            if (tags.isReallyEmpty()) {
+                continue;
+            }
             assertFalse(tags.getStates().isEmpty(), "Block tag " + tags.getName() + " has nothing inside it! Did you forget to add types to it?");
         }
     }

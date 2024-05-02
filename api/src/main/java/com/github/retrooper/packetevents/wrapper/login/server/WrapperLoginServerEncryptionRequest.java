@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.login.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
@@ -35,26 +36,34 @@ import java.security.PublicKey;
  * @see WrapperLoginClientEncryptionResponse
  */
 public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLoginServerEncryptionRequest> {
+
     private String serverID;
     private byte[] publicKeyBytes;
     private byte[] verifyToken;
+    private boolean shouldAuthenticate;
 
     public WrapperLoginServerEncryptionRequest(PacketSendEvent event) {
         super(event);
     }
 
+    public WrapperLoginServerEncryptionRequest(String serverID, PublicKey publicKey, byte[] verifyToken) {
+        this(serverID, publicKey.getEncoded(), verifyToken);
+    }
+
+    public WrapperLoginServerEncryptionRequest(String serverID, PublicKey publicKey, byte[] verifyToken, boolean shouldAuthenticate) {
+        this(serverID, publicKey.getEncoded(), verifyToken, shouldAuthenticate);
+    }
+
     public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken) {
+        this(serverID, publicKeyBytes, verifyToken, true);
+    }
+
+    public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken, boolean shouldAuthenticate) {
         super(PacketType.Login.Server.ENCRYPTION_REQUEST);
         this.serverID = serverID;
         this.publicKeyBytes = publicKeyBytes;
         this.verifyToken = verifyToken;
-    }
-
-    public WrapperLoginServerEncryptionRequest(String serverID, PublicKey publicKey, byte[] verifyToken) {
-        super(PacketType.Login.Server.ENCRYPTION_REQUEST);
-        this.serverID = serverID;
-        this.publicKeyBytes = publicKey.getEncoded();
-        this.verifyToken = verifyToken;
+        this.shouldAuthenticate = shouldAuthenticate;
     }
 
     @Override
@@ -62,13 +71,19 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
         this.serverID = readString(20);
         this.publicKeyBytes = readByteArray(512);
         this.verifyToken = readByteArray(ByteBufHelper.readableBytes(buffer));
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.shouldAuthenticate = readBoolean();
+        }
     }
 
     @Override
     public void write() {
-        writeString(serverID, 20);
+        writeString(this.serverID, 20);
         writeByteArray(this.publicKeyBytes);
-        writeByteArray(verifyToken);
+        writeByteArray(this.verifyToken);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            writeBoolean(this.shouldAuthenticate);
+        }
     }
 
     @Override
@@ -76,6 +91,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
         this.serverID = wrapper.serverID;
         this.publicKeyBytes = wrapper.publicKeyBytes;
         this.verifyToken = wrapper.verifyToken;
+        this.shouldAuthenticate = wrapper.shouldAuthenticate;
     }
 
     /**
@@ -127,5 +143,13 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
 
     public void setVerifyToken(byte[] verifyToken) {
         this.verifyToken = verifyToken;
+    }
+
+    public boolean isShouldAuthenticate() {
+        return this.shouldAuthenticate;
+    }
+
+    public void setShouldAuthenticate(boolean shouldAuthenticate) {
+        this.shouldAuthenticate = shouldAuthenticate;
     }
 }

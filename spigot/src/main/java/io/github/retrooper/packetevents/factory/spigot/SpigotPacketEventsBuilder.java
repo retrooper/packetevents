@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
@@ -101,6 +102,7 @@ public class SpigotPacketEventsBuilder {
                     try {
                         SpigotReflectionUtil.init();
                         CustomPipelineUtil.init();
+                        WrappedBlockState.ensureLoad();
                     } catch (Exception ex) {
                         throw new IllegalStateException(ex);
                     }

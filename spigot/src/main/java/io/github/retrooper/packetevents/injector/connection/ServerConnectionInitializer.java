@@ -112,8 +112,11 @@ public class ServerConnectionInitializer {
             // We are targeting the encoder and decoder since we don't want to target specific plugins
             // (ProtocolSupport has changed its handler name in the past)
             // I don't like the hacks required for compression but that's on vanilla, we can't fix it.
-            ctx.pipeline().addBefore("decoder", PacketEvents.DECODER_NAME, decoder);
-            ctx.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, encoder);
+            // TODO: i think this will only work for server-side packetevents?
+            String decoderName = ctx.pipeline().names().contains("inbound_config") ? "inbound_config" : "decoder";
+            ctx.pipeline().addBefore(decoderName, PacketEvents.DECODER_NAME, decoder);
+            String encoderName = ctx.pipeline().names().contains("outbound_config") ? "outbound_config" : "encoder";
+            ctx.pipeline().addBefore(encoderName, PacketEvents.ENCODER_NAME, encoder);
         } catch (NoSuchElementException ex) {
             String handlers = ChannelHelper.pipelineHandlerNamesAsString(ctx);
             throw new IllegalStateException("PacketEvents failed to add a decoder to the netty pipeline. Pipeline handlers: " + handlers, ex);

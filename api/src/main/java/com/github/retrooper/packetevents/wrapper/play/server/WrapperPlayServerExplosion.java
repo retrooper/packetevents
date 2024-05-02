@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
+import com.github.retrooper.packetevents.protocol.sound.Sound;
+import com.github.retrooper.packetevents.protocol.sound.StaticSound;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
@@ -45,8 +47,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     private Particle smallExplosionParticles;
     private Particle largeExplosionParticles;
     private BlockInteraction blockInteraction;
-    private ResourceLocation explosionSoundKey;
-    private @Nullable Float explosionSoundRange;
+    private Sound explosionSound;
 
     public WrapperPlayServerExplosion(PacketSendEvent event) {
         super(event);
@@ -62,6 +63,13 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
                                       Particle smallExplosionParticles, Particle largeExplosionParticles,
                                       BlockInteraction blockInteraction, ResourceLocation explosionSoundKey,
                                       @Nullable Float explosionSoundRange) {
+        this(position, strength, records, playerMotion, smallExplosionParticles, largeExplosionParticles,
+                blockInteraction, new StaticSound(explosionSoundKey, explosionSoundRange));
+    }
+
+    public WrapperPlayServerExplosion(Vector3d position, float strength, List<Vector3i> records, Vector3f playerMotion,
+                                      Particle smallExplosionParticles, Particle largeExplosionParticles,
+                                      BlockInteraction blockInteraction, Sound explosionSound) {
         super(PacketType.Play.Server.EXPLOSION);
         this.position = position;
         this.strength = strength;
@@ -70,8 +78,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         this.smallExplosionParticles = smallExplosionParticles;
         this.largeExplosionParticles = largeExplosionParticles;
         this.blockInteraction = blockInteraction;
-        this.explosionSoundKey = explosionSoundKey;
-        this.explosionSoundRange = explosionSoundRange;
+        this.explosionSound = explosionSound;
     }
 
     @Override
@@ -110,8 +117,13 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
             ParticleData largePartData = largePartType.readDataFunction().apply(this);
             this.largeExplosionParticles = new Particle(largePartType, largePartData);
 
-            this.explosionSoundKey = this.readIdentifier();
-            this.explosionSoundRange = this.readOptional(PacketWrapper::readFloat);
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                this.explosionSound = Sound.read(this);
+            } else {
+                ResourceLocation explosionSoundKey = this.readIdentifier();
+                Float explosionSoundRange = this.readOptional(PacketWrapper::readFloat);
+                this.explosionSound = new StaticSound(explosionSoundKey, explosionSoundRange);
+            }
         }
     }
 
@@ -155,8 +167,12 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
             this.writeVarInt(this.largeExplosionParticles.getType().getId(this.serverVersion.toClientVersion()));
             this.largeExplosionParticles.getType().writeDataFunction().accept(this, this.largeExplosionParticles.getData());
 
-            this.writeIdentifier(this.explosionSoundKey);
-            this.writeOptional(this.explosionSoundRange, PacketWrapper::writeFloat);
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                Sound.write(this, this.explosionSound);
+            } else {
+                this.writeIdentifier(this.explosionSound.getSoundId());
+                this.writeOptional(this.explosionSound.getRange(), PacketWrapper::writeFloat);
+            }
         }
     }
 
@@ -169,8 +185,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         smallExplosionParticles = wrapper.smallExplosionParticles;
         largeExplosionParticles = wrapper.largeExplosionParticles;
         blockInteraction = wrapper.blockInteraction;
-        explosionSoundKey = wrapper.explosionSoundKey;
-        explosionSoundRange = wrapper.explosionSoundRange;
+        explosionSound = wrapper.explosionSound;
     }
 
     private Vector3i toFloor(Vector3d position) {
@@ -246,19 +261,27 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     }
 
     public ResourceLocation getExplosionSoundKey() {
-        return this.explosionSoundKey;
+        return this.explosionSound.getSoundId();
     }
 
     public void setExplosionSoundKey(ResourceLocation explosionSoundKey) {
-        this.explosionSoundKey = explosionSoundKey;
+        this.explosionSound = new StaticSound(explosionSoundKey, this.explosionSound.getRange());
     }
 
     public @Nullable Float getExplosionSoundRange() {
-        return this.explosionSoundRange;
+        return this.explosionSound.getRange();
     }
 
     public void setExplosionSoundRange(@Nullable Float explosionSoundRange) {
-        this.explosionSoundRange = explosionSoundRange;
+        this.explosionSound = new StaticSound(this.explosionSound.getSoundId(), explosionSoundRange);
+    }
+
+    public Sound getExplosionSound() {
+        return this.explosionSound;
+    }
+
+    public void setExplosionSound(Sound explosionSound) {
+        this.explosionSound = explosionSound;
     }
 
     public enum BlockInteraction {

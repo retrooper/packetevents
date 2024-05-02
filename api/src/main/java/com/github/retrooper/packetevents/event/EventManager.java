@@ -22,13 +22,13 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 public class EventManager {
-    private final Map<Byte, Set<PacketListenerCommon>> listenersMap = new ConcurrentHashMap<>();
+    private final Map<PacketListenerPriority, Set<PacketListenerCommon>> listenersMap =
+            Collections.synchronizedMap(new EnumMap<>(PacketListenerPriority.class));
 
     /**
      * Call the PacketEvent.
@@ -44,7 +44,7 @@ public class EventManager {
     }
 
     public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
-        for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
+        for (PacketListenerPriority priority : PacketListenerPriority.values()) {
             Set<PacketListenerCommon> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerCommon listener : listeners) {
@@ -80,13 +80,12 @@ public class EventManager {
      * @param listener {@link PacketListenerCommon}
      */
     public PacketListenerCommon registerListener(PacketListenerCommon listener) {
-        byte priority = listener.getPriority().getId();
-        Set<PacketListenerCommon> listenerSet = listenersMap.get(priority);
+        Set<PacketListenerCommon> listenerSet = listenersMap.get(listener.getPriority());
         if (listenerSet == null) {
             listenerSet = ConcurrentHashMap.newKeySet();
         }
         listenerSet.add(listener);
-        listenersMap.put(priority, listenerSet);
+        listenersMap.put(listener.getPriority(), listenerSet);
         return listener;
     }
 
@@ -103,7 +102,7 @@ public class EventManager {
     }
 
     public void unregisterListener(PacketListenerCommon listener) {
-        Set<PacketListenerCommon> listenerSet = listenersMap.get(listener.getPriority().getId());
+        Set<PacketListenerCommon> listenerSet = listenersMap.get(listener.getPriority());
         if (listenerSet == null) return;
         listenerSet.remove(listener);
     }
