@@ -40,6 +40,9 @@ test {
 task generateMapping(type: MappingCompressionTask) {
     mappingsDir = rootDir.toPath().resolve("mappings")
     outDir = project.buildDir.toPath().resolve("mappings/generated/assets/mappings")
+    outputs.upToDateWhen {
+        project.projectDir.toPath().resolve("mappings").toFile().lastModified() < project.buildDir.toPath().resolve("mappings/generated/assets/mappings").toFile().lastModified()
+    }
 }
 
 tasks.assemble.dependsOn(generateMapping)
