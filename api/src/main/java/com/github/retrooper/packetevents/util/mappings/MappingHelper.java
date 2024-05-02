@@ -26,9 +26,9 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 public class MappingHelper {
@@ -42,66 +42,50 @@ public class MappingHelper {
         }
     }
 
-    public static <T extends NBT> void applyDiff(final NBTList<T> list, final IndexedDiff<NBT>[] diffs) {
-        for (final IndexedDiff<NBT> diff : diffs) {
-            if (diff instanceof IndexedDiff.Addition) {
-                list.addTagUnsafe(diff.getIndex(), diff.getValue());
-            } else if (diff instanceof IndexedDiff.Removal) {
-                list.removeTag(diff.getIndex());
-            }
-        }
-    }
+    public static ListDiff<String>[] createListDiff(final NBTCompound compound) {
+        final NBTList<NBTCompound> additions = compound.getCompoundListTagOrThrow("additions");
+        final NBTList<NBTCompound> removals = compound.getCompoundListTagOrThrow("removals");
+        final NBTList<NBTCompound> changes = compound.getCompoundListTagOrThrow("changes");
 
-    public static void applyDiff(final NBTCompound compound, final Diff<Map.Entry<String, NBT>>[] diffs) {
-        for (final Diff<Map.Entry<String, NBT>> diff : diffs) {
-            if (diff instanceof Diff.Addition) {
-                compound.setTag(diff.getValue().getKey(), diff.getValue().getValue());
-            } else if (diff instanceof Diff.Removal) {
-                compound.removeTag(diff.getValue().getKey());
-            } else if (diff instanceof Diff.Changed) {
-                compound.setTag(diff.getValue().getKey(), diff.getValue().getValue());
-            }
-        }
-    }
-
-    public static IndexedDiff<NBT>[] createIndexDiff(final NBTCompound compound) {
-        final NBTCompound removal = compound.getCompoundTagOrThrow("removals");
-        final NBTCompound additions = compound.getCompoundTagOrThrow("additions");
-
-        final IndexedDiff<NBT>[] diffs = new IndexedDiff[removal.size() + additions.size()];
+        final ListDiff<String>[] diffs = new ListDiff[additions.size() + removals.size() + changes.size()];
         int index = 0;
-        for (Map.Entry<String, NBT> entry : removal.getTags().entrySet()) {
-            diffs[index++] = new IndexedDiff.Removal<>(Integer.parseInt(entry.getKey()), entry.getValue());
+        for (NBTCompound entry : removals.getTags()) {
+            diffs[index++] = new ListDiff.Removal<>(
+                    entry.getNumberTagOrThrow("pos").getAsInt(),
+                    entry.getNumberTagOrThrow("size").getAsInt()
+            );
         }
 
-        for (Map.Entry<String, NBT> entry : additions.getTags().entrySet()) {
-            diffs[index++] = new IndexedDiff.Addition<>(Integer.parseInt(entry.getKey()), entry.getValue());
+        for (NBTCompound entry : additions.getTags()) {
+            diffs[index++] = new ListDiff.Addition<>(
+                    entry.getNumberTagOrThrow("pos").getAsInt(),
+                    entry.getStringListTagOrThrow("lines").getTags().stream().map(NBTString::getValue).collect(Collectors.toList())
+            );
+        }
+
+        for (NBTCompound entry : changes.getTags()) {
+            diffs[index++] = new ListDiff.Changed<>(
+                    entry.getNumberTagOrThrow("pos").getAsInt(),
+                    entry.getNumberTagOrThrow("size").getAsInt(),
+                    entry.getStringListTagOrThrow("lines").getTags().stream().map(NBTString::getValue).collect(Collectors.toList())
+            );
         }
 
         return diffs;
     }
 
-    public static Diff<Map.Entry<String, NBT>>[] createDiff(final NBTCompound compound) {
-        final NBTCompound removal = compound.getCompoundTagOrThrow("removals");
+    public static MapDiff<String, Integer>[] createDiff(final NBTCompound compound) {
         final NBTCompound additions = compound.getCompoundTagOrThrow("additions");
-        final NBTCompound changes = compound.getCompoundTagOrThrow("changes");
+        final NBTCompound removal = compound.getCompoundTagOrThrow("removals");
 
-        final Diff<Map.Entry<String, NBT>>[] diffs = new Diff[removal.size() + additions.size() + changes.size()];
+        final MapDiff<String, Integer>[] diffs = new MapDiff[additions.size() + removal.size()];
         int index = 0;
         for (Map.Entry<String, NBT> entry : removal.getTags().entrySet()) {
-            diffs[index++] = new Diff.Removal<>(new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue()));
+            diffs[index++] = new MapDiff.Removal<>(entry.getKey());
         }
 
         for (Map.Entry<String, NBT> entry : additions.getTags().entrySet()) {
-            diffs[index++] = new Diff.Addition<>(new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue()));
-        }
-
-        for (Map.Entry<String, NBT> entry : changes.getTags().entrySet()) {
-            final NBTIntArray c = (NBTIntArray) entry.getValue();
-            diffs[index++] = new Diff.Changed<>(
-                    new AbstractMap.SimpleEntry<>(entry.getKey(), new NBTInt(c.getValue()[0])),
-                    new AbstractMap.SimpleEntry<>(entry.getKey(), new NBTInt(c.getValue()[1]))
-            );
+            diffs[index++] = new MapDiff.Addition<>(entry.getKey(), ((NBTNumber) entry.getValue()).getAsInt());
         }
 
         return diffs;

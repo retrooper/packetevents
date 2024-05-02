@@ -23,9 +23,12 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.VersionMapper;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class TypesBuilder {
     private final String mapPath;
@@ -65,12 +68,12 @@ public class TypesBuilder {
     }
 
     private void loadAsArray(final ClientVersion start, final NBTCompound entries, final ClientVersion[] versions) {
-        final NBTList<NBTString> lastEntries = entries.getStringListTagOrThrow(start.name());
+        final List<String> lastEntries = entries.getStringListTagOrThrow(start.name()).getTags().stream().map(NBTString::getValue).collect(Collectors.toList());
 
         final Consumer<ClientVersion> mapLoader = version -> {
             final Map<String, Integer> map = new HashMap<>();
             for (int i = 0; i < lastEntries.size(); i++) {
-                map.put(lastEntries.getTag(i).getValue(), i);
+                map.put(lastEntries.get(i), i);
             }
             this.entries.put(version, map);
         };
@@ -78,30 +81,33 @@ public class TypesBuilder {
 
         for (int i = 1; i < versions.length; i++) {
             final ClientVersion version = versions[i];
-            final IndexedDiff<NBT>[] diff = MappingHelper.createIndexDiff(entries.getCompoundTagOrThrow(version.name()));
+            final ListDiff<String>[] diff = MappingHelper.createListDiff(entries.getCompoundTagOrThrow(version.name()));
 
-            MappingHelper.applyDiff(lastEntries, diff);
+            for (ListDiff<String> d : diff) {
+                d.applyTo(lastEntries);
+            }
             mapLoader.accept(version);
         }
     }
 
     private void loadAsMap(final ClientVersion start, final NBTCompound entries, final ClientVersion[] versions) {
-        final NBTCompound lastEntries = entries.getCompoundTagOrThrow(start.name());
+        final Map<String, Integer> lastEntries = entries.getCompoundTagOrThrow(start.name()).getTags().entrySet().stream()
+                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), ((NBTNumber) entry.getValue()).getAsInt()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         final Consumer<ClientVersion> mapLoader = version -> {
-            final Map<String, Integer> map = new HashMap<>();
-            for (final Map.Entry<String, NBT> entry : lastEntries.getTags().entrySet()) {
-                map.put(entry.getKey(), ((NBTInt) entry.getValue()).getAsInt());
-            }
+            final Map<String, Integer> map = new HashMap<>(lastEntries);
             this.entries.put(version, map);
         };
         mapLoader.accept(start);
 
         for (int i = 1; i < versions.length; i++) {
             final ClientVersion version = versions[i];
-            final Diff<Map.Entry<String, NBT>>[] diff = MappingHelper.createDiff(entries.getCompoundTagOrThrow(version.name()));
+            final MapDiff<String, Integer>[] diff = MappingHelper.createDiff(entries.getCompoundTagOrThrow(version.name()));
 
-            MappingHelper.applyDiff(lastEntries, diff);
+            for (MapDiff<String, Integer> d : diff) {
+                d.applyTo(lastEntries);
+            }
             mapLoader.accept(version);
         }
     }

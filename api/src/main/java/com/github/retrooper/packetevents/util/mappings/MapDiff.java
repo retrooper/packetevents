@@ -18,58 +18,60 @@
 
 package com.github.retrooper.packetevents.util.mappings;
 
-public class Diff<T> {
+import java.util.Map;
 
-    private final T value;
+public abstract class MapDiff<K, V> {
 
-    public Diff(final T value) {
-        this.value = value;
+    private final K key;
+
+    public MapDiff(final K key) {
+        this.key = key;
     }
 
-    public T getValue() {
-        return value;
+    public K getKey() {
+        return key;
     }
 
-    public static class Addition<T> extends Diff<T> {
+    public abstract void applyTo(Map<K, V> map);
 
-        public Addition(final T value) {
-            super(value);
+    public static class Addition<K, V> extends MapDiff<K, V> {
+        private final V value;
+
+        public Addition(final K key, final V value) {
+            super(key);
+            this.value = value;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        @Override
+        public void applyTo(Map<K, V> map) {
+            map.put(getKey(), getValue());
         }
 
         @Override
         public String toString() {
-            return "+ " + getValue();
+            return "+ " + getKey() + " : " + getValue();
         }
+
     }
 
-    public static class Removal<T> extends Diff<T> {
+    public static class Removal<K, V> extends MapDiff<K, V> {
 
-        public Removal(final T value) {
-            super(value);
+        public Removal(final K key) {
+            super(key);
+        }
+
+        @Override
+        public void applyTo(Map<K, V> map) {
+            map.remove(getKey());
         }
 
         @Override
         public String toString() {
-            return "- " + getValue();
-        }
-    }
-
-    public static class Changed<T> extends Diff<T> {
-
-        private final T oldValue;
-
-        public Changed(final T oldValue, final T newValue) {
-            super(newValue);
-            this.oldValue = oldValue;
-        }
-
-        public T getOldValue() {
-            return oldValue;
-        }
-
-        @Override
-        public String toString() {
-            return "~ " + getOldValue() + " -> " + getValue();
+            return "- " + getKey();
         }
     }
 
