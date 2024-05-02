@@ -45,8 +45,9 @@ import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,22 +90,7 @@ public class ItemTypes {
     private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, ItemType>> ITEM_TYPE_ID_MAP = new HashMap<>();
     private static final Map<StateType, ItemType> HELD_TO_PLACED_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_type_mappings",
-            ClientVersion.V_1_12,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_13_2,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_15,
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_16_2,
-            ClientVersion.V_1_17,
-            ClientVersion.V_1_18,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20,
-            ClientVersion.V_1_20_3,
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_type_mappings");
 
     private static final UUID TOOL_MODIFIER_ATTACK_DAMAGE_UUID = UUID.fromString("cb3f55d3-645c-4f38-a497-9c13a33db5cf");
     private static final UUID TOOL_MODIFIER_ATTACK_SPEED_UUID = UUID.fromString("fa233e1c-4180-4865-b01b-bcce9785aca3");
@@ -1589,7 +1575,7 @@ public class ItemTypes {
                 return false;
             }
         };
-        TYPES_BUILDER.register(ITEM_TYPE_MAP, ITEM_TYPE_ID_MAP, type);
+        MappingHelper.registerMapping(TYPES_BUILDER, ITEM_TYPE_MAP, ITEM_TYPE_ID_MAP, type);
         return type;
     }
 

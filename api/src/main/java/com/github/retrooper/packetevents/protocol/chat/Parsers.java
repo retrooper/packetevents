@@ -22,8 +22,9 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,29 +43,18 @@ public class Parsers {
     private static final List<Parser> ALL_PARSERS = new ArrayList<>(); // support for old methods
     private static final Map<String, Parser> PARSER_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, Parser>> PARSER_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("command/argument_parser_mappings",
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20_3,
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("command/argument_parser_mappings");
 
     public static Parser define(String key) {
         return define(key, null, null);
     }
 
     public static Parser define(String key, @Nullable Reader reader, @Nullable Writer writer) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         Parser parser = new Parser(data, reader, writer);
 
         ALL_PARSERS.add(parser);
-        PARSER_MAP.put(parser.getName().toString(), parser);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, Parser> idMap = PARSER_ID_MAP.computeIfAbsent(
-                    (byte) index, k -> new HashMap<>());
-            idMap.put(parser.getId(version), parser);
-        }
+        MappingHelper.registerMapping(TYPES_BUILDER, PARSER_MAP, PARSER_ID_MAP, parser);
         return parser;
     }
 

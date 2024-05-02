@@ -21,8 +21,9 @@ package com.github.retrooper.packetevents.protocol.world.states.type;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.MaterialType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -38,22 +39,7 @@ public class StateTypes {
     private static final List<StateType> ALL_STATE_TYPES = new ArrayList<>();
     private static final Map<String, StateType.Mapped> BY_NAME = new HashMap<>();
     private static final Map<Byte, Map<Integer, StateType.Mapped>> BY_ID = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("block/block_type_mappings",
-            ClientVersion.V_1_7_10,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_13_2,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_15,
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_16_2,
-            ClientVersion.V_1_17,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20,
-            ClientVersion.V_1_20_2,
-            ClientVersion.V_1_20_3,
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("block/block_type_mappings");
 
     public static Collection<StateType> values() {
         return Collections.unmodifiableCollection(ALL_STATE_TYPES);
@@ -1237,12 +1223,12 @@ public class StateTypes {
         }
 
         public StateType build() {
-            TypesBuilderData data = TYPES_BUILDER.defineFromArray(this.name.getKey().toLowerCase(Locale.ROOT));
+            TypesBuilderData data = TYPES_BUILDER.define(this.name.getKey().toLowerCase(Locale.ROOT));
             StateType type = new StateType(
                     TYPES_BUILDER, data, blastResistance, hardness, isSolid,
                     isBlocking, isAir, requiresCorrectTool, isShapeExceedsCube, materialType);
             ALL_STATE_TYPES.add(type);
-            TYPES_BUILDER.register(BY_NAME, BY_ID, type.getMapped());
+            MappingHelper.registerMapping(TYPES_BUILDER, BY_NAME, BY_ID, type.getMapped());
             return type;
         }
     }

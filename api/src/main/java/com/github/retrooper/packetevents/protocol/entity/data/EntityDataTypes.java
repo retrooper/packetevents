@@ -34,8 +34,8 @@ import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Quaternion4f;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -57,16 +57,7 @@ public class EntityDataTypes {
 
     private static final Map<String, EntityDataType<?>> ENTITY_DATA_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, EntityDataType<?>>> ENTITY_DATA_TYPE_ID_MAP = new HashMap<>();
-    protected static final TypesBuilder TYPES_BUILDER = new TypesBuilder("entity/entity_data_type_mappings",
-            ClientVersion.V_1_8,
-            ClientVersion.V_1_9,
-            ClientVersion.V_1_11,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20_5);
+    protected static final TypesBuilder TYPES_BUILDER = new TypesBuilder("entity/entity_data_type_mappings");
 
     public static final EntityDataType<Byte> BYTE = define("byte", PacketWrapper::readByte, PacketWrapper::writeByte);
 
@@ -381,6 +372,10 @@ public class EntityDataTypes {
                 }
             };
         }
+    }
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
     }
 
 }

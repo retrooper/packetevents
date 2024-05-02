@@ -20,8 +20,9 @@ package com.github.retrooper.packetevents.protocol.item.armormaterial;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,14 +31,10 @@ public class ArmorMaterials {
 
     private static final Map<String, ArmorMaterial> MATERIAL_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, ArmorMaterial>> MATERIAL_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_armor_material_mappings",
-            ClientVersion.V_1_7_10,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_armor_material_mappings");
 
     public static ArmorMaterial define(String key) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         ArmorMaterial instrument = new ArmorMaterial() {
             @Override
             public ResourceLocation getName() {
@@ -57,7 +54,7 @@ public class ArmorMaterials {
                 return false;
             }
         };
-        TYPES_BUILDER.register(MATERIAL_MAP, MATERIAL_ID_MAP, instrument);
+        MappingHelper.registerMapping(TYPES_BUILDER, MATERIAL_MAP, MATERIAL_ID_MAP, instrument);
         return instrument;
     }
 

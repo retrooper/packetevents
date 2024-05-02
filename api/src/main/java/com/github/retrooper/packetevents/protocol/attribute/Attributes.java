@@ -20,8 +20,9 @@ package com.github.retrooper.packetevents.protocol.attribute;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
@@ -31,17 +32,11 @@ public class Attributes {
 
     private static final Map<String, Attribute> ATTRIBUTE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, Attribute>> ATTRIBUTE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("attribute/attribute_mappings",
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_20_2,
-            ClientVersion.V_1_20_3,
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("attribute/attribute_mappings");
 
     public static Attribute define(String key) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         Attribute attribute = new Attribute() {
-            private final int[] ids = data.getData();
-
             @Override
             public ResourceLocation getName() {
                 return data.getName();
@@ -49,8 +44,7 @@ public class Attributes {
 
             @Override
             public int getId(ClientVersion version) {
-                int index = TYPES_BUILDER.getDataIndex(version);
-                return this.ids[index];
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
 
             @Override
@@ -62,12 +56,7 @@ public class Attributes {
             }
         };
 
-        ATTRIBUTE_MAP.put(attribute.getName().toString(), attribute);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, Attribute> idMap = ATTRIBUTE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
-            idMap.put(attribute.getId(version), attribute);
-        }
+        MappingHelper.registerMapping(TYPES_BUILDER, ATTRIBUTE_MAP, ATTRIBUTE_ID_MAP, attribute);
         return attribute;
     }
 

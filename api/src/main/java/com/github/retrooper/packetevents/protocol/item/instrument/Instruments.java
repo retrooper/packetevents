@@ -22,8 +22,9 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,8 +33,7 @@ public class Instruments {
 
     private static final Map<String, Instrument> INSTRUMENT_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, Instrument>> INSTRUMENT_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_instrument_mappings",
-            ClientVersion.V_1_19);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_instrument_mappings");
 
     public static Instrument define(String key, Sound sound) {
         // vanilla defaults for goat horns
@@ -41,7 +41,7 @@ public class Instruments {
     }
 
     public static Instrument define(String key, Sound sound, int useDuration, float range) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         Instrument instrument = new Instrument() {
             @Override
             public Sound getSound() {
@@ -65,7 +65,7 @@ public class Instruments {
 
             @Override
             public int getId(ClientVersion version) {
-                return TYPES_BUILDER.getId(version, data);
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
 
             @Override
@@ -76,7 +76,7 @@ public class Instruments {
                 return false;
             }
         };
-        TYPES_BUILDER.register(INSTRUMENT_MAP, INSTRUMENT_ID_MAP, instrument);
+        MappingHelper.registerMapping(TYPES_BUILDER, INSTRUMENT_MAP, INSTRUMENT_ID_MAP, instrument);
         return instrument;
     }
 

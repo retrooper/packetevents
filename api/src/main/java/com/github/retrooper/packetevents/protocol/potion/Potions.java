@@ -20,8 +20,9 @@ package com.github.retrooper.packetevents.protocol.potion;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -33,13 +34,10 @@ public class Potions {
     private static final Map<Byte, Map<Integer, Potion>> POTION_ID_MAP = new HashMap<>();
 
     // initial mappings based upon https://minecraft.wiki/w/Potion#History
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_potion_mappings",
-            ClientVersion.V_1_9,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_potion_mappings");
 
     public static Potion define(String key) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         Potion potion = new Potion() {
             @Override
             public ResourceLocation getName() {
@@ -48,7 +46,7 @@ public class Potions {
 
             @Override
             public int getId(ClientVersion version) {
-                return TYPES_BUILDER.getId(version, data);
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
 
             @Override
@@ -59,7 +57,7 @@ public class Potions {
                 return false;
             }
         };
-        TYPES_BUILDER.register(POTION_MAP, POTION_ID_MAP, potion);
+        MappingHelper.registerMapping(TYPES_BUILDER, POTION_MAP, POTION_ID_MAP, potion);
         return potion;
     }
 

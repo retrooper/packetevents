@@ -20,10 +20,11 @@ package com.github.retrooper.packetevents.protocol.stats;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.util.MappingHelper;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
@@ -42,16 +43,16 @@ public class Statistics {
 
         if (version.isOlderThan(ServerVersion.V_1_12_2)) {
 
-            JsonObject mapping = MappingHelper.getJSONObject("stats/statistics");
+            NBTCompound mapping = MappingHelper.decompress("mappings/stats/statistics");
 
             if (version.isOlderThanOrEquals(ServerVersion.V_1_8_3)) {
-                mapping = mapping.getAsJsonObject("V_1_8");
+                mapping = mapping.getCompoundTagOrThrow("V_1_8");
             } else {
-                mapping = mapping.getAsJsonObject("V_1_12");
+                mapping = mapping.getCompoundTagOrThrow("V_1_12");
             }
 
-            for (Map.Entry<String, JsonElement> entry : mapping.entrySet()) {
-                Component value = AdventureSerializer.parseComponent(entry.getValue().getAsString());
+            for (Map.Entry<String, NBT> entry : mapping.getTags().entrySet()) {
+                Component value = AdventureSerializer.parseComponent(((NBTString) entry.getValue()).getValue());
 
                 Statistic statistic = new Statistic() {
                     @Override

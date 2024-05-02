@@ -20,8 +20,9 @@ package com.github.retrooper.packetevents.protocol.item.enchantment.type;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -38,19 +39,11 @@ public class EnchantmentTypes {
 
     private static final Map<String, EnchantmentType> ENCHANTMENT_TYPE_MAPPINGS = new HashMap<>();
     private static final Map<Byte, Map<Integer, EnchantmentType>> ENCHANTMENT_TYPE_ID_MAPPINGS = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("enchantment/enchantment_type_mappings",
-            ClientVersion.V_1_12,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("enchantment/enchantment_type_mappings");
 
     public static EnchantmentType define(String key) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
         EnchantmentType enchantmentType = new EnchantmentType() {
-            private final int[] ids = data.getData();
-
             @Override
             public ResourceLocation getName() {
                 return data.getName();
@@ -58,8 +51,7 @@ public class EnchantmentTypes {
 
             @Override
             public int getId(ClientVersion version) {
-                int index = TYPES_BUILDER.getDataIndex(version);
-                return ids[index];
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
 
             @Override
@@ -71,12 +63,7 @@ public class EnchantmentTypes {
             }
         };
 
-        ENCHANTMENT_TYPE_MAPPINGS.put(enchantmentType.getName().toString(), enchantmentType);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, EnchantmentType> typeIdMap = ENCHANTMENT_TYPE_ID_MAPPINGS.computeIfAbsent((byte) index, k -> new HashMap<>());
-            typeIdMap.put(enchantmentType.getId(version), enchantmentType);
-        }
+        MappingHelper.registerMapping(TYPES_BUILDER, ENCHANTMENT_TYPE_MAPPINGS, ENCHANTMENT_TYPE_ID_MAPPINGS, enchantmentType);
         return enchantmentType;
     }
 

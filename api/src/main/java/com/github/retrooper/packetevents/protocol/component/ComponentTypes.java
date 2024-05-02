@@ -49,8 +49,9 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Dummy;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -64,15 +65,14 @@ public class ComponentTypes {
 
     private static final Map<String, ComponentType<?>> COMPONENT_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, ComponentType<?>>> COMPONENT_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_component_mappings",
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_component_mappings");
 
     public static <T> ComponentType<T> define(String key) {
         return define(key, null, null);
     }
 
     public static <T> ComponentType<T> define(String key, @Nullable Reader<T> reader, @Nullable Writer<T> writer) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         ComponentType<T> type = new ComponentType<T>() {
             @Override
             public T read(PacketWrapper<?> wrapper) {
@@ -93,7 +93,7 @@ public class ComponentTypes {
 
             @Override
             public int getId(ClientVersion version) {
-                return TYPES_BUILDER.getId(version, data);
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
 
             @Override
@@ -109,7 +109,8 @@ public class ComponentTypes {
                 return "Component[" + this.getName() + "]";
             }
         };
-        TYPES_BUILDER.register(COMPONENT_TYPE_MAP, COMPONENT_TYPE_ID_MAP, type);
+
+        MappingHelper.registerMapping(TYPES_BUILDER, COMPONENT_TYPE_MAP, COMPONENT_TYPE_ID_MAP, type);
         return type;
     }
 

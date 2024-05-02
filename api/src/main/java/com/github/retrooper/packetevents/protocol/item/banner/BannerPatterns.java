@@ -20,8 +20,9 @@ package com.github.retrooper.packetevents.protocol.item.banner;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,8 +31,7 @@ public class BannerPatterns {
 
     private static final Map<String, BannerPattern> PATTERN_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, BannerPattern>> PATTERN_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_banner_pattern_mappings",
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_banner_pattern_mappings");
 
     public static BannerPattern define(String key) {
         ResourceLocation assetId = ResourceLocation.minecraft(key);
@@ -40,7 +40,7 @@ public class BannerPatterns {
     }
 
     public static BannerPattern define(String key, ResourceLocation assetId, String translationKey) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         BannerPattern pattern = new BannerPattern() {
             @Override
             public ResourceLocation getAssetId() {
@@ -70,7 +70,7 @@ public class BannerPatterns {
                 return false;
             }
         };
-        TYPES_BUILDER.register(PATTERN_TYPE_MAP, PATTERN_TYPE_ID_MAP, pattern);
+        MappingHelper.registerMapping(TYPES_BUILDER, PATTERN_TYPE_MAP, PATTERN_TYPE_ID_MAP, pattern);
         return pattern;
     }
 

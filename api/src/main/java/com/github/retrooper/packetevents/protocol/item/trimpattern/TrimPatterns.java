@@ -22,8 +22,9 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
@@ -33,10 +34,7 @@ public class TrimPatterns {
 
     private static final Map<String, TrimPattern> PATTERN_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, TrimPattern>> PATTERN_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_trim_pattern_mappings",
-            ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20,
-            ClientVersion.V_1_20_5);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_trim_pattern_mappings");
 
     public static TrimPattern define(String key) {
         ResourceLocation assetId = ResourceLocation.minecraft(key);
@@ -50,7 +48,7 @@ public class TrimPatterns {
             String key, ResourceLocation assetId, ItemType templateItem,
             Component description, boolean decal
     ) {
-        TypesBuilderData data = TYPES_BUILDER.defineFromArray(key);
+        TypesBuilderData data = TYPES_BUILDER.define(key);
         TrimPattern pattern = new TrimPattern() {
             @Override
             public ResourceLocation getAssetId() {
@@ -90,7 +88,7 @@ public class TrimPatterns {
                 return false;
             }
         };
-        TYPES_BUILDER.register(PATTERN_TYPE_MAP, PATTERN_TYPE_ID_MAP, pattern);
+        MappingHelper.registerMapping(TYPES_BUILDER, PATTERN_TYPE_MAP, PATTERN_TYPE_ID_MAP, pattern);
         return pattern;
     }
 
