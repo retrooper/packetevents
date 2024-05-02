@@ -22,23 +22,18 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 public class WrapperPlayServerDeathCombatEvent extends PacketWrapper<WrapperPlayServerDeathCombatEvent> {
     private int playerId;
-    private Integer entityId;
     private Component deathMessage;
 
     public WrapperPlayServerDeathCombatEvent(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerDeathCombatEvent(int playerId, @Nullable Integer entityId, Component deathMessage) {
+    public WrapperPlayServerDeathCombatEvent(int playerId, Component deathMessage) {
         super(PacketType.Play.Server.DEATH_COMBAT_EVENT);
         this.playerId = playerId;
-        this.entityId = entityId;
         this.deathMessage = deathMessage;
     }
 
@@ -57,7 +52,6 @@ public class WrapperPlayServerDeathCombatEvent extends PacketWrapper<WrapperPlay
     @Override
     public void copy(WrapperPlayServerDeathCombatEvent wrapper) {
         this.playerId = wrapper.playerId;
-        this.entityId = wrapper.entityId;
         this.deathMessage = wrapper.deathMessage;
     }
 
@@ -67,14 +61,6 @@ public class WrapperPlayServerDeathCombatEvent extends PacketWrapper<WrapperPlay
 
     public void setPlayerId(int playerId) {
         this.playerId = playerId;
-    }
-
-    public Optional<Integer> getEntityId() {
-        return Optional.ofNullable(entityId);
-    }
-
-    public void setEntityId(int entityId) {
-        this.entityId = entityId;
     }
 
     public Component getDeathMessage() {

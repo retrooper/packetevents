@@ -689,30 +689,6 @@ public final class PacketType {
         }
 
         public enum Server implements PacketTypeCommon, ClientBoundPacket {
-
-            // Packets which are no longer exist on the latest version
-            SET_COMPRESSION,
-            MAP_CHUNK_BULK,
-            UPDATE_ENTITY_NBT,
-            UPDATE_SIGN,
-            USE_BED,
-            SPAWN_WEATHER_ENTITY,
-            TITLE,
-            WORLD_BORDER,
-            COMBAT_EVENT,
-            ENTITY_MOVEMENT,
-            SPAWN_LIVING_ENTITY,
-            SPAWN_PAINTING,
-            SCULK_VIBRATION_SIGNAL,
-            ACKNOWLEDGE_PLAYER_DIGGING,
-            CHAT_PREVIEW_PACKET,
-            NAMED_SOUND_EFFECT,
-            PLAYER_CHAT_HEADER,
-            PLAYER_INFO,
-            DISPLAY_CHAT_PREVIEW,
-            UPDATE_ENABLED_FEATURES,
-            SPAWN_PLAYER,
-
             // Still existing packets
             WINDOW_CONFIRMATION,
             SPAWN_ENTITY,

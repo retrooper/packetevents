@@ -212,8 +212,8 @@ public class NPC {
                     getModernPlayerInfoData());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoAdd);
 
-            WrapperPlayServerSpawnPlayer spawnPlayer =
-                    new WrapperPlayServerSpawnPlayer(getId(), getProfile().getUUID(), getLocation());
+            WrapperPlayServerSpawnEntity spawnPlayer =
+                    new WrapperPlayServerSpawnEntity(getId(), getProfile().getUUID(), EntityTypes.PLAYER, getLocation(), getLocation().getYaw(), 0, null);
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPlayer);
         }
     }
@@ -396,12 +396,6 @@ public class NPC {
                                 WrapperPlayServerTeams.OptionData.NONE
                         )),
                 getProfile().getName());
-    }
-
-    public WrapperPlayServerPlayerInfo.PlayerData getLegacyPlayerInfoData() {
-        return new WrapperPlayServerPlayerInfo.PlayerData(getTabName(),
-                getProfile(), getGameMode(),
-                getDisplayPing());
     }
 
     public WrapperPlayServerPlayerInfoUpdate.PlayerInfo getModernPlayerInfoData() {

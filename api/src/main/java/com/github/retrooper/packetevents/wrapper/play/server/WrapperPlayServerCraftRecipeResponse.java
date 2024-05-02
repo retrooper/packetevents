@@ -25,17 +25,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class WrapperPlayServerCraftRecipeResponse extends PacketWrapper<WrapperPlayServerCraftRecipeResponse> {
     private int windowId;
-    private int recipeLegacy;
     private @Nullable String recipe;
 
     public WrapperPlayServerCraftRecipeResponse(PacketSendEvent event) {
         super(event);
-    }
-
-    public WrapperPlayServerCraftRecipeResponse(int windowId, int recipeLegacy) {
-        super(PacketType.Play.Server.CRAFT_RECIPE_RESPONSE);
-        this.windowId = windowId;
-        this.recipeLegacy = recipeLegacy;
     }
 
     public WrapperPlayServerCraftRecipeResponse(int windowId, @Nullable String recipe) {
@@ -59,7 +52,6 @@ public class WrapperPlayServerCraftRecipeResponse extends PacketWrapper<WrapperP
     @Override
     public void copy(WrapperPlayServerCraftRecipeResponse wrapper) {
         this.windowId = wrapper.windowId;
-        this.recipeLegacy = wrapper.recipeLegacy;
         this.recipe = wrapper.recipe;
     }
 

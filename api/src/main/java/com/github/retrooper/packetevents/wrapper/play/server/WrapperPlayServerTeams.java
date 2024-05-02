@@ -112,7 +112,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     }
 
     public enum TeamMode {
-        CREATE, REMOVE, UPDATE, ADD_ENTITIES, REMOVE_ENTITIES;
+        CREATE, REMOVE, UPDATE, ADD_ENTITIES, REMOVE_ENTITIES
     }
 
     public WrapperPlayServerTeams(PacketSendEvent event) {

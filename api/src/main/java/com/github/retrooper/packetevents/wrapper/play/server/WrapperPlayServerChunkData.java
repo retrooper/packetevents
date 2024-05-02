@@ -36,7 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.BitSet;
 
 public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerChunkData> {
-    private static ChunkReader_v1_18 chunkReader_v1_18 = new ChunkReader_v1_18();
+    private static final ChunkReader_v1_18 chunkReader_v1_18 = new ChunkReader_v1_18();
 
     private Column column;
 
@@ -127,10 +127,6 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
         column = new Column(chunkX, chunkZ, fullChunk, chunks, tileEntities, heightMaps);
-    }
-
-    private byte[] deflate(byte[] toDeflate, BitSet mask, boolean fullChunk) {
-        return toDeflate;
     }
 
     @Override
