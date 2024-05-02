@@ -41,27 +41,18 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
 
     @Override
     public void read() {
-        boolean v1_8 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8);
-        entityID = v1_8 ? readVarInt() : readInt();
-        int id = v1_8 ? readVarInt() : readByte();
+        entityID = readVarInt();
+        int id = readVarInt();
         action = Action.getById(serverVersion, id);
-        jumpBoost = v1_8 ? readVarInt() : readInt();
+        jumpBoost = readVarInt();
     }
 
     @Override
     public void write() {
-        boolean v1_8 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8);
-        if (v1_8) {
-            writeVarInt(entityID);
-            int actionIndex = action.getId(serverVersion);
-            writeVarInt(actionIndex);
-            writeVarInt(jumpBoost);
-        } else {
-            writeInt(entityID);
-            int actionIndex = action.getId(serverVersion);
-            writeByte(actionIndex);
-            writeInt(jumpBoost);
-        }
+        writeVarInt(entityID);
+        int actionIndex = action.getId(serverVersion);
+        writeVarInt(actionIndex);
+        writeVarInt(jumpBoost);
     }
 
     @Override
@@ -110,11 +101,6 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
 
         public int getId(ServerVersion serverVersion) {
             int actionIndex = ordinal();
-            if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
-                if (this == OPEN_HORSE_INVENTORY) {
-                    actionIndex--;
-                }
-            }
             return actionIndex;
         }
 
@@ -123,11 +109,6 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
                 throw new IllegalStateException("EntityAction action out of bounds: " + id);
             }
             Action action = Action.VALUES[id];
-            if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
-                if (action == Action.STOP_JUMPING_WITH_HORSE) {
-                    action = Action.OPEN_HORSE_INVENTORY;
-                }
-            }
             return action;
         }
     }

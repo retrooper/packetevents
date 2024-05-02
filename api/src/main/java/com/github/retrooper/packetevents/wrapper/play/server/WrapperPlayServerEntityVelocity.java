@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -40,11 +39,7 @@ public class WrapperPlayServerEntityVelocity extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            entityID = readInt();
-        } else {
-            entityID = readVarInt();
-        }
+        entityID = readVarInt();
         double velX = (double) readShort() / 8000.0;
         double velY = (double) readShort() / 8000.0;
         double velZ = (double) readShort() / 8000.0;
@@ -53,11 +48,7 @@ public class WrapperPlayServerEntityVelocity extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeInt(entityID);
-        } else {
-            writeVarInt(entityID);
-        }
+        writeVarInt(entityID);
         writeShort((int) (velocity.x * 8000.0));
         writeShort((int) (velocity.y * 8000.0));
         writeShort((int) (velocity.z * 8000.0));

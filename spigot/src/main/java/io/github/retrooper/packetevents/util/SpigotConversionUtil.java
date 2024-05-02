@@ -71,26 +71,12 @@ public class SpigotConversionUtil {
     }
 
     public static EntityType fromBukkitEntityType(org.bukkit.entity.EntityType entityType) {
-        ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            return EntityTypes.getByName(entityType.getKey().toString());
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            return EntityTypes.getByName("minecraft:" + entityType.getName());
-        } else {
-            if (entityType.getTypeId() == -1) {
-                return null;
-            }
-            return EntityTypes.getById(serverVersion.toClientVersion(), entityType.getTypeId());
-        }
+        return EntityTypes.getByName(entityType.getKey().toString());
     }
 
     public static org.bukkit.entity.EntityType toBukkitEntityType(EntityType entityType) {
         ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            return org.bukkit.entity.EntityType.fromName(entityType.getName().getKey());
-        } else {
-            return org.bukkit.entity.EntityType.fromId(entityType.getId(serverVersion.toClientVersion()));
-        }
+        return org.bukkit.entity.EntityType.fromName(entityType.getName().getKey());
     }
 
     //This is sort of a lazy approach, but likely works.
@@ -105,16 +91,6 @@ public class SpigotConversionUtil {
         ItemStack stack = ItemStack.builder().type(itemType).build();
         org.bukkit.inventory.ItemStack bukkitStack = toBukkitItemStack(stack);
         return bukkitStack.getType();
-    }
-
-    public static WrappedBlockState fromBukkitMaterialData(org.bukkit.material.MaterialData materialData) {
-        int combinedID = SpigotReflectionUtil.getBlockDataCombinedId(materialData);
-        ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
-        return WrappedBlockState.getByGlobalId(serverVersion.toClientVersion(), combinedID);
-    }
-
-    public static org.bukkit.material.MaterialData toBukkitMaterialData(WrappedBlockState state) {
-        return SpigotReflectionUtil.getBlockDataByCombinedId(state.getGlobalId());
     }
 
     public static ItemStack fromBukkitItemStack(org.bukkit.inventory.ItemStack itemStack) {

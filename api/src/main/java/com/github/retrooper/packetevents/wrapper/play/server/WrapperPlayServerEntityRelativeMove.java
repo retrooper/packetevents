@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -50,32 +49,18 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
     @Override
     public void read() {
         entityID = readVarInt();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            deltaX = readShort() / MODERN_DELTA_DIVISOR;
-            deltaY = readShort() / MODERN_DELTA_DIVISOR;
-            deltaZ = readShort() / MODERN_DELTA_DIVISOR;
-        }
-        else {
-            deltaX = readByte() / LEGACY_DELTA_DIVISOR;
-            deltaY = readByte() / LEGACY_DELTA_DIVISOR;
-            deltaZ = readByte() / LEGACY_DELTA_DIVISOR;
-        }
+        deltaX = readShort() / MODERN_DELTA_DIVISOR;
+        deltaY = readShort() / MODERN_DELTA_DIVISOR;
+        deltaZ = readShort() / MODERN_DELTA_DIVISOR;
         onGround = readBoolean();
     }
 
     @Override
     public void write() {
         writeVarInt(entityID);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            writeShort((short) (deltaX * MODERN_DELTA_DIVISOR));
-            writeShort((short) (deltaY * MODERN_DELTA_DIVISOR));
-            writeShort((short) (deltaZ * MODERN_DELTA_DIVISOR));
-        }
-        else {
-            writeByte((byte) (deltaX * LEGACY_DELTA_DIVISOR));
-            writeByte((byte) (deltaY * LEGACY_DELTA_DIVISOR));
-            writeByte((byte) (deltaZ * LEGACY_DELTA_DIVISOR));
-        }
+        writeShort((short) (deltaX * MODERN_DELTA_DIVISOR));
+        writeShort((short) (deltaY * MODERN_DELTA_DIVISOR));
+        writeShort((short) (deltaZ * MODERN_DELTA_DIVISOR));
         writeBoolean(onGround);
     }
 

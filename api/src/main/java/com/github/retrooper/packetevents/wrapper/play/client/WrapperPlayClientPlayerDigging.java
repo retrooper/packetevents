@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
@@ -46,45 +45,23 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            action = DiggingAction.getById(readVarInt());
-        } else {
-            action = DiggingAction.getById(readByte());
-        }
+        action = DiggingAction.getById(readVarInt());
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            blockPosition = readBlockPosition();
-        } else {
-            int x = readInt();
-            int y = readUnsignedByte();
-            int z = readInt();
-            blockPosition = new Vector3i(x, y, z);
-        }
+        blockPosition = readBlockPosition();
         short face = readUnsignedByte();
         // Vanilla 1.8 doesn't seem to care about BlockFace of OTHER in this packet... just leave it as 1.9+
         blockFace = BlockFace.getBlockFaceByValue(face);
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            sequence = readVarInt();
-        }
+        sequence = readVarInt();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            writeVarInt(action.getId());
-            writeBlockPosition(blockPosition);
-        } else {
-            writeByte(action.getId());
-            writeInt(blockPosition.x);
-            writeByte(blockPosition.y);
-            writeInt(blockPosition.z);
-        }
+        writeVarInt(action.getId());
+        writeBlockPosition(blockPosition);
         writeByte(blockFace.getFaceValue());
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeVarInt(sequence);
-        }
+        writeVarInt(sequence);
     }
 
     @Override

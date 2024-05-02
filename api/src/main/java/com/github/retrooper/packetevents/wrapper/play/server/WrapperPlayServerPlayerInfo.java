@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
@@ -27,7 +26,6 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,134 +69,102 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            playerDataList = new ArrayList<>(1);
-            //Only one player data
-            String rawUsername = readString();
-            Component username = Component.text(rawUsername);
-            boolean online = readBoolean();
-            int ping = readShort();
-            PlayerData data = new PlayerData(username, null, GameMode.SURVIVAL, ping);
-            playerDataList.add(data);
-            if (online) {
-                //We really can't know...
-                action = null;
-            } else {
-                action = Action.REMOVE_PLAYER;
+        action = Action.VALUES[readVarInt()];
+        int playerDataCount = readVarInt();
+        playerDataList = new ArrayList<>(playerDataCount);
+        for (int i = 0; i < playerDataCount; i++) {
+            PlayerData data = null;
+            UUID uuid = readUUID();
+            switch (action) {
+                case ADD_PLAYER: {
+                    String playerUsername = readString(16);
+                    UserProfile userProfile = new UserProfile(uuid, playerUsername);
+                    int propertyCount = readVarInt();
+                    for (int j = 0; j < propertyCount; j++) {
+                        String propertyName = readString();
+                        String propertyValue = readString();
+                        String propertySignature = readOptional(PacketWrapper::readString);
+                        TextureProperty textureProperty = new TextureProperty(propertyName, propertyValue, propertySignature);
+                        userProfile.getTextureProperties().add(textureProperty);
+                    }
+                    GameMode gameMode = GameMode.getById(readVarInt());
+                    int ping = readVarInt();
+                    Component displayName = readBoolean() ? readComponent() : null;
+
+                    SignatureData signatureData = readOptional(PacketWrapper::readSignatureData);
+
+                    data = new PlayerData(displayName, userProfile, gameMode, signatureData, ping);
+                    break;
+                }
+                case UPDATE_GAME_MODE: {
+                    GameMode gameMode = GameMode.getById(readVarInt());
+                    data = new PlayerData((Component) null, new UserProfile(uuid, null), gameMode, -1);
+                    break;
+                }
+                case UPDATE_LATENCY: {
+                    int ping = readVarInt();
+                    data = new PlayerData((Component) null, new UserProfile(uuid, null), null, ping);
+                    break;
+                }
+                case UPDATE_DISPLAY_NAME:
+                    Component displayName = readBoolean() ? readComponent() : null;
+                    data = new PlayerData(displayName, new UserProfile(uuid, null), null, -1);
+                    break;
+
+                case REMOVE_PLAYER:
+                    data = new PlayerData((Component) null, new UserProfile(uuid, null), null, -1);
+                    break;
             }
-        } else {
-            action = Action.VALUES[readVarInt()];
-            int playerDataCount = readVarInt();
-            playerDataList = new ArrayList<>(playerDataCount);
-            for (int i = 0; i < playerDataCount; i++) {
-                PlayerData data = null;
-                UUID uuid = readUUID();
-                switch (action) {
-                    case ADD_PLAYER: {
-                        String playerUsername = readString(16);
-                        UserProfile userProfile = new UserProfile(uuid, playerUsername);
-                        int propertyCount = readVarInt();
-                        for (int j = 0; j < propertyCount; j++) {
-                            String propertyName = readString();
-                            String propertyValue = readString();
-                            String propertySignature = readOptional(PacketWrapper::readString);
-                            TextureProperty textureProperty = new TextureProperty(propertyName, propertyValue, propertySignature);
-                            userProfile.getTextureProperties().add(textureProperty);
-                        }
-                        GameMode gameMode = GameMode.getById(readVarInt());
-                        int ping = readVarInt();
-                        Component displayName = readBoolean() ? readComponent() : null;
-
-                        SignatureData signatureData = null;
-                        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-                            signatureData = readOptional(PacketWrapper::readSignatureData);
-                        }
-
-                        data = new PlayerData(displayName, userProfile, gameMode, signatureData, ping);
-                        break;
-                    }
-                    case UPDATE_GAME_MODE: {
-                        GameMode gameMode = GameMode.getById(readVarInt());
-                        data = new PlayerData((Component) null, new UserProfile(uuid, null), gameMode, -1);
-                        break;
-                    }
-                    case UPDATE_LATENCY: {
-                        int ping = readVarInt();
-                        data = new PlayerData((Component) null, new UserProfile(uuid, null), null, ping);
-                        break;
-                    }
-                    case UPDATE_DISPLAY_NAME:
-                        Component displayName = readBoolean() ? readComponent() : null;
-                        data = new PlayerData(displayName, new UserProfile(uuid, null), null, -1);
-                        break;
-
-                    case REMOVE_PLAYER:
-                        data = new PlayerData((Component) null, new UserProfile(uuid, null), null, -1);
-                        break;
-                }
-                if (data != null) {
-                    playerDataList.add(data);
-                }
+            if (data != null) {
+                playerDataList.add(data);
             }
         }
     }
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            //Only one player data can be sent
-            PlayerData data = playerDataList.get(0);
-            //We must convert the component string to a normal one
-            String rawUsername = ((TextComponent) data.displayName).content();
-            writeString(rawUsername);
-            writeBoolean(action != Action.REMOVE_PLAYER);
-            writeShort(data.ping);
-        } else {
-            writeVarInt(action.ordinal());
-            writeVarInt(playerDataList.size());
-            for (PlayerData data : playerDataList) {
-                writeUUID(data.userProfile.getUUID());
-                switch (action) {
-                    case ADD_PLAYER: {
-                        writeString(data.userProfile.getName(), 16);
-                        writeList(data.userProfile.getTextureProperties(), (wrapper, textureProperty) -> {
-                            wrapper.writeString(textureProperty.getName());
-                            wrapper.writeString(textureProperty.getValue());
-                            wrapper.writeOptional(textureProperty.getSignature(), PacketWrapper::writeString);
-                        });
-                        writeVarInt(data.gameMode.ordinal());
-                        writeVarInt(data.ping);
-                        if (data.displayName != null) {
-                            writeBoolean(true);
-                            writeComponent(data.displayName);
-                        } else {
-                            writeBoolean(false);
-                        }
-                        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-                            writeOptional(data.getSignatureData(), PacketWrapper::writeSignatureData);
-                        }
-                        break;
+        writeVarInt(action.ordinal());
+        writeVarInt(playerDataList.size());
+        for (PlayerData data : playerDataList) {
+            writeUUID(data.userProfile.getUUID());
+            switch (action) {
+                case ADD_PLAYER: {
+                    writeString(data.userProfile.getName(), 16);
+                    writeList(data.userProfile.getTextureProperties(), (wrapper, textureProperty) -> {
+                        wrapper.writeString(textureProperty.getName());
+                        wrapper.writeString(textureProperty.getValue());
+                        wrapper.writeOptional(textureProperty.getSignature(), PacketWrapper::writeString);
+                    });
+                    writeVarInt(data.gameMode.ordinal());
+                    writeVarInt(data.ping);
+                    if (data.displayName != null) {
+                        writeBoolean(true);
+                        writeComponent(data.displayName);
+                    } else {
+                        writeBoolean(false);
                     }
-                    case UPDATE_GAME_MODE: {
-                        writeVarInt(data.gameMode.ordinal());
-                        break;
-                    }
-                    case UPDATE_LATENCY: {
-                        writeVarInt(data.ping);
-                        break;
-                    }
-                    case UPDATE_DISPLAY_NAME:
-                        if (data.displayName != null) {
-                            writeBoolean(true);
-                            writeComponent(data.displayName);
-                        } else {
-                            writeBoolean(false);
-                        }
-                        break;
-
-                    case REMOVE_PLAYER:
-                        break;
+                    writeOptional(data.getSignatureData(), PacketWrapper::writeSignatureData);
+                    break;
                 }
+                case UPDATE_GAME_MODE: {
+                    writeVarInt(data.gameMode.ordinal());
+                    break;
+                }
+                case UPDATE_LATENCY: {
+                    writeVarInt(data.ping);
+                    break;
+                }
+                case UPDATE_DISPLAY_NAME:
+                    if (data.displayName != null) {
+                        writeBoolean(true);
+                        writeComponent(data.displayName);
+                    } else {
+                        writeBoolean(false);
+                    }
+                    break;
+
+                case REMOVE_PLAYER:
+                    break;
             }
         }
     }

@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -42,25 +41,15 @@ public class WrapperPlayServerSetExperience extends PacketWrapper<WrapperPlaySer
     @Override
     public void read() {
         experienceBar = readFloat();
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            level = readShort();
-            totalExperience = readShort();
-        } else {
-            level = readVarInt();
-            totalExperience = readVarInt();
-        }
+        level = readVarInt();
+        totalExperience = readVarInt();
     }
 
     @Override
     public void write() {
         writeFloat(experienceBar);
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeShort(level);
-            writeShort(totalExperience);
-        } else {
-            writeVarInt(level);
-            writeVarInt(totalExperience);
-        }
+        writeVarInt(level);
+        writeVarInt(totalExperience);
     }
 
     @Override

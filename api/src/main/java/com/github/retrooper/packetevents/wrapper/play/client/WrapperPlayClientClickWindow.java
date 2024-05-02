@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -57,30 +56,17 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void read() {
-        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
         this.windowID = readUnsignedByte();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
-            this.stateID = Optional.of(readVarInt());
-        } else {
-            this.stateID = Optional.empty();
-        }
+        this.stateID = Optional.of(readVarInt());
         this.slot = readShort();
         this.button = readByte();
-        if (!v1_17) {
-            this.actionNumber = Optional.of((int) readShort());
-        } else {
-            this.actionNumber = Optional.empty();
-        }
+        this.actionNumber = Optional.empty();
         int clickTypeIndex = readVarInt();
         this.windowClickType = WindowClickType.VALUES[clickTypeIndex];
-        if (v1_17) {
-            this.slots = Optional.of(readMap(
-                    packetWrapper -> Math.toIntExact(packetWrapper.readShort()),
-                    PacketWrapper::readItemStack
-            ));
-        } else {
-            this.slots = Optional.empty();
-        }
+        this.slots = Optional.of(readMap(
+                packetWrapper -> Math.toIntExact(packetWrapper.readShort()),
+                PacketWrapper::readItemStack
+        ));
         this.carriedItemStack = readItemStack();
     }
 
@@ -98,20 +84,12 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void write() {
-        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
         writeByte(windowID);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
-            writeVarInt(this.stateID.orElse(-1));
-        }
+        writeVarInt(this.stateID.orElse(-1));
         writeShort(this.slot);
         writeByte(this.button);
-        if (!v1_17) {
-            writeShort(this.actionNumber.orElse(-1));
-        }
         writeVarInt(windowClickType.ordinal());
-        if (v1_17) {
-            writeMap(slots.orElse(new HashMap<>()), PacketWrapper::writeShort, PacketWrapper::writeItemStack);
-        }
+        writeMap(slots.orElse(new HashMap<>()), PacketWrapper::writeShort, PacketWrapper::writeItemStack);
         writeItemStack(carriedItemStack);
     }
 

@@ -45,27 +45,10 @@ public class GsonComponentSerializerExtended implements GsonComponentSerializer 
     private final UnaryOperator<GsonBuilder> populator;
 
     public GsonComponentSerializerExtended(final boolean downsampleColor, final boolean emitLegacyHover) {
-        if (AdventureReflectionUtil.IS_LEGACY_ADVENTURE) {
-            this.populator = builder -> {
-                builder.registerTypeHierarchyAdapter(Key.class, AdventureReflectionUtil.KEY_SERIALIZER_INSTANCE);
-                builder.registerTypeHierarchyAdapter(Component.class, AdventureReflectionUtil.COMPONENT_SERIALIZER_CREATE.apply(null));
-                builder.registerTypeHierarchyAdapter(Style.class, new Legacy_StyleSerializerExtended(emitLegacyHover));
-                builder.registerTypeAdapter(ClickEvent.Action.class, AdventureReflectionUtil.CLICK_EVENT_ACTION_SERIALIZER_INSTANCE);
-                builder.registerTypeAdapter(HoverEvent.Action.class, AdventureReflectionUtil.HOVER_EVENT_ACTION_SERIALIZER_INSTANCE);
-                builder.registerTypeAdapter(HoverEvent.ShowItem.class, AdventureReflectionUtil.SHOW_ITEM_SERIALIZER_CREATE.apply(null));
-                builder.registerTypeAdapter(HoverEvent.ShowEntity.class, AdventureReflectionUtil.SHOW_ENTITY_SERIALIZER_CREATE.apply(null));
-                builder.registerTypeAdapter(TextColorWrapper.class, TextColorWrapper.Serializer.INSTANCE);
-                builder.registerTypeHierarchyAdapter(TextColor.class, downsampleColor ? AdventureReflectionUtil.TEXT_COLOR_SERIALIZER_DOWNSAMPLE_COLOR_INSTANCE : AdventureReflectionUtil.TEXT_COLOR_SERIALIZER_INSTANCE);
-                builder.registerTypeAdapter(TextDecoration.class, AdventureReflectionUtil.TEXT_DECORATION_SERIALIZER_INSTANCE);
-                builder.registerTypeHierarchyAdapter(BlockNBTComponent.Pos.class, AdventureReflectionUtil.BLOCK_NBT_POS_SERIALIZER_INSTANCE);
-                return builder;
-            };
-        } else {
-            this.populator = builder -> {
-                builder.registerTypeAdapterFactory(new SerializerFactory(downsampleColor, emitLegacyHover));
-                return builder;
-            };
-        }
+        this.populator = builder -> {
+            builder.registerTypeAdapterFactory(new SerializerFactory(downsampleColor, emitLegacyHover));
+            return builder;
+        };
         this.serializer = this.populator.apply(new GsonBuilder().disableHtmlEscaping()).create();
     }
 

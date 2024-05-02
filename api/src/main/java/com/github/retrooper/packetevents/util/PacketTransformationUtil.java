@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
@@ -43,16 +42,6 @@ public class PacketTransformationUtil {
             }
         } else if (wrapper instanceof WrapperPlayServerEntityEquipment) {
             WrapperPlayServerEntityEquipment entityEquipment = (WrapperPlayServerEntityEquipment) wrapper;
-            int len = entityEquipment.getEquipment().size();
-            if (entityEquipment.getServerVersion().isOlderThan(ServerVersion.V_1_16) && len > 1) {
-                //Transform into multiple packets. Actually a mistake on the user's end.
-                PacketWrapper<?>[] output = new PacketWrapper[len];
-                for (int i = 0; i < len; i++) {
-                    Equipment equipment = entityEquipment.getEquipment().get(i);
-                    output[i] = new WrapperPlayServerEntityEquipment(entityEquipment.getEntityId(), Collections.singletonList(equipment));
-                }
-                return output;
-            }
         }
         return new PacketWrapper<?>[]{wrapper};
     }

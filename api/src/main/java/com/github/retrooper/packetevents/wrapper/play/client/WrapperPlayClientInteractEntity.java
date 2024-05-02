@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.util.Vector3f;
@@ -54,64 +53,43 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
 
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            this.entityID = readInt();
-            byte typeIndex = readByte();
-            this.interactAction = InteractAction.VALUES[typeIndex];
-            this.target = Optional.empty();
-            this.interactionHand = InteractionHand.MAIN_HAND;
-            this.sneaking = Optional.empty();
+        this.entityID = readVarInt();
+        int typeIndex = readVarInt();
+        this.interactAction = InteractAction.VALUES[typeIndex];
+        if (interactAction == InteractAction.INTERACT_AT) {
+            float x = readFloat();
+            float y = readFloat();
+            float z = readFloat();
+            this.target = Optional.of(new Vector3f(x, y, z));
         } else {
-            this.entityID = readVarInt();
-            int typeIndex = readVarInt();
-            this.interactAction = InteractAction.VALUES[typeIndex];
-            if (interactAction == InteractAction.INTERACT_AT) {
-                float x = readFloat();
-                float y = readFloat();
-                float z = readFloat();
-                this.target = Optional.of(new Vector3f(x, y, z));
-            } else {
-                this.target = Optional.empty();
-            }
-
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
-                int handID = readVarInt();
-                this.interactionHand = InteractionHand.getById(handID);
-            } else {
-                this.interactionHand = InteractionHand.MAIN_HAND;
-            }
-
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-                this.sneaking = Optional.of(readBoolean());
-            } else {
-                this.sneaking = Optional.empty();
-            }
+            this.target = Optional.empty();
         }
+
+        if (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT) {
+            int handID = readVarInt();
+            this.interactionHand = InteractionHand.getById(handID);
+        } else {
+            this.interactionHand = InteractionHand.MAIN_HAND;
+        }
+        this.sneaking = Optional.of(readBoolean());
     }
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeInt(entityID);
-            writeByte(interactAction.ordinal());
-        } else {
-            writeVarInt(entityID);
-            writeVarInt(interactAction.ordinal());
-            if (interactAction == InteractAction.INTERACT_AT) {
-                Vector3f targetVec = target.orElse(new Vector3f(0.0F, 0.0F, 0.0F));
-                writeFloat(targetVec.x);
-                writeFloat(targetVec.y);
-                writeFloat(targetVec.z);
-            }
-
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
-                writeVarInt(interactionHand.getId());
-            }
-
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-                writeBoolean(sneaking.orElse(false));
-            }
+        writeVarInt(entityID);
+        writeVarInt(interactAction.ordinal());
+        if (interactAction == InteractAction.INTERACT_AT) {
+            Vector3f targetVec = target.orElse(new Vector3f(0.0F, 0.0F, 0.0F));
+            writeFloat(targetVec.x);
+            writeFloat(targetVec.y);
+            writeFloat(targetVec.z);
         }
+
+        if (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT) {
+            writeVarInt(interactionHand.getId());
+        }
+
+        writeBoolean(sneaking.orElse(false));
     }
 
     @Override

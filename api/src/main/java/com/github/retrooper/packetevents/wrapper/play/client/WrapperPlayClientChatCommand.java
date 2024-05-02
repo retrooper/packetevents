@@ -1,7 +1,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.chat.SignedCommandArgument;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -18,18 +17,16 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
     private MessageSignData messageSignData;
     private List<SignedCommandArgument> signedArguments;
     private @Nullable LastSeenMessages.Update lastSeenMessages;
-    private @Nullable LastSeenMessages.LegacyUpdate legacyLastSeenMessages;
 
     public WrapperPlayClientChatCommand(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData, List<SignedCommandArgument> signedArguments, @Nullable LastSeenMessages.LegacyUpdate lastSeenMessages) {
+    public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData, List<SignedCommandArgument> signedArguments) {
         super(PacketType.Play.Client.CHAT_COMMAND);
         this.command = command;
         this.messageSignData = messageSignData;
         this.signedArguments = signedArguments;
-        this.legacyLastSeenMessages = lastSeenMessages;
     }
 
     public WrapperPlayClientChatCommand(String command, MessageSignData messageSignData, List<SignedCommandArgument> signedArguments, @Nullable LastSeenMessages.Update lastSeenMessages) {
@@ -47,17 +44,7 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
         long salt = readLong();
         this.messageSignData = new MessageSignData(new SaltSignature(salt, new byte[0]), timestamp);
         this.signedArguments = readSignedCommandArguments();
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-            this.lastSeenMessages = readLastSeenMessagesUpdate();
-        } else {
-            boolean signedPreview = readBoolean();
-            this.messageSignData.setSignedPreview(signedPreview);
-
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-                this.legacyLastSeenMessages = readLegacyLastSeenMessagesUpdate();
-            }
-        }
+        this.lastSeenMessages = readLastSeenMessagesUpdate();
     }
 
     @Override
@@ -66,17 +53,8 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
         writeTimestamp(messageSignData.getTimestamp());
         writeLong(messageSignData.getSaltSignature().getSalt());
         writeSignedCommandArguments(signedArguments);
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-            if (lastSeenMessages != null)
-                writeLastSeenMessagesUpdate(lastSeenMessages);
-        } else {
-            writeBoolean(messageSignData.isSignedPreview());
-
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1) && legacyLastSeenMessages != null) {
-                writeLegacyLastSeenMessagesUpdate(legacyLastSeenMessages);
-            }
-        }
+        if (lastSeenMessages != null)
+            writeLastSeenMessagesUpdate(lastSeenMessages);
     }
 
     @Override
@@ -85,7 +63,6 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
         this.messageSignData = wrapper.messageSignData;
         this.signedArguments = wrapper.signedArguments;
         this.lastSeenMessages = wrapper.lastSeenMessages;
-        this.legacyLastSeenMessages = wrapper.legacyLastSeenMessages;
     }
 
     public String getCommand() {
@@ -118,13 +95,5 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
 
     public void setLastSeenMessages(LastSeenMessages.@Nullable Update lastSeenMessages) {
         this.lastSeenMessages = lastSeenMessages;
-    }
-
-    public @Nullable LastSeenMessages.LegacyUpdate getLegacyLastSeenMessages() {
-        return legacyLastSeenMessages;
-    }
-
-    public void setLegacyLastSeenMessages(@Nullable LastSeenMessages.LegacyUpdate lastSeenMessages) {
-        this.legacyLastSeenMessages = lastSeenMessages;
     }
 }

@@ -1,7 +1,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
@@ -40,45 +39,20 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     public void read() {
         this.entityID = readVarInt();
         int effectId;
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18_2)) {
-            effectId = readVarInt();
-        } else {
-            effectId = readByte();
-        }
+        effectId = readVarInt();
         this.potionType = PotionTypes.getById(effectId, this.serverVersion);
-        this.effectAmplifier = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)
-                ? this.readVarInt() : this.readByte();
+        this.effectAmplifier = this.readVarInt();
         this.effectDurationTicks = readVarInt();
-        if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
-            this.flags = readByte();
-        }
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
-                && this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
-            factorData = readOptional(PacketWrapper::readNBT);
-        }
+        this.flags = readByte();
     }
 
     @Override
     public void write() {
         writeVarInt(entityID);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18_2)) {
-            writeVarInt(potionType.getId(serverVersion.toClientVersion()));
-        } else {
-            writeByte(potionType.getId(serverVersion.toClientVersion()));
-        }
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            this.writeVarInt(this.effectAmplifier);
-        } else {
-            this.writeByte(this.effectAmplifier);
-        }
+        writeVarInt(potionType.getId(serverVersion.toClientVersion()));
+        this.writeVarInt(this.effectAmplifier);
         writeVarInt(effectDurationTicks);
-        if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
-            writeByte(flags);
-        }
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
-                && this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
-            this.writeOptional(this.factorData, PacketWrapper::writeNBT);
-        }
+        writeByte(flags);
     }
 
     @Override
@@ -149,49 +123,27 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     }
 
     public boolean isAmbient() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
-            return false;
-        }
         return (getFlags() & FLAG_AMBIENT) == FLAG_AMBIENT;
     }
 
     public void setAmbient(boolean isAmbient) {
-        if (serverVersion.isNewerThan(ServerVersion.V_1_8_8)) {
-            // used as a boolean in 1.9, works either way though
-            setFlags(constructFlags(isVisible(), isAmbient, isShowIcon()));
-        }
+        // used as a boolean in 1.9, works either way though
+        setFlags(constructFlags(isVisible(), isAmbient, isShowIcon()));
     }
 
     public boolean isVisible() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
-            return false;
-        }
-        if (serverVersion.isOlderThan(ServerVersion.V_1_10)) {
-            //hideParticles field is used as a boolean
-            return getFlags() != 0;
-        } else {
-            return (getFlags() & FLAG_VISIBLE) == FLAG_VISIBLE;
-        }
+        return (getFlags() & FLAG_VISIBLE) == FLAG_VISIBLE;
     }
 
     public void setVisible(boolean isVisible) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_10)) {
-            return;
-        }
         setFlags(constructFlags(isVisible, isAmbient(), isShowIcon()));
     }
 
     public boolean isShowIcon() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-            return false;
-        }
         return (getFlags() & FLAG_SHOW_ICONS) == FLAG_SHOW_ICONS;
     }
 
     public void setShowIcon(boolean showIcon) {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-            return;
-        }
         setFlags(constructFlags(isVisible(), isAmbient(), showIcon));
     }
 }

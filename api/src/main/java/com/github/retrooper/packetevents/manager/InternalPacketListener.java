@@ -24,13 +24,8 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
-import com.github.retrooper.packetevents.protocol.nbt.NBTList;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
-import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -83,13 +78,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
             // Switch the user's connection state to new state, but the variable event.getConnectionState() remains LOGIN
             // We switch user state immediately to remain in sync with vanilla, allowing you to encode packets immediately
-            boolean proxy = PacketEvents.getAPI().getInjector().isProxy();
-            if (proxy ? event.getUser().getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_20_2)
-                    : event.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
-                user.setEncoderState(ConnectionState.CONFIGURATION);
-            } else {
-                user.setConnectionState(ConnectionState.PLAY);
-            }
+            user.setEncoderState(ConnectionState.CONFIGURATION);
         }
 
         // The server sends dimension information in configuration phase >= 1.20.2
@@ -130,9 +119,6 @@ public class InternalPacketListener extends PacketListenerAbstract {
             WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
             user.setEntityId(joinGame.getEntityId());
             user.setDimension(joinGame.getDimension());
-            if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
-                return; // Fixed world height, no tags are sent to the client
-            }
 
             // Store world data
             NBTCompound dimensionCodec = joinGame.getDimensionCodec();
@@ -161,9 +147,6 @@ public class InternalPacketListener extends PacketListenerAbstract {
         else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
             WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
             user.setDimension(respawn.getDimension());
-            if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
-                return; // Fixed world height, no tags are sent to the client
-            }
 
             NBTCompound dimension = user.getWorldNBT(respawn.getDimension());
             if (dimension != null) {

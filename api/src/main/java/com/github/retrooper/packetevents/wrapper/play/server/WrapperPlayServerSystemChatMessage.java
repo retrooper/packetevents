@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -88,29 +87,13 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
     @Override
     public void read() {
         this.message = this.readComponent();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-            overlay = readBoolean();
-        } else {
-            type = ChatTypes.getById(serverVersion.toClientVersion(), readVarInt());
-        }
+        overlay = readBoolean();
     }
 
     @Override
     public void write() {
         this.writeComponent(this.message);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-            writeBoolean(overlay);
-        } else {
-            if (type == null) {
-                if (overlay) {
-                    writeVarInt(ChatTypes.GAME_INFO.getId(serverVersion.toClientVersion()));
-                } else {
-                    writeVarInt(ChatTypes.SYSTEM.getId(serverVersion.toClientVersion()));
-                }
-            } else {
-                writeVarInt(type.getId(serverVersion.toClientVersion()));
-            }
-        }
+        writeBoolean(overlay);
     }
 
     @Override

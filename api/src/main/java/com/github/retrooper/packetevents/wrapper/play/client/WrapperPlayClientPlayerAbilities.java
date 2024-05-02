@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -56,51 +55,18 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
     @Override
     public void read() {
         byte mask = readByte();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            flying = (mask & 0x02) != 0;
-            godMode = Optional.empty();
-            flightAllowed = Optional.empty();
-            creativeMode = Optional.empty();
-            flySpeed = Optional.empty();
-            walkSpeed = Optional.empty();
-        } else {
-            godMode = Optional.of((mask & 0x01) != 0);
-            flying = (mask & 0x02) != 0;
-            flightAllowed = Optional.of((mask & 0x04) != 0);
-            creativeMode = Optional.of((mask & 0x08) != 0);
-            flySpeed = Optional.of(readFloat());
-            walkSpeed = Optional.of(readFloat());
-        }
-
+        flying = (mask & 0x02) != 0;
+        godMode = Optional.empty();
+        flightAllowed = Optional.empty();
+        creativeMode = Optional.empty();
+        flySpeed = Optional.empty();
+        walkSpeed = Optional.empty();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            byte mask = (byte) (flying ? 0x02 : 0x00);
-            writeByte(mask);
-        } else {
-            byte mask = 0x00;
-            if (godMode.orElse(false)) {
-                mask |= 0x01;
-            }
-
-            if (flying) {
-                mask |= 0x02;
-            }
-
-            if (flightAllowed.orElse(false)) {
-                mask |= 0x04;
-            }
-
-            if (creativeMode.orElse(false)) {
-                mask |= 0x08;
-            }
-            writeByte(mask);
-            //These are my guesses of default values, don't cry, just pass in the fly/walk speed next time :0
-            writeFloat(flySpeed.orElse(0.1f));
-            writeFloat(walkSpeed.orElse(0.2f));
-        }
+        byte mask = (byte) (flying ? 0x02 : 0x00);
+        writeByte(mask);
     }
 
     @Override

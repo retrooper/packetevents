@@ -22,7 +22,6 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Location;
-import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -57,16 +56,8 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            entityID = readInt();
-        } else {
-            entityID = readVarInt();
-        }
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
-            position = new Vector3d((readInt() / 32.0), (readInt() / 32.0), (readInt() / 32.0));
-        } else {
-            position = new Vector3d(readDouble(), readDouble(), readDouble());
-        }
+        entityID = readVarInt();
+        position = new Vector3d(readDouble(), readDouble(), readDouble());
         yaw = readByte() / ROTATION_FACTOR;
         pitch = readByte() / ROTATION_FACTOR;
         if (serverVersion != ServerVersion.V_1_7_10) {
@@ -78,20 +69,10 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeInt(entityID);
-        } else {
-            writeVarInt(entityID);
-        }
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
-            writeInt(MathUtil.floor(position.x * 32.0));
-            writeInt(MathUtil.floor(position.y * 32.0));
-            writeInt(MathUtil.floor(position.z * 32.0));
-        } else {
-            writeDouble(position.x);
-            writeDouble(position.y);
-            writeDouble(position.z);
-        }
+        writeVarInt(entityID);
+        writeDouble(position.x);
+        writeDouble(position.y);
+        writeDouble(position.z);
         writeByte((int) (yaw * ROTATION_FACTOR));
         writeByte((int) (pitch * ROTATION_FACTOR));
         if (serverVersion != ServerVersion.V_1_7_10) {

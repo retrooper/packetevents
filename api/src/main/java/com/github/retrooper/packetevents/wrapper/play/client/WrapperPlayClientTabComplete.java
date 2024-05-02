@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -58,51 +57,17 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void read() {
-        boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13);
         int textLength;
-        if (v1_13) {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_1)) {
-                //1.13.1+ text length
-                textLength = 32500;
-            } else {
-                //1.13 text length
-                textLength = 256;
-            }
-            transactionId = Optional.of(readVarInt());
-            text = readString(textLength);
-        } else {
-            transactionId = Optional.empty();
-            textLength = 32767;
-            text = readString(textLength);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                assumeCommand = readBoolean();
-            }
-            blockPosition = readOptional(PacketWrapper::readBlockPosition);
-        }
+        textLength = 32500;
+        transactionId = Optional.of(readVarInt());
+        text = readString(textLength);
     }
 
     @Override
     public void write() {
-        boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13);
-        int textLength;
-        if (v1_13) {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_1)) {
-                //1.13.1+ text length
-                textLength = 32500;
-            } else {
-                //1.13 text length
-                textLength = 256;
-            }
-            writeVarInt(transactionId.orElse(0));
-            writeString(text, textLength);
-        } else {
-            textLength = 32767;
-            writeString(text, textLength);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                writeBoolean(assumeCommand);
-            }
-            writeOptional(blockPosition, PacketWrapper::writeBlockPosition);
-        }
+        int textLength = 32500;
+        writeVarInt(transactionId.orElse(0));
+        writeString(text, textLength);
     }
 
     @Override

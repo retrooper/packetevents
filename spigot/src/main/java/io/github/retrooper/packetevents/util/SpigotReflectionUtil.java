@@ -38,7 +38,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -71,11 +70,6 @@ public final class SpigotReflectionUtil {
         OBC_PACKAGE = "org.bukkit.craftbukkit." + MODIFIED_PACKAGE_NAME + ".";
     }
 
-    public static ServerVersion VERSION;
-    //Booleans
-    public static boolean V_1_19_OR_HIGHER;
-    public static boolean V_1_17_OR_HIGHER;
-    public static boolean V_1_12_OR_HIGHER;
     //Minecraft classes
     public static Class<?> MINECRAFT_SERVER_CLASS, NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS,
             NMS_IMATERIAL_CLASS, NMS_ENTITY_CLASS, ENTITY_PLAYER_CLASS, BOUNDING_BOX_CLASS, NMS_MINECRAFT_KEY_CLASS,
@@ -124,14 +118,9 @@ public final class SpigotReflectionUtil {
         try {
             NMS_ITEM_STACK_CONSTRUCTOR = NMS_ITEM_STACK_CLASS.getConstructor(itemClass, int.class);
             NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR = NMS_PACKET_DATA_SERIALIZER_CLASS.getConstructor(BYTE_BUF_CLASS);
-            // This constructor doesn't exist on 1.8 - when was it added?
-            if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                NMS_MINECRAFT_KEY_CONSTRUCTOR = NMS_MINECRAFT_KEY_CLASS.getConstructor(String.class, String.class);
-            }
-            if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-                REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR = REGISTRY_FRIENDLY_BYTE_BUF.getConstructor(
-                        BYTE_BUF_CLASS, REGISTRY_ACCESS);
-            }
+            NMS_MINECRAFT_KEY_CONSTRUCTOR = NMS_MINECRAFT_KEY_CLASS.getConstructor(String.class, String.class);
+            REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR = REGISTRY_FRIENDLY_BYTE_BUF.getConstructor(
+                    BYTE_BUF_CLASS, REGISTRY_ACCESS);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -143,28 +132,19 @@ public final class SpigotReflectionUtil {
         GET_CRAFT_PLAYER_HANDLE_METHOD = Reflection.getMethod(CRAFT_PLAYER_CLASS, "getHandle", 0);
         GET_CRAFT_ENTITY_HANDLE_METHOD = Reflection.getMethod(CRAFT_ENTITY_CLASS, "getHandle", 0);
         GET_CRAFT_WORLD_HANDLE_METHOD = Reflection.getMethod(CRAFT_WORLD_CLASS, "getHandle", 0);
-        GET_MOB_EFFECT_LIST_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, V_1_19_OR_HIGHER ? "g" : "getId", 0);
-        GET_MOB_EFFECT_LIST_BY_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, V_1_19_OR_HIGHER ? "a" : "fromId", 0);
-        GET_ITEM_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, V_1_19_OR_HIGHER ? "g" : "getId", 0);
+        GET_MOB_EFFECT_LIST_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, "g", 0);
+        GET_MOB_EFFECT_LIST_BY_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, "a", 0);
+        GET_ITEM_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, "g", 0);
         GET_ITEM_BY_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, NMS_ITEM_CLASS, 0);
-        if (V_1_17_OR_HIGHER) {
-            GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, Iterable.class, 0);
-            GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, "a", int.class);
-        }
+        GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, Iterable.class, 0);
+        GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, "a", int.class);
         if (DIMENSION_MANAGER_CLASS != null) {
-            if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16
-                    || PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16_1) {
-                GET_DIMENSION_KEY = Reflection.getMethod(NMS_WORLD_CLASS, "getTypeKey", 0);
-            }
             GET_DIMENSION_MANAGER = Reflection.getMethod(NMS_WORLD_CLASS, DIMENSION_MANAGER_CLASS, 0);
             GET_DIMENSION_ID = Reflection.getMethod(DIMENSION_MANAGER_CLASS, int.class, 0);
         }
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
-            CODEC_ENCODE_METHOD = Reflection.getMethod(MOJANG_ENCODER_CLASS, "encodeStart", 0);
-            DATA_RESULT_GET_METHOD = Reflection.getMethod(DATA_RESULT_CLASS, "result", 0);
-        }
-        String entityIdMethodName = VERSION.isOlderThan(ServerVersion.V_1_9) ? "a" :
-                VERSION.isOlderThan(ServerVersion.V_1_17) ? "getEntity" : "b";
+        CODEC_ENCODE_METHOD = Reflection.getMethod(MOJANG_ENCODER_CLASS, "encodeStart", 0);
+        DATA_RESULT_GET_METHOD = Reflection.getMethod(DATA_RESULT_CLASS, "result", 0);
+        String entityIdMethodName = "b";
         GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(WORLD_SERVER_CLASS, entityIdMethodName, NMS_ENTITY_CLASS, int.class);
         if (GET_ENTITY_BY_ID_METHOD == null) {
             GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(WORLD_SERVER_CLASS, "getEntity", NMS_ENTITY_CLASS, int.class);
@@ -172,11 +152,8 @@ public final class SpigotReflectionUtil {
 
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
             BUKKIT_PARTICLE_TO_NMS_ENUM_PARTICLE = Reflection.getMethod(CRAFT_PARTICLE_CLASS, "toNMS", NMS_ENUM_PARTICLE_CLASS);
-            // Referencing the Particle class will throw an exception on 1.8, as there is no particle class
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                Class<?> particleClass = Reflection.getClassByNameWithoutException("org.bukkit.Particle");
-                NMS_ENUM_PARTICLE_TO_BUKKIT_PARTICLE = Reflection.getMethod(CRAFT_PARTICLE_CLASS, "toBukkit", particleClass);
-            }
+            Class<?> particleClass = Reflection.getClassByNameWithoutException("org.bukkit.Particle");
+            NMS_ENUM_PARTICLE_TO_BUKKIT_PARTICLE = Reflection.getMethod(CRAFT_PARTICLE_CLASS, "toBukkit", particleClass);
         }
 
         CRAFT_ITEM_STACK_AS_BUKKIT_COPY = Reflection.getMethod(CRAFT_ITEM_STACK_CLASS, "asBukkitCopy", 0);
@@ -204,10 +181,8 @@ public final class SpigotReflectionUtil {
         }
         WRITE_NBT_TO_STREAM_METHOD = Reflection.getMethod(NBT_COMPRESSION_STREAM_TOOLS_CLASS, 0, NMS_NBT_COMPOUND_CLASS, DataOutput.class);
 
-        if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            STREAM_DECODER_DECODE = STREAM_DECODER.getMethods()[0];
-            STREAM_ENCODER_ENCODE = STREAM_ENCODER.getMethods()[0];
-        }
+        STREAM_DECODER_DECODE = STREAM_DECODER.getMethods()[0];
+        STREAM_ENCODER_ENCODE = STREAM_ENCODER.getMethods()[0];
     }
 
     private static void initFields() {
@@ -216,14 +191,10 @@ public final class SpigotReflectionUtil {
         BYTE_BUF_IN_PACKET_DATA_SERIALIZER = Reflection.getField(NMS_PACKET_DATA_SERIALIZER_CLASS, BYTE_BUF_CLASS, 0, true);
         CRAFT_PARTICLE_PARTICLES_FIELD = Reflection.getField(CRAFT_PARTICLE_CLASS, "particles");
         NMS_MK_KEY_FIELD = Reflection.getField(NMS_MINECRAFT_KEY_CLASS, "key");
-        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-            LEGACY_NMS_PARTICLE_KEY_FIELD = Reflection.getField(NMS_ENUM_PARTICLE_CLASS, "X");
-            LEGACY_NMS_KEY_TO_NMS_PARTICLE = Reflection.getField(NMS_ENUM_PARTICLE_CLASS, "ac");
-        }
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
-            DIMENSION_CODEC_FIELD = Reflection.getField(DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, 0);
-            DYNAMIC_OPS_NBT_INSTANCE_FIELD = Reflection.getField(DYNAMIC_OPS_NBT_CLASS, DYNAMIC_OPS_NBT_CLASS, 0);
-        }
+        LEGACY_NMS_PARTICLE_KEY_FIELD = Reflection.getField(NMS_ENUM_PARTICLE_CLASS, "X");
+        LEGACY_NMS_KEY_TO_NMS_PARTICLE = Reflection.getField(NMS_ENUM_PARTICLE_CLASS, "ac");
+        DIMENSION_CODEC_FIELD = Reflection.getField(DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, 0);
+        DYNAMIC_OPS_NBT_INSTANCE_FIELD = Reflection.getField(DYNAMIC_OPS_NBT_CLASS, DYNAMIC_OPS_NBT_CLASS, 0);
 
         PAPER_ENTITY_LOOKUP_EXISTS = Reflection.getField(WORLD_SERVER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) != null;
     }
@@ -251,21 +222,14 @@ public final class SpigotReflectionUtil {
         NMS_WORLD_CLASS = getServerClass("world.level.World", "World");
         WORLD_SERVER_CLASS = getServerClass("server.level.WorldServer", "WorldServer");
         ENUM_PROTOCOL_DIRECTION_CLASS = getServerClass("network.protocol.EnumProtocolDirection", "EnumProtocolDirection");
-        if (V_1_17_OR_HIGHER) {
-            LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
-            PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
-            PAPER_ENTITY_LOOKUP_CLASS = Reflection.getClassByNameWithoutException("io.papermc.paper.chunk.system.entity.EntityLookup");
-        }
+        LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
+        PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
+        PAPER_ENTITY_LOOKUP_CLASS = Reflection.getClassByNameWithoutException("io.papermc.paper.chunk.system.entity.EntityLookup");
         DIMENSION_MANAGER_CLASS = getServerClass("world.level.dimension.DimensionManager", "DimensionManager");
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
-            MOJANG_CODEC_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Codec");
-            MOJANG_ENCODER_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Encoder");
-            DATA_RESULT_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.DataResult");
-            DYNAMIC_OPS_NBT_CLASS = getServerClass("nbt.DynamicOpsNBT", "DynamicOpsNBT");
-        }
-        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-            NMS_ENUM_PARTICLE_CLASS = getServerClass(null, "EnumParticle");
-        }
+        MOJANG_CODEC_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Codec");
+        MOJANG_ENCODER_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Encoder");
+        DATA_RESULT_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.DataResult");
+        DYNAMIC_OPS_NBT_CLASS = getServerClass("nbt.DynamicOpsNBT", "DynamicOpsNBT");
 
         CRAFT_MAGIC_NUMBERS_CLASS = getOBCClass("util.CraftMagicNumbers");
         //IBlockData does not exist on 1.7.10
@@ -289,32 +253,23 @@ public final class SpigotReflectionUtil {
         NMS_NBT_COMPOUND_CLASS = getServerClass("nbt.NBTTagCompound", "NBTTagCompound");
         NBT_COMPRESSION_STREAM_TOOLS_CLASS = getServerClass("nbt.NBTCompressedStreamTools", "NBTCompressedStreamTools");
 
-        if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            STREAM_CODEC = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamCodec");
-            STREAM_DECODER = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamDecoder");
-            STREAM_ENCODER = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamEncoder");
-            REGISTRY_FRIENDLY_BYTE_BUF = Reflection.getClassByNameWithoutException("net.minecraft.network.RegistryFriendlyByteBuf");
-            REGISTRY_ACCESS = Reflection.getClassByNameWithoutException("net.minecraft.core.IRegistryCustom");
-            REGISTRY_ACCESS_FROZEN = Reflection.getClassByNameWithoutException("net.minecraft.core.IRegistryCustom$Dimension");
-        }
+        STREAM_CODEC = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamCodec");
+        STREAM_DECODER = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamDecoder");
+        STREAM_ENCODER = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamEncoder");
+        REGISTRY_FRIENDLY_BYTE_BUF = Reflection.getClassByNameWithoutException("net.minecraft.network.RegistryFriendlyByteBuf");
+        REGISTRY_ACCESS = Reflection.getClassByNameWithoutException("net.minecraft.core.IRegistryCustom");
+        REGISTRY_ACCESS_FROZEN = Reflection.getClassByNameWithoutException("net.minecraft.core.IRegistryCustom$Dimension");
     }
 
     private static void initObjects() {
         try {
-            if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-                ITEM_STACK_OPTIONAL_STREAM_CODEC = Reflection.getField(NMS_ITEM_STACK_CLASS, STREAM_CODEC, 0).get(null);
-            }
+            ITEM_STACK_OPTIONAL_STREAM_CODEC = Reflection.getField(NMS_ITEM_STACK_CLASS, STREAM_CODEC, 0).get(null);
         } catch (IllegalAccessException exception) {
             exception.printStackTrace();
         }
     }
 
     public static void init() {
-        VERSION = PacketEvents.getAPI().getServerManager().getVersion();
-        V_1_19_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_19);
-        V_1_17_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_17);
-        V_1_12_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_12);
-
         initClasses();
         initFields();
         initMethods();
@@ -324,11 +279,7 @@ public final class SpigotReflectionUtil {
 
     @Nullable
     public static Class<?> getServerClass(String modern, String legacy) {
-        if (V_1_17_OR_HIGHER) {
-            return Reflection.getClassByNameWithoutException("net.minecraft." + modern);
-        } else {
-            return Reflection.getClassByNameWithoutException(LEGACY_NMS_PACKAGE + legacy);
-        }
+        return Reflection.getClassByNameWithoutException("net.minecraft." + modern);
     }
 
     public static boolean isMinecraftServerInstanceDebugging() {
@@ -351,8 +302,7 @@ public final class SpigotReflectionUtil {
                 if (f == null) {
                     //1.20.5 way
                     MINECRAFT_SERVER_INSTANCE = Reflection.getField(MINECRAFT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0).get(null);
-                }
-                else {
+                } else {
                     MINECRAFT_SERVER_INSTANCE = f.get(server);
                 }
             } catch (IllegalAccessException e) {
@@ -521,7 +471,7 @@ public final class SpigotReflectionUtil {
 
     @Deprecated
     public static int getPlayerPingLegacy(Player player) {
-        if (V_1_17_OR_HIGHER) {
+        if (true) {
             return -1;
         }
         if (ENTITY_PLAYER_PING_FIELD != null) {
@@ -704,52 +654,6 @@ public final class SpigotReflectionUtil {
         return stack;
     }
 
-    public static int getBlockDataCombinedId(MaterialData materialData) {
-        if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
-            //TODO Finish for 1.7.10
-            throw new IllegalStateException("This operation is not supported yet on 1.7.10!");
-        }
-        //TODO Finish
-        int combinedID;
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            combinedID = -1;
-        } else {
-            combinedID = materialData.getItemType().getId() << 4 | materialData.getData();
-            //System.out.println("id: " + combinedID + ", material: " + materialData.getItemType().name());
-        }
-        return combinedID;
-        /*
-        Object iBlockDataObj = new ReflectionObject(blockData).readObject(0, IBLOCK_DATA_CLASS);
-        int combinedID = 0;
-        try {
-            combinedID = (int) GET_COMBINED_ID.invoke(null, iBlockDataObj);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return combinedID;*/
-    }
-
-    public static MaterialData getBlockDataByCombinedId(int combinedID) {
-        if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
-            //TODO Finish for 1.7.10
-            throw new IllegalStateException("This operation is not supported yet on 1.7.10!");
-        }
-        /*Object iBlockDataObj = null;
-        try {
-            iBlockDataObj = GET_BY_COMBINED_ID.invoke(null, combinedID);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }*/
-        /*
-        try {
-            return (BlockData) GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA.invoke(null, iBlockDataObj);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }*/
-
-        return null;
-    }
-
     public static Object createNMSItemStack(int itemID, int count) {
         try {
             Object nmsItem = getNMSItemById(itemID);
@@ -888,21 +792,16 @@ public final class SpigotReflectionUtil {
         try {
             Object worldServer = GET_CRAFT_WORLD_HANDLE_METHOD.invoke(world);
             Object nmsEntity;
-            //On 1.17 we need this to bypass
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
-                ReflectionObject reflectWorldServer = new ReflectionObject(worldServer);
-                Object levelEntityGetter;
-                if (PAPER_ENTITY_LOOKUP_EXISTS) {
-                    levelEntityGetter = reflectWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
-                } else {
-                    Object entitySectionManager = reflectWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
-                    ReflectionObject reflectEntitySectionManager = new ReflectionObject(entitySectionManager);
-                    levelEntityGetter = reflectEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
-                }
-                nmsEntity = GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD.invoke(levelEntityGetter, id);
+            ReflectionObject reflectWorldServer = new ReflectionObject(worldServer);
+            Object levelEntityGetter;
+            if (PAPER_ENTITY_LOOKUP_EXISTS) {
+                levelEntityGetter = reflectWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
             } else {
-                nmsEntity = GET_ENTITY_BY_ID_METHOD.invoke(worldServer, id);
+                Object entitySectionManager = reflectWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
+                ReflectionObject reflectEntitySectionManager = new ReflectionObject(entitySectionManager);
+                levelEntityGetter = reflectEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
             }
+            nmsEntity = GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD.invoke(levelEntityGetter, id);
             if (nmsEntity == null) {
                 return null;
             }
@@ -949,7 +848,7 @@ public final class SpigotReflectionUtil {
     }
 
     public static List<Entity> getEntityList(World world) {
-        if (V_1_17_OR_HIGHER) {
+        if (true) {
             Object worldServer = convertBukkitWorldToWorldServer(world);
             ReflectionObject wrappedWorldServer = new ReflectionObject(worldServer);
             Object levelEntityGetter;
@@ -981,22 +880,15 @@ public final class SpigotReflectionUtil {
 
     public static ParticleType toPacketEventsParticle(Enum<?> particle) {
         try {
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
-                BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
-                // must be done because issues happen otherwise since they are actually the same particle 1.13+
+            BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
+            // must be done because issues happen otherwise since they are actually the same particle 1.13+
 
-                if (particle.name().equals("BLOCK_DUST")) {
-                    particle = Enum.valueOf(particle.getClass(), "BLOCK_CRACK");
-                }
-                Object minecraftKey = map.get(particle);
-                return ParticleTypes.getByName(minecraftKey.toString());
-            } else {
-                Object nmsParticle = BUKKIT_PARTICLE_TO_NMS_ENUM_PARTICLE.invoke(null, particle);
-                String key = (String) LEGACY_NMS_PARTICLE_KEY_FIELD.get(nmsParticle);
-                Object minecraftKey = NMS_MINECRAFT_KEY_CONSTRUCTOR.newInstance("minecraft", key);
-                return ParticleTypes.getByName(minecraftKey.toString());
+            if (particle.name().equals("BLOCK_DUST")) {
+                particle = Enum.valueOf(particle.getClass(), "BLOCK_CRACK");
             }
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            Object minecraftKey = map.get(particle);
+            return ParticleTypes.getByName(minecraftKey.toString());
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;
@@ -1004,17 +896,10 @@ public final class SpigotReflectionUtil {
 
     public static Enum<?> fromPacketEventsParticle(ParticleType particle) {
         try {
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
-                BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
-                Object minecraftKey = NMS_MINECRAFT_KEY_CONSTRUCTOR.newInstance(particle.getName().getNamespace(), particle.getName().getKey());
-                Object bukkitParticle = map.inverse().get(minecraftKey);
-                return (Enum<?>) bukkitParticle;
-            } else {
-                Map<String, ?> keyToParticleMap = (Map<String, ?>) LEGACY_NMS_KEY_TO_NMS_PARTICLE.get(null);
-                Object enumParticle = keyToParticleMap.get(particle.getName().getKey());
-                Object bukkitParticle = NMS_ENUM_PARTICLE_TO_BUKKIT_PARTICLE.invoke(null, enumParticle);
-                return (Enum<?>) bukkitParticle;
-            }
+            BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
+            Object minecraftKey = NMS_MINECRAFT_KEY_CONSTRUCTOR.newInstance(particle.getName().getNamespace(), particle.getName().getKey());
+            Object bukkitParticle = map.inverse().get(minecraftKey);
+            return (Enum<?>) bukkitParticle;
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             e.printStackTrace();
         }

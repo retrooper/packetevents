@@ -19,12 +19,10 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class WrapperPlayServerMerchantOffers extends PacketWrapper<WrapperPlayServerMerchantOffers> {
@@ -53,15 +51,7 @@ public class WrapperPlayServerMerchantOffers extends PacketWrapper<WrapperPlaySe
     @Override
     public void read() {
         containerId = readVarInt();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            merchantOffers = readList(PacketWrapper::readMerchantOffer);
-        } else {
-            int size = readByte() & 0xFF;
-            merchantOffers = new ArrayList<>(size);
-            for (int i = 0; i < size; i++) {
-                merchantOffers.add(readMerchantOffer());
-            }
-        }
+        merchantOffers = readList(PacketWrapper::readMerchantOffer);
         villagerLevel = readVarInt();
         villagerXp = readVarInt();
         showProgress = readBoolean();
@@ -71,15 +61,7 @@ public class WrapperPlayServerMerchantOffers extends PacketWrapper<WrapperPlaySe
     @Override
     public void write() {
         writeVarInt(containerId);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeList(merchantOffers, PacketWrapper::writeMerchantOffer);
-        }
-        else {
-            writeByte(merchantOffers.size() & 0xFF);
-            for (MerchantOffer data : merchantOffers) {
-                writeMerchantOffer(data);
-            }
-        }
+        writeList(merchantOffers, PacketWrapper::writeMerchantOffer);
         writeVarInt(villagerLevel);
         writeVarInt(villagerXp);
         writeBoolean(showProgress);

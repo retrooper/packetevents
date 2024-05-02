@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.login.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -57,27 +56,14 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
     @Override
     public void read() {
         this.encryptedSharedSecret = readByteArray(ByteBufHelper.readableBytes(buffer));
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
-                && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_2)
-                && !readBoolean()) {
-            saltSignature = readSaltSignature();
-        } else {
-            encryptedVerifyToken = readByteArray();
-        }
+        encryptedVerifyToken = readByteArray();
     }
 
     @Override
     public void write() {
         writeByteArray(encryptedSharedSecret);
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
-                && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_2)
-                && saltSignature != null) {
-            writeBoolean(false);
-            writeSaltSignature(saltSignature);
-        } else {
-            writeByteArray(encryptedVerifyToken);
-        }
+        writeByteArray(encryptedVerifyToken);
     }
 
     @Override

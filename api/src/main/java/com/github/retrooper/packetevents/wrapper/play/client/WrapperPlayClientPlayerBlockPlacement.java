@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
@@ -58,77 +57,24 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
     public void read() {
         itemStack = Optional.empty();
         insideBlock = Optional.empty();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            interactionHand = InteractionHand.getById(readVarInt());
-            blockPosition = readBlockPosition();
-            face = BlockFace.getBlockFaceByValue(readVarInt());
-            cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
-            insideBlock = Optional.of(readBoolean());
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-                sequence = readVarInt();
-            }
-        } else {
-            if (serverVersion == ServerVersion.V_1_7_10) {
-                blockPosition = new Vector3i(readInt(), readUnsignedByte(), readInt());
-            } else {
-                blockPosition = readBlockPosition();
-            }
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                face = BlockFace.getBlockFaceByValue(readVarInt());
-                interactionHand = InteractionHand.getById(readVarInt());
-            } else {
-                face = BlockFace.getLegacyBlockFaceByValue(readUnsignedByte());
-                //Optional itemstack
-                itemStack = Optional.of(readItemStack());
-                interactionHand = InteractionHand.MAIN_HAND;
-            }
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
-                cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
-            } else {
-                cursorPosition = new Vector3f(readUnsignedByte() / 16.0F, readUnsignedByte() / 16.0F, readUnsignedByte() / 16.0F);
-            }
-        }
+        interactionHand = InteractionHand.getById(readVarInt());
+        blockPosition = readBlockPosition();
+        face = BlockFace.getBlockFaceByValue(readVarInt());
+        cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
+        insideBlock = Optional.of(readBoolean());
+        sequence = readVarInt();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            writeVarInt(interactionHand.getId());
-            writeBlockPosition(blockPosition);
-            writeVarInt(face.getFaceValue());
-            writeFloat(cursorPosition.x);
-            writeFloat(cursorPosition.y);
-            writeFloat(cursorPosition.z);
-            writeBoolean(insideBlock.orElse(false));
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-                writeVarInt(sequence);
-            }
-        } else {
-            if (serverVersion == ServerVersion.V_1_7_10) {
-                writeInt(blockPosition.x);
-                writeByte(blockPosition.y);
-                writeInt(blockPosition.z);
-            } else {
-                writeBlockPosition(blockPosition);
-            }
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                writeVarInt(face.getFaceValue());
-                writeVarInt(interactionHand.getId());
-            } else {
-                writeByte(face.getFaceValue());
-                writeItemStack(itemStack.orElse(ItemStack.EMPTY));
-                //Hand is always the main hand
-            }
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
-                writeFloat(cursorPosition.x);
-                writeFloat(cursorPosition.y);
-                writeFloat(cursorPosition.z);
-            } else {
-                writeByte((int) (cursorPosition.x * 16.0F));
-                writeByte((int) (cursorPosition.y * 16.0F));
-                writeByte((int) (cursorPosition.z * 16.0F));
-            }
-        }
+        writeVarInt(interactionHand.getId());
+        writeBlockPosition(blockPosition);
+        writeVarInt(face.getFaceValue());
+        writeFloat(cursorPosition.x);
+        writeFloat(cursorPosition.y);
+        writeFloat(cursorPosition.z);
+        writeBoolean(insideBlock.orElse(false));
+        writeVarInt(sequence);
     }
 
     @Override

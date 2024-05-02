@@ -59,12 +59,10 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         }
 
         //Depends on netty version. If we cannot resolve that we just check server version.
-        if ((NETTY_VERSION != null && NETTY_VERSION.isNewerThan(MODERN_NETTY_VERSION))
-                || SpigotReflectionUtil.V_1_12_OR_HIGHER) {
-            channel.pipeline().addLast(PacketEvents.SERVER_CHANNEL_HANDLER_NAME, new PreChannelInitializer_v1_12());
-        } else {
-            channel.pipeline().addFirst(PacketEvents.SERVER_CHANNEL_HANDLER_NAME, new PreChannelInitializer_v1_8());
+        if (NETTY_VERSION != null) {
+            NETTY_VERSION.isNewerThan(MODERN_NETTY_VERSION);
         }
+        channel.pipeline().addLast(PacketEvents.SERVER_CHANNEL_HANDLER_NAME, new PreChannelInitializer_v1_12());
         super.channelRead(ctx, msg);
     }
 }

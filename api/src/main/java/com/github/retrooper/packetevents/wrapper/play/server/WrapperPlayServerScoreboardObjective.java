@@ -19,12 +19,9 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
 import com.github.retrooper.packetevents.protocol.score.ScoreFormatTypes;
-import com.github.retrooper.packetevents.util.LegacyFormat;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -58,59 +55,31 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            name = readString();
-        } else {
-            name = readString(16);
-        }
+        name = readString();
         mode = ObjectiveMode.getById(readByte());
         if (mode != ObjectiveMode.CREATE && mode != ObjectiveMode.UPDATE) {
             displayName = Component.empty();
             renderType = RenderType.INTEGER;
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-                scoreFormat = null;
-            }
+            scoreFormat = null;
         } else {
-            if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-                displayName = AdventureSerializer.fromLegacyFormat(readString(32));
-                renderType = RenderType.getByName(readString());
-            } else {
-                displayName = readComponent();
-                renderType = RenderType.getById(readVarInt());
-                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-                    scoreFormat = readOptional(ScoreFormatTypes::read);
-                }
-            }
+            displayName = readComponent();
+            renderType = RenderType.getById(readVarInt());
+            scoreFormat = readOptional(ScoreFormatTypes::read);
         }
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            writeString(name);
-        } else {
-            writeString(name, 16);
-        }
+        writeString(name);
         writeByte((byte) mode.ordinal());
         if (this.mode == ObjectiveMode.CREATE || this.mode == ObjectiveMode.UPDATE) {
-            if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-                writeString(LegacyFormat.trimLegacyFormat(AdventureSerializer.asVanilla(displayName), 32));
-                if (renderType != null) {
-                    writeString(renderType.name().toLowerCase());
-                } else {
-                    writeString(RenderType.INTEGER.name().toLowerCase());
-                }
+            writeComponent(displayName);
+            if (renderType != null) {
+                writeVarInt(renderType.ordinal());
             } else {
-                writeComponent(displayName);
-                if (renderType != null) {
-                    writeVarInt(renderType.ordinal());
-                } else {
-                    writeVarInt(RenderType.INTEGER.ordinal());
-                }
-                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-                    writeOptional(scoreFormat, ScoreFormatTypes::write);
-                }
+                writeVarInt(RenderType.INTEGER.ordinal());
             }
+            writeOptional(scoreFormat, ScoreFormatTypes::write);
         }
     }
 

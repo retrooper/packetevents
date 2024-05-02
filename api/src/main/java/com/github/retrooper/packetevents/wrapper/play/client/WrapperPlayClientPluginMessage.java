@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -52,32 +51,16 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.channelName = readString();
-        } else {
-            this.channelName = readString(20);
-        }
+        this.channelName = readString();
 
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            //It is ignored, because we don't need it
-            int legacyDataSize = readShort();
-        }
-
-        if (ByteBufHelper.readableBytes(buffer) > 32767) throw new RuntimeException("Payload may not be larger than 32767 bytes");
+        if (ByteBufHelper.readableBytes(buffer) > 32767)
+            throw new RuntimeException("Payload may not be larger than 32767 bytes");
         this.data = readRemainingBytes();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeString(this.channelName);
-        }
-        else {
-            writeString(this.channelName, 20);
-        }
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeShort(this.data.length);
-        }
+        writeString(this.channelName);
         writeBytes(this.data);
     }
 
@@ -89,6 +72,7 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
 
     /**
      * The channel name of the plugin message.
+     *
      * @return The channel name.
      */
     public String getChannelName() {
@@ -97,6 +81,7 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
 
     /**
      * Sets the channel name of the plugin message.
+     *
      * @param channelName The channel name.
      */
     public void setChannelName(String channelName) {

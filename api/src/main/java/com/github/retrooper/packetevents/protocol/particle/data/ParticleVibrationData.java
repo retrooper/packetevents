@@ -154,53 +154,31 @@ public class ParticleVibrationData extends ParticleData {
     }
 
     public static ParticleVibrationData read(PacketWrapper<?> wrapper) {
-        Vector3i startingPos = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)
-                ? Vector3i.zero() : wrapper.readBlockPosition();
+        Vector3i startingPos = Vector3i.zero();
 
         PositionType positionType;
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            positionType = PositionType.getById(wrapper.readVarInt());
-        } else {
-            String positionTypeName = wrapper.readString();
-            positionType = PositionType.getByName(positionTypeName);
-            if (positionType == null) {
-                throw new IllegalArgumentException("Unknown position type: " + positionTypeName);
-            }
-        }
+        positionType = PositionType.getById(wrapper.readVarInt());
 
         switch (positionType) {
             case BLOCK:
                 return new ParticleVibrationData(startingPos, wrapper.readBlockPosition(), wrapper.readVarInt());
             case ENTITY:
-                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
-                    return new ParticleVibrationData(startingPos, wrapper.readVarInt(),
-                                                     wrapper.readFloat(), wrapper.readVarInt());
-                } else {
-                    return new ParticleVibrationData(startingPos, wrapper.readVarInt(), wrapper.readVarInt());
-                }
+                return new ParticleVibrationData(startingPos, wrapper.readVarInt(),
+                        wrapper.readFloat(), wrapper.readVarInt());
             default:
                 throw new IllegalArgumentException("Illegal position type: " + positionType);
         }
     }
 
     public static void write(PacketWrapper<?> wrapper, ParticleVibrationData data) {
-        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_19_4)) {
-            wrapper.writeBlockPosition(data.getStartingPosition());
-        }
 
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            wrapper.writeVarInt(data.getType().getId(wrapper.getServerVersion().toClientVersion()));
-        } else {
-            wrapper.writeIdentifier(data.getType().getName());
-        }
+        wrapper.writeVarInt(data.getType().getId(wrapper.getServerVersion().toClientVersion()));
 
         if (data.getType() == PositionType.BLOCK) {
             wrapper.writeBlockPosition(data.getBlockPosition().get());
         } else if (data.getType() == PositionType.ENTITY) {
             wrapper.writeVarInt(data.getEntityId().get());
-            if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
-                wrapper.writeFloat(data.getEntityEyeHeight().orElse(0f));
-            }
+            wrapper.writeFloat(data.getEntityEyeHeight().orElse(0f));
         }
         wrapper.writeVarInt(data.getTicks());
     }

@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -55,49 +54,24 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4) || readBoolean()) {
-            motd = readComponent();
-        }
+        motd = readComponent();
         if (readBoolean()) {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
-                byte[] iconByteArray = readByteArray();
-                icon = BASE64_IMAGE_HEADER + new String(Base64.getEncoder().encode(iconByteArray), StandardCharsets.UTF_8);
-            } else {
-                icon = readString();
-            }
-        }
-        if (serverVersion.isOlderThan(ServerVersion.V_1_19_3)) {
-            previewsChat = readBoolean();
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)
-                && serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
-            enforceSecureChat = readBoolean();
+            byte[] iconByteArray = readByteArray();
+            icon = BASE64_IMAGE_HEADER + new String(Base64.getEncoder().encode(iconByteArray), StandardCharsets.UTF_8);
         }
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
-            writeComponent(motd);
-            byte[] iconByteArray;
-            if (icon == null) {
-                iconByteArray = null;
-            } else {
-                String iconData = icon.substring(BASE64_IMAGE_HEADER.length());
-                iconByteArray = Base64.getDecoder().decode(iconData.getBytes(StandardCharsets.UTF_8));
-            }
-            writeOptional(iconByteArray, PacketWrapper::writeByteArray);
+        writeComponent(motd);
+        byte[] iconByteArray;
+        if (icon == null) {
+            iconByteArray = null;
         } else {
-            writeOptional(motd, PacketWrapper::writeComponent);
-            writeOptional(icon, PacketWrapper::writeString);
+            String iconData = icon.substring(BASE64_IMAGE_HEADER.length());
+            iconByteArray = Base64.getDecoder().decode(iconData.getBytes(StandardCharsets.UTF_8));
         }
-        if (serverVersion.isOlderThan(ServerVersion.V_1_19_3)) {
-            writeBoolean(previewsChat);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)
-                && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_20_5)) {
-            writeBoolean(enforceSecureChat);
-        }
+        writeOptional(iconByteArray, PacketWrapper::writeByteArray);
     }
 
     @Override

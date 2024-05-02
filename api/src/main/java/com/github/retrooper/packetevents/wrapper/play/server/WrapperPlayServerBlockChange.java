@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.util.Vector3i;
@@ -41,29 +40,14 @@ public class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            blockPosition = new Vector3i(readInt(), readUnsignedByte(), readInt());
-            int block = readVarInt();
-            int blockData = readUnsignedByte();
-            blockID = block | (blockData << 12);
-        } else {
-            blockPosition = readBlockPosition();
-            blockID = readVarInt();
-        }
+        blockPosition = readBlockPosition();
+        blockID = readVarInt();
     }
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeInt(blockPosition.getX());
-            writeByte(blockPosition.getY());
-            writeInt(blockPosition.getZ());
-            writeVarInt(blockID & 0xff);
-            writeByte(blockID >> 12);
-        } else {
-            writeBlockPosition(blockPosition);
-            writeVarInt(blockID);
-        }
+        writeBlockPosition(blockPosition);
+        writeVarInt(blockID);
     }
 
     @Override

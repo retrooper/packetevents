@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.protocol.player.SkinSection;
@@ -34,9 +33,6 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
     private HumanoidArm hand;
     private boolean textFilteringEnabled;
     private boolean allowServerListings;
-
-    //Not accessible, only for 1.7
-    private byte ignoredDifficulty;
 
     public enum ChatVisibility {
         FULL, SYSTEM, HIDDEN;
@@ -64,74 +60,29 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
 
     @Override
     public void read() {
-        int localeLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12) ? 16 : 7;
+        int localeLength = 16;
         locale = readString(localeLength);
         viewDistance = readByte();
-        int visibilityIndex = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? readVarInt() : readByte();
+        int visibilityIndex = readVarInt();
         visibility = ChatVisibility.VALUES[visibilityIndex];
         chatColorable = readBoolean();
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            //Ignored
-            ignoredDifficulty = readByte();
-            //We use this for the skin sections
-            boolean showCape = readBoolean();
-            if (showCape) {
-                visibleSkinSectionMask = SkinSection.CAPE.getMask();
-            }
-        } else {
-            visibleSkinSectionMask = (byte) readUnsignedByte();
-        }
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            hand = HumanoidArm.VALUES[readVarInt()];
-        } else {
-            hand = HumanoidArm.RIGHT;
-        }
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            textFilteringEnabled = readBoolean();
-        } else {
-            textFilteringEnabled = false;
-        }
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            allowServerListings = readBoolean();
-        } else {
-            allowServerListings = true;
-        }
+        visibleSkinSectionMask = (byte) readUnsignedByte();
+        hand = HumanoidArm.VALUES[readVarInt()];
+        textFilteringEnabled = readBoolean();
+        allowServerListings = readBoolean();
     }
 
     @Override
     public void write() {
-        int localeLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12) ? 16 : 7;
+        int localeLength = 16;
         writeString(locale, localeLength);
         writeByte(viewDistance);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            writeVarInt(visibility.ordinal());
-        } else {
-            writeByte(visibility.ordinal());
-        }
+        writeVarInt(visibility.ordinal());
         writeBoolean(chatColorable);
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeByte(ignoredDifficulty);
-            //Show cape
-            boolean showCape = SkinSection.CAPE.isSet(visibleSkinSectionMask);
-            writeBoolean(showCape);
-        } else {
-            writeByte(visibleSkinSectionMask);
-        }
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            writeVarInt(hand.ordinal());
-        }
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            writeBoolean(textFilteringEnabled);
-        }
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            writeBoolean(allowServerListings);
-        }
+        writeByte(visibleSkinSectionMask);
+        writeVarInt(hand.ordinal());
+        writeBoolean(textFilteringEnabled);
+        writeBoolean(allowServerListings);
     }
 
     @Override
@@ -144,7 +95,6 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         hand = wrapper.hand;
         textFilteringEnabled = wrapper.textFilteringEnabled;
         allowServerListings = wrapper.allowServerListings;
-        ignoredDifficulty = wrapper.ignoredDifficulty;
     }
 
     public String getLocale() {

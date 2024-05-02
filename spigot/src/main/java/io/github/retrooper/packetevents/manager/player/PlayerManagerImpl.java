@@ -36,12 +36,7 @@ import java.util.UUID;
 public class PlayerManagerImpl implements PlayerManager {
     @Override
     public int getPing(@NotNull Object player) {
-        //Yay, we contributed this to Spigot and now we can use it on 1.17+ servers.
-        if (SpigotReflectionUtil.V_1_17_OR_HIGHER) {
-            return PlayerPingAccessorModern.getPing((Player) player);
-        } else {
-            return SpigotReflectionUtil.getPlayerPingLegacy((Player) player);
-        }
+        return PlayerPingAccessorModern.getPing((Player) player);
     }
 
     @Override

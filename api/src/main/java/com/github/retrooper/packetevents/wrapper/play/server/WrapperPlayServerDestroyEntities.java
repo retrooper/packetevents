@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -42,41 +41,18 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
 
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_17) {
-            entityIDs = new int[]{readVarInt()};
-        } else {
-            if (serverVersion == ServerVersion.V_1_7_10) {
-                int entityIDCount = readUnsignedByte();
-                entityIDs = new int[entityIDCount];
-                for (int i = 0; i < entityIDCount; i++) {
-                    entityIDs[i] = readInt();
-                }
-            } else {
-                int entityIDCount = readVarInt();
-                entityIDs = new int[entityIDCount];
-                for (int i = 0; i < entityIDCount; i++) {
-                    entityIDs[i] = readVarInt();
-                }
-            }
+        int entityIDCount = readVarInt();
+        entityIDs = new int[entityIDCount];
+        for (int i = 0; i < entityIDCount; i++) {
+            entityIDs[i] = readVarInt();
         }
     }
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_17) {
-            writeVarInt(entityIDs[0]);
-        } else {
-            if (serverVersion == ServerVersion.V_1_7_10) {
-                writeByte(entityIDs.length);
-                for (int entityID : entityIDs) {
-                    writeInt(entityID);
-                }
-            } else {
-                writeVarInt(entityIDs.length);
-                for (int entityID : entityIDs) {
-                    writeVarInt(entityID);
-                }
-            }
+        writeVarInt(entityIDs.length);
+        for (int entityID : entityIDs) {
+            writeVarInt(entityID);
         }
     }
 

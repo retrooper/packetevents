@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Difficulty;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -42,18 +41,14 @@ public class WrapperPlayServerDifficulty extends PacketWrapper<WrapperPlayServer
     @Override
     public void read() {
         difficulty = Difficulty.getById(readUnsignedByte());
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            locked = readBoolean();
-        }
+        locked = readBoolean();
         //TODO: On 1.8 locked theoretically is true? Confirm
     }
 
     @Override
     public void write() {
         writeByte(difficulty.getId());
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            writeBoolean(locked);
-        }
+        writeBoolean(locked);
     }
 
     @Override

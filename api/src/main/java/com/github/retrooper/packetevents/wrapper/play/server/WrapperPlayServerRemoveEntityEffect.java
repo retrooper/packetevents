@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
@@ -43,22 +42,14 @@ public class WrapperPlayServerRemoveEntityEffect extends PacketWrapper<WrapperPl
     public void read() {
         this.entityId = readVarInt();
         int effectId;
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18_2)) {
-            effectId = readVarInt();
-        } else {
-            effectId = readByte();
-        }
+        effectId = readVarInt();
         this.potionType = PotionTypes.getById(effectId, this.serverVersion);
     }
 
     @Override
     public void write() {
         writeVarInt(entityId);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18_2)) {
-            writeVarInt(potionType.getId(serverVersion.toClientVersion()));
-        } else {
-            writeByte(potionType.getId(serverVersion.toClientVersion()));
-        }
+        writeVarInt(potionType.getId(serverVersion.toClientVersion()));
     }
 
     @Override

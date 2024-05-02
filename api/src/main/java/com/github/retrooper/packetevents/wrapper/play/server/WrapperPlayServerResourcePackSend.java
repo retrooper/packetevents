@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -61,35 +60,26 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
 
     @Override
     public void read() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.packId = this.readUUID();
-        }
+        this.packId = this.readUUID();
 
         url = readString();
         hash = readString(MAX_HASH_LENGTH);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            required = readBoolean();
-            boolean hasPrompt = readBoolean();
-            if (hasPrompt) {
-                prompt = readComponent();
-            }
+        required = readBoolean();
+        boolean hasPrompt = readBoolean();
+        if (hasPrompt) {
+            prompt = readComponent();
         }
     }
 
     @Override
     public void write() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.writeUUID(this.packId);
-        }
-
+        this.writeUUID(this.packId);
         writeString(url);
         writeString(hash, MAX_HASH_LENGTH);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            writeBoolean(required);
-            writeBoolean(prompt != null);
-            if (prompt != null) {
-                writeComponent(prompt);
-            }
+        writeBoolean(required);
+        writeBoolean(prompt != null);
+        if (prompt != null) {
+            writeComponent(prompt);
         }
     }
 

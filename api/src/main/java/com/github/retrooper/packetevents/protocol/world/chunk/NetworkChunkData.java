@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.protocol.world.chunk;
 
 public class NetworkChunkData {
     private final int mask;
-    private int extendedChunkMask; // 1.7 only
     private final boolean fullChunk;
     private final boolean sky;
     private byte[] data;
@@ -32,17 +31,8 @@ public class NetworkChunkData {
         this.data = data;
     }
 
-    public NetworkChunkData(int chunkMask, int extendedChunkMask, boolean fullChunk, boolean sky, byte[] data) {
-        this(chunkMask, fullChunk, sky, data);
-        this.extendedChunkMask = extendedChunkMask;
-    }
-
     public int getMask() {
         return this.mask;
-    }
-
-    public int getExtendedChunkMask() {
-        return this.extendedChunkMask;
     }
 
     public boolean isFullChunk() {

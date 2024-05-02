@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.configuration.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -61,9 +60,7 @@ public class WrapperConfigServerResourcePackSend extends PacketWrapper<WrapperCo
 
     @Override
     public void read() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.packId = this.readUUID();
-        }
+        this.packId = this.readUUID();
 
         this.url = this.readString();
         this.hash = this.readString(MAX_HASH_LENGTH);
@@ -75,9 +72,7 @@ public class WrapperConfigServerResourcePackSend extends PacketWrapper<WrapperCo
 
     @Override
     public void write() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.writeUUID(this.packId);
-        }
+        this.writeUUID(this.packId);
 
         this.writeString(this.url);
         this.writeString(this.hash, MAX_HASH_LENGTH);

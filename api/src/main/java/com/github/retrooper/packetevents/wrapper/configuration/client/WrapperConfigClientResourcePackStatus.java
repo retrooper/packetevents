@@ -19,11 +19,9 @@
 package com.github.retrooper.packetevents.wrapper.configuration.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.security.Provider;
 import java.util.UUID;
 
 public class WrapperConfigClientResourcePackStatus extends PacketWrapper<WrapperConfigClientResourcePackStatus> {
@@ -47,17 +45,13 @@ public class WrapperConfigClientResourcePackStatus extends PacketWrapper<Wrapper
 
     @Override
     public void read() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.packId = this.readUUID();
-        }
+        this.packId = this.readUUID();
         this.result = Result.VALUES[this.readVarInt()];
     }
 
     @Override
     public void write() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.writeUUID(this.packId);
-        }
+        this.writeUUID(this.packId);
         this.writeVarInt(this.result.ordinal());
     }
 

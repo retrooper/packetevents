@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
@@ -55,8 +54,7 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
 
     @Override
     public void read() {
-        this.sound = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3) ? Sound.read(this)
-                : Sounds.getById(this.serverVersion.toClientVersion(), this.readVarInt());
+        this.sound = Sound.read(this);
         this.soundCategory = SoundCategory.fromId(readVarInt());
         this.entityId = readVarInt();
         this.volume = readFloat();
@@ -65,11 +63,7 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
 
     @Override
     public void write() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-            Sound.write(this, this.sound);
-        } else {
-            this.writeVarInt(this.sound.getId(this.serverVersion.toClientVersion()));
-        }
+        Sound.write(this, this.sound);
         writeVarInt(this.soundCategory.ordinal());
         writeVarInt(this.entityId);
         writeFloat(this.volume);

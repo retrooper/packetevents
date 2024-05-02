@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -45,9 +44,7 @@ public class WrapperPlayServerSetSlot extends PacketWrapper<WrapperPlayServerSet
     @Override
     public void read() {
         windowID = readByte();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
-            stateID = readVarInt();
-        }
+        stateID = readVarInt();
         slot = readShort();
         item = readItemStack();
     }
@@ -55,9 +52,7 @@ public class WrapperPlayServerSetSlot extends PacketWrapper<WrapperPlayServerSet
     @Override
     public void write() {
         writeByte(windowID);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
-            writeVarInt(stateID);
-        }
+        writeVarInt(stateID);
         writeShort(slot);
         writeItemStack(item);
     }

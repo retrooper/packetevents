@@ -19,9 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -52,30 +50,13 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.channelName = readString();
-        }
-        else {
-            this.channelName = readString(20);
-        }
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            //We ignore this, because it's not needed.
-            int legacyDataSize = readShort();
-        }
+        this.channelName = readString();
         this.data = readRemainingBytes();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeString(this.channelName);
-        }
-        else {
-            writeString(this.channelName, 20);
-        }
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeShort(data.length);
-        }
+        writeString(this.channelName);
         writeBytes(data);
     }
 

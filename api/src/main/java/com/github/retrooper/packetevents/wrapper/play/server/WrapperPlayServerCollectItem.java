@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -41,30 +40,16 @@ public class WrapperPlayServerCollectItem extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            collectedEntityId = readInt();
-            collectorEntityId = readInt();
-        } else {
-            collectedEntityId = readVarInt();
-            collectorEntityId = readVarInt();
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
-                pickupItemCount = readVarInt();
-            }
-        }
+        collectedEntityId = readVarInt();
+        collectorEntityId = readVarInt();
+        pickupItemCount = readVarInt();
     }
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeInt(collectedEntityId);
-            writeInt(collectorEntityId);
-        } else {
-            writeVarInt(collectedEntityId);
-            writeVarInt(collectorEntityId);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
-                writeVarInt(pickupItemCount);
-            }
-        }
+        writeVarInt(collectedEntityId);
+        writeVarInt(collectorEntityId);
+        writeVarInt(pickupItemCount);
     }
 
     @Override

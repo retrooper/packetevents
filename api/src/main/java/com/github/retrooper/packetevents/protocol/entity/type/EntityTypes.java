@@ -51,11 +51,7 @@ public class EntityTypes {
 
             @Override
             public int getLegacyId(ClientVersion version) {
-                if (version.isNewerThanOrEquals(ClientVersion.V_1_14)) {
-                    return -1;
-                }
-                int index = LEGACY_TYPES_BUILDER.getDataIndex(version);
-                return legacyIds[index];
+                return -1;
             }
 
             @Override
@@ -110,11 +106,7 @@ public class EntityTypes {
     }
 
     public static EntityType getByLegacyId(ClientVersion version, int id) {
-        if (version.isNewerThanOrEquals(ClientVersion.V_1_14)) {
-            return null;
-        }
-        int index = LEGACY_TYPES_BUILDER.getDataIndex(version);
-        return LEGACY_ENTITY_TYPE_ID_MAP.get((byte) index).get(id);
+        return null;
     }
 
     // Credit to ViaVersion for these categories

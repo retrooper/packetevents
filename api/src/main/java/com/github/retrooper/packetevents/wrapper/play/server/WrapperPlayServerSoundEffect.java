@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
@@ -72,33 +71,24 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        this.sound = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3) ? Sound.read(this)
-                : Sounds.getById(this.serverVersion.toClientVersion(), this.readVarInt());
+        this.sound = Sound.read(this);
         soundCategory = SoundCategory.fromId(readVarInt());
         effectPosition = new Vector3i(readInt(), readInt(), readInt());
         volume = readFloat();
         pitch = readFloat();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            this.seed = readLong();
-        }
+        this.seed = readLong();
     }
 
     @Override
     public void write() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-            Sound.write(this, this.sound);
-        } else {
-            this.writeVarInt(this.sound.getId(this.serverVersion.toClientVersion()));
-        }
+        Sound.write(this, this.sound);
         writeVarInt(soundCategory.ordinal());
         writeInt(effectPosition.x);
         writeInt(effectPosition.y);
         writeInt(effectPosition.z);
         writeFloat(volume);
         writeFloat(pitch);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeLong(seed);
-        }
+        writeLong(seed);
     }
 
     @Override

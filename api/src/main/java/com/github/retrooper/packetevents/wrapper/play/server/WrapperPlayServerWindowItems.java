@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -50,42 +49,26 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
     @Override
     public void read() {
         windowID = readUnsignedByte();
-        boolean v1_17_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1);
-        if (v1_17_1) {
-            stateID = readVarInt();
-        }
+        stateID = readVarInt();
 
-        int count = v1_17_1 ? readVarInt() : readShort();
+        int count = readVarInt();
         items = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             items.add(readItemStack());
         }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
-            carriedItem = Optional.of(readItemStack());
-        } else {
-            carriedItem = Optional.empty();
-        }
+        carriedItem = Optional.of(readItemStack());
     }
 
     @Override
     public void write() {
         writeByte(windowID);
-        boolean v1_17_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1);
-        if (v1_17_1) {
-            writeVarInt(stateID);
-        }
-        if (v1_17_1) {
-            writeVarInt(items.size());
-        } else {
-            writeShort(items.size());
-        }
+        writeVarInt(stateID);
+        writeVarInt(items.size());
         for (ItemStack item : items) {
             writeItemStack(item);
         }
-        if (v1_17_1) {
-            writeItemStack(carriedItem.orElse(ItemStack.EMPTY));
-        }
+        writeItemStack(carriedItem.orElse(ItemStack.EMPTY));
     }
 
     @Override

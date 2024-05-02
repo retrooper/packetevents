@@ -34,16 +34,11 @@ public enum EquipmentSlot {
     private final byte legacyId;
 
     EquipmentSlot(int legacyId) {
-        this.legacyId =(byte) legacyId;
+        this.legacyId = (byte) legacyId;
     }
 
     public int getId(ServerVersion version) {
-        if (version.isOlderThan(ServerVersion.V_1_9)) {
-            return legacyId;
-        }
-        else {
-            return ordinal();
-        }
+        return ordinal();
     }
 
     @Nullable

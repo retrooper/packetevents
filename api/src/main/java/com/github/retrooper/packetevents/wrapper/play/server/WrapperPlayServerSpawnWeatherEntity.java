@@ -19,9 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerSpawnWeatherEntity extends PacketWrapper<WrapperPlayServerSpawnWeatherEntity> {
@@ -48,30 +46,18 @@ public class WrapperPlayServerSpawnWeatherEntity extends PacketWrapper<WrapperPl
     public void read() {
         this.entityId = readVarInt();
         this.type = readByte();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            this.x = readDouble();
-            this.y = readDouble();
-            this.z = readDouble();
-        } else {
-            this.x = readInt() / 32.0;
-            this.y = readInt() / 32.0;
-            this.z = readInt() / 32.0;
-        }
+        this.x = readDouble();
+        this.y = readDouble();
+        this.z = readDouble();
     }
 
     @Override
     public void write() {
         writeVarInt(entityId);
         writeByte(type);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            writeDouble(this.x);
-            writeDouble(this.y);
-            writeDouble(this.z);
-        } else {
-            writeInt(MathUtil.floor(this.x * 32.0));
-            writeInt(MathUtil.floor(this.y * 32.0));
-            writeInt(MathUtil.floor(this.z * 32.0));
-        }
+        writeDouble(this.x);
+        writeDouble(this.y);
+        writeDouble(this.z);
     }
 
     @Override

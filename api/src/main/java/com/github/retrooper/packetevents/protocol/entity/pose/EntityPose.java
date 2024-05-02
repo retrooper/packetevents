@@ -42,24 +42,12 @@ public enum EntityPose {
     INHALING;
 
    public int getId(ClientVersion version) {
-       if (this == DYING && version.isOlderThan(ClientVersion.V_1_17)) {
-           return 6;
-       }
-       if (this.ordinal() >= 11 && version.isOlderThan(ClientVersion.V_1_19_3)) {
-           return this.ordinal() - 1;
-       }
        return ordinal();
    }
 
    public static EntityPose getById(ClientVersion version, int id) {
        // The LONG_JUMPING pose was added in 1.17, shifting things by 1
-       if (id == 6 && version.isOlderThan(ClientVersion.V_1_17)) {
-           return DYING;
-       }
        // The SITTING pose was added in 1.19.3, shifting Warden's poses by 1
-       if (id >= 10 && version.isOlderThan(ClientVersion.V_1_19_3)) {
-           id++;
-       }
        return values()[id];
    }
 }

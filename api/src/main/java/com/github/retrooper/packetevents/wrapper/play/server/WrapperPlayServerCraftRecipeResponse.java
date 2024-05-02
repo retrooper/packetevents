@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class WrapperPlayServerCraftRecipeResponse extends PacketWrapper<WrapperPlayServerCraftRecipeResponse> {
     private int windowId;
     private int recipeLegacy;
-    private @Nullable String recipeModern;
+    private @Nullable String recipe;
 
     public WrapperPlayServerCraftRecipeResponse(PacketSendEvent event) {
         super(event);
@@ -39,37 +38,29 @@ public class WrapperPlayServerCraftRecipeResponse extends PacketWrapper<WrapperP
         this.recipeLegacy = recipeLegacy;
     }
 
-    public WrapperPlayServerCraftRecipeResponse(int windowId, @Nullable String recipeModern) {
+    public WrapperPlayServerCraftRecipeResponse(int windowId, @Nullable String recipe) {
         super(PacketType.Play.Server.CRAFT_RECIPE_RESPONSE);
         this.windowId = windowId;
-        this.recipeModern = recipeModern;
+        this.recipe = recipe;
     }
 
     @Override
     public void read() {
         this.windowId = readByte();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.recipeModern = readString();
-        } else {
-            this.recipeLegacy = readVarInt();
-        }
+        this.recipe = readString();
     }
 
     @Override
     public void write() {
         writeByte(this.windowId);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeString(this.recipeModern);
-        } else {
-            writeVarInt(this.recipeLegacy);
-        }
+        writeString(this.recipe);
     }
 
     @Override
     public void copy(WrapperPlayServerCraftRecipeResponse wrapper) {
         this.windowId = wrapper.windowId;
         this.recipeLegacy = wrapper.recipeLegacy;
-        this.recipeModern = wrapper.recipeModern;
+        this.recipe = wrapper.recipe;
     }
 
     public int getWindowId() {
@@ -81,14 +72,10 @@ public class WrapperPlayServerCraftRecipeResponse extends PacketWrapper<WrapperP
     }
 
     public <T> T getRecipe() {
-        return (T) (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? recipeModern : recipeLegacy);
+        return (T) recipe;
     }
 
     public <T> void setRecipe(T recipe) {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.recipeModern = (String) recipe;
-        } else {
-            this.recipeLegacy = (Integer) recipe;
-        }
+        this.recipe = (String) recipe;
     }
 }

@@ -19,11 +19,12 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.world.*;
+import com.github.retrooper.packetevents.protocol.world.Difficulty;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -121,184 +122,58 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     @Override
     public void read() {
         entityID = readInt();
-        boolean v1_20_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2);
-        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
-        boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
-        boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
-        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
-        if (v1_16) {
-            hardcore = readBoolean();
-            if (!v1_20_2) {
-                gameMode = readGameMode();
-            }
-        } else {
-            int gameModeId = readUnsignedByte();
-            hardcore = (gameModeId & 0x8) == 0x8;
-            gameMode = GameMode.getById(gameModeId & -0x9);
+        hardcore = readBoolean();
+        int worldCount = readVarInt();
+        worldNames = new ArrayList<>(worldCount);
+        for (int i = 0; i < worldCount; i++) {
+            worldNames.add(readString());
         }
-        if (v1_16) {
-            if (!v1_20_2) {
-                previousGameMode = readGameMode();
-            }
-            int worldCount = readVarInt();
-            worldNames = new ArrayList<>(worldCount);
-            for (int i = 0; i < worldCount; i++) {
-                worldNames.add(readString());
-            }
-            if (!v1_20_2) {
-                dimensionCodec = readNBT();
-                dimension = readDimension();
-                worldName = readString();
-            }
-        } else {
-            previousGameMode = gameMode;
-            dimensionCodec = new NBTCompound();
-            dimension = new Dimension(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9_2) ? readInt() : readByte());
-            if (!v1_14) {
-                difficulty = Difficulty.getById(readByte());
-            }
-        }
-        if (v1_15 && !v1_20_2) {
-            hashedSeed = readLong();
-        }
-        if (v1_16) {
-            maxPlayers = readVarInt();
-            viewDistance = readVarInt();
-            if (v1_18) simulationDistance = readVarInt();
-            reducedDebugInfo = readBoolean();
-            enableRespawnScreen = readBoolean();
-            if (v1_20_2) {
-                limitedCrafting = readBoolean();
-                dimension = readDimension();
-                worldName = readString();
-                hashedSeed = readLong();
-                gameMode = readGameMode();
-                previousGameMode = readGameMode();
-            }
-            isDebug = readBoolean();
-            isFlat = readBoolean();
-        } else {
-            maxPlayers = readUnsignedByte();
-            String levelType = readString(16);
-            isFlat = DimensionType.isFlat(levelType);
-            isDebug = DimensionType.isDebug(levelType);
-            if (v1_14) {
-                viewDistance = readVarInt();
-            }
-            reducedDebugInfo = readBoolean();
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
-                enableRespawnScreen = readBoolean();
-            }
-        }
-        if (v1_19) {
-            lastDeathPosition = readOptional(PacketWrapper::readWorldBlockPosition);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
-            portalCooldown = readVarInt();
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            enableRespawnScreen = readBoolean();
-        }
+        maxPlayers = readVarInt();
+        viewDistance = readVarInt();
+        simulationDistance = readVarInt();
+        reducedDebugInfo = readBoolean();
+        enableRespawnScreen = readBoolean();
+        limitedCrafting = readBoolean();
+        dimension = readDimension();
+        worldName = readString();
+        hashedSeed = readLong();
+        gameMode = readGameMode();
+        previousGameMode = readGameMode();
+        isDebug = readBoolean();
+        isFlat = readBoolean();
+        lastDeathPosition = readOptional(PacketWrapper::readWorldBlockPosition);
+        portalCooldown = readVarInt();
+        enableRespawnScreen = readBoolean();
     }
 
     @Override
     public void write() {
         writeInt(entityID);
-        boolean v1_20_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2);
-        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
-        boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
-        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
-        boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
-        if (v1_16) {
-            writeBoolean(hardcore);
-            if (!v1_20_2) {
-                writeGameMode(gameMode);
-            }
-        } else {
-            int gameModeId = gameMode.getId();
-            if (hardcore) {
-                gameModeId |= 0x8;
-            }
-            writeByte(gameModeId);
-        }
-        if (v1_16) {
-            if (previousGameMode == null) {
-                previousGameMode = gameMode;
-            }
-            if (!v1_20_2) {
-                writeGameMode(previousGameMode);
-            }
-            writeVarInt(worldNames.size());
-            for (String name : worldNames) {
-                writeString(name);
-            }
-            if (!v1_20_2) {
-                writeNBT(dimensionCodec);
-                writeDimension(dimension);
-                writeString(worldName);
-            }
-        } else {
+        writeBoolean(hardcore);
+        if (previousGameMode == null) {
             previousGameMode = gameMode;
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                writeInt(dimension.getId());
-            } else {
-                writeByte(dimension.getId());
-            }
-            if (!v1_14) {
-                writeByte(difficulty.getId());
-            }
         }
-        if (v1_15 && !v1_20_2) {
-            writeLong(hashedSeed);
+        writeVarInt(worldNames.size());
+        for (String name : worldNames) {
+            writeString(name);
         }
-        if (v1_16) {
-            writeVarInt(maxPlayers);
-            writeVarInt(viewDistance);
-            if (v1_18) writeVarInt(simulationDistance);
-            writeBoolean(reducedDebugInfo);
-            writeBoolean(enableRespawnScreen);
-            if (v1_20_2) {
-                writeBoolean(limitedCrafting);
-                writeDimension(dimension);
-                writeString(worldName);
-                writeLong(hashedSeed);
-                writeGameMode(gameMode);
-                writeGameMode(previousGameMode);
-            }
-            writeBoolean(isDebug);
-            writeBoolean(isFlat);
-        } else {
-            writeByte(maxPlayers);
-            String levelType;
-            //TODO Proper backwards compatibility for level type
-            if (isFlat) {
-                levelType = WorldType.FLAT.getName();
-            } else if (isDebug) {
-                levelType = WorldType.DEBUG_ALL_BLOCK_STATES.getName();
-            } else {
-                levelType = WorldType.DEFAULT.getName();
-            }
-            writeString(levelType, 16);
-            if (v1_14) {
-                writeVarInt(viewDistance);
-            }
-            writeBoolean(reducedDebugInfo);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
-                writeBoolean(enableRespawnScreen);
-            }
-        }
-        if (v1_19) {
-            writeOptional(lastDeathPosition, PacketWrapper::writeWorldBlockPosition);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
-            int pCooldown = portalCooldown != null ? portalCooldown : 0;
-            writeVarInt(pCooldown);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            writeBoolean(enforcesSecureChat);
-        }
+        writeVarInt(maxPlayers);
+        writeVarInt(viewDistance);
+        writeVarInt(simulationDistance);
+        writeBoolean(reducedDebugInfo);
+        writeBoolean(enableRespawnScreen);
+        writeBoolean(limitedCrafting);
+        writeDimension(dimension);
+        writeString(worldName);
+        writeLong(hashedSeed);
+        writeGameMode(gameMode);
+        writeGameMode(previousGameMode);
+        writeBoolean(isDebug);
+        writeBoolean(isFlat);
+        writeOptional(lastDeathPosition, PacketWrapper::writeWorldBlockPosition);
+        int pCooldown = portalCooldown != null ? portalCooldown : 0;
+        writeVarInt(pCooldown);
+        writeBoolean(enforcesSecureChat);
     }
 
     @Override

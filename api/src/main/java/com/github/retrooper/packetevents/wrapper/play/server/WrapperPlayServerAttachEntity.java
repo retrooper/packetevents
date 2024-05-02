@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -43,21 +42,13 @@ public class WrapperPlayServerAttachEntity extends PacketWrapper<WrapperPlayServ
     public void read() {
         this.attachedId = readInt();
         this.holdingId = readInt();
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
-            // YES, vanilla uses == 1 and not != 0
-            this.leash = readUnsignedByte() == 1;
-        } else {
-            this.leash = true;
-        }
+        this.leash = true;
     }
 
     @Override
     public void write() {
         writeInt(attachedId);
         writeInt(holdingId);
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
-            writeByte(leash ? 1 : 0);
-        }
     }
 
     @Override

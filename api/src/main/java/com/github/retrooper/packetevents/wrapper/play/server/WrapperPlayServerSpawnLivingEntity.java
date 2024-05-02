@@ -20,14 +20,12 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityMetadataProvider;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Location;
-import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -89,22 +87,11 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     @Override
     public void read() {
         this.entityID = readVarInt();
-        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
-            this.entityUUID = new UUID(0L, 0L);
-            int entityTypeID = readByte() & 255;
-            entityType = EntityTypes.getById(serverVersion.toClientVersion(), entityTypeID);
-            this.position = new Vector3d(readInt() / POSITION_FACTOR, readInt() / POSITION_FACTOR, readInt() / POSITION_FACTOR);
-        } else {
-            this.entityUUID = readUUID();
-            int entityTypeID;
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
-                entityTypeID = readVarInt();
-            } else {
-                entityTypeID = readUnsignedByte();
-            }
-            entityType = EntityTypes.getById(serverVersion.toClientVersion(), entityTypeID);
-            this.position = new Vector3d(readDouble(), readDouble(), readDouble());
-        }
+        this.entityUUID = readUUID();
+        int entityTypeID;
+        entityTypeID = readVarInt();
+        entityType = EntityTypes.getById(serverVersion.toClientVersion(), entityTypeID);
+        this.position = new Vector3d(readDouble(), readDouble(), readDouble());
         this.yaw = readByte() / ROTATION_FACTOR;
         this.pitch = readByte() / ROTATION_FACTOR;
         this.headPitch = readByte() / ROTATION_FACTOR;
@@ -112,42 +99,23 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         double velY = readShort() / VELOCITY_FACTOR;
         double velZ = readShort() / VELOCITY_FACTOR;
         this.velocity = new Vector3d(velX, velY, velZ);
-        if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            this.entityMetadata = readEntityMetadata();
-        } else {
-            this.entityMetadata = new ArrayList<>();
-        }
+        this.entityMetadata = new ArrayList<>();
     }
 
     @Override
     public void write() {
         writeVarInt(entityID);
-        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
-            writeByte(entityType.getId(serverVersion.toClientVersion()) & 255);
-            writeInt(MathUtil.floor(position.x * POSITION_FACTOR));
-            writeInt(MathUtil.floor(position.y * POSITION_FACTOR));
-            writeInt(MathUtil.floor(position.z * POSITION_FACTOR));
-        } else {
-            writeUUID(entityUUID);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
-                writeVarInt(entityType.getId(serverVersion.toClientVersion()));
-            } else {
-                //TODO Confirm if necessary
-                writeByte(entityType.getId(serverVersion.toClientVersion()) & 255);
-            }
-            writeDouble(position.x);
-            writeDouble(position.y);
-            writeDouble(position.z);
-        }
+        writeUUID(entityUUID);
+        writeVarInt(entityType.getId(serverVersion.toClientVersion()));
+        writeDouble(position.x);
+        writeDouble(position.y);
+        writeDouble(position.z);
         writeByte((int) (yaw * ROTATION_FACTOR));
         writeByte((int) (pitch * ROTATION_FACTOR));
         writeByte((int) (headPitch * ROTATION_FACTOR));
         writeShort((int) (velocity.x * VELOCITY_FACTOR));
         writeShort((int) (velocity.y * VELOCITY_FACTOR));
         writeShort((int) (velocity.z * VELOCITY_FACTOR));
-        if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            writeEntityMetadata(entityMetadata);
-        }
     }
 
     @Override

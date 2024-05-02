@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -40,34 +39,15 @@ public class WrapperPlayServerOpenSignEditor extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.position = new Vector3i(readLong());
-        } else {
-            int x = readInt();
-            int y = readInt();
-            int z = readInt();
-            this.position = new Vector3i(x, y, z);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
-            isFrontText = readBoolean();
-        } else {
-            isFrontText = true;
-        }
+        this.position = new Vector3i(readLong());
+        isFrontText = readBoolean();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            long positionVector = position.getSerializedPosition();
-            writeLong(positionVector);
-        } else {
-            writeInt(position.x);
-            writeInt(position.y);
-            writeInt(position.z);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
-            writeBoolean(isFrontText);
-        }
+        long positionVector = position.getSerializedPosition();
+        writeLong(positionVector);
+        writeBoolean(isFrontText);
     }
 
     @Override

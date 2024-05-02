@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.configuration.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -72,10 +71,6 @@ public class WrapperConfigServerRegistryData extends PacketWrapper<WrapperConfig
 
     @Override
     public void read() {
-        if (!this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            this.registryData = this.readNBT();
-            return;
-        }
         this.registryKey = this.readIdentifier();
         this.elements = this.readList(wrapper -> {
             ResourceLocation id = wrapper.readIdentifier();
@@ -86,10 +81,6 @@ public class WrapperConfigServerRegistryData extends PacketWrapper<WrapperConfig
 
     @Override
     public void write() {
-        if (!this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            this.writeNBT(this.registryData);
-            return;
-        }
         this.writeIdentifier(this.registryKey);
         this.writeList(this.elements, (wrapper, element) -> {
             wrapper.writeIdentifier(element.getId());

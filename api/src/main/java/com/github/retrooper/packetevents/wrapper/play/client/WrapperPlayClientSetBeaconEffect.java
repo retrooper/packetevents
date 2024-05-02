@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -39,24 +38,14 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            this.primaryEffect = readOptionalEffect();
-            this.secondaryEffect = readOptionalEffect();
-        } else {
-            this.primaryEffect = readVarInt();
-            this.secondaryEffect = readVarInt();
-        }
+        this.primaryEffect = readOptionalEffect();
+        this.secondaryEffect = readOptionalEffect();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeOptionalEffect(primaryEffect);
-            writeOptionalEffect(secondaryEffect);
-        } else {
-            writeVarInt(primaryEffect);
-            writeVarInt(secondaryEffect);
-        }
+        writeOptionalEffect(primaryEffect);
+        writeOptionalEffect(secondaryEffect);
     }
 
     @Override

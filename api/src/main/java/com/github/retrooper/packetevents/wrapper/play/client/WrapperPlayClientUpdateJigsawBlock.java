@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.JointType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -50,8 +49,9 @@ public class WrapperPlayClientUpdateJigsawBlock extends PacketWrapper<WrapperPla
 
     public WrapperPlayClientUpdateJigsawBlock(Vector3i position, ResourceLocation name, @Nullable ResourceLocation target,
                                               ResourceLocation pool, String finalState, @Nullable JointType jointType) {
-        this(position,name,target,pool,finalState,jointType,0,0);
+        this(position, name, target, pool, finalState, jointType, 0, 0);
     }
+
     public WrapperPlayClientUpdateJigsawBlock(Vector3i position, ResourceLocation name, @Nullable ResourceLocation target,
                                               ResourceLocation pool, String finalState, @Nullable JointType jointType,
                                               int selectionPriority, int placementPriority) {
@@ -70,36 +70,24 @@ public class WrapperPlayClientUpdateJigsawBlock extends PacketWrapper<WrapperPla
     public void read() {
         this.position = readBlockPosition();
         this.name = readIdentifier();
-        if (this.v1_16()) {
-            this.target = readIdentifier();
-        }
+        this.target = readIdentifier();
         this.pool = readIdentifier();
         this.finalState = readString();
-        if (this.v1_16()) {
-            this.jointType = JointType.byName(readString()).orElse(JointType.ALIGNED);
-        }
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.selectionPriority = this.readVarInt();
-            this.placementPriority = this.readVarInt();
-        }
+        this.jointType = JointType.byName(readString()).orElse(JointType.ALIGNED);
+        this.selectionPriority = this.readVarInt();
+        this.placementPriority = this.readVarInt();
     }
 
     @Override
     public void write() {
         writeBlockPosition(this.position);
         writeIdentifier(this.name);
-        if (this.v1_16()) {
-            writeIdentifier(this.target);
-        }
+        writeIdentifier(this.target);
         writeIdentifier(this.pool);
         writeString(this.finalState);
-        if (this.v1_16()) {
-            writeString(this.jointType.getSerializedName());
-        }
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.writeVarInt(this.selectionPriority);
-            this.writeVarInt(this.placementPriority);
-        }
+        writeString(this.jointType.getSerializedName());
+        this.writeVarInt(this.selectionPriority);
+        this.writeVarInt(this.placementPriority);
     }
 
     @Override
@@ -112,10 +100,6 @@ public class WrapperPlayClientUpdateJigsawBlock extends PacketWrapper<WrapperPla
         this.jointType = wrapper.jointType;
         this.selectionPriority = wrapper.selectionPriority;
         this.placementPriority = wrapper.placementPriority;
-    }
-
-    private boolean v1_16() {
-        return serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
     }
 
     public Vector3i getPosition() {

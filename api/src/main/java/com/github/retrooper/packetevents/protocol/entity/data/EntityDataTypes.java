@@ -50,11 +50,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class EntityDataTypes {
-    //1.7 -> 1.18 block_position is just 3 ints, not serialized with a long
-    //short was removed in 1.9+
-    //boolean was added in 1.9
-    //nbt was added in 1.12
-
     private static final Map<String, EntityDataType<?>> ENTITY_DATA_TYPE_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, EntityDataType<?>>> ENTITY_DATA_TYPE_ID_MAP = new HashMap<>();
     protected static final TypesBuilder TYPES_BUILDER = new TypesBuilder("entity/entity_data_type_mappings");
@@ -63,19 +58,7 @@ public class EntityDataTypes {
 
     public static final EntityDataType<Short> SHORT = define("short", PacketWrapper::readShort, PacketWrapper::writeShort);
 
-    public static final EntityDataType<Integer> INT = define("int", wrapper -> {
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            return wrapper.readVarInt();
-        } else {
-            return wrapper.readInt();
-        }
-    }, (wrapper, value) -> {
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            wrapper.writeVarInt(value);
-        } else {
-            wrapper.writeInt(value);
-        }
-    });
+    public static final EntityDataType<Integer> INT = define("int", PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
 
     public static final EntityDataType<Long> LONG = define("long", PacketWrapper::readVarLong, PacketWrapper::writeVarLong);
 
@@ -107,24 +90,7 @@ public class EntityDataTypes {
                 wrapper.writeFloat(value.z);
             });
 
-    public static final EntityDataType<Vector3i> BLOCK_POSITION = define("block_position", (PacketWrapper<?> wrapper) -> {
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            return wrapper.readBlockPosition();
-        } else {
-            int x = wrapper.readInt();
-            int y = wrapper.readInt();
-            int z = wrapper.readInt();
-            return new Vector3i(x, y, z);
-        }
-    }, (wrapper, blockPosition) -> {
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            wrapper.writeBlockPosition(blockPosition);
-        } else {
-            wrapper.writeInt(blockPosition.getX());
-            wrapper.writeInt(blockPosition.getY());
-            wrapper.writeInt(blockPosition.getZ());
-        }
-    });
+    public static final EntityDataType<Vector3i> BLOCK_POSITION = define("block_position", (PacketWrapper<?> wrapper) -> wrapper.readBlockPosition(), PacketWrapper::writeBlockPosition);
 
     public static final EntityDataType<Optional<Vector3i>> OPTIONAL_BLOCK_POSITION = define("optional_block_position",
             readOptionalBlockPositionDeserializer(), writeOptionalBlockPositionSerializer());
@@ -245,11 +211,7 @@ public class EntityDataTypes {
     }
 
     private static <T> Function<PacketWrapper<?>, T> readIntDeserializer() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            return (PacketWrapper<?> wrapper) -> (T) ((Object) wrapper.readVarInt());
-        } else {
-            return (PacketWrapper<?> wrapper) -> (T) ((Object) wrapper.readInt());
-        }
+        return (PacketWrapper<?> wrapper) -> (T) ((Object) wrapper.readVarInt());
     }
 
     private static <T> BiConsumer<PacketWrapper<?>, T> writeIntSerializer() {
@@ -264,11 +226,7 @@ public class EntityDataTypes {
             } else if (value instanceof Long) {
                 output = ((Long) value).intValue();
             }
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                wrapper.writeVarInt(output);
-            } else {
-                wrapper.writeInt(output);
-            }
+            wrapper.writeVarInt(output);
         };
     }
 
@@ -317,61 +275,29 @@ public class EntityDataTypes {
     }
 
     private static <T> Function<PacketWrapper<?>, T> readOptionalBlockPositionDeserializer() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            return (PacketWrapper<?> wrapper) -> {
-                if (wrapper.readBoolean()) {
-                    return (T) Optional.of(wrapper.readBlockPosition());
-                } else {
-                    return (T) Optional.empty();
-                }
-            };
-        } else {
-            return (PacketWrapper<?> wrapper) -> {
-                if (wrapper.readBoolean()) {
-                    int x = wrapper.readInt();
-                    int y = wrapper.readInt();
-                    int z = wrapper.readInt();
-                    return (T) Optional.of(new Vector3i(x, y, z));
-                } else {
-                    return (T) Optional.empty();
-                }
-            };
-        }
+        return (PacketWrapper<?> wrapper) -> {
+            if (wrapper.readBoolean()) {
+                return (T) Optional.of(wrapper.readBlockPosition());
+            } else {
+                return (T) Optional.empty();
+            }
+        };
     }
 
     private static <T> BiConsumer<PacketWrapper<?>, T> writeOptionalBlockPositionSerializer() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            return (PacketWrapper<?> wrapper, T value) -> {
-                if (value instanceof Optional) {
-                    Optional<?> optional = (Optional<?>) value;
-                    if (optional.isPresent()) {
-                        wrapper.writeBoolean(true);
-                        wrapper.writeBlockPosition((Vector3i) optional.get());
-                    } else {
-                        wrapper.writeBoolean(false);
-                    }
+        return (PacketWrapper<?> wrapper, T value) -> {
+            if (value instanceof Optional) {
+                Optional<?> optional = (Optional<?>) value;
+                if (optional.isPresent()) {
+                    wrapper.writeBoolean(true);
+                    wrapper.writeBlockPosition((Vector3i) optional.get());
                 } else {
                     wrapper.writeBoolean(false);
                 }
-            };
-        } else {
-            return (PacketWrapper<?> wrapper, T value) -> {
-                if (value instanceof Optional) {
-                    Optional<?> optional = (Optional<?>) value;
-                    if (optional.isPresent()) {
-                        wrapper.writeBoolean(true);
-                        Vector3i position = (Vector3i) optional.get();
-                        wrapper.writeInt(position.getX());
-                        wrapper.writeInt(position.getY());
-                        wrapper.writeInt(position.getZ());
-                    } else {
-                        wrapper.writeBoolean(false);
-                    }
-                } else {
-                    wrapper.writeBoolean(false);
-                }
-            };
-        }
+            } else {
+                wrapper.writeBoolean(false);
+            }
+        };
     }
 
     static {

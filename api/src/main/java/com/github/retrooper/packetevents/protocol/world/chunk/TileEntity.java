@@ -47,48 +47,27 @@ public class TileEntity {
     }
 
     public int getX() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            return (this.packedByte & 0xF0) >> 4;
-        }
-        return data.getTagOfTypeOrNull("x", NBTInt.class).getAsInt();
+        return (this.packedByte & 0xF0) >> 4;
     }
 
     public int getZ() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            return this.packedByte & 0xF;
-        }
-        return data.getTagOfTypeOrNull("z", NBTInt.class).getAsInt();
+        return this.packedByte & 0xF;
     }
 
     public int getY() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            return this.y;
-        }
-        return data.getTagOfTypeOrNull("y", NBTInt.class).getAsInt();
+        return this.y;
     }
 
     public void setX(final int x) {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            this.packedByte = (byte) ((this.packedByte & 0xF) | ((x & 0xF) << 4));
-        } else {
-            data.setTag("x", new NBTInt(x));
-        }
+        this.packedByte = (byte) ((this.packedByte & 0xF) | ((x & 0xF) << 4));
     }
 
     public void setY(final int y) {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            this.y = (short) y;
-        } else {
-            data.setTag("y", new NBTInt(y));
-        }
+        this.y = (short) y;
     }
 
     public void setZ(final int z) {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            this.packedByte = (byte) ((this.packedByte & 0xF0) | (z & 0xF));
-        } else {
-            data.setTag("z", new NBTInt(z));
-        }
+        this.packedByte = (byte) ((this.packedByte & 0xF0) | (z & 0xF));
     }
 
     // How do we get the type? Does anyone need this?

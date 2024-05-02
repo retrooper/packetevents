@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Direction;
 import com.github.retrooper.packetevents.protocol.world.PaintingType;
@@ -62,55 +61,20 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
     @Override
     public void read() {
         this.entityId = readVarInt();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            this.uuid = readUUID();
-        } else {
-            this.uuid = new UUID(0L, 0L);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.type = PaintingType.getById(readVarInt());
-        } else {
-            this.type = PaintingType.getByTitle(readString(13));
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.position = readBlockPosition();
-        } else {
-            int x = readInt();
-            int y = readInt();
-            int z = readInt();
-            this.position = new Vector3i(x, y, z);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.direction = Direction.getByHorizontalIndex(readUnsignedByte());
-        } else {
-            this.direction = Direction.getByHorizontalIndex(readInt());
-        }
+        this.uuid = readUUID();
+        this.type = PaintingType.getById(readVarInt());
+        this.position = readBlockPosition();
+        this.direction = Direction.getByHorizontalIndex(readUnsignedByte());
     }
 
     @Override
     public void write() {
         writeVarInt(this.entityId);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            writeUUID(this.uuid);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeVarInt(this.type.getId());
-        } else {
-            writeString(this.type.getTitle(), 13);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            long positionVector = this.position.getSerializedPosition();
-            writeLong(positionVector);
-        } else {
-            writeInt(this.position.x);
-            writeShort(this.position.y);
-            writeInt(this.position.z);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            writeByte(this.direction.getHorizontalIndex());
-        } else {
-            writeInt(this.direction.getHorizontalIndex());
-        }
+        writeUUID(this.uuid);
+        writeVarInt(this.type.getId());
+        long positionVector = this.position.getSerializedPosition();
+        writeLong(positionVector);
+        writeByte(this.direction.getHorizontalIndex());
     }
 
     @Override

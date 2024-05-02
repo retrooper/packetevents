@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -47,32 +46,15 @@ public class WrapperPlayServerSpawnPosition extends PacketWrapper<WrapperPlaySer
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.position = new Vector3i(readLong());
-        } else {
-            int x = readInt();
-            int y = readShort();
-            int z = readInt();
-            this.position = new Vector3i(x, y, z);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            this.angle = readFloat();
-        }
+        this.position = new Vector3i(readLong());
+        this.angle = readFloat();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            long positionVector = this.position.getSerializedPosition();
-            writeLong(positionVector);
-        } else {
-            writeInt(this.position.x);
-            writeShort(this.position.y);
-            writeInt(this.position.z);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            writeFloat(this.angle);
-        }
+        long positionVector = this.position.getSerializedPosition();
+        writeLong(positionVector);
+        writeFloat(this.angle);
     }
 
     @Override

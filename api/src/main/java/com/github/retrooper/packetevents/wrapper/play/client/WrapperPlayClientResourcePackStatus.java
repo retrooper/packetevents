@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -54,29 +53,15 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
 
     @Override
     public void read() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.packId = this.readUUID();
-        }
-
-        if (serverVersion.isOlderThan(ServerVersion.V_1_10)) {
-            //For now ignore hash, maybe make optional
-            this.hash = readString(40);
-        } else {
-            this.hash = "";
-        }
+        this.packId = this.readUUID();
+        this.hash = "";
         int resultIndex = readVarInt();
         this.result = Result.VALUES[resultIndex];
     }
 
     @Override
     public void write() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.writeUUID(this.packId);
-        }
-
-        if (serverVersion.isOlderThan(ServerVersion.V_1_10)) {
-            writeString(hash, 40);
-        }
+        this.writeUUID(this.packId);
         writeVarInt(result.ordinal());
     }
 

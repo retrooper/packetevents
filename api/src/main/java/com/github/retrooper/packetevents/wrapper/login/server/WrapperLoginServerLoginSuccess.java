@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.login.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
@@ -57,51 +56,35 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
     @Override
     public void read() {
         UUID uuid;
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            uuid = readUUID();
-        } else {
-            uuid = UUID.fromString(readString(36));
-        }
+        uuid = readUUID();
         String username = readString(16);
         this.userProfile = new UserProfile(uuid, username);
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            int propertyCount = readVarInt();
-            for (int i = 0; i < propertyCount; i++) {
-                String propertyName = readString();
-                String propertyValue = readString();
-                String propertySignature = readOptional(PacketWrapper::readString);
-                TextureProperty textureProperty = new TextureProperty(propertyName, propertyValue, propertySignature);
-                userProfile.getTextureProperties().add(textureProperty);
-            }
+        int propertyCount = readVarInt();
+        for (int i = 0; i < propertyCount; i++) {
+            String propertyName = readString();
+            String propertyValue = readString();
+            String propertySignature = readOptional(PacketWrapper::readString);
+            TextureProperty textureProperty = new TextureProperty(propertyName, propertyValue, propertySignature);
+            userProfile.getTextureProperties().add(textureProperty);
         }
 
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            this.strictErrorHandling = this.readBoolean();
-        }
+        this.strictErrorHandling = this.readBoolean();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            writeUUID(userProfile.getUUID());
-        } else {
-            writeString(userProfile.getUUID().toString(), 36);
-        }
+        writeUUID(userProfile.getUUID());
         writeString(userProfile.getName(), 16);
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeVarInt(userProfile.getTextureProperties().size());
-            for (TextureProperty textureProperty : userProfile.getTextureProperties()) {
-                writeString(textureProperty.getName());
-                writeString(textureProperty.getValue());
-                writeOptional(textureProperty.getSignature(), PacketWrapper::writeString);
-            }
+        writeVarInt(userProfile.getTextureProperties().size());
+        for (TextureProperty textureProperty : userProfile.getTextureProperties()) {
+            writeString(textureProperty.getName());
+            writeString(textureProperty.getValue());
+            writeOptional(textureProperty.getSignature(), PacketWrapper::writeString);
         }
 
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            this.writeBoolean(this.strictErrorHandling);
-        }
+        this.writeBoolean(this.strictErrorHandling);
     }
 
     @Override

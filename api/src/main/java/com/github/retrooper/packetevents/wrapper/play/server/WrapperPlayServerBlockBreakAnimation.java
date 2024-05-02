@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -43,27 +42,14 @@ public class WrapperPlayServerBlockBreakAnimation extends PacketWrapper<WrapperP
     @Override
     public void read() {
         entityID = readVarInt();
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            int x = readInt();
-            int y = readInt();
-            int z = readInt();
-            blockPosition = new Vector3i(x, y, z);
-        } else {
-            blockPosition = readBlockPosition();
-        }
+        blockPosition = readBlockPosition();
         destroyStage = (byte) readUnsignedByte();
     }
 
     @Override
     public void write() {
         writeVarInt(entityID);
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeInt(blockPosition.x);
-            writeInt(blockPosition.y);
-            writeInt(blockPosition.z);
-        } else {
-            writeBlockPosition(blockPosition);
-        }
+        writeBlockPosition(blockPosition);
         writeByte(destroyStage);
     }
 

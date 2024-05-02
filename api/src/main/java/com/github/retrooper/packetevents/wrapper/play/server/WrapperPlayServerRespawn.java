@@ -19,10 +19,11 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.world.*;
+import com.github.retrooper.packetevents.protocol.world.Difficulty;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -82,115 +83,31 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     @Override
     public void read() {
-        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
-        boolean v1_15_0 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
-        boolean v1_16_0 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
-        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        boolean v1_19_3 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3);
-        boolean v1_20_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2);
-
-        if (v1_16_0) {
-            dimension = readDimension();
-            worldName = Optional.of(readString());
-            hashedSeed = readLong();
-            if (v1_20_2) {
-                gameMode = readGameMode();
-            } else {
-                gameMode = GameMode.getById(readUnsignedByte());
-            }
-            previousGameMode = readGameMode();
-            worldDebug = readBoolean();
-            worldFlat = readBoolean();
-            if (v1_19_3) {
-                if (!v1_20_2) {
-                    keptData = readByte();
-                }
-            } else {
-                keptData = readBoolean() ? KEEP_ALL_DATA : KEEP_ENTITY_DATA;
-            }
-            if (v1_19) {
-                lastDeathPosition = readOptional(PacketWrapper::readWorldBlockPosition);
-            }
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
-                portalCooldown = readVarInt();
-            }
-            if (v1_20_2) {
-                keptData = readByte();
-            }
-        } else {
-            dimension = new Dimension(readInt());
-
-            worldName = Optional.empty();
-            hashedSeed = 0L;
-            if (v1_15_0) {
-                hashedSeed = readLong();
-            } else if (!v1_14) {
-                difficulty = Difficulty.getById(readByte());
-            }
-
-            //Note: SPECTATOR will not be expected from a 1.7 client.
-            gameMode = GameMode.getById(readByte());
-            levelType = readString(16);
-            worldFlat = DimensionType.isFlat(levelType);
-            worldDebug = DimensionType.isDebug(levelType);
-        }
+        dimension = readDimension();
+        worldName = Optional.of(readString());
+        hashedSeed = readLong();
+        gameMode = readGameMode();
+        previousGameMode = readGameMode();
+        worldDebug = readBoolean();
+        worldFlat = readBoolean();
+        lastDeathPosition = readOptional(PacketWrapper::readWorldBlockPosition);
+        portalCooldown = readVarInt();
+        keptData = readByte();
     }
 
     @Override
     public void write() {
-        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
-        boolean v1_15_0 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
-        boolean v1_16_0 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
-        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        boolean v1_19_3 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3);
-        boolean v1_20_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2);
-
-        if (v1_16_0) {
-            writeDimension(dimension);
-            writeString(worldName.orElse(""));
-            writeLong(hashedSeed);
-            writeGameMode(gameMode);
-            writeGameMode(previousGameMode);
-            writeBoolean(worldDebug);
-            writeBoolean(worldFlat);
-            if (v1_19_3) {
-                if (!v1_20_2) {
-                    writeByte(keptData);
-                }
-            } else {
-                writeBoolean((keptData & KEEP_ATTRIBUTES) != 0);
-            }
-            if (v1_19) {
-                writeOptional(lastDeathPosition, PacketWrapper::writeWorldBlockPosition);
-            }
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
-                int pCooldown = portalCooldown != null ? portalCooldown : 0;
-                writeVarInt(pCooldown);
-            }
-            if (v1_20_2) {
-                writeByte(keptData);
-            }
-        } else {
-            writeInt(dimension.getId());
-            if (v1_15_0) {
-                writeLong(hashedSeed);
-            } else if (!v1_14) {
-                //Handle 1.13.2 and below
-                int id = difficulty == null ? Difficulty.NORMAL.getId() : difficulty.getId();
-                writeByte(id);
-            }
-
-            //Note: SPECTATOR will not be expected from a 1.7 client.
-            writeByte(gameMode.ordinal());
-
-            if (worldFlat) {
-                writeString(WorldType.FLAT.getName());
-            } else if (worldDebug) {
-                writeString(WorldType.DEBUG_ALL_BLOCK_STATES.getName());
-            } else {
-                writeString(levelType == null ? WorldType.DEFAULT.getName() : levelType, 16);
-            }
-        }
+        writeDimension(dimension);
+        writeString(worldName.orElse(""));
+        writeLong(hashedSeed);
+        writeGameMode(gameMode);
+        writeGameMode(previousGameMode);
+        writeBoolean(worldDebug);
+        writeBoolean(worldFlat);
+        writeOptional(lastDeathPosition, PacketWrapper::writeWorldBlockPosition);
+        int pCooldown = portalCooldown != null ? portalCooldown : 0;
+        writeVarInt(pCooldown);
+        writeByte(keptData);
     }
 
     @Override

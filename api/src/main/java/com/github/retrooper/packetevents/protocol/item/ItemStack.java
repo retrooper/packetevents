@@ -25,20 +25,11 @@ import com.github.retrooper.packetevents.protocol.item.enchantment.type.Enchantm
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
-import com.github.retrooper.packetevents.protocol.nbt.NBTList;
-import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
-import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class ItemStack {
     public static final ItemStack EMPTY = new ItemStack(ItemTypes.AIR, 0, new NBTCompound(), 0);
@@ -270,13 +261,8 @@ public class ItemStack {
 
     @Nullable
     private static EnchantmentType getEnchantmentTypeFromTag(NBTCompound tag, ClientVersion version) {
-        if (version.isNewerThanOrEquals(ClientVersion.V_1_13)) {
-            String id = tag.getStringTagValueOrNull("id");
-            return EnchantmentTypes.getByName(id);
-        } else {
-            NBTShort idTag = tag.getTagOfTypeOrNull("id", NBTShort.class);
-            return EnchantmentTypes.getById(version, idTag.getAsInt());
-        }
+        String id = tag.getStringTagValueOrNull("id");
+        return EnchantmentTypes.getByName(id);
     }
 
     public void setEnchantments(List<Enchantment> enchantments, ClientVersion version) {
@@ -291,12 +277,7 @@ public class ItemStack {
             List<NBTCompound> list = new ArrayList<>();
             for (Enchantment enchantment : enchantments) {
                 NBTCompound compound = new NBTCompound();
-                if (version.isNewerThanOrEquals(ClientVersion.V_1_13)) {
                     compound.setTag("id", new NBTString(enchantment.getType().getName().toString()));
-                } else {
-                    compound.setTag("id", new NBTShort((short) enchantment.getType().getId(version)));
-                }
-
                 compound.setTag("lvl", new NBTShort((short) enchantment.getLevel()));
                 list.add(compound);
             }
@@ -306,7 +287,7 @@ public class ItemStack {
     }
 
     public String getEnchantmentsTagName(ClientVersion version) {
-        String tagName = version.isNewerThanOrEquals(ClientVersion.V_1_13) ? "Enchantments" : "ench";
+        String tagName = "Enchantments";
         if (type == ItemTypes.ENCHANTED_BOOK) {
             tagName = "StoredEnchantments";
         }

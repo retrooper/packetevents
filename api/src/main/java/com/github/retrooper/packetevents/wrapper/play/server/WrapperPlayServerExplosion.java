@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
@@ -83,13 +82,9 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-            position = new Vector3d(readDouble(), readDouble(), readDouble());
-        } else {
-            position = new Vector3d(readFloat(), readFloat(), readFloat());
-        }
+        position = new Vector3d(readDouble(), readDouble(), readDouble());
         strength = readFloat();
-        int recordsLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? readVarInt() : readInt();
+        int recordsLength = readVarInt();
         records = new ArrayList<>(recordsLength);
 
         Vector3i floor = toFloor(position);
@@ -106,45 +101,27 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         float motZ = readFloat();
         playerMotion = new Vector3f(motX, motY, motZ);
 
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.blockInteraction = BlockInteraction.values()[this.readVarInt()];
+        this.blockInteraction = BlockInteraction.values()[this.readVarInt()];
 
-            ParticleType smallPartType = ParticleTypes.getById(this.serverVersion.toClientVersion(), this.readVarInt());
-            ParticleData smallPartData = smallPartType.readDataFunction().apply(this);
-            this.smallExplosionParticles = new Particle(smallPartType, smallPartData);
+        ParticleType smallPartType = ParticleTypes.getById(this.serverVersion.toClientVersion(), this.readVarInt());
+        ParticleData smallPartData = smallPartType.readDataFunction().apply(this);
+        this.smallExplosionParticles = new Particle(smallPartType, smallPartData);
 
-            ParticleType largePartType = ParticleTypes.getById(this.serverVersion.toClientVersion(), this.readVarInt());
-            ParticleData largePartData = largePartType.readDataFunction().apply(this);
-            this.largeExplosionParticles = new Particle(largePartType, largePartData);
+        ParticleType largePartType = ParticleTypes.getById(this.serverVersion.toClientVersion(), this.readVarInt());
+        ParticleData largePartData = largePartType.readDataFunction().apply(this);
+        this.largeExplosionParticles = new Particle(largePartType, largePartData);
 
-            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-                this.explosionSound = Sound.read(this);
-            } else {
-                ResourceLocation explosionSoundKey = this.readIdentifier();
-                Float explosionSoundRange = this.readOptional(PacketWrapper::readFloat);
-                this.explosionSound = new StaticSound(explosionSoundKey, explosionSoundRange);
-            }
-        }
+        this.explosionSound = Sound.read(this);
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-            writeDouble(position.getX());
-            writeDouble(position.getY());
-            writeDouble(position.getZ());
-        } else {
-            writeFloat((float) position.getX());
-            writeFloat((float) position.getY());
-            writeFloat((float) position.getZ());
-        }
+        writeDouble(position.getX());
+        writeDouble(position.getY());
+        writeDouble(position.getZ());
         writeFloat(strength);
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            writeVarInt(records.size());
-        } else {
-            writeInt(records.size());
-        }
+        writeVarInt(records.size());
 
         Vector3i floor = toFloor(position);
 
@@ -158,22 +135,15 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         writeFloat(playerMotion.y);
         writeFloat(playerMotion.z);
 
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.writeVarInt(this.blockInteraction.ordinal());
+        this.writeVarInt(this.blockInteraction.ordinal());
 
-            this.writeVarInt(this.smallExplosionParticles.getType().getId(this.serverVersion.toClientVersion()));
-            this.smallExplosionParticles.getType().writeDataFunction().accept(this, this.smallExplosionParticles.getData());
+        this.writeVarInt(this.smallExplosionParticles.getType().getId(this.serverVersion.toClientVersion()));
+        this.smallExplosionParticles.getType().writeDataFunction().accept(this, this.smallExplosionParticles.getData());
 
-            this.writeVarInt(this.largeExplosionParticles.getType().getId(this.serverVersion.toClientVersion()));
-            this.largeExplosionParticles.getType().writeDataFunction().accept(this, this.largeExplosionParticles.getData());
+        this.writeVarInt(this.largeExplosionParticles.getType().getId(this.serverVersion.toClientVersion()));
+        this.largeExplosionParticles.getType().writeDataFunction().accept(this, this.largeExplosionParticles.getData());
 
-            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-                Sound.write(this, this.explosionSound);
-            } else {
-                this.writeIdentifier(this.explosionSound.getSoundId());
-                this.writeOptional(this.explosionSound.getRange(), PacketWrapper::writeFloat);
-            }
-        }
+        Sound.write(this, this.explosionSound);
     }
 
     @Override
@@ -192,15 +162,9 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         int floorX;
         int floorY;
         int floorZ;
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            floorX = (int) Math.floor(position.x);
-            floorY = (int) Math.floor(position.y);
-            floorZ = (int) Math.floor(position.z);
-        } else { // pre-1.14 does this weird way to round
-            floorX = (int) position.x;
-            floorY = (int) position.y;
-            floorZ = (int) position.z;
-        }
+        floorX = (int) Math.floor(position.x);
+        floorY = (int) Math.floor(position.y);
+        floorZ = (int) Math.floor(position.z);
         return new Vector3i(floorX, floorY, floorZ);
     }
 

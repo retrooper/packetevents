@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
 import com.github.retrooper.packetevents.protocol.score.ScoreFormatTypes;
@@ -63,77 +62,20 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.entityName = this.readString();
-            this.objectiveName = this.readString();
-            this.value = Optional.of(this.readVarInt());
-            this.entityDisplayName = this.readOptional(PacketWrapper::readComponent);
-            this.scoreFormat = this.readOptional(ScoreFormatTypes::read);
-        } else if (this.serverVersion == ServerVersion.V_1_7_10) {
-            entityName = readString(16);
-            action = Action.VALUES[readByte()];
-            if (action != Action.REMOVE_ITEM) {
-                objectiveName = readString(16);
-                value = Optional.of(readInt());
-            } else {
-                objectiveName = "";
-                value = Optional.empty();
-            }
-        } else {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-                entityName = readString();
-            } else {
-                entityName = readString(40);
-            }
-            action = Action.VALUES[readByte()];
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-                objectiveName = readString();
-            } else {
-                objectiveName = readString(16);
-            }
-            if (action != Action.REMOVE_ITEM) {
-                value = Optional.of(readVarInt());
-            } else {
-                objectiveName = "";
-                value = Optional.empty();
-            }
-        }
+        this.entityName = this.readString();
+        this.objectiveName = this.readString();
+        this.value = Optional.of(this.readVarInt());
+        this.entityDisplayName = this.readOptional(PacketWrapper::readComponent);
+        this.scoreFormat = this.readOptional(ScoreFormatTypes::read);
     }
 
     @Override
     public void write() {
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.writeString(this.entityName);
-            this.writeString(this.objectiveName);
-            this.writeVarInt(this.value.orElse(0));
-            this.writeOptional(this.entityDisplayName, PacketWrapper::writeComponent);
-            this.writeOptional(this.scoreFormat, ScoreFormatTypes::write);
-        } else if (this.serverVersion == ServerVersion.V_1_7_10) {
-            writeString(entityName, 16);
-            writeByte(action.ordinal());
-            if (action != Action.REMOVE_ITEM) {
-                writeString(objectiveName, 16);
-                writeInt(value.orElse(-1));
-            } else {
-                objectiveName = "";
-                value = Optional.empty();
-            }
-        } else {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-                writeString(entityName);
-            } else {
-                writeString(entityName, 40);
-            }
-            writeByte(action.ordinal());
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-                writeString(objectiveName);
-            } else {
-                writeString(objectiveName, 16);
-            }
-            if (action != Action.REMOVE_ITEM) {
-                writeVarInt(value.orElse(-1));
-            }
-        }
+        this.writeString(this.entityName);
+        this.writeString(this.objectiveName);
+        this.writeVarInt(this.value.orElse(0));
+        this.writeOptional(this.entityDisplayName, PacketWrapper::writeComponent);
+        this.writeOptional(this.scoreFormat, ScoreFormatTypes::write);
 
     }
 

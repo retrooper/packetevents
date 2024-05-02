@@ -19,11 +19,8 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
-import com.github.retrooper.packetevents.protocol.particle.data.LegacyConvertible;
-import com.github.retrooper.packetevents.protocol.particle.data.LegacyParticleData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
@@ -61,74 +58,32 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     public void read() {
         int particleTypeId = 0;
         ParticleType particleType;
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            String particleName = readString(64);
-            particleType = ParticleTypes.getByName("minecraft:" + particleName);
-        } else {
-            particleTypeId = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19) ? readVarInt() : readInt();
-            particleType = ParticleTypes.getById(serverVersion.toClientVersion(), particleTypeId);
-        }
+        particleTypeId = readVarInt();
+        particleType = ParticleTypes.getById(serverVersion.toClientVersion(), particleTypeId);
         longDistance = readBoolean();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
-            position = new Vector3d(readDouble(), readDouble(), readDouble());
-        } else {
-            position = new Vector3d(readFloat(), readFloat(), readFloat());
-        }
+        position = new Vector3d(readDouble(), readDouble(), readDouble());
         offset = new Vector3f(readFloat(), readFloat(), readFloat());
         maxSpeed = readFloat();
         particleCount = readInt();
         ParticleData data;
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            data = particleType.readDataFunction().apply(this);
-        } else {
-            data = new ParticleData();
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-                //TODO Understand the legacy data: https://wiki.vg/index.php?title=Protocol&oldid=14204
-                data = LegacyParticleData.read(this, particleTypeId);
-            }
-        }
+        data = particleType.readDataFunction().apply(this);
         particle = new Particle(particleType, data);
     }
 
     @Override
     public void write() {
         int id = particle.getType().getId(serverVersion.toClientVersion());
-        //TODO on 1.7 we get particle type by 64 len string
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeString(particle.getType().getName().getKey(), 64);
-        } else {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-                writeVarInt(id);
-            } else {
-                writeInt(id);
-            }
-        }
+        writeVarInt(id);
         writeBoolean(longDistance);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
-            writeDouble(position.getX());
-            writeDouble(position.getY());
-            writeDouble(position.getZ());
-        } else {
-            writeFloat((float) position.getX());
-            writeFloat((float) position.getY());
-            writeFloat((float) position.getZ());
-        }
+        writeDouble(position.getX());
+        writeDouble(position.getY());
+        writeDouble(position.getZ());
         writeFloat(offset.getX());
         writeFloat(offset.getY());
         writeFloat(offset.getZ());
         writeFloat(maxSpeed);
         writeInt(particleCount);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            particle.getType().writeDataFunction().accept(this, particle.getData());
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            LegacyParticleData legacyData;
-            if (particle.getData() instanceof LegacyConvertible) {
-                legacyData = ((LegacyConvertible) particle.getData()).toLegacy(serverVersion.toClientVersion());
-            } else {
-                legacyData = LegacyParticleData.nullValue(id);
-            }
-            LegacyParticleData.write(this, id, legacyData);
-        }
+        particle.getType().writeDataFunction().accept(this, particle.getData());
     }
 
     @Override

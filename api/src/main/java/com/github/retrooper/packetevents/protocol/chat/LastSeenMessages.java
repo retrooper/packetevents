@@ -67,24 +67,6 @@ public class LastSeenMessages {
         }
     }
 
-    public static class LegacyUpdate {
-        private final LastSeenMessages lastSeenMessages;
-        private final @Nullable Entry lastReceived;
-
-        public LegacyUpdate(LastSeenMessages lastSeenMessages, @Nullable Entry lastReceived) {
-            this.lastSeenMessages = lastSeenMessages;
-            this.lastReceived = lastReceived;
-        }
-
-        public LastSeenMessages getLastSeenMessages() {
-            return lastSeenMessages;
-        }
-
-        public @Nullable Entry getLastReceived() {
-            return lastReceived;
-        }
-    }
-
     public static class Update {
         private final int offset;
         private final BitSet acknowledged;

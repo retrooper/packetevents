@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.world.Location;
@@ -66,10 +65,6 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
         if (positionChanged) {
             double x = readDouble();
             double y = readDouble();
-            if (serverVersion == ServerVersion.V_1_7_10) {
-                //Can be ignored, cause stance = (y + 1.62)
-                double stance = readDouble();
-            }
             double z = readDouble();
             position = new Vector3d(x, y, z);
         }
@@ -85,10 +80,6 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
     public void write() {
         if (positionChanged) {
             writeDouble(location.getPosition().getX());
-            if (serverVersion == ServerVersion.V_1_7_10) {
-                //Can be ignored, cause stance = (y + 1.62)
-                writeDouble(location.getPosition().getY() + 1.62);
-            }
             writeDouble(location.getPosition().getY());
             writeDouble(location.getPosition().getZ());
         }

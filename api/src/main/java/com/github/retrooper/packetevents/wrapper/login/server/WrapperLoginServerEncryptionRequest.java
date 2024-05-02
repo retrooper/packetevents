@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.login.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
@@ -71,9 +70,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
         this.serverID = readString(20);
         this.publicKeyBytes = readByteArray(512);
         this.verifyToken = readByteArray(ByteBufHelper.readableBytes(buffer));
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            this.shouldAuthenticate = readBoolean();
-        }
+        this.shouldAuthenticate = readBoolean();
     }
 
     @Override
@@ -81,9 +78,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
         writeString(this.serverID, 20);
         writeByteArray(this.publicKeyBytes);
         writeByteArray(this.verifyToken);
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            writeBoolean(this.shouldAuthenticate);
-        }
+        writeBoolean(this.shouldAuthenticate);
     }
 
     @Override

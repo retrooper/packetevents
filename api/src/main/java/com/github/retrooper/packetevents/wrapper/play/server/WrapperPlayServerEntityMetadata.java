@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityMetadataProvider;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -48,17 +47,13 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void read() {
-        entityID = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) ? readVarInt() : readInt();
+        entityID = readVarInt();
         entityMetadata = readEntityMetadata();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            writeVarInt(entityID);
-        } else {
-            writeInt(entityID);
-        }
+        writeVarInt(entityID);
         writeEntityMetadata(entityMetadata);
     }
 

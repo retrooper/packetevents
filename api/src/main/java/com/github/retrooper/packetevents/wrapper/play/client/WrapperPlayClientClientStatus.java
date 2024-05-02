@@ -45,8 +45,8 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
     @Override
     public void write() {
         writeMultiVersional(VersionComparison.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, action.ordinal(), (wrapper, integer) -> {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) && integer == 2) {
-                throw new IllegalStateException("The WrapperGameClientClientStatus.Action.OPEN_INVENTORY_ACTION enum constant is not supported on 1.16+ servers!");
+            if (integer == 2) {
+                throw new IllegalStateException("The WrapperGameClientClientStatus.Action.OPEN_INVENTORY_ACTION enum constant is not supported!");
             }
             wrapper.writeVarInt(integer);
         }, PacketWrapper::writeByte);
@@ -67,10 +67,7 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
 
     public enum Action {
         PERFORM_RESPAWN,
-        REQUEST_STATS,
-
-        // This only exists on 1.7.10 -> 1.15.2
-        OPEN_INVENTORY_ACHIEVEMENT;
+        REQUEST_STATS
 
         private static final Action[] VALUES = values();
 

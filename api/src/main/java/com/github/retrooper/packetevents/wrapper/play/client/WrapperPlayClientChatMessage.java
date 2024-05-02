@@ -19,12 +19,10 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.crypto.MessageSignData;
-import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,17 +36,15 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
     private String message;
     private MessageSignData messageSignData;
     private @Nullable LastSeenMessages.Update lastSeenMessages;
-    private @Nullable LastSeenMessages.LegacyUpdate legacyLastSeenMessages;
 
     public WrapperPlayClientChatMessage(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientChatMessage(String message, MessageSignData messageSignData, @Nullable LastSeenMessages.LegacyUpdate lastSeenMessages) {
+    public WrapperPlayClientChatMessage(String message, MessageSignData messageSignData) {
         super(PacketType.Play.Client.CHAT_MESSAGE);
         this.message = message;
         this.messageSignData = messageSignData;
-        this.legacyLastSeenMessages = lastSeenMessages;
     }
 
     public WrapperPlayClientChatMessage(String message, MessageSignData messageSignData, @Nullable LastSeenMessages.Update lastSeenMessages) {
@@ -60,45 +56,21 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void read() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
+        int maxMessageLength = 256;
         this.message = readString(maxMessageLength);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            Instant timestamp = readTimestamp();
-            this.messageSignData = new MessageSignData(readSaltSignature(), timestamp);
-
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-                this.lastSeenMessages = readLastSeenMessagesUpdate();
-            } else {
-                boolean signedPreview = readBoolean();
-                this.messageSignData.setSignedPreview(signedPreview);
-
-                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-                    this.legacyLastSeenMessages = readLegacyLastSeenMessagesUpdate();
-                }
-            }
-        }
+        Instant timestamp = readTimestamp();
+        this.messageSignData = new MessageSignData(readSaltSignature(), timestamp);
+        this.lastSeenMessages = readLastSeenMessagesUpdate();
     }
 
     @Override
     public void write() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
+        int maxMessageLength = 256;
         writeString(this.message, maxMessageLength);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeTimestamp(messageSignData.getTimestamp());
-            writeSaltSignature(messageSignData.getSaltSignature());
-
-
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
-                if (lastSeenMessages != null)
-                    writeLastSeenMessagesUpdate(lastSeenMessages);
-            } else {
-                writeBoolean(messageSignData.isSignedPreview());
-
-                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1) && legacyLastSeenMessages != null) {
-                    writeLegacyLastSeenMessagesUpdate(legacyLastSeenMessages);
-                }
-            }
-        }
+        writeTimestamp(messageSignData.getTimestamp());
+        writeSaltSignature(messageSignData.getSaltSignature());
+        if (lastSeenMessages != null)
+            writeLastSeenMessagesUpdate(lastSeenMessages);
     }
 
     @Override
@@ -106,12 +78,10 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
         this.message = wrapper.message;
         this.messageSignData = wrapper.messageSignData;
         this.lastSeenMessages = wrapper.lastSeenMessages;
-        this.legacyLastSeenMessages = wrapper.legacyLastSeenMessages;
     }
 
     /**
      * The message.
-     * On {@link ClientVersion#V_1_10} and older clients, the message should never exceed 100 characters.
      * On {@link ClientVersion#V_1_11} and newer clients, the message should never exceed 256 characters.
      *
      * @return Message
@@ -145,13 +115,5 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
 
     public void setLastSeenMessages(LastSeenMessages.@Nullable Update lastSeenMessages) {
         this.lastSeenMessages = lastSeenMessages;
-    }
-
-    public @Nullable LastSeenMessages.LegacyUpdate getLegacyLastSeenMessages() {
-        return legacyLastSeenMessages;
-    }
-
-    public void setLegacyLastSeenMessages(@Nullable LastSeenMessages.LegacyUpdate lastSeenMessages) {
-        this.legacyLastSeenMessages = lastSeenMessages;
     }
 }

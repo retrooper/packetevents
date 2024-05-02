@@ -1,7 +1,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.teleport.RelativeFlag;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -44,12 +43,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         this.yaw = readFloat();
         this.pitch = readFloat();
         this.relativeMask = (byte) readUnsignedByte();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            this.teleportId = readVarInt();
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
-            this.dismountVehicle = readBoolean();
-        }
+        this.teleportId = readVarInt();
     }
 
     @Override
@@ -60,12 +54,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         writeFloat(yaw);
         writeFloat(pitch);
         writeByte(relativeMask);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            writeVarInt(teleportId);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
-            writeBoolean(dismountVehicle);
-        }
+        writeVarInt(teleportId);
     }
 
     @Override

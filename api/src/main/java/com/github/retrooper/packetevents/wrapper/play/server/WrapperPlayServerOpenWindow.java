@@ -19,25 +19,15 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
 // TODO: Test on outdated versions
 public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServerOpenWindow> {
     private int containerId; // All versions
-
-    private int type; // 1.14+... also 1.7. Not 1.8-1.13 though.
-
-    private String legacyType; // 1.13-
-    private int legacySlots; // 1.13-
-    private int horseId; // 1.13-
-
+    private int type;
     private Component title;
-
-    private boolean useProvidedWindowTitle; // 1.7 only
 
     public WrapperPlayServerOpenWindow(PacketSendEvent event) {
         super(event);
@@ -51,108 +41,25 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.title = title;
     }
 
-    // 1.8 through 1.13
-    public WrapperPlayServerOpenWindow(int containerId, String legacyType, Component title, int legacySlots, int horseId) {
-        super(PacketType.Play.Server.OPEN_WINDOW);
-        this.containerId = containerId;
-        this.legacyType = legacyType;
-        this.legacySlots = legacySlots;
-        this.horseId = horseId;
-        this.title = title;
-    }
-
-    // 1.7
-    public WrapperPlayServerOpenWindow(int containerId, int type, Component title, int legacySlots, boolean useProvidedWindowTitle, int horseId) {
-        super(PacketType.Play.Server.OPEN_WINDOW);
-        this.containerId = containerId;
-        this.type = type;
-        this.title = title;
-        this.legacySlots = legacySlots;
-        this.useProvidedWindowTitle = useProvidedWindowTitle;
-        this.horseId = horseId;
-    }
-
     @Override
     public void read() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-            this.containerId = readUnsignedByte();
-        } else {
-            this.containerId = readVarInt();
-        }
-
-        // 1.7 has a very different packet format
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
-            this.type = readUnsignedByte();
-            this.title = AdventureSerializer.fromLegacyFormat(readString(32));
-            this.legacySlots = readUnsignedByte();
-            this.useProvidedWindowTitle = readBoolean();
-
-            if (this.type == 11) { // AnimalChest type ID
-                this.horseId = readInt();
-            }
-            return;
-        }
-
-        // Known to be 1.8 or above
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            this.type = readVarInt();
-            this.title = readComponent();
-        } else {
-            this.legacyType = readString();
-            this.title = readComponent();
-            this.legacySlots = readUnsignedByte();
-            // This is only sent for horses
-            if (legacyType.equals("EntityHorse")) {
-                this.horseId = readInt();
-            }
-        }
+        this.containerId = readVarInt();
+        this.type = readVarInt();
+        this.title = readComponent();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-            writeByte(this.containerId);
-        } else {
-            writeVarInt(this.containerId);
-        }
-
-        // 1.7 has a very different packet format
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
-            writeByte(this.type);
-            writeString(AdventureSerializer.toLegacyFormat(this.title));
-            writeByte(this.legacySlots);
-            writeBoolean(this.useProvidedWindowTitle);
-
-            if (this.type == 11) { // AnimalChest type ID
-                writeInt(this.horseId);
-            }
-            return;
-        }
-
-        // Known to be 1.8 or above
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            writeVarInt(this.type);
-            writeComponent(this.title);
-        } else {
-            writeString(this.legacyType);
-            writeComponent(this.title);
-            writeByte(this.legacySlots);
-            // This is only sent for horses
-            if (legacyType.equals("EntityHorse")) {
-                writeInt(this.horseId);
-            }
-        }
+        writeVarInt(this.containerId);
+        writeVarInt(this.type);
+        writeComponent(this.title);
     }
 
     @Override
     public void copy(WrapperPlayServerOpenWindow wrapper) {
         this.containerId = wrapper.containerId;
         this.type = wrapper.type;
-        this.legacyType = wrapper.legacyType;
-        this.legacySlots = wrapper.legacySlots;
-        this.horseId = wrapper.horseId;
         this.title = wrapper.title;
-        this.useProvidedWindowTitle = wrapper.useProvidedWindowTitle;
     }
 
     public int getContainerId() {
@@ -171,30 +78,6 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.type = type;
     }
 
-    public String getLegacyType() {
-        return legacyType;
-    }
-
-    public void setLegacyType(String legacyType) {
-        this.legacyType = legacyType;
-    }
-
-    public int getLegacySlots() {
-        return legacySlots;
-    }
-
-    public void setLegacySlots(int legacySlots) {
-        this.legacySlots = legacySlots;
-    }
-
-    public int getHorseId() {
-        return horseId;
-    }
-
-    public void setHorseId(int horseId) {
-        this.horseId = horseId;
-    }
-
     public Component getTitle() {
         return this.title;
     }
@@ -203,11 +86,4 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.title = title;
     }
 
-    public boolean isUseProvidedWindowTitle() {
-        return useProvidedWindowTitle;
-    }
-
-    public void setUseProvidedWindowTitle(boolean useProvidedWindowTitle) {
-        this.useProvidedWindowTitle = useProvidedWindowTitle;
-    }
 }

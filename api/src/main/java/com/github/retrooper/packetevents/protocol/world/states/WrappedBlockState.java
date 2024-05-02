@@ -138,33 +138,7 @@ public class WrappedBlockState {
     }
 
     private static byte getMappingsIndex(ClientVersion version) {
-        if (version.isOlderThan(ClientVersion.V_1_13)) {
-            return 0;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_13_1)) {
-            return 1;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_13_2)) {
-            return 2;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_14_4)) {
-            return 3;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_15_2)) {
-            return 4;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_1)) {
-            return 5;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_16_4)) {
-            return 6;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_18_2)) {
-            return 7;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_19_1)) {
-            return 8;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_19_3)) {
-            return 9;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_19_4)) {
-            return 10;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_20)) {
-            return 11;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_20_2)) {
-            return 12;
-        } else if (version.isOlderThanOrEquals(ClientVersion.V_1_20_5)) {
+        if (version.isOlderThanOrEquals(ClientVersion.V_1_20_5)) {
             return 13;
         }
         // TODO UPDATE increment index (and add previous above)
@@ -1270,7 +1244,6 @@ public class WrappedBlockState {
 
     /**
      * Global ID
-     * For pre-1.13: 4 bits of block data, 4 bits empty, 8 bits block type
      * For post-1.13: Global ID
      *
      * @return

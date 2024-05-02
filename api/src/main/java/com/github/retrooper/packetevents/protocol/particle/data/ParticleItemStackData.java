@@ -40,14 +40,7 @@ public class ParticleItemStackData extends ParticleData implements LegacyConvert
     }
 
     public static ParticleItemStackData read(PacketWrapper<?> wrapper) {
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            return new ParticleItemStackData(wrapper.readItemStack());
-        }
-        else {
-            return new ParticleItemStackData(ItemStack.builder()
-                    .type(ItemTypes.getById(wrapper.getClientVersion(), wrapper.readVarInt()))
-                    .build());
-        }
+        return new ParticleItemStackData(wrapper.readItemStack());
     }
 
     public static void write(PacketWrapper<?> wrapper, ParticleItemStackData data) {

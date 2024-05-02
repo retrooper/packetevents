@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -46,19 +45,12 @@ public class WrapperPlayServerDeathCombatEvent extends PacketWrapper<WrapperPlay
     @Override
     public void read() {
         this.playerId = readVarInt();
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
-            this.entityId = readInt();
-        }
         this.deathMessage = readComponent();
     }
 
     @Override
     public void write() {
         writeVarInt(this.playerId);
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
-            int id = entityId != null ? entityId : 0;
-            writeInt(id);
-        }
         writeComponent(this.deathMessage);
     }
 

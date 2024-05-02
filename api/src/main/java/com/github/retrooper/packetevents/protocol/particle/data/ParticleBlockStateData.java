@@ -40,26 +40,13 @@ public class ParticleBlockStateData extends ParticleData implements LegacyConver
 
     public static ParticleBlockStateData read(PacketWrapper<?> wrapper) {
         int blockID;
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            blockID = wrapper.readVarInt();
-        }
-        else if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            blockID = wrapper.readInt();
-        }
-        else {
-            blockID = wrapper.readVarInt();
-        }
+        blockID = wrapper.readVarInt();
         return new ParticleBlockStateData(WrappedBlockState.getByGlobalId(wrapper.getServerVersion()
                 .toClientVersion(), blockID));
     }
 
     public static void write(PacketWrapper<?> wrapper, ParticleBlockStateData data) {
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            wrapper.writeVarInt(data.getBlockState().getGlobalId());
-        }
-        else {
-            wrapper.writeInt(data.getBlockState().getGlobalId());
-        }
+        wrapper.writeVarInt(data.getBlockState().getGlobalId());
     }
 
     @Override

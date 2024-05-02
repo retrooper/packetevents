@@ -21,20 +21,15 @@ package com.github.retrooper.packetevents.protocol.nbt.codec;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufInputStream;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufOutputStream;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
 import com.google.gson.*;
 import com.google.gson.internal.LazilyParsedNumber;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 public class NBTCodec {
     //PacketEvents start: JSON -> NBT conversion method
@@ -149,30 +144,11 @@ public class NBTCodec {
     //PacketEvents end
 
     public static NBT readNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            try {
-                final boolean named = serverVersion.isOlderThan(ServerVersion.V_1_20_2);
-                return DefaultNBTSerializer.INSTANCE.deserializeTag(
-                        new ByteBufInputStream(byteBuf), named);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        else {
-            try {
-                final short length = ByteBufHelper.readShort(byteBuf);
-                if (length < 0) {
-                    return null;
-                }
-                Object slicedBuffer = ByteBufHelper.readSlice(byteBuf, length);
-                try (DataInputStream stream = new DataInputStream(
-                        new GZIPInputStream(new ByteBufInputStream(slicedBuffer)))) {
-                    return DefaultNBTSerializer.INSTANCE.deserializeTag(stream);
-                }
-            }
-            catch (IOException ex) {
-                throw new IllegalStateException(ex);
-            }
+        try {
+            return DefaultNBTSerializer.INSTANCE.deserializeTag(
+                    new ByteBufInputStream(byteBuf), false);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -182,35 +158,14 @@ public class NBTCodec {
     }
 
     public static void writeNBTToBuffer(Object byteBuf, ServerVersion serverVersion, NBT tag) {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            try (ByteBufOutputStream outputStream = new ByteBufOutputStream(byteBuf)) {
-                if (tag != null) {
-                    boolean named = serverVersion.isOlderThan(ServerVersion.V_1_20_2);
-                    DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, tag, named);
-                } else {
-                    DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, NBTEnd.INSTANCE);
-                }
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-        else {
-            if (tag == null) {
-                ByteBufHelper.writeShort(byteBuf, -1);
+        try (ByteBufOutputStream outputStream = new ByteBufOutputStream(byteBuf)) {
+            if (tag != null) {
+                DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, tag, false);
             } else {
-                int lengthWriterIndex = ByteBufHelper.writerIndex(byteBuf);
-                ByteBufHelper.writeShort(byteBuf, 0);
-                int writerIndexDataStart = ByteBufHelper.writerIndex(byteBuf);
-                try (DataOutputStream outputstream = new DataOutputStream(new GZIPOutputStream(new ByteBufOutputStream(byteBuf)))) {
-                    DefaultNBTSerializer.INSTANCE.serializeTag(outputstream, tag);
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
-                int writerIndexDataEnd = ByteBufHelper.writerIndex(byteBuf);
-                ByteBufHelper.writerIndex(byteBuf, lengthWriterIndex);
-                ByteBufHelper.writeShort(byteBuf, writerIndexDataEnd - writerIndexDataStart);
-                ByteBufHelper.writerIndex(byteBuf, writerIndexDataEnd);
+                DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, NBTEnd.INSTANCE);
             }
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
     }
 }

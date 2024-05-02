@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -42,24 +41,12 @@ public class WrapperPlayClientKeepAlive extends PacketWrapper<WrapperPlayClientK
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
-            this.id = readLong();
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.id = readVarInt();
-        } else {
-            this.id = readInt();
-        }
+        this.id = readLong();
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
-            writeLong(id);
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            writeVarInt((int) id);
-        } else {
-            writeInt((int) id);
-        }
+        writeLong(id);
     }
 
     @Override

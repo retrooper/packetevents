@@ -24,21 +24,12 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
-import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
-import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
-import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleSubtitle;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleText;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleTimes;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTitle;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -184,20 +175,7 @@ public class User {
     }
 
     public void sendMessage(Component component, ChatType type) {
-        ServerVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion().toServerVersion() :
-                PacketEvents.getAPI().getServerManager().getVersion();
-        PacketWrapper<?> chatPacket;
-        if (version.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            chatPacket = new WrapperPlayServerSystemChatMessage(false, component);
-        } else {
-            ChatMessage message;
-            if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-                message = new ChatMessage_v1_16(component, type, new UUID(0L, 0L));
-            } else {
-                message = new ChatMessageLegacy(component, type);
-            }
-            chatPacket = new WrapperPlayServerChatMessage(message);
-        }
+        PacketWrapper<?> chatPacket = new WrapperPlayServerSystemChatMessage(false, component);
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatPacket);
     }
 
@@ -211,33 +189,18 @@ public class User {
     public void sendTitle(Component title, Component subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         ServerVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion().toServerVersion() :
                 PacketEvents.getAPI().getServerManager().getVersion();
-        boolean modern = version.isNewerThanOrEquals(ServerVersion.V_1_17);
         PacketWrapper<?> animation;
         PacketWrapper<?> setTitle = null;
         PacketWrapper<?> setSubtitle = null;
-        if (modern) {
-            animation = new WrapperPlayServerSetTitleTimes(fadeInTicks, stayTicks, fadeOutTicks);
-            if (title != null) {
-                setTitle = new WrapperPlayServerSetTitleText(title);
-            }
-            if (subtitle != null) {
-                setSubtitle = new WrapperPlayServerSetTitleSubtitle(subtitle);
-            }
-        } else {
-            animation = new WrapperPlayServerTitle(WrapperPlayServerTitle.
-                    TitleAction.SET_TIMES_AND_DISPLAY, (Component) null, null, null,
-                    fadeInTicks, stayTicks, fadeOutTicks);
-            if (title != null) {
-                setTitle = new WrapperPlayServerTitle(WrapperPlayServerTitle.
-                        TitleAction.SET_TITLE, title, null, null,
-                        0, 0, 0);
-            }
-            if (subtitle != null) {
-                setSubtitle = new WrapperPlayServerTitle(WrapperPlayServerTitle.
-                        TitleAction.SET_SUBTITLE, null, subtitle, null,
-                        0, 0, 0);
-            }
+
+        animation = new WrapperPlayServerSetTitleTimes(fadeInTicks, stayTicks, fadeOutTicks);
+        if (title != null) {
+            setTitle = new WrapperPlayServerSetTitleText(title);
         }
+        if (subtitle != null) {
+            setSubtitle = new WrapperPlayServerSetTitleSubtitle(subtitle);
+        }
+
         sendPacket(animation);
         if (setTitle != null) {
             sendPacket(setTitle);

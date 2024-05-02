@@ -18,7 +18,6 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -28,13 +27,7 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -177,12 +170,9 @@ public class Parsers {
     public static final Parser DIMENSION = define("dimension", null, null);
     public static final Parser GAMEMODE = define("gamemode", null, null);
     public static final Parser TIME = define("time",
-            wrapper -> Collections.singletonList(wrapper.getServerVersion()
-                    .isNewerThanOrEquals(ServerVersion.V_1_19_4) ? wrapper.readInt() : 0),
+            wrapper -> Collections.singletonList(wrapper.readInt()),
             (wrapper, properties) -> {
-                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
                     wrapper.writeInt((int) properties.get(0));
-                }
             }
     );
     public static final Parser RESOURCE_OR_TAG = define("resource_or_tag",

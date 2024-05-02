@@ -20,17 +20,14 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityMetadataProvider;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Location;
-import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,48 +81,22 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
     public void read() {
         entityID = readVarInt();
         uuid = readUUID();
-        boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
-        if (v1_9) {
-            position = new Vector3d(readDouble(), readDouble(), readDouble());
-        } else {
-            position = new Vector3d(readInt() / 32.0, readInt() / 32.0, readInt() / 32.0);
-        }
+        position = new Vector3d(readDouble(), readDouble(), readDouble());
         yaw = readByte() / ROTATION_DIVISOR;
         pitch = readByte() / ROTATION_DIVISOR;
-        if (!v1_9) {
-            item = ItemTypes.getById(serverVersion.toClientVersion(), readShort());
-        } else {
-            item = ItemTypes.AIR;
-        }
-        if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            entityMetadata = readEntityMetadata();
-        } else {
-            entityMetadata = new ArrayList<>();
-        }
+        item = ItemTypes.AIR;
+        entityMetadata = new ArrayList<>();
     }
 
     @Override
     public void write() {
         writeVarInt(entityID);
         writeUUID(uuid);
-        boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
-        if (v1_9) {
-            writeDouble(position.getX());
-            writeDouble(position.getY());
-            writeDouble(position.getZ());
-        } else {
-            writeInt(MathUtil.floor(position.getX() * 32.0));
-            writeInt(MathUtil.floor(position.getY() * 32.0));
-            writeInt(MathUtil.floor(position.getZ() * 32.0));
-        }
+        writeDouble(position.getX());
+        writeDouble(position.getY());
+        writeDouble(position.getZ());
         writeByte((byte) (yaw * ROTATION_DIVISOR));
         writeByte((byte) (pitch * ROTATION_DIVISOR));
-        if (!v1_9) {
-            writeShort(item.getId(serverVersion.toClientVersion()));
-        }
-        if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            writeEntityMetadata(entityMetadata);
-        }
     }
 
     @Override

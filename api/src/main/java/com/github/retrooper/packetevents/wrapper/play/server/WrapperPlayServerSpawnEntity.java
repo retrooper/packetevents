@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -78,116 +77,47 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
     @Override
     public void read() {
         entityID = readVarInt();
-        boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
-        boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
-        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        if (v1_9) {
-            uuid = Optional.of(readUUID());
-        } else {
-            uuid = Optional.empty();
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            entityType = EntityTypes.getById(serverVersion.toClientVersion(), readVarInt());
-        } else {
-            int id = readByte();
-            entityType = EntityTypes.getByLegacyId(serverVersion.toClientVersion(), id);
-            if (entityType == null) // Should not happen but anyway
-                entityType = EntityTypes.getById(serverVersion.toClientVersion(), id);
-        }
+        uuid = Optional.of(readUUID());
+        entityType = EntityTypes.getById(serverVersion.toClientVersion(), readVarInt());
         double x;
         double y;
         double z;
-        if (v1_9) {
-            x = readDouble();
-            y = readDouble();
-            z = readDouble();
-        } else {
-            x = readInt() / 32.0;
-            y = readInt() / 32.0;
-            z = readInt() / 32.0;
-        }
+        x = readDouble();
+        y = readDouble();
+        z = readDouble();
         position = new Vector3d(x, y, z);
 
-        if (v1_15) {
-            pitch = readByte() / ROTATION_FACTOR;
-            yaw = readByte() / ROTATION_FACTOR;
-        } else {
-            yaw = readByte() / ROTATION_FACTOR;
-            pitch = readByte() / ROTATION_FACTOR;
-        }
+        pitch = readByte() / ROTATION_FACTOR;
+        yaw = readByte() / ROTATION_FACTOR;
 
-        if (v1_19) {
-            headYaw = readByte() / ROTATION_FACTOR;
-            data = readVarInt();
-        } else {
-            data = readInt();
-        }
+        headYaw = readByte() / ROTATION_FACTOR;
+        data = readVarInt();
 
-        //On 1.8 check if data > 0 before reading, or it won't be in the packet
-        if (v1_9 || data > 0) {
-            double velX = readShort() / VELOCITY_FACTOR;
-            double velY = readShort() / VELOCITY_FACTOR;
-            double velZ = readShort() / VELOCITY_FACTOR;
-            velocity = Optional.of(new Vector3d(velX, velY, velZ));
-        } else {
-            velocity = Optional.empty();
-        }
+        double velX = readShort() / VELOCITY_FACTOR;
+        double velY = readShort() / VELOCITY_FACTOR;
+        double velZ = readShort() / VELOCITY_FACTOR;
+        velocity = Optional.of(new Vector3d(velX, velY, velZ));
     }
 
     @Override
     public void write() {
         writeVarInt(entityID);
-        boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
-        boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
-        boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
-        if (v1_9) {
-            writeUUID(uuid.orElse(new UUID(0L, 0L)));
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            writeVarInt(entityType.getId(serverVersion.toClientVersion()));
-        } else {
-            if (entityType.getLegacyId(serverVersion.toClientVersion()) != -1) { // Will always be true if they use correct EntityTypes for this packet
-                writeByte(entityType.getLegacyId(serverVersion.toClientVersion()));
-            } else {
-                writeByte(entityType.getId(serverVersion.toClientVersion()));
-            }
-        }
-
-        if (v1_9) {
-            writeDouble(position.x);
-            writeDouble(position.y);
-            writeDouble(position.z);
-        } else {
-            writeInt(MathUtil.floor(position.x * 32.0));
-            writeInt(MathUtil.floor(position.y * 32.0));
-            writeInt(MathUtil.floor(position.z * 32.0));
-        }
-
-        if (v1_15) {
-            writeByte(MathUtil.floor(pitch * ROTATION_FACTOR));
-            writeByte(MathUtil.floor(yaw * ROTATION_FACTOR));
-        } else {
-            writeByte(MathUtil.floor(yaw * ROTATION_FACTOR));
-            writeByte(MathUtil.floor(pitch * ROTATION_FACTOR));
-        }
-
-        if (v1_19) {
-            writeByte(MathUtil.floor(headYaw * ROTATION_FACTOR));
-            writeVarInt(data);
-        } else {
-            writeInt(data);
-        }
-
-        //On 1.8 check if data > 0 before reading, or it won't be in the packet
-        if (v1_9 || data > 0) {
-            Vector3d vel = velocity.orElse(new Vector3d(-1, -1, -1));
-            int velX = (int) (vel.x * VELOCITY_FACTOR);
-            int velY = (int) (vel.y * VELOCITY_FACTOR);
-            int velZ = (int) (vel.z * VELOCITY_FACTOR);
-            writeShort(velX);
-            writeShort(velY);
-            writeShort(velZ);
-        }
+        writeUUID(uuid.orElse(new UUID(0L, 0L)));
+        writeVarInt(entityType.getId(serverVersion.toClientVersion()));
+        writeDouble(position.x);
+        writeDouble(position.y);
+        writeDouble(position.z);
+        writeByte(MathUtil.floor(pitch * ROTATION_FACTOR));
+        writeByte(MathUtil.floor(yaw * ROTATION_FACTOR));
+        writeByte(MathUtil.floor(headYaw * ROTATION_FACTOR));
+        writeVarInt(data);
+        Vector3d vel = velocity.orElse(new Vector3d(-1, -1, -1));
+        int velX = (int) (vel.x * VELOCITY_FACTOR);
+        int velY = (int) (vel.y * VELOCITY_FACTOR);
+        int velZ = (int) (vel.z * VELOCITY_FACTOR);
+        writeShort(velX);
+        writeShort(velY);
+        writeShort(velZ);
     }
 
     @Override

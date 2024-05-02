@@ -37,46 +37,4 @@ public class Statistics {
     public static Statistic getById(String id) {
         return STATISTIC_MAP.get(id);
     }
-
-    static {
-        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
-
-        if (version.isOlderThan(ServerVersion.V_1_12_2)) {
-
-            NBTCompound mapping = MappingHelper.decompress("mappings/stats/statistics");
-
-            if (version.isOlderThanOrEquals(ServerVersion.V_1_8_3)) {
-                mapping = mapping.getCompoundTagOrThrow("V_1_8");
-            } else {
-                mapping = mapping.getCompoundTagOrThrow("V_1_12");
-            }
-
-            for (Map.Entry<String, NBT> entry : mapping.getTags().entrySet()) {
-                Component value = AdventureSerializer.parseComponent(((NBTString) entry.getValue()).getValue());
-
-                Statistic statistic = new Statistic() {
-                    @Override
-                    public String getId() {
-                        return entry.getKey();
-                    }
-
-                    @Override
-                    public Component display() {
-                        return value;
-                    }
-
-                    @Override
-                    public boolean equals(Object obj) {
-                        if (obj instanceof Statistic) {
-                            return ((Statistic) obj).getId().equals(this.getId());
-                        }
-                        return false;
-                    }
-                };
-
-                STATISTIC_MAP.put(entry.getKey(), statistic);
-            }
-        }
-    }
-
 }

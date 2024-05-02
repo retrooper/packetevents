@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -70,7 +69,7 @@ public class WrapperPlayServerTitle extends PacketWrapper<WrapperPlayServerTitle
 
     @Override
     public void read() {
-        boolean modern = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11);
+        boolean modern = true;
         int id = readVarInt();
         if (modern) {
             action = TitleAction.fromId(id);
@@ -108,7 +107,7 @@ public class WrapperPlayServerTitle extends PacketWrapper<WrapperPlayServerTitle
 
     @Override
     public void write() {
-        boolean modern = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11);
+        boolean modern = true;
         int id = modern ? action.getId() : action.getLegacyId();
         writeVarInt(id);
         switch (action) {

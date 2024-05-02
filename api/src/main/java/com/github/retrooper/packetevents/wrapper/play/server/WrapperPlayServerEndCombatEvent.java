@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -43,18 +42,11 @@ public class WrapperPlayServerEndCombatEvent extends PacketWrapper<WrapperPlaySe
     @Override
     public void read() {
         this.duration = readVarInt();
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
-            this.entityId = readInt();
-        }
     }
 
     @Override
     public void write() {
         writeVarInt(duration);
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
-            int id = entityId != null ? entityId : 0;
-            writeInt(id);
-        }
     }
 
     @Override

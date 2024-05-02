@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
@@ -45,52 +44,24 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
 
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            entityId = readInt();
-        } else {
-            entityId = readVarInt();
-        }
+        entityId = readVarInt();
         equipment = new ArrayList<>();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            byte value;
-            do {
-                value = readByte();
-                EquipmentSlot equipmentSlot = EquipmentSlot.getById(serverVersion, value & Byte.MAX_VALUE);
-                ItemStack itemStack = readItemStack();
-                equipment.add(new Equipment(equipmentSlot, itemStack));
-            } while ((value & Byte.MIN_VALUE) != 0);
-        } else {
-            EquipmentSlot slot;
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                slot = EquipmentSlot.getById(serverVersion, readVarInt());
-            } else {
-                slot = EquipmentSlot.getById(serverVersion, readShort());
-            }
-            equipment.add(new Equipment(slot, readItemStack()));
-        }
+        byte value;
+        do {
+            value = readByte();
+            EquipmentSlot equipmentSlot = EquipmentSlot.getById(serverVersion, value & Byte.MAX_VALUE);
+            ItemStack itemStack = readItemStack();
+            equipment.add(new Equipment(equipmentSlot, itemStack));
+        } while ((value & Byte.MIN_VALUE) != 0);
     }
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeInt(entityId);
-        } else {
-            writeVarInt(entityId);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            for (int i = 0; i < this.equipment.size(); i++) {
-                Equipment equipment = this.equipment.get(i);
-                boolean last = i == (this.equipment.size() - 1);
-                writeByte(last ? equipment.getSlot().getId(serverVersion) : (equipment.getSlot().getId(serverVersion) | Byte.MIN_VALUE));
-                writeItemStack(equipment.getItem());
-            }
-        } else {
-            Equipment equipment = this.equipment.get(0);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                writeVarInt(equipment.getSlot().getId(serverVersion));
-            } else {
-                writeShort(equipment.getSlot().getId(serverVersion));
-            }
+        writeVarInt(entityId);
+        for (int i = 0; i < this.equipment.size(); i++) {
+            Equipment equipment = this.equipment.get(i);
+            boolean last = i == (this.equipment.size() - 1);
+            writeByte(last ? equipment.getSlot().getId(serverVersion) : (equipment.getSlot().getId(serverVersion) | Byte.MIN_VALUE));
             writeItemStack(equipment.getItem());
         }
     }

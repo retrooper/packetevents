@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -45,19 +44,8 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.blockPosition = new Vector3i(readLong());
-        } else {
-            int x = readInt();
-            int y = readShort();
-            int z = readInt();
-            this.blockPosition = new Vector3i(x, y, z);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
-            isFrontText = readBoolean();
-        } else {
-            isFrontText = true;
-        }
+        this.blockPosition = new Vector3i(readLong());
+        isFrontText = readBoolean();
         textLines = new String[4];
         for (int i = 0; i < 4; i++) {
             this.textLines[i] = readString(384);
@@ -66,17 +54,9 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            long positionVector = blockPosition.getSerializedPosition();
-            writeLong(positionVector);
-        } else {
-            writeInt(blockPosition.x);
-            writeShort(blockPosition.y);
-            writeInt(blockPosition.z);
-        }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
-            writeBoolean(isFrontText);
-        }
+        long positionVector = blockPosition.getSerializedPosition();
+        writeLong(positionVector);
+        writeBoolean(isFrontText);
         for (int i = 0; i < 4; i++) {
             writeString(textLines[i]);
         }

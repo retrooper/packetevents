@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
@@ -42,11 +41,7 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             this.interactionHand = InteractionHand.getById(readVarInt());
-        } else {
-            this.interactionHand = InteractionHand.MAIN_HAND;
-        }
     }
 
     @Override
@@ -56,9 +51,7 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeVarInt(interactionHand.getId());
-        }
     }
 
     /**

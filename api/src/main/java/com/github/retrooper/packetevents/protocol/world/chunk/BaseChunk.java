@@ -19,16 +19,8 @@
 package com.github.retrooper.packetevents.protocol.world.chunk;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16.Chunk_v1_9;
-import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_7.Chunk_v1_7;
-import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8.Chunk_v1_8;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v_1_18.Chunk_v1_18;
-import com.github.retrooper.packetevents.protocol.world.chunk.palette.DataPalette;
-import com.github.retrooper.packetevents.protocol.world.chunk.palette.ListPalette;
-import com.github.retrooper.packetevents.protocol.world.chunk.palette.PaletteType;
-import com.github.retrooper.packetevents.protocol.world.chunk.storage.LegacyFlexibleStorage;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
 public interface BaseChunk {
@@ -64,15 +56,6 @@ public interface BaseChunk {
     boolean isEmpty();
 
     static BaseChunk create() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            return new Chunk_v1_18();
-        } else if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            return new Chunk_v1_9(0, DataPalette.createForChunk());
-        } else if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            return new Chunk_v1_9(0, new DataPalette(new ListPalette(4), new LegacyFlexibleStorage(4, 4096), PaletteType.CHUNK));
-        } else if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            return new Chunk_v1_8(new ShortArray3d(4096), null, null);
-        }
-        return new Chunk_v1_7(false, true);
+        return new Chunk_v1_18();
     }
 }

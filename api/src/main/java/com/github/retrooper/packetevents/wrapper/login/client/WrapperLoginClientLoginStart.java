@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.login.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.crypto.SignatureData;
@@ -57,35 +56,15 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     @Override
     public void read() {
         this.username = readString(16);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
-                //Removed in 1.19.4
-                this.signatureData = readOptional(PacketWrapper::readSignatureData);
-            }
-           
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
-                this.playerUUID = readUUID();
-            } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-                this.playerUUID = readOptional(PacketWrapper::readUUID);
-            }
-        }
+
+        this.playerUUID = readUUID();
     }
 
     @Override
     public void write() {
         writeString(username, 16);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_3)) {
-                //Removed in 1.19.4
-                writeOptional(signatureData, PacketWrapper::writeSignatureData);
-            }
-           
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
-                writeUUID(java.util.Objects.requireNonNull(playerUUID, "playerUUID is required for >= 1.20.2"));
-            } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
-                writeOptional(playerUUID, PacketWrapper::writeUUID);
-            }
-        }
+
+        writeUUID(java.util.Objects.requireNonNull(playerUUID, "playerUUID is required for >= 1.20.2"));
     }
 
     @Override

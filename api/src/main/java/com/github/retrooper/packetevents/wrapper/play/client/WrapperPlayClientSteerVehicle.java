@@ -27,7 +27,6 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
  * <p>
  * This packet is for sending player inputs to the server
  * <p>
- * On 1.8 and older, vehicle control is server sided.  This packet includes inputs for movement.
  * On 1.9 and newer, plugins may use this packet to create vehicles out of ordinary entities.
  */
 public class WrapperPlayClientSteerVehicle extends PacketWrapper<WrapperPlayClientSteerVehicle> {

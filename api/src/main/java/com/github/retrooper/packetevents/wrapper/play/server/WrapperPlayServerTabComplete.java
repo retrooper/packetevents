@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -58,50 +57,33 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            transactionID = Optional.of(readVarInt());
-            int begin = readVarInt();
-            int len = readVarInt();
-            int matchLength = readVarInt();
-            commandRange = Optional.of(new CommandRange(begin, begin + len));
-            commandMatches = new ArrayList<>(matchLength);
-            for (int i = 0; i < matchLength; i++) {
-                String text = readString();
-                Component tooltip = readOptional(PacketWrapper::readComponent);
-                CommandMatch commandMatch = new CommandMatch(text, tooltip);
-                commandMatches.add(commandMatch);
-            }
-        } else {
-            int matchLength = readVarInt();
-            commandMatches = new ArrayList<>(matchLength);
-            for (int i = 0; i < matchLength; i++) {
-                String text = readString();
-                CommandMatch commandMatch = new CommandMatch(text, null);
-                commandMatches.add(commandMatch);
-            }
+        transactionID = Optional.of(readVarInt());
+        int begin = readVarInt();
+        int len = readVarInt();
+        int matchLength = readVarInt();
+        commandRange = Optional.of(new CommandRange(begin, begin + len));
+        commandMatches = new ArrayList<>(matchLength);
+        for (int i = 0; i < matchLength; i++) {
+            String text = readString();
+            Component tooltip = readOptional(PacketWrapper::readComponent);
+            CommandMatch commandMatch = new CommandMatch(text, tooltip);
+            commandMatches.add(commandMatch);
         }
     }
 
     @Override
     public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeVarInt(transactionID.orElse(-1));
-            CommandRange commandRange = this.commandRange.get();
-            writeVarInt(commandRange.getBegin());
-            writeVarInt(commandRange.getLength());
-            writeVarInt(commandMatches.size());
-            for (CommandMatch match : commandMatches) {
-                writeString(match.getText());
-                boolean hasTooltip = match.getTooltip().isPresent();
-                writeBoolean(hasTooltip);
-                if (hasTooltip) {
-                    writeComponent(match.getTooltip().get());
-                }
-            }
-        } else {
-            writeVarInt(commandMatches.size());
-            for (CommandMatch match : commandMatches) {
-                writeString(match.getText());
+        writeVarInt(transactionID.orElse(-1));
+        CommandRange commandRange = this.commandRange.get();
+        writeVarInt(commandRange.getBegin());
+        writeVarInt(commandRange.getLength());
+        writeVarInt(commandMatches.size());
+        for (CommandMatch match : commandMatches) {
+            writeString(match.getText());
+            boolean hasTooltip = match.getTooltip().isPresent();
+            writeBoolean(hasTooltip);
+            if (hasTooltip) {
+                writeComponent(match.getTooltip().get());
             }
         }
     }
