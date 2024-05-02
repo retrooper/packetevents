@@ -56,10 +56,10 @@ public final class SpigotReflectionUtil {
     public static final String OBC_PACKAGE;
 
     static {
+        String cbPackage = Bukkit.getServer().getClass().getPackage().getName();
         String temp;
         try {
-            temp = Bukkit.getServer().getClass().getPackage().getName()
-                    .replace(".", ",").split(",")[3];
+            temp = cbPackage.replace(".", ",").split(",")[3];
         } catch (Exception ex) {
             temp = "";
         }
@@ -67,7 +67,7 @@ public final class SpigotReflectionUtil {
 
         LEGACY_NMS_PACKAGE = "net.minecraft.server." + MODIFIED_PACKAGE_NAME + ".";
         //Example: org.bukkit.craftbukkit.v1_8_R3.
-        OBC_PACKAGE = "org.bukkit.craftbukkit." + MODIFIED_PACKAGE_NAME + ".";
+        OBC_PACKAGE = cbPackage + ".";
     }
 
     //Minecraft classes
