@@ -143,7 +143,10 @@ public class AsyncScheduler {
         }
 
         try {
-            return new TaskWrapper(asyncRunAtFixedRateMethod.invoke(asyncScheduler, plugin, task, initialDelayTicks, periodTicks));
+            return new TaskWrapper(asyncRunAtFixedRateMethod.invoke(asyncScheduler, plugin, task,
+                    convertTimeToTicks(initialDelayTicks, TimeUnit.MILLISECONDS),
+                    convertTimeToTicks(periodTicks, TimeUnit.MILLISECONDS),
+                    TimeUnit.MILLISECONDS));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
