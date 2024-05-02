@@ -58,11 +58,18 @@ public class JsonArrayCompressionStrategy extends JsonCompressionStrategy {
             final CompoundTag versionTag = new CompoundTag();
             final CompoundTag additions = new CompoundTag();
             final CompoundTag removals = new CompoundTag();
+            final CompoundTag changes = new CompoundTag();
             for (final IndexedDiff<String> d : diff) {
                 if (d instanceof IndexedDiff.Addition) {
                     additions.put(String.valueOf(d.getIndex()), new StringTag(d.getValue()));
                 } else if (d instanceof IndexedDiff.Removal) {
                     removals.put(String.valueOf(d.getIndex()), new StringTag(d.getValue()));
+                } else if (d instanceof IndexedDiff.Changed) {
+                    final IndexedDiff.Changed<String> changed = (IndexedDiff.Changed<String>) d;
+                    final ListTag listTag = new ListTag(StringTag.class);
+                    listTag.add(new StringTag(changed.getOldValue()));
+                    listTag.add(new StringTag(changed.getValue()));
+                    changes.put(String.valueOf(d.getIndex()), listTag);
                 }
             }
 

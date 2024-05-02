@@ -83,20 +83,21 @@ public final class CompressionUtil {
     public static <T> List<IndexedDiff<T>> getDiff(final List<T> last, final List<T> current) {
         final List<IndexedDiff<T>> diff = new ArrayList<>();
 
-        int index = 0;
-        for (final T t : last) {
-            if (!current.contains(t)) {
-                diff.add(new IndexedDiff.Removal<>(index, t));
+        final List<T> copy = new ArrayList<>(current);
+        for (int i = 0; i < last.size(); i++) {
+            if (copy.isEmpty()) {
+                diff.add(new IndexedDiff.Removal<>(i, last.get(i)));
+                continue;
             }
-            index++;
+
+            final T value = copy.remove(0);
+            if (!value.equals(last.get(i))) {
+                diff.add(new IndexedDiff.Changed<>(i, value, last.get(i)));
+            }
         }
 
-        index = 0;
-        for (final T t : current) {
-            if (!last.contains(t)) {
-                diff.add(new IndexedDiff.Addition<>(index, t));
-            }
-            index++;
+        for (int i = 0; i < copy.size(); i++) {
+            diff.add(new IndexedDiff.Addition<>(i, copy.get(i)));
         }
 
         return diff;

@@ -53,4 +53,22 @@ public class IndexedDiff<T> extends Diff<T> {
         }
     }
 
+    public static class Changed<T> extends IndexedDiff<T> {
+        private final T oldValue;
+
+        public Changed(final int index, final T value, final T oldValue) {
+            super(index, value);
+            this.oldValue = oldValue;
+        }
+
+        public T getOldValue() {
+            return oldValue;
+        }
+
+        @Override
+        public String toString() {
+            return "~ " + getIndex() + " : " + getOldValue() + " -> " + getValue();
+        }
+    }
+
 }
