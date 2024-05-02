@@ -40,7 +40,7 @@ import io.github.retrooper.packetevents.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.util.BukkitLogManager;
-import io.github.retrooper.packetevents.util.FoliaCompatUtil;
+import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
@@ -49,8 +49,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SpigotPacketEventsBuilder {
     private static PacketEventsAPI<Plugin> API_INSTANCE;
@@ -159,7 +157,7 @@ public class SpigotPacketEventsBuilder {
                                 injector.inject();
                             }
                         };
-                        FoliaCompatUtil.runTaskOnInit(plugin, lateBindTask);
+                        FoliaScheduler.runTaskOnInit(plugin, lateBindTask);
                     }
 
                     // Let people override this, at their own risk
