@@ -126,6 +126,32 @@ public class AsyncScheduler {
     }
 
     /**
+     * Schedules the specified task to be executed asynchronously after the initial delay has passed, and then periodically executed.
+     *
+     * @param plugin   Plugin which owns the specified task.
+     * @param task     Specified task.
+     * @param initialDelayTicks    The time delay in ticks to pass before the task should be executed.
+     * @param periodTicks   The time period in ticks between each task execution.
+     * @return {@link TaskWrapper} instance representing a wrapped task
+     */
+    public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
+
+        if (initialDelayTicks < 1) initialDelayTicks = 1;
+
+        if (!isFolia) {
+            return new TaskWrapper(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
+        }
+
+        try {
+            return new TaskWrapper(asyncRunAtFixedRateMethod.invoke(asyncScheduler, plugin, task, initialDelayTicks, periodTicks));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
      * Attempts to cancel all tasks scheduled by the specified plugin.
      *
      * @param plugin Specified plugin.
