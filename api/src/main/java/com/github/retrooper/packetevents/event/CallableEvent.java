@@ -18,9 +18,6 @@
 
 package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.event.PacketEvent;
-import com.github.retrooper.packetevents.event.PacketListenerAbstract;
-
 /**
  * The {@link PacketEvent} implements this interface.
  * Every inbuilt event should implement the {@link #call(PacketListenerCommon)} method.

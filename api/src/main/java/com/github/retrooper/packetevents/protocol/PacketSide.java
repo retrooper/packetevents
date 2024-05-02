@@ -24,8 +24,7 @@ public enum PacketSide {
     public PacketSide getOpposite() {
         if (this == CLIENT) {
             return SERVER;
-        }
-        else {
+        } else {
             return CLIENT;
         }
     }

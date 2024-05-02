@@ -61,7 +61,7 @@ public class UpdateChecker {
         try {
             newVersion = new PEVersion(checkLatestReleasedVersion());
         } catch (Exception ex) {
-            PacketEvents.getAPI().getLogManager().warn("Failed to check for updates. " + (ex.getCause() != null ? ex.getCause().getClass().getName()+ ": " + ex.getCause().getMessage() : ex.getMessage()));
+            PacketEvents.getAPI().getLogManager().warn("Failed to check for updates. " + (ex.getCause() != null ? ex.getCause().getClass().getName() + ": " + ex.getCause().getMessage() : ex.getMessage()));
             return UpdateCheckerStatus.FAILED;
         }
         if (localVersion.isOlderThan(newVersion)) {

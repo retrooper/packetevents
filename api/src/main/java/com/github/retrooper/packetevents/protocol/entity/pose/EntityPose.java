@@ -41,13 +41,13 @@ public enum EntityPose {
     SHOOTING,
     INHALING;
 
-   public int getId(ClientVersion version) {
-       return ordinal();
-   }
+    public int getId(ClientVersion version) {
+        return ordinal();
+    }
 
-   public static EntityPose getById(ClientVersion version, int id) {
-       // The LONG_JUMPING pose was added in 1.17, shifting things by 1
-       // The SITTING pose was added in 1.19.3, shifting Warden's poses by 1
-       return values()[id];
-   }
+    public static EntityPose getById(ClientVersion version, int id) {
+        // The LONG_JUMPING pose was added in 1.17, shifting things by 1
+        // The SITTING pose was added in 1.19.3, shifting Warden's poses by 1
+        return values()[id];
+    }
 }

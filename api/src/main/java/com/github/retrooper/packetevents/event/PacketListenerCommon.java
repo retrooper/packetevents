@@ -18,10 +18,6 @@
 
 package com.github.retrooper.packetevents.event;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Abstract packet listener.
  *

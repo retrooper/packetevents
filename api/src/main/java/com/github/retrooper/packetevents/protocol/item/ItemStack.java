@@ -277,7 +277,7 @@ public class ItemStack {
             List<NBTCompound> list = new ArrayList<>();
             for (Enchantment enchantment : enchantments) {
                 NBTCompound compound = new NBTCompound();
-                    compound.setTag("id", new NBTString(enchantment.getType().getName().toString()));
+                compound.setTag("id", new NBTString(enchantment.getType().getName().toString()));
                 compound.setTag("lvl", new NBTShort((short) enchantment.getLevel()));
                 list.add(compound);
             }

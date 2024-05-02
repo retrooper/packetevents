@@ -28,7 +28,8 @@ import org.jetbrains.annotations.NotNull;
 public interface PlayerManager {
     int getPing(@NotNull Object player);
 
-    @NotNull ClientVersion getClientVersion(@NotNull Object player);
+    @NotNull
+    ClientVersion getClientVersion(@NotNull Object player);
 
     Object getChannel(@NotNull Object player);
 
@@ -41,6 +42,7 @@ public interface PlayerManager {
     default void sendPacket(@NotNull Object player, @NotNull Object byteBuf) {
         PacketEvents.getAPI().getProtocolManager().sendPacket(getChannel(player), byteBuf);
     }
+
     default void sendPacket(@NotNull Object player, @NotNull PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().sendPacket(getChannel(player), wrapper);
     }

@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRespawn> {
-   
+
     public static final byte KEEP_NOTHING = 0;
     public static final byte KEEP_ATTRIBUTES = 0b01;
     public static final byte KEEP_ENTITY_DATA = 0b10;
@@ -196,7 +196,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     public void setKeepingAllPlayerData(boolean keepAllPlayerData) {
         this.keptData = keepAllPlayerData ? KEEP_ALL_DATA : KEEP_ENTITY_DATA;
     }
-   
+
     public byte getKeptData() {
         return keptData;
     }

@@ -18,23 +18,19 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.impl.v_1_18;
 
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.DataPalette;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.PaletteType;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import org.jetbrains.annotations.NotNull;
 
 public class Chunk_v1_18 implements BaseChunk {
     private static final int AIR = 0;
 
     private int blockCount;
-    private @NotNull
-    final DataPalette chunkData;
-    private @NotNull
-    final DataPalette biomeData;
+    private @NotNull final DataPalette chunkData;
+    private @NotNull final DataPalette biomeData;
 
     public Chunk_v1_18() {
         this(0, DataPalette.createForChunk(), DataPalette.createForBiome());
@@ -46,7 +42,7 @@ public class Chunk_v1_18 implements BaseChunk {
         this.biomeData = biomeData;
     }
 
-    public static Chunk_v1_18 read(NetStreamInput in)  {
+    public static Chunk_v1_18 read(NetStreamInput in) {
         int blockCount = in.readShort();
 
         DataPalette chunkPalette = DataPalette.read(in, PaletteType.CHUNK);
@@ -54,7 +50,7 @@ public class Chunk_v1_18 implements BaseChunk {
         return new Chunk_v1_18(blockCount, chunkPalette, biomePalette);
     }
 
-    public static void write(NetStreamOutput out, Chunk_v1_18 section)  {
+    public static void write(NetStreamOutput out, Chunk_v1_18 section) {
         out.writeShort(section.blockCount);
         DataPalette.write(out, section.chunkData);
         DataPalette.write(out, section.biomeData);

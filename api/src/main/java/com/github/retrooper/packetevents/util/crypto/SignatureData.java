@@ -42,7 +42,7 @@ public class SignatureData {
         return timestamp;
     }
 
-   public PublicKey getPublicKey() {
+    public PublicKey getPublicKey() {
         return publicKey;
     }
 

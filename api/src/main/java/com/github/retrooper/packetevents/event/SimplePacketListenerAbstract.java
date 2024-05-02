@@ -20,10 +20,6 @@ package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.event.simple.*;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-
 public abstract class SimplePacketListenerAbstract extends PacketListenerCommon {
     public SimplePacketListenerAbstract(PacketListenerPriority priority) {
         super(priority);
@@ -41,11 +37,9 @@ public abstract class SimplePacketListenerAbstract extends PacketListenerCommon 
             onPacketStatusReceive((PacketStatusReceiveEvent) event);
         } else if (event instanceof PacketLoginReceiveEvent) {
             onPacketLoginReceive((PacketLoginReceiveEvent) event);
-        }
-        else if (event instanceof PacketConfigReceiveEvent) {
+        } else if (event instanceof PacketConfigReceiveEvent) {
             onPacketConfigReceive((PacketConfigReceiveEvent) event);
-        }
-        else if (event instanceof PacketPlayReceiveEvent) {
+        } else if (event instanceof PacketPlayReceiveEvent) {
             onPacketPlayReceive((PacketPlayReceiveEvent) event);
         }
     }
@@ -56,11 +50,9 @@ public abstract class SimplePacketListenerAbstract extends PacketListenerCommon 
             onPacketStatusSend((PacketStatusSendEvent) event);
         } else if (event instanceof PacketLoginSendEvent) {
             onPacketLoginSend((PacketLoginSendEvent) event);
-        }
-        else if (event instanceof PacketConfigSendEvent) {
+        } else if (event instanceof PacketConfigSendEvent) {
             onPacketConfigSend((PacketConfigSendEvent) event);
-        }
-        else if (event instanceof PacketPlaySendEvent) {
+        } else if (event instanceof PacketPlaySendEvent) {
             onPacketPlaySend((PacketPlaySendEvent) event);
         }
     }

@@ -51,6 +51,7 @@ public class BoundingBox {
     public static BoundingBox of(@NotNull Vector3d center, double x, double y, double z) {
         return new BoundingBox(center.getX() - x, center.getY() - y, center.getZ() - z, center.getX() + x, center.getY() + y, center.getZ() + z);
     }
+
     @NotNull
     public static BoundingBox deserialize(@NotNull Map<String, Object> args) {
         double minX = 0.0D;

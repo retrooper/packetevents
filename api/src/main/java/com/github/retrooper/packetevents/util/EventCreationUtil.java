@@ -43,7 +43,7 @@ public class EventCreationUtil {
     }
 
     public static PacketSendEvent createSendEvent(Object channel, User user, Object player, Object buffer,
-                                                  boolean autoProtocolTranslation) throws PacketProcessException{
+                                                  boolean autoProtocolTranslation) throws PacketProcessException {
         switch (user.getEncoderState()) {
             case HANDSHAKING:
                 return new PacketHandshakeSendEvent(channel, user, player, buffer, autoProtocolTranslation);

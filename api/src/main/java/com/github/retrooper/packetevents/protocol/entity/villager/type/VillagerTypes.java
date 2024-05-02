@@ -42,12 +42,12 @@ public class VillagerTypes {
             }
         };
         VILLAGER_TYPE_MAP.put(type.getName().toString(), type);
-        VILLAGER_TYPE_ID_MAP.put((byte)type.getId(), type);
+        VILLAGER_TYPE_ID_MAP.put((byte) type.getId(), type);
         return type;
     }
 
     public static VillagerType getById(int id) {
-        return VILLAGER_TYPE_ID_MAP.get((byte)id);
+        return VILLAGER_TYPE_ID_MAP.get((byte) id);
     }
 
 

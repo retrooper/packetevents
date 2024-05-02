@@ -37,7 +37,7 @@ public class MappingHelper {
 
     public static NBTCompound decompress(final String path) {
         try (final DataInputStream dataInput = new DataInputStream(new GZIPInputStream(new BufferedInputStream(
-                PacketEvents.getAPI().getSettings().getResourceProvider().apply( "assets/" + path + ".nbt"))))) {
+                PacketEvents.getAPI().getSettings().getResourceProvider().apply("assets/" + path + ".nbt"))))) {
             return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(dataInput);
         } catch (Exception e) {
             throw new RuntimeException("Cannot find resource file " + path + ".nbt", e);
@@ -95,7 +95,7 @@ public class MappingHelper {
         return diffs;
     }
 
-    public static  <T extends MappedEntity> void registerMapping(TypesBuilder builder, Map<String, T> typeMap, Map<Byte, Map<Integer, T>> typeIdMap, T type) {
+    public static <T extends MappedEntity> void registerMapping(TypesBuilder builder, Map<String, T> typeMap, Map<Byte, Map<Integer, T>> typeIdMap, T type) {
         typeMap.put(type.getName().toString(), type);
         for (ClientVersion version : builder.getVersions()) {
             int index = builder.getDataIndex(version);

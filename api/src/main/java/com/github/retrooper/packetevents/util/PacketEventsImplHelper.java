@@ -30,12 +30,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 public class PacketEventsImplHelper {
-    
-    public static PacketSendEvent handleClientBoundPacket(Object channel, 
-                                                              User user, 
-                                                              Object player, 
-                                                              Object buffer, 
-                                                             boolean autoProtocolTranslation) throws Exception {
+
+    public static PacketSendEvent handleClientBoundPacket(Object channel,
+                                                          User user,
+                                                          Object player,
+                                                          Object buffer,
+                                                          boolean autoProtocolTranslation) throws Exception {
         if (!ByteBufHelper.isReadable(buffer)) return null;
 
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
