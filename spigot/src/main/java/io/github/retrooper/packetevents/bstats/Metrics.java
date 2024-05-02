@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
+
 //This file was taken from bStats https://github.com/Bastian/bStats-Metrics
 public class Metrics {
 

@@ -18,7 +18,6 @@
 
 package io.github.retrooper.packetevents.util.viaversion;
 
-import com.github.retrooper.packetevents.util.reflection.Reflection;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -69,6 +68,7 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
         }
         return -1;
     }
+
     @Override
     public Class<?> getUserConnectionClass() {
         load();

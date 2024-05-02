@@ -24,12 +24,17 @@ import com.github.difflib.algorithm.myers.MeyersDiff;
 import com.github.difflib.patch.*;
 import com.github.retrooper.CompressionUtil;
 import com.github.retrooper.EntryVersion;
-import com.github.steveice10.opennbt.tag.builtin.*;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class JsonObjectCompressionStrategy extends JsonCompressionStrategy {
 

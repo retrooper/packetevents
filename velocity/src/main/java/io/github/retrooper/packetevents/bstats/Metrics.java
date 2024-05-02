@@ -26,6 +26,7 @@ import java.util.zip.GZIPOutputStream;
 
 //This file was taken from bStats https://github.com/Bastian/bStats-Metrics
 //and has been modified to fit our needs (compactness by fitting it into one file)
+
 /**
  * bStats collects some data for plugin authors.
  * <p>
@@ -162,8 +163,8 @@ public class Metrics {
         enabled = getConfigValue("enabled", lines).map("true"::equals).orElse(true);
         serverUUID = getConfigValue("server-uuid", lines).orElse(null);
         logErrors = getConfigValue("log-errors", lines).map("true"::equals).orElse(false);
-        logSentData =  getConfigValue("log-sent-data", lines).map("true"::equals).orElse(false);
-        logResponseStatusText =  getConfigValue("log-response-status-text", lines).map("true"::equals).orElse(false);
+        logSentData = getConfigValue("log-sent-data", lines).map("true"::equals).orElse(false);
+        logResponseStatusText = getConfigValue("log-response-status-text", lines).map("true"::equals).orElse(false);
 
         if (serverUUID == null) {
             if (recreateWhenMalformed) {
@@ -199,7 +200,7 @@ public class Metrics {
     /**
      * Gets a config setting from the given list of lines of the file.
      *
-     * @param key The key for the setting.
+     * @param key   The key for the setting.
      * @param lines The lines of the file.
      * @return The value of the setting.
      */
@@ -231,7 +232,7 @@ public class Metrics {
     /**
      * Writes the given lines to the given file.
      *
-     * @param file The file to write to.
+     * @param file  The file to write to.
      * @param lines The lines to write.
      */
     private void writeFile(File file, List<String> lines) throws IOException {
@@ -256,7 +257,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public SimplePie(String chartId, Callable<String> callable) {
@@ -300,7 +301,7 @@ public class Metrics {
         /**
          * Appends a string field to the JSON.
          *
-         * @param key The key of the field.
+         * @param key   The key of the field.
          * @param value The value of the field.
          * @return A reference to this object.
          */
@@ -315,7 +316,7 @@ public class Metrics {
         /**
          * Appends an integer field to the JSON.
          *
-         * @param key The key of the field.
+         * @param key   The key of the field.
          * @param value The value of the field.
          * @return A reference to this object.
          */
@@ -327,7 +328,7 @@ public class Metrics {
         /**
          * Appends an object to the JSON.
          *
-         * @param key The key of the field.
+         * @param key    The key of the field.
          * @param object The object.
          * @return A reference to this object.
          */
@@ -342,7 +343,7 @@ public class Metrics {
         /**
          * Appends a string array to the JSON.
          *
-         * @param key The key of the field.
+         * @param key    The key of the field.
          * @param values The string array.
          * @return A reference to this object.
          */
@@ -360,7 +361,7 @@ public class Metrics {
         /**
          * Appends an integer array to the JSON.
          *
-         * @param key The key of the field.
+         * @param key    The key of the field.
          * @param values The integer array.
          * @return A reference to this object.
          */
@@ -378,7 +379,7 @@ public class Metrics {
         /**
          * Appends an object array to the JSON.
          *
-         * @param key The key of the field.
+         * @param key    The key of the field.
          * @param values The integer array.
          * @return A reference to this object.
          */
@@ -396,7 +397,7 @@ public class Metrics {
         /**
          * Appends a field to the object.
          *
-         * @param key The key of the field.
+         * @param key          The key of the field.
          * @param escapedValue The escaped value of the field.
          */
         private void appendFieldUnescaped(String key, String escapedValue) {
@@ -544,23 +545,23 @@ public class Metrics {
         /**
          * Creates a new MetricsBase class instance.
          *
-         * @param platform The platform of the service.
-         * @param serviceId The id of the service.
-         * @param serverUuid The server uuid.
-         * @param enabled Whether or not data sending is enabled.
-         * @param appendPlatformDataConsumer A consumer that receives a {@code JsonObjectBuilder} and appends all
-         *                                   platform-specific data.
-         * @param appendServiceDataConsumer A consumer that receives a {@code JsonObjectBuilder} and appends all
-         *                                  service-specific data.
-         * @param submitTaskConsumer A consumer that takes a runnable with the submit task.
-         *                           This can be used to delegate the data collection to a another thread to prevent
-         *                           errors caused by concurrency. Can be {@code null}.
+         * @param platform                    The platform of the service.
+         * @param serviceId                   The id of the service.
+         * @param serverUuid                  The server uuid.
+         * @param enabled                     Whether or not data sending is enabled.
+         * @param appendPlatformDataConsumer  A consumer that receives a {@code JsonObjectBuilder} and appends all
+         *                                    platform-specific data.
+         * @param appendServiceDataConsumer   A consumer that receives a {@code JsonObjectBuilder} and appends all
+         *                                    service-specific data.
+         * @param submitTaskConsumer          A consumer that takes a runnable with the submit task.
+         *                                    This can be used to delegate the data collection to a another thread to prevent
+         *                                    errors caused by concurrency. Can be {@code null}.
          * @param checkServiceEnabledSupplier A supplier to check if the service is still enabled.
-         * @param errorLogger A consumer that accepts log message and an error.
-         * @param infoLogger A consumer that accepts info log messages.
-         * @param logErrors Whether or not errors should be logged.
-         * @param logSentData Whether or not the sent data should be logged.
-         * @param logResponseStatusText Whether or not the response status text should be logged.
+         * @param errorLogger                 A consumer that accepts log message and an error.
+         * @param infoLogger                  A consumer that accepts info log messages.
+         * @param logErrors                   Whether or not errors should be logged.
+         * @param logSentData                 Whether or not the sent data should be logged.
+         * @param logResponseStatusText       Whether or not the response status text should be logged.
          */
         public MetricsBase(
                 String platform,

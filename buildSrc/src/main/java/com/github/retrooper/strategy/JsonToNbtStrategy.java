@@ -85,7 +85,7 @@ public class JsonToNbtStrategy extends JsonCompressionStrategy {
             return new FloatTag(value.floatValue());
         } else if (value instanceof Long) {
             return new LongTag(value.longValue());
-        } else if (value instanceof Integer ||value instanceof LazilyParsedNumber) {
+        } else if (value instanceof Integer || value instanceof LazilyParsedNumber) {
             return new IntTag(value.intValue());
         } else if (value instanceof Short) {
             return new ShortTag(value.shortValue());

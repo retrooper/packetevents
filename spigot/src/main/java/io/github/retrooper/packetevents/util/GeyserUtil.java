@@ -47,8 +47,7 @@ public class GeyserUtil {
             if (GEYSER_API_CLASS == null) {
                 try {
                     GEYSER_API_CLASS = Class.forName("org.geysermc.api.GeyserApiBase");
-                }
-                catch (ClassNotFoundException e) {
+                } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }

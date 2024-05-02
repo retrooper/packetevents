@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.handlers;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EnumUtil;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
@@ -43,6 +42,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public User user;
     public Player player;
     public boolean handledCompression;
+
     public PacketEventsDecoder(User user) {
         this.user = user;
     }

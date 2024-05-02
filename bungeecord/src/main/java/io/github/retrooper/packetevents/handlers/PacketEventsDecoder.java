@@ -55,8 +55,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
                     ByteBufHelper.clear(packetReceiveEvent.getByteBuf());
                     packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
                     packetReceiveEvent.getLastUsedWrapper().write();
-                }
-                else {
+                } else {
                     transformed.readerIndex(firstReaderIndex);
                 }
                 output.add(transformed.retain());

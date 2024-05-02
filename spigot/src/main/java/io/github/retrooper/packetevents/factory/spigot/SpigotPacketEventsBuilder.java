@@ -50,8 +50,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class SpigotPacketEventsBuilder {
     private static PacketEventsAPI<Plugin> API_INSTANCE;
 

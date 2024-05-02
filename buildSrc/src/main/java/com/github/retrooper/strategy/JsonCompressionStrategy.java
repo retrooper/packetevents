@@ -20,13 +20,12 @@ package com.github.retrooper.strategy;
 
 import com.github.retrooper.CompressionUtil;
 import com.github.retrooper.EntryVersion;
-import com.github.steveice10.opennbt.tag.builtin.*;
+import com.github.steveice10.opennbt.tag.builtin.ByteTag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 

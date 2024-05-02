@@ -66,7 +66,7 @@ public class VelocityPacketEventsBuilder {
     }
 
     public static PacketEventsAPI<PluginContainer> build(ProxyServer server, PluginContainer plugin, Logger logger, Path dataDirectory,
-            PacketEventsSettings settings) {
+                                                         PacketEventsSettings settings) {
         if (INSTANCE == null) {
             INSTANCE = buildNoCache(server, plugin, logger, dataDirectory, settings);
         }
@@ -78,7 +78,7 @@ public class VelocityPacketEventsBuilder {
     }
 
     public static PacketEventsAPI<PluginContainer> buildNoCache(ProxyServer server, PluginContainer plugin, Logger logger, Path dataDirectory,
-            PacketEventsSettings inSettings) {
+                                                                PacketEventsSettings inSettings) {
         return new PacketEventsAPI<PluginContainer>() {
             private final PacketEventsSettings settings = inSettings;
             // TODO Implement platform version

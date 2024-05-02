@@ -129,7 +129,8 @@ public class SpigotConversionUtil {
 
     /**
      * Access the Bukkit Entity associated to the Entity ID.
-     * @param world The world they are in. This field is optional, but is recommended as it could boost performance.
+     *
+     * @param world    The world they are in. This field is optional, but is recommended as it could boost performance.
      * @param entityId The associated Entity ID
      * @return The Bukkit Entity
      */

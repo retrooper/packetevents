@@ -18,7 +18,7 @@
 
 package com.github.retrooper;
 
-import com.github.steveice10.opennbt.tag.builtin.*;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.github.steveice10.opennbt.tag.io.NBTIO;
 import com.github.steveice10.opennbt.tag.io.TagWriter;
 import com.google.gson.*;
@@ -27,7 +27,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public final class CompressionUtil {
 

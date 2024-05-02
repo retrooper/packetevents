@@ -56,8 +56,7 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
                 ByteBufHelper.clear(packetSendEvent.getByteBuf());
                 packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
                 packetSendEvent.getLastUsedWrapper().write();
-            }
-            else {
+            } else {
                 buffer.readerIndex(firstReaderIndex);
             }
             if (doCompression) {

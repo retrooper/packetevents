@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.injector.connection;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.PEVersion;
-import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

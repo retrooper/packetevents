@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class PlayerManagerImpl extends PlayerManagerAbstract {
     private static Class<?> CONNECTED_PLAYER, MINECRAFT_CONNECTION_CLASS;
+
     @Override
     public int getPing(@NotNull Object player) {
         return (int) ((Player) player).getPing();

@@ -22,9 +22,9 @@ import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationOperator;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufOperator;
 import com.github.retrooper.packetevents.netty.channel.ChannelOperator;
-import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
-import io.github.retrooper.packetevents.netty.buffer.*;
-import io.github.retrooper.packetevents.netty.channel.*;
+import io.github.retrooper.packetevents.netty.buffer.ByteBufAllocationOperatorModernImpl;
+import io.github.retrooper.packetevents.netty.buffer.ByteBufOperatorModernImpl;
+import io.github.retrooper.packetevents.netty.channel.ChannelOperatorModernImpl;
 
 public class NettyManagerImpl implements NettyManager {
     private static final ByteBufOperator BYTE_BUF_OPERATOR = new ByteBufOperatorModernImpl();

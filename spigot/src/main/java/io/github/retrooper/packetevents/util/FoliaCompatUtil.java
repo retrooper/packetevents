@@ -34,8 +34,9 @@ public class FoliaCompatUtil {
 
     /**
      * Run a task async, either with bukkit scheduler or using java
+     *
      * @param plugin Your plugin or PacketEvents
-     * @param run Runnable to run
+     * @param run    Runnable to run
      */
     public static void runTaskAsync(Plugin plugin, Runnable run) {
         if (!folia) {
@@ -47,9 +48,10 @@ public class FoliaCompatUtil {
 
     /**
      * Run a task every global tick
+     *
      * @param plugin Your plugin or PacketEvents
-     * @param run Consumer that accepts an object or null, for Folia or Paper/Spigot respectively
-     * @param delay Delay in ticks
+     * @param run    Consumer that accepts an object or null, for Folia or Paper/Spigot respectively
+     * @param delay  Delay in ticks
      * @param period Period in ticks
      */
     public static void runTaskTimerAsync(Plugin plugin, Consumer<Object> run, long delay, long period) {
@@ -72,8 +74,9 @@ public class FoliaCompatUtil {
 
     /**
      * Run a task on the next global tick
+     *
      * @param plugin Your plugin or PacketEvents
-     * @param run Consumer that accepts an object or null, for Folia or Paper/Spigot respectively
+     * @param run    Consumer that accepts an object or null, for Folia or Paper/Spigot respectively
      */
     public static void runTask(Plugin plugin, Consumer<Object> run) {
         if (!folia) {
@@ -97,8 +100,9 @@ public class FoliaCompatUtil {
     /**
      * Run a task after the server has finished initializing.
      * Undefined behavior if called after the server has finished initializing.
+     *
      * @param plugin Your plugin or PacketEvents
-     * @param run The task to run
+     * @param run    The task to run
      */
     public static void runTaskOnInit(Plugin plugin, Runnable run) {
         if (!folia) {
@@ -121,11 +125,12 @@ public class FoliaCompatUtil {
 
     /**
      * Run a task for an entity on whatever thread the entity is on
-     * @param entity The entity to run the task for
-     * @param plugin Your plugin or PacketEvents
-     * @param run The task to run
+     *
+     * @param entity  The entity to run the task for
+     * @param plugin  Your plugin or PacketEvents
+     * @param run     The task to run
      * @param retired The task to run if entity is retired before the task is run
-     * @param delay Delay in ticks
+     * @param delay   Delay in ticks
      */
     public static void runTaskForEntity(Entity entity, Plugin plugin, Runnable run, Runnable retired, long delay) {
         if (!folia) {
