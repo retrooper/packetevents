@@ -26,6 +26,8 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -70,6 +72,8 @@ public class MappingHelper {
                     entry.getStringListTagOrThrow("lines").getTags().stream().map(NBTString::getValue).collect(Collectors.toList())
             );
         }
+
+        Arrays.sort(diffs, Comparator.comparingInt(ListDiff::getIndex));
 
         return diffs;
     }

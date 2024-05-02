@@ -83,8 +83,8 @@ public class TypesBuilder {
             final ClientVersion version = versions[i];
             final ListDiff<String>[] diff = MappingHelper.createListDiff(entries.getCompoundTagOrThrow(version.name()));
 
-            for (ListDiff<String> d : diff) {
-                d.applyTo(lastEntries);
+            for (int j = diff.length - 1; j >= 0; j--) {
+                diff[j].applyTo(lastEntries);
             }
             mapLoader.accept(version);
         }
