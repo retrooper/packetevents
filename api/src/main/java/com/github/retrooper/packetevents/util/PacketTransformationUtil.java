@@ -19,12 +19,9 @@
 package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
-
-import java.util.Collections;
 
 public class PacketTransformationUtil {
     public static PacketWrapper<?>[] transform(PacketWrapper<?> wrapper) {

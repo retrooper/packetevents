@@ -47,12 +47,19 @@ public interface ProtocolManager {
 
     //Methods to implement
     ProtocolVersion getPlatformVersion();
+
     void sendPacket(Object channel, Object byteBuf);
+
     void sendPacketSilently(Object channel, Object byteBuf);
+
     void writePacket(Object channel, Object byteBuf);
+
     void writePacketSilently(Object channel, Object byteBuf);
+
     void receivePacket(Object channel, Object byteBuf);
+
     void receivePacketSilently(Object channel, Object byteBuf);
+
     ClientVersion getClientVersion(Object channel);
     //TODO Define method that accepts an array of channels/set/list of channels.
 

@@ -39,7 +39,7 @@ public abstract class PacketEventsAPI<T> {
     private static final LogManager LOG_MANAGER = new LogManager();
     //TODO UPDATE
     private static final PEVersion VERSION = new PEVersion(2, 2, 1);
-    
+
     public EventManager getEventManager() {
         return EVENT_MANAGER;
     }

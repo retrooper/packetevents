@@ -89,7 +89,6 @@ public class WrapperPlayServerAttachEntity extends PacketWrapper<WrapperPlayServ
     /**
      * @return true if leashing instead of mounting
      * always true for 1.9 and above, due to SetPassengers replacing this packet
-     *
      * @see WrapperPlayServerSetPassengers
      */
     public boolean isLeash() {
@@ -98,6 +97,7 @@ public class WrapperPlayServerAttachEntity extends PacketWrapper<WrapperPlayServ
 
     /**
      * Only affects 1.8 and below servers
+     *
      * @param leash whether packet indicates leashing instead of mounting
      */
     public void setLeash(boolean leash) {

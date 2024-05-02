@@ -26,7 +26,7 @@ public final class PacketEvents {
     //Put these variable names anywhere else, they are really only for the injectors
     @ApiStatus.Internal
     public static String IDENTIFIER, ENCODER_NAME, DECODER_NAME, CONNECTION_HANDLER_NAME, SERVER_CHANNEL_HANDLER_NAME,
-    TIMEOUT_HANDLER_NAME;
+            TIMEOUT_HANDLER_NAME;
 
     public static PacketEventsAPI<?> getAPI() {
         return API;

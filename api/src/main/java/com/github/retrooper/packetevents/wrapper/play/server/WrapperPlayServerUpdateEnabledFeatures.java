@@ -28,6 +28,7 @@ import java.util.Set;
 
 public class WrapperPlayServerUpdateEnabledFeatures extends PacketWrapper<WrapperPlayServerUpdateEnabledFeatures> {
     private Set<ResourceLocation> features;
+
     public WrapperPlayServerUpdateEnabledFeatures(PacketSendEvent event) {
         super(event);
     }

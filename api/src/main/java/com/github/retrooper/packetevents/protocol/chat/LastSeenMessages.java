@@ -1,7 +1,5 @@
 package com.github.retrooper.packetevents.protocol.chat;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;

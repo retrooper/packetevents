@@ -13,6 +13,6 @@ public enum BookType {
     public static BookType getById(int id) {
         return VALUES[id];
     }
-    
+
     private static final BookType[] VALUES = values();
 }

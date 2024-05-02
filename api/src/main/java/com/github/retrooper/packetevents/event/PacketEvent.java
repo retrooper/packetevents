@@ -41,7 +41,7 @@ public abstract class PacketEvent implements CallableEvent {
             case NANO:
                 timestamp = System.nanoTime();
                 break;
-                //AKA NONE:
+            //AKA NONE:
             default:
                 timestamp = 0L;
         }

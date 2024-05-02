@@ -34,9 +34,9 @@ public class PacketStatusReceiveEvent extends PacketReceiveEvent {
     }
 
     protected PacketStatusReceiveEvent(int packetId, PacketTypeCommon packetType,
-                                  ServerVersion serverVersion,
-                                  Object channel,
-                                  User user, Object player, Object byteBuf) throws PacketProcessException {
+                                       ServerVersion serverVersion,
+                                       Object channel,
+                                       User user, Object player, Object byteBuf) throws PacketProcessException {
         super(packetId, packetType, serverVersion, channel, user, player, byteBuf);
     }
 

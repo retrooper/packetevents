@@ -1264,5 +1264,6 @@ public class WrappedBlockState {
         return INTO_STRING.get(mappingsIndex).get(this);
     }
 
-    public static void ensureLoad() {}
+    public static void ensureLoad() {
+    }
 }

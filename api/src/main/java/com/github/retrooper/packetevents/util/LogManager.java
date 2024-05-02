@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 public class LogManager {
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]");
+
     protected void log(Level level, @Nullable NamedTextColor color, String message) {
         //First we must strip away the color codes that might be in this message
         message = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");

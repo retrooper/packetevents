@@ -67,7 +67,7 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
 
     public enum Action {
         PERFORM_RESPAWN,
-        REQUEST_STATS
+        REQUEST_STATS;
 
         private static final Action[] VALUES = values();
 

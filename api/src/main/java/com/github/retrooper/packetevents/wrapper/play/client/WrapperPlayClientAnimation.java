@@ -41,7 +41,7 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
 
     @Override
     public void read() {
-            this.interactionHand = InteractionHand.getById(readVarInt());
+        this.interactionHand = InteractionHand.getById(readVarInt());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
 
     @Override
     public void write() {
-            writeVarInt(interactionHand.getId());
+        writeVarInt(interactionHand.getId());
     }
 
     /**

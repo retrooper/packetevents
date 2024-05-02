@@ -18,8 +18,6 @@
 
 package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-
 /**
  * Every event that supports cancellation should implement this interface.
  * PacketEvents' event system lets the highest priority listener be have the highest priority

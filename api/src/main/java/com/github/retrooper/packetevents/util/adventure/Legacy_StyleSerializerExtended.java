@@ -127,7 +127,8 @@ public class Legacy_StyleSerializerExtended implements JsonDeserializer<Style>, 
                         switch (serializedAction.getAsString()) {
                             case "show_text":
                                 action = HoverEvent.Action.SHOW_TEXT;
-                                value = context.deserialize(rawValue, Component.class);;
+                                value = context.deserialize(rawValue, Component.class);
+                                ;
                                 break;
                             case "show_item":
                                 action = HoverEvent.Action.SHOW_ITEM;

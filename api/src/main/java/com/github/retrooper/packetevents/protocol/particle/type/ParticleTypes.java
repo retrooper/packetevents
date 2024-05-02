@@ -39,6 +39,7 @@ public class ParticleTypes {
         TypesBuilderData data = TYPES_BUILDER.define(key);
         ParticleType particleType = new ParticleType() {
             private final int[] ids = data.getData();
+
             @Override
             public ResourceLocation getName() {
                 return data.getName();

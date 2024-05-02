@@ -146,7 +146,8 @@ public class StyleSerializerExtended extends TypeAdapter<Style> {
                         switch (serializedAction.getAsString()) {
                             case "show_text":
                                 action = HoverEvent.Action.SHOW_TEXT;
-                                value = this.gson.fromJson(rawValue, Component.class);;
+                                value = this.gson.fromJson(rawValue, Component.class);
+                                ;
                                 break;
                             case "show_item":
                                 action = HoverEvent.Action.SHOW_ITEM;

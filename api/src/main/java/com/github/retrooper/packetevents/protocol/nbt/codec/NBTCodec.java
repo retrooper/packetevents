@@ -39,28 +39,21 @@ public class NBTCodec {
         if (element instanceof JsonPrimitive) {
             if (((JsonPrimitive) element).isBoolean()) {
                 return new NBTByte(element.getAsBoolean());
-            }
-            else if (((JsonPrimitive) element).isString()) {
+            } else if (((JsonPrimitive) element).isString()) {
                 return new NBTString(element.getAsString());
-            }
-            else if (((JsonPrimitive) element).isNumber()) {
+            } else if (((JsonPrimitive) element).isNumber()) {
                 Number num = element.getAsNumber();
                 if (num instanceof Float) {
                     return new NBTFloat(num.floatValue());
-                }
-                else if(num instanceof Double) {
+                } else if (num instanceof Double) {
                     return new NBTDouble(num.doubleValue());
-                }
-                else if (num instanceof Byte) {
+                } else if (num instanceof Byte) {
                     return new NBTByte(num.byteValue());
-                }
-                else if (num instanceof Short) {
+                } else if (num instanceof Short) {
                     return new NBTShort(num.shortValue());
-                }
-                else if (num instanceof Integer || num instanceof LazilyParsedNumber) {
+                } else if (num instanceof Integer || num instanceof LazilyParsedNumber) {
                     return new NBTInt(num.intValue());
-                }
-                else if (num instanceof Long) {
+                } else if (num instanceof Long) {
                     return new NBTLong(num.longValue());
                 }
             }
@@ -68,7 +61,7 @@ public class NBTCodec {
         //Then handle arrays
         else if (element instanceof JsonArray) {
             List<NBT> list = new ArrayList<>();
-            for (JsonElement var : ((JsonArray)element)) {
+            for (JsonElement var : ((JsonArray) element)) {
                 list.add(jsonToNBT(var));
             }
             if (list.isEmpty()) {
@@ -88,8 +81,7 @@ public class NBTCodec {
                 compound.setTag(jsonEntry.getKey(), jsonToNBT(jsonEntry.getValue()));
             }
             return compound;
-        }
-        else if (element instanceof JsonNull || element == null) {
+        } else if (element instanceof JsonNull || element == null) {
             return new NBTCompound();
         }
         throw new IllegalStateException("Failed to convert JSON to NBT " + element.toString());
@@ -102,20 +94,17 @@ public class NBTCodec {
         //TODO once I make my own nbt implementation, make a toJSON method that each nbt class implements to make this  a one liner
         if (nbt instanceof NBTNumber) {
             if (nbt instanceof NBTByte && parseByteAsBool) {
-                byte val = ((NBTByte)nbt).getAsByte();
+                byte val = ((NBTByte) nbt).getAsByte();
                 if (val == 0) {
                     return new JsonPrimitive(false);
-                }
-                else if (val == 1) {
+                } else if (val == 1) {
                     return new JsonPrimitive(true);
                 }
             }
-            return new JsonPrimitive(((NBTNumber)nbt).getAsNumber());
-        }
-        else if (nbt instanceof NBTString) {
+            return new JsonPrimitive(((NBTNumber) nbt).getAsNumber());
+        } else if (nbt instanceof NBTString) {
             return new JsonPrimitive(((NBTString) nbt).getValue());
-        }
-        else if (nbt instanceof NBTList) {
+        } else if (nbt instanceof NBTList) {
             NBTList<? extends NBT> list = (NBTList<? extends NBT>) nbt;
             JsonArray jsonArray = new JsonArray();
 
@@ -123,21 +112,18 @@ public class NBTCodec {
                 jsonArray.add(nbtToJson(tag, parseByteAsBool));
             });
             return jsonArray;
-        }
-        else if (nbt instanceof NBTEnd) {
+        } else if (nbt instanceof NBTEnd) {
             throw new IllegalStateException("Encountered the NBTEnd tag during the NBT to JSON conversion: " + nbt.toString());
-        }
-        else if (nbt instanceof NBTCompound) {
+        } else if (nbt instanceof NBTCompound) {
             JsonObject jsonObject = new JsonObject();
-            Map<String, NBT> compoundTags = ((NBTCompound)nbt).getTags();
+            Map<String, NBT> compoundTags = ((NBTCompound) nbt).getTags();
             for (String tagName : compoundTags.keySet()) {
                 NBT tag = compoundTags.get(tagName);
                 JsonElement jsonValue = nbtToJson(tag, parseByteAsBool);
                 jsonObject.add(tagName, jsonValue);
             }
             return jsonObject;
-        }
-        else {
+        } else {
             throw new IllegalStateException("Failed to convert NBT to JSON.");
         }
     }

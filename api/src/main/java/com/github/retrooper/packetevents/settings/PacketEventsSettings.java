@@ -45,6 +45,7 @@ public class PacketEventsSettings {
 
     /**
      * Time stamp mode. How precise should the timestamps in the events be.
+     *
      * @param timeStampMode Time Stamp mode
      * @return Settings instance
      */
@@ -55,6 +56,7 @@ public class PacketEventsSettings {
 
     /**
      * Get the timestamp mode
+     *
      * @return Time Stamp Mode
      */
     public TimeStampMode getTimeStampMode() {
@@ -63,6 +65,7 @@ public class PacketEventsSettings {
 
     /**
      * Do we re-encode all packets by default?
+     *
      * @param reEncodeByDefault Value
      * @return Settings instance
      */
@@ -151,6 +154,7 @@ public class PacketEventsSettings {
 
     /**
      * Should the packet listeners be read only?
+     *
      * @return Getter for {@link #defaultReencode}
      */
     public boolean reEncodeByDefault() {
@@ -215,6 +219,7 @@ public class PacketEventsSettings {
     /**
      * As described above, this method retrieves the function that acquires the InputStream
      * of a desired resource by its path.
+     *
      * @return Getter for {@link #resourceProvider}
      */
     public Function<String, InputStream> getResourceProvider() {

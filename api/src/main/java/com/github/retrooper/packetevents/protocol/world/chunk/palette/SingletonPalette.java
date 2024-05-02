@@ -19,9 +19,6 @@
 package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
-import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
-
-import java.io.IOException;
 
 /**
  * A palette containing one state.

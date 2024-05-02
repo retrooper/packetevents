@@ -10,15 +10,15 @@ import com.github.retrooper.packetevents.protocol.player.User;
 
 public class PacketHandshakeSendEvent extends PacketSendEvent {
     public PacketHandshakeSendEvent(Object channel, User user,
-                                       Object player, Object rawByteBuf,
-                                       boolean autoProtocolTranslation) throws PacketProcessException {
+                                    Object player, Object rawByteBuf,
+                                    boolean autoProtocolTranslation) throws PacketProcessException {
         super(channel, user, player, rawByteBuf, autoProtocolTranslation);
     }
 
     protected PacketHandshakeSendEvent(int packetId, PacketTypeCommon packetType,
-                                          ServerVersion serverVersion,
-                                          Object channel,
-                                          User user, Object player, Object byteBuf) throws PacketProcessException {
+                                       ServerVersion serverVersion,
+                                       Object channel,
+                                       User user, Object player, Object byteBuf) throws PacketProcessException {
         super(packetId, packetType, serverVersion, channel, user, player, byteBuf);
     }
 

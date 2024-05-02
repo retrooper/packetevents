@@ -172,7 +172,7 @@ public class Parsers {
     public static final Parser TIME = define("time",
             wrapper -> Collections.singletonList(wrapper.readInt()),
             (wrapper, properties) -> {
-                    wrapper.writeInt((int) properties.get(0));
+                wrapper.writeInt((int) properties.get(0));
             }
     );
     public static final Parser RESOURCE_OR_TAG = define("resource_or_tag",
@@ -204,10 +204,12 @@ public class Parsers {
     }
 
     @FunctionalInterface
-    public interface Reader extends Function<PacketWrapper<?>, List<Object>> {}
+    public interface Reader extends Function<PacketWrapper<?>, List<Object>> {
+    }
 
     @FunctionalInterface
-    public interface Writer extends BiConsumer<PacketWrapper<?>, List<Object>> {}
+    public interface Writer extends BiConsumer<PacketWrapper<?>, List<Object>> {
+    }
 
     public static final class Parser implements MappedEntity {
 

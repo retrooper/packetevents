@@ -18,15 +18,6 @@
 
 package com.github.retrooper.packetevents.protocol.stats;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import net.kyori.adventure.text.Component;
-
 import java.util.HashMap;
 import java.util.Map;
 

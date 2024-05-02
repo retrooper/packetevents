@@ -18,7 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Wrapper for the Player Game Profile.

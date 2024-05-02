@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.protocol.item.enchantment;
 
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
-import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 
 public class Enchantment {
     private EnchantmentType type;

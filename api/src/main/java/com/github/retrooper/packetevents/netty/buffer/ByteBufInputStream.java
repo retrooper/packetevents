@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.netty.buffer;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 
 import java.io.*;
+
 //TODO give netty credit
 public class ByteBufInputStream extends InputStream implements DataInput {
     private final Object buffer;
@@ -232,8 +233,7 @@ public class ByteBufInputStream extends InputStream implements DataInput {
             String msg = "fieldSize is too long! Length is " + fieldSize + ", but maximum is " + value;
             if (value == 0) {
                 throw new PacketProcessException(msg);
-            }
-            else {
+            } else {
                 throw new EOFException(msg);
             }
         }

@@ -19,31 +19,7 @@
 package com.github.retrooper.packetevents.protocol.component;
 
 import com.github.retrooper.packetevents.protocol.color.DyeColor;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ArmorTrim;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.BannerLayers;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.BundleContents;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ChargedProjectiles;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.FireworkExplosion;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.FoodProperties;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAdventurePredicate;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAttributeModifiers;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBees;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBlockStateProperties;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemContainerContents;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDyeColor;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemFireworks;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMapPostProcessingState;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPotionContents;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemProfile;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemRarity;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemTool;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.LodestoneTracker;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.PotDecorations;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.SuspiciousStewEffects;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.WritableBookContent;
-import com.github.retrooper.packetevents.protocol.component.builtin.item.WrittenBookContent;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.*;
 import com.github.retrooper.packetevents.protocol.item.instrument.Instrument;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -237,8 +213,10 @@ public class ComponentTypes {
     }
 
     @FunctionalInterface
-    public interface Reader<T> extends Function<PacketWrapper<?>, T> {}
+    public interface Reader<T> extends Function<PacketWrapper<?>, T> {
+    }
 
     @FunctionalInterface
-    public interface Writer<T> extends BiConsumer<PacketWrapper<?>, T> {}
+    public interface Writer<T> extends BiConsumer<PacketWrapper<?>, T> {
+    }
 }

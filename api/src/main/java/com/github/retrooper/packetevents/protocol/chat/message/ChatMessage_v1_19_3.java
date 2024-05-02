@@ -2,13 +2,13 @@ package com.github.retrooper.packetevents.protocol.chat.message;
 
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+
 //We'll extend ChatMessage_v1_16 for now, hopefully no breaking changes in the future
 public class ChatMessage_v1_19_3 extends ChatMessage_v1_16 {
     int index;

@@ -35,6 +35,7 @@ public class MessageSignData {
         this.timestamp = timestamp;
         this.signedPreview = signedPreview;
     }
+
     public SaltSignature getSaltSignature() {
         return saltSignature;
     }

@@ -18,10 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 
 public class TileEntity {
     // 1.18+

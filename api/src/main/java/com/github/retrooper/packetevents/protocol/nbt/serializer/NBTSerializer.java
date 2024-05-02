@@ -36,6 +36,7 @@ public class NBTSerializer<IN, OUT> {
     protected final Map<NBTType<? extends NBT>, Integer> typeToId = new HashMap<>();
     protected final Map<NBTType<? extends NBT>, TagReader<IN, ? extends NBT>> typeReaders = new HashMap<>();
     protected final Map<NBTType<? extends NBT>, TagWriter<OUT, ? extends NBT>> typeWriters = new HashMap<>();
+
     public NBTSerializer(
             IdReader<IN> idReader, IdWriter<OUT> idWriter,
             NameReader<IN> nameReader, NameWriter<OUT> nameWriter

@@ -68,6 +68,7 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
 
     /**
      * The channel name of the plugin message.
+     *
      * @return The channel name.
      */
     public String getChannelName() {
@@ -76,10 +77,11 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
 
     /**
      * Sets the channel name of the plugin message.
+     *
      * @param channelName The channel name.
      */
     public void setChannelName(String channelName) {
-       this.channelName = channelName;
+        this.channelName = channelName;
     }
 
     /**
