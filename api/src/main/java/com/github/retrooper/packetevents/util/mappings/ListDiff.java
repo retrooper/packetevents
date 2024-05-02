@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.util.mappings;
 
 import java.util.List;
 
-public abstract class ListDiff<T> {
+public abstract class ListDiff<T> implements Diff<List<T>> {
 
     private final int index;
 

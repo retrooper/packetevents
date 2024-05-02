@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.util.mappings;
 
 import java.util.Map;
 
-public abstract class MapDiff<K, V> {
+public abstract class MapDiff<K, V> implements Diff<Map<K, V>> {
 
     private final K key;
 
