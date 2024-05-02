@@ -18,10 +18,14 @@
 
 package com.github.retrooper.strategy;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.algorithm.DiffAlgorithmI;
+import com.github.difflib.algorithm.myers.MeyersDiff;
+import com.github.difflib.patch.*;
 import com.github.retrooper.CompressionUtil;
 import com.github.retrooper.EntryVersion;
-import com.github.retrooper.diff.IndexedDiff;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.gson.JsonElement;
@@ -53,28 +57,36 @@ public class JsonArrayCompressionStrategy extends JsonCompressionStrategy {
 
         for (final Map.Entry<EntryVersion, JsonElement> e : entries.entrySet()) {
             final List<String> list = CompressionUtil.getArrayEntriesAsList(e.getValue().getAsJsonArray());
-            final List<IndexedDiff<String>> diff = CompressionUtil.getDiff(ent, list);
+            final DiffAlgorithmI<String> algo = MeyersDiff.factory().create(String::equals);
+            final Patch<String> diff = DiffUtils.diff(ent, list, algo, null, false);
 
             final CompoundTag versionTag = new CompoundTag();
-            final CompoundTag additions = new CompoundTag();
-            final CompoundTag removals = new CompoundTag();
-            final CompoundTag changes = new CompoundTag();
-            for (final IndexedDiff<String> d : diff) {
-                if (d instanceof IndexedDiff.Addition) {
-                    additions.put(String.valueOf(d.getIndex()), new StringTag(d.getValue()));
-                } else if (d instanceof IndexedDiff.Removal) {
-                    removals.put(String.valueOf(d.getIndex()), new StringTag(d.getValue()));
-                } else if (d instanceof IndexedDiff.Changed) {
-                    final IndexedDiff.Changed<String> changed = (IndexedDiff.Changed<String>) d;
-                    final ListTag listTag = new ListTag(StringTag.class);
-                    listTag.add(new StringTag(changed.getOldValue()));
-                    listTag.add(new StringTag(changed.getValue()));
-                    changes.put(String.valueOf(d.getIndex()), listTag);
+            final ListTag additions = new ListTag(CompoundTag.class);
+            final ListTag removals = new ListTag(CompoundTag.class);
+            final ListTag changes = new ListTag(CompoundTag.class);
+            for (AbstractDelta<String> delta : diff.getDeltas()) {
+                if (delta instanceof InsertDelta) {
+                    final CompoundTag addition = new CompoundTag();
+                    addition.put("pos", new IntTag(delta.getSource().getPosition()));
+                    addition.put("lines", new ListTag(delta.getTarget().getLines().stream().map(StringTag::new).collect(Collectors.toList())));
+                    additions.add(addition);
+                } else if (delta instanceof DeleteDelta) {
+                    final CompoundTag removal = new CompoundTag();
+                    removal.put("pos", new IntTag(delta.getSource().getPosition()));
+                    removal.put("size", new IntTag(delta.getSource().size()));
+                    removals.add(removal);
+                } else if (delta instanceof ChangeDelta) {
+                    final CompoundTag change = new CompoundTag();
+                    change.put("pos", new IntTag(delta.getSource().getPosition()));
+                    change.put("size", new IntTag(delta.getSource().size()));
+                    change.put("lines", new ListTag(delta.getTarget().getLines().stream().map(StringTag::new).collect(Collectors.toList())));
+                    changes.add(change);
                 }
             }
 
             versionTag.put("additions", additions);
             versionTag.put("removals", removals);
+            versionTag.put("changes", changes);
             nbtEntries.put(e.getKey().toString(), versionTag);
 
             ent = list;

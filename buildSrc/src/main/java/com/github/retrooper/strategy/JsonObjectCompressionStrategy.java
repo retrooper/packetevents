@@ -18,18 +18,18 @@
 
 package com.github.retrooper.strategy;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.algorithm.DiffAlgorithmI;
+import com.github.difflib.algorithm.myers.MeyersDiff;
+import com.github.difflib.patch.*;
 import com.github.retrooper.CompressionUtil;
 import com.github.retrooper.EntryVersion;
-import com.github.retrooper.diff.Diff;
 import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class JsonObjectCompressionStrategy extends JsonCompressionStrategy {
 
@@ -56,26 +56,33 @@ public class JsonObjectCompressionStrategy extends JsonCompressionStrategy {
 
         for (Map.Entry<EntryVersion, JsonElement> e : entries.entrySet()) {
             final Map<String, JsonPrimitive> map = CompressionUtil.getObjectEntriesAsMap(e.getValue().getAsJsonObject());
-            final List<Diff<Map.Entry<String, JsonPrimitive>>> diff = CompressionUtil.getDiff(ent, map);
+            final DiffAlgorithmI<Map.Entry<String, JsonPrimitive>> algo = MeyersDiff.factory().create(Map.Entry::equals);
+            final Patch<Map.Entry<String, JsonPrimitive>> diff = DiffUtils.diff(new ArrayList<>(ent.entrySet()), new ArrayList<>(map.entrySet()), algo, null, false);
 
             final CompoundTag versionTag = new CompoundTag();
             final CompoundTag additions = new CompoundTag();
             final CompoundTag removals = new CompoundTag();
-            final CompoundTag changes = new CompoundTag();
-            for (final Diff<Map.Entry<String, JsonPrimitive>> d : diff) {
-                if (d instanceof Diff.Addition) {
-                    additions.put(d.getValue().getKey(), getAsNbtTag(d.getValue().getValue()));
-                } else if (d instanceof Diff.Removal) {
-                    removals.put(d.getValue().getKey(), getAsNbtTag(d.getValue().getValue()));
-                } else if (d instanceof Diff.Changed) {
-                    final Diff.Changed<Map.Entry<String, JsonPrimitive>> changed = (Diff.Changed<Map.Entry<String, JsonPrimitive>>) d;
-                    changes.put(d.getValue().getKey(), getAsNbtTag(changed.getOldValue().getValue(), changed.getValue().getValue()));
+            for (AbstractDelta<Map.Entry<String, JsonPrimitive>> delta : diff.getDeltas()) {
+                if (delta instanceof InsertDelta) {
+                    for (Map.Entry<String, JsonPrimitive> line : delta.getTarget().getLines()) {
+                        additions.put(line.getKey(), getAsNbtTag(line.getValue()));
+                    }
+                } else if (delta instanceof DeleteDelta) {
+                    for (Map.Entry<String, JsonPrimitive> line : delta.getSource().getLines()) {
+                        removals.put(line.getKey(), getAsNbtTag(line.getValue()));
+                    }
+                } else if (delta instanceof ChangeDelta) {
+                    for (Map.Entry<String, JsonPrimitive> line : delta.getSource().getLines()) {
+                        removals.put(line.getKey(), getAsNbtTag(line.getValue()));
+                    }
+                    for (Map.Entry<String, JsonPrimitive> line : delta.getTarget().getLines()) {
+                        additions.put(line.getKey(), getAsNbtTag(line.getValue()));
+                    }
                 }
             }
 
             versionTag.put("additions", additions);
             versionTag.put("removals", removals);
-            versionTag.put("changes", changes);
             nbtEntries.put(e.getKey().toString(), versionTag);
 
             ent = map;
@@ -92,17 +99,6 @@ public class JsonObjectCompressionStrategy extends JsonCompressionStrategy {
             return new StringTag(primitive.getAsString());
         } else {
             throw new IllegalArgumentException("Unknown primitive type: " + primitive);
-        }
-    }
-
-    private Tag getAsNbtTag(final JsonPrimitive oldValue, final JsonPrimitive newValue) {
-        // Will only be string or int as of the mappings
-        if (oldValue.isNumber()) {
-            return new IntArrayTag(new int[]{oldValue.getAsInt(), newValue.getAsInt()});
-        } else if (oldValue.isString()) {
-            return new ListTag(Arrays.asList(new StringTag(oldValue.getAsString()), new StringTag(newValue.getAsString())));
-        } else {
-            throw new IllegalArgumentException("Unknown primitive type: " + oldValue);
         }
     }
 

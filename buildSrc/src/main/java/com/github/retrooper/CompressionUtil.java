@@ -18,8 +18,6 @@
 
 package com.github.retrooper;
 
-import com.github.retrooper.diff.Diff;
-import com.github.retrooper.diff.IndexedDiff;
 import com.github.steveice10.opennbt.tag.builtin.*;
 import com.github.steveice10.opennbt.tag.io.NBTIO;
 import com.github.steveice10.opennbt.tag.io.TagWriter;
@@ -71,64 +69,6 @@ public final class CompressionUtil {
             list.add(e.getAsString());
         }
         return list;
-    }
-
-    /**
-     * Returns a list of differences between the two lists.
-     * @param last List to compare to
-     * @param current List to get differences from
-     * @return List of differences
-     * @param <T> Type of the list
-     */
-    public static <T> List<IndexedDiff<T>> getDiff(final List<T> last, final List<T> current) {
-        final List<IndexedDiff<T>> diff = new ArrayList<>();
-
-        final List<T> copy = new ArrayList<>(current);
-        for (int i = 0; i < last.size(); i++) {
-            if (copy.isEmpty()) {
-                diff.add(new IndexedDiff.Removal<>(i, last.get(i)));
-                continue;
-            }
-
-            final T value = copy.remove(0);
-            if (!value.equals(last.get(i))) {
-                diff.add(new IndexedDiff.Changed<>(i, value, last.get(i)));
-            }
-        }
-
-        for (int i = 0; i < copy.size(); i++) {
-            diff.add(new IndexedDiff.Addition<>(i, copy.get(i)));
-        }
-
-        return diff;
-    }
-
-    /**
-     * Returns a list of differences between the two maps.
-     * @param last Map to compare to
-     * @param current Map to get differences from
-     * @return List of differences
-     * @param <K> Type of the key
-     * @param <V> Type of the value
-     */
-    public static <K, V> List<Diff<Map.Entry<K, V>>> getDiff(final Map<K, V> last, final Map<K, V> current) {
-        final List<Diff<Map.Entry<K, V>>> diff = new ArrayList<>();
-
-        final Map<K, V> copy = new LinkedHashMap<>(current);
-        for (final Map.Entry<K, V> e : last.entrySet()) {
-            final V value = copy.remove(e.getKey());
-            if (value == null) {
-                diff.add(new Diff.Removal<>(e));
-            } else if (!value.equals(e.getValue())) {
-                diff.add(new Diff.Changed<>(e, new AbstractMap.SimpleEntry<>(e.getKey(), value)));
-            }
-        }
-
-        for (final Map.Entry<K, V> e : copy.entrySet()) {
-            diff.add(new Diff.Addition<>(e));
-        }
-
-        return diff;
     }
 
 }
