@@ -127,6 +127,10 @@ public class BannerPatterns {
     public static final BannerPattern PIGLIN = define("piglin");
     public static final BannerPattern DIAGONAL_LEFT = define("diagonal_left");
 
+    // Added with 1.21
+    public static final BannerPattern FLOW = define("flow");
+    public static final BannerPattern GUSTER = define("guster");
+
     static {
         TYPES_BUILDER.unloadFileMappings();
     }
