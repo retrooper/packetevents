@@ -180,11 +180,11 @@ public class FabricPacketEventsBuilder {
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalPacketListener());
+                    //TODO Look into how to set the correct player (fabric server support)
                     getEventManager().registerListener(new SimplePacketListenerAbstract() {
                         @Override
                         public void onPacketPlaySend(PacketPlaySendEvent event) {
                             if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
-                                System.out.println("Is player null? " + (Minecraft.getInstance().player != null));
                                 PacketEvents.getAPI().getInjector().setPlayer(event.getChannel(),
                                         Minecraft.getInstance().player);
                             }

@@ -14,8 +14,10 @@ import io.github.retrooper.packetevents.handler.PacketEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.PacketFlow;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,18 +26,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(net.minecraft.network.Connection.class)
 public class PacketEventsInjectorMixin {
-    @Inject(method = "channelActive", at = @At("HEAD"))
-    private void channelActive(ChannelHandlerContext ctx, CallbackInfo info) throws Exception {
+    @Inject(method = "configureSerialization", at = @At("TAIL"))
+    private static void configureSerialization(ChannelPipeline cp, PacketFlow pf, CallbackInfo info) throws Exception {
         PacketEventsMod.LOGGER.info("Connected!");
-        Channel channel = ctx.channel();
+        Channel channel = cp.channel();
         User user = new User(channel, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
                 new UserProfile(null, null));
         ProtocolManager.USERS.put(channel, user);
         PacketDecoder decoder = new PacketDecoder(user);
         PacketEncoder encoder = new PacketEncoder(user);
+        PacketEventsMod.LOGGER.info("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, encoder);
         channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
-        PacketEventsMod.LOGGER.info("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
     }
 }

@@ -87,5 +87,10 @@ java {
     // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
     // if it is present.
     // If you remove this line, sources will not be generated.
-    withSourcesJar()
+    //withSourcesJar()
+}
+
+
+remapJar {
+    archiveBaseName.set("${rootProject.name}-fabric")
 }
