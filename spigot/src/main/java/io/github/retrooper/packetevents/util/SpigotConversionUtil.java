@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
@@ -34,6 +35,7 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Pose;
 import org.jetbrains.annotations.Nullable;
 
 public class SpigotConversionUtil {
@@ -159,5 +161,13 @@ public class SpigotConversionUtil {
      */
     public static org.bukkit.entity.Entity getEntityById(@Nullable World world, int entityId) {
         return SpigotReflectionUtil.getEntityById(world, entityId);
+    }
+
+    public static Pose toBukkitPose(EntityPose pose) {
+        return Pose.values()[pose.ordinal()];
+    }
+
+    public static EntityPose fromBukkitPose(Pose pose) {
+        return EntityPose.values()[pose.ordinal()];
     }
 }
