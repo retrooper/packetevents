@@ -223,7 +223,7 @@ public class WrappedBlockState {
                     }
 
                     dataStringBuilder.append(v).append(",");
-                    dataMap.put(state, v);
+                    dataMap.put(state, state.getParser().apply(v.toString().toUpperCase(Locale.ROOT)));
                 }
 
                 String dataString;
@@ -320,13 +320,13 @@ public class WrappedBlockState {
                         } else if (value instanceof NBTString) {
                             v = ((NBTString) value).getValue();
                         } else {
-                            PacketEvents.getAPI().getLogger().warning("Unknown NBT typeString in legacy mapping: " + value.getClass().getSimpleName());
+                            PacketEvents.getAPI().getLogger().warning("Unknown NBT typeString in modern mapping: " + value.getClass().getSimpleName());
                             dataStringBuilder = new StringBuilder(dataStringBuilder.substring(0, dataStringBuilder.length() - props.getKey().length() - 1));
                             continue;
                         }
 
                         dataStringBuilder.append(v).append(",");
-                        dataMap.put(state, v);
+                        dataMap.put(state, state.getParser().apply(v.toString().toUpperCase(Locale.ROOT)));
                     }
 
                     String dataString;
