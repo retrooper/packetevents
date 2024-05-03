@@ -1,3 +1,18 @@
+pluginManagement {
+    plugins {
+        id 'fabric-loom' version '0.11-SNAPSHOT' apply(false)
+    }
+    repositories {
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+
+}
+
 rootProject.name = 'packetevents'
 include 'api'
 include 'netty-common'
@@ -5,4 +20,4 @@ include 'netty-common'
 include 'spigot'
 include 'bungeecord'
 include 'velocity'
-
+include 'fabric'

@@ -14,17 +14,18 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
-    apply plugin: 'com.github.johnrengelman.shadow'
-
+    if (project.name != "fabric") {
+        apply plugin: 'com.github.johnrengelman.shadow'
+    }
     group = 'com.github.retrooper'
     description = project.name
     version = '2.2.1'//TODO UPDATE - ADD "-SNAPSHOT" if we are dealing with snapshot versions
     project.ext.nettyVersion = '4.1.72.Final'
     project.ext.adventureVersion = '4.16.0'
-    project.ext.adventureDependencies=["net.kyori:adventure-api:${adventureVersion}",
-                                       "net.kyori:adventure-text-serializer-gson:${adventureVersion}",
-                                       "net.kyori:adventure-text-serializer-legacy:${adventureVersion}",
-                                       "net.kyori:adventure-nbt:${adventureVersion}"]
+    project.ext.adventureDependencies = ["net.kyori:adventure-api:${adventureVersion}",
+                                         "net.kyori:adventure-text-serializer-gson:${adventureVersion}",
+                                         "net.kyori:adventure-text-serializer-legacy:${adventureVersion}",
+                                         "net.kyori:adventure-nbt:${adventureVersion}"]
 
     java.sourceCompatibility = JavaVersion.VERSION_17
     java.targetCompatibility = JavaVersion.VERSION_1_8
@@ -40,31 +41,34 @@ subprojects {
     }
 
     tasks {
-        shadowJar {
-            archiveFileName.set("packetevents-${project.name}-${project.version}.jar")
-        }
+        if (project.name != "fabric") {
+            shadowJar {
+                archiveFileName.set("packetevents-${project.name}-${project.version}.jar")
 
-        build {
-            dependsOn(shadowJar)
-        }
+            }
 
-        task sourceJar(type: Jar) {
-            from sourceSets.main.allJava
-        }
+            build {
+                dependsOn(shadowJar)
+            }
 
-        withType(JavaCompile) {
-            options.encoding = 'UTF-8'
-            // Set the release flag. This configures what version bytecode the compiler will emit, as well as what JDK APIs are usable.
-            // See https://openjdk.java.net/jeps/247 for more information.
-            options.release.set(8)
-        }
+            task sourceJar(type: Jar) {
+                from sourceSets.main.allJava
+            }
 
-        jar.configure {
-            archiveClassifier = 'default'
-        }
+            withType(JavaCompile) {
+                options.encoding = 'UTF-8'
+                // Set the release flag. This configures what version bytecode the compiler will emit, as well as what JDK APIs are usable.
+                // See https://openjdk.java.net/jeps/247 for more information.
+                options.release.set(8)
+            }
 
-        shadowJar.configure {
-            archiveClassifier = null
+            jar.configure {
+                archiveClassifier = 'default'
+            }
+
+            shadowJar.configure {
+                archiveClassifier = null
+            }
         }
     }
 
@@ -90,7 +94,7 @@ subprojects {
                 def mavenUsername = System.getenv("retrooper_username") ? System.getenv("retrooper_username") : null
                 def mavenPassword = System.getenv("retrooper_password") ? System.getenv("retrooper_password") : null
 
-                if(mavenUsername != null && mavenPassword != null) {
+                if (mavenUsername != null && mavenPassword != null) {
                     credentials {
                         username = mavenUsername
                         password = mavenPassword
