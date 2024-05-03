@@ -207,7 +207,7 @@ public class EntityDataTypes {
 
     // Added in 1.20.5
     public static final EntityDataType<ArmadilloState> ARMADILLO_STATE = define("armadillo_state",
-            (PacketWrapper<?> wrapper) -> ArmadilloState.values()[ wrapper.readVarInt()],
+            (PacketWrapper<?> wrapper) -> ArmadilloState.values()[wrapper.readVarInt()],
             (PacketWrapper<?> wrapper, ArmadilloState value) -> wrapper.writeVarInt(value.ordinal())
     );
 
