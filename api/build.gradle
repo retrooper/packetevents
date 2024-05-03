@@ -58,4 +58,4 @@ task generateMapping(type: MappingCompressionTask) {
     }
 }
 
-tasks.assemble.dependsOn(processResources)
+tasks.assemble.dependsOn(generateMapping)
