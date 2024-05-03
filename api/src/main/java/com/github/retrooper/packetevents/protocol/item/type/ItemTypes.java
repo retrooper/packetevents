@@ -1385,14 +1385,14 @@ public class ItemTypes {
     public static final ItemType WAXED_EXPOSED_CHISELED_COPPER = builder("waxed_exposed_chiseled_copper").setMaxAmount(64).setPlacedType(StateTypes.WAXED_EXPOSED_CHISELED_COPPER).build();
     public static final ItemType WAXED_WEATHERED_CHISELED_COPPER = builder("waxed_weathered_chiseled_copper").setMaxAmount(64).setPlacedType(StateTypes.WAXED_WEATHERED_CHISELED_COPPER).build();
     public static final ItemType WAXED_OXIDIZED_CHISELED_COPPER = builder("waxed_oxidized_chiseled_copper").setMaxAmount(64).setPlacedType(StateTypes.WAXED_OXIDIZED_CHISELED_COPPER).build();
-    public static final ItemType COPPER_DOOR = builder("copper_door").setMaxAmount(64).setPlacedType(StateTypes.COPPER_DOOR).build();
-    public static final ItemType EXPOSED_COPPER_DOOR = builder("exposed_copper_door").setMaxAmount(64).setPlacedType(StateTypes.EXPOSED_COPPER_DOOR).build();
-    public static final ItemType WEATHERED_COPPER_DOOR = builder("weathered_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WEATHERED_COPPER_DOOR).build();
-    public static final ItemType OXIDIZED_COPPER_DOOR = builder("oxidized_copper_door").setMaxAmount(64).setPlacedType(StateTypes.OXIDIZED_COPPER_DOOR).build();
-    public static final ItemType WAXED_COPPER_DOOR = builder("waxed_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_COPPER_DOOR).build();
-    public static final ItemType WAXED_EXPOSED_COPPER_DOOR = builder("waxed_exposed_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_EXPOSED_COPPER_DOOR).build();
-    public static final ItemType WAXED_WEATHERED_COPPER_DOOR = builder("waxed_weathered_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_WEATHERED_COPPER_DOOR).build();
-    public static final ItemType WAXED_OXIDIZED_COPPER_DOOR = builder("waxed_oxidized_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_OXIDIZED_COPPER_DOOR).build();
+    public static final ItemType COPPER_DOOR = builder("copper_door").setMaxAmount(64).setPlacedType(StateTypes.COPPER_DOOR).setAttributes(ItemAttribute.FUEL).build();
+    public static final ItemType EXPOSED_COPPER_DOOR = builder("exposed_copper_door").setMaxAmount(64).setPlacedType(StateTypes.EXPOSED_COPPER_DOOR).setAttributes(ItemAttribute.FUEL).build();
+    public static final ItemType WEATHERED_COPPER_DOOR = builder("weathered_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WEATHERED_COPPER_DOOR).setAttributes(ItemAttribute.FUEL).build();
+    public static final ItemType OXIDIZED_COPPER_DOOR = builder("oxidized_copper_door").setMaxAmount(64).setPlacedType(StateTypes.OXIDIZED_COPPER_DOOR).setAttributes(ItemAttribute.FUEL).build();
+    public static final ItemType WAXED_COPPER_DOOR = builder("waxed_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_COPPER_DOOR).setAttributes(ItemAttribute.FUEL).build();
+    public static final ItemType WAXED_EXPOSED_COPPER_DOOR = builder("waxed_exposed_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_EXPOSED_COPPER_DOOR).setAttributes(ItemAttribute.FUEL).build();
+    public static final ItemType WAXED_WEATHERED_COPPER_DOOR = builder("waxed_weathered_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_WEATHERED_COPPER_DOOR).setAttributes(ItemAttribute.FUEL).build();
+    public static final ItemType WAXED_OXIDIZED_COPPER_DOOR = builder("waxed_oxidized_copper_door").setMaxAmount(64).setPlacedType(StateTypes.WAXED_OXIDIZED_COPPER_DOOR).setAttributes(ItemAttribute.FUEL).build();
     public static final ItemType COPPER_TRAPDOOR = builder("copper_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.COPPER_TRAPDOOR).build();
     public static final ItemType EXPOSED_COPPER_TRAPDOOR = builder("exposed_copper_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.EXPOSED_COPPER_TRAPDOOR).build();
     public static final ItemType WEATHERED_COPPER_TRAPDOOR = builder("weathered_copper_trapdoor").setMaxAmount(64).setPlacedType(StateTypes.WEATHERED_COPPER_TRAPDOOR).build();
@@ -1429,7 +1429,7 @@ public class ItemTypes {
     public static final ItemType HEAVY_CORE = builder("heavy_core").setMaxAmount(64).setPlacedType(StateTypes.HEAVY_CORE).build();
     public static final ItemType BOGGED_SPAWN_EGG = builder("bogged_spawn_egg").setMaxAmount(64).build();
     public static final ItemType WIND_CHARGE = builder("wind_charge").setMaxAmount(64).build();
-    public static final ItemType MACE = builder("mace").setMaxAmount(1).setMaxDurability(250).setComponent(DAMAGE, 0).setComponent(ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(Arrays.asList(new ItemAttributeModifiers.ModifierEntry(Attributes.GENERIC_ATTACK_DAMAGE, new ItemAttributeModifiers.Modifier(TOOL_MODIFIER_ATTACK_DAMAGE_UUID, "Weapon modifier", 6.0d, AttributeOperation.ADDITION), ItemAttributeModifiers.EquipmentSlotGroup.MAINHAND), new ItemAttributeModifiers.ModifierEntry(Attributes.GENERIC_ATTACK_SPEED, new ItemAttributeModifiers.Modifier(TOOL_MODIFIER_ATTACK_SPEED_UUID, "Weapon modifier", -2.4d, AttributeOperation.ADDITION), ItemAttributeModifiers.EquipmentSlotGroup.MAINHAND)), true)).setComponent(TOOL, new ItemTool(Collections.emptyList(), 1.0f, 2)).build();
+    public static final ItemType MACE = builder("mace").setMaxAmount(1).setMaxDurability(500).setComponent(DAMAGE, 0).setComponent(ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(Arrays.asList(new ItemAttributeModifiers.ModifierEntry(Attributes.GENERIC_ATTACK_DAMAGE, new ItemAttributeModifiers.Modifier(TOOL_MODIFIER_ATTACK_DAMAGE_UUID, "Weapon modifier", 5.0d, AttributeOperation.ADDITION), ItemAttributeModifiers.EquipmentSlotGroup.MAINHAND), new ItemAttributeModifiers.ModifierEntry(Attributes.GENERIC_ATTACK_SPEED, new ItemAttributeModifiers.Modifier(TOOL_MODIFIER_ATTACK_SPEED_UUID, "Weapon modifier", -3.5d, AttributeOperation.ADDITION), ItemAttributeModifiers.EquipmentSlotGroup.MAINHAND)), true)).setComponent(TOOL, new ItemTool(Collections.emptyList(), 1.0f, 2)).build();
     public static final ItemType FLOW_BANNER_PATTERN = builder("flow_banner_pattern").setMaxAmount(1).build();
     public static final ItemType GUSTER_BANNER_PATTERN = builder("guster_banner_pattern").setMaxAmount(1).build();
     public static final ItemType FLOW_ARMOR_TRIM_SMITHING_TEMPLATE = builder("flow_armor_trim_smithing_template").setMaxAmount(64).build();
@@ -1471,22 +1471,22 @@ public class ItemTypes {
      * @deprecated Renamed to {@link #ARCHER_POTTERY_SHERD} in 1.20
      */
     @Deprecated
-    public static final ItemType POTTERY_SHARD_ARCHER = builder("POTTERY_SHARD_ARCHER").setMaxAmount(64).build();
+    public static final ItemType POTTERY_SHARD_ARCHER = builder("pottery_shard_archer").build();
     /**
      * @deprecated Renamed to {@link #PRIZE_POTTERY_SHERD} in 1.20
      */
     @Deprecated
-    public static final ItemType POTTERY_SHARD_PRIZE = builder("POTTERY_SHARD_PRIZE").setMaxAmount(64).build();
+    public static final ItemType POTTERY_SHARD_PRIZE = builder("pottery_shard_prize").build();
     /**
      * @deprecated Renamed to {@link #ARMS_UP_POTTERY_SHERD} in 1.20
      */
     @Deprecated
-    public static final ItemType POTTERY_SHARD_ARMS_UP = builder("POTTERY_SHARD_ARMS_UP").setMaxAmount(64).build();
+    public static final ItemType POTTERY_SHARD_ARMS_UP = builder("pottery_shard_arms_up").build();
     /**
      * @deprecated Renamed to {@link #SKULL_POTTERY_SHERD} in 1.20
      */
     @Deprecated
-    public static final ItemType POTTERY_SHARD_SKULL = builder("POTTERY_SHARD_SKULL").setMaxAmount(64).build();
+    public static final ItemType POTTERY_SHARD_SKULL = builder("pottery_shard_skull").build();
 
     public static Collection<ItemType> values() {
         return ITEM_TYPE_MAP.values();
