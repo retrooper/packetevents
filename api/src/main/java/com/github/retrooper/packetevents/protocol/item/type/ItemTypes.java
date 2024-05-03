@@ -1442,6 +1442,11 @@ public class ItemTypes {
     public static final ItemType OMINOUS_BOTTLE = builder("ominous_bottle").setMaxAmount(64).setAttributes(ItemAttribute.EDIBLE).setComponent(FOOD, new FoodProperties(1, 0.2f, false, 1.6f, Collections.emptyList())).setComponent(OMINOUS_BOTTLE_AMPLIFIER, 0).build();
     public static final ItemType BREEZE_ROD = builder("breeze_rod").setMaxAmount(64).build();
 
+    // 1.21 items
+    public static final ItemType MUSIC_DISC_CREATOR = builder("music_disc_creator").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).setComponent(RARITY, ItemRarity.RARE).build();
+    public static final ItemType MUSIC_DISC_CREATOR_MUSIC_BOX = builder("music_disc_creator_music_box").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).setComponent(RARITY, ItemRarity.RARE).build();
+    public static final ItemType MUSIC_DISC_PRECIPICE = builder("music_disc_precipice").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).setComponent(RARITY, ItemRarity.RARE).build();
+
     /**
      * @deprecated Burning furnace shows up as a missing texture, removed in 1.9
      */
