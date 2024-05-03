@@ -1,5 +1,3 @@
-import org.gradle.api.internal.artifacts.configurations.DefaultConfigurationContainer
-
 plugins {
     id 'fabric-loom'
 }
@@ -13,12 +11,16 @@ repositories {
     }
 }
 
+configurations {
+    includeAll
+}
+
 dependencies {
     api project(':api')
     api project(':netty-common')
     implementation(adventureDependencies)
 
-    include(adventureDependencies)
+    includeAll(adventureDependencies)
     include(project(':api'))
     include(project(':netty-common'))
 
@@ -55,6 +57,25 @@ tasks.withType(JavaCompile).configureEach {
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
         it.options.release = targetJavaVersion
     }
+}
+
+def includeDependency(ResolvedDependency dependency) {
+    configurations.named("include").get().withDependencies {
+        it.add(dependencyFactory.create(
+                dependency.moduleGroup,
+                dependency.moduleName,
+                dependency.moduleVersion
+        ))
+    }
+    dependency.getChildren().forEach { includeDependency(it) }
+}
+
+tasks.remapJar {
+    configurations.named("includeAll")
+            .get()
+            .getResolvedConfiguration()
+            .getFirstLevelModuleDependencies()
+            .forEach { includeDependency(it) }
 }
 
 java {
