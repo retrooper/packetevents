@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
@@ -36,6 +37,7 @@ import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Pose;
+import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
 public class SpigotConversionUtil {
@@ -169,5 +171,9 @@ public class SpigotConversionUtil {
 
     public static EntityPose fromBukkitPose(Pose pose) {
         return EntityPose.values()[pose.ordinal()];
+    }
+
+    public static MainHand toBukkitHand(HumanoidArm arm) {
+        return MainHand.values()[arm.ordinal()];
     }
 }
