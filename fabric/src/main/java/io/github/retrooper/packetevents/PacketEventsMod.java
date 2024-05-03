@@ -25,7 +25,7 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
         PacketEvents.setAPI(FabricPacketEventsBuilder.build("packetevents"));
         PacketEvents.getAPI().getSettings().debug(true).bStats(true);
         PacketEvents.getAPI().load();
-        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+        /*PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 if (event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE) {
@@ -50,7 +50,7 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
             public void onUserDisconnect(UserDisconnectEvent event) {
                 System.out.println("DISCONNECTED PACKETEVENTS");
             }
-        });
+        });*/
         //TODO Test if userconnectevent and userdisconnectevent work.
         //especially disconnect
     }
