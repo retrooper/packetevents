@@ -144,8 +144,8 @@ public class AsyncScheduler {
 
         try {
             return new TaskWrapper(asyncRunAtFixedRateMethod.invoke(asyncScheduler, plugin, task,
-                    convertTimeToTicks(initialDelayTicks, TimeUnit.MILLISECONDS),
-                    convertTimeToTicks(periodTicks, TimeUnit.MILLISECONDS),
+                    initialDelayTicks * 50,
+                    periodTicks * 50,
                     TimeUnit.MILLISECONDS));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
