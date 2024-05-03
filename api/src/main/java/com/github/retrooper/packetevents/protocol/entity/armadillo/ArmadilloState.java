@@ -23,4 +23,5 @@ public enum ArmadilloState {
     IDLE,
     ROLLING,
     SCARED,
+    UNROLLING,
 }
