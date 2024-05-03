@@ -89,7 +89,7 @@ public class Attributes {
     // Added in 1.20.2
     public static final Attribute GENERIC_MAX_ABSORPTION = define("generic.max_absorption");
 
-    // added in 1.20.5
+    // Added in 1.20.5
     public static final Attribute PLAYER_BLOCK_BREAK_SPEED = define("player.block_break_speed");
     public static final Attribute PLAYER_BLOCK_INTERACTION_RANGE = define("player.block_interaction_range");
     public static final Attribute PLAYER_ENTITY_INTERACTION_RANGE = define("player.entity_interaction_range");
@@ -99,6 +99,17 @@ public class Attributes {
     public static final Attribute GENERIC_SAFE_FALL_DISTANCE = define("generic.safe_fall_distance");
     public static final Attribute GENERIC_SCALE = define("generic.scale");
     public static final Attribute GENERIC_STEP_HEIGHT = define("generic.step_height");
+
+    // Added in 1.21
+    public static final Attribute GENERIC_BURNING_TIME = define("generic.burning_time");
+    public static final Attribute GENERIC_EXPLOSION_KNOCKBACK_RESISTANCE = define("generic.explosion_knockback_resistance");
+    public static final Attribute PLAYER_MINING_EFFICIENCY = define("player.mining_efficiency");
+    public static final Attribute GENERIC_MOVEMENT_EFFICIENCY = define("generic.movement_efficiency");
+    public static final Attribute GENERIC_OXYGEN_BONUS = define("generic.oxygen_bonus");
+    public static final Attribute PLAYER_SNEAKING_SPEED = define("player.sneaking_speed");
+    public static final Attribute PLAYER_SUBMERGED_MINING_SPEED = define("player.submerged_mining_speed");
+    public static final Attribute PLAYER_SWEEPING_DAMAGE_RATIO = define("player.sweeping_damage_ratio");
+    public static final Attribute GENERIC_WATER_MOVEMENT_EFFICIENCY = define("generic.water_movement_efficiency");
 
     static {
         TYPES_BUILDER.unloadFileMappings();
