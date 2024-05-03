@@ -54,11 +54,9 @@ public class EntityScheduler {
      * @param plugin  Plugin which owns the specified task.
      * @param run     The callback to run after the specified delay, may not be null.
      * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
-     * @param delay   The delay in ticks before the run callback is invoked. Any value less-than 1 is treated as 1.
+     * @param delay   The delay in ticks before the run callback is invoked.
      */
     public void execute(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Runnable run, @Nullable Runnable retired, long delay) {
-        if (delay < 1) delay = 1;
-
         if (!isFolia) {
             Bukkit.getScheduler().runTaskLater(plugin, run, delay);
             return;
@@ -152,11 +150,12 @@ public class EntityScheduler {
      * @param task              The task to execute
      * @param retired           Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
      * @param initialDelayTicks The initial delay, in ticks before the method is invoked. Any value less-than 1 is treated as 1.
-     * @param periodTicks       The period, in ticks.
+     * @param periodTicks       The period, in ticks. Any value less-than 1 is treated as 1.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runAtFixedRate(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Consumer<Object> task, @Nullable Runnable retired, long initialDelayTicks, long periodTicks) {
         if (initialDelayTicks < 1) initialDelayTicks = 1;
+        if (periodTicks < 1) periodTicks = 1;
 
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
