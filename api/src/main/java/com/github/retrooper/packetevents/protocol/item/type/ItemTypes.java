@@ -1471,22 +1471,22 @@ public class ItemTypes {
      * @deprecated Renamed to {@link #ARCHER_POTTERY_SHERD} in 1.20
      */
     @Deprecated
-    public static final ItemType POTTERY_SHARD_ARCHER = builder("pottery_shard_archer").build();
+    public static final ItemType POTTERY_SHARD_ARCHER = builder("POTTERY_SHARD_ARCHER").setMaxAmount(64).build();
     /**
      * @deprecated Renamed to {@link #PRIZE_POTTERY_SHERD} in 1.20
      */
     @Deprecated
-    public static final ItemType POTTERY_SHARD_PRIZE = builder("pottery_shard_prize").build();
+    public static final ItemType POTTERY_SHARD_PRIZE = builder("POTTERY_SHARD_PRIZE").setMaxAmount(64).build();
     /**
      * @deprecated Renamed to {@link #ARMS_UP_POTTERY_SHERD} in 1.20
      */
     @Deprecated
-    public static final ItemType POTTERY_SHARD_ARMS_UP = builder("pottery_shard_arms_up").build();
+    public static final ItemType POTTERY_SHARD_ARMS_UP = builder("POTTERY_SHARD_ARMS_UP").setMaxAmount(64).build();
     /**
      * @deprecated Renamed to {@link #SKULL_POTTERY_SHERD} in 1.20
      */
     @Deprecated
-    public static final ItemType POTTERY_SHARD_SKULL = builder("pottery_shard_skull").build();
+    public static final ItemType POTTERY_SHARD_SKULL = builder("POTTERY_SHARD_SKULL").setMaxAmount(64).build();
 
     public static Collection<ItemType> values() {
         return ITEM_TYPE_MAP.values();
