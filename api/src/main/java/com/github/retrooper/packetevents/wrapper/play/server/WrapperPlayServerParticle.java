@@ -60,11 +60,11 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     @Override
     public void read() {
         int particleTypeId = 0;
-        ParticleType particleType;
+        ParticleType particleType = null;
         if (serverVersion == ServerVersion.V_1_7_10) {
             String particleName = readString(64);
             particleType = ParticleTypes.getByName("minecraft:" + particleName);
-        } else {
+        } else if (this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
             particleTypeId = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19) ? readVarInt() : readInt();
             particleType = ParticleTypes.getById(serverVersion.toClientVersion(), particleTypeId);
         }
@@ -77,6 +77,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         offset = new Vector3f(readFloat(), readFloat(), readFloat());
         maxSpeed = readFloat();
         particleCount = readInt();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            particleType = this.readMappedEntity(ParticleTypes::getById);
+        }
         ParticleData data;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             data = particleType.readDataFunction().apply(this);
@@ -96,7 +99,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         //TODO on 1.7 we get particle type by 64 len string
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeString(particle.getType().getName().getKey(), 64);
-        } else {
+        } else if (this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
                 writeVarInt(id);
             } else {
@@ -118,6 +121,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         writeFloat(offset.getZ());
         writeFloat(maxSpeed);
         writeInt(particleCount);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.writeVarInt(id);
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             particle.getType().writeDataFunction().accept(this, particle.getData());
         } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
