@@ -24,10 +24,11 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
-public class ItemEnchantments {
+public class ItemEnchantments implements Iterable<Map.Entry<EnchantmentType, Integer>> {
 
     public static final ItemEnchantments EMPTY = new ItemEnchantments(
             Collections.emptyMap(), true) {
@@ -76,6 +77,10 @@ public class ItemEnchantments {
         }
     }
 
+    public int getEnchantmentCount() {
+        return this.enchantments.size();
+    }
+
     public Map<EnchantmentType, Integer> getEnchantments() {
         return this.enchantments;
     }
@@ -90,6 +95,11 @@ public class ItemEnchantments {
 
     public void setShowInTooltip(boolean showInTooltip) {
         this.showInTooltip = showInTooltip;
+    }
+
+    @Override
+    public Iterator<Map.Entry<EnchantmentType, Integer>> iterator() {
+        return this.enchantments.entrySet().iterator();
     }
 
     @Override
