@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
+import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -34,10 +35,10 @@ import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Quaternion4f;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
@@ -147,13 +148,14 @@ public class EntityDataTypes {
 
     public static final EntityDataType<NBTCompound> NBT = define("nbt", PacketWrapper::readNBT, PacketWrapper::writeNBT);
 
+    @SuppressWarnings("unchecked")
     public static final EntityDataType<Particle> PARTICLE = define("particle", wrapper -> {
-        int id = wrapper.readVarInt();
-        ParticleType type = ParticleTypes.getById(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), id);
-        return new Particle(type, type.readDataFunction().apply(wrapper));
+        ParticleType<?> type = wrapper.readMappedEntity(ParticleTypes::getById);
+        return new Particle(type, type.readData(wrapper));
     }, (wrapper, particle) -> {
-        wrapper.writeVarInt(particle.getType().getId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
-        particle.getType().writeDataFunction().accept(wrapper, particle.getData());
+        wrapper.writeMappedEntity(particle.getType());
+        ParticleType<ParticleData> particleType = (ParticleType<ParticleData>) particle.getType();
+        particleType.writeData(wrapper, particle.getData());
     });
 
     public static final EntityDataType<VillagerData> VILLAGER_DATA = define("villager_data", PacketWrapper::readVillagerData, PacketWrapper::writeVillagerData);

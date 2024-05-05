@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,28 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.particle.type;
+package com.github.retrooper.packetevents.protocol.world.positionsource;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
-import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+public interface PositionSourceType<T extends PositionSource> extends MappedEntity {
 
-public interface ParticleType<T extends ParticleData> extends MappedEntity {
+    T read(PacketWrapper<?> wrapper);
 
-    T readData(PacketWrapper<?> wrapper);
-
-    void writeData(PacketWrapper<?> wrapper, T data);
-
-    @Deprecated
-    default Function<PacketWrapper<?>, ParticleData> readDataFunction() {
-        return this::readData;
-    }
-
-    @Deprecated
-    default BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction() {
-        return (wrapper, data) -> this.writeData(wrapper, (T) data);
-    }
+    void write(PacketWrapper<?> wrapper, T source);
 }

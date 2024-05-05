@@ -18,43 +18,54 @@
 
 package com.github.retrooper.packetevents.protocol.particle.data;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSource;
+import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSourceType;
+import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSourceTypes;
+import com.github.retrooper.packetevents.protocol.world.positionsource.builtin.BlockPositionSource;
+import com.github.retrooper.packetevents.protocol.world.positionsource.builtin.EntityPositionSource;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
 public class ParticleVibrationData extends ParticleData {
 
+    @Deprecated
     public enum PositionType implements MappedEntity {
 
-        BLOCK(new ResourceLocation("minecraft:block")),
-        ENTITY(new ResourceLocation("minecraft:entity"));
+        BLOCK(PositionSourceTypes.BLOCK),
+        ENTITY(PositionSourceTypes.ENTITY);
 
-        private final ResourceLocation name;
+        private final PositionSourceType<?> type;
 
-        PositionType(ResourceLocation name) {
-            this.name = name;
+        PositionType(PositionSourceType<?> type) {
+            this.type = type;
         }
 
-        @Override
-        public ResourceLocation getName() {
-            return name;
+        @Contract("null -> null; !null -> !null")
+        public static @Nullable PositionType byModern(@Nullable PositionSourceType<?> type) {
+            if (type == null) {
+                return null;
+            }
+            for (PositionType legacyType : values()) {
+                if (legacyType.type == type) {
+                    return legacyType;
+                }
+            }
+            throw new UnsupportedOperationException("Unsupported modern type: " + type.getName());
         }
 
         public static PositionType getById(int id) {
-            switch (id) {
-                case 0x00:
-                    return BLOCK;
-                case 0x01:
-                    return ENTITY;
-                default:
-                    throw new IllegalArgumentException("Illegal position type id: " + id);
-            }
+            ClientVersion version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+            return byModern(PositionSourceTypes.getById(version, id));
         }
 
         public static @Nullable PositionType getByName(String name) {
@@ -62,94 +73,43 @@ public class ParticleVibrationData extends ParticleData {
         }
 
         public static @Nullable PositionType getByName(ResourceLocation name) {
-            for (PositionType type : values()) {
-                if (type.getName().equals(name)) {
-                    return type;
-                }
-            }
-            return null;
+            return byModern(PositionSourceTypes.getByName(name.toString()));
+        }
+
+        @Override
+        public ResourceLocation getName() {
+            return this.type.getName();
         }
 
         @Override
         public int getId(ClientVersion version) {
-            return this.ordinal();
+            return this.type.getId(version);
         }
     }
 
     private Vector3i startingPosition; // Removed in 1.19.4
-    private PositionType type;
-    private @Nullable Vector3i blockPosition;
-    private @Nullable Integer entityId;
-    private @Nullable Float entityEyeHeight; // Added in 1.19
+    private PositionSource source;
     private int ticks;
 
-    public ParticleVibrationData(Vector3i startingPosition, @Nullable Vector3i blockPosition, int ticks) {
-        this.startingPosition = startingPosition;
-        this.type = PositionType.BLOCK;
-        this.blockPosition = blockPosition;
-        this.entityId = null;
-        this.ticks = ticks;
+    public ParticleVibrationData(@Nullable Vector3i startingPos, Vector3i blockPosition, int ticks) {
+        this(startingPos, new BlockPositionSource(blockPosition), ticks);
     }
 
-    public ParticleVibrationData(Vector3i startingPosition, int entityId, int ticks) {
-        this.startingPosition = startingPosition;
-        this.type = PositionType.ENTITY;
-        this.blockPosition = null;
-        this.entityId = entityId;
-        this.entityEyeHeight = null;
-        this.ticks = ticks;
+    public ParticleVibrationData(@Nullable Vector3i startingPos, int entityId, int ticks) {
+        this(startingPos, new EntityPositionSource(entityId), ticks);
     }
 
-    public ParticleVibrationData(Vector3i startingPosition, int entityId, float entityEyeHeight, int ticks) {
-        this.startingPosition = startingPosition;
-        this.type = PositionType.ENTITY;
-        this.blockPosition = null;
-        this.entityId = entityId;
-        this.entityEyeHeight = entityEyeHeight;
-        this.ticks = ticks;
+    public ParticleVibrationData(@Nullable Vector3i startingPos, int entityId, float entityEyeHeight, int ticks) {
+        this(startingPos, new EntityPositionSource(entityId, entityEyeHeight), ticks);
     }
 
-    public Vector3i getStartingPosition() {
-        return startingPosition;
+    public ParticleVibrationData(PositionSource source, int ticks) {
+        this(null, source, ticks);
     }
 
-    public void setStartingPosition(Vector3i startingPosition) {
-        this.startingPosition = startingPosition;
-    }
-
-    public PositionType getType() {
-        return type;
-    }
-
-    public Optional<Vector3i> getBlockPosition() {
-        return Optional.ofNullable(blockPosition);
-    }
-
-    public void setBlockPosition(@Nullable Vector3i blockPosition) {
-        this.blockPosition = blockPosition;
-    }
-
-    public Optional<Integer> getEntityId() {
-        return Optional.ofNullable(entityId);
-    }
-
-    public void setEntityId(int entityId) {
-        this.entityId = entityId;
-    }
-
-    public Optional<Float> getEntityEyeHeight() {
-        return Optional.ofNullable(entityEyeHeight);
-    }
-
-    public void setEntityEyeHeight(@Nullable Float entityEyeHeight) {
-        this.entityEyeHeight = entityEyeHeight;
-    }
-
-    public int getTicks() {
-        return ticks;
-    }
-
-    public void setTicks(int ticks) {
+    public ParticleVibrationData(@Nullable Vector3i startingPos, PositionSource source, int ticks) {
+        this.startingPosition = startingPos;
+        this.source = source;
         this.ticks = ticks;
     }
 
@@ -157,52 +117,109 @@ public class ParticleVibrationData extends ParticleData {
         Vector3i startingPos = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)
                 ? Vector3i.zero() : wrapper.readBlockPosition();
 
-        PositionType positionType;
+        PositionSourceType<?> sourceType;
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            positionType = PositionType.getById(wrapper.readVarInt());
+            sourceType = wrapper.readMappedEntity(PositionSourceTypes::getById);
         } else {
-            String positionTypeName = wrapper.readString();
-            positionType = PositionType.getByName(positionTypeName);
-            if (positionType == null) {
-                throw new IllegalArgumentException("Unknown position type: " + positionTypeName);
+            String sourceTypeName = wrapper.readString();
+            sourceType = PositionSourceTypes.getByName(sourceTypeName);
+            if (sourceType == null) {
+                throw new IllegalArgumentException("Illegal position type: " + sourceTypeName);
             }
         }
 
-        switch (positionType) {
-            case BLOCK:
-                return new ParticleVibrationData(startingPos, wrapper.readBlockPosition(), wrapper.readVarInt());
-            case ENTITY:
-                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
-                    return new ParticleVibrationData(startingPos, wrapper.readVarInt(),
-                                                     wrapper.readFloat(), wrapper.readVarInt());
-                } else {
-                    return new ParticleVibrationData(startingPos, wrapper.readVarInt(), wrapper.readVarInt());
-                }
-            default:
-                throw new IllegalArgumentException("Illegal position type: " + positionType);
-        }
+        PositionSource source = sourceType.read(wrapper);
+        int ticks = wrapper.readVarInt();
+        return new ParticleVibrationData(startingPos, source, ticks);
     }
 
+    @SuppressWarnings("unchecked")
     public static void write(PacketWrapper<?> wrapper, ParticleVibrationData data) {
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_19_4)) {
             wrapper.writeBlockPosition(data.getStartingPosition());
         }
 
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            wrapper.writeVarInt(data.getType().getId(wrapper.getServerVersion().toClientVersion()));
+            wrapper.writeMappedEntity(data.getSourceType());
         } else {
             wrapper.writeIdentifier(data.getType().getName());
         }
 
-        if (data.getType() == PositionType.BLOCK) {
-            wrapper.writeBlockPosition(data.getBlockPosition().get());
-        } else if (data.getType() == PositionType.ENTITY) {
-            wrapper.writeVarInt(data.getEntityId().get());
-            if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
-                wrapper.writeFloat(data.getEntityEyeHeight().orElse(0f));
-            }
-        }
+        PositionSourceType<PositionSource> sourceType =
+                (PositionSourceType<PositionSource>) data.getSourceType();
+        sourceType.write(wrapper, data.getSource());
+
         wrapper.writeVarInt(data.getTicks());
+    }
+
+    @ApiStatus.Obsolete
+    public Vector3i getStartingPosition() {
+        return this.startingPosition;
+    }
+
+    @ApiStatus.Obsolete
+    public void setStartingPosition(Vector3i startingPosition) {
+        this.startingPosition = startingPosition;
+    }
+
+    @Deprecated
+    public PositionType getType() {
+        return PositionType.byModern(this.source.getType());
+    }
+
+    public PositionSourceType<?> getSourceType() {
+        return this.source.getType();
+    }
+
+    public PositionSource getSource() {
+        return this.source;
+    }
+
+    public Optional<Vector3i> getBlockPosition() {
+        if (this.source instanceof BlockPositionSource) {
+            return Optional.of(((BlockPositionSource) this.source).getPos());
+        }
+        return Optional.empty();
+    }
+
+    public void setBlockPosition(Vector3i blockPosition) {
+        this.source = new BlockPositionSource(blockPosition);
+    }
+
+    public Optional<Integer> getEntityId() {
+        if (this.source instanceof EntityPositionSource) {
+            return Optional.of(((EntityPositionSource) this.source).getEntityId());
+        }
+        return Optional.empty();
+    }
+
+    public void setEntityId(int entityId) {
+        float offsetY = this.getEntityEyeHeight().orElse(0f);
+        this.source = new EntityPositionSource(entityId, offsetY);
+    }
+
+    public Optional<Float> getEntityEyeHeight() {
+        if (this.source instanceof EntityPositionSource) {
+            return Optional.of(((EntityPositionSource) this.source).getOffsetY());
+        }
+        return Optional.empty();
+    }
+
+    public void setEntityEyeHeight(Float offsetY) {
+        this.setEntityEyeHeight(offsetY == null ? 0f : offsetY);
+    }
+
+    public void setEntityEyeHeight(float offsetY) {
+        int entityId = this.getEntityId().orElse(0);
+        this.source = new EntityPositionSource(entityId, offsetY);
+    }
+
+    public int getTicks() {
+        return this.ticks;
+    }
+
+    public void setTicks(int ticks) {
+        this.ticks = ticks;
     }
 
     @Override

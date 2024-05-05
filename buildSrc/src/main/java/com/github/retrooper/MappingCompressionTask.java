@@ -66,6 +66,8 @@ public class MappingCompressionTask extends DefaultTask {
         compressJson("sound/sound_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
 
         compressJson("stats/statistics.json", JsonToNbtStrategy.INSTANCE);
+
+        compressJson("world/world_position_source_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
     }
 
     private void compressJson(final String relativePath, final CompressionStrategy strategy) {
