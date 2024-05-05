@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
@@ -50,11 +51,21 @@ public class SpigotConversionUtil {
     }
 
     public static PotionType fromBukkitPotionEffectType(org.bukkit.potion.PotionEffectType potionEffectType) {
-        return PotionTypes.getById(potionEffectType.getId(), PacketEvents.getAPI().getServerManager().getVersion());
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        int id = potionEffectType.getId();
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+            id--;
+        }
+        return PotionTypes.getById(id, version);
     }
 
     public static org.bukkit.potion.PotionEffectType toBukkitPotionEffectType(PotionType potionType) {
-        return org.bukkit.potion.PotionEffectType.getById(potionType.getId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
+        ClientVersion version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        int id = potionType.getId(version);
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_2)) {
+            id++;
+        }
+        return org.bukkit.potion.PotionEffectType.getById(id);
     }
 
     public static GameMode fromBukkitGameMode(org.bukkit.GameMode gameMode) {
