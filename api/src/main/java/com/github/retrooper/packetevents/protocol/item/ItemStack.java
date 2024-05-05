@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.protocol.item;
 
 import com.github.retrooper.packetevents.protocol.component.ComponentType;
-import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments;
 import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
@@ -42,6 +41,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.DAMAGE;
+import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.ENCHANTMENTS;
+import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.MAX_DAMAGE;
+import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.MAX_STACK_SIZE;
+import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.STORED_ENCHANTMENTS;
 
 public class ItemStack {
     public static final ItemStack EMPTY = new ItemStack(ItemTypes.AIR, 0, new NBTCompound(), 0);
@@ -75,7 +80,7 @@ public class ItemStack {
     }
 
     public int getMaxStackSize() {
-        return this.getComponentOr(ComponentTypes.MAX_STACK_SIZE,
+        return this.getComponentOr(MAX_STACK_SIZE,
                 // fallback to legacy specified max stack size
                 this.getType().getMaxAmount());
     }
@@ -103,7 +108,7 @@ public class ItemStack {
                 return damage.getAsInt();
             }
         }
-        return this.getComponentOr(ComponentTypes.DAMAGE, 0);
+        return this.getComponentOr(DAMAGE, 0);
     }
 
     public void setDamageValue(int damage) {
@@ -111,11 +116,11 @@ public class ItemStack {
         // set in legacy nbt
         this.getOrCreateTag().setTag("Damage", new NBTInt(cappedDamage));
         // set in components
-        this.setComponent(ComponentTypes.DAMAGE, cappedDamage);
+        this.setComponent(DAMAGE, cappedDamage);
     }
 
     public int getMaxDamage() {
-        return this.getComponentOr(ComponentTypes.MAX_DAMAGE,
+        return this.getComponentOr(MAX_DAMAGE,
                 // fallback to legacy specified max durability
                 this.getType().getMaxDurability());
     }
@@ -250,8 +255,8 @@ public class ItemStack {
             return false;
         }
         // check for components
-        if (this.hasComponent(ComponentTypes.ENCHANTMENTS)
-                || this.hasComponent(ComponentTypes.STORED_ENCHANTMENTS)) {
+        if (!this.getComponentOr(ENCHANTMENTS, ItemEnchantments.EMPTY).isEmpty()
+                || !this.getComponentOr(STORED_ENCHANTMENTS, ItemEnchantments.EMPTY).isEmpty()) {
             return true;
         }
         // check for legacy nbt
@@ -269,8 +274,8 @@ public class ItemStack {
         }
 
         // check for components
-        Optional<ItemEnchantments> optEnchantments = this.getComponent(ComponentTypes.ENCHANTMENTS);
-        Optional<ItemEnchantments> optStoredEnchantments = this.getComponent(ComponentTypes.STORED_ENCHANTMENTS);
+        Optional<ItemEnchantments> optEnchantments = this.getComponent(ENCHANTMENTS);
+        Optional<ItemEnchantments> optStoredEnchantments = this.getComponent(STORED_ENCHANTMENTS);
         if (optEnchantments.isPresent() || optStoredEnchantments.isPresent()) {
             ItemEnchantments enchantments = optEnchantments.orElse(ItemEnchantments.EMPTY);
             ItemEnchantments storedEnchantments = optStoredEnchantments.orElse(ItemEnchantments.EMPTY);
@@ -316,14 +321,14 @@ public class ItemStack {
         }
 
         // check for components
-        Optional<ItemEnchantments> optEnchantments = this.getComponent(ComponentTypes.ENCHANTMENTS);
+        Optional<ItemEnchantments> optEnchantments = this.getComponent(ENCHANTMENTS);
         if (optEnchantments.isPresent()) {
             int level = optEnchantments.get().getEnchantmentLevel(enchantment);
             if (level > 0) {
                 return level;
             }
         }
-        Optional<ItemEnchantments> optStoredEnchantments = this.getComponent(ComponentTypes.STORED_ENCHANTMENTS);
+        Optional<ItemEnchantments> optStoredEnchantments = this.getComponent(STORED_ENCHANTMENTS);
         if (optStoredEnchantments.isPresent()) {
             int level = optStoredEnchantments.get().getEnchantmentLevel(enchantment);
             if (level > 0) {
@@ -390,7 +395,7 @@ public class ItemStack {
             enchantmentsMap.put(enchantment.getType(), enchantment.getLevel());
         }
         ComponentType<ItemEnchantments> componentType = this.type == ItemTypes.ENCHANTED_BOOK
-                ? ComponentTypes.STORED_ENCHANTMENTS : ComponentTypes.ENCHANTMENTS;
+                ? STORED_ENCHANTMENTS : ENCHANTMENTS;
         Optional<ItemEnchantments> prevEnchantments = this.getComponent(componentType);
         boolean showInTooltip = prevEnchantments.map(ItemEnchantments::isShowInTooltip).orElse(true);
         this.setComponent(componentType, new ItemEnchantments(enchantmentsMap, showInTooltip));

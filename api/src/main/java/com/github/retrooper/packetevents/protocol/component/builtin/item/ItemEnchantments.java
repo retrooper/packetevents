@@ -77,6 +77,10 @@ public class ItemEnchantments implements Iterable<Map.Entry<EnchantmentType, Int
         }
     }
 
+    public boolean isEmpty() {
+        return this.getEnchantmentCount() < 1;
+    }
+
     public int getEnchantmentCount() {
         return this.enchantments.size();
     }
