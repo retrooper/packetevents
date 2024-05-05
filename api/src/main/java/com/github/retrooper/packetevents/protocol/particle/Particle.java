@@ -20,33 +20,47 @@ package com.github.retrooper.packetevents.protocol.particle;
 
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
+import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class Particle {
-    private ParticleType<?> type;
-    private ParticleData data;
+public class Particle<T extends ParticleData> {
 
-    public Particle(ParticleType<?> type, ParticleData data) {
+    private ParticleType<T> type;
+    private T data;
+
+    public Particle(ParticleType<T> type, T data) {
         this.type = type;
         this.data = data;
     }
 
-    public Particle(ParticleType<?> type) {
-        this(type, new ParticleData());
+    public Particle(ParticleType<T> type) {
+        this(type, ParticleData.emptyData());
     }
 
-    public ParticleType<?> getType() {
-        return type;
+    @SuppressWarnings("unchecked") // will work on runtime
+    public static Particle<?> read(PacketWrapper<?> wrapper) {
+        ParticleType<?> type = wrapper.readMappedEntity(ParticleTypes::getById);
+        return new Particle<>((ParticleType<ParticleData>) type, type.readData(wrapper));
     }
 
-    public void setType(ParticleType<?> type) {
+    public static <T extends ParticleData> void write(PacketWrapper<?> wrapper, Particle<T> particle) {
+        wrapper.writeMappedEntity(particle.type);
+        particle.getType().writeData(wrapper, particle.data);
+    }
+
+    public ParticleType<T> getType() {
+        return this.type;
+    }
+
+    public void setType(ParticleType<T> type) {
         this.type = type;
     }
 
-    public ParticleData getData() {
-        return data;
+    public T getData() {
+        return this.data;
     }
 
-    public void setData(ParticleData data) {
+    public void setData(T data) {
         this.data = data;
     }
 }

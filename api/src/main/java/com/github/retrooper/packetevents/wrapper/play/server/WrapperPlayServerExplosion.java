@@ -22,8 +22,6 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
-import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
-import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.StaticSound;
@@ -44,8 +42,8 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     private List<Vector3i> records;
     private Vector3f playerMotion;
 
-    private Particle smallExplosionParticles;
-    private Particle largeExplosionParticles;
+    private Particle<?> smallExplosionParticles;
+    private Particle<?> largeExplosionParticles;
     private BlockInteraction blockInteraction;
     private Sound explosionSound;
 
@@ -54,13 +52,13 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     }
 
     public WrapperPlayServerExplosion(Vector3d position, float strength, List<Vector3i> records, Vector3f playerMotion) {
-        this(position, strength, records, playerMotion, new Particle(ParticleTypes.EXPLOSION),
-                new Particle(ParticleTypes.EXPLOSION_EMITTER), BlockInteraction.DESTROY_BLOCKS,
+        this(position, strength, records, playerMotion, new Particle<>(ParticleTypes.EXPLOSION),
+                new Particle<>(ParticleTypes.EXPLOSION_EMITTER), BlockInteraction.DESTROY_BLOCKS,
                 new ResourceLocation("minecraft:entity.generic.explode"), null);
     }
 
     public WrapperPlayServerExplosion(Vector3d position, float strength, List<Vector3i> records, Vector3f playerMotion,
-                                      Particle smallExplosionParticles, Particle largeExplosionParticles,
+                                      Particle<?> smallExplosionParticles, Particle<?> largeExplosionParticles,
                                       BlockInteraction blockInteraction, ResourceLocation explosionSoundKey,
                                       @Nullable Float explosionSoundRange) {
         this(position, strength, records, playerMotion, smallExplosionParticles, largeExplosionParticles,
@@ -68,7 +66,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     }
 
     public WrapperPlayServerExplosion(Vector3d position, float strength, List<Vector3i> records, Vector3f playerMotion,
-                                      Particle smallExplosionParticles, Particle largeExplosionParticles,
+                                      Particle<?> smallExplosionParticles, Particle<?> largeExplosionParticles,
                                       BlockInteraction blockInteraction, Sound explosionSound) {
         super(PacketType.Play.Server.EXPLOSION);
         this.position = position;
@@ -108,14 +106,8 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
 
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
             this.blockInteraction = BlockInteraction.values()[this.readVarInt()];
-
-            ParticleType smallPartType = ParticleTypes.getById(this.serverVersion.toClientVersion(), this.readVarInt());
-            ParticleData smallPartData = smallPartType.readDataFunction().apply(this);
-            this.smallExplosionParticles = new Particle(smallPartType, smallPartData);
-
-            ParticleType largePartType = ParticleTypes.getById(this.serverVersion.toClientVersion(), this.readVarInt());
-            ParticleData largePartData = largePartType.readDataFunction().apply(this);
-            this.largeExplosionParticles = new Particle(largePartType, largePartData);
+            this.smallExplosionParticles = Particle.read(this);
+            this.largeExplosionParticles = Particle.read(this);
 
             if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
                 this.explosionSound = Sound.read(this);
@@ -160,12 +152,8 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
 
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
             this.writeVarInt(this.blockInteraction.ordinal());
-
-            this.writeVarInt(this.smallExplosionParticles.getType().getId(this.serverVersion.toClientVersion()));
-            this.smallExplosionParticles.getType().writeDataFunction().accept(this, this.smallExplosionParticles.getData());
-
-            this.writeVarInt(this.largeExplosionParticles.getType().getId(this.serverVersion.toClientVersion()));
-            this.largeExplosionParticles.getType().writeDataFunction().accept(this, this.largeExplosionParticles.getData());
+            Particle.write(this, this.smallExplosionParticles);
+            Particle.write(this, this.largeExplosionParticles);
 
             if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
                 Sound.write(this, this.explosionSound);
@@ -236,19 +224,19 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         this.playerMotion = playerMotion;
     }
 
-    public Particle getSmallExplosionParticles() {
+    public Particle<?> getSmallExplosionParticles() {
         return this.smallExplosionParticles;
     }
 
-    public void setSmallExplosionParticles(Particle smallExplosionParticles) {
+    public void setSmallExplosionParticles(Particle<?> smallExplosionParticles) {
         this.smallExplosionParticles = smallExplosionParticles;
     }
 
-    public Particle getLargeExplosionParticles() {
+    public Particle<?> getLargeExplosionParticles() {
         return this.largeExplosionParticles;
     }
 
-    public void setLargeExplosionParticles(Particle largeExplosionParticles) {
+    public void setLargeExplosionParticles(Particle<?> largeExplosionParticles) {
         this.largeExplosionParticles = largeExplosionParticles;
     }
 

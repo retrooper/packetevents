@@ -36,6 +36,7 @@ public interface ParticleType<T extends ParticleData> extends MappedEntity {
         return this::readData;
     }
 
+    @SuppressWarnings("unchecked")
     @Deprecated
     default BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction() {
         return (wrapper, data) -> this.writeData(wrapper, (T) data);

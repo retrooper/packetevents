@@ -45,7 +45,7 @@ public class ParticleTypes {
     private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("particle/particle_type_mappings");
 
     public static ParticleType<ParticleData> define(String key) {
-        return define(key, wrapper -> new ParticleData(), null);
+        return define(key, wrapper -> ParticleData.emptyData(), null);
     }
 
     public static <T extends ParticleData> ParticleType<T> define(
