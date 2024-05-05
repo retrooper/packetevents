@@ -48,7 +48,7 @@ public class MappingCompressionTask extends DefaultTask {
         compressJson("enchantment/enchantment_type_mappings.json", JsonObjectCompressionStrategy.INSTANCE);
 
         compressJson("entity/entity_data_type_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
-        compressJson("entity/entity_effect_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
+        compressJson("entity/entity_effect_mappings.json", JsonObjectCompressionStrategy.INSTANCE);
         compressJson("entity/entity_type_mappings.json", JsonObjectCompressionStrategy.INSTANCE);
         compressJson("entity/legacy_entity_type_mappings.json", JsonObjectCompressionStrategy.INSTANCE);
 
