@@ -31,8 +31,18 @@ public final class Dummy {
         return DUMMY;
     }
 
+    public static Dummy dummyReadNbt(PacketWrapper<?> wrapper) {
+        wrapper.readNBTRaw();
+        return DUMMY;
+    }
+
     public static void dummyWrite(PacketWrapper<?> wrapper, Dummy dummy) {
         // NO-OP
+    }
+
+    public static void dummyWriteNbt(PacketWrapper<?> wrapper, Dummy dummy) {
+        wrapper.writeByte(0x0A); // compound start
+        wrapper.writeByte(0x00); // compound end
     }
 
     public static Dummy dummy() {

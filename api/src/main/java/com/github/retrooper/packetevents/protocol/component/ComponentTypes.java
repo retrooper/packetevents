@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ArmorTr
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BannerLayers;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BundleContents;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ChargedProjectiles;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.DebugStickState;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.FireworkExplosion;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.FoodProperties;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAdventurePredicate;
@@ -30,14 +31,18 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAtt
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBees;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBlockStateProperties;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemContainerContents;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemContainerLoot;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDyeColor;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemFireworks;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLock;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMapDecorations;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMapPostProcessingState;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPotionContents;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemProfile;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemRarity;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemRecipes;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemTool;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.LodestoneTracker;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.PotDecorations;
@@ -126,7 +131,8 @@ public class ComponentTypes {
     }
 
     // item component types
-    public static final ComponentType<Void> CUSTOM_DATA = define("custom_data"); // not synchronized
+    public static final ComponentType<NBTCompound> CUSTOM_DATA = define("custom_data",
+            PacketWrapper::readNBT, PacketWrapper::writeNBT);
     public static final ComponentType<Integer> MAX_STACK_SIZE = define("max_stack_size",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
     public static final ComponentType<Integer> MAX_DAMAGE = define("max_damage",
@@ -163,7 +169,8 @@ public class ComponentTypes {
             Dummy::dummyRead, Dummy::dummyWrite);
     public static final ComponentType<Boolean> ENCHANTMENT_GLINT_OVERRIDE = define("enchantment_glint_override",
             PacketWrapper::readBoolean, PacketWrapper::writeBoolean);
-    public static final ComponentType<Void> INTANGIBLE_PROJECTILE = define("intangible_projectile"); // not synchronized
+    public static final ComponentType<Dummy> INTANGIBLE_PROJECTILE = define("intangible_projectile",
+            Dummy::dummyReadNbt, Dummy::dummyWriteNbt);
     public static final ComponentType<FoodProperties> FOOD = define("food",
             FoodProperties::read, FoodProperties::write);
     public static final ComponentType<Dummy> FIRE_RESISTANT = define("fire_resistant",
@@ -178,7 +185,8 @@ public class ComponentTypes {
             PacketWrapper::readInt, PacketWrapper::writeInt);
     public static final ComponentType<Integer> MAP_ID = define("map_id",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
-    public static final ComponentType<Void> MAP_DECORATIONS = define("map_decorations"); // not synchronized
+    public static final ComponentType<ItemMapDecorations> MAP_DECORATIONS = define("map_decorations",
+            ItemMapDecorations::read, ItemMapDecorations::write);
     public static final ComponentType<ItemMapPostProcessingState> MAP_POST_PROCESSING = define("map_post_processing",
             wrapper -> wrapper.readEnum(ItemMapPostProcessingState.values()), PacketWrapper::writeEnum);
     public static final ComponentType<ChargedProjectiles> CHARGED_PROJECTILES = define("charged_projectiles",
@@ -195,7 +203,8 @@ public class ComponentTypes {
             WrittenBookContent::read, WrittenBookContent::write);
     public static final ComponentType<ArmorTrim> TRIM = define("trim",
             ArmorTrim::read, ArmorTrim::write);
-    public static final ComponentType<Void> DEBUG_STICK_STATE = define("debug_stick_state"); // not synchronized
+    public static final ComponentType<DebugStickState> DEBUG_STICK_STATE = define("debug_stick_state",
+            DebugStickState::read, DebugStickState::write);
     public static final ComponentType<NBTCompound> ENTITY_DATA = define("entity_data",
             PacketWrapper::readNBT, PacketWrapper::writeNBT);
     public static final ComponentType<NBTCompound> BUCKET_ENTITY_DATA = define("bucket_entity_data",
@@ -206,7 +215,8 @@ public class ComponentTypes {
             Instrument::read, Instrument::write);
     public static final ComponentType<Integer> OMINOUS_BOTTLE_AMPLIFIER = define("ominous_bottle_amplifier",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
-    public static final ComponentType<Void> RECIPES = define("recipes"); // not synchronized
+    public static final ComponentType<ItemRecipes> RECIPES = define("recipes",
+            ItemRecipes::read, ItemRecipes::write);
     public static final ComponentType<LodestoneTracker> LODESTONE_TRACKER = define("lodestone_tracker",
             LodestoneTracker::read, LodestoneTracker::write);
     public static final ComponentType<FireworkExplosion> FIREWORK_EXPLOSION = define("firework_explosion",
@@ -229,8 +239,10 @@ public class ComponentTypes {
             ItemBlockStateProperties::read, ItemBlockStateProperties::write);
     public static final ComponentType<ItemBees> BEES = define("bees",
             ItemBees::read, ItemBees::write);
-    public static final ComponentType<Void> LOCK = define("lock"); // not synchronized
-    public static final ComponentType<Void> CONTAINER_LOOT = define("container_loot"); // not synchronized
+    public static final ComponentType<ItemLock> LOCK = define("lock",
+            ItemLock::read, ItemLock::write);
+    public static final ComponentType<ItemContainerLoot> CONTAINER_LOOT = define("container_loot",
+            ItemContainerLoot::read, ItemContainerLoot::write);
 
     static {
         TYPES_BUILDER.unloadFileMappings();
