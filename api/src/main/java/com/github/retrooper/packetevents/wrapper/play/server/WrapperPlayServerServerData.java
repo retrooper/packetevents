@@ -95,7 +95,7 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
             writeBoolean(previewsChat);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)
-                && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_20_5)) {
+                && serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
             writeBoolean(enforceSecureChat);
         }
     }
