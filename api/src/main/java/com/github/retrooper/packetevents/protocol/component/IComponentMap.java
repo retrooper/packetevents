@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.component;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -29,6 +30,15 @@ public interface IComponentMap {
     }
 
     boolean has(ComponentType<?> type);
+
+    @Contract("_, !null -> !null")
+    default <T> @Nullable T getOr(ComponentType<T> type, @Nullable T otherValue) {
+        T value = this.get(type);
+        if (value != null) {
+            return value;
+        }
+        return otherValue;
+    }
 
     <T> @Nullable T get(ComponentType<T> type);
 
