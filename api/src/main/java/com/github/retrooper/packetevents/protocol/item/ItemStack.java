@@ -75,7 +75,9 @@ public class ItemStack {
     }
 
     public int getMaxStackSize() {
-        return getType().getMaxAmount();
+        return this.getComponentOr(ComponentTypes.MAX_STACK_SIZE,
+                // fallback to legacy specified max stack size
+                this.getType().getMaxAmount());
     }
 
     public boolean isStackable() {
