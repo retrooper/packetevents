@@ -144,17 +144,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             }
 
             // Update world height
-            NBTCompound dimension = user.getWorldNBT(joinGame.getDimension());
-            if (dimension != null) {
-                NBTCompound worldNBT = dimension.getCompoundTagOrNull("element");
-                if (worldNBT != null) {
-                    user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-                    user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
-                } else {
-                    PacketEvents.getAPI().getLogger().warning(
-                            "No data was sent for dimension " + dimension + " to " + user.getName());
-                }
-            }
+            user.switchDimensionType(joinGame.getServerVersion(), joinGame.getDimension());
         }
 
         // Respawn is used to switch dimensions
@@ -165,17 +155,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
                 return; // Fixed world height, no tags are sent to the client
             }
 
-            NBTCompound dimension = user.getWorldNBT(respawn.getDimension());
-            if (dimension != null) {
-                NBTCompound worldNBT = dimension.getCompoundTagOrNull("element"); // This is 1.17+, it always sends the world name
-                if (worldNBT != null) {
-                    user.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-                    user.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
-                } else {
-                    PacketEvents.getAPI().getLogger().warning(
-                            "No data was sent for dimension " + dimension + " to " + user.getName());
-                }
-            }
+            user.switchDimensionType(respawn.getServerVersion(), respawn.getDimension());
         } else if (event.getPacketType() == PacketType.Play.Server.CONFIGURATION_START) {
             user.setEncoderState(ConnectionState.CONFIGURATION);
         } else if (event.getPacketType() == PacketType.Configuration.Server.CONFIGURATION_END) {
