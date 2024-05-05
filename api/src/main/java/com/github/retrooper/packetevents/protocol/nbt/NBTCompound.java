@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.nbt;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -57,7 +59,7 @@ public class NBTCompound extends NBT {
         return tag;
     }
 
-    public NBT getTagOrNull(String key) {
+    public @Nullable NBT getTagOrNull(String key) {
         return tags.get(key);
     }
 
@@ -72,7 +74,7 @@ public class NBTCompound extends NBT {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends NBT> T getTagOfTypeOrNull(String key, Class<T> type) {
+    public <T extends NBT> @Nullable T getTagOfTypeOrNull(String key, Class<T> type) {
         NBT tag = getTagOrNull(key);
         if (type.isInstance(tag)) {
             return (T) tag;
@@ -90,7 +92,7 @@ public class NBTCompound extends NBT {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends NBT> NBTList<T> getTagListOfTypeOrNull(String key, Class<T> type) {
+    public <T extends NBT> @Nullable NBTList<T> getTagListOfTypeOrNull(String key, Class<T> type) {
         NBTList<? extends NBT> list = getTagOfTypeOrNull(key, NBTList.class);
         if ((list != null) && type.isAssignableFrom(list.getTagsType().getNBTClass())) {
             return (NBTList<T>) list;
@@ -102,7 +104,7 @@ public class NBTCompound extends NBT {
         return getTagOfTypeOrThrow(key, NBTCompound.class);
     }
 
-    public NBTCompound getCompoundTagOrNull(String key) {
+    public @Nullable NBTCompound getCompoundTagOrNull(String key) {
         return getTagOfTypeOrNull(key, NBTCompound.class);
     }
 
@@ -110,7 +112,7 @@ public class NBTCompound extends NBT {
         return getTagOfTypeOrThrow(key, NBTNumber.class);
     }
 
-    public NBTNumber getNumberTagOrNull(String key) {
+    public @Nullable NBTNumber getNumberTagOrNull(String key) {
         return getTagOfTypeOrNull(key, NBTNumber.class);
     }
 
@@ -118,7 +120,7 @@ public class NBTCompound extends NBT {
         return getTagOfTypeOrThrow(key, NBTString.class);
     }
 
-    public NBTString getStringTagOrNull(String key) {
+    public @Nullable NBTString getStringTagOrNull(String key) {
         return getTagOfTypeOrNull(key, NBTString.class);
     }
 
@@ -126,7 +128,7 @@ public class NBTCompound extends NBT {
         return getTagListOfTypeOrThrow(key, NBTCompound.class);
     }
 
-    public NBTList<NBTCompound> getCompoundListTagOrNull(String key) {
+    public @Nullable NBTList<NBTCompound> getCompoundListTagOrNull(String key) {
         return getTagListOfTypeOrNull(key, NBTCompound.class);
     }
 
@@ -134,7 +136,7 @@ public class NBTCompound extends NBT {
         return getTagListOfTypeOrThrow(key, NBTNumber.class);
     }
 
-    public NBTList<NBTNumber> getNumberListTagOrNull(String key) {
+    public @Nullable NBTList<NBTNumber> getNumberListTagOrNull(String key) {
         return getTagListOfTypeOrNull(key, NBTNumber.class);
     }
 
@@ -142,7 +144,7 @@ public class NBTCompound extends NBT {
         return getTagListOfTypeOrThrow(key, NBTString.class);
     }
 
-    public NBTList<NBTString> getStringListTagOrNull(String key) {
+    public @Nullable NBTList<NBTString> getStringListTagOrNull(String key) {
         return getTagListOfTypeOrNull(key, NBTString.class);
     }
 
@@ -150,7 +152,7 @@ public class NBTCompound extends NBT {
         return getStringTagOrThrow(key).getValue();
     }
 
-    public String getStringTagValueOrNull(String key) {
+    public @Nullable String getStringTagValueOrNull(String key) {
         NBT tag = getTagOrNull(key);
         if (tag instanceof NBTString) {
             return ((NBTString) tag).getValue();

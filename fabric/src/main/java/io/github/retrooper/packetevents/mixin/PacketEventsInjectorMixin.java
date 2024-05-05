@@ -1,8 +1,8 @@
 package io.github.retrooper.packetevents.mixin;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.UserConnectEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -13,10 +13,7 @@ import io.github.retrooper.packetevents.handler.PacketDecoder;
 import io.github.retrooper.packetevents.handler.PacketEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.PacketFlow;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,9 +30,15 @@ public class PacketEventsInjectorMixin {
         User user = new User(channel, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
                 new UserProfile(null, null));
         ProtocolManager.USERS.put(channel, user);
+
+        UserConnectEvent connectEvent = new UserConnectEvent(user);
+        PacketEvents.getAPI().getEventManager().callEvent(connectEvent);
+        if (connectEvent.isCancelled()) {
+            channel.unsafe().closeForcibly();
+            return;
+        }
         PacketDecoder decoder = new PacketDecoder(user);
         PacketEncoder encoder = new PacketEncoder(user);
-        PacketEventsMod.LOGGER.info("Pipeline: " + ChannelHelper.pipelineHandlerNamesAsString(channel));
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, encoder);
         channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
