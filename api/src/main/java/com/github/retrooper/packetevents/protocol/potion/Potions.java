@@ -28,6 +28,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Potions are all possible brewable drinks.<br>
+ * Some examples are the potion of leaping, the extended potion of leaping
+ * or the strong potion of leaping.
+ * <p>
+ * For individual potion effects, see {@link PotionTypes}.
+ */
 public class Potions {
 
     private static final Map<String, Potion> POTION_MAP = new HashMap<>();
