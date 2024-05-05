@@ -55,7 +55,7 @@ jobs:
           path: velocity/build/libs
 
       - name: Upload build artifacts fabric
-          uses: actions/upload-artifact@v3
-          with:
-            name: fabric-build
-            path: fabric/build/libs
+        uses: actions/upload-artifact@v3
+        with:
+          name: fabric-build
+          path: fabric/build/libs
