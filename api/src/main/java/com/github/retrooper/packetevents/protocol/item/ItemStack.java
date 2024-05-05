@@ -107,14 +107,17 @@ public class ItemStack {
     }
 
     public void setDamageValue(int damage) {
+        int cappedDamage = Math.max(0, damage);
         // set in legacy nbt
-        this.getOrCreateTag().setTag("Damage", new NBTInt(Math.max(0, damage)));
+        this.getOrCreateTag().setTag("Damage", new NBTInt(cappedDamage));
         // set in components
-        this.setComponent(ComponentTypes.DAMAGE, Math.max(0, damage));
+        this.setComponent(ComponentTypes.DAMAGE, cappedDamage);
     }
 
     public int getMaxDamage() {
-        return this.getType().getComponents().getOr(ComponentTypes.MAX_DAMAGE, 0);
+        return this.getComponentOr(ComponentTypes.MAX_DAMAGE,
+                // fallback to legacy specified max durability
+                this.getType().getMaxDurability());
     }
 
     public NBTCompound getOrCreateTag() {
