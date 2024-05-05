@@ -53,17 +53,13 @@ public class PotionTypes {
 
             @Override
             public int getId(ClientVersion version) {
-                int id = MappingHelper.getId(version, TYPES_BUILDER, data);
-                if (version.isOlderThan(ClientVersion.V_1_20_2)) {
-                    id++;
-                }
-                return id;
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
 
             @Override
             public boolean equals(Object obj) {
                 if (obj instanceof PotionType) {
-                    return getName().equals(((PotionType) obj).getName());
+                    return this.getName().equals(((PotionType) obj).getName());
                 }
                 return false;
             }
@@ -92,11 +88,7 @@ public class PotionTypes {
     public static @Nullable PotionType getById(int id, ClientVersion version) {
         int index = TYPES_BUILDER.getDataIndex(version);
         Map<Integer, PotionType> idMap = POTION_TYPE_ID_MAP.get((byte) index);
-        if (version.isOlderThan(ClientVersion.V_1_20_2)) {
-            return idMap.get(id - 1);
-        } else {
-            return idMap.get(id);
-        }
+        return idMap.get(id);
     }
 
     // Added in b1.8
