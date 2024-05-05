@@ -108,7 +108,7 @@ public class ItemStack {
         // set in legacy nbt
         this.getOrCreateTag().setTag("Damage", new NBTInt(Math.max(0, damage)));
         // set in components
-        this.setComponent(ComponentTypes.DAMAGE, damage);
+        this.setComponent(ComponentTypes.DAMAGE, Math.max(0, damage));
     }
 
     public int getMaxDamage() {
