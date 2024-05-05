@@ -119,4 +119,9 @@ public class ItemEnchantments implements Iterable<Map.Entry<EnchantmentType, Int
     public int hashCode() {
         return Objects.hash(this.enchantments, this.showInTooltip);
     }
+
+    @Override
+    public String toString() {
+        return "ItemEnchantments{enchantments=" + this.enchantments + ", showInTooltip=" + this.showInTooltip + '}';
+    }
 }

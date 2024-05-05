@@ -59,6 +59,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.PublicProfileKey;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.recipe.data.MerchantItemCost;
 import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
@@ -1180,9 +1181,11 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public MerchantOffer readMerchantOffer() {
-        ItemStack buyItemPrimary = readItemStack();
-        ItemStack sellItem = readItemStack();
-        ItemStack buyItemSecondary = readOptional(PacketWrapper::readItemStack);
+        ItemStack buyItemPrimary = MerchantItemCost.readItem(this);
+        ItemStack sellItem = this.readItemStack();
+        ItemStack buyItemSecondary = this.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)
+                || this.getServerVersion().isOlderThan(ServerVersion.V_1_19)
+                ? this.readOptional(MerchantItemCost::readItem) : this.readItemStack();
         boolean tradeDisabled = readBoolean();
         int uses = readInt();
         int maxUses = readInt();
@@ -1190,7 +1193,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         int specialPrice = readInt();
         float priceMultiplier = readFloat();
         int demand = readInt();
-        MerchantOffer data = MerchantOffer.of(buyItemPrimary, buyItemSecondary, sellItem, uses, maxUses, xp, specialPrice, priceMultiplier, demand);
+        MerchantOffer data = MerchantOffer.of(buyItemPrimary, buyItemSecondary,
+                sellItem, uses, maxUses, xp, specialPrice, priceMultiplier, demand);
         if (tradeDisabled) {
             data.setUses(data.getMaxUses());
         }
@@ -1198,14 +1202,20 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeMerchantOffer(MerchantOffer data) {
-        writeItemStack(data.getFirstInputItem());
-        writeItemStack(data.getOutputItem());
+        MerchantItemCost.writeItem(this, data.getFirstInputItem());
+        this.writeItemStack(data.getOutputItem());
         ItemStack buyItemSecondary = data.getSecondInputItem();
-        //In this case writing empty itemstacks is just as good as writing nothing according to vanilla server code
+        // in this case writing empty itemstacks is just
+        // as good as writing nothing according to vanilla server code
         if (buyItemSecondary != null && buyItemSecondary.isEmpty()) {
             buyItemSecondary = null;
         }
-        writeOptional(buyItemSecondary, PacketWrapper::writeItemStack);
+        if (this.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)
+                || this.getServerVersion().isOlderThan(ServerVersion.V_1_19)) {
+            this.writeOptional(buyItemSecondary, MerchantItemCost::writeItem);
+        } else {
+            this.writeItemStack(buyItemSecondary);
+        }
         writeBoolean(data.getUses() >= data.getMaxUses());
         writeInt(data.getUses());
         writeInt(data.getMaxUses());
