@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.particle.data;
+package com.github.retrooper.packetevents.protocol.world.positionsource;
 
-public class ParticleData {
+public abstract class PositionSource {
 
-    static ParticleData EMPTY = new ParticleData();
+    protected final PositionSourceType<?> type;
 
-    @SuppressWarnings("unchecked")
-    public static <T extends ParticleData> T emptyData() {
-        return (T) EMPTY;
+    public PositionSource(PositionSourceType<?> type) {
+        this.type = type;
     }
 
-    public boolean isEmpty() {
-        return true;
+    public PositionSourceType<?> getType() {
+        return this.type;
     }
 }

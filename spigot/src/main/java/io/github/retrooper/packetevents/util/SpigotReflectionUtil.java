@@ -979,7 +979,7 @@ public final class SpigotReflectionUtil {
         }
     }
 
-    public static ParticleType toPacketEventsParticle(Enum<?> particle) {
+    public static ParticleType<?> toPacketEventsParticle(Enum<?> particle) {
         try {
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
                 BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
@@ -1002,7 +1002,7 @@ public final class SpigotReflectionUtil {
         return null;
     }
 
-    public static Enum<?> fromPacketEventsParticle(ParticleType particle) {
+    public static Enum<?> fromPacketEventsParticle(ParticleType<?> particle) {
         try {
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
                 BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
