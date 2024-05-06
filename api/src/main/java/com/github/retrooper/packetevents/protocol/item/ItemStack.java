@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.item;
 
 import com.github.retrooper.packetevents.protocol.component.ComponentType;
+import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments;
 import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
@@ -90,11 +91,9 @@ public class ItemStack {
     }
 
     public boolean isDamageableItem() {
-        if (!this.cachedIsEmpty && this.getType().getMaxDurability() > 0) {
-            NBTCompound tag = this.getNBT();
-            return tag == null || !tag.getBoolean("Unbreakable");
-        }
-        return false;
+        return !this.cachedIsEmpty && this.getMaxDamage() > 0
+                && (this.nbt == null || !this.nbt.getBoolean("Unbreakable"))
+                && !this.getComponentOr(ComponentTypes.UNBREAKABLE, false);
     }
 
     public boolean isDamaged() {
