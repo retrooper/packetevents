@@ -23,7 +23,11 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.world.*;
+import com.github.retrooper.packetevents.protocol.world.Difficulty;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.protocol.world.DimensionType;
+import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
+import com.github.retrooper.packetevents.protocol.world.WorldType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -124,10 +128,11 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         boolean v1_20_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2);
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
+        boolean v1_16_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
         boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
         boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
-        if (v1_16) {
+        if (v1_16_2) {
             hardcore = readBoolean();
             if (!v1_20_2) {
                 gameMode = readGameMode();
@@ -135,7 +140,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         } else {
             int gameModeId = readUnsignedByte();
             hardcore = (gameModeId & 0x8) == 0x8;
-            gameMode = GameMode.getById(gameModeId & -0x9);
+            gameMode = GameMode.getById(gameModeId & ~0x08);
         }
         if (v1_16) {
             if (!v1_20_2) {
@@ -163,7 +168,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             hashedSeed = readLong();
         }
         if (v1_16) {
-            maxPlayers = readVarInt();
+            this.maxPlayers = v1_16_2 ? this.readVarInt() : this.readUnsignedByte();
             viewDistance = readVarInt();
             if (v1_18) simulationDistance = readVarInt();
             reducedDebugInfo = readBoolean();
@@ -208,10 +213,11 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         boolean v1_20_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_2);
         boolean v1_19 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19);
         boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
+        boolean v1_16_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
         boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         boolean v1_15 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
-        if (v1_16) {
+        if (v1_16_2) {
             writeBoolean(hardcore);
             if (!v1_20_2) {
                 writeGameMode(gameMode);
@@ -254,7 +260,11 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             writeLong(hashedSeed);
         }
         if (v1_16) {
-            writeVarInt(maxPlayers);
+            if (v1_16_2) {
+                this.writeVarInt(this.maxPlayers);
+            } else {
+                this.writeByte(this.maxPlayers);
+            }
             writeVarInt(viewDistance);
             if (v1_18) writeVarInt(simulationDistance);
             writeBoolean(reducedDebugInfo);
