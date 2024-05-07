@@ -258,15 +258,15 @@ public class WrappedBlockState {
     }
 
     private static void loadModern() {
-        Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
-        Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
-        Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
-        Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
-        Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
-
         final NBTCompound compound = MappingHelper.decompress("mappings/block/modern_block_mappings");
 
         for (Map.Entry<String, NBT> versionEntry : compound.getTags().entrySet()) {
+            Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
+            Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
+            Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
+            Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
+            Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
+
             if (versionEntry.getKey().equals("version")) continue;
             ClientVersion version = ClientVersion.valueOf(versionEntry.getKey());
             byte mappingIndex = getMappingsIndex(version);
@@ -363,7 +363,7 @@ public class WrappedBlockState {
 
     @Override
     public WrappedBlockState clone() {
-        return new WrappedBlockState(type, data, globalID, mappingsIndex);
+        return new WrappedBlockState(type, new HashMap<>(data), globalID, mappingsIndex);
     }
 
     @Override
