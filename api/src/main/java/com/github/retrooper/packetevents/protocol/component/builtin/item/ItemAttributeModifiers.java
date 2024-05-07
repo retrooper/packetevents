@@ -91,6 +91,11 @@ public class ItemAttributeModifiers {
         return Objects.hash(this.modifiers, this.showInTooltip);
     }
 
+    @Override
+    public String toString() {
+        return "ItemAttributeModifiers{modifiers=" + this.modifiers + ", showInTooltip=" + this.showInTooltip + '}';
+    }
+
     public static class ModifierEntry {
 
         private Attribute attribute;
@@ -153,6 +158,11 @@ public class ItemAttributeModifiers {
         @Override
         public int hashCode() {
             return Objects.hash(this.attribute, this.modifier, this.slotGroup);
+        }
+
+        @Override
+        public String toString() {
+            return "ModifierEntry{attribute=" + this.attribute + ", modifier=" + this.modifier + ", slotGroup=" + this.slotGroup + '}';
         }
     }
 
@@ -231,6 +241,11 @@ public class ItemAttributeModifiers {
         @Override
         public int hashCode() {
             return Objects.hash(this.id, this.name, this.value, this.operation);
+        }
+
+        @Override
+        public String toString() {
+            return "Modifier{id=" + this.id + ", name='" + this.name + '\'' + ", value=" + this.value + ", operation=" + this.operation + '}';
         }
     }
 

@@ -42,6 +42,10 @@ public interface IComponentMap {
 
     <T> @Nullable T get(ComponentType<T> type);
 
+    default <T> void set(ComponentValue<T> component) {
+        this.set(component.getType(), component.getValue());
+    }
+
     default <T> void set(ComponentType<T> type, @Nullable T value) {
         this.set(type, Optional.ofNullable(value));
     }
