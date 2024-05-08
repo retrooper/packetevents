@@ -33,6 +33,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.MapMaker;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -205,7 +206,7 @@ public final class SpigotReflectionUtil {
             WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, 0, NMS_ITEM_STACK_CLASS);
         }
 
-        GET_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, IBLOCK_DATA_CLASS, 0, int.class);
+        GET_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, int.class, 0, IBLOCK_DATA_CLASS);
         GET_BY_COMBINED_ID = Reflection.getMethod(BLOCK_CLASS, IBLOCK_DATA_CLASS, 0, int.class);
         if (CRAFT_BLOCK_DATA_CLASS != null) {
             GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA = Reflection.getMethodExact(CRAFT_BLOCK_DATA_CLASS, "fromData", CRAFT_BLOCK_DATA_CLASS, IBLOCK_DATA_CLASS);
@@ -791,18 +792,21 @@ public final class SpigotReflectionUtil {
             //TODO Finish for 1.7.10
             throw new IllegalStateException("This operation is not supported yet on 1.7.10!");
         }
-        /*Object iBlockDataObj = null;
+        Object iBlockDataObj = null;
         try {
             iBlockDataObj = GET_BY_COMBINED_ID.invoke(null, combinedID);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
-        }*/
-        /*
+        }
+
         try {
-            return (BlockData) GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA.invoke(null, iBlockDataObj);
+            Class<?> blockData = Reflection.getClassByNameWithoutException("org.bukkit.block.data.BlockData");
+            Object bd = (blockData.cast(GET_CRAFT_BLOCK_DATA_FROM_IBLOCKDATA.invoke(null, iBlockDataObj)));
+            Method materialMethod = Reflection.getMethod(blockData, Material.class, 0);
+            return new MaterialData((Material) materialMethod.invoke(bd));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
-        }*/
+        }
 
         return null;
     }
