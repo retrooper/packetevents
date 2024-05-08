@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -73,8 +74,11 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     @Override
     public void read() {
         this.sound = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3) ? Sound.read(this)
-                : Sounds.getById(this.serverVersion.toClientVersion(), this.readVarInt());
-        soundCategory = SoundCategory.fromId(readVarInt());
+                : serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? Sounds.getById(this.serverVersion.toClientVersion(), this.readVarInt())
+                : Sounds.getByName(readString());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            soundCategory = SoundCategory.fromId(readVarInt());
+        }
         effectPosition = new Vector3i(readInt(), readInt(), readInt());
         volume = readFloat();
         pitch = readFloat();
@@ -103,7 +107,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void copy(WrapperPlayServerSoundEffect wrapper) {
-        this.sound = wrapper.sound;
+        sound = wrapper.sound;
         soundCategory = wrapper.soundCategory;
         effectPosition = wrapper.effectPosition;
         volume = wrapper.volume;
@@ -129,6 +133,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         this.setSound(Sounds.getById(this.serverVersion.toClientVersion(), soundId));
     }
 
+    @Nullable
     public SoundCategory getSoundCategory() {
         return soundCategory;
     }

@@ -30,8 +30,8 @@ import java.util.Map;
 
 public class Sounds {
 
-    private static final Map<String, Sound> POTION_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, Sound>> POTION_TYPE_ID_MAP = new HashMap<>();
+    private static final Map<String, Sound> SOUND_TYPE_MAP = new HashMap<>();
+    private static final Map<Byte, Map<Integer, Sound>> SOUND_TYPE_ID_MAP = new HashMap<>();
 
     private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("sound/sound_mappings");
 
@@ -70,17 +70,17 @@ public class Sounds {
                 return false;
             }
         };
-        MappingHelper.registerMapping(TYPES_BUILDER, POTION_TYPE_MAP, POTION_TYPE_ID_MAP, potionType);
+        MappingHelper.registerMapping(TYPES_BUILDER, SOUND_TYPE_MAP, SOUND_TYPE_ID_MAP, potionType);
         return potionType;
     }
 
     public static @Nullable Sound getByName(String name) {
-        return POTION_TYPE_MAP.get(name);
+        return SOUND_TYPE_MAP.get(name);
     }
 
     public static @Nullable Sound getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, Sound> idMap = POTION_TYPE_ID_MAP.get((byte) index);
+        Map<Integer, Sound> idMap = SOUND_TYPE_ID_MAP.get((byte) index);
         return idMap.get(id);
     }
 
