@@ -54,6 +54,8 @@ public interface ReflectionObjectReader {
 
     <T> T readObject(int index, Class<? extends T> type);
 
+    <T> T[] readObjectArray(int index, Class<? extends T> type);
+
     Enum<?> readEnumConstant(int index, Class<? extends Enum<?>> type);
 
     Object readAnyObject(int index);

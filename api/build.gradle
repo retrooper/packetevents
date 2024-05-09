@@ -5,6 +5,11 @@ repositories {
     maven { url 'https://repo.papermc.io/repository/maven-public/' }
 }
 
+
+javadoc {
+    destinationDir = file("${buildDir}/docs/javadoc")
+}
+
 java {
     disableAutoTargetJvm()
     sourceSets {
