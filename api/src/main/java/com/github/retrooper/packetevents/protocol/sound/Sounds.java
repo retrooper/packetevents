@@ -41,7 +41,7 @@ public class Sounds {
 
     public static Sound define(String key, ResourceLocation soundId, @Nullable Float range) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
-        Sound potionType = new Sound() {
+        Sound soundType = new Sound() {
             @Override
             public ResourceLocation getSoundId() {
                 return soundId;
@@ -70,8 +70,8 @@ public class Sounds {
                 return false;
             }
         };
-        MappingHelper.registerMapping(TYPES_BUILDER, SOUND_TYPE_MAP, SOUND_TYPE_ID_MAP, potionType);
-        return potionType;
+        MappingHelper.registerMapping(TYPES_BUILDER, SOUND_TYPE_MAP, SOUND_TYPE_ID_MAP, soundType);
+        return soundType;
     }
 
     public static @Nullable Sound getByName(String name) {

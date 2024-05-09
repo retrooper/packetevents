@@ -75,13 +75,19 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     public void read() {
         this.sound = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3) ? Sound.read(this)
                 : serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? Sounds.getById(this.serverVersion.toClientVersion(), this.readVarInt())
+                //TODO Test
                 : Sounds.getByName(readString());
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             soundCategory = SoundCategory.fromId(readVarInt());
         }
         effectPosition = new Vector3i(readInt(), readInt(), readInt());
         volume = readFloat();
-        pitch = readFloat();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
+            pitch = readFloat();
+        }
+        else {
+            pitch = readUnsignedByte() / 63.5F;
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             this.seed = readLong();
         }
@@ -91,15 +97,24 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     public void write() {
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
             Sound.write(this, this.sound);
-        } else {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)){
             this.writeVarInt(this.sound.getId(this.serverVersion.toClientVersion()));
+        }
+        else {
+            //TODO Test
+            writeString(sound.getName().getKey());
         }
         writeVarInt(soundCategory.ordinal());
         writeInt(effectPosition.x);
         writeInt(effectPosition.y);
         writeInt(effectPosition.z);
         writeFloat(volume);
-        writeFloat(pitch);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
+            writeFloat(pitch);
+        }
+        else {
+            writeByte((int) (pitch * 63.5F));
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeLong(seed);
         }

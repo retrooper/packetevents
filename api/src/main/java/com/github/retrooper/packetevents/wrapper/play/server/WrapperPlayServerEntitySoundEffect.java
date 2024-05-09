@@ -60,7 +60,12 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
         this.soundCategory = SoundCategory.fromId(readVarInt());
         this.entityId = readVarInt();
         this.volume = readFloat();
-        this.pitch = readFloat();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
+            pitch = readFloat();
+        }
+        else {
+            pitch = readUnsignedByte() / 63.5F;
+        }
     }
 
     @Override
@@ -73,7 +78,12 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
         writeVarInt(this.soundCategory.ordinal());
         writeVarInt(this.entityId);
         writeFloat(this.volume);
-        writeFloat(this.pitch);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
+            writeFloat(pitch);
+        }
+        else {
+            writeByte((int) (pitch * 63.5F));
+        }
     }
 
     @Override
