@@ -37,8 +37,23 @@ public class WrappedBlockState {
     static {
         STRING_UPDATER.put("grass_path", "dirt_path"); // 1.16 -> 1.17
 
-        loadLegacy();
-        loadModern();
+        // Try to reduce memory footprint by re-using hashmaps when they are equal
+        // We do this by setting the key to the NBTCompound of the data and the value to the data
+        // this.data = cache.computeIfAbsent(dataContent, (key) -> { // NBTCompound to data });
+        // This will get an equal value if present, otherwise it will compute the value
+        // Once this is done, we remove this cache to save memory
+        // A HashMap is used instead of another data type because a hashmap is o(1)
+        //
+        // 6160 total combinations, last updated with 1.20.5
+        // This brings total memory usage from 62 MB to 34 MB, a 28 MB reduction
+        // Using a HashMap reduces memory usage to less than a megabyte, I can't get precise numbers because it is hard to see on a heapdump
+        Map<NBTCompound, Map.Entry<Map<StateValue, Object>, String>> cache = new HashMap<>(6160, 70);
+
+        loadLegacy(cache);
+        loadModern(cache);
+
+        cache.clear();
+        cache = null;
     }
 
     int globalID;
@@ -171,7 +186,7 @@ public class WrappedBlockState {
         return 14;
     }
 
-    private static void loadLegacy() {
+    private static void loadLegacy(Map<NBTCompound, Map.Entry<Map<StateValue, Object>, String>> cache) {
         Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
         Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
         Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
@@ -196,45 +211,49 @@ public class WrappedBlockState {
                 int data = Integer.parseInt(ids[1]);
                 int combinedID = (id << 4) | data;
 
-                StringBuilder dataStringBuilder = new StringBuilder();
                 NBTCompound dataContent = (NBTCompound) element.getValue();
-                Map<StateValue, Object> dataMap = new HashMap<>(dataContent.size());
+                Map.Entry<Map<StateValue, Object>, String> dataEntry = cache.computeIfAbsent(dataContent, (key) -> {
+                    StringBuilder dataStringBuilder = new StringBuilder();
+                    Map<StateValue, Object> dataMap = new HashMap<>(key.size());
 
-                for (Map.Entry<String, NBT> props : dataContent.getTags().entrySet()) {
-                    StateValue state = StateValue.byName(props.getKey());
-                    if (state == null) {
-                        PacketEvents.getAPI().getLogger().warning("Could not find value for " + props.getKey());
-                        continue;
+                    for (Map.Entry<String, NBT> props : key.getTags().entrySet()) {
+                        StateValue state = StateValue.byName(props.getKey());
+                        if (state == null) {
+                            PacketEvents.getAPI().getLogger().warning("Could not find value for " + props.getKey());
+                            continue;
+                        }
+
+                        dataStringBuilder.append(props.getKey()).append("=");
+                        NBT value = props.getValue();
+                        Object v;
+                        if (value instanceof NBTByte) {
+                            v = ((NBTByte) value).getAsInt() == 1;
+                        } else if (value instanceof NBTNumber) {
+                            v = ((NBTNumber) value).getAsInt();
+                        } else if (value instanceof NBTString) {
+                            v = ((NBTString) value).getValue();
+                        } else {
+                            PacketEvents.getAPI().getLogger().warning("Unknown NBT type in legacy mapping: " + value.getClass().getSimpleName());
+                            dataStringBuilder = new StringBuilder(dataStringBuilder.substring(0, dataStringBuilder.length() - props.getKey().length() - 1));
+                            continue;
+                        }
+
+                        dataStringBuilder.append(v).append(",");
+                        dataMap.put(state, state.getParser().apply(v.toString().toUpperCase(Locale.ROOT)));
                     }
 
-                    dataStringBuilder.append(props.getKey()).append("=");
-                    NBT value = props.getValue();
-                    Object v;
-                    if (value instanceof NBTByte) {
-                        v = ((NBTByte) value).getAsInt() == 1;
-                    } else if (value instanceof NBTNumber) {
-                        v = ((NBTNumber) value).getAsInt();
-                    } else if (value instanceof NBTString) {
-                        v = ((NBTString) value).getValue();
+                    String dataString;
+                    if (dataStringBuilder.length() == 0) {
+                        dataString = "";
                     } else {
-                        PacketEvents.getAPI().getLogger().warning("Unknown NBT type in legacy mapping: " + value.getClass().getSimpleName());
-                        dataStringBuilder = new StringBuilder(dataStringBuilder.substring(0, dataStringBuilder.length() - props.getKey().length() - 1));
-                        continue;
+                        dataString = "[" + dataStringBuilder.substring(0, dataStringBuilder.length() - 1) + "]";
                     }
 
-                    dataStringBuilder.append(v).append(",");
-                    dataMap.put(state, state.getParser().apply(v.toString().toUpperCase(Locale.ROOT)));
-                }
+                    return new AbstractMap.SimpleEntry<>(dataMap, dataString);
+                });
 
-                String dataString;
-                if (dataStringBuilder.length() == 0) {
-                    dataString = "";
-                } else {
-                    dataString = "[" + dataStringBuilder.substring(0, dataStringBuilder.length() - 1) + "]";
-                }
-                String fullString = entry.getKey() + dataString;
-
-                WrappedBlockState state = new WrappedBlockState(type, dataMap, combinedID, (byte) 0);
+                String fullString = entry.getKey() + dataEntry.getValue();
+                WrappedBlockState state = new WrappedBlockState(type, dataEntry.getKey(), combinedID, (byte) 0);
 
                 stateByIdMap.put(combinedID, state);
                 stateToStringMap.put(state, fullString);
@@ -257,20 +276,20 @@ public class WrappedBlockState {
         DEFAULT_STATES.put((byte) 0, stateTypeToBlockStateMap);
     }
 
-    private static void loadModern() {
+    private static void loadModern(Map<NBTCompound, Map.Entry<Map<StateValue, Object>, String>> cache) {
         final NBTCompound compound = MappingHelper.decompress("mappings/block/modern_block_mappings");
 
         for (Map.Entry<String, NBT> versionEntry : compound.getTags().entrySet()) {
+            if (versionEntry.getKey().equals("version")) continue;
+            ClientVersion version = ClientVersion.valueOf(versionEntry.getKey());
+            byte mappingIndex = getMappingsIndex(version);
+            NBTList<NBTCompound> list = (NBTList<NBTCompound>) versionEntry.getValue();
+
             Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
             Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
             Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
             Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
             Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
-
-            if (versionEntry.getKey().equals("version")) continue;
-            ClientVersion version = ClientVersion.valueOf(versionEntry.getKey());
-            byte mappingIndex = getMappingsIndex(version);
-            NBTList<NBTCompound> list = (NBTList<NBTCompound>) versionEntry.getValue();
 
             int id = 0;
             for (NBTCompound element : list.getTags()) {
@@ -299,45 +318,48 @@ public class WrappedBlockState {
 
                 int index = 0;
                 for (NBTCompound dataContent : element.getCompoundListTagOrThrow("entries").getTags()) {
-                    StringBuilder dataStringBuilder = new StringBuilder();
+                    Map.Entry<Map<StateValue, Object>, String> dataEntry = cache.computeIfAbsent(dataContent, (key) -> {
+                        StringBuilder dataStringBuilder = new StringBuilder();
+                        Map<StateValue, Object> dataMap = new HashMap<>(key.size());
 
-                    Map<StateValue, Object> dataMap = new HashMap<>(dataContent.size());
+                        for (Map.Entry<String, NBT> props : key.getTags().entrySet()) {
+                            StateValue state = StateValue.byName(props.getKey());
+                            if (state == null) {
+                                PacketEvents.getAPI().getLogger().warning("Could not find value for " + props.getKey());
+                                continue;
+                            }
 
-                    for (Map.Entry<String, NBT> props : dataContent.getTags().entrySet()) {
-                        StateValue state = StateValue.byName(props.getKey());
-                        if (state == null) {
-                            PacketEvents.getAPI().getLogger().warning("Could not find value for " + props.getKey());
-                            continue;
+                            dataStringBuilder.append(props.getKey()).append("=");
+                            NBT value = props.getValue();
+                            Object v;
+                            if (value instanceof NBTByte) {
+                                v = ((NBTByte) value).getAsInt() == 1;
+                            } else if (value instanceof NBTNumber) {
+                                v = ((NBTNumber) value).getAsInt();
+                            } else if (value instanceof NBTString) {
+                                v = ((NBTString) value).getValue();
+                            } else {
+                                PacketEvents.getAPI().getLogger().warning("Unknown NBT typeString in modern mapping: " + value.getClass().getSimpleName());
+                                dataStringBuilder = new StringBuilder(dataStringBuilder.substring(0, dataStringBuilder.length() - props.getKey().length() - 1));
+                                continue;
+                            }
+
+                            dataStringBuilder.append(v).append(",");
+                            dataMap.put(state, state.getParser().apply(v.toString().toUpperCase(Locale.ROOT)));
                         }
 
-                        dataStringBuilder.append(props.getKey()).append("=");
-                        NBT value = props.getValue();
-                        Object v;
-                        if (value instanceof NBTByte) {
-                            v = ((NBTByte) value).getAsInt() == 1;
-                        } else if (value instanceof NBTNumber) {
-                            v = ((NBTNumber) value).getAsInt();
-                        } else if (value instanceof NBTString) {
-                            v = ((NBTString) value).getValue();
+                        String dataString;
+                        if (dataStringBuilder.length() == 0) {
+                            dataString = "";
                         } else {
-                            PacketEvents.getAPI().getLogger().warning("Unknown NBT typeString in modern mapping: " + value.getClass().getSimpleName());
-                            dataStringBuilder = new StringBuilder(dataStringBuilder.substring(0, dataStringBuilder.length() - props.getKey().length() - 1));
-                            continue;
+                            dataString = "[" + dataStringBuilder.substring(0, dataStringBuilder.length() - 1) + "]";
                         }
 
-                        dataStringBuilder.append(v).append(",");
-                        dataMap.put(state, state.getParser().apply(v.toString().toUpperCase(Locale.ROOT)));
-                    }
+                        return new AbstractMap.SimpleEntry<>(dataMap, dataString);
+                    });
 
-                    String dataString;
-                    if (dataStringBuilder.length() == 0) {
-                        dataString = "";
-                    } else {
-                        dataString = "[" + dataStringBuilder.substring(0, dataStringBuilder.length() - 1) + "]";
-                    }
-                    String fullString = typeString + dataString;
-
-                    WrappedBlockState state = new WrappedBlockState(type, dataMap, id, mappingIndex);
+                    String fullString = typeString + dataEntry.getValue();
+                    WrappedBlockState state = new WrappedBlockState(type, dataEntry.getKey(), id, mappingIndex);
 
                     if (defaultIdx == index) {
                         stateTypeToBlockStateMap.put(type, state);
@@ -363,7 +385,7 @@ public class WrappedBlockState {
 
     @Override
     public WrappedBlockState clone() {
-        return new WrappedBlockState(type, new HashMap<>(data), globalID, mappingsIndex);
+        return new WrappedBlockState(type, data, globalID, mappingsIndex);
     }
 
     @Override
