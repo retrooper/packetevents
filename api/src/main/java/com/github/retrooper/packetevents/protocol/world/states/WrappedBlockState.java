@@ -46,7 +46,7 @@ public class WrappedBlockState {
         //
         // 6160 total combinations, last updated with 1.20.5
         // This brings total memory usage from 62 MB to 34 MB, a 28 MB reduction
-        // Using a HashMap reduces memory usage to less than a megabyte, I can't get precise numbers because hard to see on a heapdump
+        // Using a HashMap reduces memory usage to less than a megabyte, I can't get precise numbers because it is hard to see on a heapdump
         Map<NBTCompound, Map.Entry<Map<StateValue, Object>, String>> cache = new HashMap<>(6160, 70);
 
         loadLegacy(cache);
