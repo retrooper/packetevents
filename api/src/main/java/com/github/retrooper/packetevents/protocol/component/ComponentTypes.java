@@ -61,6 +61,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -243,6 +245,14 @@ public class ComponentTypes {
             ItemLock::read, ItemLock::write);
     public static final ComponentType<ItemContainerLoot> CONTAINER_LOOT = define("container_loot",
             ItemContainerLoot::read, ItemContainerLoot::write);
+
+    /**
+     * Returns an immutable view of the component types.
+     * @return Component Types
+     */
+    public static Collection<ComponentType<?>> values() {
+        return Collections.unmodifiableCollection(COMPONENT_TYPE_MAP.values());
+    }
 
     static {
         TYPES_BUILDER.unloadFileMappings();

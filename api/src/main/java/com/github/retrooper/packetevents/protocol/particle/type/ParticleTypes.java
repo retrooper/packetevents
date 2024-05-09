@@ -35,6 +35,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -226,6 +228,14 @@ public class ParticleTypes {
     public static final ParticleType<ParticleData> OMINOUS_SPAWNING = define("ominous_spawning");
     public static final ParticleType<ParticleData> RAID_OMEN = define("raid_omen");
     public static final ParticleType<ParticleData> TRIAL_OMEN = define("trial_omen");
+
+    /**
+     * Returns an immutable view of the particle types.
+     * @return Particle Types
+     */
+    public static Collection<ParticleType<?>> values() {
+        return Collections.unmodifiableCollection(PARTICLE_TYPE_MAP.values());
+    }
 
     static {
         TYPES_BUILDER.unloadFileMappings();

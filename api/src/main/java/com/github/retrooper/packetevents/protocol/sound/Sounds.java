@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -1691,6 +1693,14 @@ public class Sounds {
     public static final Sound EVENT_MOB_EFFECT_BAD_OMEN = define("event.mob_effect.bad_omen");
     public static final Sound EVENT_MOB_EFFECT_TRIAL_OMEN = define("event.mob_effect.trial_omen");
     public static final Sound EVENT_MOB_EFFECT_RAID_OMEN = define("event.mob_effect.raid_omen");
+
+    /**
+     * Returns an immutable view of the sounds.
+     * @return Sounds
+     */
+    public static Collection<Sound> values() {
+        return Collections.unmodifiableCollection(SOUND_TYPE_MAP.values());
+    }
 
     static {
         TYPES_BUILDER.unloadFileMappings();

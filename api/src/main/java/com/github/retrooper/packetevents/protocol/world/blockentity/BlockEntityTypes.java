@@ -23,6 +23,8 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -122,6 +124,14 @@ public class BlockEntityTypes {
     public static final BlockEntityType CRAFTER = define("crafter");
     public static final BlockEntityType TRIAL_SPAWNER = define("trial_spawner");
     public static final BlockEntityType VAULT = define("vault");
+
+    /**
+     * Returns an immutable view of the block entity types.
+     * @return Block Entity Types
+     */
+    public static Collection<BlockEntityType> values() {
+        return Collections.unmodifiableCollection(BLOCK_ENTITY_TYPE_MAP.values());
+    }
 
     static {
         TYPES_BUILDER.unloadFileMappings();

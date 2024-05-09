@@ -39,11 +39,7 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -209,6 +205,14 @@ public class EntityDataTypes {
 
     public static final EntityDataType<Integer> WOLF_VARIANT =
             define("wolf_variant_type", readIntDeserializer(), writeIntSerializer());
+
+    /**
+     * Returns an immutable view of the entity-data types.
+     * @return Entity-Data Types
+     */
+    public static Collection<EntityDataType<?>> values() {
+        return Collections.unmodifiableCollection(ENTITY_DATA_TYPE_MAP.values());
+    }
 
     public static EntityDataType<?> getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);

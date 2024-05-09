@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -200,6 +202,14 @@ public class MapDecorationTypes {
     // Added with 1.20.5
     public static final MapDecorationType TRIAL_CHAMBERS = define("trial_chambers",
             true, COPPER_COLOR, true, false);
+
+    /**
+     * Returns an immutable view of the map decoration types.
+     * @return Map Decoration Types
+     */
+    public static Collection<MapDecorationType> values() {
+        return Collections.unmodifiableCollection(DECORATION_TYPE_MAP.values());
+    }
 
     static {
         TYPES_BUILDER.unloadFileMappings();

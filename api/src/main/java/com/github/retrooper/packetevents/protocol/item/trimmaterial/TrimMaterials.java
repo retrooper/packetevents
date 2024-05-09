@@ -29,6 +29,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import net.kyori.adventure.text.Component;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,8 +39,8 @@ import static net.kyori.adventure.text.format.TextColor.color;
 
 public class TrimMaterials {
 
-    private static final Map<String, TrimMaterial> PATTERN_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, TrimMaterial>> PATTERN_TYPE_ID_MAP = new HashMap<>();
+    private static final Map<String, TrimMaterial> TRIM_MATERIAL_MAP = new HashMap<>();
+    private static final Map<Byte, Map<Integer, TrimMaterial>> TRIM_MATERIAL_ID_MAP = new HashMap<>();
     private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_trim_material_mappings");
 
     public static TrimMaterial define(String key, ItemType ingredient, float itemModelIndex, int color) {
@@ -59,7 +61,7 @@ public class TrimMaterials {
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
-        TrimMaterial pattern = new TrimMaterial() {
+        TrimMaterial material = new TrimMaterial() {
             @Override
             public String getAssetName() {
                 return assetName;
@@ -103,18 +105,18 @@ public class TrimMaterials {
                 return false;
             }
         };
-        MappingHelper.registerMapping(TYPES_BUILDER, PATTERN_TYPE_MAP, PATTERN_TYPE_ID_MAP, pattern);
-        return pattern;
+        MappingHelper.registerMapping(TYPES_BUILDER, TRIM_MATERIAL_MAP, TRIM_MATERIAL_ID_MAP, material);
+        return material;
     }
 
     // with key
     public static TrimMaterial getByName(String name) {
-        return PATTERN_TYPE_MAP.get(name);
+        return TRIM_MATERIAL_MAP.get(name);
     }
 
     public static TrimMaterial getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, TrimMaterial> idMap = PATTERN_TYPE_ID_MAP.get((byte) index);
+        Map<Integer, TrimMaterial> idMap = TRIM_MATERIAL_ID_MAP.get((byte) index);
         return idMap.get(id);
     }
 
@@ -129,6 +131,14 @@ public class TrimMaterials {
     public static final TrimMaterial NETHERITE = define("netherite", ItemTypes.NETHERITE_INGOT, 0.3f, 0x625859);
     public static final TrimMaterial QUARTZ = define("quartz", ItemTypes.QUARTZ, 0.1f, 0xE3D4C4);
     public static final TrimMaterial REDSTONE = define("redstone", ItemTypes.REDSTONE, 0.4f, 0x971607);
+
+    /**
+     * Returns an immutable view of the trim materials.
+     * @return Trim Materials
+     */
+    public static Collection<TrimMaterial> values() {
+        return Collections.unmodifiableCollection(TRIM_MATERIAL_MAP.values());
+    }
 
     static {
         TYPES_BUILDER.unloadFileMappings();

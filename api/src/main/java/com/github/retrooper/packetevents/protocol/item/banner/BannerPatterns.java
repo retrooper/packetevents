@@ -24,6 +24,8 @@ import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -126,6 +128,14 @@ public class BannerPatterns {
     public static final BannerPattern BORDER = define("border");
     public static final BannerPattern PIGLIN = define("piglin");
     public static final BannerPattern DIAGONAL_LEFT = define("diagonal_left");
+
+    /**
+     * Returns an immutable view of the banner patterns.
+     * @return Banner Patterns
+     */
+    public static Collection<BannerPattern> values() {
+        return Collections.unmodifiableCollection(PATTERN_TYPE_MAP.values());
+    }
 
     static {
         TYPES_BUILDER.unloadFileMappings();

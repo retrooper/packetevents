@@ -24,6 +24,8 @@ import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,6 +79,14 @@ public class ChatTypes {
     public static final ChatType MSG_COMMAND = define("msg_command");
     @Deprecated
     public static final ChatType TEAM_MSG_COMMAND = define("team_msg_command");
+
+    /**
+     * Returns an immutable view of the chat types.
+     * @return Chat Types
+     */
+    public static Collection<ChatType> values() {
+        return Collections.unmodifiableCollection(CHAT_TYPE_MAP.values());
+    }
 
     static {
         TYPES_BUILDER.unloadFileMappings();
