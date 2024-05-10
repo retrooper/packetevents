@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ArmorTr
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BannerLayers;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BundleContents;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ChargedProjectiles;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.CustomData;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.DebugStickState;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.FireworkExplosion;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.FoodProperties;
@@ -134,7 +135,9 @@ public class ComponentTypes {
 
     // item component types
     public static final ComponentType<NBTCompound> CUSTOM_DATA = define("custom_data",
-            PacketWrapper::readNBT, PacketWrapper::writeNBT);
+            // mojang wraps their "persistent" codec as a stream codec just here,
+            // so packetevents has to handle nbt strings
+            CustomData::read, CustomData::write);
     public static final ComponentType<Integer> MAX_STACK_SIZE = define("max_stack_size",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
     public static final ComponentType<Integer> MAX_DAMAGE = define("max_damage",
