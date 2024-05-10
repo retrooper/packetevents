@@ -15,254 +15,253 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package shadow.utils.holders.packet.custom;
+package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.item.mapdecoration.MapDecorationType;
+import com.github.retrooper.packetevents.protocol.item.mapdecoration.MapDecorationTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMapData> {
 
     private int mapId;
     private byte scale;
+    private boolean trackingPosition;
     private boolean locked;
-    private MapIcon[] icons;
-    private int columns, rows, x, z;
-    private byte[] bytes;
+    private @Nullable List<MapDecoration> decorations;
+    private int columns;
+    private int rows;
+    private int x;
+    private int z;
+    private byte @Nullable [] data;
 
     public WrapperPlayServerMapData(PacketSendEvent event) {
         super(event);
     }
 
-    //The only change occurred here, where the array's length became optional
-    //https://wiki.vg/index.php?title=Protocol&oldid=17753#Map_Data 1.19
-    //https://wiki.vg/index.php?title=Protocol&oldid=18067#Map_Data 1.19.2
-
-    //hasIcons can also be called trackingPositions, but both ultimately do the same
-
-    public WrapperPlayServerMapData(int mapId, byte scale, boolean locked, @Nullable MapIcon[] icons) {
-        super(PacketType.Play.Server.MAP_DATA);
-        this.mapId = mapId;
-        this.scale = scale;
-        this.locked = locked;
-        this.icons = icons;
+    public WrapperPlayServerMapData(int mapId, byte scale, @Nullable List<MapDecoration> decorations) {
+        this(mapId, scale, false, decorations);
     }
 
-    public WrapperPlayServerMapData(int mapId, byte scale, boolean locked, @Nullable MapIcon[] icons, int columns, int rows, int x, int z, @NotNull byte[] bytes) {
+    public WrapperPlayServerMapData(int mapId, byte scale, boolean locked, @Nullable List<MapDecoration> decorations) {
+        this(mapId, scale, false, locked, decorations, 0, 0, 0, 0, null);
+    }
+
+    public WrapperPlayServerMapData(
+            int mapId, byte scale, boolean trackingPosition,
+            boolean locked, @Nullable List<MapDecoration> decorations,
+            int columns, int rows, int x, int z, byte @Nullable [] data
+    ) {
         super(PacketType.Play.Server.MAP_DATA);
         this.mapId = mapId;
         this.scale = scale;
+        this.trackingPosition = trackingPosition;
         this.locked = locked;
-        this.icons = icons;
+        this.decorations = decorations;
         this.columns = columns;
         this.rows = rows;
         this.x = x;
         this.z = z;
-        this.bytes = bytes;
+        this.data = data;
     }
 
-    //No version changes fixes necessary here
     @Override
     public void read() {
-        this.mapId = readVarInt();
-        this.scale = readByte();
-        this.locked = readBoolean();
-
-        boolean hasIcons = this.readBoolean();
-        if (hasIcons) {
-            int length = this.readVarInt();
-            MapIcon[] icons = new MapIcon[length];
-            for (int i = 0; i < length; i++)
-                icons[i] = new MapIcon(MapIconType.ofId(this.readVarInt()), this.readByte(), this.readByte(), this.readByte(), this.readBoolean() ? this.readComponent() : null);
-            this.icons = icons;
+        this.mapId = this.readVarInt();
+        this.scale = this.readByte();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)
+                && this.serverVersion.isOlderThan(ServerVersion.V_1_17)) {
+            this.trackingPosition = this.readBoolean();
         }
-        this.columns = this.readByte();
-        if (columns > 0) {
-            this.rows = this.readByte();
-            this.x = this.readByte();
-            this.z = this.readByte();
-            this.bytes = this.readByteArrayOfSize(this.readVarInt());
+        this.locked = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14) && this.readBoolean();
+
+        if (this.serverVersion.isOlderThan(ServerVersion.V_1_17) || this.readBoolean()) {
+            this.decorations = this.readList(MapDecoration::read);
+        }
+
+        this.columns = this.readUnsignedByte();
+        if (this.columns > 0) {
+            this.rows = this.readUnsignedByte();
+            this.x = this.readUnsignedByte();
+            this.z = this.readUnsignedByte();
+            this.data = this.readByteArray();
         }
     }
 
     @Override
     public void write() {
-        ServerVersion version = this.getServerVersion();
+        this.writeVarInt(this.mapId);
+        this.writeByte(this.scale);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)
+                && this.serverVersion.isOlderThan(ServerVersion.V_1_17)) {
+            this.writeBoolean(this.trackingPosition);
+        }
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+            this.writeBoolean(this.locked);
+        }
 
-        writeVarInt(this.mapId);
-        writeByte(scale);//0-4
-        writeBoolean(locked);
-        boolean hasIcons = icons != null;
-
-        writeBoolean(hasIcons);//hasIcons/trackingPosition, whatever you call it
-        if (hasIcons) {
-            writeVarInt(icons.length);
-            for (MapIcon icon : icons) {
-                writeVarInt(icon.getType().getId());
-                writeByte(icon.getX());
-                writeByte(icon.getZ());
-                writeByte(icon.getDirection());
-                boolean hasDisplayName = icon.getDisplayName() != null;
-                writeBoolean(hasDisplayName);
-                if (hasDisplayName) writeComponent(icon.getDisplayName());
+        if (this.decorations != null) {
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+                this.writeBoolean(true); // decorations are present
             }
-        } else if (version.isOlderThanOrEquals(ServerVersion.V_1_19))
-            writeVarInt(0);//The array is not optional on 1.19 and below, so if it's missing, we have to at least write that it's length is 0
+            this.writeList(this.decorations, MapDecoration::write);
+        } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            this.writeBoolean(false); // not present
+        } else {
+            // write empty list size
+            this.writeVarInt(0);
+        }
 
-        writeByte(columns);
-        if (columns > 0) {
-            writeByte(rows);
-            writeByte(x);
-            writeByte(z);
-            writeVarInt(bytes.length);
-            writeBytes(bytes);
+        if (this.data != null) {
+            this.writeByte(this.columns);
+            if (this.columns > 0) {
+                this.writeByte(this.rows);
+                this.writeByte(this.x);
+                this.writeByte(this.z);
+                this.writeByteArray(this.data);
+            }
+        } else {
+            this.writeByte(0); // 0 columns mean no data
         }
     }
 
-    public static class MapIcon {
+    public static class MapDecoration {
 
-        private MapIconType type;
-        private byte x, z, direction;
-        private Component displayName;
+        private MapDecorationType type;
+        private byte x;
+        private byte y;
+        private byte direction; // 0 to 15
+        private @Nullable Component displayName;
 
-        public MapIcon(MapIconType type, byte x, byte z, byte direction, @Nullable Component displayName) {
+        public MapDecoration(MapDecorationType type, byte x, byte y, byte direction, @Nullable Component displayName) {
             this.type = type;
             this.x = x;
-            this.z = z;
-            this.direction = direction;//0-15
+            this.y = y;
+            this.direction = direction;
             this.displayName = displayName;
         }
 
-        public MapIconType getType() {
-            return type;
+        public static MapDecoration read(PacketWrapper<?> wrapper) {
+            // first 4 bits determine decoration type, last 4 bits determine rotation below 1.13
+            boolean v113 = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13);
+            byte flags = v113 ? 0 : wrapper.readByte();
+            MapDecorationType type = !v113
+                    ? MapDecorationTypes.getById(wrapper.getServerVersion().toClientVersion(), flags & 0xF0)
+                    : wrapper.readMappedEntity(MapDecorationTypes::getById);
+
+            byte x = wrapper.readByte();
+            byte y = wrapper.readByte();
+            byte direction = (byte) ((v113 ? wrapper.readByte() : flags) & 0xF);
+            Component displayName = v113 ? wrapper.readOptional(PacketWrapper::readComponent) : null;
+            return new MapDecoration(type, x, y, direction, displayName);
         }
 
-        public void setType(MapIconType type) {
+        public static void write(PacketWrapper<?> wrapper, MapDecoration decoration) {
+            boolean v113 = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13);
+            if (v113) {
+                wrapper.writeMappedEntity(decoration.getType());
+            } else {
+                int typeId = decoration.getType().getId(wrapper.getServerVersion().toClientVersion());
+                wrapper.writeByte((typeId & 0xF) << 4 | (decoration.getDirection() & 0xF));
+            }
+
+            wrapper.writeByte(decoration.getX());
+            wrapper.writeByte(decoration.getY());
+            if (v113) {
+                wrapper.writeByte(decoration.getDirection());
+                wrapper.writeOptional(decoration.getDisplayName(), PacketWrapper::writeComponent);
+            }
+        }
+
+        public MapDecorationType getType() {
+            return this.type;
+        }
+
+        public void setType(MapDecorationType type) {
             this.type = type;
         }
 
-        public Component getDisplayName() {
-            return displayName;
+        public byte getX() {
+            return this.x;
         }
 
-        public void setDisplayName(Component displayName) {
-            this.displayName = displayName;
+        public void setX(byte x) {
+            this.x = x;
+        }
+
+        public byte getY() {
+            return this.y;
+        }
+
+        public void setY(byte y) {
+            this.y = y;
         }
 
         public byte getDirection() {
-            return direction;
+            return this.direction;
         }
 
         public void setDirection(byte direction) {
             this.direction = direction;
         }
 
-        public byte getZ() {
-            return z;
+        public @Nullable Component getDisplayName() {
+            return this.displayName;
         }
 
-        public void setZ(byte z) {
-            this.z = z;
-        }
-
-        public byte getX() {
-            return x;
-        }
-
-        public void setX(byte x) {
-            this.x = x;
-        }
-    }
-
-    //the id is equivalent to their ordinal
-    public enum MapIconType {
-        WHITE_ARROW,
-        GREEN_ARROW,
-        RED_ARROW,
-        BLUE_ARROW,
-        WHITE_CROSS,
-        RED_POINTER,
-        WHITE_CIRCLE,
-        SMALL_WHITE_CIRCLE,
-        MANSION,
-        TEMPLE,
-        WHITE_BANNER,
-        ORANGE_BANNER,
-        MAGENTA_BANNER,
-        LIGHT_BLUE_BANNER,
-        YELLOW_BANNER,
-        LIME_BANNER,
-        PINK_BANNER,
-        GRAY_BANNER,
-        LIGHT_GRAY_BANNER,
-        CYAN_BANNER,
-        PURPLE_BANNER,
-        BLUE_BANNER,
-        BROWN_BANNER,
-        GREEN_BANNER,
-        RED_BANNER,
-        BLACK_BANNER,
-        TREASURE_MARKER;
-
-        public int getId() {
-            return this.ordinal();
-        }
-
-        public static MapIconType ofId(int id) {
-            return id < MapIconType.values().length && id >= 0 ? MapIconType.values()[id] : null;
+        public void setDisplayName(@Nullable Component displayName) {
+            this.displayName = displayName;
         }
     }
 
     public int getMapId() {
-        return mapId;
+        return this.mapId;
     }
 
     public void setMapId(int mapId) {
         this.mapId = mapId;
     }
 
-    public byte[] getBytes() {
-        return bytes;
-    }
-
-    public void setBytes(@NotNull byte[] bytes) {
-        this.bytes = bytes;
-    }
-
-    public void setColumns(byte columns) {
-        this.columns = columns;
-    }
-
-    public MapIcon[] getIcons() {
-        return icons;
-    }
-
-    public void setIcons(@Nullable MapIcon[] icons) {
-        this.icons = icons;
-    }
-
-    public boolean isLocked() {
-        return locked;
-    }
-
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
-
     public byte getScale() {
-        return scale;
+        return this.scale;
     }
 
     public void setScale(byte scale) {
         this.scale = scale;
     }
 
+    public boolean isTrackingPosition() {
+        return this.trackingPosition;
+    }
+
+    public void setTrackingPosition(boolean trackingPosition) {
+        this.trackingPosition = trackingPosition;
+    }
+
+    public boolean isLocked() {
+        return this.locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    public @Nullable List<MapDecoration> getDecorations() {
+        return this.decorations;
+    }
+
+    public void setDecorations(@Nullable List<MapDecoration> decorations) {
+        this.decorations = decorations;
+    }
+
     public int getColumns() {
-        return columns;
+        return this.columns;
     }
 
     public void setColumns(int columns) {
@@ -270,7 +269,7 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
     }
 
     public int getRows() {
-        return rows;
+        return this.rows;
     }
 
     public void setRows(int rows) {
@@ -278,7 +277,7 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
     }
 
     public int getX() {
-        return x;
+        return this.x;
     }
 
     public void setX(int x) {
@@ -286,10 +285,18 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
     }
 
     public int getZ() {
-        return z;
+        return this.z;
     }
 
     public void setZ(int z) {
         this.z = z;
+    }
+
+    public byte @Nullable [] getData() {
+        return this.data;
+    }
+
+    public void setData(byte @Nullable [] data) {
+        this.data = data;
     }
 }
