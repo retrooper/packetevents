@@ -42,22 +42,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -98,7 +88,8 @@ public final class SpigotReflectionUtil {
             BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS, PROPERTY_MAP_CLASS, DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, MOJANG_ENCODER_CLASS, DATA_RESULT_CLASS,
             DYNAMIC_OPS_NBT_CLASS, NMS_NBT_COMPOUND_CLASS, NMS_NBT_BASE_CLASS, NBT_COMPRESSION_STREAM_TOOLS_CLASS,
             STREAM_CODEC, STREAM_DECODER, STREAM_ENCODER, REGISTRY_FRIENDLY_BYTE_BUF, REGISTRY_ACCESS, REGISTRY_ACCESS_FROZEN,
-            RESOURCE_KEY, REGISTRY, WRITABLE_REGISTRY, NBT_ACCOUNTER;
+            RESOURCE_KEY, REGISTRY, WRITABLE_REGISTRY, NBT_ACCOUNTER, CHUNK_PROVIDER_SERVER_CLASS, CHUNK_STATUS_CLASS,
+            BLOCK_POSITION_CLASS, PLAYER_CHUNK_MAP_CLASS, PLAYER_CHUNK_CLASS, CHUNK_CLASS, IBLOCKACCESS_CLASS, ICHUNKACCESS_CLASS;
 
     //Netty classes
     public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS, BYTE_TO_MESSAGE_DECODER, MESSAGE_TO_BYTE_ENCODER;
@@ -118,11 +109,12 @@ public final class SpigotReflectionUtil {
             GET_DIMENSION_MANAGER, GET_DIMENSION_ID, GET_DIMENSION_KEY, CODEC_ENCODE_METHOD, DATA_RESULT_GET_METHOD,
             READ_NBT_FROM_STREAM_METHOD, WRITE_NBT_TO_STREAM_METHOD, STREAM_DECODER_DECODE, STREAM_ENCODER_ENCODE,
             CREATE_REGISTRY_RESOURCE_KEY, GET_REGISTRY_OR_THROW, GET_DIMENSION_TYPES, GET_REGISTRY_ID,
-            NBT_ACCOUNTER_UNLIMITED_HEAP, GET_REGISTRY_KEY_LOCATION;
+            NBT_ACCOUNTER_UNLIMITED_HEAP, GET_REGISTRY_KEY_LOCATION, CHUNK_CACHE_GET_IBLOCKACCESS, CHUNK_CACHE_GET_ICHUNKACCESS,
+            IBLOCKACCESS_GET_BLOCK_DATA, CHUNK_GET_BLOCK_DATA, PLAYER_CHUNK_MAP_GET_PLAYER_CHUNK, PLAYER_CHUNK_GET_CHUNK;
 
     //Constructors
     private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR,
-            NMS_MINECRAFT_KEY_CONSTRUCTOR, REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR;
+            NMS_MINECRAFT_KEY_CONSTRUCTOR, REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR, BLOCK_POSITION_CONSTRUCTOR;
 
     private static Object MINECRAFT_SERVER_INSTANCE;
     private static Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
@@ -147,6 +139,9 @@ public final class SpigotReflectionUtil {
             if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
                 REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR = REGISTRY_FRIENDLY_BYTE_BUF.getConstructor(
                         BYTE_BUF_CLASS, REGISTRY_ACCESS);
+            }
+            if (BLOCK_POSITION_CLASS != null) {
+                BLOCK_POSITION_CONSTRUCTOR = BLOCK_POSITION_CLASS.getConstructor(int.class, int.class, int.class);
             }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -246,6 +241,25 @@ public final class SpigotReflectionUtil {
         GET_DIMENSION_TYPES = Reflection.getMethod(REGISTRY_ACCESS_FROZEN, REGISTRY, 0);
         GET_REGISTRY_ID = Reflection.getMethod(REGISTRY, int.class, 0, Object.class);
         GET_REGISTRY_KEY_LOCATION = Reflection.getMethod(RESOURCE_KEY, NMS_MINECRAFT_KEY_CLASS, 0);
+        //Only need to check if the arguments are null. The lookup class being null is handled in the method.
+        //Not checking if the arguments passed are null could lead to unintended behavior.
+        if (IBLOCKACCESS_CLASS != null) {
+            CHUNK_CACHE_GET_IBLOCKACCESS = Reflection.getMethod(SpigotReflectionUtil.CHUNK_PROVIDER_SERVER_CLASS, SpigotReflectionUtil.IBLOCKACCESS_CLASS, 0, int.class, int.class);
+            IBLOCKACCESS_GET_BLOCK_DATA = Reflection.getMethod(SpigotReflectionUtil.IBLOCKACCESS_CLASS, SpigotReflectionUtil.IBLOCK_DATA_CLASS, 0);
+        }
+        if (ICHUNKACCESS_CLASS != null) {
+            CHUNK_CACHE_GET_ICHUNKACCESS = Reflection.getMethod(SpigotReflectionUtil.CHUNK_PROVIDER_SERVER_CLASS, SpigotReflectionUtil.ICHUNKACCESS_CLASS, 0, int.class, int.class, boolean.class);
+        }
+        if (IBLOCK_DATA_CLASS != null) {
+            CHUNK_GET_BLOCK_DATA = Reflection.getMethod(SpigotReflectionUtil.CHUNK_CLASS, SpigotReflectionUtil.IBLOCK_DATA_CLASS, 0, SpigotReflectionUtil.BLOCK_POSITION_CLASS);
+        }
+        if (PLAYER_CHUNK_CLASS != null) {
+            PLAYER_CHUNK_MAP_GET_PLAYER_CHUNK = Reflection.getMethod(SpigotReflectionUtil.PLAYER_CHUNK_MAP_CLASS, SpigotReflectionUtil.PLAYER_CHUNK_CLASS, 0, long.class);
+        }
+
+        if (CHUNK_CLASS != null) {
+            PLAYER_CHUNK_GET_CHUNK = Reflection.getMethod(SpigotReflectionUtil.PLAYER_CHUNK_CLASS, SpigotReflectionUtil.CHUNK_CLASS, 0);
+        }
     }
 
     private static void initFields() {
@@ -324,6 +338,18 @@ public final class SpigotReflectionUtil {
         NMS_NBT_BASE_CLASS = getServerClass("nbt.NBTBase", "NBTBase");
         NBT_COMPRESSION_STREAM_TOOLS_CLASS = getServerClass("nbt.NBTCompressedStreamTools", "NBTCompressedStreamTools");
         NBT_ACCOUNTER = getServerClass("nbt.NBTReadLimiter", "NBTReadLimiter");
+        CHUNK_PROVIDER_SERVER_CLASS = getServerClass("server.level.ChunkProviderServer", "");
+        CHUNK_STATUS_CLASS = SpigotReflectionUtil.getServerClass("world.level.chunk.status.ChunkStatus", "");
+        if (CHUNK_STATUS_CLASS == null) {
+            CHUNK_STATUS_CLASS = SpigotReflectionUtil.getServerClass("world.level.ChunkStatus", "");
+        }
+        BLOCK_POSITION_CLASS = SpigotReflectionUtil.getServerClass("core.BlockPosition", "BlockPosition");
+        PLAYER_CHUNK_MAP_CLASS = SpigotReflectionUtil.getServerClass("server.level.PlayerChunkMap", "");
+        PLAYER_CHUNK_CLASS = SpigotReflectionUtil.getServerClass("server.level.PlayerChunk", "");
+        CHUNK_CLASS = SpigotReflectionUtil.getServerClass("world.level.chunk.Chunk", "Chunk");
+        IBLOCKACCESS_CLASS = SpigotReflectionUtil.getServerClass("world.level.IBlockAccess", "IBlockAccess");
+        ICHUNKACCESS_CLASS = SpigotReflectionUtil.getServerClass("world.level.chunk.IChunkAccess", "IChunkAccess");
+
 
         if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             STREAM_CODEC = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamCodec");
@@ -827,6 +853,15 @@ public final class SpigotReflectionUtil {
                 return REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR.newInstance(byteBuf, getFrozenRegistryAccess());
             }
             return NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR.newInstance(byteBuf);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object createBlockPosition(int x, int y, int z) {
+        try {
+            return BLOCK_POSITION_CONSTRUCTOR.newInstance(x, y, z);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
