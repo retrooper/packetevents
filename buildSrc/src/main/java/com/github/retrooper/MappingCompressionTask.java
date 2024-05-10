@@ -48,7 +48,7 @@ public class MappingCompressionTask extends DefaultTask {
         compressJson("enchantment/enchantment_type_mappings.json", JsonObjectCompressionStrategy.INSTANCE);
 
         compressJson("entity/entity_data_type_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
-        compressJson("entity/entity_effect_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
+        compressJson("entity/entity_effect_mappings.json", JsonObjectCompressionStrategy.INSTANCE);
         compressJson("entity/entity_type_mappings.json", JsonObjectCompressionStrategy.INSTANCE);
         compressJson("entity/legacy_entity_type_mappings.json", JsonObjectCompressionStrategy.INSTANCE);
         compressJson("entity/painting_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
@@ -57,6 +57,7 @@ public class MappingCompressionTask extends DefaultTask {
         compressJson("item/item_banner_pattern_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
         compressJson("item/item_component_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
         compressJson("item/item_instrument_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
+        compressJson("item/item_map_decoration_type_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
         compressJson("item/item_potion_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
         compressJson("item/item_trim_material_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
         compressJson("item/item_trim_pattern_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
@@ -67,6 +68,8 @@ public class MappingCompressionTask extends DefaultTask {
         compressJson("sound/sound_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
 
         compressJson("stats/statistics.json", JsonToNbtStrategy.INSTANCE);
+
+        compressJson("world/world_position_source_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
     }
 
     private void compressJson(final String relativePath, final CompressionStrategy strategy) {

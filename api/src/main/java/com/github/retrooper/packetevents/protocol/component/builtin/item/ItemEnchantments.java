@@ -24,10 +24,11 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
-public class ItemEnchantments {
+public class ItemEnchantments implements Iterable<Map.Entry<EnchantmentType, Integer>> {
 
     public static final ItemEnchantments EMPTY = new ItemEnchantments(
             Collections.emptyMap(), true) {
@@ -76,6 +77,14 @@ public class ItemEnchantments {
         }
     }
 
+    public boolean isEmpty() {
+        return this.getEnchantmentCount() < 1;
+    }
+
+    public int getEnchantmentCount() {
+        return this.enchantments.size();
+    }
+
     public Map<EnchantmentType, Integer> getEnchantments() {
         return this.enchantments;
     }
@@ -93,6 +102,11 @@ public class ItemEnchantments {
     }
 
     @Override
+    public Iterator<Map.Entry<EnchantmentType, Integer>> iterator() {
+        return this.enchantments.entrySet().iterator();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof ItemEnchantments)) return false;
@@ -104,5 +118,10 @@ public class ItemEnchantments {
     @Override
     public int hashCode() {
         return Objects.hash(this.enchantments, this.showInTooltip);
+    }
+
+    @Override
+    public String toString() {
+        return "ItemEnchantments{enchantments=" + this.enchantments + ", showInTooltip=" + this.showInTooltip + '}';
     }
 }

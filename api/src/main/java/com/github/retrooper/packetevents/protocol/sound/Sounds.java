@@ -25,13 +25,15 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Sounds {
 
-    private static final Map<String, Sound> POTION_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, Sound>> POTION_TYPE_ID_MAP = new HashMap<>();
+    private static final Map<String, Sound> SOUND_TYPE_MAP = new HashMap<>();
+    private static final Map<Byte, Map<Integer, Sound>> SOUND_TYPE_ID_MAP = new HashMap<>();
 
     private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("sound/sound_mappings");
 
@@ -41,7 +43,7 @@ public class Sounds {
 
     public static Sound define(String key, ResourceLocation soundId, @Nullable Float range) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
-        Sound potionType = new Sound() {
+        Sound soundType = new Sound() {
             @Override
             public ResourceLocation getSoundId() {
                 return soundId;
@@ -70,17 +72,17 @@ public class Sounds {
                 return false;
             }
         };
-        MappingHelper.registerMapping(TYPES_BUILDER, POTION_TYPE_MAP, POTION_TYPE_ID_MAP, potionType);
-        return potionType;
+        MappingHelper.registerMapping(TYPES_BUILDER, SOUND_TYPE_MAP, SOUND_TYPE_ID_MAP, soundType);
+        return soundType;
     }
 
     public static @Nullable Sound getByName(String name) {
-        return POTION_TYPE_MAP.get(name);
+        return SOUND_TYPE_MAP.get(name);
     }
 
     public static @Nullable Sound getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, Sound> idMap = POTION_TYPE_ID_MAP.get((byte) index);
+        Map<Integer, Sound> idMap = SOUND_TYPE_ID_MAP.get((byte) index);
         return idMap.get(id);
     }
 
@@ -1691,6 +1693,14 @@ public class Sounds {
     public static final Sound EVENT_MOB_EFFECT_BAD_OMEN = define("event.mob_effect.bad_omen");
     public static final Sound EVENT_MOB_EFFECT_TRIAL_OMEN = define("event.mob_effect.trial_omen");
     public static final Sound EVENT_MOB_EFFECT_RAID_OMEN = define("event.mob_effect.raid_omen");
+
+    /**
+     * Returns an immutable view of the sounds.
+     * @return Sounds
+     */
+    public static Collection<Sound> values() {
+        return Collections.unmodifiableCollection(SOUND_TYPE_MAP.values());
+    }
 
     static {
         TYPES_BUILDER.unloadFileMappings();

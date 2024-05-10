@@ -18,11 +18,7 @@
 
 package io.github.retrooper.packetevents.util.viaversion;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.reflection.Reflection;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import io.netty.channel.Channel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -67,24 +63,7 @@ public class ViaVersionUtil {
     }
 
     public static int getProtocolVersion(User user) {
-        try {
-            if (user.getUUID() != null) {
-                Player player = Bukkit.getPlayer(user.getUUID());
-                if (player != null) {
-                    int version = getProtocolVersion(player);
-                    // -1 means via hasn't gotten join event yet
-                    if (version != -1) return version;
-                }
-            }
-            Object viaEncoder = ((Channel) user.getChannel()).pipeline().get("via-encoder");
-            Object connection = Reflection.getField(viaEncoder.getClass(), "connection").get(viaEncoder);
-            Object protocolInfo = Reflection.getField(connection.getClass(), "protocolInfo").get(connection);
-            Object protocolVersion = Reflection.getField(protocolInfo.getClass(), "protocolVersion").get(protocolInfo);
-            return protocolVersion instanceof Integer ? (int) protocolVersion : ((ProtocolVersion) protocolVersion).getVersion();
-        } catch (Exception e) {
-            PacketEvents.getAPI().getLogManager().warn("Unable to grab ViaVersion client version for player!");
-            return -1;
-        }
+        return getViaVersionAccessor().getProtocolVersion(user);
     }
 
     public static int getProtocolVersion(Player player) {

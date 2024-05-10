@@ -20,6 +20,13 @@ package com.github.retrooper.packetevents.protocol.particle.data;
 
 public class ParticleData {
 
+    static ParticleData EMPTY = new ParticleData();
+
+    @SuppressWarnings("unchecked")
+    public static <T extends ParticleData> T emptyData() {
+        return (T) EMPTY;
+    }
+
     public boolean isEmpty() {
         return true;
     }

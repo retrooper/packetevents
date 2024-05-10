@@ -24,9 +24,7 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class EntityTypes {
     private static final Map<String, EntityType> ENTITY_TYPE_MAP = new HashMap<>();
@@ -296,6 +294,14 @@ public class EntityTypes {
     public static final EntityType BOGGED = define("bogged", ABSTRACT_SKELETON);
     public static final EntityType BREEZE_WIND_CHARGE = define("breeze_wind_charge", ABSTRACT_WIND_CHARGE);
     public static final EntityType OMINOUS_ITEM_SPAWNER = define("ominous_item_spawner", ENTITY);
+
+    /**
+     * Returns an immutable view of the entity types.
+     * @return Entity Types
+     */
+    public static Collection<EntityType> values() {
+        return Collections.unmodifiableCollection(ENTITY_TYPE_MAP.values());
+    }
 
     static {
         TYPES_BUILDER.unloadFileMappings();

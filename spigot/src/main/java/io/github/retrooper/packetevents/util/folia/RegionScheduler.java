@@ -217,11 +217,12 @@ public class RegionScheduler {
      * @param chunkZ            The chunk Z coordinate of the region that owns the task
      * @param task              The task to execute
      * @param initialDelayTicks The initial delay, in ticks before the method is invoked. Any value less-than 1 is treated as 1.
-     * @param periodTicks       The period, in ticks.
+     * @param periodTicks       The period, in ticks. Any value less-than 1 is treated as 1.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull World world, int chunkX, int chunkZ, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
         if (initialDelayTicks < 1) initialDelayTicks = 1;
+        if (periodTicks < 1) periodTicks = 1;
 
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
@@ -243,11 +244,12 @@ public class RegionScheduler {
      * @param location          The location at which the region executing should own
      * @param task              The task to execute
      * @param initialDelayTicks The initial delay, in ticks before the method is invoked. Any value less-than 1 is treated as 1.
-     * @param periodTicks       The period, in ticks.
+     * @param periodTicks       The period, in ticks. Any value less-than 1 is treated as 1.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Location location, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
         if (initialDelayTicks < 1) initialDelayTicks = 1;
+        if (periodTicks < 1) periodTicks = 1;
 
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));

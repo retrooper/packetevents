@@ -61,7 +61,7 @@ public class UpdateChecker {
         try {
             newVersion = new PEVersion(checkLatestReleasedVersion());
         } catch (Exception ex) {
-            PacketEvents.getAPI().getLogManager().warn("Failed to check for updates. " + (ex.getCause() != null ? ex.getCause().getClass().getName()+ ": " + ex.getCause().getMessage() : ex.getMessage()));
+            PacketEvents.getAPI().getLogManager().warn("Failed to check for updates. " + (ex.getCause() != null ? ex.getCause().getClass().getName() + ": " + ex.getCause().getMessage() : ex.getMessage()));
             return UpdateCheckerStatus.FAILED;
         }
         if (localVersion.isOlderThan(newVersion)) {
@@ -92,29 +92,10 @@ public class UpdateChecker {
         Thread thread = new Thread(() -> {
             PacketEvents.getAPI().getLogManager().info("Checking for updates, please wait...");
             UpdateChecker.UpdateCheckerStatus status = checkForUpdate();
-            int waitTimeInSeconds = 5;
-            int maxRetryCount = 3;
-            int retries = 0;
-            while (retries < maxRetryCount && status == UpdateChecker.UpdateCheckerStatus.FAILED) {
-                PacketEvents.getAPI().getLogManager().warn("Checking for updates again in " + waitTimeInSeconds + " seconds...");
-                try {
-                    Thread.sleep(waitTimeInSeconds * 1000L);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                waitTimeInSeconds *= 2;
-
-                status = checkForUpdate();
-
-                if (retries == (maxRetryCount - 1)) {
-                    PacketEvents.getAPI().getLogManager().severe("Failed to check for updates after " + maxRetryCount + " times.");
-                    break;
-                }
-
-                retries++;
-            }
-
+            //if (status == UpdateChecker.UpdateCheckerStatus.FAILED) {
+                //PacketEvents.getAPI().getLogManager().severe("Failed to check for updates!");
+                //A warning message is already printed when we fail to check for updates, no need to spam.
+            //}
         }, "packetevents-update-check-thread");
         thread.start();
     }

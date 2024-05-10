@@ -20,5 +20,12 @@ package com.github.retrooper.packetevents.protocol.potion;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 
+/**
+ * Potions are all possible brewable drinks.<br>
+ * Some examples are the potion of leaping, the extended potion of leaping
+ * or the strong potion of leaping.
+ * <p>
+ * For individual potion effects, see {@link PotionTypes}.
+ */
 public interface Potion extends MappedEntity {
 }

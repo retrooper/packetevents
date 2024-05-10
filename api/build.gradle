@@ -5,6 +5,11 @@ repositories {
     maven { url 'https://repo.papermc.io/repository/maven-public/' }
 }
 
+
+javadoc {
+    destinationDir = file("${buildDir}/docs/javadoc")
+}
+
 java {
     disableAutoTargetJvm()
     sourceSets {
@@ -48,7 +53,6 @@ task generateMapping(type: MappingCompressionTask) {
         }
 
         for (File file : list) {
-            println('Checking ' + file + ' ' + file.lastModified() + ' ' + gen_modified)
             if (file.lastModified() > gen_modified) {
                 return false
             }
@@ -58,4 +62,4 @@ task generateMapping(type: MappingCompressionTask) {
     }
 }
 
-tasks.assemble.dependsOn(generateMapping)
+tasks.processResources.dependsOn(generateMapping)

@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -73,11 +74,20 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     @Override
     public void read() {
         this.sound = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3) ? Sound.read(this)
-                : Sounds.getById(this.serverVersion.toClientVersion(), this.readVarInt());
-        soundCategory = SoundCategory.fromId(readVarInt());
+                : serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? Sounds.getById(this.serverVersion.toClientVersion(), this.readVarInt())
+                //TODO Test
+                : Sounds.getByName(readString());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            soundCategory = SoundCategory.fromId(readVarInt());
+        }
         effectPosition = new Vector3i(readInt(), readInt(), readInt());
         volume = readFloat();
-        pitch = readFloat();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
+            pitch = readFloat();
+        }
+        else {
+            pitch = readUnsignedByte() / 63.5F;
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             this.seed = readLong();
         }
@@ -87,15 +97,24 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     public void write() {
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
             Sound.write(this, this.sound);
-        } else {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)){
             this.writeVarInt(this.sound.getId(this.serverVersion.toClientVersion()));
+        }
+        else {
+            //TODO Test
+            writeString(sound.getName().getKey());
         }
         writeVarInt(soundCategory.ordinal());
         writeInt(effectPosition.x);
         writeInt(effectPosition.y);
         writeInt(effectPosition.z);
         writeFloat(volume);
-        writeFloat(pitch);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
+            writeFloat(pitch);
+        }
+        else {
+            writeByte((int) (pitch * 63.5F));
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeLong(seed);
         }
@@ -103,7 +122,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void copy(WrapperPlayServerSoundEffect wrapper) {
-        this.sound = wrapper.sound;
+        sound = wrapper.sound;
         soundCategory = wrapper.soundCategory;
         effectPosition = wrapper.effectPosition;
         volume = wrapper.volume;
@@ -129,6 +148,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         this.setSound(Sounds.getById(this.serverVersion.toClientVersion(), soundId));
     }
 
+    @Nullable
     public SoundCategory getSoundCategory() {
         return soundCategory;
     }

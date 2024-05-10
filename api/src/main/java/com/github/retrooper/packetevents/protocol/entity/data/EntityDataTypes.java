@@ -27,25 +27,19 @@ import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
-import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
-import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Quaternion4f;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -147,14 +141,7 @@ public class EntityDataTypes {
 
     public static final EntityDataType<NBTCompound> NBT = define("nbt", PacketWrapper::readNBT, PacketWrapper::writeNBT);
 
-    public static final EntityDataType<Particle> PARTICLE = define("particle", wrapper -> {
-        int id = wrapper.readVarInt();
-        ParticleType type = ParticleTypes.getById(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), id);
-        return new Particle(type, type.readDataFunction().apply(wrapper));
-    }, (wrapper, particle) -> {
-        wrapper.writeVarInt(particle.getType().getId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
-        particle.getType().writeDataFunction().accept(wrapper, particle.getData());
-    });
+    public static final EntityDataType<Particle<?>> PARTICLE = define("particle", Particle::read, Particle::write);
 
     public static final EntityDataType<VillagerData> VILLAGER_DATA = define("villager_data", PacketWrapper::readVillagerData, PacketWrapper::writeVillagerData);
 
@@ -207,17 +194,25 @@ public class EntityDataTypes {
 
     // Added in 1.20.5
     public static final EntityDataType<ArmadilloState> ARMADILLO_STATE = define("armadillo_state",
-            (PacketWrapper<?> wrapper) -> ArmadilloState.values()[ wrapper.readVarInt()],
+            (PacketWrapper<?> wrapper) -> ArmadilloState.values()[wrapper.readVarInt()],
             (PacketWrapper<?> wrapper, ArmadilloState value) -> wrapper.writeVarInt(value.ordinal())
     );
 
-    public static final EntityDataType<List<Particle>> PARTICLES = define("particles",
-            wrapper -> wrapper.readList(PARTICLE.getDataDeserializer()::apply),
-            (wrapper, particles) -> wrapper.writeList(particles, PARTICLE.getDataSerializer()::accept)
+    public static final EntityDataType<List<Particle<?>>> PARTICLES = define("particles",
+            wrapper -> wrapper.readList(Particle::read),
+            (wrapper, particles) -> wrapper.writeList(particles, Particle::write)
     );
 
     public static final EntityDataType<Integer> WOLF_VARIANT =
             define("wolf_variant_type", readIntDeserializer(), writeIntSerializer());
+
+    /**
+     * Returns an immutable view of the entity-data types.
+     * @return Entity-Data Types
+     */
+    public static Collection<EntityDataType<?>> values() {
+        return Collections.unmodifiableCollection(ENTITY_DATA_TYPE_MAP.values());
+    }
 
     public static EntityDataType<?> getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);

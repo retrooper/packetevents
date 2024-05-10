@@ -27,9 +27,17 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Potion types are the individually applied potion effects.<br>
+ * Some examples are speed, poison and blindness.
+ * <p>
+ * For potions brewable in survival, see {@link Potions}.
+ */
 public class PotionTypes {
 
     private static final Map<String, PotionType> POTION_TYPE_MAP = new HashMap<>();
@@ -59,7 +67,7 @@ public class PotionTypes {
             @Override
             public boolean equals(Object obj) {
                 if (obj instanceof PotionType) {
-                    return getName().equals(((PotionType) obj).getName());
+                    return this.getName().equals(((PotionType) obj).getName());
                 }
                 return false;
             }
@@ -145,6 +153,14 @@ public class PotionTypes {
     public static final PotionType WEAVING = define("darkness");
     public static final PotionType OOZING = define("darkness");
     public static final PotionType INFESTED = define("darkness");
+
+    /**
+     * Returns an immutable view of the potion types.
+     * @return Potion Types
+     */
+    public static Collection<PotionType> values() {
+        return Collections.unmodifiableCollection(POTION_TYPE_MAP.values());
+    }
 
     static {
         TYPES_BUILDER.unloadFileMappings();

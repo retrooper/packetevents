@@ -66,6 +66,11 @@ public class ItemLore {
 
     @Override
     public int hashCode() {
-        return Objects.hash(lines);
+        return Objects.hash(this.lines);
+    }
+
+    @Override
+    public String toString() {
+        return "ItemLore{lines=" + this.lines + '}';
     }
 }

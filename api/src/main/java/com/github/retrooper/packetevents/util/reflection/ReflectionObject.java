@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.util.reflection;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -146,6 +147,11 @@ public class ReflectionObject implements ReflectionObjectReader, ReflectionObjec
     @Override
     public <T> T readObject(int index, Class<? extends T> type) {
         return read(index, type);
+    }
+
+    @Override
+    public <T> T[] readObjectArray(int index, Class<? extends T> type) {
+        return (T[]) read(0, Array.newInstance(type, 0).getClass());
     }
 
     @Override

@@ -107,11 +107,13 @@ public class AsyncScheduler {
      * @param plugin   Plugin which owns the specified task.
      * @param task     Specified task.
      * @param delay    The time delay to pass before the task should be executed.
-     * @param period   The time period between each task execution.
+     * @param period   The time period between each task execution. Any value less-than 1 is treated as 1.
      * @param timeUnit The time unit for the initial delay and period.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay, long period, @NotNull TimeUnit timeUnit) {
+        if (period < 1) period = 1;
+
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit), convertTimeToTicks(period, timeUnit)));
         }
@@ -131,12 +133,11 @@ public class AsyncScheduler {
      * @param plugin   Plugin which owns the specified task.
      * @param task     Specified task.
      * @param initialDelayTicks    The time delay in ticks to pass before the task should be executed.
-     * @param periodTicks   The time period in ticks between each task execution.
+     * @param periodTicks   The time period in ticks between each task execution. Any value less-than 1 is treated as 1.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
-
-        if (initialDelayTicks < 1) initialDelayTicks = 1;
+        if (periodTicks < 1) periodTicks = 1;
 
         if (!isFolia) {
             return new TaskWrapper(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
@@ -144,8 +145,8 @@ public class AsyncScheduler {
 
         try {
             return new TaskWrapper(asyncRunAtFixedRateMethod.invoke(asyncScheduler, plugin, task,
-                    convertTimeToTicks(initialDelayTicks, TimeUnit.MILLISECONDS),
-                    convertTimeToTicks(periodTicks, TimeUnit.MILLISECONDS),
+                    initialDelayTicks * 50,
+                    periodTicks * 50,
                     TimeUnit.MILLISECONDS));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
