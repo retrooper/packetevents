@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -33,6 +34,10 @@ public class WrapperPlayServerProjectilePower extends PacketWrapper<WrapperPlayS
         super(event);
     }
 
+    public WrapperPlayServerProjectilePower(int entityId, double power) {
+        this(entityId, power, power, power);
+    }
+
     public WrapperPlayServerProjectilePower(int entityId, double powerX, double powerY, double powerZ) {
         super(PacketType.Play.Server.PROJECTILE_POWER);
         this.entityId = entityId;
@@ -44,17 +49,25 @@ public class WrapperPlayServerProjectilePower extends PacketWrapper<WrapperPlayS
     @Override
     public void read() {
         this.entityId = this.readVarInt();
-        this.powerX = this.readDouble();
-        this.powerY = this.readDouble();
-        this.powerZ = this.readDouble();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)) {
+            this.setPower(this.readDouble());
+        } else {
+            this.powerX = this.readDouble();
+            this.powerY = this.readDouble();
+            this.powerZ = this.readDouble();
+        }
     }
 
     @Override
     public void write() {
         this.writeVarInt(this.entityId);
-        this.writeDouble(this.powerX);
-        this.writeDouble(this.powerY);
-        this.writeDouble(this.powerZ);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)) {
+            this.writeDouble(this.getPower());
+        } else {
+            this.writeDouble(this.powerX);
+            this.writeDouble(this.powerY);
+            this.writeDouble(this.powerZ);
+        }
     }
 
     @Override
@@ -71,6 +84,16 @@ public class WrapperPlayServerProjectilePower extends PacketWrapper<WrapperPlayS
 
     public void setEntityId(int entityId) {
         this.entityId = entityId;
+    }
+
+    public double getPower() {
+        return this.powerX;
+    }
+
+    public void setPower(double power) {
+        this.powerX = power;
+        this.powerY = power;
+        this.powerZ = power;
     }
 
     public double getPowerX() {
