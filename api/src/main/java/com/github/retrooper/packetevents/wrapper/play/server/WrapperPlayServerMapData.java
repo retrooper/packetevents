@@ -152,7 +152,7 @@ public class WrapperPlayServerMapData extends PacketWrapper<WrapperPlayServerMap
             boolean v113 = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13);
             byte flags = v113 ? 0 : wrapper.readByte();
             MapDecorationType type = !v113
-                    ? MapDecorationTypes.getById(wrapper.getServerVersion().toClientVersion(), flags & 0xF0)
+                    ? MapDecorationTypes.getById(wrapper.getServerVersion().toClientVersion(), (flags >> 4) & 0xF)
                     : wrapper.readMappedEntity(MapDecorationTypes::getById);
 
             byte x = wrapper.readByte();
