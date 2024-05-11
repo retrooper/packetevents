@@ -27,6 +27,7 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 
 public class PotDecorations {
@@ -36,8 +37,13 @@ public class PotDecorations {
     private @Nullable ItemType right;
     private @Nullable ItemType front;
 
-    private PotDecorations(Queue<ItemType> items) {
-        this(items.poll(), items.poll(), items.poll(), items.poll());
+    private PotDecorations(Queue<Optional<ItemType>> items) {
+        this(
+                items.isEmpty() ? null : items.remove().orElse(null),
+                items.isEmpty() ? null : items.remove().orElse(null),
+                items.isEmpty() ? null : items.remove().orElse(null),
+                items.isEmpty() ? null : items.remove().orElse(null)
+        );
     }
 
     public PotDecorations(
@@ -52,23 +58,28 @@ public class PotDecorations {
         this.front = front;
     }
 
-    private List<ItemType> asList() {
-        return Arrays.asList(this.back, this.left, this.right, this.front);
+    private List<Optional<ItemType>> asList() {
+        return Arrays.asList(
+                Optional.ofNullable(this.back),
+                Optional.ofNullable(this.left),
+                Optional.ofNullable(this.right),
+                Optional.ofNullable(this.front)
+        );
     }
 
-    private static @Nullable ItemType readItem(PacketWrapper<?> wrapper) {
+    private static Optional<ItemType> readItem(PacketWrapper<?> wrapper) {
         ItemType type = wrapper.readMappedEntity(ItemTypes::getById);
-        return type == ItemTypes.BRICK ? null : type;
+        return type == ItemTypes.BRICK ? Optional.empty() : Optional.of(type);
     }
 
     public static PotDecorations read(PacketWrapper<?> wrapper) {
-        Queue<ItemType> items = wrapper.<ItemType, Queue<ItemType>>readCollection(
-                ArrayDeque::new, PotDecorations::readItem);
+        Queue<Optional<ItemType>> items = wrapper.<Optional<ItemType>, Queue<Optional<ItemType>>>
+                readCollection(ArrayDeque::new, PotDecorations::readItem);
         return new PotDecorations(items);
     }
 
-    private static void writeItem(PacketWrapper<?> wrapper, @Nullable ItemType type) {
-        wrapper.writeMappedEntity(type == null ? ItemTypes.BRICK : type);
+    private static void writeItem(PacketWrapper<?> wrapper, Optional<ItemType> type) {
+        wrapper.writeMappedEntity(type.orElse(ItemTypes.BRICK));
     }
 
     public static void write(PacketWrapper<?> wrapper, PotDecorations decorations) {
