@@ -713,8 +713,8 @@ public final class SpigotReflectionUtil {
                 AtomicInteger atomicInteger = (AtomicInteger) field.get(null);
                 return atomicInteger.incrementAndGet();
             } else {
-                int id = field.getInt(null) + 1;
-                field.set(null, id);
+                int id = field.getInt(null);
+                field.set(null, id + 1);
                 return id;
             }
         } catch (IllegalAccessException ex) {
