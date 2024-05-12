@@ -87,4 +87,9 @@ public class ArmorTrim {
     public int hashCode() {
         return Objects.hash(this.material, this.pattern, this.showInTooltip);
     }
+
+    @Override
+    public String toString() {
+        return "ArmorTrim{material=" + this.material + ", pattern=" + this.pattern + ", showInTooltip=" + this.showInTooltip + '}';
+    }
 }
