@@ -1226,15 +1226,20 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public ChatMessage_v1_19_1.ChatTypeBoundNetwork readChatTypeBoundNetwork() {
-        int id = readVarInt();
-        ChatType type = ChatTypes.getById(getServerVersion().toClientVersion(), id);
+        ChatType type = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)
+                ? this.readMappedEntityOrDirect(ChatTypes::getById, ChatType::readDirect)
+                : this.readMappedEntity(ChatTypes::getById);
         Component name = readComponent();
         Component targetName = readOptional(PacketWrapper::readComponent);
         return new ChatMessage_v1_19_1.ChatTypeBoundNetwork(type, name, targetName);
     }
 
     public void writeChatTypeBoundNetwork(ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
-        writeVarInt(chatType.getType().getId(getServerVersion().toClientVersion()));
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)) {
+            this.writeMappedEntityOrDirect(chatType.getType(), ChatType::writeDirect);
+        } else {
+            this.writeMappedEntity(chatType.getType());
+        }
         writeComponent(chatType.getName());
         writeOptional(chatType.getTargetName(), PacketWrapper::writeComponent);
     }
