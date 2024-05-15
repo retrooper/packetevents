@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.world.painting;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public interface PaintingVariant extends MappedEntity {
 
@@ -28,4 +29,17 @@ public interface PaintingVariant extends MappedEntity {
     int getHeight();
 
     ResourceLocation getAssetId();
+
+    static PaintingVariant readDirect(PacketWrapper<?> wrapper) {
+        int width = wrapper.readVarInt();
+        int height = wrapper.readVarInt();
+        ResourceLocation assetId = wrapper.readIdentifier();
+        return new StaticPaintingVariant(width, height, assetId);
+    }
+
+    static void writeDirect(PacketWrapper<?> wrapper, PaintingVariant variant) {
+        wrapper.writeVarInt(variant.getWidth());
+        wrapper.writeVarInt(variant.getHeight());
+        wrapper.writeIdentifier(variant.getAssetId());
+    }
 }
