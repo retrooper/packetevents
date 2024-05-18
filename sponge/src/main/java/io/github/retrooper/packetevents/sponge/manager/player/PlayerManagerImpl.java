@@ -27,13 +27,22 @@ import io.github.retrooper.packetevents.sponge.util.SpongeReflectionUtil;
 import io.github.retrooper.packetevents.sponge.util.viaversion.ViaVersionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.network.ServerConnectionState;
+import org.spongepowered.api.network.ServerSideConnection;
 
 import java.util.UUID;
 
 public class PlayerManagerImpl implements PlayerManager {
     @Override
     public int getPing(@NotNull Object player) {
-        return ((ServerPlayer) player).connection().latency();
+        final ServerSideConnection connection = ((ServerPlayer) player).connection();
+        return connection.state().map(state -> {
+            if (state instanceof ServerConnectionState.Game) {
+                final ServerConnectionState.Game game = (ServerConnectionState.Game) state;
+                return game.latency();
+            }
+            return -1;
+        }).orElse(-1);
     }
 
     @Override

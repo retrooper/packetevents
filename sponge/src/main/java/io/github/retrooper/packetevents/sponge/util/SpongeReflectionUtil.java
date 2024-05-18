@@ -56,25 +56,29 @@ public final class SpongeReflectionUtil {
             ENTITY_PLAYER_CLASS,
             NMS_MINECRAFT_KEY_CLASS,
             PLAYER_CONNECTION_CLASS, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS,
-            NMS_NBT_COMPOUND_CLASS, NBT_COMPRESSION_STREAM_TOOLS_CLASS;
+            NMS_NBT_COMPOUND_CLASS, NBT_COMPRESSION_STREAM_TOOLS_CLASS,
+            STREAM_CODEC, STREAM_DECODER, STREAM_ENCODER, REGISTRY_FRIENDLY_BYTE_BUF,
+            REGISTRY_ACCESS, REGISTRY_ACCESS_FROZEN;
 
     // Fields
     public static Field BYTE_BUF_IN_PACKET_DATA_SERIALIZER, NMS_MK_KEY_FIELD;
 
     // Methods
     public static Method IS_DEBUGGING,
-            READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD,
-            WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD,
-            READ_NBT_FROM_STREAM_METHOD, WRITE_NBT_TO_STREAM_METHOD;
+            READ_NBT_FROM_STREAM_METHOD, WRITE_NBT_TO_STREAM_METHOD,
+            STREAM_DECODER_DECODE, STREAM_ENCODER_ENCODE;
 
     // Constructors
-    private static Constructor<?> NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR;
+    private static Constructor<?> REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR;
 
     private static Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
+    private static Object ITEM_STACK_OPTIONAL_STREAM_CODEC;
+    private static Object MINECRAFT_SERVER_REGISTRY_ACCESS;
 
     private static void initConstructors() {
         try {
-            NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR = NMS_PACKET_DATA_SERIALIZER_CLASS.getConstructor(ByteBuf.class);
+            REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR = REGISTRY_FRIENDLY_BYTE_BUF.getConstructor(
+                    ByteBuf.class, REGISTRY_ACCESS);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -83,14 +87,14 @@ public final class SpongeReflectionUtil {
     private static void initMethods() {
         IS_DEBUGGING = Reflection.getMethod(MINECRAFT_SERVER_CLASS, "isDebugging", 0);
 
-        READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS, 0);
-        WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_PACKET_DATA_SERIALIZER_CLASS, 0, NMS_ITEM_STACK_CLASS);
-
         READ_NBT_FROM_STREAM_METHOD = Reflection.getMethod(NBT_COMPRESSION_STREAM_TOOLS_CLASS, 0, DataInputStream.class);
         if (READ_NBT_FROM_STREAM_METHOD == null) {
             READ_NBT_FROM_STREAM_METHOD = Reflection.getMethod(NBT_COMPRESSION_STREAM_TOOLS_CLASS, 0, DataInput.class);
         }
         WRITE_NBT_TO_STREAM_METHOD = Reflection.getMethod(NBT_COMPRESSION_STREAM_TOOLS_CLASS, 0, NMS_NBT_COMPOUND_CLASS, DataOutput.class);
+
+        STREAM_DECODER_DECODE = STREAM_DECODER.getMethods()[0];
+        STREAM_ENCODER_ENCODE = STREAM_ENCODER.getMethods()[0];
     }
 
     private static void initFields() {
@@ -108,7 +112,6 @@ public final class SpongeReflectionUtil {
 
         PLAYER_CONNECTION_CLASS = getServerClass("server.network.ServerGamePacketListenerImpl");
 
-        //Only on 1.20.2
         SERVER_COMMON_PACKETLISTENER_IMPL_CLASS = getServerClass("server.network.ServerCommonPacketListenerImpl");
 
         SERVER_CONNECTION_CLASS = getServerClass("server.network.ServerConnectionListener");
@@ -116,6 +119,24 @@ public final class SpongeReflectionUtil {
 
         NMS_NBT_COMPOUND_CLASS = getServerClass("nbt.CompoundTag");
         NBT_COMPRESSION_STREAM_TOOLS_CLASS = getServerClass("nbt.NbtIo");
+
+        STREAM_CODEC = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamCodec");
+        STREAM_DECODER = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamDecoder");
+        STREAM_ENCODER = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamEncoder");
+        REGISTRY_FRIENDLY_BYTE_BUF = Reflection.getClassByNameWithoutException("net.minecraft.network.RegistryFriendlyByteBuf");
+
+        REGISTRY_ACCESS = getServerClass("core.RegistryAccess");
+        REGISTRY_ACCESS_FROZEN = getServerClass("core.RegistryAccess$Frozen");
+    }
+
+    private static void initObjects() {
+        try {
+            if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                ITEM_STACK_OPTIONAL_STREAM_CODEC = Reflection.getField(NMS_ITEM_STACK_CLASS, STREAM_CODEC, 0).get(null);
+            }
+        } catch (IllegalAccessException exception) {
+            exception.printStackTrace();
+        }
     }
 
     public static void init() {
@@ -125,6 +146,7 @@ public final class SpongeReflectionUtil {
         initFields();
         initMethods();
         initConstructors();
+        initObjects();
     }
 
     @Nullable
@@ -242,7 +264,7 @@ public final class SpongeReflectionUtil {
 
     public static Object createPacketDataSerializer(Object byteBuf) {
         try {
-            return NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR.newInstance(byteBuf);
+            return REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR.newInstance(byteBuf, getFrozenRegistryAccess());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -251,16 +273,30 @@ public final class SpongeReflectionUtil {
 
     public static Object readNMSItemStackPacketDataSerializer(Object packetDataSerializer) {
         try {
-            return READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD.invoke(packetDataSerializer);
+            return STREAM_DECODER_DECODE.invoke(ITEM_STACK_OPTIONAL_STREAM_CODEC, packetDataSerializer);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
     }
 
+    public static Object getFrozenRegistryAccess() {
+        if (MINECRAFT_SERVER_REGISTRY_ACCESS == null) {
+            try {
+                MINECRAFT_SERVER_REGISTRY_ACCESS = Reflection.getMethod(MINECRAFT_SERVER_CLASS,
+                                REGISTRY_ACCESS_FROZEN,
+                                0)
+                        .invoke(Sponge.server());
+            } catch (IllegalAccessException | InvocationTargetException exception) {
+                exception.printStackTrace();
+            }
+        }
+        return MINECRAFT_SERVER_REGISTRY_ACCESS;
+    }
+
     public static Object writeNMSItemStackPacketDataSerializer(Object packetDataSerializer, Object nmsItemStack) {
         try {
-            return WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD.invoke(packetDataSerializer, nmsItemStack);
+            return STREAM_ENCODER_ENCODE.invoke(ITEM_STACK_OPTIONAL_STREAM_CODEC, packetDataSerializer, nmsItemStack);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
