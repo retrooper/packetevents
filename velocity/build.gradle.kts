@@ -1,3 +1,8 @@
+plugins {
+    packetevents.`library-conventions`
+    packetevents.`shadow-conventions`
+}
+
 repositories {
     mavenCentral()
     maven("https://papermc.io/repo/repository/maven-public/")

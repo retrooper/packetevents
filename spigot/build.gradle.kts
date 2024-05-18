@@ -1,4 +1,6 @@
 plugins {
+    packetevents.`library-conventions`
+    packetevents.`shadow-conventions`
     alias(libs.plugins.run.paper)
 }
 

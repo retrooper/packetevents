@@ -1,6 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
+    packetevents.`library-conventions`
     alias(libs.plugins.fabric)
 }
 

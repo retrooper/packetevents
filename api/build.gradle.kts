@@ -1,6 +1,11 @@
 import com.github.retrooper.MappingCompressionTask
 import kotlin.io.path.exists
 
+plugins {
+    packetevents.`library-conventions`
+    packetevents.`shadow-conventions`
+}
+
 // papermc repo + disableAutoTargetJvm needed for mockbukkit
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
