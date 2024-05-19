@@ -10,5 +10,8 @@ tasks {
 
     register("build") {
         dependsOn(*subprojects.map { it.tasks["build"] }.toTypedArray())
+        group = "build"
     }
+
+    defaultTasks("build")
 }

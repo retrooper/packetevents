@@ -47,7 +47,7 @@ tasks {
 
     processResources {
         dependsOn("generateMapping")
-        from(named<MappingCompressionTask>("generateMapping").map { it.outDir }.get())
+        from(project.layout.buildDirectory.dir("mappings/generated").get())
     }
 
     test {

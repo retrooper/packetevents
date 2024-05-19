@@ -34,6 +34,8 @@ tasks {
     jar {
         archiveClassifier = "default"
     }
+
+    defaultTasks("build")
 }
 
 publishing {

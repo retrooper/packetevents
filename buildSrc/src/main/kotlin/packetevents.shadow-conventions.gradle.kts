@@ -9,7 +9,7 @@ tasks {
         archiveClassifier = null
     }
 
-    build {
+    assemble {
         dependsOn(shadowJar)
     }
 }
