@@ -11,6 +11,21 @@ tasks {
     register("build") {
         dependsOn(*subprojects.map { it.tasks["build"] }.toTypedArray())
         group = "build"
+
+        doLast {
+            val buildOut = project.layout.buildDirectory.dir("libs").get()
+            for (subproject in subprojects) {
+                val subIn = subproject.layout.buildDirectory.dir("libs").get()
+                val subOut = buildOut.dir(subproject.name).asFile
+                if (!subOut.exists())
+                    subOut.mkdirs()
+
+                copy {
+                    from(subIn)
+                    into(subOut)
+                }
+            }
+        }
     }
 
     defaultTasks("build")

@@ -29,6 +29,9 @@ dependencies {
 tasks {
     javadoc {
         setDestinationDir(file("${project.layout.buildDirectory.asFile.get()}/docs/javadoc"))
+        options {
+            (this as CoreJavadocOptions).addBooleanOption("Xdoclint:none", true)
+        }
     }
 
     register<MappingCompressionTask>("generateMapping") {
