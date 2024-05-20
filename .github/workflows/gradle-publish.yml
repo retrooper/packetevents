@@ -24,8 +24,38 @@ jobs:
       - name: Build with Gradle
         run: chmod +x gradlew && ./gradlew build
 
-      - name: Upload build artifacts
+      - name: Upload build artifacts api
         uses: actions/upload-artifact@v3
         with:
-          name: build
-          path: build/libs
+          name: api-build
+          path: api/build/libs
+
+      - name: Upload build artifacts spigot
+        uses: actions/upload-artifact@v3
+        with:
+          name: spigot-build
+          path: spigot/build/libs
+
+      - name: Upload build artifacts netty-common
+        uses: actions/upload-artifact@v3
+        with:
+          name: netty-common-build
+          path: netty-common/build/libs
+
+      - name: Upload build artifacts bungeecord
+        uses: actions/upload-artifact@v3
+        with:
+          name: bungeecord-build
+          path: bungeecord/build/libs
+
+      - name: Upload build artifacts velocity
+        uses: actions/upload-artifact@v3
+        with:
+          name: velocity-build
+          path: velocity/build/libs
+
+      - name: Upload build artifacts fabric
+        uses: actions/upload-artifact@v3
+        with:
+          name: fabric-build
+          path: fabric/build/libs
