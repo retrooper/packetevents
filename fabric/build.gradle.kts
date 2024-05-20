@@ -1,5 +1,3 @@
-import net.fabricmc.loom.task.RemapJarTask
-
 plugins {
     packetevents.`library-conventions`
     alias(libs.plugins.fabric)
@@ -61,13 +59,12 @@ tasks {
         // this fixes some edge cases with special characters not displaying correctly
         // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
         // If Javadoc is generated, this must be specified in that task too.
-        options.encoding = "UTF-8"
         if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
             options.release = targetJavaVersion
         }
     }
 
-    named<RemapJarTask>("remapJar") {
+    remapJar {
         archiveBaseName.set("${rootProject.name}-fabric")
     }
 }

@@ -13,19 +13,25 @@ tasks {
         group = "build"
 
         doLast {
-            val buildOut = project.layout.buildDirectory.dir("libs").get()
+            val buildOut = project.layout.buildDirectory.dir("libs").get().asFile
+            if (!buildOut.exists())
+                buildOut.mkdirs()
+
             for (subproject in subprojects) {
                 val subIn = subproject.layout.buildDirectory.dir("libs").get()
-                val subOut = buildOut.dir(subproject.name).asFile
-                if (!subOut.exists())
-                    subOut.mkdirs()
 
                 copy {
                     from(subIn)
-                    into(subOut)
+                    into(buildOut)
                 }
             }
         }
+    }
+
+    register<Delete>("clean") {
+        dependsOn(*subprojects.map { it.tasks["clean"] }.toTypedArray())
+        group = "build"
+        delete(rootProject.layout.buildDirectory)
     }
 
     defaultTasks("build")

@@ -15,7 +15,6 @@ repositories {
 
 java {
     withJavadocJar()
-    disableAutoTargetJvm()
 }
 
 dependencies {

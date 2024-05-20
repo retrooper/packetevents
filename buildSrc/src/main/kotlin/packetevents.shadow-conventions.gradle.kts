@@ -5,7 +5,7 @@ plugins {
 
 tasks {
     shadowJar {
-        archiveFileName.set("packetevents-${project.name}-${project.version}.jar")
+        archiveFileName = "packetevents-${project.name}-${project.version}.jar"
         archiveClassifier = null
     }
 

@@ -19,16 +19,15 @@ dependencies {
 
 java {
     withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_1_8
+    disableAutoTargetJvm()
 }
 
 tasks {
     withType<JavaCompile> {
-        options.encoding = "UTF-8"
+        options.encoding = Charsets.UTF_8.name()
         // Set the release flag. This configures what version bytecode the compiler will emit, as well as what JDK APIs are usable.
         // See https://openjdk.java.net/jeps/247 for more information.
-        options.release.set(8)
+        options.release = 8
     }
 
     jar {
@@ -57,14 +56,12 @@ publishing {
             // Check which URL should be used
             url = uri(if ((version as String).endsWith("SNAPSHOT")) snapshotUrl else releaseUrl)
 
-            val mavenUsername = System.getenv("retrooper_username")
-            val mavenPassword = System.getenv("retrooper_password")
+            val mavenUsername = System.getenv("retrooper_username") ?: return@maven
+            val mavenPassword = System.getenv("retrooper_password") ?: return@maven
 
-            if (mavenUsername != null && mavenPassword != null) {
-                credentials {
-                    username = mavenUsername
-                    password = mavenPassword
-                }
+            credentials {
+                username = mavenUsername
+                password = mavenPassword
             }
         }
     }
