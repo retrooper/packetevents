@@ -1,6 +1,6 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow")
+    com.github.johnrengelman.shadow
 }
 
 tasks {
