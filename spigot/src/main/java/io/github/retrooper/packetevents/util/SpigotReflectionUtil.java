@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -34,6 +35,9 @@ import com.google.common.collect.MapMaker;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.Registry;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -264,15 +268,6 @@ public final class SpigotReflectionUtil {
         ENTITY_PLAYER_PING_FIELD = Reflection.getField(ENTITY_PLAYER_CLASS, "ping");
         BYTE_BUF_IN_PACKET_DATA_SERIALIZER = Reflection.getField(NMS_PACKET_DATA_SERIALIZER_CLASS, BYTE_BUF_CLASS, 0, true);
         CRAFT_PARTICLE_PARTICLES_FIELD = Reflection.getField(CRAFT_PARTICLE_CLASS, "particles");
-        if (CRAFT_PARTICLE_PARTICLES_FIELD == null) {
-            for (Field f : Reflection.getFields(CRAFT_PARTICLE_CLASS)) {
-                if (Modifier.isStatic(f.getModifiers())) {
-                    CRAFT_PARTICLE_PARTICLES_FIELD = f;
-                    //Found the first static field in this class.
-                    break;
-                }
-            }
-        }
         NMS_MK_KEY_FIELD = Reflection.getField(NMS_MINECRAFT_KEY_CLASS, "key");
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
             LEGACY_NMS_PARTICLE_KEY_FIELD = Reflection.getField(NMS_ENUM_PARTICLE_CLASS, "X");
@@ -1108,6 +1103,10 @@ public final class SpigotReflectionUtil {
     public static ParticleType<?> toPacketEventsParticle(Enum<?> particle) {
         try {
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                if (CRAFT_PARTICLE_PARTICLES_FIELD == null) {
+                    return ParticleTypes.getByName(((Particle) particle).getKey().toString());
+                }
+
                 BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
                 // must be done because issues happen otherwise since they are actually the same particle 1.13+
 
@@ -1131,6 +1130,12 @@ public final class SpigotReflectionUtil {
     public static Enum<?> fromPacketEventsParticle(ParticleType<?> particle) {
         try {
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                if (CRAFT_PARTICLE_PARTICLES_FIELD == null) {
+                    ResourceLocation particleName = particle.getName();
+                    return Registry.PARTICLE_TYPE.get(new NamespacedKey(
+                            particleName.getNamespace(), particleName.getKey()));
+                }
+
                 BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
                 Object minecraftKey = NMS_MINECRAFT_KEY_CONSTRUCTOR.newInstance(particle.getName().getNamespace(), particle.getName().getKey());
                 Object bukkitParticle = map.inverse().get(minecraftKey);
