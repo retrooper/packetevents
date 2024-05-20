@@ -4,7 +4,7 @@ netty = "4.1.72.Final"
 jetbrains-annotations = "23.0.0"
 via-version = "4.5.0"
 protocol-support = "3d24efeda6"
-spigot = "1.20.1-R0.1-SNAPSHOT"
+spigot = "1.20.4-R0.1-SNAPSHOT"
 bungeecord = "1.20-R0.1-SNAPSHOT"
 velocity = "3.1.0"
 
