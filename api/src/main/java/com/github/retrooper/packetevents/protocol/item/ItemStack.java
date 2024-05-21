@@ -273,17 +273,15 @@ public class ItemStack {
         }
 
         // check for components
-        Optional<ItemEnchantments> optEnchantments = this.getComponent(ENCHANTMENTS);
-        Optional<ItemEnchantments> optStoredEnchantments = this.getComponent(STORED_ENCHANTMENTS);
-        if (optEnchantments.isPresent() || optStoredEnchantments.isPresent()) {
-            ItemEnchantments enchantments = optEnchantments.orElse(ItemEnchantments.EMPTY);
-            ItemEnchantments storedEnchantments = optStoredEnchantments.orElse(ItemEnchantments.EMPTY);
+        ItemEnchantments enchantmentsComp = this.getComponentOr(ENCHANTMENTS, ItemEnchantments.EMPTY);
+        ItemEnchantments storedEnchantmentsComp = this.getComponentOr(STORED_ENCHANTMENTS, ItemEnchantments.EMPTY);
+        if (!enchantmentsComp.isEmpty() || !storedEnchantmentsComp.isEmpty()) {
             List<Enchantment> enchantmentsList = new ArrayList<>(
-                    enchantments.getEnchantmentCount() + storedEnchantments.getEnchantmentCount());
-            for (Map.Entry<EnchantmentType, Integer> enchantment : enchantments) {
+                    enchantmentsComp.getEnchantmentCount() + storedEnchantmentsComp.getEnchantmentCount());
+            for (Map.Entry<EnchantmentType, Integer> enchantment : enchantmentsComp) {
                 enchantmentsList.add(new Enchantment(enchantment.getKey(), enchantment.getValue()));
             }
-            for (Map.Entry<EnchantmentType, Integer> enchantment : storedEnchantments) {
+            for (Map.Entry<EnchantmentType, Integer> enchantment : storedEnchantmentsComp) {
                 enchantmentsList.add(new Enchantment(enchantment.getKey(), enchantment.getValue()));
             }
             return enchantmentsList;
@@ -320,16 +318,16 @@ public class ItemStack {
         }
 
         // check for components
-        Optional<ItemEnchantments> optEnchantments = this.getComponent(ENCHANTMENTS);
-        if (optEnchantments.isPresent()) {
-            int level = optEnchantments.get().getEnchantmentLevel(enchantment);
+        ItemEnchantments enchantmentsComp = this.getComponentOr(ENCHANTMENTS, ItemEnchantments.EMPTY);
+        if (!enchantmentsComp.isEmpty()) {
+            int level = enchantmentsComp.getEnchantmentLevel(enchantment);
             if (level > 0) {
                 return level;
             }
         }
-        Optional<ItemEnchantments> optStoredEnchantments = this.getComponent(STORED_ENCHANTMENTS);
-        if (optStoredEnchantments.isPresent()) {
-            int level = optStoredEnchantments.get().getEnchantmentLevel(enchantment);
+        ItemEnchantments storedEnchantmentsComp = this.getComponentOr(STORED_ENCHANTMENTS, ItemEnchantments.EMPTY);
+        if (!storedEnchantmentsComp.isEmpty()) {
+            int level = storedEnchantmentsComp.getEnchantmentLevel(enchantment);
             if (level > 0) {
                 return level;
             }
