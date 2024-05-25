@@ -40,4 +40,16 @@ public class UnpooledByteBufAllocationHelper {
     public static Object compositeBuffer() {
         return PacketEvents.getAPI().getNettyManager().getByteBufAllocationOperator().compositeBuffer();
     }
+
+    public static Object buffer(int initialCapacity) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationOperator().buffer(initialCapacity);
+    }
+
+    public static Object directBuffer(int initialCapacity) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationOperator().directBuffer(initialCapacity);
+    }
+
+    public static Object compositeBuffer(int maxNumComponents) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufAllocationOperator().compositeBuffer(maxNumComponents);
+    }
 }
