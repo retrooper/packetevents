@@ -120,6 +120,7 @@ public class NPC {
             WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
         }
+        channels.clear();
     }
 
     public void teleport(Location to) {
