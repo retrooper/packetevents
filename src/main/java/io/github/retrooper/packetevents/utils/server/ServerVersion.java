@@ -51,18 +51,18 @@ public enum ServerVersion {
     //TODO Update (checkpoint)
     ERROR(-1);
 
-    private static final String NMS_VERSION_SUFFIX;
+    private static final String NMS_VERSION_SUFFIX, OBC_DIRECTORY;
     
     static {
+        String cbPackage = Bukkit.getServer().getClass().getPackage().getName();
         String temp;
         try {
-            temp = Bukkit.getServer().getClass().getPackage().getName()
-                    .replace(".", ",").split(",")[3] + ".";
-        }
-        catch (Exception ex) {
+            temp = cbPackage.replace(".", ",").split(",")[3];
+        } catch (Exception ex) {
             temp = "";
         }
-        NMS_VERSION_SUFFIX = temp;
+        NMS_VERSION_SUFFIX = temp + ".";
+        OBC_DIRECTORY = cbPackage + ".";
     }
     private static final ServerVersion[] VALUES = values();
     public static ServerVersion[] reversedValues = new ServerVersion[VALUES.length];
@@ -140,7 +140,7 @@ public enum ServerVersion {
     }
 
     public static String getOBCDirectory() {
-        return "org.bukkit.craftbukkit." + (getNMSSuffix());
+        return OBC_DIRECTORY;
     }
 
     public static ServerVersion getLatest() {
