@@ -151,7 +151,9 @@ public class Parsers {
     public static final Parser COMPONENT = define("component", null, null);
     public static final Parser STYLE = define("style", null, null);
     public static final Parser MESSAGE = define("message", null, null);
-    public static final Parser NBT = define("nbt", null, null);
+    public static final Parser NBT_COMPOUND_TAG = define("nbt_compound_tag", null, null);
+    @Deprecated
+    public static final Parser NBT = NBT_COMPOUND_TAG;
     public static final Parser NBT_TAG = define("nbt_tag", null, null);
     public static final Parser NBT_PATH = define("nbt_path", null, null);
     public static final Parser OBJECTIVE = define("objective", null, null);
