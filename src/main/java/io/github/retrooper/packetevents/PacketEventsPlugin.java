@@ -58,13 +58,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                     ItemStack stack = new ItemStack(Material.STICK);
                     WrappedPacketOutSetSlot setSlot = new WrappedPacketOutSetSlot(0, 37, stack);
                     PacketEvents.get().getPlayerUtils().sendPacket(event.getPlayer(), setSlot);
-                }
-                else if (event.getPacketId() == PacketType.Play.Client.CUSTOM_PAYLOAD) {
+                } else if (event.getPacketId() == PacketType.Play.Client.CUSTOM_PAYLOAD) {
                     WrappedPacketInCustomPayload cp = new WrappedPacketInCustomPayload(event.getNMSPacket());
-                    System.out.println("name: " + cp.getChannelName());
-                    if (cp.getChannelName().contains("brand")) {
-                        System.out.println("Data: " + ((new String(cp.getData(), StandardCharsets.UTF_8))));
-                    }
+                    String name = cp.getChannelName();
+                    System.out.println("name play: " + name);
+                    System.out.println("Data: " + ((new String(cp.getData(), StandardCharsets.UTF_8))));
                 }
             }
 
@@ -72,10 +70,9 @@ public class PacketEventsPlugin extends JavaPlugin {
             public void onPacketConfigReceive(PacketConfigReceiveEvent event) {
                 if (event.getPacketId() == PacketType.Play.Client.CUSTOM_PAYLOAD) {
                     WrappedPacketInCustomPayload cp = new WrappedPacketInCustomPayload(event.getNMSPacket());
-                    System.out.println("name: " + cp.getChannelName());
-                    if (cp.getChannelName().contains("brand")) {
-                        System.out.println("Data: " + ((new String(cp.getData(), StandardCharsets.UTF_8))));
-                    }
+                    String name = cp.getChannelName();
+                    System.out.println("name: " + name);
+                    System.out.println("Data: " + ((new String(cp.getData(), StandardCharsets.UTF_8))));
                 }
             }
 
@@ -87,8 +84,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrappedPacketOutEntityEffect eff = new WrappedPacketOutEntityEffect(event.getNMSPacket());
                     eff.setEffectId(eff.getEffectId());
                     System.out.println("eff: " + eff.getEffectId() + ", ampl: " + eff.getAmplifier() + ", dur:" + eff.getDuration());
-                }
-                else if (event.getPacketId() == PacketType.Play.Server.ENTITY_VELOCITY) {
+                } else if (event.getPacketId() == PacketType.Play.Server.ENTITY_VELOCITY) {
                     WrappedPacketOutEntityVelocity ev = new WrappedPacketOutEntityVelocity(event.getNMSPacket());
                 }
             }
