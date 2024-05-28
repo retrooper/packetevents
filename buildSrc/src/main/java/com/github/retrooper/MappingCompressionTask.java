@@ -61,6 +61,7 @@ public class MappingCompressionTask extends DefaultTask {
         compressJson("item/item_trim_material_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
         compressJson("item/item_trim_pattern_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
         compressJson("item/item_type_mappings.json", JsonObjectCompressionStrategy.INSTANCE);
+        compressJson("item/recipe_serializer_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
 
         compressJson("particle/particle_type_mappings.json", JsonArrayCompressionStrategy.INSTANCE);
 

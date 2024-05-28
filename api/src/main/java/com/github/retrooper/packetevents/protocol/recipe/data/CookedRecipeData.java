@@ -18,45 +18,81 @@
 
 package com.github.retrooper.packetevents.protocol.recipe.data;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.recipe.CookingCategory;
 import com.github.retrooper.packetevents.protocol.recipe.Ingredient;
-import org.jetbrains.annotations.NotNull;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class CookedRecipeData implements RecipeData {
-    private final @NotNull String group;
-    private final @NotNull Ingredient ingredient;
+
+    private final String group;
+    private final CookingCategory category;
+    private final Ingredient ingredient;
     private final ItemStack result;
     private final float experience;
     private final int cookingTime;
 
-    public CookedRecipeData(@NotNull String group, @NotNull Ingredient ingredient, @NotNull ItemStack result, float experience, int cookingTime) {
+    @Deprecated
+    public CookedRecipeData(String group, Ingredient ingredient, ItemStack result, float experience, int cookingTime) {
+        this(group, CookingCategory.MISC, ingredient, result, experience, cookingTime);
+    }
+
+    public CookedRecipeData(
+            String group, CookingCategory category, Ingredient ingredient,
+            ItemStack result, float experience, int cookingTime
+    ) {
         this.group = group;
+        this.category = category;
         this.ingredient = ingredient;
         this.result = result;
         this.experience = experience;
         this.cookingTime = cookingTime;
     }
 
-    @NotNull
+    public static CookedRecipeData read(PacketWrapper<?> wrapper) {
+        String group = wrapper.readString();
+        CookingCategory category = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3) ?
+                wrapper.readEnum(CookingCategory.values()) : CookingCategory.MISC;
+        Ingredient ingredient = Ingredient.read(wrapper);
+        ItemStack result = wrapper.readItemStack();
+        float experience = wrapper.readFloat();
+        int cookingTime = wrapper.readVarInt();
+        return new CookedRecipeData(group, category, ingredient, result, experience, cookingTime);
+    }
+
+    public static void write(PacketWrapper<?> wrapper, CookedRecipeData data) {
+        wrapper.writeString(data.group);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            wrapper.writeEnum(data.category);
+        }
+        Ingredient.write(wrapper, data.ingredient);
+        wrapper.writeItemStack(data.result);
+        wrapper.writeFloat(data.experience);
+        wrapper.writeVarInt(data.cookingTime);
+    }
+
     public String getGroup() {
-        return group;
+        return this.group;
     }
 
-    @NotNull
+    public CookingCategory getCategory() {
+        return this.category;
+    }
+
     public Ingredient getIngredient() {
-        return ingredient;
+        return this.ingredient;
     }
 
-    @NotNull
     public ItemStack getResult() {
-        return result;
+        return this.result;
     }
 
     public float getExperience() {
-        return experience;
+        return this.experience;
     }
 
     public int getCookingTime() {
-        return cookingTime;
+        return this.cookingTime;
     }
 }
