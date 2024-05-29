@@ -176,6 +176,19 @@ public class PacketTypeClasses {
                 }
                 if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
                     GROUND = SubclassUtil.getSubClass(FLYING, "d");
+                    if (GROUND == null) {
+                        GROUND = SubclassUtil.getSubClass(FLYING, 0);
+                    }
+                    if (POSITION == null) {
+                        GROUND = SubclassUtil.getSubClass(FLYING, 2);
+                    }
+                    if (POSITION_LOOK == null) {
+                        GROUND = SubclassUtil.getSubClass(FLYING, 3);
+                    }
+
+                    if (LOOK == null) {
+                        GROUND = SubclassUtil.getSubClass(FLYING, 1);
+                    }
                 }
                 else {
                     GROUND = FLYING;
