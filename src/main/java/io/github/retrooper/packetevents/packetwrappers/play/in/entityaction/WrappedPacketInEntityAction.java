@@ -43,6 +43,9 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
         if (enumPlayerActionClass == null) {
             enumPlayerActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.ENTITY_ACTION, "EnumPlayerAction");
         }
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_20_6)) {
+            enumPlayerActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.ENTITY_ACTION, 0);
+        }
 
     }
 

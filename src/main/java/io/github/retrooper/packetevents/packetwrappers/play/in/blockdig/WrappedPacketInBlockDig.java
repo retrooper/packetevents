@@ -47,6 +47,9 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
             } catch (ClassNotFoundException e) {
                 //It is probably a subclass
                 digTypeClass = SubclassUtil.getEnumSubClass(blockDigClass, "EnumPlayerDigType");
+                if (digTypeClass == null) {
+                    digTypeClass = SubclassUtil.getEnumSubClass(blockDigClass, 0);
+                }
             }
         }
     }

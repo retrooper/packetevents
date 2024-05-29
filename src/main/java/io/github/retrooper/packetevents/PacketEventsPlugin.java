@@ -23,7 +23,10 @@ import io.github.retrooper.packetevents.event.impl.PacketConfigReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
 import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
+import io.github.retrooper.packetevents.packetwrappers.play.in.entityaction.WrappedPacketInEntityAction;
+import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entityeffect.WrappedPacketOutEntityEffect;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entityvelocity.WrappedPacketOutEntityVelocity;
@@ -55,6 +58,9 @@ public class PacketEventsPlugin extends JavaPlugin {
             public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
                 if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
                     System.out.println("Yes");
+                    WrappedPacketInUseEntity ue = new WrappedPacketInUseEntity(event.getNMSPacket());
+                    event.getPlayer().sendMessage("action: " + ue.getAction());
+                    event.getPlayer().sendMessage("target: " + ue.getTarget());
                     ItemStack stack = new ItemStack(Material.STICK);
                     WrappedPacketOutSetSlot setSlot = new WrappedPacketOutSetSlot(0, 37, stack);
                     PacketEvents.get().getPlayerUtils().sendPacket(event.getPlayer(), setSlot);
@@ -63,6 +69,13 @@ public class PacketEventsPlugin extends JavaPlugin {
                     String name = cp.getChannelName();
                     System.out.println("name play: " + name);
                     System.out.println("Data: " + ((new String(cp.getData(), StandardCharsets.UTF_8))));
+                }
+                else if (event.getPacketId() == PacketType.Play.Client.ENTITY_ACTION) {
+                    WrappedPacketInEntityAction ea = new WrappedPacketInEntityAction(event.getNMSPacket());
+                    event.getPlayer().sendMessage("EA: " + ea.getAction());
+                } else if (PacketType.Play.Client.BLOCK_DIG == event.getPacketId()) {
+                    WrappedPacketInBlockDig bd = new WrappedPacketInBlockDig(event.getNMSPacket());
+                    event.getPlayer().sendMessage("bd: " + bd.getDigType());
                 }
             }
 

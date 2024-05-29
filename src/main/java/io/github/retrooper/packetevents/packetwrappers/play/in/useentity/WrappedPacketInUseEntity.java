@@ -38,7 +38,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
     private static Class<? extends Enum<?>> enumEntityUseActionClass;
     private static Class<?> obfuscatedDataInterface, obfuscatedHandContainerClass, obfuscatedTargetAndHandContainerClass;
     private static Method getObfuscatedEntityUseActionMethod;
-    private static boolean v_1_7_10, v_1_9, v_1_17;
+    private static boolean v_1_7_10, v_1_9, v_1_17, v_1_20_5;
     private EntityUseAction action;
     private Object obfuscatedDataObj;
 
@@ -51,15 +51,27 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
         v_1_7_10 = version.isOlderThan(ServerVersion.v_1_8);
         v_1_9 = version.isNewerThanOrEquals(ServerVersion.v_1_9);
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
+        v_1_20_5 = version.isNewerThanOrEquals(ServerVersion.v_1_20_5);
         try {
             enumEntityUseActionClass = NMSUtils.getNMSEnumClass("EnumEntityUseAction");
         } catch (ClassNotFoundException e) {
             //That is fine, it is probably a subclass
             if (v_1_17) {
                 enumEntityUseActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, "b");
+                if (v_1_20_5) {
+                    if (enumEntityUseActionClass == null) {
+                        enumEntityUseActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, 3);
+                    }
+                }
                 obfuscatedDataInterface = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, "EnumEntityUseAction");
+                if (v_1_20_5) {
+                    obfuscatedDataInterface = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, 0);
+                }
                 obfuscatedHandContainerClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, "d");
                 obfuscatedTargetAndHandContainerClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, "e");
+                if (obfuscatedTargetAndHandContainerClass == null) {
+                    obfuscatedTargetAndHandContainerClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, 2);
+                }
                 getObfuscatedEntityUseActionMethod = Reflection.getMethod(obfuscatedDataInterface, enumEntityUseActionClass, 0);
             } else {
                 enumEntityUseActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, "EnumEntityUseAction");
