@@ -34,10 +34,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -248,6 +245,17 @@ public final class NMSUtils {
 
         if (builtInRegistriesClass != null) {
             mobEffectsRegistryField = Reflection.getField(builtInRegistriesClass, "e");
+
+            for (Field f : Reflection.getFields(builtInRegistriesClass)) {
+                Type type = f.getGenericType();
+                if (type instanceof ParameterizedType) {
+                    ParameterizedType pType = (ParameterizedType)type;
+                    if (pType.getActualTypeArguments()[0].equals(mobEffectListClass)) {
+                        mobEffectsRegistryField = f;
+                        break;
+                    }
+                }
+            }
         }
 
         vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");

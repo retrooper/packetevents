@@ -26,6 +26,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
 import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
 import io.github.retrooper.packetevents.packetwrappers.play.in.entityaction.WrappedPacketInEntityAction;
+import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entityeffect.WrappedPacketOutEntityEffect;
@@ -77,6 +78,10 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrappedPacketInBlockDig bd = new WrappedPacketInBlockDig(event.getNMSPacket());
                     event.getPlayer().sendMessage("bd: " + bd.getDigType());
                 }
+                else if (PacketType.Play.Client.Util.isInstanceOfFlying(event.getPacketId())) {
+                    WrappedPacketInFlying f = new WrappedPacketInFlying(event.getNMSPacket());
+                    System.out.println("flying: " + f.getPosition().toString() + ", pitch and yaw: " + f.getPitch() + ", " + f.getYaw());
+                }
             }
 
             @Override
@@ -95,7 +100,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrappedPacketOutEntity entity = new WrappedPacketOutEntity(event.getNMSPacket());
                 } else if (event.getPacketId() == PacketType.Play.Server.ENTITY_EFFECT) {
                     WrappedPacketOutEntityEffect eff = new WrappedPacketOutEntityEffect(event.getNMSPacket());
-                    eff.setEffectId(eff.getEffectId());
+                    //TODO Broken on 1.20.5 eff.setEffectId(eff.getEffectId());
                     System.out.println("eff: " + eff.getEffectId() + ", ampl: " + eff.getAmplifier() + ", dur:" + eff.getDuration());
                 } else if (event.getPacketId() == PacketType.Play.Server.ENTITY_VELOCITY) {
                     WrappedPacketOutEntityVelocity ev = new WrappedPacketOutEntityVelocity(event.getNMSPacket());

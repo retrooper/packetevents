@@ -24,17 +24,23 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Effect;
 import org.bukkit.entity.Entity;
 import org.bukkit.potion.PotionEffectType;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction implements SendableWrapper {
-    private static boolean v_1_7_10, v_1_17, v_1_18_2, v_1_19;
+    private static boolean v_1_7_10, v_1_17, v_1_18_2, v_1_19, v_1_20_5;
     private static Constructor<?> packetConstructor;
+    private static Class<?> holderClass;
+    private static Method accessHolderValueMethod;
+    private static boolean hasHolder = false;
     private int effectID;
     private int amplifier;
     private int duration;
@@ -106,11 +112,23 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         v_1_18_2 = version.isNewerThanOrEquals(ServerVersion.v_1_18_2);
         v_1_19 = version.isNewerThanOrEquals(ServerVersion.v_1_19);
+        v_1_20_5 = version.isNewerThanOrEquals(ServerVersion.v_1_20_5);
         try {
+
             if (v_1_17) {
-                packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EFFECT.getConstructor(NMSUtils.packetDataSerializerClass);
+                /*packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EFFECT.getDeclaredConstructor(NMSUtils.packetDataSerializerClass);
+                packetConstructor.setAccessible(true);
+                if (packetConstructor == null) {
+                    Class<?> registryFriendlyByteBuf = NMSUtils.getNMClassWithoutException("network.RegistryFriendlyByteBuf");
+                    packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EFFECT.getDeclaredConstructor(registryFriendlyByteBuf);
+                }*/
             } else {
                 packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EFFECT.getConstructor();
+            }
+
+            holderClass = NMSUtils.getNMClassWithoutException("core.Holder");
+            if (holderClass != null) {
+                hasHolder = Reflection.getField(PacketTypeClasses.Play.Server.ENTITY_EFFECT, holderClass, 0) != null;
             }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -120,7 +138,21 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
     public int getEffectId() {
         if (packet != null) {
             if (v_1_19) {
-                Object mobEffectList = readObject(0, NMSUtils.mobEffectListClass);
+                Object mobEffectList = null;
+                if (hasHolder) {
+                    Object holder = readObject(0, holderClass);
+                    if (accessHolderValueMethod == null) {
+                        accessHolderValueMethod = Reflection.getMethod(holderClass, 0);
+                    }
+                    try {
+                        mobEffectList = accessHolderValueMethod.invoke(holder);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    mobEffectList = readObject(0, NMSUtils.mobEffectListClass);
+                }
                 return NMSUtils.getEffectId(mobEffectList);
             } else if (v_1_18_2) {
                 return readInt(4);
@@ -149,6 +181,9 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public int getAmplifier() {
         if (packet != null) {
+            if (v_1_20_5) {
+                return readInt(5);
+            }
             return readByte(v_1_18_2 ? 0 : 1);
         } else {
             return amplifier;
@@ -157,6 +192,9 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public void setAmplifier(int amplifier) {
         if (packet != null) {
+            if (v_1_20_5) {
+                writeInt(5, amplifier);
+            }
             writeByte(v_1_18_2 ? 0 : 1, (byte) amplifier);
         } else {
             this.amplifier = amplifier;
@@ -168,6 +206,9 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
             //1.7 and only 1.7(below 1.8)
             if (v_1_7_10) {
                 return readShort(1);
+            }
+            else if (v_1_20_5) {
+                return readInt(6);
             }
             else if (v_1_19) {
                 return readInt(4);
@@ -195,7 +236,11 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
                     duration = Short.MIN_VALUE;
                 }
                 writeShort(0, (short) duration);
-            } else if (v_1_19) {
+            }
+            else if (v_1_20_5) {
+                writeInt(6, duration);
+            }
+            else if (v_1_19) {
                 writeInt(4, duration);
             } else if (v_1_18_2) {
                 writeInt(5, duration);
@@ -212,6 +257,9 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
             return Optional.empty();
         }
         if (packet != null && !byteMaskInitialized) {
+            if (v_1_20_5) {
+                return Optional.of(readByte(0));
+            }
             return Optional.of(byteMask = readByte(v_1_18_2 ? 1 : 2));
         } else {
             return Optional.of(byteMask);
@@ -222,6 +270,9 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
         if (!v_1_7_10) {
             this.byteMask = byteMask;
             if (packet != null) {
+                if (v_1_20_5) {
+                    writeByte(0, byteMask);
+                }
                 writeByte(v_1_18_2 ? 1 : 2, byteMask);
             }
         }
