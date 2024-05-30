@@ -372,6 +372,16 @@ public class PacketTypeClasses {
                     REL_ENTITY_MOVE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "RelEntityMove");
                     REL_ENTITY_MOVE_LOOK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "RelEntityMoveLook");
                     ENTITY_LOOK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "RelEntityLook");
+
+                    if (REL_ENTITY_MOVE == null) {
+                        REL_ENTITY_MOVE = SubclassUtil.getSubClass(ENTITY, 1);
+                    }
+                    if (REL_ENTITY_MOVE_LOOK == null) {
+                        REL_ENTITY_MOVE_LOOK = SubclassUtil.getSubClass(ENTITY, 2);
+                    }
+                    if (ENTITY_LOOK == null) {
+                        ENTITY_LOOK = SubclassUtil.getSubClass(ENTITY, 0);
+                    }
                 }
                 VEHICLE_MOVE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "VehicleMove");
                 OPEN_BOOK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "OpenBook");
