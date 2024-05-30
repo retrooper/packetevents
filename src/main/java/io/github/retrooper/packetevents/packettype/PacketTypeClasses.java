@@ -180,14 +180,14 @@ public class PacketTypeClasses {
                         GROUND = SubclassUtil.getSubClass(FLYING, 0);
                     }
                     if (POSITION == null) {
-                        GROUND = SubclassUtil.getSubClass(FLYING, 2);
+                        POSITION = SubclassUtil.getSubClass(FLYING, 2);
                     }
                     if (POSITION_LOOK == null) {
-                        GROUND = SubclassUtil.getSubClass(FLYING, 3);
+                        POSITION_LOOK = SubclassUtil.getSubClass(FLYING, 3);
                     }
 
                     if (LOOK == null) {
-                        GROUND = SubclassUtil.getSubClass(FLYING, 1);
+                        LOOK = SubclassUtil.getSubClass(FLYING, 1);
                     }
                 }
                 else {

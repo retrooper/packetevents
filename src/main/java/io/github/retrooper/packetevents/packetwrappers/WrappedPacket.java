@@ -416,9 +416,17 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public Vector3i readBlockPosition(int index) {
         Object blockPosObj = readObject(index, NMSUtils.blockPosClass);
         try {
-            int x = (Integer) NMSUtils.getBlockPosX.invoke(blockPosObj);
-            int y = (Integer) NMSUtils.getBlockPosY.invoke(blockPosObj);
-            int z = (Integer) NMSUtils.getBlockPosZ.invoke(blockPosObj);
+            int x, y, z;
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_20_5)) {
+                x = (int) NMSUtils.getBaseBlockPosX.get(blockPosObj);
+                y = (int) NMSUtils.getBaseBlockPosY.get(blockPosObj);
+                z = (int) NMSUtils.getBaseBlockPosZ.get(blockPosObj);
+            }
+            else {
+                x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
+                y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
+                z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
+            }
             return new Vector3i(x, y, z);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();

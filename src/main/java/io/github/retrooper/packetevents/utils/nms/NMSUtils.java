@@ -59,6 +59,7 @@ public final class NMSUtils {
             asNMSCopy, getMessageMethod, chatFromStringMethod, getMaterialFromNMSBlock, getNMSBlockFromMaterial,
             getMobEffectListId, getMobEffectListById, getItemId, getItemById, getBukkitEntity;
     private static Field entityPlayerPingField, entityBoundingBoxField, mobEffectsRegistryField;
+    public static Field  getBaseBlockPosX, getBaseBlockPosY, getBaseBlockPosZ;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
 
@@ -258,6 +259,15 @@ public final class NMSUtils {
             }
         }
 
+        Class<?> baseBlockPosClass = NMSUtils.getNMSClassWithoutException("BaseBlockPosition");
+        if (baseBlockPosClass == null) {
+            baseBlockPosClass = getNMClassWithoutException("core.BaseBlockPosition");
+        }
+        if (baseBlockPosClass != null) {
+            getBaseBlockPosX = Reflection.getField(baseBlockPosClass, int.class, 0);
+            getBaseBlockPosY = Reflection.getField(baseBlockPosClass, int.class, 1);
+            getBaseBlockPosZ = Reflection.getField(baseBlockPosClass, int.class, 2);
+        }
         vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");
         if (vec3DClass == null) {
             vec3DClass = getNMClassWithoutException("world.phys.Vec3D");
@@ -379,6 +389,9 @@ public final class NMSUtils {
             // Mappings changed with 1.18
             if (getBlockPosX == null) {
                 getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass, "u", int.class);
+                if (getBlockPosX == null) {
+
+                }
             }
             if (getBlockPosY == null) {
                 getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass, "v", int.class);
