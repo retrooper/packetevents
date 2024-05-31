@@ -41,6 +41,9 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
         if (enumClientCommandClass == null) {
             //Probably a subclass
             enumClientCommandClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.CLIENT_COMMAND, "EnumClientCommand");
+            if (enumClientCommandClass == null) {
+                enumClientCommandClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.CLIENT_COMMAND, 0);
+            }
         }
     }
 
