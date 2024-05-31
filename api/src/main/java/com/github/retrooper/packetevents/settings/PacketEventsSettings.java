@@ -181,7 +181,7 @@ public class PacketEventsSettings {
      *
      * @return Getter for bStatsEnabled
      * @deprecated This method has been deprecated, because the setter has been removed.
-     * Removing bStats is now done through the bStats config file.
+     * Disabling bStats is now done through the bStats config file.
      */
     @Deprecated
     public boolean isbStatsEnabled() {
