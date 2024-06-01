@@ -35,7 +35,6 @@ public class PacketEventsSettings {
     private boolean defaultReencode = true; // true for backwards compat and more idiot-proof
     private boolean checkForUpdates = true;
     private boolean downsampleColors = false;
-    private boolean bStatsEnabled = true;
     private boolean debugEnabled = false;
     private boolean fullStackTraceEnabled = false;
     private boolean kickOnPacketExceptionEnabled = true;
@@ -98,9 +97,10 @@ public class PacketEventsSettings {
      *
      * @param bStatsEnabled Value
      * @return Settings instance.
+     * @deprecated This method has been deprecated. To disable bStats use the config file found in the bStats folder.
      */
+    @Deprecated()
     public PacketEventsSettings bStats(boolean bStatsEnabled) {
-        this.bStatsEnabled = bStatsEnabled;
         return this;
     }
 
@@ -179,10 +179,13 @@ public class PacketEventsSettings {
     /**
      * Should we collect server data anonymously and report to bStats?
      *
-     * @return Getter for {@link #bStatsEnabled}
+     * @return Getter for bStatsEnabled
+     * @deprecated This method has been deprecated, because the setter has been removed.
+     * Disabling bStats is now done through the bStats config file.
      */
+    @Deprecated
     public boolean isbStatsEnabled() {
-        return bStatsEnabled;
+        return true;
     }
 
     /**
