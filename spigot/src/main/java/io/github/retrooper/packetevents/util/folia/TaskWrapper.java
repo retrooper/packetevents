@@ -18,12 +18,9 @@
 
 package io.github.retrooper.packetevents.util.folia;
 
-import com.github.retrooper.packetevents.util.reflection.Reflection;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
-
-import java.lang.reflect.Method;
-import java.util.function.Supplier;
 
 /**
  * Represents a wrapper around {@code BukkitTask} and Paper's {@code ScheduledTask}.
@@ -31,24 +28,9 @@ import java.util.function.Supplier;
  * and Paper's task scheduler.
  */
 public class TaskWrapper {
-    private static Method getOwningPluginMethod;
-    private static Method isCancelledMethod;
-    private static Method cancelMethod;
-
-    static {
-        if (FoliaScheduler.isFolia()) {
-            // When Folia is being used, we initialize the reflection methods for Paper's ScheduledTask on startup
-            // to avoid reflection overhead during runtime.
-            Class<?> scheduledTaskClass = Reflection.getClassByNameWithoutException("io.papermc.paper.threadedregions.scheduler.ScheduledTask");
-
-            getOwningPluginMethod = Reflection.getMethod(scheduledTaskClass, "getOwningPlugin");
-            isCancelledMethod = Reflection.getMethod(scheduledTaskClass, "isCancelled");
-            cancelMethod = Reflection.getMethod(scheduledTaskClass, "cancel");
-        }
-    }
 
     private BukkitTask bukkitTask;
-    private Object scheduledTask;
+    private ScheduledTask scheduledTask;
 
     /**
      * Constructs a new TaskWrapper around a BukkitTask.
@@ -64,7 +46,7 @@ public class TaskWrapper {
      *
      * @param scheduledTask the ScheduledTask to wrap
      */
-    public TaskWrapper(Object scheduledTask) {
+    public TaskWrapper(ScheduledTask scheduledTask) {
         this.scheduledTask = scheduledTask;
     }
 
@@ -77,9 +59,12 @@ public class TaskWrapper {
         if (bukkitTask == null && scheduledTask == null) {
             return null;
         }
-        return getIfBukkitTaskOrElse(
-                () -> bukkitTask.getOwner(),
-                () -> invokeReflectedMethod(getOwningPluginMethod));
+
+        if (bukkitTask != null) {
+            return bukkitTask.getOwner();
+        } else {
+            return scheduledTask.getOwningPlugin();
+        }
     }
 
     /**
@@ -91,9 +76,12 @@ public class TaskWrapper {
         if (bukkitTask == null && scheduledTask == null) {
             return false;
         }
-        return getIfBukkitTaskOrElse(
-                () -> bukkitTask.isCancelled(),
-                () -> invokeReflectedMethod(isCancelledMethod));
+
+        if (bukkitTask != null) {
+            return bukkitTask.isCancelled();
+        } else {
+            return scheduledTask.isCancelled();
+        }
     }
 
     /**
@@ -103,38 +91,11 @@ public class TaskWrapper {
         if (bukkitTask == null && scheduledTask == null) {
             return;
         }
+
         if (bukkitTask != null) {
             bukkitTask.cancel();
         } else {
-            invokeReflectedMethod(cancelMethod);
-        }
-    }
-
-    /**
-     * Private helper method to encapsulate the logic of conditional fetching data
-     * depending on the type of the task (BukkitTask or ScheduledTask).
-     *
-     * @param bukkitTaskSupplier    function that should be called for a Bukkit task
-     * @param scheduledTaskSupplier function that should be called for a Paper / Folia task
-     * @return the result of calling the appropriate function based on the task type
-     */
-    private <T> T getIfBukkitTaskOrElse(Supplier<T> bukkitTaskSupplier, Supplier<T> scheduledTaskSupplier) {
-        return bukkitTask != null ? bukkitTaskSupplier.get() : scheduledTaskSupplier.get();
-    }
-
-    /**
-     * Invokes the given reflection method on the scheduled task.
-     *
-     * @param method method to be invoked
-     * @return the result of the method invocation
-     */
-    @SuppressWarnings("unchecked")
-    private <T> T invokeReflectedMethod(Method method) {
-        try {
-            return (T) method.invoke(scheduledTask);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            scheduledTask.cancel();
         }
     }
 }
