@@ -69,7 +69,7 @@ public class AsyncScheduler {
      */
     public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay, @NotNull TimeUnit timeUnit) {
         if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit)));
+            return new TaskWrapper(bukkitScheduler.runTaskLaterAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit)));
         }
 
         return new TaskWrapper(asyncScheduler.runDelayed(plugin, (o) -> task.accept(null), delay, timeUnit));
@@ -89,7 +89,7 @@ public class AsyncScheduler {
         if (period < 1) period = 1;
 
         if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit), convertTimeToTicks(period, timeUnit)));
+            return new TaskWrapper(bukkitScheduler.runTaskTimerAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit), convertTimeToTicks(period, timeUnit)));
         }
 
         return new TaskWrapper(asyncScheduler.runAtFixedRate(plugin, (o) -> task.accept(null), delay, period, timeUnit));
@@ -108,7 +108,7 @@ public class AsyncScheduler {
         if (periodTicks < 1) periodTicks = 1;
 
         if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
+            return new TaskWrapper(bukkitScheduler.runTaskTimerAsynchronously(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
 
         return new TaskWrapper(asyncScheduler.runAtFixedRate(plugin, (o) -> task.accept(null), initialDelayTicks, periodTicks, TimeUnit.MILLISECONDS));
@@ -121,7 +121,7 @@ public class AsyncScheduler {
      */
     public void cancel(@NotNull Plugin plugin) {
         if (!isFolia) {
-            Bukkit.getScheduler().cancelTasks(plugin);
+            bukkitScheduler.cancelTasks(plugin);
             return;
         }
 
