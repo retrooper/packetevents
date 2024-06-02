@@ -7,6 +7,7 @@ protocol-support = "3d24efeda6"
 paper = "1.20.6-R0.1-SNAPSHOT"
 bungeecord = "1.20-R0.1-SNAPSHOT"
 velocity = "3.1.0"
+run-paper = "2.3.0"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
@@ -26,5 +27,6 @@ velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref =
 adventure = [ "adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-legacy", "adventure-nbt" ]
 
 [plugins]
-run-paper = { id = "xyz.jpenilla.run-paper", version = "2.3.0" }
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
+run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-paper" }
 fabric = { id = "fabric-loom", version = "0.11-SNAPSHOT" }
