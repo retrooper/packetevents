@@ -7,7 +7,7 @@ plugins {
 repositories {
     maven("https://jitpack.io")
     maven("https://repo.viaversion.com/")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
@@ -16,7 +16,7 @@ dependencies {
     api(project(":netty-common"))
     api(libs.bundles.adventure)
 
-    compileOnly(libs.spigot)
+    compileOnly(libs.paper)
     compileOnly(libs.via.version)
     compileOnly(libs.protocol.support)
 }
