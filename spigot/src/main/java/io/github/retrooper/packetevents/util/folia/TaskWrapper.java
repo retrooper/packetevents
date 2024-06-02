@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.util.folia;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a wrapper around {@code BukkitTask} and Paper's {@code ScheduledTask}.
@@ -37,7 +38,7 @@ public class TaskWrapper {
      *
      * @param bukkitTask the BukkitTask to wrap
      */
-    public TaskWrapper(BukkitTask bukkitTask) {
+    public TaskWrapper(@NotNull BukkitTask bukkitTask) {
         this.bukkitTask = bukkitTask;
     }
 
@@ -46,7 +47,7 @@ public class TaskWrapper {
      *
      * @param scheduledTask the ScheduledTask to wrap
      */
-    public TaskWrapper(ScheduledTask scheduledTask) {
+    public TaskWrapper(@NotNull ScheduledTask scheduledTask) {
         this.scheduledTask = scheduledTask;
     }
 
@@ -56,15 +57,7 @@ public class TaskWrapper {
      * @return the owning {@link Plugin}
      */
     public Plugin getOwner() {
-        if (bukkitTask == null && scheduledTask == null) {
-            return null;
-        }
-
-        if (bukkitTask != null) {
-            return bukkitTask.getOwner();
-        } else {
-            return scheduledTask.getOwningPlugin();
-        }
+        return bukkitTask != null ? bukkitTask.getOwner() : scheduledTask.getOwningPlugin();
     }
 
     /**
@@ -73,25 +66,13 @@ public class TaskWrapper {
      * @return true if the task is canceled, false otherwise
      */
     public boolean isCancelled() {
-        if (bukkitTask == null && scheduledTask == null) {
-            return false;
-        }
-
-        if (bukkitTask != null) {
-            return bukkitTask.isCancelled();
-        } else {
-            return scheduledTask.isCancelled();
-        }
+        return bukkitTask != null ? bukkitTask.isCancelled() : scheduledTask.isCancelled();
     }
 
     /**
      * Cancels the task. If the task is running, it will be canceled.
      */
     public void cancel() {
-        if (bukkitTask == null && scheduledTask == null) {
-            return;
-        }
-
         if (bukkitTask != null) {
             bukkitTask.cancel();
         } else {
