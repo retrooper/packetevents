@@ -40,6 +40,10 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
     private static Class<?> attributeSnapshotClass, attributeBaseClass;
     private static Field iRegistryAttributeBaseField;
     private static Method getiRegistryByMinecraftKeyMethod;
+
+    private static Class<?> holderClass;
+    private static Method accessHolderValueMethod;
+    private static boolean hasHolder = false;
     private static boolean stringKeyPresent;
 
     public AttributeSnapshotWrapper(NMSPacket packet) {
@@ -160,7 +164,21 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
         if (stringKeyPresent) {
             return readString(0);
         } else {
-            Object attributeBase = readObject(0, attributeBaseClass);
+            Object attributeBase = null;
+                if (hasHolder) {
+                    Object holder = readObject(0, holderClass);
+                    if (accessHolderValueMethod == null) {
+                    accessHolderValueMethod = Reflection.getMethod(holderClass, 0);
+                }
+                try {
+                    attributeBase = accessHolderValueMethod.invoke(holder);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                attributeBase = readObject(0, attributeBaseClass);
+            }
             WrappedPacket attributeBaseWrapper = new WrappedPacket(new NMSPacket(attributeBase), attributeBaseClass);
             return attributeBaseWrapper.readString(0);
         }
