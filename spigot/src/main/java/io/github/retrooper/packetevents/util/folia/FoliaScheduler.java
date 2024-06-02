@@ -31,7 +31,7 @@ import org.bukkit.plugin.Plugin;
  */
 public class FoliaScheduler {
     private static boolean folia;
-    private static Class<? extends Event> serverInitEventClass = null;
+    private static Class<? extends Event> regionizedServerInitEventClass = null;
 
     private static AsyncScheduler asyncScheduler;
     private static EntityScheduler entityScheduler;
@@ -44,7 +44,8 @@ public class FoliaScheduler {
             folia = true;
 
             // Thanks for this code ViaVersion
-            serverInitEventClass = (Class<? extends Event>) Class.forName("io.papermc.paper.threadedregions.RegionizedServerInitEvent");
+            // The class is only part of the Folia API, so we need to use reflections to get it
+            regionizedServerInitEventClass = (Class<? extends Event>) Class.forName("io.papermc.paper.threadedregions.RegionizedServerInitEvent");
         } catch (ClassNotFoundException e) {
             folia = false;
         }
@@ -108,6 +109,8 @@ public class FoliaScheduler {
     /**
      * Run a task after the server has finished initializing.
      * Undefined behavior if called after the server has finished initializing.
+     * <p>
+     * We still need to use reflections to get the server init event class, as this is only part of the Folia API.
      *
      * @param plugin Your plugin or PacketEvents
      * @param run    The task to run
@@ -118,7 +121,7 @@ public class FoliaScheduler {
             return;
         }
 
-        Bukkit.getServer().getPluginManager().registerEvent(serverInitEventClass, new Listener() {
+        Bukkit.getServer().getPluginManager().registerEvent(regionizedServerInitEventClass, new Listener() {
         }, EventPriority.HIGHEST, (listener, event) -> run.run(), plugin);
     }
 }
