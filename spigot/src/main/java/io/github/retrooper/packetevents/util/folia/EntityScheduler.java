@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 public class EntityScheduler {
     private final boolean isFolia = FoliaScheduler.isFolia();
 
-    private BukkitScheduler bukkitScheduler = null;
+    private BukkitScheduler bukkitScheduler;
 
     protected EntityScheduler() {
         if (!isFolia) {

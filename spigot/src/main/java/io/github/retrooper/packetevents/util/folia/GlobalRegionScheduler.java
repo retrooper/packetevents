@@ -31,8 +31,8 @@ import java.util.function.Consumer;
 public class GlobalRegionScheduler {
     private final boolean isFolia = FoliaScheduler.isFolia();
 
-    private BukkitScheduler bukkitScheduler = null;
-    private io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler globalRegionScheduler = null;
+    private BukkitScheduler bukkitScheduler;
+    private io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler globalRegionScheduler;
 
     protected GlobalRegionScheduler() {
         if (isFolia) {

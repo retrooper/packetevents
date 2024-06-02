@@ -24,7 +24,7 @@ public class FoliaCompatUtil {
     private static AsyncScheduler asyncScheduler;
     private static GlobalRegionScheduler globalRegionScheduler;
 
-    private static Class<? extends Event> regionizedServerInitEventClass = null;
+    private static Class<? extends Event> regionizedServerInitEventClass;
 
     static {
         try {

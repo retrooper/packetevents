@@ -32,8 +32,8 @@ import java.util.function.Consumer;
 public class AsyncScheduler {
     private final boolean isFolia = FoliaScheduler.isFolia();
 
-    private BukkitScheduler bukkitScheduler = null;
-    private io.papermc.paper.threadedregions.scheduler.AsyncScheduler asyncScheduler = null;
+    private BukkitScheduler bukkitScheduler;
+    private io.papermc.paper.threadedregions.scheduler.AsyncScheduler asyncScheduler;
 
     protected AsyncScheduler() {
         if (isFolia) {

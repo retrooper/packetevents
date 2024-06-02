@@ -33,8 +33,8 @@ import java.util.function.Consumer;
 public class RegionScheduler {
     private final boolean isFolia = FoliaScheduler.isFolia();
 
-    private BukkitScheduler bukkitScheduler = null;
-    private io.papermc.paper.threadedregions.scheduler.RegionScheduler regionScheduler = null;
+    private BukkitScheduler bukkitScheduler;
+    private io.papermc.paper.threadedregions.scheduler.RegionScheduler regionScheduler;
 
     protected RegionScheduler() {
         if (isFolia) {
