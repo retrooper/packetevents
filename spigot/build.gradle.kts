@@ -12,11 +12,8 @@ repositories {
 
 dependencies {
     compileOnly(libs.netty)
-    api(project(":api"))
+    api(project(":api", "shadow"))
     api(project(":netty-common"))
-    api(libs.bundles.adventure)
-    api(project(":patch:adventure-text-serializer-gson", "shadow"))
-    api(libs.adventure.text.serializer.legacy)
 
     compileOnly(libs.spigot)
     compileOnly(libs.via.version)

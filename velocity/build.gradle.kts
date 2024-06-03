@@ -13,7 +13,7 @@ dependencies {
     compileOnly(libs.netty)
     compileOnly(libs.velocity)
     annotationProcessor(libs.velocity)
-    api(project(":api"))
+    api(project(":api", "shadow"))
     implementation(project(":netty-common"))
     //Velocity ships with adventure & gson
     compileOnly(libs.bundles.adventure)
