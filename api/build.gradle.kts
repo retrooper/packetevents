@@ -19,8 +19,9 @@ java {
 
 dependencies {
     api(libs.bundles.adventure)
-    api(project(":patch:adventure-text-serializer-gson"))
+    api(project(":patch:adventure-text-serializer-gson", "shadow"))
     api(libs.adventure.text.serializer.legacy)
+    compileOnly(libs.gson)
 
     testImplementation(libs.bundles.adventure)
     testImplementation(project(":patch:adventure-text-serializer-gson"))
