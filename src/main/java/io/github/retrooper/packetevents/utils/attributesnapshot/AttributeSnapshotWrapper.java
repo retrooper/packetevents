@@ -56,6 +56,10 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
 
     public static AttributeSnapshotWrapper create(String key, double value, Collection<AttributeModifierWrapper> modifiers) {
         Object nmsAttributeSnapshot = null;
+        holderClass = NMSUtils.getNMClassWithoutException("core.Holder");
+        if (holderClass != null) {
+            hasHolder = Reflection.getField(PacketTypeClasses.Play.Server.ENTITY_EFFECT, holderClass, 0) != null;
+        }
         if (attributeSnapshotClass == null) {
             attributeSnapshotClass = NMSUtils.getNMSClassWithoutException("AttributeSnapshot");
             if (attributeSnapshotClass == null) {
