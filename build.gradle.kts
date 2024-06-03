@@ -8,8 +8,12 @@ tasks {
         distributionType = Wrapper.DistributionType.ALL
     }
 
+    val taskSubModules: (String) -> Array<Task> = { task ->
+        subprojects.filterNot { it.path == ":patch" }.map { it.tasks[task] }.toTypedArray()
+    }
+
     register("build") {
-        dependsOn(*subprojects.map { it.tasks["build"] }.toTypedArray())
+        dependsOn(*taskSubModules("build"))
         group = "build"
 
         doLast {
@@ -18,6 +22,7 @@ tasks {
                 buildOut.mkdirs()
 
             for (subproject in subprojects) {
+                if (subproject.path.startsWith(":patch")) continue
                 val subIn = subproject.layout.buildDirectory.dir("libs").get()
 
                 copy {
@@ -29,7 +34,7 @@ tasks {
     }
 
     register<Delete>("clean") {
-        dependsOn(*subprojects.map { it.tasks["clean"] }.toTypedArray())
+        dependsOn(*taskSubModules("clean"))
         group = "build"
         delete(rootProject.layout.buildDirectory)
     }
