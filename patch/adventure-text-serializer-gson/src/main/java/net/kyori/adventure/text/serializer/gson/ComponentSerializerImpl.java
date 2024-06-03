@@ -29,7 +29,6 @@ import net.kyori.adventure.text.StorageNBTComponent;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.TranslationArgument;
-import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.serializer.json.JSONOptions;
 import net.kyori.option.OptionState;
 import org.jetbrains.annotations.Nullable;
@@ -152,11 +151,11 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
             } else if (fieldName.equals(NBT_INTERPRET)) {
                 nbtInterpret = in.nextBoolean();
             } else if (fieldName.equals(NBT_BLOCK)) {
-                nbtBlock = this.gson.fromJson(in, BlockNBTComponent.Pos.class);
+                nbtBlock = this.gson.fromJson(in, SerializerFactory.BLOCK_NBT_POS_TYPE);
             } else if (fieldName.equals(NBT_ENTITY)) {
                 nbtEntity = in.nextString();
             } else if (fieldName.equals(NBT_STORAGE)) {
-                nbtStorage = this.gson.fromJson(in, Key.class);
+                nbtStorage = this.gson.fromJson(in, SerializerFactory.KEY_TYPE);
             } else if (fieldName.equals(EXTRA)) {
                 extra = this.gson.fromJson(in, COMPONENT_LIST_TYPE);
             } else if (fieldName.equals(SEPARATOR)) {
@@ -207,7 +206,7 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
             throw notSureHowToDeserialize(in.getPath());
         }
 
-        builder.style(this.gson.fromJson(style, Style.class))
+        builder.style(this.gson.fromJson(style, SerializerFactory.STYLE_TYPE))
                 .append(extra);
         in.endObject();
         return builder.build();
@@ -235,7 +234,7 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
         out.beginObject();
 
         if (value.hasStyling()) {
-            final JsonElement style = this.gson.toJsonTree(value.style(), Style.class);
+            final JsonElement style = this.gson.toJsonTree(value.style(), SerializerFactory.STYLE_TYPE);
             if (style.isJsonObject()) {
                 for (final Map.Entry<String, JsonElement> entry : style.getAsJsonObject().entrySet()) {
                     out.name(entry.getKey());
@@ -295,13 +294,13 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
             this.serializeSeparator(out, nbt.separator());
             if (value instanceof BlockNBTComponent) {
                 out.name(NBT_BLOCK);
-                this.gson.toJson(((BlockNBTComponent) value).pos(), BlockNBTComponent.Pos.class, out);
+                this.gson.toJson(((BlockNBTComponent) value).pos(), SerializerFactory.BLOCK_NBT_POS_TYPE, out);
             } else if (value instanceof EntityNBTComponent) {
                 out.name(NBT_ENTITY);
                 out.value(((EntityNBTComponent) value).selector());
             } else if (value instanceof StorageNBTComponent) {
                 out.name(NBT_STORAGE);
-                this.gson.toJson(((StorageNBTComponent) value).storage(), Key.class, out);
+                this.gson.toJson(((StorageNBTComponent) value).storage(), SerializerFactory.KEY_TYPE, out);
             } else {
                 throw notSureHowToSerialize(value);
             }

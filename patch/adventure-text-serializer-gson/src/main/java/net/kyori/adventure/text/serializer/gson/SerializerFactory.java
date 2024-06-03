@@ -19,6 +19,30 @@ import net.kyori.option.OptionState;
 import org.jetbrains.annotations.Nullable;
 
 final class SerializerFactory implements TypeAdapterFactory {
+    static final Class<Key> KEY_TYPE = Key.class;
+    static final Class<Component> COMPONENT_TYPE = Component.class;
+    static final Class<Style> STYLE_TYPE = Style.class;
+    static final Class<ClickEvent.Action> CLICK_ACTION_TYPE = ClickEvent.Action.class;
+    static final Class<HoverEvent.Action> HOVER_ACTION_TYPE = HoverEvent.Action.class;
+    static final Class<HoverEvent.ShowItem> SHOW_ITEM_TYPE = HoverEvent.ShowItem.class;
+    static final Class<HoverEvent.ShowEntity> SHOW_ENTITY_TYPE = HoverEvent.ShowEntity.class;
+    static final Class<String> STRING_TYPE = String.class;
+    static final Class<TextColorWrapper> COLOR_WRAPPER_TYPE = TextColorWrapper.class;
+    static final Class<TextColor> COLOR_TYPE = TextColor.class;
+    static final Class<TextDecoration> TEXT_DECORATION_TYPE = TextDecoration.class;
+    static final Class<BlockNBTComponent.Pos> BLOCK_NBT_POS_TYPE = BlockNBTComponent.Pos.class;
+    static final Class<UUID> UUID_TYPE = UUID.class;
+    // packetevents patch start
+    static final Class<?> TRANSLATION_ARGUMENT_TYPE;
+
+    static {
+        if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
+            TRANSLATION_ARGUMENT_TYPE = TranslationArgument.class;
+        } else {
+            TRANSLATION_ARGUMENT_TYPE = null;
+        }
+    }
+    // packetevents patch end
 
     private final OptionState features;
     private final net.kyori.adventure.text.serializer.json.LegacyHoverEventSerializer legacyHoverSerializer;
@@ -41,36 +65,36 @@ final class SerializerFactory implements TypeAdapterFactory {
     @SuppressWarnings("unchecked")
     public <T> TypeAdapter<T> create(final Gson gson, final TypeToken<T> type) {
         final Class<? super T> rawType = type.getRawType();
-        if (Component.class.isAssignableFrom(rawType)) {
+        if (COMPONENT_TYPE.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) ComponentSerializerImpl.create(this.features, gson);
-        } else if (Key.class.isAssignableFrom(rawType)) {
+        } else if (KEY_TYPE.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) KeySerializer.INSTANCE;
-        } else if (Style.class.isAssignableFrom(rawType)) {
+        } else if (STYLE_TYPE.isAssignableFrom(rawType)) {
             // packetevents patch start
             return (TypeAdapter<T>) StyleSerializer.create(this.legacyHoverSerializer, this.compatShowAchievement, this.features, gson);
             // packetevents patch end
-        } else if (ClickEvent.Action.class.isAssignableFrom(rawType)) {
+        } else if (CLICK_ACTION_TYPE.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) ClickEventActionSerializer.INSTANCE;
-        } else if (HoverEvent.Action.class.isAssignableFrom(rawType)) {
+        } else if (HOVER_ACTION_TYPE.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) HoverEventActionSerializer.INSTANCE;
-        } else if (HoverEvent.ShowItem.class.isAssignableFrom(rawType)) {
+        } else if (SHOW_ITEM_TYPE.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) ShowItemSerializer.create(gson);
-        } else if (HoverEvent.ShowEntity.class.isAssignableFrom(rawType)) {
+        } else if (SHOW_ENTITY_TYPE.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) ShowEntitySerializer.create(gson);
-        } else if (TextColorWrapper.class.isAssignableFrom(rawType)) {
+        } else if (COLOR_WRAPPER_TYPE.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) TextColorWrapper.Serializer.INSTANCE;
-        } else if (TextColor.class.isAssignableFrom(rawType)) {
+        } else if (COLOR_TYPE.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) (this.features.value(JSONOptions.EMIT_RGB) ? TextColorSerializer.INSTANCE : TextColorSerializer.DOWNSAMPLE_COLOR);
-        } else if (TextDecoration.class.isAssignableFrom(rawType)) {
+        } else if (TEXT_DECORATION_TYPE.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) TextDecorationSerializer.INSTANCE;
-        } else if (BlockNBTComponent.Pos.class.isAssignableFrom(rawType)) {
+        } else if (BLOCK_NBT_POS_TYPE.isAssignableFrom(rawType)) {
             return (TypeAdapter<T>) BlockNBTComponentPosSerializer.INSTANCE;
         }
         // packetevents patch start
         else if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
-            if (UUID.class.isAssignableFrom(rawType)) {
+            if (UUID_TYPE.isAssignableFrom(rawType)) {
                 return (TypeAdapter<T>) UUIDSerializer.uuidSerializer(this.features);
-            } else if (TranslationArgument.class.isAssignableFrom(rawType)) {
+            } else if (TRANSLATION_ARGUMENT_TYPE.isAssignableFrom(rawType)) {
                 return (TypeAdapter<T>) TranslationArgumentSerializer.create(gson);
             }
         }
