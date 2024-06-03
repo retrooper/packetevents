@@ -15,6 +15,8 @@ dependencies {
     api(project(":api"))
     api(project(":netty-common"))
     api(libs.bundles.adventure)
+    api(project(":patch:adventure-text-serializer-gson", "shadow"))
+    api(libs.adventure.text.serializer.legacy)
 
     compileOnly(libs.spigot)
     compileOnly(libs.via.version)
@@ -22,14 +24,6 @@ dependencies {
 }
 
 tasks {
-    shadowJar {
-        relocate("net.kyori.adventure.text.serializer.gson", "io.github.retrooper.packetevents.adventure.serializer.gson")
-        relocate("net.kyori.adventure.text.serializer.legacy", "io.github.retrooper.packetevents.adventure.serializer.legacy")
-        dependencies {
-            exclude(dependency("com.google.code.gson:gson:.*"))
-        }
-    }
-
     runServer {
         minecraftVersion("1.19.4")
         outputs.upToDateWhen { false }

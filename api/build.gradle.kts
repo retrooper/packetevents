@@ -19,8 +19,12 @@ java {
 
 dependencies {
     compileOnly(libs.bundles.adventure)
+    compileOnly(project(":patch:adventure-text-serializer-gson"))
+    compileOnly(libs.adventure.text.serializer.legacy)
 
     testImplementation(libs.bundles.adventure)
+    testImplementation(project(":patch:adventure-text-serializer-gson"))
+    testImplementation(libs.adventure.text.serializer.legacy)
     testImplementation(project(":netty-common"))
     testImplementation(testlibs.mockbukkit)
     testImplementation(testlibs.slf4j)

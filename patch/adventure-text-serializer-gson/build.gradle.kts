@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.adventure.text.serializer.gson)
-    implementation(libs.adventure.text.serializer.json.legacy)
+    api(libs.adventure.text.serializer.gson)
+    api(libs.adventure.text.serializer.json.legacy)
 }
 
 tasks {
@@ -16,6 +16,7 @@ tasks {
             exclude(dependency("net.kyori:examination-api:.*"))
             exclude(dependency("net.kyori:examination-string:.*"))
             exclude(dependency("com.google.code.gson:gson:.*"))
+            exclude("META-INF/services/**")
         }
     }
 }
