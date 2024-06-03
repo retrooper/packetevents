@@ -151,7 +151,6 @@ final class GsonComponentSerializerImpl implements GsonComponentSerializer {
         }
 
         // packetevents patch start
-        @Override
         public @NotNull Builder showAchievementToComponent(final BackwardCompatUtil.@Nullable ShowAchievementToComponent compatShowAchievement) {
             this.compatShowAchievement = compatShowAchievement;
             return this;

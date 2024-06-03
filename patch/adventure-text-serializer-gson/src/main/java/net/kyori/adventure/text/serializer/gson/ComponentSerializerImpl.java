@@ -11,6 +11,7 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +101,9 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
         String text = null;
         String translate = null;
         String translateFallback = null;
-        List<TranslationArgument> translateWith = null;
+        // packetevents patch start
+        List<?> translateWith = null;
+        // packetevents patch end
         String scoreName = null;
         String scoreObjective = null;
         String scoreValue = null;
@@ -123,7 +126,13 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
             } else if (fieldName.equals(TRANSLATE_FALLBACK)) {
                 translateFallback = in.nextString();
             } else if (fieldName.equals(TRANSLATE_WITH)) {
-                translateWith = this.gson.fromJson(in, TRANSLATABLE_ARGUMENT_LIST_TYPE);
+                // packetevents patch start
+                if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
+                    translateWith = this.gson.fromJson(in, TRANSLATABLE_ARGUMENT_LIST_TYPE);
+                } else {
+                    translateWith = this.gson.fromJson(in, COMPONENT_LIST_TYPE);
+                }
+                // packetevents patch end
             } else if (fieldName.equals(SCORE)) {
                 in.beginObject();
                 while (in.hasNext()) {
@@ -173,9 +182,9 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
                 // packetevents patch start
                 ComponentBuilder<?, ?> translateBuilder;
                 try {
-                    translateBuilder = Component.translatable().key(translate).fallback(translateFallback).arguments(translateWith);
+                    translateBuilder = Component.translatable().key(translate).fallback(translateFallback).arguments((List<TranslationArgument>) translateWith);
                 } catch (NoSuchMethodError e) {
-                    translateBuilder = Component.translatable().key(translate).fallback(translateFallback).args(translateWith);
+                    translateBuilder = Component.translatable().key(translate).fallback(translateFallback).args((List<Component>) translateWith);
                 }
                 builder = translateBuilder;
                 // packetevents patch end
@@ -260,10 +269,22 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
                 out.name(TRANSLATE_FALLBACK);
                 out.value(fallback);
             }
-            if (!translatable.arguments().isEmpty()) {
-                out.name(TRANSLATE_WITH);
-                this.gson.toJson(translatable.arguments(), TRANSLATABLE_ARGUMENT_LIST_TYPE, out);
+            // packetevents patch start
+            boolean argsPresent = false;
+            try {
+                argsPresent = !translatable.arguments().isEmpty();
+            } catch (final NoSuchMethodError e) {
+                argsPresent = !translatable.args().isEmpty();
             }
+            if (!argsPresent) {
+                out.name(TRANSLATE_WITH);
+                if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
+                    this.gson.toJson(translatable.arguments(), TRANSLATABLE_ARGUMENT_LIST_TYPE, out);
+                } else {
+                    this.gson.toJson(translatable.arguments(), COMPONENT_LIST_TYPE, out);
+                }
+            }
+            // packetevents patch end
         } else if (value instanceof ScoreComponent) {
             final ScoreComponent score = (ScoreComponent) value;
             out.name(SCORE);

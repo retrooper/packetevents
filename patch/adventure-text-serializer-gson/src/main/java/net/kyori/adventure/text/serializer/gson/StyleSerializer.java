@@ -217,7 +217,6 @@ final class StyleSerializer extends TypeAdapter<Style> {
                             style.hoverEvent(HoverEvent.hoverEvent(action, value));
                         }
                     }
-                    // packetevents patch end
                 }
             } else {
                 in.skipValue();
