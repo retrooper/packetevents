@@ -18,7 +18,7 @@ dependencies {
     //Velocity ships with adventure & gson
     compileOnly(libs.bundles.adventure)
     //Ship with legacy adventure
-    implementation(libs.adventure.text.serializer.gson.legacy)
+    implementation(libs.adventure.text.serializer.json.legacy)
 }
 
 tasks {
