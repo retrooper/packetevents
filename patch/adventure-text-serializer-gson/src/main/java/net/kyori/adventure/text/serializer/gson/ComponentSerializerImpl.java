@@ -11,25 +11,11 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.BlockNBTComponent;
-import net.kyori.adventure.text.BuildableComponent;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentBuilder;
-import net.kyori.adventure.text.EntityNBTComponent;
-import net.kyori.adventure.text.KeybindComponent;
-import net.kyori.adventure.text.NBTComponent;
-import net.kyori.adventure.text.NBTComponentBuilder;
-import net.kyori.adventure.text.ScoreComponent;
-import net.kyori.adventure.text.SelectorComponent;
-import net.kyori.adventure.text.StorageNBTComponent;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.TranslationArgument;
+import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.serializer.json.JSONOptions;
 import net.kyori.option.OptionState;
 import org.jetbrains.annotations.Nullable;
@@ -102,7 +88,7 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
         String translate = null;
         String translateFallback = null;
         // packetevents patch start
-        List<?> translateWith = null;
+        List<? extends ComponentLike> translateWith = null;
         // packetevents patch end
         String scoreName = null;
         String scoreObjective = null;
@@ -182,9 +168,9 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
                 // packetevents patch start
                 ComponentBuilder<?, ?> translateBuilder;
                 try {
-                    translateBuilder = Component.translatable().key(translate).fallback(translateFallback).arguments((List<TranslationArgument>) translateWith);
+                    translateBuilder = Component.translatable().key(translate).fallback(translateFallback).arguments(translateWith);
                 } catch (NoSuchMethodError e) {
-                    translateBuilder = Component.translatable().key(translate).fallback(translateFallback).args((List<Component>) translateWith);
+                    translateBuilder = Component.translatable().key(translate).fallback(translateFallback).args(translateWith);
                 }
                 builder = translateBuilder;
                 // packetevents patch end
@@ -270,18 +256,22 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
                 out.value(fallback);
             }
             // packetevents patch start
-            boolean argsPresent = false;
+            boolean argsPresent;
             try {
                 argsPresent = !translatable.arguments().isEmpty();
             } catch (final NoSuchMethodError e) {
                 argsPresent = !translatable.args().isEmpty();
             }
-            if (!argsPresent) {
+            if (argsPresent) {
                 out.name(TRANSLATE_WITH);
                 if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
                     this.gson.toJson(translatable.arguments(), TRANSLATABLE_ARGUMENT_LIST_TYPE, out);
                 } else {
-                    this.gson.toJson(translatable.arguments(), COMPONENT_LIST_TYPE, out);
+                    try {
+                        this.gson.toJson(translatable.arguments(), COMPONENT_LIST_TYPE, out);
+                    } catch (final NoSuchMethodError e) {
+                        this.gson.toJson(translatable.args(), COMPONENT_LIST_TYPE, out);
+                    }
                 }
             }
             // packetevents patch end
