@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.protocol.entity.villager.type;
 
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,4 +64,12 @@ public class VillagerTypes {
     public static final VillagerType SNOW = define(4, "minecraft:snow");
     public static final VillagerType SWAMP = define(5, "minecraft:swamp");
     public static final VillagerType TAIGA = define(6, "minecraft:taiga");
+
+    /**
+     * Returns an immutable view of the villager types.
+     * @return Villager Types
+     */
+    public static Collection<VillagerType> values() {
+        return Collections.unmodifiableCollection(VILLAGER_TYPE_MAP.values());
+    }
 }

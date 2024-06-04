@@ -94,8 +94,16 @@ public class NBTList<T extends NBT> extends NBT {
         tags.add(tag);
     }
 
+    public void addTagUnsafe(int index, NBT nbt) {
+        addTag(index, (T) nbt);
+    }
+
     public void addTagUnsafe(NBT nbt) {
-        addTag((T)nbt);
+        addTag((T) nbt);
+    }
+
+    public void removeTag(int index) {
+        tags.remove(index);
     }
 
     protected void validateAddTag(T tag) {

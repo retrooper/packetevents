@@ -37,6 +37,8 @@ public enum StateValue {
     CAN_SUMMON("can_summon", Boolean::parseBoolean),
     CHARGES("charges", Integer::parseInt),
     CONDITIONAL("conditional", Boolean::parseBoolean),
+    CRACKED("cracked", Boolean::parseBoolean),
+    CRAFTING("crafting", Boolean::parseBoolean),
     DELAY("delay", Integer::parseInt),
     DISARMED("disarmed", Boolean::parseBoolean),
     DISTANCE("distance", Integer::parseInt),
@@ -74,6 +76,7 @@ public enum StateValue {
     NORTH("north", North::valueOf),
     NOTE("note", Integer::parseInt),
     OCCUPIED("occupied", Boolean::parseBoolean),
+    OMINOUS("ominous", Boolean::parseBoolean),
     OPEN("open", Boolean::parseBoolean),
     ORIENTATION("orientation", Orientation::valueOf),
     PART("part", Part::valueOf),
@@ -98,16 +101,15 @@ public enum StateValue {
     SOUTH("south", South::valueOf),
     THICKNESS("thickness", Thickness::valueOf),
     TILT("tilt", Tilt::valueOf),
+    TRIAL_SPAWNER_STATE("trial_spawner_state", TrialSpawnerState::valueOf),
     TRIGGERED("triggered", Boolean::parseBoolean),
     TYPE("type", Type::valueOf),
     UNSTABLE("unstable", Boolean::parseBoolean),
     UP("up", Boolean::parseBoolean),
+    VAULT_STATE("vault_state", VaultState::valueOf),
     VERTICAL_DIRECTION("vertical_direction", VerticalDirection::valueOf),
     WATERLOGGED("waterlogged", Boolean::parseBoolean),
-    WEST("west", West::valueOf),
-    CRACKED("cracked", Boolean::parseBoolean),
-    CRAFTING("crafting", Boolean::parseBoolean),
-    TRIAL_SPAWNER_STATE("trial_spawner_state", TrialSpawnerState::valueOf);
+    WEST("west", West::valueOf);
 
     private final String name;
     private final Function<String, Object> parser;

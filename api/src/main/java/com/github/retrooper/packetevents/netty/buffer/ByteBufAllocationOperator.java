@@ -24,8 +24,11 @@ public interface ByteBufAllocationOperator {
     Object copiedBuffer(byte[] bytes);
 
     Object buffer();
+    Object buffer(int initialCapacity);
 
     Object directBuffer();
+    Object directBuffer(int initialCapacity);
 
     Object compositeBuffer();
+    Object compositeBuffer(int maxNumComponents);
 }

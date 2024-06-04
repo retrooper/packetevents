@@ -18,15 +18,22 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
+import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServerSoundEffect> {
-    private int soundID;
+
+    private Sound sound;
     private SoundCategory soundCategory;
     private Vector3i effectPosition;
     private float volume;
@@ -37,15 +44,26 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    public WrapperPlayServerSoundEffect(int soundID, SoundCategory soundCategory,
+    public WrapperPlayServerSoundEffect(int soundId, SoundCategory soundCategory,
                                         Vector3i effectPosition, float volume, float pitch) {
-        this(soundID, soundCategory, effectPosition, volume, pitch, -1);
+        this(soundId, soundCategory, effectPosition, volume, pitch, ThreadLocalRandom.current().nextLong());
     }
 
-    public WrapperPlayServerSoundEffect(int soundID, SoundCategory soundCategory,
+    public WrapperPlayServerSoundEffect(int soundId, SoundCategory soundCategory,
+                                        Vector3i effectPosition, float volume, float pitch, long seed) {
+        this(Sounds.getById(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), soundId),
+                soundCategory, effectPosition, volume, pitch, seed);
+    }
+
+    public WrapperPlayServerSoundEffect(Sound sound, SoundCategory soundCategory,
+                                        Vector3i effectPosition, float volume, float pitch) {
+        this(sound, soundCategory, effectPosition, volume, pitch, ThreadLocalRandom.current().nextLong());
+    }
+
+    public WrapperPlayServerSoundEffect(Sound sound, SoundCategory soundCategory,
                                         Vector3i effectPosition, float volume, float pitch, long seed) {
         super(PacketType.Play.Server.SOUND_EFFECT);
-        this.soundID = soundID;
+        this.sound = sound;
         this.soundCategory = soundCategory;
         this.effectPosition = effectPosition;
         this.volume = volume;
@@ -55,11 +73,21 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        soundID = readVarInt();
-        soundCategory = SoundCategory.fromId(readVarInt());
+        this.sound = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3) ? Sound.read(this)
+                : serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? Sounds.getById(this.serverVersion.toClientVersion(), this.readVarInt())
+                //TODO Test
+                : Sounds.getByName(readString());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            soundCategory = SoundCategory.fromId(readVarInt());
+        }
         effectPosition = new Vector3i(readInt(), readInt(), readInt());
         volume = readFloat();
-        pitch = readFloat();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
+            pitch = readFloat();
+        }
+        else {
+            pitch = readUnsignedByte() / 63.5F;
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             this.seed = readLong();
         }
@@ -67,13 +95,26 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
-        writeVarInt(soundID);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            Sound.write(this, this.sound);
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)){
+            this.writeVarInt(this.sound.getId(this.serverVersion.toClientVersion()));
+        }
+        else {
+            //TODO Test
+            writeString(sound.getName().getKey());
+        }
         writeVarInt(soundCategory.ordinal());
         writeInt(effectPosition.x);
         writeInt(effectPosition.y);
         writeInt(effectPosition.z);
         writeFloat(volume);
-        writeFloat(pitch);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
+            writeFloat(pitch);
+        }
+        else {
+            writeByte((int) (pitch * 63.5F));
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeLong(seed);
         }
@@ -81,7 +122,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void copy(WrapperPlayServerSoundEffect wrapper) {
-        soundID = wrapper.soundID;
+        sound = wrapper.sound;
         soundCategory = wrapper.soundCategory;
         effectPosition = wrapper.effectPosition;
         volume = wrapper.volume;
@@ -89,14 +130,25 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         seed = wrapper.seed;
     }
 
+    public Sound getSound() {
+        return this.sound;
+    }
+
+    public void setSound(Sound sound) {
+        this.sound = sound;
+    }
+
+    @Deprecated
     public int getSoundId() {
-        return soundID;
+        return this.getSound().getId(this.serverVersion.toClientVersion());
     }
 
-    public void setSoundId(int soundID) {
-        this.soundID = soundID;
+    @Deprecated
+    public void setSoundId(int soundId) {
+        this.setSound(Sounds.getById(this.serverVersion.toClientVersion(), soundId));
     }
 
+    @Nullable
     public SoundCategory getSoundCategory() {
         return soundCategory;
     }

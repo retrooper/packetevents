@@ -1,8 +1,0 @@
-rootProject.name = 'packetevents'
-include 'api'
-include 'netty-common'
-//Real modules
-include 'spigot'
-include 'bungeecord'
-include 'velocity'
-

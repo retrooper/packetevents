@@ -20,46 +20,19 @@ package com.github.retrooper.packetevents.protocol.entity.type;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class EntityTypes {
     private static final Map<String, EntityType> ENTITY_TYPE_MAP = new HashMap<>();
     //Key - mappings version, value - map with entity type ids and entity types
     private static final Map<Byte, Map<Integer, EntityType>> ENTITY_TYPE_ID_MAP = new HashMap<>();
     private static final Map<Byte, Map<Integer, EntityType>> LEGACY_ENTITY_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("entity/entity_type_mappings",
-            ClientVersion.V_1_10,
-            ClientVersion.V_1_11,
-            ClientVersion.V_1_12,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_15,
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_16_2,
-            ClientVersion.V_1_17,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_3,
-            ClientVersion.V_1_19_4,
-            ClientVersion.V_1_20_3);
-    private static final TypesBuilder LEGACY_TYPES_BUILDER = new TypesBuilder("entity/legacy_entity_type_mappings",
-            ClientVersion.V_1_8,
-            ClientVersion.V_1_9,
-            ClientVersion.V_1_10,
-            ClientVersion.V_1_11,
-            ClientVersion.V_1_12,
-            ClientVersion.V_1_13);
-
-
-    static {
-        TYPES_BUILDER.unloadFileMappings();
-        LEGACY_TYPES_BUILDER.unloadFileMappings();
-    }
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("entity/entity_type_mappings");
+    private static final TypesBuilder LEGACY_TYPES_BUILDER = new TypesBuilder("entity/legacy_entity_type_mappings");
 
     public static EntityType define(String key, @Nullable EntityType parent) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
@@ -313,5 +286,25 @@ public class EntityTypes {
 
     // Added in 1.20.3
     public static final EntityType BREEZE = define("breeze", ABSTRACT_MONSTER);
-    public static final EntityType WIND_CHARGE = define("wind_charge", PROJECTILE_ABSTRACT);
+    public static final EntityType ABSTRACT_WIND_CHARGE = define("abstract_wind_charge", PROJECTILE_ABSTRACT);
+    public static final EntityType WIND_CHARGE = define("wind_charge", ABSTRACT_WIND_CHARGE);
+
+    // Added in 1.20.5
+    public static final EntityType ARMADILLO = define("armadillo", ABSTRACT_ANIMAL);
+    public static final EntityType BOGGED = define("bogged", ABSTRACT_SKELETON);
+    public static final EntityType BREEZE_WIND_CHARGE = define("breeze_wind_charge", ABSTRACT_WIND_CHARGE);
+    public static final EntityType OMINOUS_ITEM_SPAWNER = define("ominous_item_spawner", ENTITY);
+
+    /**
+     * Returns an immutable view of the entity types.
+     * @return Entity Types
+     */
+    public static Collection<EntityType> values() {
+        return Collections.unmodifiableCollection(ENTITY_TYPE_MAP.values());
+    }
+
+    static {
+        TYPES_BUILDER.unloadFileMappings();
+        LEGACY_TYPES_BUILDER.unloadFileMappings();
+    }
 }

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "packetevents",
+  "version": "${version}",
+  "name": "PacketEvents",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "GPL-3.0",
+  "icon": "assets/packetevents/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.retrooper.packetevents.PacketEventsMod"
+    ],
+    "preLaunch": [
+      "io.github.retrooper.packetevents.PacketEventsMod"
+    ]
+  },
+  "mixins": [
+    "packetevents.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "fabric": "*",
+    "minecraft": "1.20"
+  }
+}

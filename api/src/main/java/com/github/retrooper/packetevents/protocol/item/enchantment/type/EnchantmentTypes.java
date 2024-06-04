@@ -20,28 +20,30 @@ package com.github.retrooper.packetevents.protocol.item.enchantment.type;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class EnchantmentTypes {
+
+    private static final Map<String, String> STRING_UPDATER = new HashMap<>();
+
+    static {
+        // renamed in 24w03a, during the 1.20.5 update
+        STRING_UPDATER.put("minecraft:sweeping", "minecraft:sweeping_edge");
+    }
+
     private static final Map<String, EnchantmentType> ENCHANTMENT_TYPE_MAPPINGS = new HashMap<>();
     private static final Map<Byte, Map<Integer, EnchantmentType>> ENCHANTMENT_TYPE_ID_MAPPINGS = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("enchantment/enchantment_type_mappings",
-            ClientVersion.V_1_12,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_19);
+    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("enchantment/enchantment_type_mappings");
 
     public static EnchantmentType define(String key) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
         EnchantmentType enchantmentType = new EnchantmentType() {
-            private final int[] ids = data.getData();
-
             @Override
             public ResourceLocation getName() {
                 return data.getName();
@@ -49,8 +51,7 @@ public class EnchantmentTypes {
 
             @Override
             public int getId(ClientVersion version) {
-                int index = TYPES_BUILDER.getDataIndex(version);
-                return ids[index];
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
 
             @Override
@@ -62,18 +63,14 @@ public class EnchantmentTypes {
             }
         };
 
-        ENCHANTMENT_TYPE_MAPPINGS.put(enchantmentType.getName().toString(), enchantmentType);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, EnchantmentType> typeIdMap = ENCHANTMENT_TYPE_ID_MAPPINGS.computeIfAbsent((byte) index, k -> new HashMap<>());
-            typeIdMap.put(enchantmentType.getId(version), enchantmentType);
-        }
+        MappingHelper.registerMapping(TYPES_BUILDER, ENCHANTMENT_TYPE_MAPPINGS, ENCHANTMENT_TYPE_ID_MAPPINGS, enchantmentType);
         return enchantmentType;
     }
 
     @Nullable
     public static EnchantmentType getByName(String name) {
-        return ENCHANTMENT_TYPE_MAPPINGS.get(name);
+        String fixedName = STRING_UPDATER.getOrDefault(name, name);
+        return ENCHANTMENT_TYPE_MAPPINGS.get(fixedName);
     }
 
     @Nullable
@@ -102,7 +99,7 @@ public class EnchantmentTypes {
     public static final EnchantmentType KNOCKBACK = define("knockback");
     public static final EnchantmentType FIRE_ASPECT = define("fire_aspect");
     public static final EnchantmentType MOB_LOOTING = define("looting");
-    public static final EnchantmentType SWEEPING_EDGE = define("sweeping");
+    public static final EnchantmentType SWEEPING_EDGE = define("sweeping_edge");
     public static final EnchantmentType BLOCK_EFFICIENCY = define("efficiency");
     public static final EnchantmentType SILK_TOUCH = define("silk_touch");
     public static final EnchantmentType UNBREAKING = define("unbreaking");
@@ -122,6 +119,11 @@ public class EnchantmentTypes {
     public static final EnchantmentType PIERCING = define("piercing");
     public static final EnchantmentType MENDING = define("mending");
     public static final EnchantmentType VANISHING_CURSE = define("vanishing_curse");
+
+    // Added in 1.20.5
+    public static final EnchantmentType DENSITY = define("density");
+    public static final EnchantmentType BREACH = define("breach");
+    public static final EnchantmentType WIND_BURST = define("wind_burst");
 
     static {
         TYPES_BUILDER.unloadFileMappings();

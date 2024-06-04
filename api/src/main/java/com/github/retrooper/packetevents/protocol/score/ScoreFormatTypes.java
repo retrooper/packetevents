@@ -23,6 +23,8 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -42,6 +44,14 @@ public final class ScoreFormatTypes {
     public static final ScoreFormatType FIXED = define(2, "fixed", FixedScoreFormat.class,
             wrapper -> ScoreFormat.fixedScore(wrapper.readComponent()),
             (wrapper, format) -> wrapper.writeComponent(format.getValue()));
+
+    /**
+     * Returns an immutable view of the score format types.
+     * @return Score Format Types
+     */
+    public static Collection<ScoreFormatType> values() {
+        return Collections.unmodifiableCollection(SCORE_FORMAT_TYPE_MAP.values());
+    }
 
     private ScoreFormatTypes() {
     }

@@ -19,12 +19,13 @@
 package com.github.retrooper.packetevents.protocol.recipe.data;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 public class MerchantOffer implements RecipeData {
 
     private ItemStack firstInputItem;
-    private ItemStack secondInputItem;
+    private @Nullable ItemStack secondInputItem;
     private ItemStack outputItem;
     private int uses;
     private int maxUses;
@@ -33,7 +34,23 @@ public class MerchantOffer implements RecipeData {
     private float priceMultiplier;
     private int demand;
 
-    private MerchantOffer(ItemStack firstInputItem, ItemStack secondInputItem, ItemStack outputItem, int uses, int maxUses, int xp, int specialPrice, float priceMultiplier, int demand) {
+    private MerchantOffer(
+            MerchantItemCost firstInputItem, @Nullable MerchantItemCost secondInputItem,
+            ItemStack outputItem, int uses, int maxUses, int xp,
+            int specialPrice, float priceMultiplier, int demand
+    ) {
+        this(
+                firstInputItem.asItem(),
+                secondInputItem == null ? null : secondInputItem.asItem(),
+                outputItem, uses, maxUses, xp, specialPrice, priceMultiplier, demand
+        );
+    }
+
+    private MerchantOffer(
+            ItemStack firstInputItem, @Nullable ItemStack secondInputItem,
+            ItemStack outputItem, int uses, int maxUses, int xp,
+            int specialPrice, float priceMultiplier, int demand
+    ) {
         this.firstInputItem = firstInputItem;
         this.secondInputItem = secondInputItem;
         this.outputItem = outputItem;
@@ -57,18 +74,50 @@ public class MerchantOffer implements RecipeData {
         return new MerchantOffer(buyItem1, null, sellItem, uses, maxUses, xp, 0, priceMultiplier, demand);
     }
 
-    public ItemStack getFirstInputItem() {
-        return firstInputItem;
+    public static MerchantOffer of(MerchantItemCost buyCost1, @Nullable MerchantItemCost buyCost2, ItemStack sellItem, int uses, int maxUses, int xp, int specialPrice, float priceMultiplier, int demand) {
+        return new MerchantOffer(buyCost1, buyCost2, sellItem, uses, maxUses, xp, specialPrice, priceMultiplier, demand);
     }
 
+    public static MerchantOffer of(MerchantItemCost buyCost1, ItemStack sellItem, int uses, int maxUses, int xp, int specialPrice, float priceMultiplier, int demand) {
+        return new MerchantOffer(buyCost1, null, sellItem, uses, maxUses, xp, specialPrice, priceMultiplier, demand);
+    }
+
+    public static MerchantOffer of(MerchantItemCost buyCost1, ItemStack sellItem, int uses, int maxUses, int xp, float priceMultiplier, int demand) {
+        return new MerchantOffer(buyCost1, null, sellItem, uses, maxUses, xp, 0, priceMultiplier, demand);
+    }
+
+    public MerchantItemCost getFirstInputCost() {
+        return MerchantItemCost.ofItem(this.firstInputItem);
+    }
+
+    public void setFirstInputCost(MerchantItemCost firstInputCost) {
+        this.firstInputItem = firstInputCost.asItem();
+    }
+
+    @ApiStatus.Obsolete
+    public ItemStack getFirstInputItem() {
+        return this.firstInputItem;
+    }
+
+    @ApiStatus.Obsolete
     public void setFirstInputItem(ItemStack firstInputItem) {
         this.firstInputItem = firstInputItem;
     }
 
-    public @Nullable ItemStack getSecondInputItem() {
-        return secondInputItem;
+    public @Nullable MerchantItemCost getSecondInputCost() {
+        return MerchantItemCost.ofItem(this.firstInputItem);
     }
 
+    public void setSecondInputCost(@Nullable MerchantItemCost secondInputCost) {
+        this.secondInputItem = secondInputCost == null ? null : secondInputCost.asItem();
+    }
+
+    @ApiStatus.Obsolete
+    public @Nullable ItemStack getSecondInputItem() {
+        return this.secondInputItem;
+    }
+
+    @ApiStatus.Obsolete
     public void setSecondInputItem(@Nullable ItemStack secondInputItem) {
         this.secondInputItem = secondInputItem;
     }

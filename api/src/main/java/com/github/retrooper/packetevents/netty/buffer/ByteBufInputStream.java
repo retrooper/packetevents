@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.netty.buffer;
 
-import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 
 import java.io.*;
 //TODO give netty credit
@@ -31,11 +31,11 @@ public class ByteBufInputStream extends InputStream implements DataInput {
     private boolean closed;
 
     public ByteBufInputStream(Object buffer) {
-        this(buffer, NBTCodec.MAX_BYTES);
+        this(buffer, ByteBufHelper.readableBytes(buffer));
     }
 
-    public ByteBufInputStream(Object buffer, int maxLength) {
-        this(buffer, maxLength, false);
+    public ByteBufInputStream(Object buffer, int length) {
+        this(buffer, length, false);
     }
 
     public ByteBufInputStream(Object buffer, boolean releaseOnClose) {
@@ -206,7 +206,8 @@ public class ByteBufInputStream extends InputStream implements DataInput {
     }
 
     public String readUTF() throws IOException {
-        return DataInputStream.readUTF(this);
+        String text = DataInputStream.readUTF(this);
+        return text;
     }
 
     public int readUnsignedByte() throws IOException {
@@ -227,7 +228,14 @@ public class ByteBufInputStream extends InputStream implements DataInput {
         if (fieldSize < 0) {
             throw new IndexOutOfBoundsException("fieldSize cannot be a negative number");
         } else if (fieldSize > this.available()) {
-            throw new EOFException("fieldSize is too long! Length is " + fieldSize + ", but maximum is " + this.available());
+            int value = this.available();
+            String msg = "fieldSize is too long! Length is " + fieldSize + ", but maximum is " + value;
+            if (value == 0) {
+                throw new PacketProcessException(msg);
+            }
+            else {
+                throw new EOFException(msg);
+            }
         }
     }
 }

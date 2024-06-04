@@ -38,8 +38,6 @@ import java.util.zip.GZIPOutputStream;
 
 public class NBTCodec {
 
-    public static final int MAX_BYTES = 2097152;
-
     //PacketEvents start: JSON -> NBT conversion method
     @Deprecated
     public static NBT jsonToNBT(JsonElement element) {
@@ -151,16 +149,13 @@ public class NBTCodec {
     }
     //PacketEvents end
 
-    public static NBTCompound readNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
-        return (NBTCompound) readRawNBTFromBuffer(byteBuf, serverVersion);
-    }
-
-    public static NBT readRawNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
-        NBTLimiter limiter = new NBTLimiter(byteBuf, MAX_BYTES);
+    public static NBT readNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
+        NBTLimiter limiter = new NBTLimiter(byteBuf);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try {
                 final boolean named = serverVersion.isOlderThan(ServerVersion.V_1_20_2);
-                return DefaultNBTSerializer.INSTANCE.deserializeTag(limiter, new ByteBufInputStream(byteBuf), named);
+                return DefaultNBTSerializer.INSTANCE.deserializeTag(
+                        limiter, new ByteBufInputStream(byteBuf), named);
             } catch (IOException e) {
                 e.printStackTrace();
             }

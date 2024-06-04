@@ -46,12 +46,14 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
             effectId = readByte();
         }
         this.potionType = PotionTypes.getById(effectId, this.serverVersion);
-        this.effectAmplifier = readByte();
+        this.effectAmplifier = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)
+                ? this.readVarInt() : this.readByte();
         this.effectDurationTicks = readVarInt();
         if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
             this.flags = readByte();
         }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                && this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
             factorData = readOptional(PacketWrapper::readNBT);
         }
     }
@@ -64,13 +66,18 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         } else {
             writeByte(potionType.getId(serverVersion.toClientVersion()));
         }
-        writeByte(effectAmplifier);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.writeVarInt(this.effectAmplifier);
+        } else {
+            this.writeByte(this.effectAmplifier);
+        }
         writeVarInt(effectDurationTicks);
         if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
             writeByte(flags);
         }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
-            writeOptional(factorData, PacketWrapper::writeNBT);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                && this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
+            this.writeOptional(this.factorData, PacketWrapper::writeNBT);
         }
     }
 
@@ -81,6 +88,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         effectAmplifier = wrapper.effectAmplifier;
         effectDurationTicks = wrapper.effectDurationTicks;
         flags = wrapper.flags;
+        factorData = wrapper.factorData;
     }
 
     public PotionType getPotionType() {

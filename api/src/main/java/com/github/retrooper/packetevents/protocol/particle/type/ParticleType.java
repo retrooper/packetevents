@@ -23,11 +23,22 @@ import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
-public interface ParticleType extends MappedEntity {
-    Function<PacketWrapper<?>, ParticleData> readDataFunction();
+public interface ParticleType<T extends ParticleData> extends MappedEntity {
 
-    BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction();
+    T readData(PacketWrapper<?> wrapper);
+
+    void writeData(PacketWrapper<?> wrapper, T data);
+
+    @Deprecated
+    default Function<PacketWrapper<?>, ParticleData> readDataFunction() {
+        return this::readData;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Deprecated
+    default BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction() {
+        return (wrapper, data) -> this.writeData(wrapper, (T) data);
+    }
 }
