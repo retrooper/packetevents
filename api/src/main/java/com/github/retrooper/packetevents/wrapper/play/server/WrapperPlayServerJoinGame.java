@@ -203,7 +203,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             portalCooldown = readVarInt();
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            enableRespawnScreen = readBoolean();
+            enforcesSecureChat = readBoolean();
         }
     }
 
