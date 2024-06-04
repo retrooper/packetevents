@@ -207,9 +207,7 @@ public class FabricPacketEventsBuilder {
                         getUpdateChecker().handleUpdateCheck();
                     }
 
-                    if (settings.isbStatsEnabled()) {
-                        //TODO Cross-platform metrics?
-                    }
+                    //TODO Cross-platform metrics?
 
                     PacketType.Play.Client.load();
                     PacketType.Play.Server.load();

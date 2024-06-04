@@ -25,7 +25,7 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
     @Override
     public void onPreLaunch() {
         PacketEvents.setAPI(FabricPacketEventsBuilder.build("packetevents"));
-        PacketEvents.getAPI().getSettings().debug(true).bStats(true);
+        PacketEvents.getAPI().getSettings().debug(true);
         PacketEvents.getAPI().load();
         /*PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override

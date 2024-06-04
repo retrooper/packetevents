@@ -1,0 +1,30 @@
+[versions]
+adventure = "4.16.0"
+netty = "4.1.72.Final"
+jetbrains-annotations = "23.0.0"
+via-version = "4.5.0"
+protocol-support = "3d24efeda6"
+spigot = "1.20.4-R0.1-SNAPSHOT"
+bungeecord = "1.20-R0.1-SNAPSHOT"
+velocity = "3.1.0"
+
+[libraries]
+adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
+adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
+adventure-text-serializer-gson-legacy = { group = "net.kyori", name = "adventure-text-serializer-gson-legacy-impl", version.ref = "adventure" }
+adventure-nbt = { group = "net.kyori", name = "adventure-nbt", version.ref = "adventure" }
+jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrains-annotations" }
+netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
+via-version = { group = "com.viaversion", name = "viaversion", version.ref = "via-version" }
+protocol-support = { group = "com.github.ProtocolSupport", name = "ProtocolSupport", version.ref = "protocol-support" }
+spigot = { group = "org.spigotmc", name = "spigot-api", version.ref = "spigot" }
+bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungeecord" }
+velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+
+[bundles]
+adventure = [ "adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-legacy", "adventure-nbt" ]
+
+[plugins]
+run-paper = { id = "xyz.jpenilla.run-paper", version = "2.3.0" }
+fabric = { id = "fabric-loom", version = "0.11-SNAPSHOT" }

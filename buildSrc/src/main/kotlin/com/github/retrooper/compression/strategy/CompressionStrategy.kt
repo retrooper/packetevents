@@ -15,15 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.github.retrooper.compression.strategy
 
-package com.github.retrooper.strategy;
+import java.nio.file.Path
 
-import java.nio.file.Path;
+interface CompressionStrategy {
 
-public interface CompressionStrategy {
+    companion object {
+        const val COMPRESSION_VERSION: Byte = 1
+    }
 
-    byte COMPRESSION_VERSION = 1;
-
-    void compress(final Path from, final Path to);
+    fun compress(from: Path, to: Path)
 
 }

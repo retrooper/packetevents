@@ -54,7 +54,9 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
             new SimpleEntry<>("generic.attackDamage", Attributes.GENERIC_ATTACK_DAMAGE),
             new SimpleEntry<>("generic.attackKnockback", Attributes.GENERIC_ATTACK_KNOCKBACK),
             new SimpleEntry<>("generic.attackSpeed", Attributes.GENERIC_ATTACK_SPEED),
-            new SimpleEntry<>("generic.armorToughness", Attributes.GENERIC_ARMOR_TOUGHNESS)
+            new SimpleEntry<>("generic.armorToughness", Attributes.GENERIC_ARMOR_TOUGHNESS),
+            new SimpleEntry<>("generic.armor", Attributes.GENERIC_ARMOR),
+            new SimpleEntry<>("generic.luck", Attributes.GENERIC_LUCK)
     ));
     private static final Map<String, Attribute> PRE_1_16_ATTRIBUTES_MAP = PRE_1_16_ATTRIBUTES.stream()
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -97,7 +99,12 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
             } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
                 attribute = Attributes.getByName(this.readIdentifier().toString());
             } else {
-                attribute = PRE_1_16_ATTRIBUTES_MAP.get(this.readString(64));
+                String attributeName = this.readString(64);
+                attribute = PRE_1_16_ATTRIBUTES_MAP.get(attributeName);
+                if (attribute == null) {
+                    throw new IllegalStateException("Can't find attribute for name " + attributeName
+                            + " (version: " + this.serverVersion.name() + ")");
+                }
             }
 
             double value = readDouble();
