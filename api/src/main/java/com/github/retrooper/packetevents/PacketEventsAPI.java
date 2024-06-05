@@ -38,7 +38,10 @@ public abstract class PacketEventsAPI<T> {
     private static final LogManager LOG_MANAGER = new LogManager();
     private final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
 
-    private static final String[] versionParts = PacketEvents.class.getPackage().getImplementationVersion().split("-");
+    private static final String version = PacketEvents.class.getPackage().getImplementationVersion();
+
+    // The version needs to be checked for null, because when running Unit Tests, the version will be null.
+    private static final String[] versionParts = (version != null) ? version.split("-") : new String[]{ "0.0.0" };
     private static final String[] parts = versionParts[0].split("\\.");
     private static final PEVersion VERSION = new PEVersion(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
 
