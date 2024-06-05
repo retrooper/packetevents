@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.util;
 
+import com.github.retrooper.packetevents.PacketEvents;
+
 import java.util.Arrays;
 
 /**
@@ -55,6 +57,26 @@ public class PEVersion {
         for (int i = 0; i < length; i++) {
             versionIntArray[i] = Integer.parseInt(versionIntegers[i]);
         }
+    }
+
+    /**
+     * Create a PEVersion from the package version.
+     *
+     * @return PEVersion from the package version.
+     */
+    public static PEVersion createFromPackageVersion() {
+        // Grabbing the version from the clas manifest.
+        final String version = PacketEvents.class.getPackage().getImplementationVersion();
+
+        // Making sure the version is not null (This happens during Unit Testing), and remove the -SNAPSHOT part.
+        final String[] versionParts = (version != null) ? version.split("-") : new String[]{ "0.0.0" };
+        final String[] parts = versionParts[0].split("\\.");
+
+        int major = Integer.parseInt(parts[0]);
+        int minor = Integer.parseInt(parts[1]);
+        int patch = Integer.parseInt(parts[2]);
+
+        return new PEVersion(major, minor, patch);
     }
 
     /**
