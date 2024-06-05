@@ -65,7 +65,7 @@ public class PEVersion {
      * @return PEVersion from the package version.
      */
     public static PEVersion createFromPackageVersion() {
-        // Grabbing the version from the clas manifest.
+        // Grabbing the version from the class manifest.
         final String version = PacketEvents.class.getPackage().getImplementationVersion();
 
         // Making sure the version is not null (This happens during Unit Testing), and remove the -SNAPSHOT part.
