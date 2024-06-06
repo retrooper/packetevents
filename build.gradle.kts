@@ -1,4 +1,4 @@
-group = "com.github.retrooper"
+group = "com.github.retrooper.packetevents"
 description = rootProject.name
 version = "2.3.1-SNAPSHOT" //TODO UPDATE - ADD "-SNAPSHOT" if we are dealing with snapshot versions
 
