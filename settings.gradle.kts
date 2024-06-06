@@ -24,8 +24,10 @@ pluginManagement {
 rootProject.name = "packetevents"
 include("api")
 include("netty-common")
-//Real modules
+// Platform modules
 include("spigot")
 include("bungeecord")
 include("velocity")
 include("fabric")
+// Patch modules
+include(":patch:adventure-text-serializer-gson")

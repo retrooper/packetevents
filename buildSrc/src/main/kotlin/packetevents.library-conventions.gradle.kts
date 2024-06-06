@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.ShadowExtension
+
 plugins {
     `java-library`
     `maven-publish`
@@ -39,12 +41,16 @@ tasks {
 
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
+        create<MavenPublication>("shadow") {
             groupId = "$group.$name"
             artifactId = project.name
             version = project.version as String
 
-            from(components["java"])
+            if (getTasksByName("shadowJar", false).isNotEmpty()) {
+                project.extensions.getByName<ShadowExtension>("shadow").component(this)
+            } else {
+                from(components["java"])
+            }
         }
     }
 

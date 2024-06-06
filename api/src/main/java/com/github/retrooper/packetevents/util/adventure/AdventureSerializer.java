@@ -21,9 +21,12 @@ package com.github.retrooper.packetevents.util.adventure;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.stats.Statistics;
 import com.google.gson.JsonElement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.json.JSONOptions;
+import net.kyori.adventure.text.serializer.json.legacyimpl.NBTLegacyHoverEventSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class AdventureSerializer {
@@ -35,10 +38,16 @@ public class AdventureSerializer {
     public static GsonComponentSerializer getGsonSerializer() {
         if (GSON == null) {
             ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
-            GSON = new GsonComponentSerializerExtended(
-                    version.isOlderThan(ServerVersion.V_1_16) || PacketEvents.getAPI().getSettings().shouldDownsampleColors(),
-                    version.isOlderThanOrEquals(ServerVersion.V_1_12_2)
-            );
+            GSON = GsonComponentSerializer.builder().editOptions(builder -> {
+                boolean is_1_20_3_or_new = version.isNewerThanOrEquals(ServerVersion.V_1_20_3);
+                builder.value(JSONOptions.EMIT_RGB, version.isNewerThanOrEquals(ServerVersion.V_1_16) && !PacketEvents.getAPI().getSettings().shouldDownsampleColors());
+                builder.value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.BOTH);
+                builder.value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_ID_AS_INT_ARRAY, is_1_20_3_or_new);
+                builder.value(JSONOptions.VALIDATE_STRICT_EVENTS, is_1_20_3_or_new);
+            })
+                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
+                    .showAchievementToComponent(input -> Statistics.getById(input).display())
+                    .build();
         }
         return GSON;
     }
