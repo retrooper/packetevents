@@ -10,7 +10,6 @@ version = rootProject.version
 description = rootProject.description
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven("https://oss.sonatype.org/content/groups/public/")
 }
