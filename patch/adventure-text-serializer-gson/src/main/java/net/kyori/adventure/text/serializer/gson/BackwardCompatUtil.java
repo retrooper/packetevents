@@ -30,14 +30,16 @@ import java.util.UUID;
 
 public final class BackwardCompatUtil {
 
-    static boolean IS_4_15_0_OR_NEWER = false;
+    public static final boolean IS_4_15_0_OR_NEWER;
 
     static {
+        boolean is4_15_0OrNewer = false;
         try {
             Component.translatable().arguments(Component.empty()); // TranslatableComponent#arguments method was added in 4.15.0
-            IS_4_15_0_OR_NEWER = true;
+            is4_15_0OrNewer = true;
         } catch (Throwable ignored) {
         }
+        IS_4_15_0_OR_NEWER = is4_15_0OrNewer;
     }
 
     private BackwardCompatUtil() {
