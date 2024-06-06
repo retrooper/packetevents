@@ -48,8 +48,33 @@ publishing {
 
             if (getTasksByName("shadowJar", false).isNotEmpty()) {
                 project.extensions.getByName<ShadowExtension>("shadow").component(this)
+                from(components["shadow"])
             } else {
                 from(components["java"])
+            }
+
+            pom {
+                name = "${rootProject.name}-${project.name}"
+                description = rootProject.description
+                url = "https://github.com/retrooper/packetevents"
+                licenses {
+                    license {
+                        name = "GPL-3.0"
+                        url = "https://www.gnu.org/licenses/gpl-3.0.html"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "retrooper"
+                        name = "Retrooper"
+                        email = "retrooperdev@gmail.com"
+                    }
+                }
+                scm {
+                    connection = "scm:git:https://github.com/retrooper/packetevents.git"
+                    developerConnection = "scm:git:https://github.com/retrooper/packetevents.git"
+                    url = "https://github.com/retrooper/packetevents/tree/2.0"
+                }
             }
         }
     }
