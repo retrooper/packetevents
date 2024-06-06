@@ -42,7 +42,7 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>("shadow") {
-            groupId = "$group.${project.name}"
+            groupId = "$group.${rootProject.name}"
             artifactId = project.name
             version = project.version as String
 
