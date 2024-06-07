@@ -122,7 +122,7 @@ public class ItemMapDecorations {
             compound.setTag("type", new NBTString(decoration.type.getName().toString()));
             compound.setTag("x", new NBTDouble(decoration.x));
             compound.setTag("z", new NBTDouble(decoration.z));
-            compound.setTag("float", new NBTFloat(decoration.rotation));
+            compound.setTag("rotation", new NBTFloat(decoration.rotation));
         }
 
         public MapDecorationType getType() {
