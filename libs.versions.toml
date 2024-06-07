@@ -1,5 +1,5 @@
 [versions]
-adventure = "4.16.0"
+adventure = "4.17.0"
 netty = "4.1.72.Final"
 jetbrains-annotations = "23.0.0"
 via-version = "4.5.0"
@@ -11,11 +11,12 @@ run-paper = "2.3.0"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+adventure-nbt = { group = "net.kyori", name = "adventure-nbt", version.ref = "adventure" }
 adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
 adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
-adventure-text-serializer-gson-legacy = { group = "net.kyori", name = "adventure-text-serializer-gson-legacy-impl", version.ref = "adventure" }
-adventure-nbt = { group = "net.kyori", name = "adventure-nbt", version.ref = "adventure" }
+adventure-text-serializer-json-legacy = { group = "net.kyori", name = "adventure-text-serializer-json-legacy-impl", version.ref = "adventure" }
 jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrains-annotations" }
+gson = { group = "com.google.code.gson", name = "gson", version = "2.11.0" }
 netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 via-version = { group = "com.viaversion", name = "viaversion", version.ref = "via-version" }
 protocol-support = { group = "com.github.ProtocolSupport", name = "ProtocolSupport", version.ref = "protocol-support" }
@@ -24,7 +25,8 @@ bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bunge
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 
 [bundles]
-adventure = [ "adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-legacy", "adventure-nbt" ]
+adventure = [ "adventure-api", "adventure-nbt" ]
+adventure-serializers = [ "adventure-text-serializer-gson", "adventure-text-serializer-json-legacy", "adventure-text-serializer-legacy" ]
 
 [plugins]
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }

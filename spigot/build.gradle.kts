@@ -12,9 +12,8 @@ repositories {
 
 dependencies {
     compileOnly(libs.netty)
-    api(project(":api"))
+    api(project(":api", "shadow"))
     api(project(":netty-common"))
-    api(libs.bundles.adventure)
 
     compileOnly(libs.paper)
     compileOnly(libs.via.version)
@@ -22,14 +21,6 @@ dependencies {
 }
 
 tasks {
-    shadowJar {
-        relocate("net.kyori.adventure.text.serializer.gson", "io.github.retrooper.packetevents.adventure.serializer.gson")
-        relocate("net.kyori.adventure.text.serializer.legacy", "io.github.retrooper.packetevents.adventure.serializer.legacy")
-        dependencies {
-            exclude(dependency("com.google.code.gson:gson:.*"))
-        }
-    }
-
     // 1.8.8 - 1.16.5 = Java 8
     // 1.17           = Java 16
     // 1.18 - 1.20.4  = Java 17

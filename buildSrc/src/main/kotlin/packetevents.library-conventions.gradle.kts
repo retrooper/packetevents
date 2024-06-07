@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.ShadowExtension
+
 plugins {
     `java-library`
     `maven-publish`
@@ -8,7 +10,6 @@ version = rootProject.version
 description = rootProject.description
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven("https://oss.sonatype.org/content/groups/public/")
 }
@@ -39,12 +40,41 @@ tasks {
 
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
-            groupId = "$group.$name"
+        create<MavenPublication>("shadow") {
+            groupId = "$group.${rootProject.name}"
             artifactId = project.name
             version = project.version as String
 
-            from(components["java"])
+            if (getTasksByName("shadowJar", false).isNotEmpty()) {
+                project.extensions.getByName<ShadowExtension>("shadow").component(this)
+                from(components["shadow"])
+            } else {
+                from(components["java"])
+            }
+
+            pom {
+                name = "${rootProject.name}-${project.name}"
+                description = rootProject.description
+                url = "https://github.com/retrooper/packetevents"
+                licenses {
+                    license {
+                        name = "GPL-3.0"
+                        url = "https://www.gnu.org/licenses/gpl-3.0.html"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "retrooper"
+                        name = "Retrooper"
+                        email = "retrooperdev@gmail.com"
+                    }
+                }
+                scm {
+                    connection = "scm:git:https://github.com/retrooper/packetevents.git"
+                    developerConnection = "scm:git:https://github.com/retrooper/packetevents.git"
+                    url = "https://github.com/retrooper/packetevents/tree/2.0"
+                }
+            }
         }
     }
 
