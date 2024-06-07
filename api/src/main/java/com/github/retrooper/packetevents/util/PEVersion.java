@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,163 +19,161 @@
 package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * PacketEvents version.
- * This class represents a PacketEvents version.
- *
- * @author retrooper
- * @since 1.8
+ * This class represents a PacketEvents version using Semantic Versioning.
+ * It supports comparison and cloning operations.
  */
-public class PEVersion {
-    /**
-     * Array containing the digits in the version.
-     * For example, "1.8.9" will be stored as {1, 8, 9} in an array.
-     */
-    private final int[] versionIntArray;
+public class PEVersion implements Comparable<PEVersion>, Cloneable {
+
+    private final int major;
+    private final int minor;
+    private final int patch;
+    private final boolean snapshot;
 
     /**
-     * Specify your version using an array.
+     * Specify your version using Semantic Versioning.
      *
-     * @param version Array version.
+     * @param major    the major version number.
+     * @param minor    the minor version number
+     * @param patch    the patch version number.
+     * @param snapshot boolean flag indicating whether the version is a snapshot.
      */
-    public PEVersion(final int... version) {
-        this.versionIntArray = version;
+    public PEVersion(int major, int minor, int patch, boolean snapshot) {
+        this.major = major;
+        this.minor = minor;
+        this.patch = patch;
+        this.snapshot = snapshot;
     }
 
     /**
-     * Specify your version using a string, for example: "1.8.9".
+     * Specify your version using a string, for example: "1.8.9-SNAPSHOT".
      *
      * @param version String version.
      */
-    public PEVersion(final String version) {
-        String[] versionIntegers = version.split("\\.");
-        int length = versionIntegers.length;
-        this.versionIntArray = new int[length];
-        for (int i = 0; i < length; i++) {
-            versionIntArray[i] = Integer.parseInt(versionIntegers[i]);
+    public PEVersion(@NotNull String version) {
+        this.snapshot = version.endsWith("-SNAPSHOT");
+        String versionWithoutSnapshot = version.replace("-SNAPSHOT", "");
+        String[] parts = versionWithoutSnapshot.split("\\.");
+
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Version string must be in the format 'major.minor.patch[-SNAPSHOT]'");
         }
+
+        this.major = Integer.parseInt(parts[0]);
+        this.minor = Integer.parseInt(parts[1]);
+        this.patch = Integer.parseInt(parts[2]);
     }
 
     /**
-     * Create a PEVersion from the package version.
+     * Creates a PEVersion instance from the package version.
      *
-     * @return PEVersion from the package version.
+     * @return PEVersion instance with version derived from the package implementation version.
      */
     public static PEVersion createFromPackageVersion() {
-        // Grabbing the version from the class manifest.
-        final String version = PacketEvents.class.getPackage().getImplementationVersion();
-
-        // Making sure the version is not null (This happens during Unit Testing), and remove the -SNAPSHOT part.
-        final String[] versionParts = (version != null) ? version.split("-") : new String[]{ "0.0.0" };
-        final String[] parts = versionParts[0].split("\\.");
-
-        int major = Integer.parseInt(parts[0]);
-        int minor = Integer.parseInt(parts[1]);
-        int patch = Integer.parseInt(parts[2]);
-
-        return new PEVersion(major, minor, patch);
+        String version = Optional.ofNullable(PacketEvents.class.getPackage().getImplementationVersion()).orElse("0.0.0");
+        return new PEVersion(version);
     }
 
     /**
-     * Compare to another PEVersion.
-     * If we are newer than the compared version,
-     * this method will return 1.
-     * If we are older than the compared version,
-     * this method will return -1.
-     * If we are equal to the compared version,
-     * this method will return 0.
-     * Similar to {@link Integer#compareTo(Integer)}.
+     * Compares this PEVersion instance with another PEVersion.
+     * Considers major, minor, patch versions, and snapshot state.
      *
-     * @param version Compared version
-     * @return Comparing to another Version.
-     */
-    public int compareTo(PEVersion version) {
-        int localLength = versionIntArray.length;
-        int oppositeLength = version.versionIntArray.length;
-        int length = Math.max(localLength, oppositeLength);
-        for (int i = 0; i < length; i++) {
-            int localInteger = i < localLength ? versionIntArray[i] : 0;
-            int oppositeInteger = i < oppositeLength ? version.versionIntArray[i] : 0;
-            if (localInteger > oppositeInteger) {
-                return 1;
-            } else if (localInteger < oppositeInteger) {
-                return -1;
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * Does the {@link #compareTo(PEVersion)} return 1?
-     *
-     * @param version Compared version.
-     * @return Is this newer than the compared version.
-     */
-    public boolean isNewerThan(PEVersion version) {
-        return compareTo(version) == 1;
-    }
-
-    /**
-     * Does the {@link #compareTo(PEVersion)} return -1?
-     *
-     * @param version Compared version.
-     * @return Is this older than the compared version.
-     */
-    public boolean isOlderThan(PEVersion version) {
-        return compareTo(version) == -1;
-    }
-
-    /**
-     * Represented as an array.
-     *
-     * @return Array version.
-     */
-    public int[] asArray() {
-        return versionIntArray;
-    }
-
-    /**
-     * Is this version equal to the compared object.
-     * The object must be a PEVersion and the array values must be equal.
-     *
-     * @param obj Compared object.
-     * @return Are they equal?
+     * @param other The PEVersion object to be compared.
+     * @return A negative integer, zero, or a positive integer as this version is less than, equal to, or greater than the specified version.
      */
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj instanceof PEVersion) {
-            return Arrays.equals(versionIntArray, ((PEVersion) obj).versionIntArray);
-        }
-        return false;
+    public int compareTo(@NotNull PEVersion other) {
+        int majorCompare = Integer.compare(this.major, other.major);
+        if (majorCompare != 0) return majorCompare;
+
+        int minorCompare = Integer.compare(this.minor, other.minor);
+        if (minorCompare != 0) return minorCompare;
+
+        int patchCompare = Integer.compare(this.patch, other.patch);
+        if (patchCompare != 0) return patchCompare;
+
+        // Snapshot versions are considered older than non-snapshot versions
+        return Boolean.compare(other.snapshot, this.snapshot);
     }
 
     /**
-     * Clone the PEVersion.
+     * Determines whether the provided object is equal to the current PEVersion.
+     * Checks for equality by comparing major, minor, patch versions, and the snapshot state.
      *
-     * @return A clone.
+     * @param obj Object expected to be a PEVersion instance that is to be compared with the current PEVersion.
+     * @return Boolean, true if the provided object is logically equal to the current PEVersion, false otherwise.
+     */
+    @Override
+    public boolean equals(@NotNull Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof PEVersion)) return false;
+        PEVersion other = (PEVersion) obj;
+
+        return this.major == other.major &&
+                this.minor == other.minor &&
+                this.patch == other.patch &&
+                this.snapshot == other.snapshot;
+    }
+
+    /**
+     * Checks if this version is newer than the provided version.
+     *
+     * @param otherVersion Other PEVersion.
+     * @return boolean, true if this version is newer, false otherwise.
+     */
+    public boolean isNewerThan(@NotNull PEVersion otherVersion) {
+        return this.compareTo(otherVersion) > 0;
+    }
+
+    /**
+     * Checks if this version is older than the provided version.
+     *
+     * @param otherVersion Other PEVersion.
+     * @return boolean, true if this version is older, false otherwise.
+     */
+    public boolean isOlderThan(@NotNull PEVersion otherVersion) {
+        return this.compareTo(otherVersion) < 0;
+    }
+
+    /**
+     * Returns a hash code value for the object based on its state.
+     *
+     * @return A hash code value for this object.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(major, minor, patch, snapshot);
+    }
+
+    /**
+     * Creates and returns a copy of this PEVersion instance.
+     *
+     * @return A clone of this instance.
      */
     @Override
     public PEVersion clone() {
-        return new PEVersion(versionIntArray);
+        try {
+            return (PEVersion) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Clone not supported", e); // Should never happen as we implement Cloneable
+        }
     }
 
     /**
-     * Represent the version as a string.
+     * Converts the PEVersion instance to a string representation.
+     * Constructed by concatenating major, minor, patch versions, and snapshot state.
      *
-     * @return String representation.
+     * @return A string representation of the version in the pattern "Major.Minor.Patch-SnapshotStatus".
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(versionIntArray.length * 2 - 1).append(versionIntArray[0]);
-        for (int i = 1; i < versionIntArray.length; i++) {
-            sb.append(".").append(versionIntArray[i]);
-        }
-        return sb.toString();
+        return major + "." + minor + "." + patch + (snapshot ? "-SNAPSHOT" : "");
     }
 }
+
