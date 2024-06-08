@@ -23,7 +23,7 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import org.spongepowered.api.block.BlockState;
 
-public class SpongeConversionUtil {
+public final class SpongeConversionUtil {
 
     public static ItemStack fromSpongeItemStack(org.spongepowered.api.item.inventory.ItemStack itemStack) {
         return SpongeReflectionUtil.decodeSpongeItemStack(itemStack);

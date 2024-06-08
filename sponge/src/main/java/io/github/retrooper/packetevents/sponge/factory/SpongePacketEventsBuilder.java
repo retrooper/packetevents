@@ -127,19 +127,10 @@ public class SpongePacketEventsBuilder {
 
             @Override
             public void init() {
-                //Load if we haven't loaded already
+                // Load if we haven't loaded already
                 load();
 
                 if (initialized) return;
-
-                if (settings.shouldCheckForUpdates()) {
-                    getUpdateChecker().handleUpdateCheck();
-                }
-
-                if (settings.isbStatsEnabled()) {
-                    // TODO: how do we do this? bStats wants @Inject but that won't work here.
-                    // https://github.com/Bastian/bstats-metrics/blob/1.x.x/bstats-sponge/src/examples/java/ExamplePlugin.java
-                }
 
                 Sponge.eventManager().registerListeners(plugin, new InternalSpongeListener());
 
