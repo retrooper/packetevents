@@ -42,7 +42,6 @@ public class ViaVersionUtil {
 
     public static void checkIfViaIsPresent() {
         boolean present = Sponge.pluginManager().plugin("viaversion").isPresent();
-        System.out.println("via present? " + present);
         available = present ? ViaState.ENABLED : ViaState.DISABLED;
     }
 

@@ -90,8 +90,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
         if (ChannelHelper.isOpen(channel)) {
             List<String> handlerNames = ChannelHelper.pipelineHandlerNames(channel);
             //Account for ViaVersion
-            if (handlerNames.contains("encoder")) {
-                ChannelHelper.fireChannelReadInContext(channel, "decoder", byteBuf);
+            if (handlerNames.contains("via-encoder")) {
+                ChannelHelper.fireChannelReadInContext(channel, "via-decoder", byteBuf);
             } else if (handlerNames.contains("decompress")) {
                 //We will have to just skip through the minecraft server's decompression handler
                 ChannelHelper.fireChannelReadInContext(channel, "decompress", byteBuf);
