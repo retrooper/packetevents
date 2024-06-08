@@ -46,6 +46,7 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.plugin.PluginContainer;
 
 public class SpongePacketEventsBuilder {
+
     private static PacketEventsAPI<PluginContainer> API_INSTANCE;
 
     public static void clearBuildCache() {
@@ -81,6 +82,7 @@ public class SpongePacketEventsBuilder {
             private final LogManager logManager = new SpongeLogManager();
             private boolean loaded;
             private boolean initialized;
+            private boolean terminated;
             private boolean lateBind = false;
 
             @Override
@@ -127,19 +129,10 @@ public class SpongePacketEventsBuilder {
 
             @Override
             public void init() {
-                //Load if we haven't loaded already
+                // Load if we haven't loaded already
                 load();
 
                 if (initialized) return;
-
-                if (settings.shouldCheckForUpdates()) {
-                    getUpdateChecker().handleUpdateCheck();
-                }
-
-                if (settings.isbStatsEnabled()) {
-                    // TODO: how do we do this? bStats wants @Inject but that won't work here.
-                    // https://github.com/Bastian/bstats-metrics/blob/1.x.x/bstats-sponge/src/examples/java/ExamplePlugin.java
-                }
 
                 Sponge.eventManager().registerListeners(plugin, new InternalSpongeListener());
 
@@ -180,7 +173,13 @@ public class SpongePacketEventsBuilder {
                     // Unregister all listeners. Because if we attempt to reload, we will end up with duplicate listeners.
                     getEventManager().unregisterAllListeners();
                     initialized = false;
+                    terminated = true;
                 }
+            }
+
+            @Override
+            public boolean isTerminated() {
+                return terminated;
             }
 
             @Override

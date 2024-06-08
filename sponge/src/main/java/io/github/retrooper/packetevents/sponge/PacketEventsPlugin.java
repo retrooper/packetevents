@@ -53,8 +53,7 @@ public class PacketEventsPlugin {
         PacketEvents.getAPI().load();
 
         // Register your listeners
-        // TODO disable debug
-        PacketEvents.getAPI().getSettings().debug(true).downsampleColors(false).bStats(true).checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).reEncodeByDefault(true);
+        PacketEvents.getAPI().getSettings().debug(false).downsampleColors(false).checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).reEncodeByDefault(true);
         PacketEvents.getAPI().init();
 
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {

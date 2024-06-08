@@ -22,10 +22,12 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import io.github.retrooper.packetevents.sponge.injector.SpongeChannelInjector;
 import net.kyori.adventure.text.Component;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 public class InternalSpongeListener {
@@ -48,5 +50,12 @@ public class InternalSpongeListener {
 
         // Set player object in the injectors
         injector.updatePlayer(user, player);
+    }
+
+    @Listener(order = Order.EARLY)
+    public void onStart(StartedEngineEvent<Server> event) {
+        if (PacketEvents.getAPI().getSettings().shouldCheckForUpdates()) {
+            PacketEvents.getAPI().getUpdateChecker().handleUpdateCheck();
+        }
     }
 }

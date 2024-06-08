@@ -36,13 +36,13 @@ public class ServerManagerImpl implements ServerManager {
 
         // Our PEVersion class can parse this version and detect if it is a newer version than what is currently supported
         // and account for that properly
-        PEVersion version = new PEVersion(minecraftRelease);
-        PEVersion latestVersion = new PEVersion(ServerVersion.getLatest().getReleaseName());
+        PEVersion version = PEVersion.fromString(minecraftRelease);
+        PEVersion latestVersion = PEVersion.fromString(ServerVersion.getLatest().getReleaseName());
         if (version.isNewerThan(latestVersion)) {
             //We do not support this version yet, so let us warn the user
-            plugin.logger().warn("[packetevents] We currently do not support the minecraft version "
-                    + version + ", so things might break. PacketEvents will behave as if the minecraft version were "
-                    + latestVersion + "!");
+            plugin.logger().warn("[packetevents] We currently do not support the minecraft version {}," +
+                    " so things might break. " +
+                    "PacketEvents will behave as if the minecraft version were {}!", version, latestVersion);
             return ServerVersion.getLatest();
         }
 
@@ -53,7 +53,7 @@ public class ServerManagerImpl implements ServerManager {
             }
         }
 
-        plugin.logger().warn("[packetevents] Your server software is preventing us from checking the server version. This is what we found: " + minecraftRelease + ". We will assume the server version is " + fallbackVersion.name() + "...");
+        plugin.logger().warn("[packetevents] Your server software is preventing us from checking the server version. This is what we found: {}. We will assume the server version is {}...", minecraftRelease, fallbackVersion.name());
         return fallbackVersion;
     }
 
