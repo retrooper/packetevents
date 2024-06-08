@@ -29,7 +29,7 @@ import java.util.Optional;
  * This class represents a PacketEvents version using Semantic Versioning.
  * It supports comparison and cloning operations.
  */
-public class PEVersion implements Comparable<PEVersion>, Cloneable {
+public class PEVersion implements Comparable<PEVersion> {
 
     private final int major;
     private final int minor;
@@ -44,7 +44,7 @@ public class PEVersion implements Comparable<PEVersion>, Cloneable {
      * @param patch    the patch version number.
      * @param snapshot boolean flag indicating whether the version is a snapshot.
      */
-    public PEVersion(int major, int minor, int patch, boolean snapshot) {
+    public PEVersion(final int major, final int minor, final int patch, final boolean snapshot) {
         this.major = major;
         this.minor = minor;
         this.patch = patch;
@@ -52,11 +52,22 @@ public class PEVersion implements Comparable<PEVersion>, Cloneable {
     }
 
     /**
-     * Specify your version using a string, for example: "1.8.9-SNAPSHOT".
+     * Overloaded constructor for PEVersion where snapshot is defaulted to false.
+     *
+     * @param major the major version number.
+     * @param minor the minor version number.
+     * @param patch the patch version number.
+     */
+    public PEVersion(final int major, final int minor, final int patch) {
+        this(major, minor, patch, false);
+    }
+
+    /**
+     * Specify your version using a string, for example, "1.8.9-SNAPSHOT".
      *
      * @param version String version.
      */
-    public PEVersion(@NotNull String version) {
+    public PEVersion(@NotNull final String version) {
         this.snapshot = version.endsWith("-SNAPSHOT");
         String versionWithoutSnapshot = version.replace("-SNAPSHOT", "");
         String[] parts = versionWithoutSnapshot.split("\\.");
@@ -73,11 +84,47 @@ public class PEVersion implements Comparable<PEVersion>, Cloneable {
     /**
      * Creates a PEVersion instance from the package version.
      *
-     * @return PEVersion instance with version derived from the package implementation version.
+     * @return PEVersion instance with a version derived from the package implementation version.
      */
     public static PEVersion createFromPackageVersion() {
         String version = Optional.ofNullable(PacketEvents.class.getPackage().getImplementationVersion()).orElse("0.0.0");
         return new PEVersion(version);
+    }
+
+    /**
+     * Retreives the major version number
+     *
+     * @return major version number
+     */
+    public int major() {
+        return major;
+    }
+
+    /**
+     * Retrieves the minor version number
+     *
+     * @return minor version number
+     */
+    public int minor() {
+        return minor;
+    }
+
+    /**
+     * Retrieves the patch version number
+     *
+     * @return patch version number
+     */
+    public int patch() {
+        return patch;
+    }
+
+    /**
+     * Checks if the version is a snapshot
+     *
+     * @return true if snapshot, false otherwise
+     */
+    public boolean snapshot() {
+        return snapshot;
     }
 
     /**
@@ -88,7 +135,7 @@ public class PEVersion implements Comparable<PEVersion>, Cloneable {
      * @return A negative integer, zero, or a positive integer as this version is less than, equal to, or greater than the specified version.
      */
     @Override
-    public int compareTo(@NotNull PEVersion other) {
+    public int compareTo(@NotNull final PEVersion other) {
         int majorCompare = Integer.compare(this.major, other.major);
         if (majorCompare != 0) return majorCompare;
 
@@ -110,7 +157,7 @@ public class PEVersion implements Comparable<PEVersion>, Cloneable {
      * @return Boolean, true if the provided object is logically equal to the current PEVersion, false otherwise.
      */
     @Override
-    public boolean equals(@NotNull Object obj) {
+    public boolean equals(@NotNull final Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof PEVersion)) return false;
         PEVersion other = (PEVersion) obj;
@@ -127,7 +174,7 @@ public class PEVersion implements Comparable<PEVersion>, Cloneable {
      * @param otherVersion Other PEVersion.
      * @return boolean, true if this version is newer, false otherwise.
      */
-    public boolean isNewerThan(@NotNull PEVersion otherVersion) {
+    public boolean isNewerThan(@NotNull final PEVersion otherVersion) {
         return this.compareTo(otherVersion) > 0;
     }
 
@@ -137,7 +184,7 @@ public class PEVersion implements Comparable<PEVersion>, Cloneable {
      * @param otherVersion Other PEVersion.
      * @return boolean, true if this version is older, false otherwise.
      */
-    public boolean isOlderThan(@NotNull PEVersion otherVersion) {
+    public boolean isOlderThan(@NotNull final PEVersion otherVersion) {
         return this.compareTo(otherVersion) < 0;
     }
 
@@ -158,11 +205,7 @@ public class PEVersion implements Comparable<PEVersion>, Cloneable {
      */
     @Override
     public PEVersion clone() {
-        try {
-            return (PEVersion) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError("Clone not supported", e); // Should never happen as we implement Cloneable
-        }
+        return new PEVersion(major, minor, patch, snapshot);
     }
 
     /**

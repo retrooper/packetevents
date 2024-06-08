@@ -31,7 +31,7 @@ import java.util.Map;
 public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     public static boolean CHECKED_NETTY_VERSION;
     public static PEVersion NETTY_VERSION;
-    public static final PEVersion MODERN_NETTY_VERSION = new PEVersion(4, 1, 24, false);
+    public static final PEVersion MODERN_NETTY_VERSION = new PEVersion(4, 1, 24);
 
     private static PEVersion resolveNettyVersion() {
         Map<String, Version> nettyArtifacts = Version.identify();
