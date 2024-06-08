@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 group = "com.github.retrooper"
 description = rootProject.name
 version = "2.3.1-SNAPSHOT" //TODO UPDATE - ADD "-SNAPSHOT" if we are dealing with snapshot versions
@@ -37,6 +39,12 @@ tasks {
         dependsOn(*taskSubModules("clean"))
         group = "build"
         delete(rootProject.layout.buildDirectory)
+    }
+
+    register<ShadowJar>("shadowJar") {
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "mojang"
+        }
     }
 
     defaultTasks("build")

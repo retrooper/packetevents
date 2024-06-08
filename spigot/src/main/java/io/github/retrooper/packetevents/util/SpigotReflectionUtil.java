@@ -283,46 +283,51 @@ public final class SpigotReflectionUtil {
         PAPER_ENTITY_LOOKUP_EXISTS = Reflection.getField(WORLD_SERVER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) != null;
     }
 
+    private static boolean IS_OBFUSCATED;
+
     private static void initClasses() {
+        // spigot / paper versions older than 1.20.5 use spigot mappings
+        IS_OBFUSCATED = Reflection.getClassByNameWithoutException("net.minecraft.server.network.PlayerConnection") != null;
+
         MINECRAFT_SERVER_CLASS = getServerClass("server.MinecraftServer", "MinecraftServer");
-        NMS_PACKET_DATA_SERIALIZER_CLASS = getServerClass("network.PacketDataSerializer", "PacketDataSerializer");
+        NMS_PACKET_DATA_SERIALIZER_CLASS = getServerClass(IS_OBFUSCATED ? "network.PacketDataSerializer" : "network.FriendlyByteBuf", "PacketDataSerializer");
         NMS_ITEM_STACK_CLASS = getServerClass("world.item.ItemStack", "ItemStack");
-        NMS_IMATERIAL_CLASS = getServerClass("world.level.IMaterial", "IMaterial");
+        NMS_IMATERIAL_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.IMaterial" : "world.level.ItemLike", "IMaterial");
         NMS_ENTITY_CLASS = getServerClass("world.entity.Entity", "Entity");
-        ENTITY_PLAYER_CLASS = getServerClass("server.level.EntityPlayer", "EntityPlayer");
-        BOUNDING_BOX_CLASS = getServerClass("world.phys.AxisAlignedBB", "AxisAlignedBB");
-        NMS_MINECRAFT_KEY_CLASS = getServerClass("resources.MinecraftKey", "MinecraftKey");
-        ENTITY_HUMAN_CLASS = getServerClass("world.entity.player.EntityHuman", "EntityHuman");
-        PLAYER_CONNECTION_CLASS = getServerClass("server.network.PlayerConnection", "PlayerConnection");
+        ENTITY_PLAYER_CLASS = getServerClass(IS_OBFUSCATED ? "server.level.EntityPlayer" : "world.level.ServerPlayer", "EntityPlayer");
+        BOUNDING_BOX_CLASS = getServerClass(IS_OBFUSCATED ? "world.phys.AxisAlignedBB" : "world.phys.AABB", "AxisAlignedBB");
+        NMS_MINECRAFT_KEY_CLASS = getServerClass(IS_OBFUSCATED ? "resources.MinecraftKey" : "resources.ResourceLocation", "MinecraftKey");
+        ENTITY_HUMAN_CLASS = getServerClass(IS_OBFUSCATED ? "world.entity.player.EntityHuman" : "world.entity.player.Player", "EntityHuman");
+        PLAYER_CONNECTION_CLASS = getServerClass(IS_OBFUSCATED ? "server.network.PlayerConnection" : "server.network.ServerGamePacketListenerImpl", "PlayerConnection");
 
         //Only on 1.20.2
         SERVER_COMMON_PACKETLISTENER_IMPL_CLASS = getServerClass("server.network.ServerCommonPacketListenerImpl", "ServerCommonPacketListenerImpl");
 
-        SERVER_CONNECTION_CLASS = getServerClass("server.network.ServerConnection", "ServerConnection");
-        NETWORK_MANAGER_CLASS = getServerClass("network.NetworkManager", "NetworkManager");
-        MOB_EFFECT_LIST_CLASS = getServerClass("world.effect.MobEffectList", "MobEffectList");
+        SERVER_CONNECTION_CLASS = getServerClass(IS_OBFUSCATED ? "server.network.ServerConnection" : "server.network.ServerConnectionListener", "ServerConnection");
+        NETWORK_MANAGER_CLASS = getServerClass(IS_OBFUSCATED ? "network.NetworkManager" : "network.Connection", "NetworkManager");
+        MOB_EFFECT_LIST_CLASS = getServerClass(IS_OBFUSCATED ? "world.effect.MobEffectList" : "world.effect.MobEffect", "MobEffectList");
         NMS_ITEM_CLASS = getServerClass("world.item.Item", "Item");
         DEDICATED_SERVER_CLASS = getServerClass("server.dedicated.DedicatedServer", "DedicatedServer");
-        NMS_WORLD_CLASS = getServerClass("world.level.World", "World");
-        WORLD_SERVER_CLASS = getServerClass("server.level.WorldServer", "WorldServer");
-        ENUM_PROTOCOL_DIRECTION_CLASS = getServerClass("network.protocol.EnumProtocolDirection", "EnumProtocolDirection");
+        NMS_WORLD_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.World" : "world.level.Level", "World");
+        WORLD_SERVER_CLASS = getServerClass(IS_OBFUSCATED ? "server.level.WorldServer" : "server.level.ServerLevel", "WorldServer");
+        ENUM_PROTOCOL_DIRECTION_CLASS = getServerClass(IS_OBFUSCATED ? "network.protocol.EnumProtocolDirection" : "network.protocol.PacketFlow", "EnumProtocolDirection");
         if (V_1_17_OR_HIGHER) {
             LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
             PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
             PAPER_ENTITY_LOOKUP_CLASS = Reflection.getClassByNameWithoutException("io.papermc.paper.chunk.system.entity.EntityLookup");
         }
-        DIMENSION_MANAGER_CLASS = getServerClass("world.level.dimension.DimensionManager", "DimensionManager");
+        DIMENSION_MANAGER_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.dimension.DimensionManager" : "world.level.dimension.DimensionType", "DimensionManager");
         MOJANG_CODEC_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Codec");
         MOJANG_ENCODER_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Encoder");
         DATA_RESULT_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.DataResult");
-        DYNAMIC_OPS_NBT_CLASS = getServerClass("nbt.DynamicOpsNBT", "DynamicOpsNBT");
+        DYNAMIC_OPS_NBT_CLASS = getServerClass(IS_OBFUSCATED ? "nbt.DynamicOpsNBT" : "nbt.NbtOps", "DynamicOpsNBT");
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
             NMS_ENUM_PARTICLE_CLASS = getServerClass(null, "EnumParticle");
         }
 
         CRAFT_MAGIC_NUMBERS_CLASS = getOBCClass("util.CraftMagicNumbers");
         //IBlockData does not exist on 1.7.10
-        IBLOCK_DATA_CLASS = getServerClass("world.level.block.state.IBlockData", "IBlockData");
+        IBLOCK_DATA_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.block.state.IBlockData" : "world.level.block.state.BlockState", "IBlockData");
         BLOCK_CLASS = getServerClass("world.level.block.Block", "Block");
         CRAFT_BLOCK_DATA_CLASS = getOBCClass("block.data.CraftBlockData");
 
@@ -339,22 +344,22 @@ public final class SpigotReflectionUtil {
         BYTE_BUF_CLASS = getNettyClass("buffer.ByteBuf");
         BYTE_TO_MESSAGE_DECODER = getNettyClass("handler.codec.ByteToMessageDecoder");
         MESSAGE_TO_BYTE_ENCODER = getNettyClass("handler.codec.MessageToByteEncoder");
-        NMS_NBT_COMPOUND_CLASS = getServerClass("nbt.NBTTagCompound", "NBTTagCompound");
-        NMS_NBT_BASE_CLASS = getServerClass("nbt.NBTBase", "NBTBase");
-        NBT_COMPRESSION_STREAM_TOOLS_CLASS = getServerClass("nbt.NBTCompressedStreamTools", "NBTCompressedStreamTools");
-        NBT_ACCOUNTER = getServerClass("nbt.NBTReadLimiter", "NBTReadLimiter");
-        CHUNK_PROVIDER_SERVER_CLASS = getServerClass("server.level.ChunkProviderServer", "ChunkProviderServer");
-        ICHUNKPROVIDER_CLASS = getServerClass("world.level.chunk.IChunkProvider", "IChunkProvider");
+        NMS_NBT_COMPOUND_CLASS = getServerClass(IS_OBFUSCATED ? "nbt.NBTTagCompound" : "nbt.CompoundTag", "NBTTagCompound");
+        NMS_NBT_BASE_CLASS = getServerClass(IS_OBFUSCATED ? "nbt.NBTBase" : "nbt.Tag", "NBTBase");
+        NBT_COMPRESSION_STREAM_TOOLS_CLASS = getServerClass(IS_OBFUSCATED ? "nbt.NBTCompressedStreamTools" : "nbt.NbtIo", "NBTCompressedStreamTools");
+        NBT_ACCOUNTER = getServerClass(IS_OBFUSCATED ? "nbt.NBTReadLimiter" : "nbt.NbtAccounter", "NBTReadLimiter");
+        CHUNK_PROVIDER_SERVER_CLASS = getServerClass(IS_OBFUSCATED ? "server.level.ChunkProviderServer" : "server.level.ServerChunkCache", "ChunkProviderServer");
+        ICHUNKPROVIDER_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.chunk.IChunkProvider" : "world.level.chunk.ChunkSource", "IChunkProvider");
         CHUNK_STATUS_CLASS = SpigotReflectionUtil.getServerClass("world.level.chunk.status.ChunkStatus", "");
         if (CHUNK_STATUS_CLASS == null) {
             CHUNK_STATUS_CLASS = SpigotReflectionUtil.getServerClass("world.level.ChunkStatus", "");
         }
-        BLOCK_POSITION_CLASS = SpigotReflectionUtil.getServerClass("core.BlockPosition", "BlockPosition");
-        PLAYER_CHUNK_MAP_CLASS = SpigotReflectionUtil.getServerClass("server.level.PlayerChunkMap", "");
-        PLAYER_CHUNK_CLASS = SpigotReflectionUtil.getServerClass("server.level.PlayerChunk", "");
-        CHUNK_CLASS = SpigotReflectionUtil.getServerClass("world.level.chunk.Chunk", "Chunk");
-        IBLOCKACCESS_CLASS = SpigotReflectionUtil.getServerClass("world.level.IBlockAccess", "IBlockAccess");
-        ICHUNKACCESS_CLASS = SpigotReflectionUtil.getServerClass("world.level.chunk.IChunkAccess", "IChunkAccess");
+        BLOCK_POSITION_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "core.BlockPosition" : "core.BlockPos", "BlockPosition");
+        PLAYER_CHUNK_MAP_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "server.level.PlayerChunkMap" : "server.level.ChunkMap", "");
+        PLAYER_CHUNK_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "server.level.PlayerChunk" : "server.level.ChunkHolder", "");
+        CHUNK_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "world.level.chunk.Chunk" : "world.level.chunk.LevelChunk", "Chunk");
+        IBLOCKACCESS_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "world.level.IBlockAccess" : "world.level.BlockGetter", "IBlockAccess");
+        ICHUNKACCESS_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "world.level.chunk.IChunkAccess" : "world.level.chunk.ChunkAccess", "IChunkAccess");
 
 
         if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
@@ -363,11 +368,11 @@ public final class SpigotReflectionUtil {
             STREAM_ENCODER = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamEncoder");
             REGISTRY_FRIENDLY_BYTE_BUF = Reflection.getClassByNameWithoutException("net.minecraft.network.RegistryFriendlyByteBuf");
         }
-        REGISTRY_ACCESS = getServerClass("core.IRegistryCustom", "IRegistryCustom");
-        REGISTRY_ACCESS_FROZEN = getServerClass("core.IRegistryCustom$Dimension", "IRegistryCustom$Dimension");
+        REGISTRY_ACCESS = getServerClass(IS_OBFUSCATED ? "core.IRegistryCustom" : "core.RegistryAccess", "IRegistryCustom");
+        REGISTRY_ACCESS_FROZEN = getServerClass(IS_OBFUSCATED ? "core.IRegistryCustom$Dimension" : "core.RegistryAccess$Frozen", "IRegistryCustom$Dimension");
         RESOURCE_KEY = getServerClass("resources.ResourceKey", "ResourceKey");
-        REGISTRY = getServerClass("core.IRegistry", "IRegistry");
-        WRITABLE_REGISTRY = getServerClass("core.IRegistryWritable", "IRegistryWritable");
+        REGISTRY = getServerClass(IS_OBFUSCATED ? "core.IRegistry" : "core.Registry", "IRegistry");
+        WRITABLE_REGISTRY = getServerClass(IS_OBFUSCATED ? "core.IRegistryWritable" : "core.WritableRegistry", "IRegistryWritable");
     }
 
     private static void initObjects() {
