@@ -18,11 +18,14 @@
 
 package io.github.retrooper.packetevents.sponge.util.viaversion;
 
+import com.github.retrooper.packetevents.protocol.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 public interface ViaVersionAccessor {
 
     int getProtocolVersion(ServerPlayer player);
+
+    int getProtocolVersion(User user);
 
     Class<?> getUserConnectionClass();
 

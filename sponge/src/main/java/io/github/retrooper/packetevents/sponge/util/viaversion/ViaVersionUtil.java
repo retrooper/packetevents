@@ -18,15 +18,9 @@
 
 package io.github.retrooper.packetevents.sponge.util.viaversion;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.reflection.Reflection;
-import io.netty.channel.Channel;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-
-import java.util.Optional;
 
 public class ViaVersionUtil {
     private static ViaState available = ViaState.UNKNOWN;
@@ -65,26 +59,7 @@ public class ViaVersionUtil {
     }
 
     public static int getProtocolVersion(User user) {
-        try {
-            if (user.getUUID() != null) {
-                Optional<ServerPlayer> player = Sponge.server().player(user.getUUID());
-                if (player.isPresent()) {
-                    int version = getProtocolVersion(player.get());
-                    // -1 means via hasn't gotten join event yet
-                    if (version != -1) return version;
-                }
-            }
-
-            System.out.println(ChannelHelper.pipelineHandlerNamesAsString(user.getChannel()));
-            Object viaEncoder = ((Channel) user.getChannel()).pipeline().get("encoder");
-            Object connection = Reflection.getField(viaEncoder.getClass(), "connection").get(viaEncoder);
-            Object protocolInfo = Reflection.getField(connection.getClass(), "protocolInfo").get(connection);
-            return (int) Reflection.getField(protocolInfo.getClass(), "protocolVersion").get(protocolInfo);
-        } catch (Exception e) {
-            PacketEvents.getAPI().getLogManager().warn("Unable to grab ViaVersion client version for player!");
-            e.printStackTrace();
-            return -1;
-        }
+        return getViaVersionAccessor().getProtocolVersion(user);
     }
 
     public static int getProtocolVersion(ServerPlayer player) {
