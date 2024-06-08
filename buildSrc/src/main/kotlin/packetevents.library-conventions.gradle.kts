@@ -14,8 +14,11 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/")
 }
 
+val isShadow = project.pluginManager.hasPlugin("com.github.johnrengelman.shadow")
+
 dependencies {
-    compileOnly("org.jetbrains:annotations:23.0.0")
+    val annotationVersion = "23.0.0"
+    add(if (isShadow) "shadow" else "compileOnly", "org.jetbrains:annotations:$annotationVersion")
 }
 
 java {
@@ -45,7 +48,7 @@ publishing {
             artifactId = project.name
             version = project.version as String
 
-            if (project.pluginManager.hasPlugin("com.github.johnrengelman.shadow")) {
+            if (isShadow) {
                 project.extensions.getByName<ShadowExtension>("shadow").component(this)
                 artifact(tasks["sourcesJar"])
             } else {
