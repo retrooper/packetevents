@@ -45,9 +45,9 @@ publishing {
             artifactId = project.name
             version = project.version as String
 
-            if (getTasksByName("shadowJar", false).isNotEmpty()) {
+            if (project.pluginManager.hasPlugin("com.github.johnrengelman.shadow")) {
                 project.extensions.getByName<ShadowExtension>("shadow").component(this)
-                from(components["shadow"])
+                artifact(tasks["sourcesJar"])
             } else {
                 from(components["java"])
             }

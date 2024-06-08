@@ -3,8 +3,8 @@ import com.github.retrooper.compression.strategy.JsonObjectCompressionStrategy
 import com.github.retrooper.compression.strategy.JsonToNbtStrategy
 
 plugins {
-    packetevents.`library-conventions`
     packetevents.`shadow-conventions`
+    packetevents.`library-conventions`
     `mapping-compression`
 }
 
@@ -97,5 +97,13 @@ tasks {
 
     test {
         useJUnitPlatform()
+    }
+}
+
+publishing {
+    publications {
+        named<MavenPublication>("shadow") {
+            artifact(tasks["javadocJar"])
+        }
     }
 }

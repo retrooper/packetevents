@@ -1,6 +1,6 @@
 plugins {
-    packetevents.`library-conventions`
     packetevents.`shadow-conventions`
+    packetevents.`library-conventions`
 }
 
 dependencies {
