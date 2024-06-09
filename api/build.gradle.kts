@@ -1,6 +1,7 @@
 import com.github.retrooper.compression.strategy.JsonArrayCompressionStrategy
 import com.github.retrooper.compression.strategy.JsonObjectCompressionStrategy
 import com.github.retrooper.compression.strategy.JsonToNbtStrategy
+import com.github.retrooper.excludeAdventure
 
 plugins {
     packetevents.`shadow-conventions`
@@ -19,9 +20,12 @@ java {
 
 dependencies {
     compileOnlyApi(libs.bundles.adventure)
-    shadow(libs.bundles.adventure)
-    api(project(":patch:adventure-text-serializer-gson", "shadow"))
-    api(libs.adventure.text.serializer.legacy)
+    api(project(":patch:adventure-text-serializer-gson", "shadow")) {
+        excludeAdventure()
+    }
+    api(libs.adventure.text.serializer.legacy) {
+        excludeAdventure()
+    }
     compileOnly(libs.gson)
 
     testImplementation(libs.bundles.adventure)

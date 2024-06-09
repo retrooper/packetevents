@@ -21,6 +21,7 @@ val fabric_version: String by project
 val loader_version: String by project
 
 dependencies {
+    api(libs.bundles.adventure)
     api(project(":api", "shadow"))
     api(project(":netty-common"))
 

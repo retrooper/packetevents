@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
@@ -29,12 +30,21 @@ tasks {
 configurations.implementation.get().extendsFrom(configurations.shadow.get())
 
 gradle.taskGraph.whenReady {
-    if (gradle.startParameter.taskNames.any { it.startsWith("publish") }) {
+    if (gradle.startParameter.taskNames.any { it.contains("publish") }) {
         logger.info("Adding shadow configuration to shadowJar tasks in module ${project.name}.")
         tasks.withType<ShadowJar> {
             dependencies {
-                exclude { it.configuration == "shadow" }
+                project.configurations.shadow.get().resolvedConfiguration.firstLevelModuleDependencies.forEach {
+                    exclude(it)
+                }
             }
         }
+    }
+}
+
+fun DependencyFilter.exclude(dependency: ResolvedDependency) {
+    exclude(dependency("${dependency.moduleGroup}:${dependency.moduleName}:.*"))
+    dependency.children.forEach {
+        exclude(it)
     }
 }

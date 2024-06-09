@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     compileOnly(libs.netty)
+    shadow(libs.bundles.adventure)
     shadow(project(":api", "shadow"))
     shadow(project(":netty-common"))
 

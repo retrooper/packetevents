@@ -14,5 +14,6 @@ dependencies {
     compileOnly(libs.velocity)
     annotationProcessor(libs.velocity)
     shadow(project(":api", "shadow"))
-    implementation(project(":netty-common"))
+    shadow(project(":netty-common"))
+    // Velocity already bundles with adventure
 }

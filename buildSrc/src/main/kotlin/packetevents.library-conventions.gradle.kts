@@ -103,3 +103,9 @@ publishing {
 configurations.all {
     resolutionStrategy.cacheDynamicVersionsFor(0, "seconds")
 }
+
+val taskNames = gradle.startParameter.taskNames
+if (taskNames.any { it.contains("build") }
+    && taskNames.any { it.contains("publish") }) {
+    throw IllegalStateException("Cannot build and publish at the same time.")
+}
