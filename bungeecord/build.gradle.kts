@@ -4,8 +4,7 @@ plugins {
 }
 
 dependencies {
-    shadow(libs.bungeecord)
-    api(project(":api", "shadow"))
-    api(project(":netty-common"))
-    api(libs.bundles.adventure)
+    compileOnly(libs.bungeecord)
+    shadow(project(":api", "shadow"))
+    shadow(project(":netty-common"))
 }

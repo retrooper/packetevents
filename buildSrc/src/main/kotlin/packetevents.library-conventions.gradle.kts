@@ -17,8 +17,7 @@ repositories {
 val isShadow = project.pluginManager.hasPlugin("com.github.johnrengelman.shadow")
 
 dependencies {
-    val annotationVersion = "23.0.0"
-    add(if (isShadow) "shadow" else "compileOnly", "org.jetbrains:annotations:$annotationVersion")
+    compileOnly("org.jetbrains:annotations:23.0.0")
 }
 
 java {

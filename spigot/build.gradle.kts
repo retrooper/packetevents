@@ -11,13 +11,13 @@ repositories {
 }
 
 dependencies {
-    shadow(libs.netty)
-    api(project(":api", "shadow"))
-    api(project(":netty-common"))
+    compileOnly(libs.netty)
+    shadow(project(":api", "shadow"))
+    shadow(project(":netty-common"))
 
-    shadow(libs.spigot)
-    shadow(libs.via.version)
-    shadow(libs.protocol.support)
+    compileOnly(libs.spigot)
+    compileOnly(libs.via.version)
+    compileOnly(libs.protocol.support)
 }
 
 tasks {

@@ -10,13 +10,9 @@ repositories {
 }
 
 dependencies {
-    shadow(libs.netty)
-    shadow(libs.velocity)
+    compileOnly(libs.netty)
+    compileOnly(libs.velocity)
     annotationProcessor(libs.velocity)
-    api(project(":api", "shadow"))
+    shadow(project(":api", "shadow"))
     implementation(project(":netty-common"))
-    //Velocity ships with adventure & gson
-    shadow(libs.bundles.adventure)
-    //Ship with legacy adventure
-    implementation(libs.adventure.text.serializer.json.legacy)
 }
