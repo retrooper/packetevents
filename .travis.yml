@@ -1,1 +1,2 @@
-language: openjdk17
+language: java
+jdk: openjdk17
