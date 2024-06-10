@@ -1,4 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.ShadowExtension
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import groovy.util.Node
 
 plugins {
     `java-library`
@@ -44,11 +46,40 @@ publishing {
     publications {
         create<MavenPublication>("shadow") {
             groupId = project.group as String
-            artifactId = project.name
+            artifactId = "packetevents-" + project.name
             version = project.version as String
 
             if (isShadow) {
-                project.extensions.getByName<ShadowExtension>("shadow").component(this)
+                artifact(project.tasks.withType<ShadowJar>().getByName("shadowJar").archiveFile)
+
+                val allDependencies = project.provider {
+                    project.configurations.getByName("shadow").allDependencies
+                        .filter { it is ProjectDependency || it !is SelfResolvingDependency }
+                }
+
+                pom {
+                    withXml {
+                        val (libraryDeps, projectDeps) = allDependencies.get().partition { it !is ProjectDependency }
+                        val dependenciesNode = asNode().get("dependencies") as? Node ?: asNode().appendNode("dependencies")
+
+                        libraryDeps.forEach {
+                            val dependencyNode = dependenciesNode.appendNode("dependency")
+                            dependencyNode.appendNode("groupId", it.group)
+                            dependencyNode.appendNode("artifactId", it.name)
+                            dependencyNode.appendNode("version", it.version)
+                            dependencyNode.appendNode("scope", "compile")
+                        }
+
+                        projectDeps.forEach {
+                            val dependencyNode = dependenciesNode.appendNode("dependency")
+                            dependencyNode.appendNode("groupId", it.group)
+                            dependencyNode.appendNode("artifactId", "packetevents-" + it.name)
+                            dependencyNode.appendNode("version", it.version)
+                            dependencyNode.appendNode("scope", "compile")
+                        }
+                    }
+                }
+
                 artifact(tasks["sourcesJar"])
             } else {
                 from(components["java"])
@@ -58,12 +89,14 @@ publishing {
                 name = "${rootProject.name}-${project.name}"
                 description = rootProject.description
                 url = "https://github.com/retrooper/packetevents"
+
                 licenses {
                     license {
                         name = "GPL-3.0"
                         url = "https://www.gnu.org/licenses/gpl-3.0.html"
                     }
                 }
+
                 developers {
                     developer {
                         id = "retrooper"
@@ -71,6 +104,7 @@ publishing {
                         email = "retrooperdev@gmail.com"
                     }
                 }
+
                 scm {
                     connection = "scm:git:https://github.com/retrooper/packetevents.git"
                     developerConnection = "scm:git:https://github.com/retrooper/packetevents.git"
