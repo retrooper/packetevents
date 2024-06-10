@@ -27,7 +27,8 @@ public enum EquipmentSlot {
     BOOTS(1),
     LEGGINGS(2),
     CHEST_PLATE(3),
-    HELMET(4);
+    HELMET(4),
+    BODY(0);
 
     private static final EquipmentSlot[] VALUES = values();
 
