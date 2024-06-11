@@ -51,6 +51,8 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
                 packetSendEvent.getLastUsedWrapper().write();
             }
             buffer.readerIndex(firstReaderIndex);
+        } else {
+            ByteBufHelper.clear(packetSendEvent.getByteBuf());
         }
         if (packetSendEvent.hasPostTasks()) {
             for (Runnable task : packetSendEvent.getPostTasks()) {

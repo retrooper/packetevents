@@ -29,6 +29,7 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
+import net.kyori.adventure.text.serializer.gson.BackwardCompatUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,7 +80,12 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
 
         String translate = reader.readUTF("translate", Function.identity());
         String translateFallback = reader.readUTF("fallback", Function.identity());
-        List<Component> translateWith = reader.readList("with", this::deserializeComponentList);
+        List<? extends ComponentLike> translateWith;
+        if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
+            translateWith = reader.readList("with", this::deserializeTranslationArgumentList);
+        } else {
+            translateWith = reader.readList("with", this::deserializeComponentList);
+        }
         NBTReader score = reader.child("score");
         String selector = reader.readUTF("selector", Function.identity());
         String keybind = reader.readUTF("keybind", Function.identity());
@@ -98,7 +104,11 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             builder = Component.text().content(text);
         } else if (translate != null) {
             if (translateWith != null) {
-                builder = Component.translatable().key(translate).fallback(translateFallback).arguments(translateWith);
+                if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
+                    builder = Component.translatable().key(translate).fallback(translateFallback).arguments(translateWith);
+                } else {
+                    builder = Component.translatable().key(translate).fallback(translateFallback).args(translateWith);
+                }
             } else {
                 builder = Component.translatable().key(translate).fallback(translateFallback);
             }
@@ -168,7 +178,11 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             // translation arguments
             List<Component> args = ((TranslatableComponent) component).args();
             if (!args.isEmpty()) {
-                writer.writeList("with", NBTType.COMPOUND, serializeComponentList(args));
+                if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
+                    writer.writeList("with", NBTType.COMPOUND, serializeTranslationArgumentList(((TranslatableComponent) component).arguments()));
+                } else {
+                    writer.writeList("with", NBTType.COMPOUND, serializeComponentList(args));
+                }
             }
         } else if (component instanceof ScoreComponent) {
             // nested compound
@@ -424,6 +438,33 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             components.add(serializeComponent(component));
         }
         return components;
+    }
+    // -------------------------------------------------
+
+    // ------------ TranslationArgument List ------------
+    private @NotNull List<TranslationArgument> deserializeTranslationArgumentList(List<?> value) {
+        if (value.isEmpty()) return Collections.emptyList();
+
+        List<TranslationArgument> arguments = new ArrayList<>(value.size());
+        for (Object nbt : value) {
+            if (nbt instanceof NBTByte) {
+                arguments.add(TranslationArgument.bool(((NBTByte) nbt).getAsByte() == 1));
+            } else if (nbt instanceof NBTNumber) {
+                arguments.add(TranslationArgument.numeric(((NBTNumber) nbt).getAsInt()));
+            } else {
+                arguments.add(TranslationArgument.component(deserialize(requireType((NBT) nbt, NBTType.COMPOUND))));
+            }
+        }
+
+        return arguments;
+    }
+
+    private List<NBTCompound> serializeTranslationArgumentList(List<TranslationArgument> value) {
+        List<NBTCompound> arguments = new ArrayList<>(value.size());
+        for (TranslationArgument argument : value) {
+            arguments.add(serializeComponent(argument.asComponent()));
+        }
+        return arguments;
     }
     // -------------------------------------------------
 

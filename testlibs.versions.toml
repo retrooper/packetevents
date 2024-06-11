@@ -1,0 +1,13 @@
+[versions]
+mockbukkit = "3.9.0"
+slf4j = "2.0.7"
+junit = "5.10.0"
+
+[libraries]
+mockbukkit = { group = "com.github.seeseemelk", name = "MockBukkit-v1.20", version.ref = "mockbukkit" }
+slf4j = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
+junit-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
+junit-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
+
+[bundles]
+junit = [ "junit-api", "junit-engine" ]

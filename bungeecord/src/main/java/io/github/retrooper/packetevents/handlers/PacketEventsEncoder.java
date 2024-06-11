@@ -63,6 +63,8 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
             if (doCompression) {
                 recompress(ctx, buffer);
             }
+        } else {
+            ByteBufHelper.clear(packetSendEvent.getByteBuf());
         }
         if (packetSendEvent.hasPostTasks()) {
             for (Runnable task : packetSendEvent.getPostTasks()) {
