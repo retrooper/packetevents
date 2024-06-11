@@ -27,9 +27,11 @@ tasks {
         outputs.upToDateWhen { false }
     }
 
-    // Paper doesn't need to map spigot -> mojang since we support both
-    manifest {
-        attributes["paperweight-mappings-namespace"] = "mojang"
+    shadowJar {
+        // Paper doesn't need to map spigot -> mojang since we support both
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "mojang"
+        }
     }
 }
 
