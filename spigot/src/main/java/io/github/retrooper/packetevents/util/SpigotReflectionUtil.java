@@ -294,7 +294,7 @@ public final class SpigotReflectionUtil {
         NMS_ITEM_STACK_CLASS = getServerClass("world.item.ItemStack", "ItemStack");
         NMS_IMATERIAL_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.IMaterial" : "world.level.ItemLike", "IMaterial");
         NMS_ENTITY_CLASS = getServerClass("world.entity.Entity", "Entity");
-        ENTITY_PLAYER_CLASS = getServerClass(IS_OBFUSCATED ? "server.level.EntityPlayer" : "world.level.ServerPlayer", "EntityPlayer");
+        ENTITY_PLAYER_CLASS = getServerClass(IS_OBFUSCATED ? "server.level.EntityPlayer" : "server.level.ServerPlayer", "EntityPlayer");
         BOUNDING_BOX_CLASS = getServerClass(IS_OBFUSCATED ? "world.phys.AxisAlignedBB" : "world.phys.AABB", "AxisAlignedBB");
         NMS_MINECRAFT_KEY_CLASS = getServerClass(IS_OBFUSCATED ? "resources.MinecraftKey" : "resources.ResourceLocation", "MinecraftKey");
         ENTITY_HUMAN_CLASS = getServerClass(IS_OBFUSCATED ? "world.entity.player.EntityHuman" : "world.entity.player.Player", "EntityHuman");
