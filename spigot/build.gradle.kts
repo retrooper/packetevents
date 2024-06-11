@@ -26,5 +26,10 @@ tasks {
         minecraftVersion("1.19.4")
         outputs.upToDateWhen { false }
     }
+
+    // Paper doesn't need to map spigot -> mojang since we support both
+    manifest {
+        attributes["paperweight-mappings-namespace"] = "mojang"
+    }
 }
 
