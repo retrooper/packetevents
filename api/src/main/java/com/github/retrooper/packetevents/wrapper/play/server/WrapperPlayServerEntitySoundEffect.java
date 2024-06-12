@@ -34,23 +34,25 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
     private int entityId;
     private float volume;
     private float pitch;
+    private long seed;
 
     public WrapperPlayServerEntitySoundEffect(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntitySoundEffect(int soundId, SoundCategory soundCategory, int entityId, float volume, float pitch) {
+    public WrapperPlayServerEntitySoundEffect(int soundId, SoundCategory soundCategory, int entityId, float volume, float pitch, long seed) {
         this(Sounds.getById(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), soundId),
-                soundCategory, entityId, volume, pitch);
+                soundCategory, entityId, volume, pitch, seed);
     }
 
-    public WrapperPlayServerEntitySoundEffect(Sound sound, SoundCategory soundCategory, int entityId, float volume, float pitch) {
+    public WrapperPlayServerEntitySoundEffect(Sound sound, SoundCategory soundCategory, int entityId, float volume, float pitch, long seed) {
         super(PacketType.Play.Server.ENTITY_SOUND_EFFECT);
         this.sound = sound;
         this.soundCategory = soundCategory;
         this.entityId = entityId;
         this.volume = volume;
         this.pitch = pitch;
+        this.seed = seed;
     }
 
     @Override
@@ -65,6 +67,9 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
         }
         else {
             pitch = readUnsignedByte() / 63.5F;
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            this.seed = readLong();
         }
     }
 
@@ -84,6 +89,9 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
         else {
             writeByte((int) (pitch * 63.5F));
         }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            writeLong(seed);
+        }
     }
 
     @Override
@@ -93,6 +101,7 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
         this.entityId = wrapper.entityId;
         this.volume = wrapper.volume;
         this.pitch = wrapper.pitch;
+        this.seed = wrapper.seed;
     }
 
     public Sound getSound() {
@@ -143,5 +152,13 @@ public class WrapperPlayServerEntitySoundEffect extends PacketWrapper<WrapperPla
 
     public void setPitch(float pitch) {
         this.pitch = pitch;
+    }
+
+    public long getSeed() {
+        return seed;
+    }
+
+    public void setSeed(long seed) {
+        this.seed = seed;
     }
 }
