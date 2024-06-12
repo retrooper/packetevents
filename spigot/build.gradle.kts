@@ -22,6 +22,13 @@ dependencies {
 }
 
 tasks {
+    shadowJar {
+        // Paper doesn't need to map spigot -> mojang since we support both
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "mojang"
+        }
+    }
+
     // 1.8.8 - 1.16.5 = Java 8
     // 1.17           = Java 16
     // 1.18 - 1.20.4  = Java 17
@@ -53,13 +60,6 @@ tasks {
         }
 
         jvmArgs = jvmArgsExternal
-    }
-
-    shadowJar {
-        // Paper doesn't need to map spigot -> mojang since we support both
-        manifest {
-            attributes["paperweight-mappings-namespace"] = "mojang"
-        }
     }
 }
 

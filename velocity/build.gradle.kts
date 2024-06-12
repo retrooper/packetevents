@@ -17,7 +17,9 @@ dependencies {
     shadow(project(":api", "shadow"))
     shadow(project(":netty-common"))
     // Velocity already bundles with adventure
+}
 
+tasks {
     runVelocity {
         velocityVersion("3.3.0-SNAPSHOT")
         runDirectory = file("run/velocity/")
