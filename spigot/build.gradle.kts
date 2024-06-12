@@ -1,6 +1,6 @@
 plugins {
-    packetevents.`library-conventions`
     packetevents.`shadow-conventions`
+    packetevents.`library-conventions`
     alias(libs.plugins.run.paper)
 }
 
@@ -12,8 +12,9 @@ repositories {
 
 dependencies {
     compileOnly(libs.netty)
-    api(project(":api", "shadow"))
-    api(project(":netty-common"))
+    shadow(libs.bundles.adventure)
+    shadow(project(":api", "shadow"))
+    shadow(project(":netty-common"))
 
     compileOnly(libs.paper)
     compileOnly(libs.via.version)
@@ -52,6 +53,13 @@ tasks {
         }
 
         jvmArgs = jvmArgsExternal
+    }
+
+    shadowJar {
+        // Paper doesn't need to map spigot -> mojang since we support both
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "mojang"
+        }
     }
 }
 

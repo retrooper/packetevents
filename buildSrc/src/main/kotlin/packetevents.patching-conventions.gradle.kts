@@ -1,9 +1,30 @@
 plugins {
-    java
+    `java-library`
     com.github.johnrengelman.shadow
 }
 
+group = rootProject.group
+version = rootProject.version
+description = rootProject.description
+
+repositories {
+    mavenCentral()
+    maven("https://oss.sonatype.org/content/groups/public/")
+}
+
+java {
+    withSourcesJar()
+    disableAutoTargetJvm()
+}
+
 tasks {
+    withType<JavaCompile> {
+        options.encoding = Charsets.UTF_8.name()
+        // Set the release flag. This configures what version bytecode the compiler will emit, as well as what JDK APIs are usable.
+        // See https://openjdk.java.net/jeps/247 for more information.
+        options.release = 8
+    }
+
     jar {
         enabled = false
     }
