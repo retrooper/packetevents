@@ -1,6 +1,6 @@
 plugins {
-    packetevents.`library-conventions`
     packetevents.`shadow-conventions`
+    packetevents.`library-conventions`
 }
 
 repositories {
@@ -13,18 +13,7 @@ dependencies {
     compileOnly(libs.netty)
     compileOnly(libs.velocity)
     annotationProcessor(libs.velocity)
-    api(project(":api", "shadow"))
-    implementation(project(":netty-common"))
-    //Velocity ships with adventure & gson
-    compileOnly(libs.bundles.adventure)
-    //Ship with legacy adventure
-    implementation(libs.adventure.text.serializer.json.legacy)
-}
-
-tasks {
-    shadowJar {
-        relocate("net.kyori.adventure.text.serializer.gson", "io.github.retrooper.packetevents.adventure.serializer.gson")
-        relocate("net.kyori.adventure.text.serializer.legacy", "io.github.retrooper.packetevents.adventure.serializer.legacy")
-        relocate("net.kyori.adventure.text.serializer.gson.legacyimpl", "io.github.retrooper.packetevents.adventure.serializer.gson.legacyimpl")
-    }
+    shadow(project(":api", "shadow"))
+    shadow(project(":netty-common"))
+    // Velocity already bundles with adventure
 }

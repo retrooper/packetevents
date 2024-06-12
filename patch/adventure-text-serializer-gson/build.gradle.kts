@@ -1,5 +1,4 @@
 plugins {
-    packetevents.`library-conventions`
     packetevents.`patching-conventions`
 }
 

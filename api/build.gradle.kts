@@ -1,10 +1,11 @@
 import com.github.retrooper.compression.strategy.JsonArrayCompressionStrategy
 import com.github.retrooper.compression.strategy.JsonObjectCompressionStrategy
 import com.github.retrooper.compression.strategy.JsonToNbtStrategy
+import com.github.retrooper.excludeAdventure
 
 plugins {
-    packetevents.`library-conventions`
     packetevents.`shadow-conventions`
+    packetevents.`library-conventions`
     `mapping-compression`
 }
 
@@ -18,9 +19,13 @@ java {
 }
 
 dependencies {
-    api(libs.bundles.adventure)
-    api(project(":patch:adventure-text-serializer-gson", "shadow"))
-    api(libs.adventure.text.serializer.legacy)
+    compileOnlyApi(libs.bundles.adventure)
+    api(project(":patch:adventure-text-serializer-gson", "shadow")) {
+        excludeAdventure()
+    }
+    api(libs.adventure.text.serializer.legacy) {
+        excludeAdventure()
+    }
     compileOnly(libs.gson)
 
     testImplementation(libs.bundles.adventure)
@@ -97,5 +102,13 @@ tasks {
 
     test {
         useJUnitPlatform()
+    }
+}
+
+publishing {
+    publications {
+        named<MavenPublication>("shadow") {
+            artifact(tasks["javadocJar"])
+        }
     }
 }
