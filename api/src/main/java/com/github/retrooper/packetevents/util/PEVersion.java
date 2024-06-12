@@ -62,6 +62,17 @@ public class PEVersion implements Comparable<PEVersion> {
     }
 
     /**
+     * Constructs a {@link PEVersion} instance from an array of version numbers.
+     *
+     * @param version the version numbers (e.g., {1, 8, 9}).
+     * @deprecated use {@link #PEVersion(int, int, int)} or {@link #PEVersion(int, int, int, boolean)} instead.
+     */
+    @Deprecated
+    public PEVersion(final int... version) {
+        this(version[0], version[1], version[2]);
+    }
+
+    /**
      * Constructs a {@link PEVersion} instance from a version string.
      *
      * @param version the version string (e.g., "1.8.9-SNAPSHOT").
