@@ -33,7 +33,11 @@ import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_7.Chunk_v1
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8.Chunk_v1_8;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v_1_18.Chunk_v1_18;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
-import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.*;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_16;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_18;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_7;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_8;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_9;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.io.ByteArrayInputStream;
@@ -52,29 +56,73 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     private static ChunkReader_v1_18 chunkReader_v1_18 = new ChunkReader_v1_18();
 
     private Column column;
-
-    //TODO Make accessible??
-    private boolean ignoreOldData;
-
-    // 1.18 only (lighting) - for writing data
-    // TODO: Make accessible?? Include in chunk data?? What do we do with this?
-    private boolean trustEdges;
-    private BitSet blockLightMask;
-    private BitSet skyLightMask;
-    private BitSet emptyBlockLightMask;
-    private BitSet emptySkyLightMask;
-    private int skyLightCount;
-    private  int blockLightCount;
-    private byte[][] skyLightArray;
-    private byte[][] blockLightArray;
+    private boolean ignoreOldData; // 1.16-1.16.1
+    private boolean trustEdges; // 1.18-1.19.3
+    private BitSet blockLightMask; // since 1.18
+    private BitSet skyLightMask; // since 1.18
+    private BitSet emptyBlockLightMask; // since 1.18
+    private BitSet emptySkyLightMask; // since 1.18
+    private int skyLightCount; // since 1.18
+    private int blockLightCount; // since 1.18
+    private byte[][] skyLightArray; // since 1.18
+    private byte[][] blockLightArray; // since 1.18
 
     public WrapperPlayServerChunkData(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperPlayServerChunkData(Column column) {
+        this(column, false);
+    }
+
+    public WrapperPlayServerChunkData(Column column, boolean ignoreOldData) {
+        this(column, ignoreOldData, true, null,
+                null, null, null,
+                0, 0, null, null);
+    }
+
+    public WrapperPlayServerChunkData(
+            Column column, BitSet blockLightMask, BitSet skyLightMask,
+            BitSet emptyBlockLightMask, BitSet emptySkyLightMask,
+            int skyLightCount, int blockLightCount,
+            byte[][] skyLightArray, byte[][] blockLightArray
+    ) {
+        this(column, false, true, blockLightMask, skyLightMask,
+                emptyBlockLightMask, emptySkyLightMask, skyLightCount, blockLightCount,
+                skyLightArray, blockLightArray);
+    }
+
+    public WrapperPlayServerChunkData(
+            Column column, boolean trustEdges,
+            BitSet blockLightMask, BitSet skyLightMask,
+            BitSet emptyBlockLightMask, BitSet emptySkyLightMask,
+            int skyLightCount, int blockLightCount,
+            byte[][] skyLightArray, byte[][] blockLightArray
+    ) {
+        this(column, false, trustEdges, blockLightMask, skyLightMask,
+                emptyBlockLightMask, emptySkyLightMask, skyLightCount, blockLightCount,
+                skyLightArray, blockLightArray);
+    }
+
+    public WrapperPlayServerChunkData(
+            Column column, boolean ignoreOldData,
+            boolean trustEdges, BitSet blockLightMask, BitSet skyLightMask,
+            BitSet emptyBlockLightMask, BitSet emptySkyLightMask,
+            int skyLightCount, int blockLightCount,
+            byte[][] skyLightArray, byte[][] blockLightArray
+    ) {
         super(PacketType.Play.Server.CHUNK_DATA);
         this.column = column;
+        this.ignoreOldData = ignoreOldData;
+        this.trustEdges = trustEdges;
+        this.blockLightMask = blockLightMask;
+        this.skyLightMask = skyLightMask;
+        this.emptyBlockLightMask = emptyBlockLightMask;
+        this.emptySkyLightMask = emptySkyLightMask;
+        this.skyLightCount = skyLightCount;
+        this.blockLightCount = blockLightCount;
+        this.skyLightArray = skyLightArray;
+        this.blockLightArray = blockLightArray;
     }
 
     private long[] readBitSetLongs() {
@@ -96,9 +144,13 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
     private void writeChunkMask(BitSet chunkMask) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            //Write primary bit mask
-            long[] longArray = chunkMask.toLongArray();
-            writeLongArray(longArray);
+            if (chunkMask == null) {
+                this.writeVarInt(0);
+            } else {
+                //Write primary bit mask
+                long[] longArray = chunkMask.toLongArray();
+                writeLongArray(longArray);
+            }
         } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             //Write primary bit mask
             writeVarInt((int) chunkMask.toLongArray()[0]);
@@ -474,14 +526,6 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         this.blockLightArray = wrapper.blockLightArray;
     }
 
-    public Column getColumn() {
-        return column;
-    }
-
-    public void setColumn(Column column) {
-        this.column = column;
-    }
-
     private ChunkReader getChunkReader() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
             return chunkReader_v1_18;
@@ -494,5 +538,93 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         } else {
             return chunkReader_v1_7;
         }
+    }
+
+    public Column getColumn() {
+        return this.column;
+    }
+
+    public void setColumn(Column column) {
+        this.column = column;
+    }
+
+    public boolean isIgnoreOldData() {
+        return this.ignoreOldData;
+    }
+
+    public void setIgnoreOldData(boolean ignoreOldData) {
+        this.ignoreOldData = ignoreOldData;
+    }
+
+    public boolean isTrustEdges() {
+        return this.trustEdges;
+    }
+
+    public void setTrustEdges(boolean trustEdges) {
+        this.trustEdges = trustEdges;
+    }
+
+    public BitSet getBlockLightMask() {
+        return this.blockLightMask;
+    }
+
+    public void setBlockLightMask(BitSet blockLightMask) {
+        this.blockLightMask = blockLightMask;
+    }
+
+    public BitSet getSkyLightMask() {
+        return this.skyLightMask;
+    }
+
+    public void setSkyLightMask(BitSet skyLightMask) {
+        this.skyLightMask = skyLightMask;
+    }
+
+    public BitSet getEmptyBlockLightMask() {
+        return this.emptyBlockLightMask;
+    }
+
+    public void setEmptyBlockLightMask(BitSet emptyBlockLightMask) {
+        this.emptyBlockLightMask = emptyBlockLightMask;
+    }
+
+    public BitSet getEmptySkyLightMask() {
+        return this.emptySkyLightMask;
+    }
+
+    public void setEmptySkyLightMask(BitSet emptySkyLightMask) {
+        this.emptySkyLightMask = emptySkyLightMask;
+    }
+
+    public int getSkyLightCount() {
+        return this.skyLightCount;
+    }
+
+    public void setSkyLightCount(int skyLightCount) {
+        this.skyLightCount = skyLightCount;
+    }
+
+    public int getBlockLightCount() {
+        return this.blockLightCount;
+    }
+
+    public void setBlockLightCount(int blockLightCount) {
+        this.blockLightCount = blockLightCount;
+    }
+
+    public byte[][] getSkyLightArray() {
+        return this.skyLightArray;
+    }
+
+    public void setSkyLightArray(byte[][] skyLightArray) {
+        this.skyLightArray = skyLightArray;
+    }
+
+    public byte[][] getBlockLightArray() {
+        return this.blockLightArray;
+    }
+
+    public void setBlockLightArray(byte[][] blockLightArray) {
+        this.blockLightArray = blockLightArray;
     }
 }
