@@ -30,13 +30,17 @@ public class LightData implements Cloneable {
         skyLightCount = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? packet.readVarInt() : 18;
         this.skyLightArray = new byte[skyLightCount][];
         for (int x = 0; x < skyLightCount; x++) {
-            skyLightArray[x] = packet.readByteArray();
+            if (this.skyLightMask.get(x)) {
+                skyLightArray[x] = packet.readByteArray();
+            }
         }
 
         blockLightCount = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? packet.readVarInt() : 18;
         this.blockLightArray = new byte[blockLightCount][];
         for (int x = 0; x < blockLightCount; x++) {
-            blockLightArray[x] = packet.readByteArray();
+            if (this.blockLightMask.get(x)) {
+                blockLightArray[x] = packet.readByteArray();
+            }
         }
     }
 
@@ -53,13 +57,17 @@ public class LightData implements Cloneable {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17))
             packet.writeVarInt(skyLightCount);
         for (int x = 0; x < skyLightCount; x++) {
-            packet.writeByteArray(skyLightArray[x]);
+            if (skyLightMask.get(x)) {
+                packet.writeByteArray(skyLightArray[x]);
+            }
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17))
             packet.writeVarInt(blockLightCount);
         for (int x = 0; x < blockLightCount; x++) {
-            packet.writeByteArray(blockLightArray[x]);
+            if (blockLightMask.get(x)) {
+                packet.writeByteArray(blockLightArray[x]);
+            }
         }
     }
 
@@ -139,12 +147,11 @@ public class LightData implements Cloneable {
     public LightData clone() {
         try {
             LightData clone = (LightData) super.clone();
+            clone.trustEdges = trustEdges;
             clone.blockLightMask = (BitSet) blockLightMask.clone();
             clone.skyLightMask = (BitSet) skyLightMask.clone();
             clone.emptyBlockLightMask = (BitSet) emptyBlockLightMask.clone();
             clone.emptySkyLightMask = (BitSet) emptySkyLightMask.clone();
-            clone.skyLightArray = skyLightArray.clone();
-            clone.blockLightArray = blockLightArray.clone();
             clone.skyLightArray = skyLightArray.clone();
             clone.blockLightArray = blockLightArray.clone();
             return clone;

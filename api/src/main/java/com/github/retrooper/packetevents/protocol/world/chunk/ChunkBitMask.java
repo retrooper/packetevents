@@ -25,15 +25,23 @@ public class ChunkBitMask {
     }
 
     public static void writeChunkMask(PacketWrapper<?> packet, BitSet chunkMask) {
+        long[] longArray = chunkMask.toLongArray();
+
         if (packet.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
             //Write primary bit mask
-            long[] longArray = chunkMask.toLongArray();
             packet.writeLongArray(longArray);
         } else if (packet.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            //Write primary bit mask
-            packet.writeVarInt((int) chunkMask.toLongArray()[0]);
+            if (longArray.length > 0) {
+                packet.writeVarInt((int) longArray[0]);
+            } else {
+                packet.writeVarInt(0);
+            }
         } else {
-            packet.writeShort((int) chunkMask.toLongArray()[0]);
+            if (longArray.length > 0) {
+                packet.writeShort((int) longArray[0]);
+            } else {
+                packet.writeShort(0);
+            }
         }
     }
 
