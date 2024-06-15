@@ -93,18 +93,24 @@ public class VelocityPacketEventsBuilder {
 
                 @Override
                 public ServerVersion getVersion() {
-                    if (version == null) {
-                        for (final ProtocolVersion ver : ProtocolVersion.SUPPORTED_VERSIONS) {
-                            final String verStr = ver.getVersionIntroducedIn();
-                            for (final ServerVersion val : ServerVersion.values()) {
-                                if (val.getReleaseName().contains(verStr)) {
-                                    return version = val;
+                    if (this.version == null) {
+                        ProtocolVersion[] velVers = ProtocolVersion.values();
+                        for (int i = velVers.length - 1; i >= 0; i--) {
+                            ProtocolVersion velVer = velVers[i];
+                            if (velVer.isLegacy() || velVer.isUnknown()) {
+                                continue; // skip
+                            }
+                            String velVerStr = velVer.getVersionIntroducedIn();
+                            for (ServerVersion peVer : ServerVersion.values()) {
+                                if (peVer.getReleaseName().contains(velVerStr)) {
+                                    this.version = peVer;
+                                    return peVer;
                                 }
                             }
                         }
                         throw new IllegalStateException("Can't find any version compatible with this velocity instance");
                     }
-                    return version;
+                    return this.version;
                 }
             };
 
