@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
@@ -39,7 +40,7 @@ import io.github.retrooper.packetevents.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.util.BukkitLogManager;
-import io.github.retrooper.packetevents.util.FoliaCompatUtil;
+import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
@@ -48,8 +49,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SpigotPacketEventsBuilder {
     private static PacketEventsAPI<Plugin> API_INSTANCE;
@@ -103,6 +102,7 @@ public class SpigotPacketEventsBuilder {
                     try {
                         SpigotReflectionUtil.init();
                         CustomPipelineUtil.init();
+                        WrappedBlockState.ensureLoad();
                     } catch (Exception ex) {
                         throw new IllegalStateException(ex);
                     }
@@ -140,13 +140,9 @@ public class SpigotPacketEventsBuilder {
                         getUpdateChecker().handleUpdateCheck();
                     }
 
-                    if (settings.isbStatsEnabled()) {
-                        Metrics metrics = new Metrics((JavaPlugin) plugin, 11327);
-                        //Just to have an idea of which versions of packetevents people use
-                        metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
-                            return getVersion().toString();
-                        }));
-                    }
+                    Metrics metrics = new Metrics((JavaPlugin) plugin, 11327);
+                    //Just to have an idea of which versions of packetevents people use
+                    metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> getVersion().toString()));
 
                     Bukkit.getPluginManager().registerEvents(new InternalBukkitListener(plugin), plugin);
 
@@ -157,7 +153,7 @@ public class SpigotPacketEventsBuilder {
                                 injector.inject();
                             }
                         };
-                        FoliaCompatUtil.runTaskOnInit(plugin, lateBindTask);
+                        FoliaScheduler.runTaskOnInit(plugin, lateBindTask);
                     }
 
                     // Let people override this, at their own risk

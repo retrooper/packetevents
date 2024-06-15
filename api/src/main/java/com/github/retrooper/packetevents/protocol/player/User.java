@@ -32,7 +32,13 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.server.*;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleSubtitle;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleText;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleTimes;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTitle;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -259,6 +265,41 @@ public class User {
         this.totalWorldHeight = totalWorldHeight;
     }
 
+    public void switchDimensionType(ServerVersion version, Dimension dimension) {
+        NBTCompound dimensionData = this.getWorldNBT(dimension);
+        if (dimensionData != null) {
+            NBTCompound worldNBT = dimensionData.getCompoundTagOrNull("element");
+            if (worldNBT != null) {
+                this.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
+                this.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
+                return;
+            } else {
+                this.setDefaultWorldHeights(version, dimension);
+            }
+        }
+        if (version.isOlderThan(ServerVersion.V_1_20_5)
+                || this.clientVersion.isOlderThan(ClientVersion.V_1_20_5)) {
+            // hide this warning on 1.20.5, as the server does no longer send
+            // vanilla datapack dimension type contents
+            //
+            // this 1.20.5 feature can be fully worked around with by clearing the
+            // known packs sent by the client to the server durings config phase
+            PacketEvents.getAPI().getLogger().warning(
+                    "No data was sent for dimension " + dimensionData + " to " + this.getName());
+        }
+    }
+
+    public void setDefaultWorldHeights(ServerVersion version, Dimension dimension) {
+        boolean extended = version.isNewerThanOrEquals(ServerVersion.V_1_18)
+                && "minecraft:overworld".equals(this.getWorldName(dimension));
+        this.setDefaultWorldHeights(extended);
+    }
+
+    public void setDefaultWorldHeights(boolean extended) {
+        this.minWorldHeight = extended ? -64 : 0;
+        this.totalWorldHeight = extended ? 256 + 128 : 256;
+    }
+
     public void setWorldNBT(NBTList<NBTCompound> worldNBT) {
         this.worldNBT = worldNBT.getTags();
     }
@@ -282,5 +323,42 @@ public class User {
             }
         }
         return null;
+    }
+
+    public @Nullable NBTCompound getWorldNBT(int worldId) {
+        if (this.worldNBT == null) {
+            return null;
+        }
+        for (NBTCompound element : this.worldNBT) {
+            if (element.getNumberTagOrNull("id").getAsInt() == worldId) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    public @Nullable NBTCompound getWorldNBT(Dimension dimension) {
+        String dimensionName = dimension.getDimensionName();
+        if (!dimensionName.isEmpty()) {
+            return this.getWorldNBT(dimensionName);
+        }
+        return this.getWorldNBT(dimension.getId());
+    }
+
+    public @Nullable String getWorldName(int worldId) {
+        if (this.worldNBT == null) {
+            return null;
+        }
+        for (NBTCompound element : this.worldNBT) {
+            if (element.getNumberTagOrNull("id").getAsInt() == worldId) {
+                return element.getStringTagValueOrNull("name");
+            }
+        }
+        return null;
+    }
+
+    public @Nullable String getWorldName(Dimension dimension) {
+        String dimensionName = dimension.getDimensionName();
+        return dimensionName.isEmpty() ? this.getWorldName(dimension.getId()) : dimensionName;
     }
 }

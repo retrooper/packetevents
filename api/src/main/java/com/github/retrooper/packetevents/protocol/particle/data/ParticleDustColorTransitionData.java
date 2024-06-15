@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.particle.data;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.color.Color;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -116,10 +117,16 @@ public class ParticleDustColorTransitionData extends ParticleData {
         float startRed = wrapper.readFloat();
         float startGreen = wrapper.readFloat();
         float startBlue = wrapper.readFloat();
-        float scale = wrapper.readFloat();
+        float scale = 0f;
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_20_5)) {
+            scale = wrapper.readFloat();
+        }
         float endRed = wrapper.readFloat();
         float endGreen = wrapper.readFloat();
         float endBlue = wrapper.readFloat();
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            scale = wrapper.readFloat();
+        }
         return new ParticleDustColorTransitionData(scale, startRed, startGreen, startBlue, endRed, endGreen, endBlue);
     }
 
@@ -127,10 +134,15 @@ public class ParticleDustColorTransitionData extends ParticleData {
         wrapper.writeFloat(data.getStartRed());
         wrapper.writeFloat(data.getStartGreen());
         wrapper.writeFloat(data.getStartBlue());
-        wrapper.writeFloat(data.getScale());
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_20_5)) {
+            wrapper.writeFloat(data.getScale());
+        }
         wrapper.writeFloat(data.getEndRed());
         wrapper.writeFloat(data.getEndGreen());
         wrapper.writeFloat(data.getEndBlue());
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            wrapper.writeFloat(data.getScale());
+        }
     }
 
     @Override

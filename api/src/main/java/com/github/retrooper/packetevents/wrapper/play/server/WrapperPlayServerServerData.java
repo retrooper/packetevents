@@ -69,7 +69,8 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
         if (serverVersion.isOlderThan(ServerVersion.V_1_19_3)) {
             previewsChat = readBoolean();
         }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)
+                && serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
             enforceSecureChat = readBoolean();
         }
     }
@@ -93,7 +94,8 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
         if (serverVersion.isOlderThan(ServerVersion.V_1_19_3)) {
             writeBoolean(previewsChat);
         }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)
+                && serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
             writeBoolean(enforceSecureChat);
         }
     }
@@ -130,10 +132,16 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
         this.previewsChat = previewsChat;
     }
 
+    /**
+     * <strong>WARNING:</strong> This was moved to {@link WrapperPlayServerJoinGame} with 1.20.5
+     */
     public boolean isEnforceSecureChat() {
         return enforceSecureChat;
     }
 
+    /**
+     * <strong>WARNING:</strong> This was moved to {@link WrapperPlayServerJoinGame} with 1.20.5
+     */
     public void setEnforceSecureChat(boolean enforceSecureChat) {
         this.enforceSecureChat = enforceSecureChat;
     }

@@ -1,0 +1,15 @@
+[versions]
+shadow = "8.1.1"
+jetbrains-annotations = "23.0.0"
+via-nbt = "4.1.0"
+fast-util = "8.5.6"
+gson = "2.8.9"
+java-diff-utils = "4.12"
+
+[libraries]
+shadow = { group = "com.github.johnrengelman", name = "shadow", version.ref = "shadow" }
+jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrains-annotations" }
+via-nbt = { group = "com.viaversion", name = "nbt", version.ref = "via-nbt" }
+fast-util = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fast-util" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+java-diff-utils = { group = "io.github.java-diff-utils", name = "java-diff-utils", version.ref = "java-diff-utils" }

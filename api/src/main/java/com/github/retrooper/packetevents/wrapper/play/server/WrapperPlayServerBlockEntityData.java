@@ -23,6 +23,8 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.TileEntityType;
+import com.github.retrooper.packetevents.protocol.world.blockentity.BlockEntityType;
+import com.github.retrooper.packetevents.protocol.world.blockentity.BlockEntityTypes;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -88,6 +90,11 @@ public class WrapperPlayServerBlockEntityData extends PacketWrapper<WrapperPlayS
         return type;
     }
 
+    public BlockEntityType getBlockEntityType() {
+        return BlockEntityTypes.getById(this.serverVersion.toClientVersion(), this.type);
+    }
+
+    @Deprecated
     public TileEntityType getAsTileType() {
         return TileEntityType.getById(type);
     }
@@ -96,6 +103,11 @@ public class WrapperPlayServerBlockEntityData extends PacketWrapper<WrapperPlayS
         this.type = type;
     }
 
+    public void setType(BlockEntityType blockEntityType) {
+        this.setType(blockEntityType.getId(this.serverVersion.toClientVersion()));
+    }
+
+    @Deprecated
     public void setType(TileEntityType type) {
         this.type = type.getId();
     }

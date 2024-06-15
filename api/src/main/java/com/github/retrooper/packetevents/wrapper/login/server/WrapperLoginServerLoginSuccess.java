@@ -32,20 +32,26 @@ import java.util.UUID;
  * This packet switches the connection state to {@link ConnectionState#PLAY}.
  */
 public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginServerLoginSuccess> {
+
     private UserProfile userProfile;
+    private boolean strictErrorHandling;
 
     public WrapperLoginServerLoginSuccess(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperLoginServerLoginSuccess(UUID uuid, String username) {
-        super(PacketType.Login.Server.LOGIN_SUCCESS);
-        this.userProfile = new UserProfile(uuid, username);
+        this(new UserProfile(uuid, username));
     }
 
     public WrapperLoginServerLoginSuccess(UserProfile userProfile) {
+        this(userProfile, true);
+    }
+
+    public WrapperLoginServerLoginSuccess(UserProfile userProfile, boolean strictErrorHandling) {
         super(PacketType.Login.Server.LOGIN_SUCCESS);
         this.userProfile = userProfile;
+        this.strictErrorHandling = strictErrorHandling;
     }
 
     @Override
@@ -69,6 +75,10 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
                 userProfile.getTextureProperties().add(textureProperty);
             }
         }
+
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.strictErrorHandling = this.readBoolean();
+        }
     }
 
     @Override
@@ -88,6 +98,10 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
                 writeOptional(textureProperty.getSignature(), PacketWrapper::writeString);
             }
         }
+
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.writeBoolean(this.strictErrorHandling);
+        }
     }
 
     @Override
@@ -101,5 +115,13 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
 
     public void setUserProfile(UserProfile userProfile) {
         this.userProfile = userProfile;
+    }
+
+    public boolean isStrictErrorHandling() {
+        return this.strictErrorHandling;
+    }
+
+    public void setStrictErrorHandling(boolean strictErrorHandling) {
+        this.strictErrorHandling = strictErrorHandling;
     }
 }

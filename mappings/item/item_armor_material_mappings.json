@@ -1,0 +1,36 @@
+{
+  "V_1_20_5": [
+    "leather",
+    "chainmail",
+    "iron",
+    "gold",
+    "diamond",
+    "turtle",
+    "netherite",
+    "armadillo"
+  ],
+  "V_1_16": [
+    "leather",
+    "chainmail",
+    "iron",
+    "gold",
+    "diamond",
+    "turtle",
+    "netherite"
+  ],
+  "V_1_13": [
+    "leather",
+    "chainmail",
+    "iron",
+    "gold",
+    "diamond",
+    "turtle"
+  ],
+  "V_1_7_10": [
+    "leather",
+    "chainmail",
+    "iron",
+    "gold",
+    "diamond"
+  ]
+}

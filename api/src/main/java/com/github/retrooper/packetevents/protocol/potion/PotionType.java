@@ -20,6 +20,12 @@ package com.github.retrooper.packetevents.protocol.potion;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 
+/**
+ * Potion types are the individually applied potion effects.<br>
+ * Some examples are speed, poison and blindness.
+ * <p>
+ * For potions brewable in survival, see {@link Potions}.
+ */
 public interface PotionType extends MappedEntity {
 
 }

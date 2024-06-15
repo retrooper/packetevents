@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.item.type;
 
+import com.github.retrooper.packetevents.protocol.component.StaticComponentMap;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import org.jetbrains.annotations.Nullable;
@@ -39,4 +40,8 @@ public interface ItemType extends MappedEntity {
     Set<ItemTypes.ItemAttribute> getAttributes();
 
     boolean hasAttribute(ItemTypes.ItemAttribute attribute);
+
+    default StaticComponentMap getComponents() {
+        return StaticComponentMap.EMPTY;
+    }
 }

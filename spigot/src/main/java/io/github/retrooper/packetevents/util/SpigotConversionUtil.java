@@ -20,13 +20,15 @@ package io.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
@@ -34,6 +36,8 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Pose;
+import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
 public class SpigotConversionUtil {
@@ -46,11 +50,21 @@ public class SpigotConversionUtil {
     }
 
     public static PotionType fromBukkitPotionEffectType(org.bukkit.potion.PotionEffectType potionEffectType) {
-        return PotionTypes.getById(potionEffectType.getId(), PacketEvents.getAPI().getServerManager().getVersion());
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        int id = potionEffectType.getId();
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+            id--;
+        }
+        return PotionTypes.getById(id, version);
     }
 
     public static org.bukkit.potion.PotionEffectType toBukkitPotionEffectType(PotionType potionType) {
-        return org.bukkit.potion.PotionEffectType.getById(potionType.getId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
+        ClientVersion version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        int id = potionType.getId(version);
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_2)) {
+            id++;
+        }
+        return org.bukkit.potion.PotionEffectType.getById(id);
     }
 
     public static GameMode fromBukkitGameMode(org.bukkit.GameMode gameMode) {
@@ -126,28 +140,29 @@ public class SpigotConversionUtil {
     }
 
     public static Dimension fromBukkitWorld(World world) {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_14)) {
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        if (version.isOlderThan(ServerVersion.V_1_14)) {
             return new Dimension(world.getEnvironment().getId());
-        } else if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_16)) {
+        } else if (version.isOlderThan(ServerVersion.V_1_16)) {
             Object worldServer = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
             return new Dimension(SpigotReflectionUtil.getDimensionId(worldServer));
-        } else if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_16_2)) {
-            Object worldServer = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
-            Dimension dimension = new Dimension(new NBTCompound());
-            dimension.setDimensionName(SpigotReflectionUtil.getDimensionKey(worldServer));
-            return dimension;
         } else {
-            Object worldServer = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
-            Object nbt = SpigotReflectionUtil.convertWorldServerDimensionToNMSNbt(worldServer);
-            return new Dimension(SpigotReflectionUtil.fromMinecraftNBT(nbt));
+            Object serverLevel = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
+            Object nbt = SpigotReflectionUtil.convertWorldServerDimensionToNMSNbt(serverLevel);
+            Dimension dimension = new Dimension(SpigotReflectionUtil.fromMinecraftNBT(nbt));
+            if (version.isOlderThan(ServerVersion.V_1_16_2)) {
+                dimension.setDimensionName(SpigotReflectionUtil.getDimensionKey(serverLevel));
+            }
+            dimension.setId(SpigotReflectionUtil.getDimensionId(serverLevel));
+            return dimension;
         }
     }
 
-    public static ParticleType fromBukkitParticle(Enum<?> particle) {
+    public static ParticleType<?> fromBukkitParticle(Enum<?> particle) {
         return SpigotReflectionUtil.toPacketEventsParticle(particle);
     }
 
-    public static Enum<?> toBukkitParticle(ParticleType particle) {
+    public static Enum<?> toBukkitParticle(ParticleType<?> particle) {
         return SpigotReflectionUtil.fromPacketEventsParticle(particle);
     }
 
@@ -159,5 +174,17 @@ public class SpigotConversionUtil {
      */
     public static org.bukkit.entity.Entity getEntityById(@Nullable World world, int entityId) {
         return SpigotReflectionUtil.getEntityById(world, entityId);
+    }
+
+    public static Pose toBukkitPose(EntityPose pose) {
+        return Pose.values()[pose.ordinal()];
+    }
+
+    public static EntityPose fromBukkitPose(Pose pose) {
+        return EntityPose.values()[pose.ordinal()];
+    }
+
+    public static MainHand toBukkitHand(HumanoidArm arm) {
+        return MainHand.values()[arm.ordinal()];
     }
 }
