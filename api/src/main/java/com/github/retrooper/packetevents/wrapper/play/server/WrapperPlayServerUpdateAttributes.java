@@ -132,7 +132,7 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
                 double amount = readDouble();
                 byte operationIndex = readByte();
                 PropertyModifier.Operation operation = PropertyModifier.Operation.VALUES[operationIndex];
-                modifiers.add(new PropertyModifier(uuid, amount, operation));
+                modifiers.add(new PropertyModifier(name, uuid, amount, operation));
             }
             this.properties.add(new Property(attribute, value, modifiers));
         }
