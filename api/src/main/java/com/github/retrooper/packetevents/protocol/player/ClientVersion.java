@@ -95,6 +95,7 @@ public enum ClientVersion {
      * 1.20.5 and 1.20.6 have the same protocol version.
      */
     V_1_20_5(766),
+  
     V_1_21(767),
     //TODO UPDATE Add new protocol version field
 
@@ -173,9 +174,9 @@ public enum ClientVersion {
     @NotNull
     public static ClientVersion getById(int protocolVersion) {
         if (protocolVersion < LOWEST_SUPPORTED_PROTOCOL_VERSION) {
-            return V_1_7_10;
+            return getOldest();
         } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
-            return V_1_21;
+            return getLatest();
         } else {
             for (ClientVersion version : VALUES) {
                 if (version.protocolVersion > protocolVersion) {
