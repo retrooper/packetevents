@@ -43,7 +43,7 @@ public class ParticleDustData extends ParticleData {
     }
 
     public ParticleDustData(float scale, Color color) {
-        this(scale, color.red(), color.green(), color.blue());
+        this(scale, color.red() / 255f, color.green() / 255f, color.blue() / 255f);
     }
 
     public float getRed() {
