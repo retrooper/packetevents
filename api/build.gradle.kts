@@ -96,6 +96,10 @@ tasks {
         }
     }
 
+    compressMappings {
+        inputs.dir(mappingCompression.mappingDirectory)
+    }
+
     processResources {
         dependsOn(compressMappings)
         from(project.layout.buildDirectory.dir("mappings/generated").get())
