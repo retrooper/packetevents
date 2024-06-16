@@ -38,6 +38,7 @@ import com.github.retrooper.packetevents.protocol.packettype.clientbound.Clientb
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_20_2;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_20_3;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_20_5;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_21;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_7_10;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_8;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_9;
@@ -970,7 +971,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_20_2.values());
                 loadPacketIds(ClientboundPacketType_1_20_3.values());
                 loadPacketIds(ClientboundPacketType_1_20_5.values());
-                loadPacketIds(ClientboundConfigPacketType_1_21.values());
+                loadPacketIds(ClientboundPacketType_1_21.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }
