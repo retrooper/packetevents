@@ -45,6 +45,7 @@ import com.github.retrooper.packetevents.protocol.packettype.clientbound.Clientb
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_20_2;
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_20_3;
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_20_5;
+import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_21;
 import com.github.retrooper.packetevents.protocol.packettype.config.serverbound.ServerboundConfigPacketType_1_20_2;
 import com.github.retrooper.packetevents.protocol.packettype.config.serverbound.ServerboundConfigPacketType_1_20_5;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_12;
@@ -100,7 +101,8 @@ public final class PacketType {
             ClientVersion.V_1_19_4,
             ClientVersion.V_1_20_2,
             ClientVersion.V_1_20_3,
-            ClientVersion.V_1_20_5);
+            ClientVersion.V_1_20_5,
+            ClientVersion.V_1_21);
 
     //TODO UPDATE Update packet type mappings (serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
@@ -127,7 +129,8 @@ public final class PacketType {
     private static final VersionMapper CLIENTBOUND_CONFIG_VERSION_MAPPER = new VersionMapper(
             ClientVersion.V_1_20_2,
             ClientVersion.V_1_20_3,
-            ClientVersion.V_1_20_5);
+            ClientVersion.V_1_20_5,
+            ClientVersion.V_1_21);
     // TODO UPDATE Update packet type mappings (config serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_CONFIG_VERSION_MAPPER = new VersionMapper(
             ClientVersion.V_1_20_2,
@@ -512,7 +515,11 @@ public final class PacketType {
             RESET_CHAT,
             STORE_COOKIE,
             TRANSFER,
-            SELECT_KNOWN_PACKS;
+            SELECT_KNOWN_PACKS,
+
+            // added in 1.21
+            CUSTOM_REPORT_DETAILS,
+            SERVER_LINKS;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -528,6 +535,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundConfigPacketType_1_20_2.values());
                 loadPacketIds(ClientboundConfigPacketType_1_20_3.values());
                 loadPacketIds(ClientboundConfigPacketType_1_20_5.values());
+                loadPacketIds(ClientboundConfigPacketType_1_21.values());
                 // TODO UPDATE Update packet type mappings (config clientbound pt. 2)
             }
 
@@ -888,7 +896,11 @@ public final class PacketType {
             DEBUG_SAMPLE,
             STORE_COOKIE,
             TRANSFER,
-            PROJECTILE_POWER;
+            PROJECTILE_POWER,
+
+            // added in 1.21
+            CUSTOM_REPORT_DETAILS,
+            SERVER_LINKS;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -958,6 +970,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_20_2.values());
                 loadPacketIds(ClientboundPacketType_1_20_3.values());
                 loadPacketIds(ClientboundPacketType_1_20_5.values());
+                loadPacketIds(ClientboundConfigPacketType_1_21.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }
