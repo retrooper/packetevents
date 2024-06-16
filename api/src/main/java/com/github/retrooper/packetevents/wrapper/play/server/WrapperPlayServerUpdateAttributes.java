@@ -242,6 +242,7 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
         // added in 1.21
         public void setName(ResourceLocation name) {
             this.name = name;
+            this.uuid = generateSemiUniqueId(name);
         }
 
         @ApiStatus.Obsolete // unused since 1.21
@@ -251,6 +252,12 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
 
         @ApiStatus.Obsolete // unused since 1.21
         public void setUUID(UUID uuid) {
+            this.name = new ResourceLocation(uuid.toString());
+            this.uuid = uuid;
+        }
+
+        public void setNameAndUUID(ResourceLocation name, UUID uuid) {
+            this.name = name;
             this.uuid = uuid;
         }
 
