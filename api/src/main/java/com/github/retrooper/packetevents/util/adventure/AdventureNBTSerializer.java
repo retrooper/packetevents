@@ -451,6 +451,8 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                 arguments.add(TranslationArgument.bool(((NBTByte) nbt).getAsByte() == 1));
             } else if (nbt instanceof NBTNumber) {
                 arguments.add(TranslationArgument.numeric(((NBTNumber) nbt).getAsInt()));
+            } else if (nbt instanceof NBTString) {
+                arguments.add(TranslationArgument.component(Component.text(((NBTString) nbt).getValue())));
             } else {
                 arguments.add(TranslationArgument.component(deserialize(requireType((NBT) nbt, NBTType.COMPOUND))));
             }
