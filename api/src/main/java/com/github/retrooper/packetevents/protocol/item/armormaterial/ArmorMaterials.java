@@ -43,7 +43,7 @@ public class ArmorMaterials {
 
             @Override
             public int getId(ClientVersion version) {
-                return TYPES_BUILDER.getDataIndex(version);
+                return MappingHelper.getId(version, TYPES_BUILDER, data);
             }
 
             @Override

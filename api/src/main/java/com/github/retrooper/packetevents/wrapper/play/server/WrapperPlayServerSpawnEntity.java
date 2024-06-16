@@ -251,6 +251,14 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         this.yaw = yaw;
     }
 
+    public float getHeadYaw() {
+        return this.headYaw;
+    }
+
+    public void setHeadYaw(float headYaw) {
+        this.headYaw = headYaw;
+    }
+
     public int getData() {
         return data;
     }

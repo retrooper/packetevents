@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -34,6 +35,9 @@ import com.google.common.collect.MapMaker;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.Registry;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -42,22 +46,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -98,14 +89,15 @@ public final class SpigotReflectionUtil {
             BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS, PROPERTY_MAP_CLASS, DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, MOJANG_ENCODER_CLASS, DATA_RESULT_CLASS,
             DYNAMIC_OPS_NBT_CLASS, NMS_NBT_COMPOUND_CLASS, NMS_NBT_BASE_CLASS, NBT_COMPRESSION_STREAM_TOOLS_CLASS,
             STREAM_CODEC, STREAM_DECODER, STREAM_ENCODER, REGISTRY_FRIENDLY_BYTE_BUF, REGISTRY_ACCESS, REGISTRY_ACCESS_FROZEN,
-            RESOURCE_KEY, REGISTRY, WRITABLE_REGISTRY, NBT_ACCOUNTER;
+            RESOURCE_KEY, REGISTRY, WRITABLE_REGISTRY, NBT_ACCOUNTER, CHUNK_PROVIDER_SERVER_CLASS, ICHUNKPROVIDER_CLASS, CHUNK_STATUS_CLASS,
+            BLOCK_POSITION_CLASS, PLAYER_CHUNK_MAP_CLASS, PLAYER_CHUNK_CLASS, CHUNK_CLASS, IBLOCKACCESS_CLASS, ICHUNKACCESS_CLASS;
 
     //Netty classes
     public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS, BYTE_TO_MESSAGE_DECODER, MESSAGE_TO_BYTE_ENCODER;
 
     //Fields
     public static Field ENTITY_PLAYER_PING_FIELD, ENTITY_BOUNDING_BOX_FIELD, BYTE_BUF_IN_PACKET_DATA_SERIALIZER, DIMENSION_CODEC_FIELD,
-            DYNAMIC_OPS_NBT_INSTANCE_FIELD, CRAFT_PARTICLE_PARTICLES_FIELD, NMS_MK_KEY_FIELD, LEGACY_NMS_PARTICLE_KEY_FIELD, LEGACY_NMS_KEY_TO_NMS_PARTICLE;
+            DYNAMIC_OPS_NBT_INSTANCE_FIELD, CHUNK_PROVIDER_SERVER_FIELD, CRAFT_PARTICLE_PARTICLES_FIELD, NMS_MK_KEY_FIELD, LEGACY_NMS_PARTICLE_KEY_FIELD, LEGACY_NMS_KEY_TO_NMS_PARTICLE;
 
     //Methods
     public static Method IS_DEBUGGING, GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
@@ -118,11 +110,12 @@ public final class SpigotReflectionUtil {
             GET_DIMENSION_MANAGER, GET_DIMENSION_ID, GET_DIMENSION_KEY, CODEC_ENCODE_METHOD, DATA_RESULT_GET_METHOD,
             READ_NBT_FROM_STREAM_METHOD, WRITE_NBT_TO_STREAM_METHOD, STREAM_DECODER_DECODE, STREAM_ENCODER_ENCODE,
             CREATE_REGISTRY_RESOURCE_KEY, GET_REGISTRY_OR_THROW, GET_DIMENSION_TYPES, GET_REGISTRY_ID,
-            NBT_ACCOUNTER_UNLIMITED_HEAP, GET_REGISTRY_KEY_LOCATION;
+            NBT_ACCOUNTER_UNLIMITED_HEAP, GET_REGISTRY_KEY_LOCATION, CHUNK_CACHE_GET_IBLOCKACCESS, CHUNK_CACHE_GET_ICHUNKACCESS,
+            IBLOCKACCESS_GET_BLOCK_DATA, CHUNK_GET_BLOCK_DATA, PLAYER_CHUNK_MAP_GET_PLAYER_CHUNK, PLAYER_CHUNK_GET_CHUNK;
 
     //Constructors
     private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR,
-            NMS_MINECRAFT_KEY_CONSTRUCTOR, REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR;
+            NMS_MINECRAFT_KEY_CONSTRUCTOR, REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR, BLOCK_POSITION_CONSTRUCTOR;
 
     private static Object MINECRAFT_SERVER_INSTANCE;
     private static Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
@@ -147,6 +140,9 @@ public final class SpigotReflectionUtil {
             if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
                 REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR = REGISTRY_FRIENDLY_BYTE_BUF.getConstructor(
                         BYTE_BUF_CLASS, REGISTRY_ACCESS);
+            }
+            if (BLOCK_POSITION_CLASS != null) {
+                BLOCK_POSITION_CONSTRUCTOR = BLOCK_POSITION_CLASS.getConstructor(int.class, int.class, int.class);
             }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -246,6 +242,25 @@ public final class SpigotReflectionUtil {
         GET_DIMENSION_TYPES = Reflection.getMethod(REGISTRY_ACCESS_FROZEN, REGISTRY, 0);
         GET_REGISTRY_ID = Reflection.getMethod(REGISTRY, int.class, 0, Object.class);
         GET_REGISTRY_KEY_LOCATION = Reflection.getMethod(RESOURCE_KEY, NMS_MINECRAFT_KEY_CLASS, 0);
+        //Only need to check if the arguments are null. The lookup class being null is handled in the method.
+        //Not checking if the arguments passed are null could lead to unintended behavior.
+        if (IBLOCKACCESS_CLASS != null) {
+            CHUNK_CACHE_GET_IBLOCKACCESS = Reflection.getMethod(SpigotReflectionUtil.CHUNK_PROVIDER_SERVER_CLASS, SpigotReflectionUtil.IBLOCKACCESS_CLASS, 0, int.class, int.class);
+            IBLOCKACCESS_GET_BLOCK_DATA = Reflection.getMethod(SpigotReflectionUtil.IBLOCKACCESS_CLASS, SpigotReflectionUtil.IBLOCK_DATA_CLASS, 0);
+        }
+        if (ICHUNKACCESS_CLASS != null) {
+            CHUNK_CACHE_GET_ICHUNKACCESS = Reflection.getMethod(SpigotReflectionUtil.CHUNK_PROVIDER_SERVER_CLASS, SpigotReflectionUtil.ICHUNKACCESS_CLASS, 0, int.class, int.class, boolean.class);
+        }
+        if (IBLOCK_DATA_CLASS != null) {
+            CHUNK_GET_BLOCK_DATA = Reflection.getMethod(SpigotReflectionUtil.CHUNK_CLASS, SpigotReflectionUtil.IBLOCK_DATA_CLASS, 0, SpigotReflectionUtil.BLOCK_POSITION_CLASS);
+        }
+        if (PLAYER_CHUNK_CLASS != null) {
+            PLAYER_CHUNK_MAP_GET_PLAYER_CHUNK = Reflection.getMethod(SpigotReflectionUtil.PLAYER_CHUNK_MAP_CLASS, SpigotReflectionUtil.PLAYER_CHUNK_CLASS, 0, long.class);
+        }
+
+        if (CHUNK_CLASS != null) {
+            PLAYER_CHUNK_GET_CHUNK = Reflection.getMethod(SpigotReflectionUtil.PLAYER_CHUNK_CLASS, SpigotReflectionUtil.CHUNK_CLASS, 0);
+        }
     }
 
     private static void initFields() {
@@ -260,50 +275,59 @@ public final class SpigotReflectionUtil {
         }
         DIMENSION_CODEC_FIELD = Reflection.getField(DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, 0);
         DYNAMIC_OPS_NBT_INSTANCE_FIELD = Reflection.getField(DYNAMIC_OPS_NBT_CLASS, DYNAMIC_OPS_NBT_CLASS, 0);
+        CHUNK_PROVIDER_SERVER_FIELD = Reflection.getField(WORLD_SERVER_CLASS, CHUNK_PROVIDER_SERVER_CLASS, 0);
+        if (CHUNK_PROVIDER_SERVER_FIELD == null) {
+            CHUNK_PROVIDER_SERVER_FIELD = Reflection.getField(WORLD_SERVER_CLASS, ICHUNKPROVIDER_CLASS, 0);
+        }
 
         PAPER_ENTITY_LOOKUP_EXISTS = Reflection.getField(WORLD_SERVER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) != null;
     }
 
+    private static boolean IS_OBFUSCATED;
+
     private static void initClasses() {
+        // spigot / paper versions older than 1.20.5 use spigot mappings
+        IS_OBFUSCATED = Reflection.getClassByNameWithoutException("net.minecraft.server.network.PlayerConnection") != null;
+
         MINECRAFT_SERVER_CLASS = getServerClass("server.MinecraftServer", "MinecraftServer");
-        NMS_PACKET_DATA_SERIALIZER_CLASS = getServerClass("network.PacketDataSerializer", "PacketDataSerializer");
+        NMS_PACKET_DATA_SERIALIZER_CLASS = getServerClass(IS_OBFUSCATED ? "network.PacketDataSerializer" : "network.FriendlyByteBuf", "PacketDataSerializer");
         NMS_ITEM_STACK_CLASS = getServerClass("world.item.ItemStack", "ItemStack");
-        NMS_IMATERIAL_CLASS = getServerClass("world.level.IMaterial", "IMaterial");
+        NMS_IMATERIAL_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.IMaterial" : "world.level.ItemLike", "IMaterial");
         NMS_ENTITY_CLASS = getServerClass("world.entity.Entity", "Entity");
-        ENTITY_PLAYER_CLASS = getServerClass("server.level.EntityPlayer", "EntityPlayer");
-        BOUNDING_BOX_CLASS = getServerClass("world.phys.AxisAlignedBB", "AxisAlignedBB");
-        NMS_MINECRAFT_KEY_CLASS = getServerClass("resources.MinecraftKey", "MinecraftKey");
-        ENTITY_HUMAN_CLASS = getServerClass("world.entity.player.EntityHuman", "EntityHuman");
-        PLAYER_CONNECTION_CLASS = getServerClass("server.network.PlayerConnection", "PlayerConnection");
+        ENTITY_PLAYER_CLASS = getServerClass(IS_OBFUSCATED ? "server.level.EntityPlayer" : "server.level.ServerPlayer", "EntityPlayer");
+        BOUNDING_BOX_CLASS = getServerClass(IS_OBFUSCATED ? "world.phys.AxisAlignedBB" : "world.phys.AABB", "AxisAlignedBB");
+        NMS_MINECRAFT_KEY_CLASS = getServerClass(IS_OBFUSCATED ? "resources.MinecraftKey" : "resources.ResourceLocation", "MinecraftKey");
+        ENTITY_HUMAN_CLASS = getServerClass(IS_OBFUSCATED ? "world.entity.player.EntityHuman" : "world.entity.player.Player", "EntityHuman");
+        PLAYER_CONNECTION_CLASS = getServerClass(IS_OBFUSCATED ? "server.network.PlayerConnection" : "server.network.ServerGamePacketListenerImpl", "PlayerConnection");
 
         //Only on 1.20.2
         SERVER_COMMON_PACKETLISTENER_IMPL_CLASS = getServerClass("server.network.ServerCommonPacketListenerImpl", "ServerCommonPacketListenerImpl");
 
-        SERVER_CONNECTION_CLASS = getServerClass("server.network.ServerConnection", "ServerConnection");
-        NETWORK_MANAGER_CLASS = getServerClass("network.NetworkManager", "NetworkManager");
-        MOB_EFFECT_LIST_CLASS = getServerClass("world.effect.MobEffectList", "MobEffectList");
+        SERVER_CONNECTION_CLASS = getServerClass(IS_OBFUSCATED ? "server.network.ServerConnection" : "server.network.ServerConnectionListener", "ServerConnection");
+        NETWORK_MANAGER_CLASS = getServerClass(IS_OBFUSCATED ? "network.NetworkManager" : "network.Connection", "NetworkManager");
+        MOB_EFFECT_LIST_CLASS = getServerClass(IS_OBFUSCATED ? "world.effect.MobEffectList" : "world.effect.MobEffect", "MobEffectList");
         NMS_ITEM_CLASS = getServerClass("world.item.Item", "Item");
         DEDICATED_SERVER_CLASS = getServerClass("server.dedicated.DedicatedServer", "DedicatedServer");
-        NMS_WORLD_CLASS = getServerClass("world.level.World", "World");
-        WORLD_SERVER_CLASS = getServerClass("server.level.WorldServer", "WorldServer");
-        ENUM_PROTOCOL_DIRECTION_CLASS = getServerClass("network.protocol.EnumProtocolDirection", "EnumProtocolDirection");
+        NMS_WORLD_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.World" : "world.level.Level", "World");
+        WORLD_SERVER_CLASS = getServerClass(IS_OBFUSCATED ? "server.level.WorldServer" : "server.level.ServerLevel", "WorldServer");
+        ENUM_PROTOCOL_DIRECTION_CLASS = getServerClass(IS_OBFUSCATED ? "network.protocol.EnumProtocolDirection" : "network.protocol.PacketFlow", "EnumProtocolDirection");
         if (V_1_17_OR_HIGHER) {
             LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
             PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
             PAPER_ENTITY_LOOKUP_CLASS = Reflection.getClassByNameWithoutException("io.papermc.paper.chunk.system.entity.EntityLookup");
         }
-        DIMENSION_MANAGER_CLASS = getServerClass("world.level.dimension.DimensionManager", "DimensionManager");
+        DIMENSION_MANAGER_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.dimension.DimensionManager" : "world.level.dimension.DimensionType", "DimensionManager");
         MOJANG_CODEC_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Codec");
         MOJANG_ENCODER_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Encoder");
         DATA_RESULT_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.DataResult");
-        DYNAMIC_OPS_NBT_CLASS = getServerClass("nbt.DynamicOpsNBT", "DynamicOpsNBT");
+        DYNAMIC_OPS_NBT_CLASS = getServerClass(IS_OBFUSCATED ? "nbt.DynamicOpsNBT" : "nbt.NbtOps", "DynamicOpsNBT");
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
             NMS_ENUM_PARTICLE_CLASS = getServerClass(null, "EnumParticle");
         }
 
         CRAFT_MAGIC_NUMBERS_CLASS = getOBCClass("util.CraftMagicNumbers");
         //IBlockData does not exist on 1.7.10
-        IBLOCK_DATA_CLASS = getServerClass("world.level.block.state.IBlockData", "IBlockData");
+        IBLOCK_DATA_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.block.state.IBlockData" : "world.level.block.state.BlockState", "IBlockData");
         BLOCK_CLASS = getServerClass("world.level.block.Block", "Block");
         CRAFT_BLOCK_DATA_CLASS = getOBCClass("block.data.CraftBlockData");
 
@@ -320,10 +344,23 @@ public final class SpigotReflectionUtil {
         BYTE_BUF_CLASS = getNettyClass("buffer.ByteBuf");
         BYTE_TO_MESSAGE_DECODER = getNettyClass("handler.codec.ByteToMessageDecoder");
         MESSAGE_TO_BYTE_ENCODER = getNettyClass("handler.codec.MessageToByteEncoder");
-        NMS_NBT_COMPOUND_CLASS = getServerClass("nbt.NBTTagCompound", "NBTTagCompound");
-        NMS_NBT_BASE_CLASS = getServerClass("nbt.NBTBase", "NBTBase");
-        NBT_COMPRESSION_STREAM_TOOLS_CLASS = getServerClass("nbt.NBTCompressedStreamTools", "NBTCompressedStreamTools");
-        NBT_ACCOUNTER = getServerClass("nbt.NBTReadLimiter", "NBTReadLimiter");
+        NMS_NBT_COMPOUND_CLASS = getServerClass(IS_OBFUSCATED ? "nbt.NBTTagCompound" : "nbt.CompoundTag", "NBTTagCompound");
+        NMS_NBT_BASE_CLASS = getServerClass(IS_OBFUSCATED ? "nbt.NBTBase" : "nbt.Tag", "NBTBase");
+        NBT_COMPRESSION_STREAM_TOOLS_CLASS = getServerClass(IS_OBFUSCATED ? "nbt.NBTCompressedStreamTools" : "nbt.NbtIo", "NBTCompressedStreamTools");
+        NBT_ACCOUNTER = getServerClass(IS_OBFUSCATED ? "nbt.NBTReadLimiter" : "nbt.NbtAccounter", "NBTReadLimiter");
+        CHUNK_PROVIDER_SERVER_CLASS = getServerClass(IS_OBFUSCATED ? "server.level.ChunkProviderServer" : "server.level.ServerChunkCache", "ChunkProviderServer");
+        ICHUNKPROVIDER_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.chunk.IChunkProvider" : "world.level.chunk.ChunkSource", "IChunkProvider");
+        CHUNK_STATUS_CLASS = SpigotReflectionUtil.getServerClass("world.level.chunk.status.ChunkStatus", "");
+        if (CHUNK_STATUS_CLASS == null) {
+            CHUNK_STATUS_CLASS = SpigotReflectionUtil.getServerClass("world.level.ChunkStatus", "");
+        }
+        BLOCK_POSITION_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "core.BlockPosition" : "core.BlockPos", "BlockPosition");
+        PLAYER_CHUNK_MAP_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "server.level.PlayerChunkMap" : "server.level.ChunkMap", "");
+        PLAYER_CHUNK_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "server.level.PlayerChunk" : "server.level.ChunkHolder", "");
+        CHUNK_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "world.level.chunk.Chunk" : "world.level.chunk.LevelChunk", "Chunk");
+        IBLOCKACCESS_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "world.level.IBlockAccess" : "world.level.BlockGetter", "IBlockAccess");
+        ICHUNKACCESS_CLASS = SpigotReflectionUtil.getServerClass(IS_OBFUSCATED ? "world.level.chunk.IChunkAccess" : "world.level.chunk.ChunkAccess", "IChunkAccess");
+
 
         if (VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             STREAM_CODEC = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamCodec");
@@ -331,11 +368,11 @@ public final class SpigotReflectionUtil {
             STREAM_ENCODER = Reflection.getClassByNameWithoutException("net.minecraft.network.codec.StreamEncoder");
             REGISTRY_FRIENDLY_BYTE_BUF = Reflection.getClassByNameWithoutException("net.minecraft.network.RegistryFriendlyByteBuf");
         }
-        REGISTRY_ACCESS = getServerClass("core.IRegistryCustom", "IRegistryCustom");
-        REGISTRY_ACCESS_FROZEN = getServerClass("core.IRegistryCustom$Dimension", "IRegistryCustom$Dimension");
+        REGISTRY_ACCESS = getServerClass(IS_OBFUSCATED ? "core.IRegistryCustom" : "core.RegistryAccess", "IRegistryCustom");
+        REGISTRY_ACCESS_FROZEN = getServerClass(IS_OBFUSCATED ? "core.IRegistryCustom$Dimension" : "core.RegistryAccess$Frozen", "IRegistryCustom$Dimension");
         RESOURCE_KEY = getServerClass("resources.ResourceKey", "ResourceKey");
-        REGISTRY = getServerClass("core.IRegistry", "IRegistry");
-        WRITABLE_REGISTRY = getServerClass("core.IRegistryWritable", "IRegistryWritable");
+        REGISTRY = getServerClass(IS_OBFUSCATED ? "core.IRegistry" : "core.Registry", "IRegistry");
+        WRITABLE_REGISTRY = getServerClass(IS_OBFUSCATED ? "core.IRegistryWritable" : "core.WritableRegistry", "IRegistryWritable");
     }
 
     private static void initObjects() {
@@ -682,8 +719,8 @@ public final class SpigotReflectionUtil {
                 AtomicInteger atomicInteger = (AtomicInteger) field.get(null);
                 return atomicInteger.incrementAndGet();
             } else {
-                int id = field.getInt(null) + 1;
-                field.set(null, id);
+                int id = field.getInt(null);
+                field.set(null, id + 1);
                 return id;
             }
         } catch (IllegalAccessException ex) {
@@ -827,6 +864,15 @@ public final class SpigotReflectionUtil {
                 return REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR.newInstance(byteBuf, getFrozenRegistryAccess());
             }
             return NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR.newInstance(byteBuf);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object createBlockPosition(int x, int y, int z) {
+        try {
+            return BLOCK_POSITION_CONSTRUCTOR.newInstance(x, y, z);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -1062,6 +1108,10 @@ public final class SpigotReflectionUtil {
     public static ParticleType<?> toPacketEventsParticle(Enum<?> particle) {
         try {
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                if (CRAFT_PARTICLE_PARTICLES_FIELD == null) {
+                    return ParticleTypes.getByName(((Particle) particle).getKey().toString());
+                }
+
                 BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
                 // must be done because issues happen otherwise since they are actually the same particle 1.13+
 
@@ -1085,6 +1135,12 @@ public final class SpigotReflectionUtil {
     public static Enum<?> fromPacketEventsParticle(ParticleType<?> particle) {
         try {
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                if (CRAFT_PARTICLE_PARTICLES_FIELD == null) {
+                    ResourceLocation particleName = particle.getName();
+                    return Registry.PARTICLE_TYPE.get(new NamespacedKey(
+                            particleName.getNamespace(), particleName.getKey()));
+                }
+
                 BiMap<?, ?> map = (BiMap<?, ?>) CRAFT_PARTICLE_PARTICLES_FIELD.get(null);
                 Object minecraftKey = NMS_MINECRAFT_KEY_CONSTRUCTOR.newInstance(particle.getName().getNamespace(), particle.getName().getKey());
                 Object bukkitParticle = map.inverse().get(minecraftKey);

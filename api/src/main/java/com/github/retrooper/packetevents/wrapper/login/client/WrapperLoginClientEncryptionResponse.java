@@ -71,10 +71,13 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
         writeByteArray(encryptedSharedSecret);
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
-                && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_2)
-                && saltSignature != null) {
-            writeBoolean(false);
-            writeSaltSignature(saltSignature);
+                && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_2)) {
+            writeBoolean(saltSignature == null);
+            if(saltSignature != null) {
+                writeSaltSignature(saltSignature);
+            } else {
+                writeByteArray(encryptedVerifyToken);
+            }
         } else {
             writeByteArray(encryptedVerifyToken);
         }

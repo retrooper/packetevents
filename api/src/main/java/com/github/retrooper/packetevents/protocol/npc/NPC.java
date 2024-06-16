@@ -120,6 +120,7 @@ public class NPC {
             WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
         }
+        channels.clear();
     }
 
     public void teleport(Location to) {
@@ -255,9 +256,16 @@ public class NPC {
             }
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoAdd);
 
-            WrapperPlayServerSpawnPlayer spawnPlayer =
-                    new WrapperPlayServerSpawnPlayer(getId(), getProfile().getUUID(), getLocation());
-            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPlayer);
+            PacketWrapper<?> spawnPacket;
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+                spawnPacket = new WrapperPlayServerSpawnEntity(getId(), getProfile().getUUID(), EntityTypes.PLAYER, getLocation(), getLocation().getYaw(), 0, null);
+            }
+            else {
+                spawnPacket = new WrapperPlayServerSpawnPlayer(getId(),
+                        getProfile().getUUID(),
+                        getLocation());
+            }
+            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPacket);
         }
     }
 
