@@ -28,12 +28,12 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -84,8 +84,8 @@ public class VelocityPacketEventsBuilder {
             // TODO Implement platform version
             private final ProtocolManager protocolManager = new ProtocolManagerAbstract() {
                 @Override
-                public ProtocolVersion getPlatformVersion() {
-                    return ProtocolVersion.UNKNOWN;
+                public com.github.retrooper.packetevents.protocol.ProtocolVersion getPlatformVersion() {
+                    return com.github.retrooper.packetevents.protocol.ProtocolVersion.UNKNOWN;
                 }
             };
             private final ServerManager serverManager = new ServerManagerAbstract() {
@@ -93,18 +93,24 @@ public class VelocityPacketEventsBuilder {
 
                 @Override
                 public ServerVersion getVersion() {
-                    if (version == null) {
-                        String velocityVersion = com.velocitypowered.api.network.ProtocolVersion.MAXIMUM_VERSION
-                                .getVersionIntroducedIn();
-
-                        for (final ServerVersion val : ServerVersion.values()) {
-                            if (val.getReleaseName().contains(velocityVersion)) {
-                                return version = val;
+                    if (this.version == null) {
+                        ProtocolVersion[] velVers = ProtocolVersion.values();
+                        for (int i = velVers.length - 1; i >= 0; i--) {
+                            ProtocolVersion velVer = velVers[i];
+                            if (velVer.isLegacy() || velVer.isUnknown()) {
+                                continue; // skip
+                            }
+                            String velVerStr = velVer.getVersionIntroducedIn();
+                            for (ServerVersion peVer : ServerVersion.values()) {
+                                if (peVer.getReleaseName().contains(velVerStr)) {
+                                    this.version = peVer;
+                                    return peVer;
+                                }
                             }
                         }
-                        return null;
+                        throw new IllegalStateException("Can't find any version compatible with this velocity instance");
                     }
-                    return version;
+                    return this.version;
                 }
             };
 
