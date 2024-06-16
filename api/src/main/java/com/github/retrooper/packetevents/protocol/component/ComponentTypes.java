@@ -36,6 +36,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemCon
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDyeColor;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemFireworks;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemJukeboxPlayable;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLock;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMapDecorations;
@@ -249,8 +250,13 @@ public class ComponentTypes {
     public static final ComponentType<ItemContainerLoot> CONTAINER_LOOT = define("container_loot",
             ItemContainerLoot::read, ItemContainerLoot::write);
 
+    // added in 1.21
+    public static final ComponentType<ItemJukeboxPlayable> JUKEBOX_PLAYABLE = define("jukebox_playable",
+            ItemJukeboxPlayable::read, ItemJukeboxPlayable::write);
+
     /**
      * Returns an immutable view of the component types.
+     *
      * @return Component Types
      */
     public static Collection<ComponentType<?>> values() {
