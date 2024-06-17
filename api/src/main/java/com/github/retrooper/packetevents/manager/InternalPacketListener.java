@@ -26,11 +26,13 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -100,9 +102,16 @@ public class InternalPacketListener extends PacketListenerAbstract {
             NBTCompound registryDataTag = registryData.getRegistryData();
             NBTList<NBTCompound> list = null;
             if (registryDataTag != null) { // <1.20.5
+                //Handle dimension type
                 list = registryDataTag
                         .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString())
                         .getCompoundListTagOrNull("value");
+
+                //TODO Handle chat type
+                NBTCompound chatDecoration = registryDataTag.getCompoundTagOrNull("chat");
+                ChatTypeDecoration ctd = new ChatTypeDecoration(chatDecoration);
+
+
             } else if (DIMENSION_TYPE_REGISTRY_KEY.equals(registryData.getRegistryKey())) { // >=1.20.5
                 // remap to legacy format
                 list = new NBTList<>(NBTType.COMPOUND);

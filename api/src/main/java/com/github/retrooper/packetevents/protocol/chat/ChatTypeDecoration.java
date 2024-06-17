@@ -18,8 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.format.Style;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +48,34 @@ public class ChatTypeDecoration {
         this.translationKey = translationKey;
         this.parameters = Collections.unmodifiableList(new ArrayList<>(parameters));
         this.style = style;
+    }
+
+    public ChatTypeDecoration(NBTCompound nbt) {
+        //Read the translation key
+        this.translationKey = nbt.getStringTagValueOrDefault("translation_key", null);
+
+        //Read parameters
+        List<Parameter> temporaryList = new ArrayList<>();
+        NBTList<NBTString> parametersTag = nbt.getStringListTagOrNull("parameters");
+        if (parametersTag != null) {
+            for (NBTString p : parametersTag.getTags()) {
+                Parameter parameter = Parameter.valueByName(p.getValue().toUpperCase());
+                if (parameter != null) {
+                    temporaryList.add(parameter);
+                }
+            }
+        }
+        this.parameters = Collections.unmodifiableList(temporaryList);
+
+        //Read style
+        NBTCompound styleTag = nbt.getCompoundTagOrNull("style");
+        if (styleTag != null) {
+            //TODO Read style! Must we hard-code this or is there already a way?
+            style = empty();
+        }
+        else {
+            style = empty();
+        }
     }
 
     public static ChatTypeDecoration read(PacketWrapper<?> wrapper) {
@@ -90,7 +122,17 @@ public class ChatTypeDecoration {
     }
 
     public enum Parameter {
-        SENDER, TARGET, CONTENT,
+        SENDER, TARGET, CONTENT;
+
+        @Nullable
+        public static Parameter valueByName(String name) {
+            try {
+                return valueOf(name);
+            }
+            catch (IllegalArgumentException ex) {
+                return null;
+            }
+        }
     }
 }
 
