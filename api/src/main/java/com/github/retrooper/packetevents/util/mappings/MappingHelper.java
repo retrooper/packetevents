@@ -36,9 +36,10 @@ import java.util.zip.GZIPInputStream;
 public class MappingHelper {
 
     public static NBTCompound decompress(final String path) {
+        NBTLimiter limiter = new NBTLimiter();
         try (final DataInputStream dataInput = new DataInputStream(new GZIPInputStream(new BufferedInputStream(
                 PacketEvents.getAPI().getSettings().getResourceProvider().apply( "assets/" + path + ".nbt"))))) {
-            return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(dataInput);
+            return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(limiter, dataInput);
         } catch (Exception e) {
             throw new RuntimeException("Cannot find resource file " + path + ".nbt", e);
         }

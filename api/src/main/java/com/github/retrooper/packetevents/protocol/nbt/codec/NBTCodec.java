@@ -37,6 +37,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class NBTCodec {
+
     //PacketEvents start: JSON -> NBT conversion method
     @Deprecated
     public static NBT jsonToNBT(JsonElement element) {
@@ -149,11 +150,12 @@ public class NBTCodec {
     //PacketEvents end
 
     public static NBT readNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
+        NBTLimiter limiter = new NBTLimiter(byteBuf);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try {
                 final boolean named = serverVersion.isOlderThan(ServerVersion.V_1_20_2);
                 return DefaultNBTSerializer.INSTANCE.deserializeTag(
-                        new ByteBufInputStream(byteBuf), named);
+                        limiter, new ByteBufInputStream(byteBuf), named);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -167,7 +169,7 @@ public class NBTCodec {
                 Object slicedBuffer = ByteBufHelper.readSlice(byteBuf, length);
                 try (DataInputStream stream = new DataInputStream(
                         new GZIPInputStream(new ByteBufInputStream(slicedBuffer)))) {
-                    return DefaultNBTSerializer.INSTANCE.deserializeTag(stream);
+                    return DefaultNBTSerializer.INSTANCE.deserializeTag(limiter, stream);
                 }
             }
             catch (IOException ex) {
