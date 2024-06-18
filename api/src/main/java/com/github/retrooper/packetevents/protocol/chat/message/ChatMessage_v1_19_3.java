@@ -120,7 +120,7 @@ public class ChatMessage_v1_19_3 extends ChatMessage_v1_16 {
     }
 
     /**
-     * Retrieves the chat formatting. Please refer to {@link ChatMessage_v1_19_1#getChatFormatting}
+     * Retrieves the chat formatting. Please refer to {@link ChatMessage_v1_19_3#getChatFormatting}
      * @return chat formatting which contains the actual chat type.
      */
     @Deprecated
@@ -129,7 +129,7 @@ public class ChatMessage_v1_19_3 extends ChatMessage_v1_16 {
     }
 
     /**
-     * Sets the chat formatting. Please refer to {@link ChatMessage_v1_19_1#setChatFormatting}
+     * Sets the chat formatting. Please refer to {@link ChatMessage_v1_19_3#setChatFormatting}
      * @param chatFormatting formatting which contains the actual chat type.
      */
     @Deprecated
