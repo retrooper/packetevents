@@ -18,8 +18,11 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 public interface ChatType extends MappedEntity {
 
@@ -36,5 +39,11 @@ public interface ChatType extends MappedEntity {
     static void writeDirect(PacketWrapper<?> wrapper, ChatType chatType) {
         ChatTypeDecoration.write(wrapper, chatType.getChatDecoration());
         ChatTypeDecoration.write(wrapper, chatType.getNarrationDecoration());
+    }
+
+    class Bound extends ChatMessage_v1_19_1.ChatTypeBoundNetwork {
+        public Bound(ChatType type, Component name, @Nullable Component targetName) {
+            super(type, name, targetName);
+        }
     }
 }

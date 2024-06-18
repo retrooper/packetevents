@@ -18,20 +18,23 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
 
-import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.CONTENT;
-import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.SENDER;
-import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.TARGET;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.*;
 import static java.util.Arrays.asList;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 import static net.kyori.adventure.text.format.Style.empty;
@@ -70,10 +73,8 @@ public class ChatTypeDecoration {
         //Read style
         NBTCompound styleTag = nbt.getCompoundTagOrNull("style");
         if (styleTag != null) {
-            //TODO Read style! Must we hard-code this or is there already a way?
-            style = empty();
-        }
-        else {
+            style = AdventureSerializer.getNBTSerializer().deserializeStyle(styleTag);
+        } else {
             style = empty();
         }
     }
@@ -109,6 +110,15 @@ public class ChatTypeDecoration {
         return new ChatTypeDecoration(translationKey, asList(TARGET, SENDER, CONTENT), empty());
     }
 
+    public Component decorate(Component component, ChatType.Bound chatType) {
+        ComponentLike[] components = new ComponentLike[this.parameters.size()];
+        for (int i = 0; i < components.length; i++) {
+            Parameter parameter = this.parameters.get(i);
+            components[i] = parameter.selector.apply(component, chatType);
+        }
+        return Component.translatable(this.translationKey, null, this.style, components);
+    }
+
     public String getTranslationKey() {
         return this.translationKey;
     }
@@ -122,14 +132,21 @@ public class ChatTypeDecoration {
     }
 
     public enum Parameter {
-        SENDER, TARGET, CONTENT;
+        SENDER((component, type) -> type.getName()),
+        TARGET((component, type) -> type.getTargetName() != null ? type.getTargetName() : Component.empty()),
+        CONTENT((component, type) -> component);
+
+        private final BiFunction<Component, ChatType.Bound, Component> selector;
+
+        Parameter(BiFunction<Component, ChatType.Bound, Component> selector) {
+            this.selector = selector;
+        }
 
         @Nullable
         public static Parameter valueByName(String name) {
             try {
                 return valueOf(name);
-            }
-            catch (IllegalArgumentException ex) {
+            } catch (IllegalArgumentException ex) {
                 return null;
             }
         }
