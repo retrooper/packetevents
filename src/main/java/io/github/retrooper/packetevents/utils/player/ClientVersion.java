@@ -100,11 +100,13 @@ public enum ClientVersion {
      * 1.20.5 and 1.20.6 have the same protocol version.
       */
     v_1_20(763), v_1_20_2(764), v_1_20_3(765), v_1_20_5(766),
+
+    v_1_21(767),
     //TODO Update(checkpoint for things to look out for when updating)
 
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
     //TODO Update(checkpoint for things to look out for when updating)
-    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_20_5.protocolVersion + 1),
+    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_21.protocolVersion + 1),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
      * This constant assures you they are on a pre-release.
@@ -125,7 +127,7 @@ public enum ClientVersion {
     //TODO Update(checkpoint for things to look out for when updating)
     private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
             340, 393, 401, 404, 477, 480, 485, 490, 498, 573,
-            575, 578, 735, 736, 751, 753, 754, 755, 756, 757, 758, 759, 760, 761, 762, 763, 764, 765, 766};
+            575, 578, 735, 736, 751, 753, 754, 755, 756, 757, 758, 759, 760, 761, 762, 763, 764, 765, 766, 767};
     private int protocolVersion;
 
     ClientVersion(int protocolVersion) {

@@ -48,6 +48,7 @@ public enum ServerVersion {
     //Same protocol version for 1.20 and 1.20.1. Same protocol version for 1.20.3 and 1.20.4.
     //Same protocol version for 1.20.5 and 1.20.6.
     v_1_20(763), v_1_20_1(763), v_1_20_2(764), v_1_20_3(765), v_1_20_4(765), v_1_20_5(766), v_1_20_6(766),
+    v_1_21(767),
     //TODO Update (checkpoint)
     ERROR(-1);
 

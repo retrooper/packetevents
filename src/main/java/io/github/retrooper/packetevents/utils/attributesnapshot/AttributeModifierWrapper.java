@@ -101,6 +101,7 @@ public class AttributeModifierWrapper extends WrappedPacket {
         }
     }
 
+    //TODO Might cause issues since now a resourcelocation
     public String getName() {
         if (supplierPresent) {
             //About 1.13 and above
