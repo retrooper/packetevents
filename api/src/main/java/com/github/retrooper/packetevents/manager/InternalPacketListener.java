@@ -102,10 +102,6 @@ public class InternalPacketListener extends PacketListenerAbstract {
                         .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString())
                         .getCompoundListTagOrNull("value");
 
-                //TODO Handle chat type
-                NBTCompound chatDecorationNBT = registryDataTag.getCompoundTagOrNull("chat");
-                ChatTypeDecoration chatTypeDecoration = new ChatTypeDecoration(chatDecorationNBT);
-
             } else if (DIMENSION_TYPE_REGISTRY_KEY.equals(registryData.getRegistryKey())) { // >=1.20.5
                 // remap to legacy format
                 list = new NBTList<>(NBTType.COMPOUND);
