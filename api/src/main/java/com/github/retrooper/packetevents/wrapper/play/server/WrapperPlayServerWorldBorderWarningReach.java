@@ -26,11 +26,11 @@ public class WrapperPlayServerWorldBorderWarningReach extends PacketWrapper<Wrap
 
     private int warningBlocks;
 
-    public WrapperPlayWorldBorderWarningReach(PacketSendEvent event) {
+    public WrapperPlayServerWorldBorderWarningReach(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayWorldBorderWarningReach(int warningBlocks) {
+    public WrapperPlayServerWorldBorderWarningReach(int warningBlocks) {
         super(PacketType.Play.Server.WORLD_BORDER_WARNING_REACH);
         this.warningBlocks = warningBlocks;
     }
