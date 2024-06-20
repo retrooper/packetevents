@@ -237,7 +237,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializerModern) oldInit).getOldChannelInitializer());
                 }
             } catch (Exception e) {
-                PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!");
+                //PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!");
             }
         }
         injectedFutures.clear();
@@ -253,7 +253,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 }
 
             } catch (IllegalAccessException e) {
-                PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!!");
+                //PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!!");
             }
         }
 
