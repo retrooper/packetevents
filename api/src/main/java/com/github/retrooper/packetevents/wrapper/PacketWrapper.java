@@ -1235,18 +1235,23 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         writeInt(data.getDemand());
     }
 
-    public ChatMessage_v1_19_1.ChatTypeBoundNetwork readChatTypeBoundNetwork() {
-        int id = readVarInt();
-        ChatType type = ChatTypes.getById(getServerVersion().toClientVersion(), id);
+    public ChatType.Bound readChatTypeBoundNetwork() {
+        ChatType type = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)
+                ? this.readMappedEntityOrDirect(ChatTypes::getById, ChatType::readDirect)
+                : this.readMappedEntity(ChatTypes::getById);
         Component name = readComponent();
         Component targetName = readOptional(PacketWrapper::readComponent);
-        return new ChatMessage_v1_19_1.ChatTypeBoundNetwork(type, name, targetName);
+        return new ChatType.Bound(type, name, targetName);
     }
 
-    public void writeChatTypeBoundNetwork(ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
-        writeVarInt(chatType.getType().getId(getServerVersion().toClientVersion()));
-        writeComponent(chatType.getName());
-        writeOptional(chatType.getTargetName(), PacketWrapper::writeComponent);
+    public void writeChatTypeBoundNetwork(ChatType.Bound chatFormatting) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)) {
+            this.writeMappedEntityOrDirect(chatFormatting.getType(), ChatType::writeDirect);
+        } else {
+            this.writeMappedEntity(chatFormatting.getType());
+        }
+        writeComponent(chatFormatting.getName());
+        writeOptional(chatFormatting.getTargetName(), PacketWrapper::writeComponent);
     }
 
     public Node readNode() {

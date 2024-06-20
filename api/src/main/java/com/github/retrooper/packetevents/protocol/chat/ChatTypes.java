@@ -29,15 +29,39 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.incomingDirectMessage;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.outgoingDirectMessage;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.teamMessage;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.withSender;
+
 public class ChatTypes {
+
     private static final Map<String, ChatType> CHAT_TYPE_MAP = new HashMap<>();
     //Key - mappings version, value - map with chat type ids and chat types
     private static final Map<Byte, Map<Integer, ChatType>> CHAT_TYPE_ID_MAP = new HashMap<>();
     private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("chat/chat_type_mappings");
 
     public static ChatType define(String key) {
+        return define(key, withSender("chat.type.text"));
+    }
+
+    public static ChatType define(String key, ChatTypeDecoration chatDeco) {
+        return define(key, chatDeco, withSender("chat.type.text.narrate"));
+    }
+
+    public static ChatType define(String key, ChatTypeDecoration chatDeco, ChatTypeDecoration narrationDeco) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
         ChatType chatType = new ChatType() {
+            @Override
+            public ChatTypeDecoration getChatDecoration() {
+                return chatDeco;
+            }
+
+            @Override
+            public ChatTypeDecoration getNarrationDecoration() {
+                return narrationDeco;
+            }
+
             @Override
             public ResourceLocation getName() {
                 return data.getName();
@@ -63,12 +87,21 @@ public class ChatTypes {
     }
 
     public static final ChatType CHAT = define("chat");
-    public static final ChatType SAY_COMMAND = define("say_command");
-    public static final ChatType MSG_COMMAND_INCOMING = define("msg_command_incoming");
-    public static final ChatType MSG_COMMAND_OUTGOING = define("msg_command_outgoing");
-    public static final ChatType TEAM_MSG_COMMAND_INCOMING = define("team_msg_command_incoming");
-    public static final ChatType TEAM_MSG_COMMAND_OUTGOING = define("team_msg_command_outgoing");
-    public static final ChatType EMOTE_COMMAND = define("emote_command");
+    public static final ChatType SAY_COMMAND = define("say_command",
+            withSender("chat.type.announcement"));
+    public static final ChatType MSG_COMMAND_INCOMING = define("msg_command_incoming",
+            incomingDirectMessage("commands.message.display.incoming"));
+    public static final ChatType MSG_COMMAND_OUTGOING = define("msg_command_outgoing",
+            outgoingDirectMessage("commands.message.display.outgoing"));
+    public static final ChatType TEAM_MSG_COMMAND_INCOMING = define("team_msg_command_incoming",
+            teamMessage("chat.type.team.text"));
+    public static final ChatType TEAM_MSG_COMMAND_OUTGOING = define("team_msg_command_outgoing",
+            teamMessage("chat.type.team.sent"));
+    public static final ChatType EMOTE_COMMAND = define("emote_command",
+            withSender("chat.type.emote"),
+            withSender("chat.type.emote"));
+
+    // added by CraftBukkit for a few versions
     public static final ChatType RAW = define("raw");
 
     @Deprecated
