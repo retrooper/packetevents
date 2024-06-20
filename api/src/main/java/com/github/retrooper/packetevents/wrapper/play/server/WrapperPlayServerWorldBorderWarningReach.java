@@ -18,13 +18,19 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayWorldBorderWarningReach extends PacketWrapper<WrapperPlayWorldBorderWarningReach> {
+public class WrapperPlayServerWorldBorderWarningReach extends PacketWrapper<WrapperPlayServerWorldBorderWarningReach> {
+
     private int warningBlocks;
 
-    public WrapperPlayWorldBorderWarningReach(int warningBlocks) {
+    public WrapperPlayServerWorldBorderWarningReach(PacketSendEvent event) {
+        super(event);
+    }
+
+    public WrapperPlayServerWorldBorderWarningReach(int warningBlocks) {
         super(PacketType.Play.Server.WORLD_BORDER_WARNING_REACH);
         this.warningBlocks = warningBlocks;
     }
@@ -40,7 +46,7 @@ public class WrapperPlayWorldBorderWarningReach extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void copy(WrapperPlayWorldBorderWarningReach packet) {
+    public void copy(WrapperPlayServerWorldBorderWarningReach packet) {
         warningBlocks = packet.warningBlocks;
     }
 

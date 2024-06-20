@@ -151,7 +151,9 @@ public class Parsers {
     public static final Parser COMPONENT = define("component", null, null);
     public static final Parser STYLE = define("style", null, null);
     public static final Parser MESSAGE = define("message", null, null);
-    public static final Parser NBT = define("nbt", null, null);
+    public static final Parser NBT_COMPOUND_TAG = define("nbt_compound_tag", null, null);
+    @Deprecated
+    public static final Parser NBT = NBT_COMPOUND_TAG;
     public static final Parser NBT_TAG = define("nbt_tag", null, null);
     public static final Parser NBT_PATH = define("nbt_path", null, null);
     public static final Parser OBJECTIVE = define("objective", null, null);
@@ -170,10 +172,13 @@ public class Parsers {
     public static final Parser ITEM_SLOT = define("item_slot", null, null);
     public static final Parser ITEM_SLOTS = define("item_slots", null, null);
     public static final Parser RESOURCE_LOCATION = define("resource_location", null, null);
+    public static final Parser MOB_EFFECT = define("mob_effect", null, null);
     public static final Parser FUNCTION = define("function", null, null);
     public static final Parser ENTITY_ANCHOR = define("entity_anchor", null, null);
     public static final Parser INT_RANGE = define("int_range", null, null);
     public static final Parser FLOAT_RANGE = define("float_range", null, null);
+    public static final Parser ITEM_ENCHANTMENT = define("item_enchantment", null, null);
+    public static final Parser ENTITY_SUMMON = define("entity_summon", null, null);
     public static final Parser DIMENSION = define("dimension", null, null);
     public static final Parser GAMEMODE = define("gamemode", null, null);
     public static final Parser TIME = define("time",

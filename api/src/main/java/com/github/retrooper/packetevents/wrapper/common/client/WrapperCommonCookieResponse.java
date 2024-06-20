@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.common.client;
 
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -31,7 +32,12 @@ public abstract class WrapperCommonCookieResponse<T extends WrapperCommonCookieR
     private ResourceLocation key;
     private byte @Nullable [] payload;
 
+    @Deprecated
     public WrapperCommonCookieResponse(PacketSendEvent event) {
+        super(event);
+    }
+
+    public WrapperCommonCookieResponse(PacketReceiveEvent event) {
         super(event);
     }
 

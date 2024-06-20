@@ -19,63 +19,55 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> {
-    private Map<String, List<Tag>> tags;
+
+    private Map<ResourceLocation, List<Tag>> tags;
 
     public WrapperPlayServerTags(PacketSendEvent event) {
         super(event);
     }
 
+    public WrapperPlayServerTags(Map<ResourceLocation, List<Tag>> tags) {
+        super(PacketType.Play.Server.TAGS);
+        this.tags = tags;
+    }
+
     @Override
     public void read() {
-        int count = readVarInt(); // Number of resource tags sent
-        tags = new HashMap<>(count);
-
-        for (int tagIter = 0; tagIter < count; tagIter++) {
-            String resourceName = readString();
-            int elements = readVarInt(); // Number of tags in this resource tag
-
-            List<Tag> tagList = new ArrayList<>(elements);
-
-            for (int valueIter = 0; valueIter < elements; valueIter++) {
-                String tagName = readString(); // The actual tag name
-                int tagElements = readVarInt(); // Number of blocks/items in this tag
-
-                List<Integer> tagValues = new ArrayList<>(tagElements);
-                for (int tagValueIter = 0; tagValueIter < tagElements; tagValueIter++) {
-                    tagValues.add(readVarInt());
-                }
-
-                tagList.add(new Tag(tagName, tagValues));
-            }
-
-            tags.put(resourceName, tagList);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            this.tags = this.readMap(
+                    PacketWrapper::readIdentifier,
+                    ew -> ew.readList(Tag::read));
+        } else {
+            this.tags = new HashMap<>(4);
+            this.tags.put(ResourceLocation.minecraft("block"), this.readList(Tag::read));
+            this.tags.put(ResourceLocation.minecraft("item"), this.readList(Tag::read));
+            this.tags.put(ResourceLocation.minecraft("fluid"), this.readList(Tag::read));
+            this.tags.put(ResourceLocation.minecraft("entity_type"), this.readList(Tag::read));
         }
     }
 
     @Override
     public void write() {
-        writeVarInt(tags.size());
-
-        for (Map.Entry<String, List<Tag>> entry : tags.entrySet()) {
-            writeString(entry.getKey());
-            writeVarInt(entry.getValue().size());
-
-            for (Tag tag : entry.getValue()) {
-                writeString(tag.getName());
-                writeVarInt(tag.getValues().size());
-
-                for (Integer value : tag.getValues()) {
-                    writeVarInt(value);
-                }
-            }
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            this.writeMap(this.tags,
+                    PacketWrapper::writeIdentifier,
+                    (ew, tags) -> ew.writeList(tags, Tag::write));
+        } else {
+            this.writeList(this.tags.get(ResourceLocation.minecraft("block")), Tag::write);
+            this.writeList(this.tags.get(ResourceLocation.minecraft("item")), Tag::write);
+            this.writeList(this.tags.get(ResourceLocation.minecraft("fluid")), Tag::write);
+            this.writeList(this.tags.get(ResourceLocation.minecraft("entity_type")), Tag::write);
         }
     }
 
@@ -84,33 +76,81 @@ public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> 
         this.tags = wrapper.tags;
     }
 
-    public Map<String, List<Tag>> getTags() {
-        return tags;
+    public Map<ResourceLocation, List<Tag>> getTagMap() {
+        return this.tags;
     }
 
-    public void setTags(HashMap<String, List<Tag>> tags) {
+    public void setTagMap(Map<ResourceLocation, List<Tag>> tags) {
         this.tags = tags;
     }
 
+    @Deprecated
+    public Map<String, List<Tag>> getTags() {
+        if (this.tags == null) {
+            return null;
+        }
+        Map<String, List<Tag>> tags = new HashMap<>(this.tags.size());
+        for (Map.Entry<ResourceLocation, List<Tag>> entry : this.tags.entrySet()) {
+            tags.put(entry.getKey().toString(), entry.getValue());
+        }
+        return Collections.unmodifiableMap(tags);
+    }
+
+    @Deprecated
+    public void setTags(HashMap<String, List<Tag>> tags) {
+        if (tags == null) {
+            this.tags = null;
+        } else {
+            this.tags = new HashMap<>(tags.size());
+            for (Map.Entry<String, List<Tag>> entry : tags.entrySet()) {
+                this.tags.put(new ResourceLocation(entry.getKey()), entry.getValue());
+            }
+        }
+    }
+
     public static class Tag {
-        private String name;
+
+        private ResourceLocation key;
         private List<Integer> values;
 
         public Tag(String name, List<Integer> values) {
-            this.name = name;
+            this(new ResourceLocation(name), values);
+        }
+
+        public Tag(ResourceLocation key, List<Integer> values) {
+            this.key = key;
             this.values = values;
         }
 
+        public static Tag read(PacketWrapper<?> wrapper) {
+            ResourceLocation tagName = wrapper.readIdentifier();
+            List<Integer> values = wrapper.readList(PacketWrapper::readVarInt);
+            return new Tag(tagName, values);
+        }
+
+        public static void write(PacketWrapper<?> wrapper, Tag tag) {
+            wrapper.writeIdentifier(tag.key);
+            wrapper.writeList(tag.values, PacketWrapper::writeVarInt);
+        }
+
         public String getName() {
-            return name;
+            return this.key.toString();
         }
 
         public void setName(String name) {
-            this.name = name;
+            this.key = new ResourceLocation(name);
+        }
+
+        public ResourceLocation getKey() {
+            return this.key;
+        }
+
+        public void setKey(ResourceLocation key) {
+            this.key = key;
         }
 
         public List<Integer> getValues() {
-            return values;
+            return this.values;
         }
 
         public void setValues(List<Integer> values) {
