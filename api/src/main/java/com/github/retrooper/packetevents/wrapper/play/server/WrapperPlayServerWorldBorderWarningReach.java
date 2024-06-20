@@ -46,7 +46,7 @@ public class WrapperPlayServerWorldBorderWarningReach extends PacketWrapper<Wrap
     }
 
     @Override
-    public void copy(WrapperPlayWorldBorderWarningReach packet) {
+    public void copy(WrapperPlayServerWorldBorderWarningReach packet) {
         warningBlocks = packet.warningBlocks;
     }
 
