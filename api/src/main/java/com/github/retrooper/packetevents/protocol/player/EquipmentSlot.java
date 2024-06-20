@@ -35,26 +35,37 @@ public enum EquipmentSlot {
     private final byte legacyId;
 
     EquipmentSlot(int legacyId) {
-        this.legacyId =(byte) legacyId;
+        this.legacyId = (byte) legacyId;
     }
 
     public int getId(ServerVersion version) {
-        if (version.isOlderThan(ServerVersion.V_1_9)) {
+        return getId(serverVersion.toClientVersion());
+    }
+
+    public int getId(ClientVersion version) {
+        if (version.isOlderThan(ClientVersion.V_1_9)) {
             return legacyId;
-        }
-        else {
+        } else {
             return ordinal();
         }
     }
 
     @Nullable
-    public static EquipmentSlot getById(ServerVersion version, int id) {
-        // FIXME: try making this O(1)
-        for (EquipmentSlot slot : VALUES) {
-            if (slot.getId(version) == id) {
-                return slot;
+    public static EquipmentSlot getById(ClientVersion version, int id) {
+        if (version.isOlderThan(ClientVersion.V_1_9)) {
+            for (EquipmentSlot slot : VALUES) {
+                if (slot.getId(version) == id) {
+                    return slot;
+                }
             }
+        } else {
+            return VALUES[id];
         }
         return null;
+    }
+
+    @Nullable
+    public static EquipmentSlot getById(ServerVersion version, int id) {
+        return getById(version.toClientVersion(), id);
     }
 }
