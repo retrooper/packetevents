@@ -39,7 +39,7 @@ public enum EquipmentSlot {
     }
 
     public int getId(ServerVersion version) {
-        return getId(serverVersion.toClientVersion());
+        return getId(version.toClientVersion());
     }
 
     public int getId(ClientVersion version) {
