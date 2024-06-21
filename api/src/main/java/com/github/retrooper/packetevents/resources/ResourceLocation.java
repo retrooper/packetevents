@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.resources;
 
+import java.util.Objects;
+
 public class ResourceLocation {
     protected final String namespace;
     protected final String key;
@@ -46,6 +48,11 @@ public class ResourceLocation {
 
     public String getKey() {
         return key;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.namespace, this.key);
     }
 
     @Override
