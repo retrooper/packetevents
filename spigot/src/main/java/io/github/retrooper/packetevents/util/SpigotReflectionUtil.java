@@ -138,6 +138,8 @@ public final class SpigotReflectionUtil {
 
     private static boolean PAPER_ENTITY_LOOKUP_EXISTS = false;
 
+    private static boolean IS_OBFUSCATED;
+
     //Cache entities right after we request/find them for faster search.
     public static Map<Integer, Entity> ENTITY_ID_CACHE = new MapMaker().weakValues().makeMap();
 
@@ -297,8 +299,6 @@ public final class SpigotReflectionUtil {
         PAPER_ENTITY_LOOKUP_EXISTS = Reflection.getField(WORLD_SERVER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) != null;
     }
 
-    private static boolean IS_OBFUSCATED;
-
     private static void initClasses() {
         // spigot / paper versions older than 1.20.5 use spigot mappings
         IS_OBFUSCATED = Reflection.getClassByNameWithoutException("net.minecraft.server.network.PlayerConnection") != null;
@@ -328,7 +328,11 @@ public final class SpigotReflectionUtil {
         if (V_1_17_OR_HIGHER) {
             LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
             PERSISTENT_ENTITY_SECTION_MANAGER_CLASS = getServerClass("world.level.entity.PersistentEntitySectionManager", "");
-            PAPER_ENTITY_LOOKUP_CLASS = Reflection.getClassByNameWithoutException("io.papermc.paper.chunk.system.entity.EntityLookup");
+            PAPER_ENTITY_LOOKUP_CLASS = Reflection.getClassByNameWithoutException("ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup");
+            if (PAPER_ENTITY_LOOKUP_CLASS == null) {
+                //Older than 1.21 names this differently
+                PAPER_ENTITY_LOOKUP_CLASS = Reflection.getClassByNameWithoutException("io.papermc.paper.chunk.system.entity.EntityLookup");
+            }
         }
         DIMENSION_MANAGER_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.dimension.DimensionManager" : "world.level.dimension.DimensionType", "DimensionManager");
         MOJANG_CODEC_CLASS = Reflection.getClassByNameWithoutException("com.mojang.serialization.Codec");
