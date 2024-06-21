@@ -44,7 +44,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                 //Remove "." at the end.
                 stringVersion = stringVersion.substring(0, stringVersion.length() - 1);
             }
-            return new PEVersion(stringVersion);
+            return PEVersion.fromString(stringVersion);
         }
         return null;
     }

@@ -59,7 +59,7 @@ public class UpdateChecker {
         PEVersion localVersion = PacketEvents.getAPI().getVersion();
         PEVersion newVersion;
         try {
-            newVersion = new PEVersion(checkLatestReleasedVersion());
+            newVersion = PEVersion.fromString(checkLatestReleasedVersion());
         } catch (Exception ex) {
             PacketEvents.getAPI().getLogManager().warn("Failed to check for updates. "
                     + (ex.getCause() != null ? ex.getCause().getClass().getName() + ": " + ex.getCause().getMessage() : ex.getMessage()));
