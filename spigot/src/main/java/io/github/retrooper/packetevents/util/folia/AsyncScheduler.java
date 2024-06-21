@@ -18,14 +18,11 @@
 
 package io.github.retrooper.packetevents.util.folia;
 
-import com.github.retrooper.packetevents.util.reflection.Reflection;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -33,29 +30,15 @@ import java.util.function.Consumer;
  * Represents a scheduler for executing tasks asynchronously.
  */
 public class AsyncScheduler {
-    private final boolean isFolia = FoliaScheduler.isFolia();
 
-    private Object asyncScheduler;
-
-    private Method asyncRunNowMethod;
-    private Method asyncRunDelayedMethod;
-    private Method asyncRunAtFixedRateMethod;
-    private Method asyncCancelMethod;
+    private BukkitScheduler bukkitScheduler;
+    private io.papermc.paper.threadedregions.scheduler.AsyncScheduler asyncScheduler;
 
     protected AsyncScheduler() {
-        try {
-            if (isFolia) {
-                Method getAsyncSchedulerMethod = Reflection.getMethod(Server.class, "getAsyncScheduler", 0);
-                asyncScheduler = getAsyncSchedulerMethod.invoke(Bukkit.getServer());
-                Class<?> asyncSchedulerClass = asyncScheduler.getClass();
-
-                asyncRunNowMethod = asyncSchedulerClass.getMethod("runNow", Plugin.class, Consumer.class);
-                asyncRunDelayedMethod = asyncSchedulerClass.getMethod("runDelayed", Plugin.class, Consumer.class, long.class, TimeUnit.class);
-                asyncRunAtFixedRateMethod = asyncSchedulerClass.getMethod("runAtFixedRate", Plugin.class, Consumer.class, long.class, long.class, TimeUnit.class);
-                asyncCancelMethod = asyncSchedulerClass.getMethod("cancelTasks", Plugin.class);
-            }
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
+        if (FoliaScheduler.isFolia) {
+            asyncScheduler = Bukkit.getAsyncScheduler();
+        } else {
+            bukkitScheduler = Bukkit.getScheduler();
         }
     }
 
@@ -67,16 +50,11 @@ public class AsyncScheduler {
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runNow(@NotNull Plugin plugin, @NotNull Consumer<Object> task) {
-        if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> task.accept(null)));
+        if (!FoliaScheduler.isFolia) {
+            return new TaskWrapper(bukkitScheduler.runTaskAsynchronously(plugin, () -> task.accept(null)));
         }
 
-        try {
-            return new TaskWrapper(asyncRunNowMethod.invoke(asyncScheduler, plugin, task));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return new TaskWrapper(asyncScheduler.runNow(plugin, (o) -> task.accept(null)));
     }
 
     /**
@@ -89,16 +67,11 @@ public class AsyncScheduler {
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay, @NotNull TimeUnit timeUnit) {
-        if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit)));
+        if (!FoliaScheduler.isFolia) {
+            return new TaskWrapper(bukkitScheduler.runTaskLaterAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit)));
         }
 
-        try {
-            return new TaskWrapper(asyncRunDelayedMethod.invoke(asyncScheduler, plugin, task, delay, timeUnit));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return new TaskWrapper(asyncScheduler.runDelayed(plugin, (o) -> task.accept(null), delay, timeUnit));
     }
 
     /**
@@ -114,45 +87,30 @@ public class AsyncScheduler {
     public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay, long period, @NotNull TimeUnit timeUnit) {
         if (period < 1) period = 1;
 
-        if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit), convertTimeToTicks(period, timeUnit)));
+        if (!FoliaScheduler.isFolia) {
+            return new TaskWrapper(bukkitScheduler.runTaskTimerAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit), convertTimeToTicks(period, timeUnit)));
         }
 
-        try {
-            return new TaskWrapper(asyncRunAtFixedRateMethod.invoke(asyncScheduler, plugin, task, delay, period, timeUnit));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return new TaskWrapper(asyncScheduler.runAtFixedRate(plugin, (o) -> task.accept(null), delay, period, timeUnit));
     }
 
     /**
      * Schedules the specified task to be executed asynchronously after the initial delay has passed, and then periodically executed.
      *
-     * @param plugin   Plugin which owns the specified task.
-     * @param task     Specified task.
-     * @param initialDelayTicks    The time delay in ticks to pass before the task should be executed.
-     * @param periodTicks   The time period in ticks between each task execution. Any value less-than 1 is treated as 1.
+     * @param plugin            Plugin which owns the specified task.
+     * @param task              Specified task.
+     * @param initialDelayTicks The time delay in ticks to pass before the task should be executed.
+     * @param periodTicks       The time period in ticks between each task execution. Any value less-than 1 is treated as 1.
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper runAtFixedRate(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long initialDelayTicks, long periodTicks) {
         if (periodTicks < 1) periodTicks = 1;
 
-        if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
+        if (!FoliaScheduler.isFolia) {
+            return new TaskWrapper(bukkitScheduler.runTaskTimerAsynchronously(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
 
-        try {
-            return new TaskWrapper(asyncRunAtFixedRateMethod.invoke(asyncScheduler, plugin, task,
-                    initialDelayTicks * 50,
-                    periodTicks * 50,
-                    TimeUnit.MILLISECONDS));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return new TaskWrapper(asyncScheduler.runAtFixedRate(plugin, (o) -> task.accept(null), initialDelayTicks, periodTicks, TimeUnit.MILLISECONDS));
     }
 
     /**
@@ -161,16 +119,12 @@ public class AsyncScheduler {
      * @param plugin Specified plugin.
      */
     public void cancel(@NotNull Plugin plugin) {
-        if (!isFolia) {
-            Bukkit.getScheduler().cancelTasks(plugin);
+        if (!FoliaScheduler.isFolia) {
+            bukkitScheduler.cancelTasks(plugin);
             return;
         }
 
-        try {
-            asyncCancelMethod.invoke(asyncScheduler, plugin);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        asyncScheduler.cancelTasks(plugin);
     }
 
     /**

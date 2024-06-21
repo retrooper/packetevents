@@ -4,9 +4,10 @@ netty = "4.1.72.Final"
 jetbrains-annotations = "23.0.0"
 via-version = "4.5.0"
 protocol-support = "3d24efeda6"
-spigot = "1.20.4-R0.1-SNAPSHOT"
+paper = "1.20.6-R0.1-SNAPSHOT"
 bungeecord = "1.20-R0.1-SNAPSHOT"
 velocity = "3.1.0"
+run-paper = "2.3.0"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
@@ -19,7 +20,7 @@ gson = { group = "com.google.code.gson", name = "gson", version = "2.11.0" }
 netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 via-version = { group = "com.viaversion", name = "viaversion", version.ref = "via-version" }
 protocol-support = { group = "com.github.ProtocolSupport", name = "ProtocolSupport", version.ref = "protocol-support" }
-spigot = { group = "org.spigotmc", name = "spigot-api", version.ref = "spigot" }
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungeecord" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 
@@ -28,5 +29,6 @@ adventure = [ "adventure-api", "adventure-nbt" ]
 adventure-serializers = [ "adventure-text-serializer-gson", "adventure-text-serializer-json-legacy", "adventure-text-serializer-legacy" ]
 
 [plugins]
-run-paper = { id = "xyz.jpenilla.run-paper", version = "2.3.0" }
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
+run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-paper" }
 fabric = { id = "fabric-loom", version = "0.11-SNAPSHOT" }
