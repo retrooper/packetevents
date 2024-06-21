@@ -131,19 +131,20 @@ public class LightData implements Cloneable {
         lightData.emptySkyLightMask = ChunkBitMask.readChunkMask(packet);
         lightData.emptyBlockLightMask = ChunkBitMask.readChunkMask(packet);
 
-        lightData.skyLightCount = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? packet.readVarInt() : 18;
+        boolean v17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
+        lightData.skyLightCount = v17 ? packet.readVarInt() : 18;
         lightData.skyLightArray = new byte[lightData.skyLightCount][];
-        for (int x = 0; x < lightData.skyLightCount; x++) {
-            if (lightData.skyLightMask.get(x)) {
-                lightData.skyLightArray[x] = packet.readByteArray();
+        for (int i = 0; i < lightData.skyLightCount; i++) {
+            if (v17 || lightData.skyLightMask.get(i)) {
+                lightData.skyLightArray[i] = packet.readByteArray();
             }
         }
 
-        lightData.blockLightCount = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? packet.readVarInt() : 18;
+        lightData.blockLightCount = v17 ? packet.readVarInt() : 18;
         lightData.blockLightArray = new byte[lightData.blockLightCount][];
-        for (int x = 0; x < lightData.blockLightCount; x++) {
-            if (lightData.blockLightMask.get(x)) {
-                lightData.blockLightArray[x] = packet.readByteArray();
+        for (int i = 0; i < lightData.blockLightCount; i++) {
+            if (v17 || lightData.blockLightMask.get(i)) {
+                lightData.blockLightArray[i] = packet.readByteArray();
             }
         }
 
@@ -160,19 +161,22 @@ public class LightData implements Cloneable {
         ChunkBitMask.writeChunkMask(packet, lightData.emptySkyLightMask);
         ChunkBitMask.writeChunkMask(packet, lightData.emptyBlockLightMask);
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17))
+        boolean v17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
+        if (v17) {
             packet.writeVarInt(lightData.skyLightCount);
-        for (int x = 0; x < lightData.skyLightCount; x++) {
-            if (lightData.skyLightMask.get(x)) {
-                packet.writeByteArray(lightData.skyLightArray[x]);
+        }
+        for (int i = 0; i < lightData.skyLightCount; i++) {
+            if (v17 || lightData.skyLightMask.get(i)) {
+                packet.writeByteArray(lightData.skyLightArray[i]);
             }
         }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17))
+        if (v17) {
             packet.writeVarInt(lightData.blockLightCount);
-        for (int x = 0; x < lightData.blockLightCount; x++) {
-            if (lightData.blockLightMask.get(x)) {
-                packet.writeByteArray(lightData.blockLightArray[x]);
+        }
+        for (int i = 0; i < lightData.blockLightCount; i++) {
+            if (v17 || lightData.blockLightMask.get(i)) {
+                packet.writeByteArray(lightData.blockLightArray[i]);
             }
         }
     }
