@@ -35,11 +35,10 @@ public abstract class PacketEventsAPI<T> {
     private static final EventManager EVENT_MANAGER = new EventManager();
     private static final PacketEventsSettings SETTINGS = new PacketEventsSettings();
     private static final UpdateChecker UPDATE_CHECKER = new UpdateChecker();
-    private final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
     private static final LogManager LOG_MANAGER = new LogManager();
-    //TODO UPDATE
-    private static final PEVersion VERSION = new PEVersion(2, 3, 1);
-    
+    private static final PEVersion VERSION = PEVersion.createFromPackageVersion();
+    private final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
+
     public EventManager getEventManager() {
         return EVENT_MANAGER;
     }
