@@ -51,7 +51,8 @@ public class BungeePipelineInjector implements ChannelInjector {
             ChannelHandler handler = channel.pipeline().get(channelName);
             if (handler == null) continue;
             try {
-                Field f = handler.getClass().getField("childHandler");
+                Field f = handler.getClass().getDeclaredField("childHandler");
+                f.setAccessible(true);
                 if (f.getType().isAssignableFrom(ChannelInitializer.class)) {
                     handlerInstance = handler;
                     initializerField = f;
@@ -76,8 +77,10 @@ public class BungeePipelineInjector implements ChannelInjector {
         };
 
         try {
-            finalInitializerField.set(handlerInstance, newInitializer);
-        } catch (IllegalAccessException e) {
+            Field childHandlerField = handlerInstance.getClass().getDeclaredField("childHandler");
+            childHandlerField.setAccessible(true);
+            childHandlerField.set(handlerInstance, newInitializer);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
 
