@@ -31,12 +31,10 @@ import java.util.function.Consumer;
  * Represents a scheduler for executing entity tasks.
  */
 public class EntityScheduler {
-    private final boolean isFolia = FoliaScheduler.isFolia();
-
     private BukkitScheduler bukkitScheduler;
 
     protected EntityScheduler() {
-        if (!isFolia) {
+        if (!FoliaScheduler.isFolia) {
             bukkitScheduler = Bukkit.getScheduler();
         }
     }
@@ -55,7 +53,7 @@ public class EntityScheduler {
      * @param delay   The delay in ticks before the run callback is invoked.
      */
     public void execute(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Runnable run, @Nullable Runnable retired, long delay) {
-        if (!isFolia) {
+        if (!FoliaScheduler.isFolia) {
             bukkitScheduler.runTaskLater(plugin, run, delay);
             return;
         }
@@ -78,7 +76,7 @@ public class EntityScheduler {
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper run(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Consumer<Object> task, @Nullable Runnable retired) {
-        if (!isFolia) {
+        if (!FoliaScheduler.isFolia) {
             return new TaskWrapper(bukkitScheduler.runTask(plugin, () -> task.accept(null)));
         }
 
@@ -102,7 +100,7 @@ public class EntityScheduler {
     public TaskWrapper runDelayed(@NotNull Entity entity, @NotNull Plugin plugin, @NotNull Consumer<Object> task, @Nullable Runnable retired, long delayTicks) {
         if (delayTicks < 1) delayTicks = 1;
 
-        if (!isFolia) {
+        if (!FoliaScheduler.isFolia) {
             return new TaskWrapper(bukkitScheduler.runTaskLater(plugin, () -> task.accept(null), delayTicks));
         }
 
@@ -128,7 +126,7 @@ public class EntityScheduler {
         if (initialDelayTicks < 1) initialDelayTicks = 1;
         if (periodTicks < 1) periodTicks = 1;
 
-        if (!isFolia) {
+        if (!FoliaScheduler.isFolia) {
             return new TaskWrapper(bukkitScheduler.runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
 

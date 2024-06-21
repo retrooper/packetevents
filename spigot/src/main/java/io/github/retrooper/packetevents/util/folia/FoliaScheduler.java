@@ -30,7 +30,7 @@ import org.bukkit.plugin.Plugin;
  * otherwise it falls back to the default Bukkit scheduler.
  */
 public class FoliaScheduler {
-    private static boolean folia;
+    static final boolean isFolia;
     private static Class<? extends Event> regionizedServerInitEventClass;
 
     private static AsyncScheduler asyncScheduler;
@@ -39,6 +39,7 @@ public class FoliaScheduler {
     private static RegionScheduler regionScheduler;
 
     static {
+        boolean folia;
         try {
             Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
             folia = true;
@@ -49,13 +50,15 @@ public class FoliaScheduler {
         } catch (ClassNotFoundException e) {
             folia = false;
         }
+
+        isFolia = folia;
     }
 
     /**
      * @return Whether the server is running Folia
      */
     public static boolean isFolia() {
-        return folia;
+        return isFolia;
     }
 
     /**
@@ -116,7 +119,7 @@ public class FoliaScheduler {
      * @param run    The task to run
      */
     public static void runTaskOnInit(Plugin plugin, Runnable run) {
-        if (!folia) {
+        if (!isFolia) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, run);
             return;
         }

@@ -29,13 +29,12 @@ import java.util.function.Consumer;
  * Represents a scheduler for executing global region tasks.
  */
 public class GlobalRegionScheduler {
-    private final boolean isFolia = FoliaScheduler.isFolia();
 
     private BukkitScheduler bukkitScheduler;
     private io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler globalRegionScheduler;
 
     protected GlobalRegionScheduler() {
-        if (isFolia) {
+        if (FoliaScheduler.isFolia) {
             globalRegionScheduler = Bukkit.getGlobalRegionScheduler();
         } else {
             bukkitScheduler = Bukkit.getScheduler();
@@ -49,7 +48,7 @@ public class GlobalRegionScheduler {
      * @param run    The task to execute
      */
     public void execute(@NotNull Plugin plugin, @NotNull Runnable run) {
-        if (!isFolia) {
+        if (!FoliaScheduler.isFolia) {
             bukkitScheduler.runTask(plugin, run);
             return;
         }
@@ -65,7 +64,7 @@ public class GlobalRegionScheduler {
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper run(@NotNull Plugin plugin, @NotNull Consumer<Object> task) {
-        if (!isFolia) {
+        if (!FoliaScheduler.isFolia) {
             return new TaskWrapper(bukkitScheduler.runTask(plugin, () -> task.accept(null)));
         }
 
@@ -83,7 +82,7 @@ public class GlobalRegionScheduler {
     public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay) {
         if (delay < 1) delay = 1;
 
-        if (!isFolia) {
+        if (!FoliaScheduler.isFolia) {
             return new TaskWrapper(bukkitScheduler.runTaskLater(plugin, () -> task.accept(null), delay));
         }
 
@@ -103,7 +102,7 @@ public class GlobalRegionScheduler {
         if (initialDelayTicks < 1) initialDelayTicks = 1;
         if (periodTicks < 1) periodTicks = 1;
 
-        if (!isFolia) {
+        if (!FoliaScheduler.isFolia) {
             return new TaskWrapper(bukkitScheduler.runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
 
@@ -116,7 +115,7 @@ public class GlobalRegionScheduler {
      * @param plugin Specified plugin.
      */
     public void cancel(@NotNull Plugin plugin) {
-        if (!isFolia) {
+        if (!FoliaScheduler.isFolia) {
             Bukkit.getScheduler().cancelTasks(plugin);
             return;
         }
