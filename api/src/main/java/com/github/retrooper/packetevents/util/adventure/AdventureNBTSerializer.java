@@ -82,7 +82,34 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         String translateFallback = reader.readUTF("fallback", Function.identity());
         List<? extends ComponentLike> translateWith;
         if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
-            translateWith = reader.readList("with", this::deserializeTranslationArgumentList);
+            NBTType<?> type = reader.type("with");
+            if (type == NBTType.INT_ARRAY) {
+                translateWith = reader.readIntArray("with", params -> {
+                    List<TranslationArgument> args = new ArrayList<>(params.length);
+                    for (int param : params) {
+                        args.add(TranslationArgument.numeric(param));
+                    }
+                    return args;
+                });
+            } else if (type == NBTType.BYTE_ARRAY) {
+                translateWith = reader.readByteArray("with", params -> {
+                    List<TranslationArgument> args = new ArrayList<>(params.length);
+                    for (byte param : params) {
+                        args.add(TranslationArgument.bool(param != (byte) 0));
+                    }
+                    return args;
+                });
+            } else if (type == NBTType.LONG_ARRAY) {
+                translateWith = reader.readLongArray("with", params -> {
+                    List<TranslationArgument> args = new ArrayList<>(params.length);
+                    for (long param : params) {
+                        args.add(TranslationArgument.numeric(param));
+                    }
+                    return args;
+                });
+            } else {
+                translateWith = reader.readList("with", this::deserializeTranslationArgumentList);
+            }
         } else {
             translateWith = reader.readList("with", this::deserializeComponentList);
         }
@@ -448,9 +475,11 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         List<TranslationArgument> arguments = new ArrayList<>(value.size());
         for (Object nbt : value) {
             if (nbt instanceof NBTByte) {
-                arguments.add(TranslationArgument.bool(((NBTByte) nbt).getAsByte() == 1));
+                arguments.add(TranslationArgument.bool(((NBTByte) nbt).getAsByte() != (byte) 0));
             } else if (nbt instanceof NBTNumber) {
                 arguments.add(TranslationArgument.numeric(((NBTNumber) nbt).getAsInt()));
+            } else if (nbt instanceof NBTString) {
+                arguments.add(TranslationArgument.component(Component.text(((NBTString) nbt).getValue())));
             } else {
                 arguments.add(TranslationArgument.component(deserialize(requireType((NBT) nbt, NBTType.COMPOUND))));
             }

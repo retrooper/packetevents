@@ -59,6 +59,7 @@ mappingCompression {
         compress("command/argument_parser_mappings.json")
 
         compress("entity/entity_data_type_mappings.json")
+        compress("entity/painting_mappings.json")
 
         compress("item/item_armor_material_mappings.json")
         compress("item/item_banner_pattern_mappings.json")
@@ -93,6 +94,10 @@ tasks {
         options {
             (this as CoreJavadocOptions).addBooleanOption("Xdoclint:none", true)
         }
+    }
+
+    compressMappings {
+        inputs.dir(mappingCompression.mappingDirectory)
     }
 
     processResources {

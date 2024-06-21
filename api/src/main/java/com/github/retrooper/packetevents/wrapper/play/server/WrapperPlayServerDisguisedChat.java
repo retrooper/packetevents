@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -26,34 +27,34 @@ import net.kyori.adventure.text.Component;
 
 public class WrapperPlayServerDisguisedChat extends PacketWrapper<WrapperPlayServerDisguisedChat> {
     private Component message;
-    private ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType;
+    private ChatType.Bound chatFormatting;
 
     public WrapperPlayServerDisguisedChat(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerDisguisedChat(Component message, ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
+    public WrapperPlayServerDisguisedChat(Component message, ChatType.Bound chatType) {
         super(PacketType.Play.Server.DISGUISED_CHAT);
         this.message = message;
-        this.chatType = chatType;
+        this.chatFormatting = chatType;
     }
 
     @Override
     public void read() {
         message = readComponent();
-        chatType = readChatTypeBoundNetwork();
+        chatFormatting = readChatTypeBoundNetwork();
     }
 
     @Override
     public void write() {
         writeComponent(message);
-        writeChatTypeBoundNetwork(chatType);
+        writeChatTypeBoundNetwork(chatFormatting);
     }
 
     @Override
     public void copy(WrapperPlayServerDisguisedChat wrapper) {
         this.message = wrapper.message;
-        this.chatType = wrapper.chatType;
+        this.chatFormatting = wrapper.chatFormatting;
     }
 
     public Component getMessage() {
@@ -64,11 +65,29 @@ public class WrapperPlayServerDisguisedChat extends PacketWrapper<WrapperPlaySer
         this.message = message;
     }
 
-    public ChatMessage_v1_19_1.ChatTypeBoundNetwork getChatType() {
-        return chatType;
+    public ChatType.Bound getChatFormatting() {
+        return chatFormatting;
     }
 
-    public void setChatType(ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
-        this.chatType = chatType;
+    public void setChatFormatting(ChatType.Bound chatFormatting) {
+        this.chatFormatting = chatFormatting;
+    }
+
+    /**
+     * Retrieves the chat formatting. Please refer to {@link WrapperPlayServerDisguisedChat#getChatFormatting}
+     * @return chat formatting which contains the actual chat type.
+     */
+    @Deprecated
+    public ChatType.Bound getChatType() {
+        return chatFormatting;
+    }
+
+    /**
+     * Sets the chat formatting. Please refer to {@link WrapperPlayServerDisguisedChat#setChatFormatting}
+     * @param chatFormatting formatting which contains the actual chat type.
+     */
+    @Deprecated
+    public void setChatType(ChatType.Bound chatFormatting) {
+        this.chatFormatting = chatFormatting;
     }
 }

@@ -19,92 +19,88 @@ package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
-import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.handlers.PacketEventsEncoder;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelInitializer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Method;
 import java.util.Set;
 
 //Thanks to ViaVersion for helping us design this injector.
 public class BungeePipelineInjector implements ChannelInjector {
-    private static final Field LISTENERS_FIELD;
-    private static final Field CONNECTIONS_FIELD;
-    private static final Class<?> CHANNEL_WRAPPER_CLASS;
+	private static final Field LISTENERS_FIELD;
 
-    static {
-        LISTENERS_FIELD = Reflection.getField(ProxyServer.getInstance().getClass(), "listeners");
-        LISTENERS_FIELD.setAccessible(true);
-        CONNECTIONS_FIELD = Reflection.getField(ProxyServer.getInstance().getClass(), "connections");
-        CONNECTIONS_FIELD.setAccessible(true);
-        CHANNEL_WRAPPER_CLASS = Reflection.getClassByNameWithoutException("net.md_5.bungee.netty.ChannelWrapper");
-    }
+	static {
+		LISTENERS_FIELD = Reflection.getField(ProxyServer.getInstance().getClass(), "listeners");
+		LISTENERS_FIELD.setAccessible(true);
+	}
 
-    private final List<Channel> connectionChannels = new ArrayList<>();
+	public void injectChannel(Channel channel) {
+		Field initializerField = null;
+		ChannelHandler handlerInstance = null;
+		for (String channelName : channel.pipeline().names()) {
+			ChannelHandler handler = channel.pipeline().get(channelName);
+			Field childHandlerField = Reflection.getField(handler.getClass(), "childHandler");
+			if (childHandlerField != null && childHandlerField.getType().isAssignableFrom(ChannelInitializer.class)) {
+				initializerField = childHandlerField;
+				initializerField.setAccessible(true);
+				handlerInstance = handler;
+			}
+		}
+		Field finalInitializerField = initializerField;
+		ChannelHandler finalHandlerInstance = handlerInstance;
+		ChannelInitializer<Channel> newInitializer = new ChannelInitializer<Channel>() {
+			@Override
+			protected void initChannel(@NotNull Channel ch) throws Exception {
+				if (!ch.isActive()) return;
+				Method initChannelMethod = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
+				initChannelMethod.setAccessible(true);
 
-    public void injectChannel(Channel channel) {
-        channel.pipeline().addFirst(PacketEvents.CONNECTION_HANDLER_NAME,
-                new ChannelInboundHandlerAdapter() {
-                    @Override
-                    public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
-                        Channel channel = (Channel) msg;
-                        channel.pipeline().addLast(PacketEvents.SERVER_CHANNEL_HANDLER_NAME, new PreChannelInitializer());
-                        super.channelRead(ctx, msg);
-                    }
-                });
+				initChannelMethod.invoke(finalInitializerField.get(finalHandlerInstance), ch);
 
-        try {
-            Map<?, ?> connectionsMap = (Map<?, ?>) CONNECTIONS_FIELD.get(ProxyServer.getInstance());
-            for (Object connection : connectionsMap.values()) {
-                ReflectionObject reflectUserConnection = new ReflectionObject(connection);
-                Object channelWrapper = reflectUserConnection.readObject(0, CHANNEL_WRAPPER_CLASS);
-                ReflectionObject reflectChannelWrapper = new ReflectionObject(channelWrapper);
-                Channel connectionChannel = reflectChannelWrapper.readObject(0, Channel.class);
-                if (connectionChannel != null &&
-                        connectionChannel.localAddress().equals(channel.localAddress())) {
-                    connectionChannel.close();
-                }
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        connectionChannels.add(channel);
-    }
+				ServerConnectionInitializer.initChannel(ch, ConnectionState.HANDSHAKING);
+			}
+		};
 
-    @Override
-    public void inject() {
-        try {
-            Set<Channel> listeners = (Set<Channel>) LISTENERS_FIELD.get(ProxyServer.getInstance());
-            Set<Channel> wrapper = new SetWrapper<>(listeners, this::injectChannel);
-            LISTENERS_FIELD.set(ProxyServer.getInstance(), wrapper);
+		try {
+			initializerField.set(handlerInstance, newInitializer);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
 
-            for (Channel channel : listeners) {
-                injectChannel(channel);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
+	}
 
-    @Override
-    public void uninject() {
-        for (Channel channel : connectionChannels) {
-            channel.pipeline().remove(PacketEvents.CONNECTION_HANDLER_NAME);
-        }
-        // Set<Channel> listeners = (Set<Channel>) LISTENERS_FIELD.get(ProxyServer.getInstance());
-        // TODO: Unwrap the listeners
-    }
+	@Override
+	public void inject() {
+		try {
+			Set<Channel> listeners = (Set<Channel>) LISTENERS_FIELD.get(ProxyServer.getInstance());
+
+			for (Channel channel : listeners) {
+				injectChannel(channel);
+			}
+
+			Set<Channel> wrapper = new SetWrapper<>(listeners, this::injectChannel);
+			LISTENERS_FIELD.set(ProxyServer.getInstance(), wrapper);
+
+
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void uninject() {
+		//Uninjection is not easily possible on BungeeCord.
+	}
 
     @Override
     public void setPlayer(Object ch, Object p) {

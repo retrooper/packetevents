@@ -193,7 +193,7 @@ public class ItemTags {
         copy(BlockTags.WOODEN_BUTTONS, ItemTags.WOODEN_BUTTONS);
         copy(BlockTags.STONE_BUTTONS, ItemTags.STONE_BUTTONS);
         copy(BlockTags.WOOL_CARPETS, ItemTags.WOOL_CARPETS);
-        ItemTags.WOODEN_DOORS.add(ItemTypes.OAK_DOOR, ItemTypes.SPRUCE_DOOR, ItemTypes.BIRCH_DOOR, ItemTypes.JUNGLE_DOOR, ItemTypes.ACACIA_DOOR, ItemTypes.DARK_OAK_DOOR, ItemTypes.CRIMSON_DOOR, ItemTypes.WARPED_DOOR, ItemTypes.MANGROVE_DOOR, ItemTypes.BAMBOO_DOOR, ItemTypes.CHERRY_DOOR);
+        copy(BlockTags.WOODEN_DOORS, ItemTags.WOODEN_DOORS);
         copy(BlockTags.WOODEN_STAIRS, ItemTags.WOODEN_STAIRS);
         copy(BlockTags.WOODEN_SLABS, ItemTags.WOODEN_SLABS);
         copy(BlockTags.WOODEN_FENCES, ItemTags.WOODEN_FENCES);
@@ -313,10 +313,10 @@ public class ItemTags {
         ItemTags.WOLF_FOOD.addTag(ItemTags.MEAT);
         ItemTags.STRIDER_TEMPT_ITEMS.addTag(ItemTags.STRIDER_FOOD).add(ItemTypes.WARPED_FUNGUS_ON_A_STICK);
         ItemTags.BOATS.addTag(ItemTags.CHEST_BOATS).add(ItemTypes.OAK_BOAT, ItemTypes.SPRUCE_BOAT, ItemTypes.BIRCH_BOAT, ItemTypes.JUNGLE_BOAT, ItemTypes.ACACIA_BOAT, ItemTypes.DARK_OAK_BOAT, ItemTypes.MANGROVE_BOAT, ItemTypes.BAMBOO_RAFT, ItemTypes.CHERRY_BOAT);
-        ItemTags.MUSIC_DISCS.addTag(ItemTags.CREEPER_DROP_MUSIC_DISCS).add(ItemTypes.MUSIC_DISC_PIGSTEP, ItemTypes.MUSIC_DISC_OTHERSIDE, ItemTypes.MUSIC_DISC_5, ItemTypes.MUSIC_DISC_RELIC);
+        ItemTags.MUSIC_DISCS.addTag(ItemTags.CREEPER_DROP_MUSIC_DISCS).add(ItemTypes.MUSIC_DISC_PIGSTEP, ItemTypes.MUSIC_DISC_OTHERSIDE, ItemTypes.MUSIC_DISC_5, ItemTypes.MUSIC_DISC_RELIC, ItemTypes.MUSIC_DISC_CREATOR, ItemTypes.MUSIC_DISC_CREATOR_MUSIC_BOX, ItemTypes.MUSIC_DISC_PRECIPICE);
         copy(BlockTags.DAMPENS_VIBRATIONS, ItemTags.DAMPENS_VIBRATIONS);
         ItemTags.TRIMMABLE_ARMOR.addTag(ItemTags.FOOT_ARMOR).addTag(ItemTags.LEG_ARMOR).addTag(ItemTags.CHEST_ARMOR).addTag(ItemTags.HEAD_ARMOR);
-        ItemTags.DECORATED_POT_INGREDIENTS.addTag(ItemTags.DECORATED_POT_SHERDS).add(ItemTypes.BRICK, ItemTypes.FLOW_POTTERY_SHERD, ItemTypes.GUSTER_POTTERY_SHERD, ItemTypes.SCRAPE_POTTERY_SHERD);
+        ItemTags.DECORATED_POT_INGREDIENTS.addTag(ItemTags.DECORATED_POT_SHERDS).add(ItemTypes.BRICK);
         ItemTags.BREAKS_DECORATED_POTS.addTag(ItemTags.SWORDS).addTag(ItemTags.AXES).addTag(ItemTags.PICKAXES).addTag(ItemTags.SHOVELS).addTag(ItemTags.HOES).add(ItemTypes.TRIDENT, ItemTypes.MACE);
         ItemTags.ENCHANTABLE_FOOT_ARMOR.addTag(ItemTags.FOOT_ARMOR);
         ItemTags.ENCHANTABLE_LEG_ARMOR.addTag(ItemTags.LEG_ARMOR);
@@ -333,7 +333,7 @@ public class ItemTags {
         ItemTags.ENCHANTABLE_ARMOR.addTag(ItemTags.ENCHANTABLE_FOOT_ARMOR).addTag(ItemTags.ENCHANTABLE_LEG_ARMOR).addTag(ItemTags.ENCHANTABLE_CHEST_ARMOR).addTag(ItemTags.ENCHANTABLE_HEAD_ARMOR);
         ItemTags.ENCHANTABLE_FIRE_ASPECT.addTag(ItemTags.ENCHANTABLE_SWORD).add(ItemTypes.MACE);
         ItemTags.ENCHANTABLE_WEAPON.addTag(ItemTags.ENCHANTABLE_SHARP_WEAPON).add(ItemTypes.MACE);
-        ItemTags.ENCHANTABLE_VANISHING.addTag(ItemTags.ENCHANTABLE_DURABILITY).addTag(ItemTags.SKULLS).add(ItemTypes.COMPASS, ItemTypes.CARVED_PUMPKIN, ItemTypes.MACE);
+        ItemTags.ENCHANTABLE_VANISHING.addTag(ItemTags.ENCHANTABLE_DURABILITY).addTag(ItemTags.SKULLS).add(ItemTypes.COMPASS, ItemTypes.CARVED_PUMPKIN);
         copy(BlockTags.COMPLETES_FIND_TREE_TUTORIAL, ItemTags.COMPLETES_FIND_TREE_TUTORIAL);
     }
 

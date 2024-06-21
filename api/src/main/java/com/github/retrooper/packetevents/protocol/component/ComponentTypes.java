@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ArmorTr
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BannerLayers;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BundleContents;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ChargedProjectiles;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.CustomData;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.DebugStickState;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.FireworkExplosion;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.FoodProperties;
@@ -35,6 +36,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemCon
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDyeColor;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemFireworks;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemJukeboxPlayable;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLock;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMapDecorations;
@@ -134,7 +136,9 @@ public class ComponentTypes {
 
     // item component types
     public static final ComponentType<NBTCompound> CUSTOM_DATA = define("custom_data",
-            PacketWrapper::readNBT, PacketWrapper::writeNBT);
+            // mojang wraps their "persistent" codec as a stream codec just here,
+            // so packetevents has to handle nbt strings
+            CustomData::read, CustomData::write);
     public static final ComponentType<Integer> MAX_STACK_SIZE = define("max_stack_size",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
     public static final ComponentType<Integer> MAX_DAMAGE = define("max_damage",
@@ -246,8 +250,13 @@ public class ComponentTypes {
     public static final ComponentType<ItemContainerLoot> CONTAINER_LOOT = define("container_loot",
             ItemContainerLoot::read, ItemContainerLoot::write);
 
+    // added in 1.21
+    public static final ComponentType<ItemJukeboxPlayable> JUKEBOX_PLAYABLE = define("jukebox_playable",
+            ItemJukeboxPlayable::read, ItemJukeboxPlayable::write);
+
     /**
      * Returns an immutable view of the component types.
+     *
      * @return Component Types
      */
     public static Collection<ComponentType<?>> values() {
