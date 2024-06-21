@@ -119,6 +119,10 @@ public class MapDecorationTypes {
     }
 
     public static @Nullable MapDecorationType getById(int id, ClientVersion version) {
+        return getById(version, id);
+    }
+
+    public static @Nullable MapDecorationType getById(ClientVersion version, int id) {
         int index = TYPES_BUILDER.getDataIndex(version);
         Map<Integer, MapDecorationType> idMap = DECORATION_TYPE_ID_MAP.get((byte) index);
         return idMap.get(id);
