@@ -22,7 +22,7 @@ dependencies {
 tasks {
     runVelocity {
         velocityVersion("3.3.0-SNAPSHOT")
-        runDirectory = file("run/velocity/")
+        runDirectory = rootDir.resolve("run/velocity/")
 
         javaLauncher = project.javaToolchains.launcherFor {
             languageVersion = JavaLanguageVersion.of(21)
