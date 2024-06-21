@@ -878,9 +878,6 @@ public final class SpigotReflectionUtil {
 
     public static Object createPacketDataSerializer(Object byteBuf) {
         try {
-            if (REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR != null) {
-                return REGISTRY_FRIENDLY_BYTE_BUF_CONSTRUCTOR.newInstance(byteBuf, getFrozenRegistryAccess());
-            }
             return NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR.newInstance(byteBuf);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
