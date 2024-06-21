@@ -2,10 +2,15 @@ package com.github.retrooper.packetevents.protocol.world.chunk;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.BitSet;
 
+@ApiStatus.Internal
 public class ChunkBitMask {
+
+    private ChunkBitMask() {
+    }
 
     public static long[] readBitSetLongs(PacketWrapper<?> packet) {
         if (packet.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {

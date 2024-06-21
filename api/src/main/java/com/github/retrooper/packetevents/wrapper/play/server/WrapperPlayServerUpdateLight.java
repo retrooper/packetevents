@@ -26,15 +26,14 @@ public class WrapperPlayServerUpdateLight extends PacketWrapper<WrapperPlayServe
     public void read() {
         x = readVarInt();
         z = readVarInt();
-        lightData = new LightData();
-        lightData.read(this);
+        lightData = LightData.read(this);
     }
 
     @Override
     public void write() {
         writeVarInt(x);
         writeVarInt(z);
-        lightData.write(this);
+        LightData.write(this, lightData);
     }
 
     public int getX() {

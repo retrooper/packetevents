@@ -70,7 +70,6 @@ public class PacketTransformationUtil {
                 );
                 // Light packet must be sent first
                 output[1] = chunkData;
-                chunkData.setLightData(null);
 
                 return output;
             }

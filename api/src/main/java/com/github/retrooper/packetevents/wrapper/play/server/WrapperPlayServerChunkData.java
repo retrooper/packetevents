@@ -182,8 +182,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            this.lightData = new LightData();
-            this.lightData.read(this);
+            this.lightData = LightData.read(this);
         }
 
         if (hasBiomeData) {
@@ -386,7 +385,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            this.lightData.write(this);
+            LightData.write(this, lightData);
         }
     }
 

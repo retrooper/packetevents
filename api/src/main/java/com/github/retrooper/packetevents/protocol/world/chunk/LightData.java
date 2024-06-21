@@ -16,58 +16,34 @@ public class LightData implements Cloneable {
     private byte[][] skyLightArray;
     private byte[][] blockLightArray;
 
-    public void read(PacketWrapper<?> packet) {
-        ServerVersion serverVersion = packet.getServerVersion();
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
-            trustEdges = packet.readBoolean();
-        }
-
-        skyLightMask = ChunkBitMask.readChunkMask(packet);
-        blockLightMask = ChunkBitMask.readChunkMask(packet);
-        emptySkyLightMask = ChunkBitMask.readChunkMask(packet);
-        emptyBlockLightMask = ChunkBitMask.readChunkMask(packet);
-
-        skyLightCount = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? packet.readVarInt() : 18;
-        this.skyLightArray = new byte[skyLightCount][];
-        for (int x = 0; x < skyLightCount; x++) {
-            if (this.skyLightMask.get(x)) {
-                skyLightArray[x] = packet.readByteArray();
-            }
-        }
-
-        blockLightCount = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? packet.readVarInt() : 18;
-        this.blockLightArray = new byte[blockLightCount][];
-        for (int x = 0; x < blockLightCount; x++) {
-            if (this.blockLightMask.get(x)) {
-                blockLightArray[x] = packet.readByteArray();
-            }
-        }
+    public LightData() {
     }
 
-    public void write(PacketWrapper<?> packet) {
-        ServerVersion serverVersion = packet.getServerVersion();
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
-            packet.writeBoolean(trustEdges);
-        }
-        ChunkBitMask.writeChunkMask(packet, skyLightMask);
-        ChunkBitMask.writeChunkMask(packet, blockLightMask);
-        ChunkBitMask.writeChunkMask(packet, emptySkyLightMask);
-        ChunkBitMask.writeChunkMask(packet, emptyBlockLightMask);
+    public LightData(boolean trustEdges, BitSet blockLightMask, BitSet skyLightMask, BitSet emptyBlockLightMask, BitSet emptySkyLightMask, int skyLightCount, int blockLightCount, byte[][] skyLightArray, byte[][] blockLightArray) {
+        this.trustEdges = trustEdges;
+        this.blockLightMask = blockLightMask;
+        this.skyLightMask = skyLightMask;
+        this.emptyBlockLightMask = emptyBlockLightMask;
+        this.emptySkyLightMask = emptySkyLightMask;
+        this.skyLightCount = skyLightCount;
+        this.blockLightCount = blockLightCount;
+        this.skyLightArray = skyLightArray;
+        this.blockLightArray = blockLightArray;
+    }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17))
-            packet.writeVarInt(skyLightCount);
-        for (int x = 0; x < skyLightCount; x++) {
-            if (skyLightMask.get(x)) {
-                packet.writeByteArray(skyLightArray[x]);
-            }
-        }
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17))
-            packet.writeVarInt(blockLightCount);
-        for (int x = 0; x < blockLightCount; x++) {
-            if (blockLightMask.get(x)) {
-                packet.writeByteArray(blockLightArray[x]);
-            }
+    @Override
+    public LightData clone() {
+        try {
+            LightData clone = (LightData) super.clone();
+            clone.blockLightMask = (BitSet) blockLightMask.clone();
+            clone.skyLightMask = (BitSet) skyLightMask.clone();
+            clone.emptyBlockLightMask = (BitSet) emptyBlockLightMask.clone();
+            clone.emptySkyLightMask = (BitSet) emptySkyLightMask.clone();
+            clone.skyLightArray = skyLightArray.clone();
+            clone.blockLightArray = blockLightArray.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
         }
     }
 
@@ -143,20 +119,61 @@ public class LightData implements Cloneable {
         this.blockLightArray = blockLightArray;
     }
 
-    @Override
-    public LightData clone() {
-        try {
-            LightData clone = (LightData) super.clone();
-            clone.trustEdges = trustEdges;
-            clone.blockLightMask = (BitSet) blockLightMask.clone();
-            clone.skyLightMask = (BitSet) skyLightMask.clone();
-            clone.emptyBlockLightMask = (BitSet) emptyBlockLightMask.clone();
-            clone.emptySkyLightMask = (BitSet) emptySkyLightMask.clone();
-            clone.skyLightArray = skyLightArray.clone();
-            clone.blockLightArray = blockLightArray.clone();
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
+    public static LightData read(PacketWrapper<?> packet) {
+        LightData lightData = new LightData();
+        ServerVersion serverVersion = packet.getServerVersion();
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
+            lightData.trustEdges = packet.readBoolean();
+        }
+
+        lightData.skyLightMask = ChunkBitMask.readChunkMask(packet);
+        lightData.blockLightMask = ChunkBitMask.readChunkMask(packet);
+        lightData.emptySkyLightMask = ChunkBitMask.readChunkMask(packet);
+        lightData.emptyBlockLightMask = ChunkBitMask.readChunkMask(packet);
+
+        lightData.skyLightCount = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? packet.readVarInt() : 18;
+        lightData.skyLightArray = new byte[lightData.skyLightCount][];
+        for (int x = 0; x < lightData.skyLightCount; x++) {
+            if (lightData.skyLightMask.get(x)) {
+                lightData.skyLightArray[x] = packet.readByteArray();
+            }
+        }
+
+        lightData.blockLightCount = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? packet.readVarInt() : 18;
+        lightData.blockLightArray = new byte[lightData.blockLightCount][];
+        for (int x = 0; x < lightData.blockLightCount; x++) {
+            if (lightData.blockLightMask.get(x)) {
+                lightData.blockLightArray[x] = packet.readByteArray();
+            }
+        }
+
+        return lightData;
+    }
+
+    public static void write(PacketWrapper<?> packet, LightData lightData) {
+        ServerVersion serverVersion = packet.getServerVersion();
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
+            packet.writeBoolean(lightData.trustEdges);
+        }
+        ChunkBitMask.writeChunkMask(packet, lightData.skyLightMask);
+        ChunkBitMask.writeChunkMask(packet, lightData.blockLightMask);
+        ChunkBitMask.writeChunkMask(packet, lightData.emptySkyLightMask);
+        ChunkBitMask.writeChunkMask(packet, lightData.emptyBlockLightMask);
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17))
+            packet.writeVarInt(lightData.skyLightCount);
+        for (int x = 0; x < lightData.skyLightCount; x++) {
+            if (lightData.skyLightMask.get(x)) {
+                packet.writeByteArray(lightData.skyLightArray[x]);
+            }
+        }
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17))
+            packet.writeVarInt(lightData.blockLightCount);
+        for (int x = 0; x < lightData.blockLightCount; x++) {
+            if (lightData.blockLightMask.get(x)) {
+                packet.writeByteArray(lightData.blockLightArray[x]);
+            }
         }
     }
 }
