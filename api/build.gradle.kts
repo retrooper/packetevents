@@ -1,10 +1,11 @@
 import com.github.retrooper.compression.strategy.JsonArrayCompressionStrategy
 import com.github.retrooper.compression.strategy.JsonObjectCompressionStrategy
 import com.github.retrooper.compression.strategy.JsonToNbtStrategy
+import com.github.retrooper.excludeAdventure
 
 plugins {
-    packetevents.`library-conventions`
     packetevents.`shadow-conventions`
+    packetevents.`library-conventions`
     `mapping-compression`
 }
 
@@ -18,9 +19,18 @@ java {
 }
 
 dependencies {
-    compileOnly(libs.bundles.adventure)
+    compileOnlyApi(libs.bundles.adventure)
+    api(project(":patch:adventure-text-serializer-gson", "shadow")) {
+        excludeAdventure()
+    }
+    api(libs.adventure.text.serializer.legacy) {
+        excludeAdventure()
+    }
+    compileOnly(libs.gson)
 
     testImplementation(libs.bundles.adventure)
+    testImplementation(project(":patch:adventure-text-serializer-gson"))
+    testImplementation(libs.adventure.text.serializer.legacy)
     testImplementation(project(":netty-common"))
     testImplementation(testlibs.mockbukkit)
     testImplementation(testlibs.slf4j)
@@ -49,6 +59,7 @@ mappingCompression {
         compress("command/argument_parser_mappings.json")
 
         compress("entity/entity_data_type_mappings.json")
+        compress("entity/painting_mappings.json")
 
         compress("item/item_armor_material_mappings.json")
         compress("item/item_banner_pattern_mappings.json")
@@ -86,6 +97,10 @@ tasks {
         }
     }
 
+    compressMappings {
+        inputs.dir(mappingCompression.mappingDirectory)
+    }
+
     processResources {
         dependsOn(compressMappings)
         from(project.layout.buildDirectory.dir("mappings/generated").get())
@@ -93,5 +108,13 @@ tasks {
 
     test {
         useJUnitPlatform()
+    }
+}
+
+publishing {
+    publications {
+        named<MavenPublication>("shadow") {
+            artifact(tasks["javadocJar"])
+        }
     }
 }

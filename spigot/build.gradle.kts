@@ -1,6 +1,6 @@
 plugins {
-    packetevents.`library-conventions`
     packetevents.`shadow-conventions`
+    packetevents.`library-conventions`
     alias(libs.plugins.run.paper)
 }
 
@@ -12,9 +12,9 @@ repositories {
 
 dependencies {
     compileOnly(libs.netty)
-    api(project(":api"))
-    api(project(":netty-common"))
-    api(libs.bundles.adventure)
+    shadow(libs.bundles.adventure)
+    shadow(project(":api", "shadow"))
+    shadow(project(":netty-common"))
 
     compileOnly(libs.spigot)
     compileOnly(libs.via.version)
@@ -22,17 +22,16 @@ dependencies {
 }
 
 tasks {
-    shadowJar {
-        relocate("net.kyori.adventure.text.serializer.gson", "io.github.retrooper.packetevents.adventure.serializer.gson")
-        relocate("net.kyori.adventure.text.serializer.legacy", "io.github.retrooper.packetevents.adventure.serializer.legacy")
-        dependencies {
-            exclude(dependency("com.google.code.gson:gson:.*"))
-        }
-    }
-
     runServer {
         minecraftVersion("1.19.4")
         outputs.upToDateWhen { false }
+    }
+
+    shadowJar {
+        // Paper doesn't need to map spigot -> mojang since we support both
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "mojang"
+        }
     }
 }
 

@@ -155,6 +155,14 @@ public class WrapperPlayServerChunkDataBulk extends PacketWrapper<WrapperPlaySer
         }
     }
 
+    @Override
+    public void copy(WrapperPlayServerChunkDataBulk wrapper) {
+        this.x = wrapper.x;
+        this.z = wrapper.z;
+        this.chunks = wrapper.chunks;
+        this.biomeData = wrapper.biomeData;
+    }
+
     private void write_1_8() {
         boolean skylight = false;
         NetworkChunkData data[] = new NetworkChunkData[this.chunks.length];

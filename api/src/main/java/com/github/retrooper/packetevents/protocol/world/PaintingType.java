@@ -18,11 +18,13 @@
 
 package com.github.retrooper.packetevents.protocol.world;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.HashMap;
 import java.util.Map;
 
 // From MCProtocolLib
-//TODO Recode and make registry
+@ApiStatus.Obsolete
 public enum PaintingType {
     KEBAB("Kebab", 0, 1, 1),
     AZTEC("Aztec", 1, 1, 1),

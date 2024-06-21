@@ -1,5 +1,6 @@
 package com.github.retrooper.packetevents.protocol.chat.message.reader.impl;
 
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
@@ -25,7 +26,7 @@ public class ChatMessageProcessor_v1_19_3 implements ChatMessageProcessor {
         LastSeenMessages.Packed lastSeenMessagesPacked = wrapper.readLastSeenMessagesPacked();
         Component unsignedChatContent = wrapper.readOptional(PacketWrapper::readComponent);
         FilterMask filterMask = wrapper.readFilterMask();
-        ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType = wrapper.readChatTypeBoundNetwork();
+        ChatType.Bound chatType = wrapper.readChatTypeBoundNetwork();
 
         return new ChatMessage_v1_19_3(senderUUID, index, signature, plainContent, timestamp, salt, lastSeenMessagesPacked, unsignedChatContent, filterMask, chatType);
     }
@@ -42,6 +43,6 @@ public class ChatMessageProcessor_v1_19_3 implements ChatMessageProcessor {
         wrapper.writeLastSeenMessagesPacked(newData.getLastSeenMessagesPacked());
         wrapper.writeOptional(newData.getUnsignedChatContent().orElse(null), PacketWrapper::writeComponent);
         wrapper.writeFilterMask(newData.getFilterMask());
-        wrapper.writeChatTypeBoundNetwork(newData.getChatType());
+        wrapper.writeChatTypeBoundNetwork(newData.getChatFormatting());
     }
 }

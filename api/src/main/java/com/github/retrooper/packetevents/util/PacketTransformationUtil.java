@@ -21,9 +21,12 @@ package com.github.retrooper.packetevents.util;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
+import com.github.retrooper.packetevents.protocol.world.chunk.LightData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateLight;
 
 import java.util.Collections;
 
@@ -51,6 +54,23 @@ public class PacketTransformationUtil {
                     Equipment equipment = entityEquipment.getEquipment().get(i);
                     output[i] = new WrapperPlayServerEntityEquipment(entityEquipment.getEntityId(), Collections.singletonList(equipment));
                 }
+                return output;
+            }
+        } else if (wrapper instanceof WrapperPlayServerChunkData) {
+            WrapperPlayServerChunkData chunkData = (WrapperPlayServerChunkData) wrapper;
+            LightData lightData = chunkData.getLightData();
+
+            if (chunkData.getServerVersion().isOlderThan(ServerVersion.V_1_18) && lightData != null) {
+                //Transform into chunk data & light data packets
+                PacketWrapper<?>[] output = new PacketWrapper[2];
+                output[0] = new WrapperPlayServerUpdateLight(
+                        chunkData.getColumn().getX(),
+                        chunkData.getColumn().getZ(),
+                        lightData
+                );
+                // Light packet must be sent first
+                output[1] = chunkData;
+
                 return output;
             }
         }

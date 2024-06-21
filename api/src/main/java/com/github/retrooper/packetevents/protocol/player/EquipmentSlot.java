@@ -27,33 +27,45 @@ public enum EquipmentSlot {
     BOOTS(1),
     LEGGINGS(2),
     CHEST_PLATE(3),
-    HELMET(4);
+    HELMET(4),
+    BODY(0);
 
     private static final EquipmentSlot[] VALUES = values();
 
     private final byte legacyId;
 
     EquipmentSlot(int legacyId) {
-        this.legacyId =(byte) legacyId;
+        this.legacyId = (byte) legacyId;
     }
 
     public int getId(ServerVersion version) {
-        if (version.isOlderThan(ServerVersion.V_1_9)) {
+        return getId(version.toClientVersion());
+    }
+
+    public int getId(ClientVersion version) {
+        if (version.isOlderThan(ClientVersion.V_1_9)) {
             return legacyId;
-        }
-        else {
+        } else {
             return ordinal();
         }
     }
 
     @Nullable
-    public static EquipmentSlot getById(ServerVersion version, int id) {
-        // FIXME: try making this O(1)
-        for (EquipmentSlot slot : VALUES) {
-            if (slot.getId(version) == id) {
-                return slot;
+    public static EquipmentSlot getById(ClientVersion version, int id) {
+        if (version.isOlderThan(ClientVersion.V_1_9)) {
+            for (EquipmentSlot slot : VALUES) {
+                if (slot.getId(version) == id) {
+                    return slot;
+                }
             }
+        } else {
+            return VALUES[id];
         }
         return null;
+    }
+
+    @Nullable
+    public static EquipmentSlot getById(ServerVersion version, int id) {
+        return getById(version.toClientVersion(), id);
     }
 }

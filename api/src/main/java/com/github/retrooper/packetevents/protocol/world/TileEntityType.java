@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.world;
 
+@Deprecated
 public enum TileEntityType {
     MOB_SPAWNER,
     COMMAND_BLOCK,

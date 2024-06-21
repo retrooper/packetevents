@@ -50,8 +50,8 @@ public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
         LastSeenMessages lastSeenMessages = wrapper.readLastSeenMessages();
         Component unsignedChatContent = wrapper.readOptional(PacketWrapper::readComponent);
         FilterMask filterMask = wrapper.readFilterMask();
-        ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType = wrapper.readChatTypeBoundNetwork();
-        return new ChatMessage_v1_19_1(plainContent, chatContent, unsignedChatContent, senderUUID, chatType,
+        ChatType.Bound chatFormatting = wrapper.readChatTypeBoundNetwork();
+        return new ChatMessage_v1_19_1(plainContent, chatContent, unsignedChatContent, senderUUID, chatFormatting,
                 previousSignature, signature, timestamp, salt, lastSeenMessages, filterMask);
     }
 
@@ -68,6 +68,6 @@ public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
         wrapper.writeLastSeenMessages(newData.getLastSeenMessages());
         wrapper.writeOptional(newData.getUnsignedChatContent(), PacketWrapper::writeComponent);
         wrapper.writeFilterMask(newData.getFilterMask());
-        wrapper.writeChatTypeBoundNetwork(newData.getChatType());
+        wrapper.writeChatTypeBoundNetwork(newData.getChatFormatting());
     }
 }
