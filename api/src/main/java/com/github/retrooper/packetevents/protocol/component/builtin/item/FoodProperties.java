@@ -18,8 +18,11 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.potion.PotionEffect;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,13 +34,25 @@ public class FoodProperties {
     private boolean canAlwaysEat;
     private float eatSeconds;
     private List<PossibleEffect> effects;
+    private @Nullable ItemStack usingConvertsTo;
 
-    public FoodProperties(int nutrition, float saturation, boolean canAlwaysEat, float eatSeconds, List<PossibleEffect> effects) {
+    public FoodProperties(
+            int nutrition, float saturation, boolean canAlwaysEat,
+            float eatSeconds, List<PossibleEffect> effects
+    ) {
+        this(nutrition, saturation, canAlwaysEat, eatSeconds, effects, null);
+    }
+
+    public FoodProperties(
+            int nutrition, float saturation, boolean canAlwaysEat, float eatSeconds,
+            List<PossibleEffect> effects, @Nullable ItemStack usingConvertsTo
+    ) {
         this.nutrition = nutrition;
         this.saturation = saturation;
         this.canAlwaysEat = canAlwaysEat;
         this.eatSeconds = eatSeconds;
         this.effects = effects;
+        this.usingConvertsTo = usingConvertsTo;
     }
 
     public static FoodProperties read(PacketWrapper<?> wrapper) {
@@ -46,7 +61,9 @@ public class FoodProperties {
         boolean canAlwaysEat = wrapper.readBoolean();
         float eatSeconds = wrapper.readFloat();
         List<PossibleEffect> effects = wrapper.readList(PossibleEffect::read);
-        return new FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, effects);
+        ItemStack usingConvertsTo = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21)
+                ? wrapper.readOptional(PacketWrapper::readItemStack) : null;
+        return new FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, effects, usingConvertsTo);
     }
 
     public static void write(PacketWrapper<?> wrapper, FoodProperties props) {
@@ -55,6 +72,9 @@ public class FoodProperties {
         wrapper.writeBoolean(props.canAlwaysEat);
         wrapper.writeFloat(props.eatSeconds);
         wrapper.writeList(props.effects, PossibleEffect::write);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21)) {
+            wrapper.writeOptional(props.usingConvertsTo, PacketWrapper::writeItemStack);
+        }
     }
 
     public int getNutrition() {
@@ -101,6 +121,14 @@ public class FoodProperties {
         this.effects = effects;
     }
 
+    public @Nullable ItemStack getUsingConvertsTo() {
+        return this.usingConvertsTo;
+    }
+
+    public void setUsingConvertsTo(@Nullable ItemStack usingConvertsTo) {
+        this.usingConvertsTo = usingConvertsTo;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -110,12 +138,13 @@ public class FoodProperties {
         if (Float.compare(that.saturation, this.saturation) != 0) return false;
         if (this.canAlwaysEat != that.canAlwaysEat) return false;
         if (Float.compare(that.eatSeconds, this.eatSeconds) != 0) return false;
-        return this.effects.equals(that.effects);
+        if (!this.effects.equals(that.effects)) return false;
+        return Objects.equals(this.usingConvertsTo, that.usingConvertsTo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.nutrition, this.saturation, this.canAlwaysEat, this.eatSeconds, this.effects);
+        return Objects.hash(this.nutrition, this.saturation, this.canAlwaysEat, this.eatSeconds, this.effects, this.usingConvertsTo);
     }
 
     public static class PossibleEffect {

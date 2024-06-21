@@ -46,6 +46,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.protocol.ProtocolConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,13 +94,11 @@ public class BungeePacketEventsBuilder {
 
                 @Override
                 public ServerVersion getVersion() {
-                    // TODO: Not perfect, as this is on the client! Might be inaccurate by a few patch versions.
                     if (version == null) {
-                        String bungeeVersion = ProxyServer.getInstance().getVersion();
-                        for (final ServerVersion val : ServerVersion.reversedValues()) {
-                        	if (bungeeVersion.contains(val.getReleaseName())) {
-                                return version = val;
-                            }
+                        version = ServerVersion.getById(ProtocolConstants.SUPPORTED_VERSION_IDS.get(0));
+                        if (version == null) {
+                            logManager.warn("PacketEvents currently does not support the protocol version " + ProtocolConstants.SUPPORTED_VERSION_IDS.get(0) + " but will act as if the minecraft version were " + ServerVersion.getLatest().getReleaseName() + "!");
+                            version = ServerVersion.getLatest();
                         }
                     }
                     return version;

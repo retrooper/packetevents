@@ -23,8 +23,11 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.attribute.Attribute;
 import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,7 +98,7 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
         for (int i = 0; i < propertyCount; i++) {
             Attribute attribute;
             if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-                attribute = Attributes.getById(this.serverVersion.toClientVersion(), this.readVarInt());
+                attribute = this.readMappedEntity(Attributes::getById);
             } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
                 attribute = Attributes.getByName(this.readIdentifier().toString());
             } else {
@@ -116,13 +119,20 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
             }
             List<PropertyModifier> modifiers = new ArrayList<>(modifiersLength);
             for (int j = 0; j < modifiersLength; j++) {
-                UUID uuid = readUUID();
-                //Name always had this value, and was never part of the protocol, so why include it?
-                //String name = "Unknown synced attribute modifier";
+                ResourceLocation name;
+                UUID uuid;
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)) {
+                    name = this.readIdentifier();
+                    uuid = PropertyModifier.generateSemiUniqueId(name);
+                } else {
+                    uuid = this.readUUID();
+                    name = new ResourceLocation(uuid.toString());
+                }
+
                 double amount = readDouble();
                 byte operationIndex = readByte();
                 PropertyModifier.Operation operation = PropertyModifier.Operation.VALUES[operationIndex];
-                modifiers.add(new PropertyModifier(uuid, amount, operation));
+                modifiers.add(new PropertyModifier(name, uuid, amount, operation));
             }
             this.properties.add(new Property(attribute, value, modifiers));
         }
@@ -157,7 +167,11 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
                 writeVarInt(property.modifiers.size());
             }
             for (PropertyModifier modifier : property.modifiers) {
-                writeUUID(modifier.uuid);
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)) {
+                    this.writeIdentifier(modifier.name);
+                } else {
+                    this.writeUUID(modifier.uuid);
+                }
                 writeDouble(modifier.amount);
                 writeByte(modifier.operation.ordinal());
             }
@@ -195,21 +209,55 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
             public static final Operation[] VALUES = values();
         }
 
-        private UUID uuid;
+        private ResourceLocation name; // added in 1.21
+        private UUID uuid; // removed in 1.21
         private double amount;
         private Operation operation;
 
         public PropertyModifier(UUID uuid, double amount, Operation operation) {
+            this(new ResourceLocation(uuid.toString()), uuid, amount, operation);
+        }
+
+        public PropertyModifier(ResourceLocation name, double amount, Operation operation) {
+            this(name, generateSemiUniqueId(name), amount, operation);
+        }
+
+        public PropertyModifier(ResourceLocation name, UUID uuid, double amount, Operation operation) {
+            this.name = name;
             this.uuid = uuid;
             this.amount = amount;
             this.operation = operation;
         }
 
+        private static UUID generateSemiUniqueId(ResourceLocation name) {
+            String extendedName = "packetevents_" + name.toString();
+            return UUID.nameUUIDFromBytes(extendedName.getBytes(StandardCharsets.UTF_8));
+        }
+
+        // added in 1.21
+        public ResourceLocation getName() {
+            return this.name;
+        }
+
+        // added in 1.21
+        public void setName(ResourceLocation name) {
+            this.name = name;
+            this.uuid = generateSemiUniqueId(name);
+        }
+
+        @ApiStatus.Obsolete // unused since 1.21
         public UUID getUUID() {
             return uuid;
         }
 
+        @ApiStatus.Obsolete // unused since 1.21
         public void setUUID(UUID uuid) {
+            this.name = new ResourceLocation(uuid.toString());
+            this.uuid = uuid;
+        }
+
+        public void setNameAndUUID(ResourceLocation name, UUID uuid) {
+            this.name = name;
             this.uuid = uuid;
         }
 

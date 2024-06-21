@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
@@ -31,44 +32,49 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperPlayServerBlockEntityData extends PacketWrapper<WrapperPlayServerBlockEntityData> {
 
     private Vector3i position;
-    private int type;
+    private BlockEntityType type;
     private NBTCompound nbt;
 
     public WrapperPlayServerBlockEntityData(PacketSendEvent event) {
         super(event);
     }
 
+    @Deprecated
+    public WrapperPlayServerBlockEntityData(Vector3i position, TileEntityType type, NBTCompound nbt) {
+        this(position, type.getId(), nbt);
+    }
+
+    @Deprecated
     public WrapperPlayServerBlockEntityData(Vector3i position, int type, NBTCompound nbt) {
+        this(position, BlockEntityTypes.getById(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), type), nbt);
+    }
+
+    public WrapperPlayServerBlockEntityData(Vector3i position, BlockEntityType type, NBTCompound nbt) {
         super(PacketType.Play.Server.BLOCK_ENTITY_DATA);
         this.position = position;
         this.type = type;
         this.nbt = nbt;
     }
 
-    public WrapperPlayServerBlockEntityData(Vector3i position, TileEntityType type, NBTCompound nbt) {
-        this(position, type.getId(), nbt);
-    }
-
     @Override
     public void read() {
-        this.position = readBlockPosition();
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            this.type = readVarInt();
-        } else {
-            this.type = readUnsignedByte();
-        }
-        this.nbt = readNBT();
+        this.position = this.readBlockPosition();
+        int typeId = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)
+                ? this.readVarInt() : this.readUnsignedByte();
+        this.type = BlockEntityTypes.getById(this.serverVersion.toClientVersion(), typeId);
+        this.nbt = this.readNBT();
     }
 
     @Override
     public void write() {
-        writeBlockPosition(this.position);
+        this.writeBlockPosition(this.position);
+        int typeId = this.type.getId(this.serverVersion.toClientVersion());
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            writeVarInt(this.type);
+            this.writeVarInt(typeId);
         } else {
-            writeByte(this.type);
+            this.writeByte(typeId);
         }
-        writeNBT(this.nbt);
+        this.writeNBT(this.nbt);
     }
 
     @Override
@@ -86,30 +92,32 @@ public class WrapperPlayServerBlockEntityData extends PacketWrapper<WrapperPlayS
         this.position = position;
     }
 
+    @Deprecated
     public int getType() {
-        return type;
+        return this.type.getId(this.serverVersion.toClientVersion());
     }
 
     public BlockEntityType getBlockEntityType() {
-        return BlockEntityTypes.getById(this.serverVersion.toClientVersion(), this.type);
+        return this.type;
     }
 
     @Deprecated
     public TileEntityType getAsTileType() {
-        return TileEntityType.getById(type);
+        return TileEntityType.getById(this.getType());
     }
 
+    @Deprecated
     public void setType(int type) {
-        this.type = type;
+        this.setType(BlockEntityTypes.getById(this.serverVersion.toClientVersion(), type));
     }
 
     public void setType(BlockEntityType blockEntityType) {
-        this.setType(blockEntityType.getId(this.serverVersion.toClientVersion()));
+        this.type = blockEntityType;
     }
 
     @Deprecated
     public void setType(TileEntityType type) {
-        this.type = type.getId();
+        this.setType(type.getId());
     }
 
     public NBTCompound getNBT() {

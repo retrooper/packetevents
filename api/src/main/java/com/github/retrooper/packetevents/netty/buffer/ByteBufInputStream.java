@@ -42,27 +42,27 @@ public class ByteBufInputStream extends InputStream implements DataInput {
         this(buffer, ByteBufHelper.readableBytes(buffer), releaseOnClose);
     }
 
-    public ByteBufInputStream(Object buffer, int length, boolean releaseOnClose) {
+    public ByteBufInputStream(Object buffer, int maxLength, boolean releaseOnClose) {
         this.lineBuf = new StringBuilder();
         if (buffer == null) {
             throw new NullPointerException("buffer");
-        } else if (length < 0) {
+        } else if (maxLength < 0) {
             if (releaseOnClose) {
                 ByteBufHelper.release(buffer);
             }
 
-            throw new IllegalArgumentException("length: " + length);
-        } else if (length > ByteBufHelper.readableBytes(buffer)) {
+            throw new IllegalArgumentException("maxLength: " + maxLength);
+        } else if (ByteBufHelper.readableBytes(buffer) > maxLength) {
             if (releaseOnClose) {
                 ByteBufHelper.release(buffer);
             }
 
-            throw new IndexOutOfBoundsException("Too many bytes to be read - Needs " + length + ", maximum is " + ByteBufHelper.readableBytes(buffer));
+            throw new IndexOutOfBoundsException("Too many bytes to be read - Found " + ByteBufHelper.readableBytes(buffer) + ", maximum is " + maxLength);
         } else {
             this.releaseOnClose = releaseOnClose;
             this.buffer = buffer;
             this.startIndex = ByteBufHelper.readerIndex(buffer);
-            this.endIndex = this.startIndex + length;
+            this.endIndex = this.startIndex + ByteBufHelper.readableBytes(buffer);
             ByteBufHelper.markReaderIndex(buffer);
         }
     }

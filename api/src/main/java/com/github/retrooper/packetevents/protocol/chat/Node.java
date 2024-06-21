@@ -16,9 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package com.github.retrooper.packetevents.protocol.chat;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.chat.Parsers.Parser;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,20 +27,33 @@ import java.util.List;
 import java.util.Optional;
 
 public class Node {
+
     private byte flags;
     private List<Integer> children;
     private int redirectNodeIndex;
     private Optional<String> name;
-    private Optional<Integer> parserID;
+    private Optional<Parser> parser;
     private Optional<List<Object>> properties;
     private Optional<ResourceLocation> suggestionsType;
 
-    public Node(byte flags, List<Integer> children, int redirectNodeIndex, @Nullable String name, @Nullable Integer parserID, @Nullable List<Object> properties, @Nullable ResourceLocation suggestionsType) {
+    public Node(
+            byte flags, List<Integer> children, int redirectNodeIndex, @Nullable String name,
+            @Nullable Integer parserID, @Nullable List<Object> properties, @Nullable ResourceLocation suggestionsType
+    ) {
+        this(flags, children, redirectNodeIndex, name, parserID == null ? null : Parsers.getById(
+                        PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), parserID),
+                properties, suggestionsType);
+    }
+
+    public Node(
+            byte flags, List<Integer> children, int redirectNodeIndex, @Nullable String name, @Nullable Parser parser,
+            @Nullable List<Object> properties, @Nullable ResourceLocation suggestionsType
+    ) {
         this.flags = flags;
         this.children = children;
         this.redirectNodeIndex = redirectNodeIndex;
         this.name = Optional.ofNullable(name);
-        this.parserID = Optional.ofNullable(parserID);
+        this.parser = Optional.ofNullable(parser);
         this.properties = Optional.ofNullable(properties);
         this.suggestionsType = Optional.ofNullable(suggestionsType);
     }
@@ -76,12 +90,22 @@ public class Node {
         this.name = name;
     }
 
+    public Optional<Parser> getParser() {
+        return this.parser;
+    }
+
+    public void setParser(Optional<Parser> parser) {
+        this.parser = parser;
+    }
+
     public Optional<Integer> getParserID() {
-        return parserID;
+        return this.parser.map(parser -> parser.getId(PacketEvents.getAPI()
+                .getServerManager().getVersion().toClientVersion()));
     }
 
     public void setParserID(Optional<Integer> parserID) {
-        this.parserID = parserID;
+        this.parser = parserID.map(id -> Parsers.getById(PacketEvents.getAPI()
+                .getServerManager().getVersion().toClientVersion(), id));
     }
 
     public Optional<List<Object>> getProperties() {

@@ -1,5 +1,6 @@
 package com.github.retrooper.packetevents.protocol.chat.message;
 
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
@@ -19,10 +20,10 @@ public class ChatMessage_v1_19_3 extends ChatMessage_v1_16 {
     LastSeenMessages.Packed lastSeenMessagesPacked;
     @Nullable Component unsignedChatContent;
     FilterMask filterMask;
-    ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType;
+    ChatType.Bound chatFormatting;
 
-    public ChatMessage_v1_19_3(UUID senderUUID, int index, byte[] signature, String plainContent, Instant timestamp, long salt, LastSeenMessages.Packed lastSeenMessagesPacked, @Nullable Component unsignedChatContent, FilterMask filterMask, ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
-        super(Component.text(plainContent), chatType.getType(), senderUUID);
+    public ChatMessage_v1_19_3(UUID senderUUID, int index, byte[] signature, String plainContent, Instant timestamp, long salt, LastSeenMessages.Packed lastSeenMessagesPacked, @Nullable Component unsignedChatContent, FilterMask filterMask, ChatType.Bound chatFormatting) {
+        super(Component.text(plainContent), chatFormatting.getType(), senderUUID);
         this.index = index;
         this.signature = signature;
         this.plainContent = plainContent;
@@ -31,7 +32,7 @@ public class ChatMessage_v1_19_3 extends ChatMessage_v1_16 {
         this.lastSeenMessagesPacked = lastSeenMessagesPacked;
         this.unsignedChatContent = unsignedChatContent;
         this.filterMask = filterMask;
-        this.chatType = chatType;
+        this.chatFormatting = chatFormatting;
     }
 
     public int getIndex() {
@@ -109,11 +110,30 @@ public class ChatMessage_v1_19_3 extends ChatMessage_v1_16 {
         this.filterMask = filterMask;
     }
 
-    public ChatMessage_v1_19_1.ChatTypeBoundNetwork getChatType() {
-        return chatType;
+
+    public ChatType.Bound getChatFormatting() {
+        return chatFormatting;
     }
 
-    public void setChatType(ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType) {
-        this.chatType = chatType;
+    public void setChatFormatting(ChatType.Bound chatFormatting) {
+        this.chatFormatting = chatFormatting;
+    }
+
+    /**
+     * Retrieves the chat formatting. Please refer to {@link ChatMessage_v1_19_3#getChatFormatting}
+     * @return chat formatting which contains the actual chat type.
+     */
+    @Deprecated
+    public ChatType.Bound getChatType() {
+        return chatFormatting;
+    }
+
+    /**
+     * Sets the chat formatting. Please refer to {@link ChatMessage_v1_19_3#setChatFormatting}
+     * @param chatFormatting formatting which contains the actual chat type.
+     */
+    @Deprecated
+    public void setChatType(ChatType.Bound chatFormatting) {
+        this.chatFormatting = chatFormatting;
     }
 }
