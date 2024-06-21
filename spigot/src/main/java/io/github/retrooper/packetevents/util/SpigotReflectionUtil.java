@@ -137,6 +137,7 @@ public final class SpigotReflectionUtil {
     private static Object DIMENSION_TYPE_REGISTRY_KEY;
 
     private static boolean PAPER_ENTITY_LOOKUP_EXISTS = false;
+    private static boolean PAPER_ENTITY_LOOKUP_LEGACY = false;
 
     private static boolean IS_OBFUSCATED;
 
@@ -297,6 +298,10 @@ public final class SpigotReflectionUtil {
         }
 
         PAPER_ENTITY_LOOKUP_EXISTS = Reflection.getField(WORLD_SERVER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) != null;
+        if (PAPER_ENTITY_LOOKUP_EXISTS) {
+            //It's not inside the Level class (NMS World) class, which is how it was on < 1.21 Paper
+            PAPER_ENTITY_LOOKUP_LEGACY = Reflection.getField(NMS_WORLD_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) == null;
+        }
     }
 
     private static void initClasses() {
@@ -1034,6 +1039,10 @@ public final class SpigotReflectionUtil {
                 ReflectionObject reflectWorldServer = new ReflectionObject(worldServer);
                 Object levelEntityGetter;
                 if (PAPER_ENTITY_LOOKUP_EXISTS) {
+                    if (!PAPER_ENTITY_LOOKUP_LEGACY) {
+                        //Check in the correct class!
+                        reflectWorldServer = new ReflectionObject(worldServer, NMS_WORLD_CLASS);
+                    }
                     levelEntityGetter = reflectWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
                 } else {
                     Object entitySectionManager = reflectWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
@@ -1095,6 +1104,10 @@ public final class SpigotReflectionUtil {
             ReflectionObject wrappedWorldServer = new ReflectionObject(worldServer);
             Object levelEntityGetter;
             if (PAPER_ENTITY_LOOKUP_EXISTS) {
+                if (!PAPER_ENTITY_LOOKUP_LEGACY) {
+                    //Check in the correct class!
+                    wrappedWorldServer = new ReflectionObject(worldServer, NMS_WORLD_CLASS);
+                }
                 levelEntityGetter = wrappedWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
             } else {
                 Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
