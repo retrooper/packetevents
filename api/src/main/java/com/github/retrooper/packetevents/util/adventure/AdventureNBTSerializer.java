@@ -350,7 +350,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                     int nonNullCount = count == null ? 1 : count;
 
                     BinaryTagHolder tag = child.readUTF("tag", BinaryTagHolder::binaryTagHolder);
-                    if (tag != null) {
+                    if (tag != null || !BackwardCompatUtil.IS_4_17_0_OR_NEWER) {
                         style.hoverEvent(HoverEvent.showItem(itemId, nonNullCount, tag));
                     } else {
                         Map<Key, DataComponentValue> components = child.readCompound("components", nbt -> {
@@ -425,9 +425,9 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                     Key itemId = item.item();
                     int count = item.count();
                     BinaryTagHolder nbt = item.nbt();
-                    Map<Key, DataComponentValue> comps = item.dataComponents();
+                    boolean emptyComps = !BackwardCompatUtil.IS_4_17_0_OR_NEWER || item.dataComponents().isEmpty();
 
-                    if (count == 1 && nbt == null && comps.isEmpty()) {
+                    if (count == 1 && nbt == null && emptyComps) {
                         child.writeUTF("contents", itemId.asString());
                     } else {
                         NBTWriter itemNBT = child.child("contents");
@@ -436,9 +436,9 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                         if (nbt != null) {
                             itemNBT.writeUTF("tag", nbt.string());
                         }
-                        if (!comps.isEmpty()) {
+                        if (!emptyComps) {
                             NBTWriter compsNbt = itemNBT.child("components");
-                            for (Map.Entry<Key, DataComponentValue> entry : comps.entrySet()) {
+                            for (Map.Entry<Key, DataComponentValue> entry : item.dataComponents().entrySet()) {
                                 if (entry.getValue() == DataComponentValue.removed()) {
                                     // I don't think value matters here
                                     compsNbt.writeCompound("!" + entry.getKey(), new NBTCompound());
