@@ -234,7 +234,7 @@ public class PEVersion implements Comparable<PEVersion> {
      * @return an array of version numbers.
      */
     @Deprecated
-    public int[] toArray() {
+    public int[] asArray() {
         return new int[]{major, minor, patch};
     }
 }
