@@ -18,12 +18,9 @@
 
 package com.github.retrooper.packetevents.util;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
-import java.util.Optional;
-import java.util.logging.Logger;
 
 /**
  * Represents a PacketEvents version using Semantic Versioning.
@@ -31,8 +28,6 @@ import java.util.logging.Logger;
  * Snapshots will always resolve to a newer version than the non-snapshot version if major, minor, and patch are the same.
  */
 public class PEVersion implements Comparable<PEVersion> {
-
-    public static final PEVersion UNKNOWN = new PEVersion(0, 0, 0);
 
     private final int major;
     private final int minor;
@@ -106,21 +101,6 @@ public class PEVersion implements Comparable<PEVersion> {
      */
     public static PEVersion fromString(@NotNull final String version) {
         return new PEVersion(version);
-    }
-
-    /**
-     * Creates a {@link PEVersion} instance from the package implementation version.
-     *
-     * @return a {@link PEVersion} instance.
-     */
-    public static PEVersion createFromPackageVersion() {
-        Optional<PEVersion> version = Optional.ofNullable(PacketEvents.class.getPackage().getImplementationVersion()).map(PEVersion::fromString);
-        if (!version.isPresent()) {
-            Logger logger = Logger.getLogger(PEVersion.class.getName());
-            logger.warning("[packetevents-version] Failed to retrieve the PacketEvents version from the package implementation version. Are you using a using a custom build?");
-        }
-
-        return version.orElse(UNKNOWN);
     }
 
     /**

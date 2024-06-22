@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
+import com.github.retrooper.packetevents.util.PEVersions;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 
 import java.util.logging.Logger;
@@ -37,7 +38,6 @@ public abstract class PacketEventsAPI<T> {
     private static final UpdateChecker UPDATE_CHECKER = new UpdateChecker();
     private static final LogManager LOG_MANAGER = new LogManager();
     private static final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
-    private static final PEVersion VERSION = PEVersion.createFromPackageVersion();
 
     public EventManager getEventManager() {
         return EVENT_MANAGER;
@@ -52,7 +52,7 @@ public abstract class PacketEventsAPI<T> {
     }
 
     public PEVersion getVersion() {
-        return VERSION;
+        return PEVersions.CURRENT;
     }
 
     public Logger getLogger() {

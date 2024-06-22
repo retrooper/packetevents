@@ -18,10 +18,6 @@ tasks {
         }
 
         mergeServiceFiles()
-
-        manifest {
-            attributes["Implementation-Version"] = rootProject.version
-        }
     }
 
     assemble {
