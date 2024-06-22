@@ -103,6 +103,10 @@ tasks {
         from(project.layout.buildDirectory.dir("mappings/generated").get())
     }
 
+    generateVersionsFile {
+        packageName = "com.github.retrooper.packetevents.util"
+    }
+
     test {
         useJUnitPlatform()
     }
