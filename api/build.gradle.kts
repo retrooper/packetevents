@@ -7,6 +7,7 @@ plugins {
     packetevents.`shadow-conventions`
     packetevents.`library-conventions`
     `mapping-compression`
+    `pe-version`
 }
 
 // papermc repo + disableAutoTargetJvm needed for mockbukkit
@@ -100,6 +101,10 @@ tasks {
     processResources {
         dependsOn(compressMappings)
         from(project.layout.buildDirectory.dir("mappings/generated").get())
+    }
+
+    generateVersionsFile {
+        packageName = "com.github.retrooper.packetevents.util"
     }
 
     test {

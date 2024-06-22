@@ -1,4 +1,4 @@
 name: packetevents
-version: 2.3.1 #//TODO UPDATE
+version: ${version}
 main: io.github.retrooper.packetevents.PacketEventsPlugin
 author: retrooper
