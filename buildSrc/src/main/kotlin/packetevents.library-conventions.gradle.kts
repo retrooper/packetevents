@@ -142,7 +142,7 @@ publishing {
 
 // So that SNAPSHOT is always the latest SNAPSHOT
 configurations.all {
-    resolutionStrategy.cacheDynamicVersionsFor(0, "seconds")
+    resolutionStrategy.cacheDynamicVersionsFor(0, TimeUnit.SECONDS)
 }
 
 val taskNames = gradle.startParameter.taskNames

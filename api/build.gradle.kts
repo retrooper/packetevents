@@ -7,6 +7,7 @@ plugins {
     packetevents.`shadow-conventions`
     packetevents.`library-conventions`
     `mapping-compression`
+    `pe-version`
 }
 
 // papermc repo + disableAutoTargetJvm needed for mockbukkit
