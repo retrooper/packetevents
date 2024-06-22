@@ -96,6 +96,15 @@ tasks {
         options {
             (this as CoreJavadocOptions).addBooleanOption("Xdoclint:none", true)
         }
+        mustRunAfter(generateVersionsFile)
+    }
+
+    sourcesJar {
+        mustRunAfter(generateVersionsFile)
+    }
+
+    withType<JavaCompile> {
+        dependsOn(generateVersionsFile)
     }
 
     processResources {
