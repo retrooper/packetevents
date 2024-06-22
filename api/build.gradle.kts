@@ -20,6 +20,7 @@ java {
 
 dependencies {
     compileOnlyApi(libs.bundles.adventure)
+    implementation(libs.adventure.api)
     api(project(":patch:adventure-text-serializer-gson", "shadow")) {
         excludeAdventure()
     }
@@ -96,10 +97,6 @@ tasks {
         }
     }
 
-    compressMappings {
-        inputs.dir(mappingCompression.mappingDirectory)
-    }
-
     processResources {
         dependsOn(compressMappings)
         from(project.layout.buildDirectory.dir("mappings/generated").get())
@@ -107,6 +104,13 @@ tasks {
 
     test {
         useJUnitPlatform()
+    }
+
+    shadowJar {
+        exclude {
+            val path = it.path
+            path.startsWith("net/kyori") && !path.startsWith("net/kyori/adventure/text/serializer") && !path.startsWith("net/kyori/option")
+        }
     }
 }
 

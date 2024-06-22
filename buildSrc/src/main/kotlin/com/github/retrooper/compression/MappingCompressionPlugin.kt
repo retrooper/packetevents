@@ -41,6 +41,7 @@ class MappingCompressionPlugin : Plugin<Project> {
         }
 
         target.afterEvaluate {
+            task.inputs.dir(ext.mappingDirectory)
             task.mappingsDir = ext.mappingDirectory.get().asFile.toPath()
             task.outDir = ext.outDirectory.get().asFile.toPath()
             task.strategies = ext.strategies
