@@ -247,4 +247,14 @@ public class PEVersion implements Comparable<PEVersion> {
     public String toString() {
         return major + "." + minor + "." + patch + (snapshot ? "-SNAPSHOT" : "");
     }
+
+    /**
+     * Converts the {@link PEVersion} to an array of version numbers.
+     *
+     * @return an array of version numbers.
+     */
+    @Deprecated
+    public int[] toArray() {
+        return new int[]{major, minor, patch};
+    }
 }
