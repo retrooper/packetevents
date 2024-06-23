@@ -533,12 +533,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public void writeMinecraftKey(int index, String content) {
-        Object minecraftKey = null;
-        try {
-            minecraftKey = NMSUtils.minecraftKeyConstructor.newInstance(content);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        Object minecraftKey = NMSUtils.generateMinecraftKeyNew(content);
         write(NMSUtils.minecraftKeyClass, index, minecraftKey);
     }
 

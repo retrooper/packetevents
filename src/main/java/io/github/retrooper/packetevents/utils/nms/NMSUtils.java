@@ -45,7 +45,8 @@ public final class NMSUtils {
     private static final ThreadLocal<Random> randomThreadLocal = ThreadLocal.withInitial(Random::new);
     public static boolean legacyNettyImportMode;
     public static ServerVersion version;
-    public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor, dataWatcherConstructor, packetDataSerializerConstructor, itemStackConstructor;
+    public static Executable minecraftKeyConstructorOrMethod;
+    public static Constructor<?> blockPosConstructor, vec3DConstructor, dataWatcherConstructor, packetDataSerializerConstructor, itemStackConstructor;
     public static Class<?> mobEffectListClass, nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, sectionPositionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
@@ -59,7 +60,7 @@ public final class NMSUtils {
             asNMSCopy, getMessageMethod, chatFromStringMethod, getMaterialFromNMSBlock, getNMSBlockFromMaterial,
             getMobEffectListId, getMobEffectListById, getItemId, getItemById, getBukkitEntity;
     private static Field entityPlayerPingField, entityBoundingBoxField, mobEffectsRegistryField;
-    public static Field  getBaseBlockPosX, getBaseBlockPosY, getBaseBlockPosZ;
+    public static Field getBaseBlockPosX, getBaseBlockPosY, getBaseBlockPosZ;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
 
@@ -250,7 +251,7 @@ public final class NMSUtils {
             for (Field f : Reflection.getFields(builtInRegistriesClass)) {
                 Type type = f.getGenericType();
                 if (type instanceof ParameterizedType) {
-                    ParameterizedType pType = (ParameterizedType)type;
+                    ParameterizedType pType = (ParameterizedType) type;
                     if (pType.getActualTypeArguments()[0].equals(mobEffectListClass)) {
                         mobEffectsRegistryField = f;
                         break;
@@ -362,7 +363,12 @@ public final class NMSUtils {
             getNMSBlockFromMaterial = Reflection.getMethod(craftMagicNumbersClass, "getBlock", NMSUtils.blockClass, Material.class);
 
             if (minecraftKeyClass != null) {
-                minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
+                try {
+                    minecraftKeyConstructorOrMethod = minecraftKeyClass.getConstructor(String.class);
+                } catch (Exception ex) {
+                    minecraftKeyConstructorOrMethod = Reflection.getMethod(minecraftKeyClass, 0, String.class, char.class);
+                }
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -778,7 +784,12 @@ public final class NMSUtils {
 
     public static Object generateMinecraftKeyNew(String text) {
         try {
-            return minecraftKeyConstructor.newInstance(text);
+            if (minecraftKeyConstructorOrMethod instanceof Constructor<?>) {
+                return ((Constructor<?>)minecraftKeyConstructorOrMethod).newInstance(text);
+            }
+            else {
+                return ((Method)minecraftKeyConstructorOrMethod).invoke(text, ':');
+            }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -824,8 +835,7 @@ public final class NMSUtils {
         try {
             if (dataWatcherConstructor.getParameterCount() == 2) {
                 return dataWatcherConstructor.newInstance(nmsEntity, null);
-            }
-            else {
+            } else {
                 return dataWatcherConstructor.newInstance(nmsEntity);
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
