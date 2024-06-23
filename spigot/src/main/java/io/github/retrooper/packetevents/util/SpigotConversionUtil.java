@@ -94,7 +94,7 @@ public class SpigotConversionUtil {
             if (entityType.getTypeId() == -1) {
                 return null;
             }
-            return EntityTypes.getById(serverVersion.toClientVersion(), entityType.getTypeId());
+            return EntityTypes.getByLegacyId(serverVersion.toClientVersion(), entityType.getTypeId());
         }
     }
 
