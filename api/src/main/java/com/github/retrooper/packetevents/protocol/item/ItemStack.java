@@ -21,12 +21,14 @@ package com.github.retrooper.packetevents.protocol.item;
 import com.github.retrooper.packetevents.protocol.component.ComponentType;
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
+import com.github.retrooper.packetevents.protocol.component.StaticComponentMap;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments;
 import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
@@ -494,8 +496,25 @@ public class ItemStack {
             return this;
         }
 
+        public Builder nbt(String key, NBT tag) {
+            if (this.nbt == null) {
+                this.nbt = new NBTCompound();
+            }
+            this.nbt.setTag(key, tag);
+            return this;
+        }
+
         public Builder components(@Nullable PatchableComponentMap components) {
             this.components = components;
+            return this;
+        }
+
+        public <T> Builder component(ComponentType<T> type, @Nullable T value) {
+            if (this.components == null) {
+                this.components = new PatchableComponentMap(this.type == null
+                        ? StaticComponentMap.SHARED_ITEM_COMPONENTS : this.type.getComponents());
+            }
+            this.components.set(type, value);
             return this;
         }
 
