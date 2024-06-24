@@ -26,9 +26,11 @@ public class ShapelessRecipeData implements RecipeData {
     private final @NotNull String group;
     private final @NotNull Ingredient[] ingredients;
     private final ItemStack result;
+    private CraftingBookCategory category;
 
-    public ShapelessRecipeData(@NotNull String group, @NotNull Ingredient[] ingredients, @NotNull ItemStack result) {
+    public ShapelessRecipeData(@NotNull String group, @NotNull CraftingBookCategory category, @NotNull Ingredient[] ingredients, @NotNull ItemStack result) {
         this.group = group;
+        this.category = category;
         this.ingredients = ingredients;
         this.result = result;
     }
@@ -43,5 +45,9 @@ public class ShapelessRecipeData implements RecipeData {
 
     public @NotNull ItemStack getResult() {
         return result;
+    }
+
+    public CraftingBookCategory getCategory() {
+        return category;
     }
 }
