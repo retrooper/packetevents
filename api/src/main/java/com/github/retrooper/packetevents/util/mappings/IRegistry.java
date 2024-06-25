@@ -16,24 +16,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.mapper;
+package com.github.retrooper.packetevents.util.mappings;
 
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-public interface MappedEntity {
+import java.util.Collection;
 
-    ResourceLocation getName();
+public interface IRegistry<T extends MappedEntity> {
 
-    default int getId(@Nullable User user, ClientVersion version) {
-        return this.getId(version);
+    default @Nullable T getByName(ResourceLocation name) {
+        return this.getByName(name.toString());
     }
 
-    int getId(ClientVersion version);
+    @Nullable
+    T getByName(String name);
 
-    default boolean isRegistered() {
-        return true;
+    @Nullable
+    T getById(ClientVersion version, int id);
+
+    default int getId(String entityName, ClientVersion version) {
+        return this.getId(this.getByName(entityName), version);
     }
+
+    int getId(MappedEntity entity, ClientVersion version);
+
+    /**
+     * Returns an immutable view of the registry entries.
+     *
+     * @return Registry entries
+     */
+    Collection<T> getEntries();
+
+    ResourceLocation getRegistryKey();
 }

@@ -18,17 +18,24 @@
 
 package com.github.retrooper.packetevents.protocol.item.banner;
 
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class StaticBannerPattern implements BannerPattern {
+public class StaticBannerPattern extends AbstractMappedEntity implements BannerPattern {
 
     private final ResourceLocation assetId;
     private final String translationKey;
 
     public StaticBannerPattern(ResourceLocation assetId, String translationKey) {
+        this(null, assetId, translationKey);
+    }
+
+    public StaticBannerPattern(@Nullable TypesBuilderData data, ResourceLocation assetId, String translationKey) {
+        super(data);
         this.assetId = assetId;
         this.translationKey = translationKey;
     }
@@ -44,23 +51,8 @@ public class StaticBannerPattern implements BannerPattern {
     }
 
     @Override
-    public ResourceLocation getName() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int getId(ClientVersion version) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isRegistered() {
-        return false;
-    }
-
-    @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
+        if (this == obj || super.equals(obj)) return true;
         if (!(obj instanceof StaticBannerPattern)) return false;
         StaticBannerPattern that = (StaticBannerPattern) obj;
         if (!this.assetId.equals(that.assetId)) return false;
@@ -69,6 +61,7 @@ public class StaticBannerPattern implements BannerPattern {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.assetId, this.translationKey);
+        return this.data != null ? super.hashCode() :
+                Objects.hash(this.assetId, this.translationKey);
     }
 }

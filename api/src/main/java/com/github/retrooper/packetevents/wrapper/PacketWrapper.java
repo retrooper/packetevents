@@ -38,7 +38,6 @@ import com.github.retrooper.packetevents.protocol.chat.RemoteChatSession;
 import com.github.retrooper.packetevents.protocol.chat.SignedCommandArgument;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
-import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
 import com.github.retrooper.packetevents.protocol.component.ComponentType;
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
@@ -72,6 +71,8 @@ import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.util.crypto.SignatureData;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.ApiStatus;
@@ -1111,7 +1112,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public MessageSignature readMessageSignature() {
-        if(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) return new MessageSignature(readBytes(256));
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) return new MessageSignature(readBytes(256));
         else return new MessageSignature(readByteArray());
     }
 
@@ -1424,12 +1425,35 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         return directReader.apply(this);
     }
 
+    public <Z extends MappedEntity> Z readMappedEntity(IRegistry<Z> registry) {
+        if (this.user != null) {
+            IRegistry<Z> prevReg = registry;
+            registry = this.user.replaceRegistry(registry);
+            if (prevReg != registry) {
+                this.user.sendMessage("1replaced registry: " + registry.getRegistryKey());
+            }
+        }
+        return this.readMappedEntity(registry::getById);
+    }
+
+    public <Z extends MappedEntity> Z readMappedEntityOrDirect(
+            IRegistry<Z> registry, Reader<Z> directReader) {
+        if (this.user != null) {
+            IRegistry<Z> prevReg = registry;
+            registry = this.user.replaceRegistry(registry);
+            if (prevReg != registry) {
+                this.user.sendMessage("2replaced registry: " + registry.getRegistryKey());
+            }
+        }
+        return this.readMappedEntityOrDirect(registry::getById, directReader);
+    }
+
     public void writeMappedEntity(MappedEntity entity) {
         if (!entity.isRegistered()) {
             throw new IllegalArgumentException("Can't write id of unregistered entity "
                     + entity.getName() + " (" + entity + ")");
         }
-        this.writeVarInt(entity.getId(this.serverVersion.toClientVersion()));
+        this.writeVarInt(entity.getId(this.user, this.serverVersion.toClientVersion()));
     }
 
     public <Z extends MappedEntity> void writeMappedEntityOrDirect(Z entity, Writer<Z> writer) {
@@ -1438,7 +1462,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
             writer.accept(this, entity);
             return;
         }
-        int id = entity.getId(this.serverVersion.toClientVersion());
+        int id = entity.getId(this.user, this.serverVersion.toClientVersion());
         this.writeVarInt(id + 1);
     }
 

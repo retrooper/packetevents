@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
+@ApiStatus.Internal
 public class MappingHelper {
 
     public static NBTCompound decompress(final String path) {

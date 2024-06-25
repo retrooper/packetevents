@@ -27,10 +27,13 @@ import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
@@ -40,10 +43,13 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTitle;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class User {
@@ -58,6 +64,8 @@ public class User {
     private List<NBTCompound> worldNBT;
     private Dimension dimension = new Dimension(0);
 
+    private final Map<ResourceLocation, IRegistry<?>> synchronizedRegistries = new HashMap<>();
+
     public User(Object channel,
                 ConnectionState connectionState, ClientVersion clientVersion,
                 UserProfile profile) {
@@ -66,6 +74,28 @@ public class User {
         this.encoderState = connectionState;
         this.clientVersion = clientVersion;
         this.profile = profile;
+    }
+
+    @ApiStatus.Internal
+    @SuppressWarnings("unchecked") // should be fine
+    public <T extends MappedEntity> IRegistry<T> replaceRegistry(IRegistry<T> registry) {
+        IRegistry<?> replacedRegistry = this.synchronizedRegistries.get(registry.getRegistryKey());
+        return replacedRegistry != null ? (IRegistry<T>) replacedRegistry : registry;
+    }
+
+    @ApiStatus.Internal
+    public IRegistry<?> getRegistry(ResourceLocation registryKey) {
+        return this.synchronizedRegistries.get(registryKey);
+    }
+
+    @ApiStatus.Internal
+    public void putSynchronizedRegistry(IRegistry<?> registry) {
+        this.synchronizedRegistries.put(registry.getRegistryKey(), registry);
+    }
+
+    @ApiStatus.Internal
+    public void clearSynchronizedRegistries() {
+        this.synchronizedRegistries.clear();
     }
 
     public Object getChannel() {

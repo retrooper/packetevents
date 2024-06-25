@@ -18,10 +18,15 @@
 
 package com.github.retrooper.packetevents.util.mappings;
 
-import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.VersionMapper;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -34,6 +39,9 @@ public class TypesBuilder {
     private final String mapPath;
     private Map<ClientVersion, Map<String, Integer>> entries = new HashMap<>();
     private VersionMapper versionMapper;
+
+    @Nullable
+    VersionedRegistry<?> registry;
 
     public TypesBuilder(String mapPath, boolean lazy) {
         this.mapPath = mapPath;
@@ -112,6 +120,11 @@ public class TypesBuilder {
         }
     }
 
+    @ApiStatus.Internal
+    public @Nullable VersionedRegistry<?> getRegistry() {
+        return this.registry;
+    }
+
     public ClientVersion[] getVersions() {
         return versionMapper.getVersions();
     }
@@ -143,6 +156,6 @@ public class TypesBuilder {
             }
             index++;
         }
-        return new TypesBuilderData(name, ids);
+        return new TypesBuilderData(this, name, ids);
     }
 }
