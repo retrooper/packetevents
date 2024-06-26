@@ -5,24 +5,24 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-class WrapperPlayServerWorldEvent extends PacketWrapper<WrapperPlayServerWorldEvent> {
-        private int event;
-        private Vector3i location;
-        private int data;
-        private boolean globalEvent;
+public class WrapperPlayServerEffect extends PacketWrapper<WrapperPlayServerEffect> {
+    private int event;
+    private Vector3i location;
+    private int data;
+    private boolean globalEvent;
 
 
-        public WrapperPlayServerWorldEvent(PacketReceiveEvent event) {
-            super(event);
-        }
+    public WrapperPlayServerEffect(PacketReceiveEvent event) {
+        super(event);
+    }
 
-        public WrapperPlayServerWorldEvent(int type, Vector3i location, int data, boolean globalEvent) {
-            super(PacketType.Play.Server.WORLD_EVENT);
-            this.event = type;
-            this.location = location;
-            this.data = data;
-            this.globalEvent = globalEvent;
-        }
+    public WrapperPlayServerEffect(int type, Vector3i location, int data, boolean globalEvent) {
+        super(PacketType.Play.Server.EFFECT);
+        this.event = type;
+        this.location = location;
+        this.data = data;
+        this.globalEvent = globalEvent;
+    }
 
     @Override
     public void read() {
@@ -41,7 +41,7 @@ class WrapperPlayServerWorldEvent extends PacketWrapper<WrapperPlayServerWorldEv
     }
 
     @Override
-    public void copy(WrapperPlayServerWorldEvent wrapper) {
+    public void copy(WrapperPlayServerEffect wrapper) {
         this.event = wrapper.event;
         this.location = wrapper.location;
         this.data = wrapper.data;
