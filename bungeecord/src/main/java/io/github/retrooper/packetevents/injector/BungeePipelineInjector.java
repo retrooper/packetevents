@@ -61,6 +61,12 @@ public class BungeePipelineInjector implements ChannelInjector {
 
         if (bootstrapAcceptor == null) {
             bootstrapAcceptor = channel.pipeline().first();
+            try {
+                initializerField = bootstrapAcceptor.getClass().getDeclaredField("childHandler");
+                initializerField.setAccessible(true);
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         if (bootstrapAcceptor.getClass().getName().equals("net.md_5.bungee.query.QueryHandler")) {
