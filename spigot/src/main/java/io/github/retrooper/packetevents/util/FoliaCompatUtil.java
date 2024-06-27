@@ -1,18 +1,16 @@
 package io.github.retrooper.packetevents.util;
 
-import com.github.retrooper.packetevents.util.reflection.Reflection;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
+import io.papermc.paper.threadedregions.scheduler.AsyncScheduler;
+import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
@@ -22,33 +20,23 @@ import java.util.function.Consumer;
 public class FoliaCompatUtil {
     private static boolean folia;
 
-    private static Object globalRegionScheduler;
+    private static BukkitScheduler bukkitScheduler;
+    private static AsyncScheduler asyncScheduler;
+    private static GlobalRegionScheduler globalRegionScheduler;
 
-    private static Method runAtFixedRateMethod;
-    private static Method runNowMethod;
-    private static Method getEntitySchedulerMethod;
-
-    private static Class<? extends Event> serverInitEventClass = null;
+    private static Class<? extends Event> regionizedServerInitEventClass;
 
     static {
         try {
             Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
             folia = true;
 
-            Method getGlobalRegionSchedulerMethod = Reflection.getMethod(Server.class, "getGlobalRegionScheduler", 0);
-            globalRegionScheduler = getGlobalRegionSchedulerMethod.invoke(Bukkit.getServer());
-
-            Class<?> globalRegionSchedulerClass = globalRegionScheduler.getClass();
-            runAtFixedRateMethod = globalRegionSchedulerClass.getMethod("runAtFixedRate", Plugin.class, Consumer.class, long.class, long.class);
-            runNowMethod = globalRegionSchedulerClass.getMethod("run", Plugin.class, Consumer.class);
-
-            serverInitEventClass = (Class<? extends Event>) Class.forName("io.papermc.paper.threadedregions.RegionizedServerInitEvent");
-            getEntitySchedulerMethod = Reflection.getMethod(Entity.class, "getScheduler", 0);
-
+            asyncScheduler = Bukkit.getAsyncScheduler();
+            globalRegionScheduler = Bukkit.getGlobalRegionScheduler();
+            regionizedServerInitEventClass = (Class<? extends Event>) Class.forName("io.papermc.paper.threadedregions.RegionizedServerInitEvent");
         } catch (ClassNotFoundException e) {
             folia = false;
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            bukkitScheduler = Bukkit.getScheduler();
         }
     }
 
@@ -70,14 +58,11 @@ public class FoliaCompatUtil {
      */
     public static void runTaskAsync(Plugin plugin, Runnable run) {
         if (!folia) {
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, run);
+            bukkitScheduler.runTaskAsynchronously(plugin, run);
             return;
         }
-        try {
-            Executors.defaultThreadFactory().newThread(run).start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        asyncScheduler.runNow(plugin, (o) -> run.run());
     }
 
     /**
@@ -95,11 +80,8 @@ public class FoliaCompatUtil {
             Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> run.accept(null), delay, period);
             return;
         }
-        try {
-            runAtFixedRateMethod.invoke(globalRegionScheduler, plugin, run, delay, period);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        globalRegionScheduler.runAtFixedRate(plugin, (o) -> run.accept(null), delay, period);
     }
 
     /**
@@ -115,11 +97,8 @@ public class FoliaCompatUtil {
             Bukkit.getScheduler().runTask(plugin, () -> run.accept(null));
             return;
         }
-        try {
-            runNowMethod.invoke(globalRegionScheduler, plugin, run);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        globalRegionScheduler.run(plugin, (o) -> run.accept(null));
     }
 
 
@@ -137,7 +116,7 @@ public class FoliaCompatUtil {
             return;
         }
 
-        Bukkit.getServer().getPluginManager().registerEvent(serverInitEventClass, new Listener() {
+        Bukkit.getServer().getPluginManager().registerEvent(regionizedServerInitEventClass, new Listener() {
         }, EventPriority.HIGHEST, (listener, event) -> run.run(), plugin);
     }
 
@@ -157,16 +136,6 @@ public class FoliaCompatUtil {
             return;
         }
 
-        // Gradle doesn't allow us to use java 17 APIs, so we have to use reflection instead...
-        try {
-            Object entityScheduler = getEntitySchedulerMethod.invoke(entity);
-
-            Class<?> schedulerClass = entityScheduler.getClass();
-            Method executeMethod = schedulerClass.getMethod("execute", Plugin.class, Runnable.class, Runnable.class, long.class);
-
-            executeMethod.invoke(entityScheduler, plugin, run, retired, delay);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        entity.getScheduler().execute(plugin, run, retired, delay);
     }
 }

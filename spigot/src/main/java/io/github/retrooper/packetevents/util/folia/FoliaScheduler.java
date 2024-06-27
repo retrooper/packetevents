@@ -30,8 +30,8 @@ import org.bukkit.plugin.Plugin;
  * otherwise it falls back to the default Bukkit scheduler.
  */
 public class FoliaScheduler {
-    private static boolean folia;
-    private static Class<? extends Event> serverInitEventClass = null;
+    static final boolean isFolia;
+    private static Class<? extends Event> regionizedServerInitEventClass;
 
     private static AsyncScheduler asyncScheduler;
     private static EntityScheduler entityScheduler;
@@ -39,22 +39,26 @@ public class FoliaScheduler {
     private static RegionScheduler regionScheduler;
 
     static {
+        boolean folia;
         try {
             Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
             folia = true;
 
             // Thanks for this code ViaVersion
-            serverInitEventClass = (Class<? extends Event>) Class.forName("io.papermc.paper.threadedregions.RegionizedServerInitEvent");
+            // The class is only part of the Folia API, so we need to use reflections to get it
+            regionizedServerInitEventClass = (Class<? extends Event>) Class.forName("io.papermc.paper.threadedregions.RegionizedServerInitEvent");
         } catch (ClassNotFoundException e) {
             folia = false;
         }
+
+        isFolia = folia;
     }
 
     /**
      * @return Whether the server is running Folia
      */
     public static boolean isFolia() {
-        return folia;
+        return isFolia;
     }
 
     /**
@@ -108,17 +112,19 @@ public class FoliaScheduler {
     /**
      * Run a task after the server has finished initializing.
      * Undefined behavior if called after the server has finished initializing.
+     * <p>
+     * We still need to use reflections to get the server init event class, as this is only part of the Folia API.
      *
      * @param plugin Your plugin or PacketEvents
      * @param run    The task to run
      */
     public static void runTaskOnInit(Plugin plugin, Runnable run) {
-        if (!folia) {
+        if (!isFolia) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, run);
             return;
         }
 
-        Bukkit.getServer().getPluginManager().registerEvent(serverInitEventClass, new Listener() {
+        Bukkit.getServer().getPluginManager().registerEvent(regionizedServerInitEventClass, new Listener() {
         }, EventPriority.HIGHEST, (listener, event) -> run.run(), plugin);
     }
 }

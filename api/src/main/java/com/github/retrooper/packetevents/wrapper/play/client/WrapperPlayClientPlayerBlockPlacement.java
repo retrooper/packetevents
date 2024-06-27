@@ -33,11 +33,12 @@ import java.util.Optional;
 public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<WrapperPlayClientPlayerBlockPlacement> {
     private InteractionHand interactionHand;
     private Vector3i blockPosition;
+    private int faceId;
     private BlockFace face;
     private Vector3f cursorPosition;
     private Optional<ItemStack> itemStack;
     private Optional<Boolean> insideBlock;
-    int sequence;
+    private int sequence;
 
     public WrapperPlayClientPlayerBlockPlacement(PacketReceiveEvent event) {
         super(event);
@@ -48,6 +49,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
         this.interactionHand = interactionHand;
         this.blockPosition = blockPosition;
         this.face = face;
+        this.faceId = face.getFaceValue();
         this.cursorPosition = cursorPosition;
         this.itemStack = Optional.ofNullable(itemStack);
         this.insideBlock = Optional.ofNullable(insideBlock);
@@ -61,7 +63,8 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             interactionHand = InteractionHand.getById(readVarInt());
             blockPosition = readBlockPosition();
-            face = BlockFace.getBlockFaceByValue(readVarInt());
+            faceId = readVarInt();
+            face = BlockFace.getBlockFaceByValue(faceId);
             cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
             insideBlock = Optional.of(readBoolean());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
@@ -74,10 +77,12 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
                 blockPosition = readBlockPosition();
             }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                face = BlockFace.getBlockFaceByValue(readVarInt());
+                faceId = readVarInt();
+                face = BlockFace.getBlockFaceByValue(faceId);
                 interactionHand = InteractionHand.getById(readVarInt());
             } else {
-                face = BlockFace.getLegacyBlockFaceByValue(readUnsignedByte());
+                faceId = readUnsignedByte();
+                face = BlockFace.getLegacyBlockFaceByValue(faceId);
                 //Optional itemstack
                 itemStack = Optional.of(readItemStack());
                 interactionHand = InteractionHand.MAIN_HAND;
@@ -95,7 +100,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             writeVarInt(interactionHand.getId());
             writeBlockPosition(blockPosition);
-            writeVarInt(face.getFaceValue());
+            writeVarInt(faceId);
             writeFloat(cursorPosition.x);
             writeFloat(cursorPosition.y);
             writeFloat(cursorPosition.z);
@@ -112,10 +117,10 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
                 writeBlockPosition(blockPosition);
             }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                writeVarInt(face.getFaceValue());
+                writeVarInt(faceId);
                 writeVarInt(interactionHand.getId());
             } else {
-                writeByte(face.getFaceValue());
+                writeByte(faceId);
                 writeItemStack(itemStack.orElse(ItemStack.EMPTY));
                 //Hand is always the main hand
             }
@@ -136,6 +141,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
         interactionHand = wrapper.interactionHand;
         blockPosition = wrapper.blockPosition;
         face = wrapper.face;
+        faceId = wrapper.faceId;
         cursorPosition = wrapper.cursorPosition;
         itemStack = wrapper.itemStack;
         insideBlock = wrapper.insideBlock;
@@ -158,12 +164,24 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
         this.blockPosition = blockPosition;
     }
 
+    public int getFaceId() {
+        return faceId;
+    }
+
+    public void setFaceId(int faceId) {
+        this.faceId = faceId;
+        this.face = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)
+                ? BlockFace.getBlockFaceByValue(faceId)
+                : BlockFace.getLegacyBlockFaceByValue(faceId);
+    }
+
     public BlockFace getFace() {
         return face;
     }
 
     public void setFace(BlockFace face) {
         this.face = face;
+        this.faceId = face.getFaceValue();
     }
 
     public Vector3f getCursorPosition() {

@@ -18,11 +18,38 @@
 
 package com.github.retrooper.packetevents.util.adventure;
 
-import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
+import com.github.retrooper.packetevents.protocol.nbt.NBTByteArray;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTDouble;
+import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.nbt.NBTIntArray;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTLong;
+import com.github.retrooper.packetevents.protocol.nbt.NBTLongArray;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
+import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
-import net.kyori.adventure.text.*;
+import net.kyori.adventure.text.BlockNBTComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.EntityNBTComponent;
+import net.kyori.adventure.text.KeybindComponent;
+import net.kyori.adventure.text.NBTComponent;
+import net.kyori.adventure.text.ScoreComponent;
+import net.kyori.adventure.text.SelectorComponent;
+import net.kyori.adventure.text.StorageNBTComponent;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.TranslationArgument;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.DataComponentValue;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -33,7 +60,13 @@ import net.kyori.adventure.text.serializer.gson.BackwardCompatUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -312,11 +345,30 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                     style.hoverEvent(HoverEvent.showItem(hoverEvent.readUTF("contents", Key::key), 1));
                 } else {
                     NBTReader child = hoverEvent.child("contents");
-                    style.hoverEvent(HoverEvent.showItem(
-                            child.readUTF("id", Key::key),
-                            child.readInt("count", Function.identity()),
-                            child.readUTF("tag", BinaryTagHolder::binaryTagHolder)
-                    ));
+                    Key itemId = child.readUTF("id", Key::key);
+                    Integer count = child.readInt("count", Function.identity());
+                    int nonNullCount = count == null ? 1 : count;
+
+                    BinaryTagHolder tag = child.readUTF("tag", BinaryTagHolder::binaryTagHolder);
+                    if (tag != null || !BackwardCompatUtil.IS_4_17_0_OR_NEWER) {
+                        style.hoverEvent(HoverEvent.showItem(itemId, nonNullCount, tag));
+                    } else {
+                        Map<Key, DataComponentValue> components = child.readCompound("components", nbt -> {
+                            Map<Key, DataComponentValue> map = new HashMap<>(nbt.size());
+                            for (Map.Entry<String, NBT> entry : nbt.getTags().entrySet()) {
+                                if (entry.getKey().startsWith("!")) { // removed component
+                                    Key key = Key.key(entry.getKey().substring(1));
+                                    map.put(key, DataComponentValue.removed());
+                                    continue;
+                                }
+                                Key key = Key.key(entry.getKey());
+                                map.put(key, new NbtComponentValue(entry.getValue()));
+                            }
+                            return map;
+                        });
+                        style.hoverEvent(HoverEvent.showItem(itemId, nonNullCount,
+                                components == null ? Collections.emptyMap() : components));
+                    }
                 }
             } else if (action.equals(HoverEvent.Action.SHOW_ENTITY)) {
                 NBTReader child = hoverEvent.child("contents");
@@ -373,14 +425,32 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                     Key itemId = item.item();
                     int count = item.count();
                     BinaryTagHolder nbt = item.nbt();
+                    boolean emptyComps = !BackwardCompatUtil.IS_4_17_0_OR_NEWER || item.dataComponents().isEmpty();
 
-                    if (count == 1 && nbt == null) {
+                    if (count == 1 && nbt == null && emptyComps) {
                         child.writeUTF("contents", itemId.asString());
                     } else {
                         NBTWriter itemNBT = child.child("contents");
                         itemNBT.writeUTF("id", itemId.asString());
                         itemNBT.writeInt("count", count);
-                        if (nbt != null) itemNBT.writeUTF("tag", nbt.string());
+                        if (nbt != null) {
+                            itemNBT.writeUTF("tag", nbt.string());
+                        }
+                        if (!emptyComps) {
+                            NBTWriter compsNbt = itemNBT.child("components");
+                            for (Map.Entry<Key, DataComponentValue> entry : item.dataComponents().entrySet()) {
+                                if (entry.getValue() == DataComponentValue.removed()) {
+                                    // I don't think value matters here
+                                    compsNbt.writeCompound("!" + entry.getKey(), new NBTCompound());
+                                    continue;
+                                }
+                                if (entry.getValue() instanceof NbtComponentValue) {
+                                    NBT compNbt = ((NbtComponentValue) entry.getValue()).nbt;
+                                    compsNbt.write(entry.getKey().toString(), compNbt);
+                                }
+                                // unsupported entry component value, skip for now
+                            }
+                        }
                     }
                     break;
                 }
@@ -713,5 +783,14 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             throw new IllegalArgumentException("Expected " + required + " but got " + nbt.getType());
         }
         return (T) nbt;
+    }
+
+    private static final class NbtComponentValue implements DataComponentValue {
+
+        private final NBT nbt;
+
+        public NbtComponentValue(NBT nbt) {
+            this.nbt = nbt;
+        }
     }
 }

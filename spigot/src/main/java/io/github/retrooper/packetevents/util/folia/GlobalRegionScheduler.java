@@ -18,45 +18,26 @@
 
 package io.github.retrooper.packetevents.util.folia;
 
-import com.github.retrooper.packetevents.util.reflection.Reflection;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
 /**
  * Represents a scheduler for executing global region tasks.
  */
 public class GlobalRegionScheduler {
-    private final boolean isFolia = FoliaScheduler.isFolia();
 
-    private Object globalRegionScheduler;
-
-    private Method globalExecuteMethod;
-    private Method globalRunMethod;
-    private Method globalRunDelayedMethod;
-    private Method globalRunAtFixedRateMethod;
-    private Method globalCancelMethod;
+    private BukkitScheduler bukkitScheduler;
+    private io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler globalRegionScheduler;
 
     protected GlobalRegionScheduler() {
-        try {
-            if (isFolia) {
-                Method getGlobalRegionSchedulerMethod = Reflection.getMethod(Server.class, "getGlobalRegionScheduler", 0);
-                globalRegionScheduler = getGlobalRegionSchedulerMethod.invoke(Bukkit.getServer());
-                Class<?> globalRegionSchedulerClass = globalRegionScheduler.getClass();
-
-                globalExecuteMethod = globalRegionSchedulerClass.getMethod("execute", Plugin.class, Runnable.class);
-                globalRunMethod = globalRegionSchedulerClass.getMethod("run", Plugin.class, Consumer.class);
-                globalRunDelayedMethod = globalRegionSchedulerClass.getMethod("runDelayed", Plugin.class, Consumer.class, long.class);
-                globalRunAtFixedRateMethod = globalRegionSchedulerClass.getMethod("runAtFixedRate", Plugin.class, Consumer.class, long.class, long.class);
-                globalCancelMethod = globalRegionSchedulerClass.getMethod("cancelTasks", Plugin.class);
-            }
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
+        if (FoliaScheduler.isFolia) {
+            globalRegionScheduler = Bukkit.getGlobalRegionScheduler();
+        } else {
+            bukkitScheduler = Bukkit.getScheduler();
         }
     }
 
@@ -67,16 +48,12 @@ public class GlobalRegionScheduler {
      * @param run    The task to execute
      */
     public void execute(@NotNull Plugin plugin, @NotNull Runnable run) {
-        if (!isFolia) {
-            Bukkit.getScheduler().runTask(plugin, run);
+        if (!FoliaScheduler.isFolia) {
+            bukkitScheduler.runTask(plugin, run);
             return;
         }
 
-        try {
-            globalExecuteMethod.invoke(globalRegionScheduler, plugin, run);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
+        globalRegionScheduler.execute(plugin, run);
     }
 
     /**
@@ -87,17 +64,11 @@ public class GlobalRegionScheduler {
      * @return {@link TaskWrapper} instance representing a wrapped task
      */
     public TaskWrapper run(@NotNull Plugin plugin, @NotNull Consumer<Object> task) {
-        if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTask(plugin, () -> task.accept(null)));
+        if (!FoliaScheduler.isFolia) {
+            return new TaskWrapper(bukkitScheduler.runTask(plugin, () -> task.accept(null)));
         }
 
-        try {
-            return new TaskWrapper(globalRunMethod.invoke(globalRegionScheduler, plugin, task));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return new TaskWrapper(globalRegionScheduler.run(plugin, (o) -> task.accept(null)));
     }
 
     /**
@@ -111,17 +82,11 @@ public class GlobalRegionScheduler {
     public TaskWrapper runDelayed(@NotNull Plugin plugin, @NotNull Consumer<Object> task, long delay) {
         if (delay < 1) delay = 1;
 
-        if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, () -> task.accept(null), delay));
+        if (!FoliaScheduler.isFolia) {
+            return new TaskWrapper(bukkitScheduler.runTaskLater(plugin, () -> task.accept(null), delay));
         }
 
-        try {
-            return new TaskWrapper(globalRunDelayedMethod.invoke(globalRegionScheduler, plugin, task, delay));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return new TaskWrapper(globalRegionScheduler.runDelayed(plugin, (o) -> task.accept(null), delay));
     }
 
     /**
@@ -137,17 +102,11 @@ public class GlobalRegionScheduler {
         if (initialDelayTicks < 1) initialDelayTicks = 1;
         if (periodTicks < 1) periodTicks = 1;
 
-        if (!isFolia) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
+        if (!FoliaScheduler.isFolia) {
+            return new TaskWrapper(bukkitScheduler.runTaskTimer(plugin, () -> task.accept(null), initialDelayTicks, periodTicks));
         }
 
-        try {
-            return new TaskWrapper(globalRunAtFixedRateMethod.invoke(globalRegionScheduler, plugin, task, initialDelayTicks, periodTicks));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return new TaskWrapper(globalRegionScheduler.runAtFixedRate(plugin, (o) -> task.accept(null), initialDelayTicks, periodTicks));
     }
 
     /**
@@ -156,15 +115,11 @@ public class GlobalRegionScheduler {
      * @param plugin Specified plugin.
      */
     public void cancel(@NotNull Plugin plugin) {
-        if (!isFolia) {
+        if (!FoliaScheduler.isFolia) {
             Bukkit.getScheduler().cancelTasks(plugin);
             return;
         }
 
-        try {
-            globalCancelMethod.invoke(globalRegionScheduler, plugin);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        globalRegionScheduler.cancelTasks(plugin);
     }
 }

@@ -184,6 +184,9 @@ public class DefaultNBTSerializer extends NBTSerializer<DataInput, DataOutput> {
                     limiter.increment(24);
                     int length = stream.readInt();
 
+                    if (length >= 1 << 24)
+                        throw new IllegalArgumentException("Long array length is too large: " + length);
+
                     limiter.checkReadability(length * 8);
                     limiter.increment(length * 8);
 

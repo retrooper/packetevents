@@ -59,27 +59,29 @@ public class UpdateChecker {
         PEVersion localVersion = PacketEvents.getAPI().getVersion();
         PEVersion newVersion;
         try {
-            newVersion = new PEVersion(checkLatestReleasedVersion());
+            newVersion = PEVersion.fromString(checkLatestReleasedVersion());
         } catch (Exception ex) {
-            PacketEvents.getAPI().getLogManager().warn("Failed to check for updates. " + (ex.getCause() != null ? ex.getCause().getClass().getName() + ": " + ex.getCause().getMessage() : ex.getMessage()));
+            PacketEvents.getAPI().getLogManager().warn("Failed to check for updates. "
+                    + (ex.getCause() != null ? ex.getCause().getClass().getName() + ": " + ex.getCause().getMessage() : ex.getMessage()));
             return UpdateCheckerStatus.FAILED;
         }
+
         if (localVersion.isOlderThan(newVersion)) {
-            PacketEvents.getAPI().getLogManager().warn("There is an update available for packetevents! Your build: ("
+            PacketEvents.getAPI().getLogManager().warn("There is an update available for PacketEvents! Your build: ("
                     + ColorUtil.toString(NamedTextColor.YELLOW) + localVersion
                     + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
                     + ColorUtil.toString(NamedTextColor.GREEN) + newVersion
                     + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             return UpdateCheckerStatus.OUTDATED;
         } else if (localVersion.isNewerThan(newVersion)) {
-            PacketEvents.getAPI().getLogManager().info("You are on a dev or pre released build of packetevents. Your build: ("
+            PacketEvents.getAPI().getLogManager().info("You are on a dev or pre-released build of PacketEvents. Your build: ("
                     + ColorUtil.toString(NamedTextColor.AQUA) + localVersion
                     + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
                     + ColorUtil.toString(NamedTextColor.DARK_AQUA) + newVersion
                     + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             return UpdateCheckerStatus.PRE_RELEASE;
         } else if (localVersion.equals(newVersion)) {
-            PacketEvents.getAPI().getLogManager().info("You are on the latest released version of packetevents. Your build: ("
+            PacketEvents.getAPI().getLogManager().info("You are on the latest released version of PacketEvents. Your build: ("
                     + ColorUtil.toString(NamedTextColor.GREEN) + newVersion + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {

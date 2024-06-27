@@ -7,6 +7,7 @@ plugins {
     packetevents.`shadow-conventions`
     packetevents.`library-conventions`
     `mapping-compression`
+    `pe-version`
 }
 
 // papermc repo + disableAutoTargetJvm needed for mockbukkit
@@ -20,6 +21,7 @@ java {
 
 dependencies {
     compileOnlyApi(libs.bundles.adventure)
+    implementation(libs.adventure.api)
     api(project(":patch:adventure-text-serializer-gson", "shadow")) {
         excludeAdventure()
     }
@@ -95,10 +97,15 @@ tasks {
         options {
             (this as CoreJavadocOptions).addBooleanOption("Xdoclint:none", true)
         }
+        mustRunAfter(generateVersionsFile)
     }
 
-    compressMappings {
-        inputs.dir(mappingCompression.mappingDirectory)
+    sourcesJar {
+        mustRunAfter(generateVersionsFile)
+    }
+
+    withType<JavaCompile> {
+        dependsOn(generateVersionsFile)
     }
 
     processResources {
@@ -106,8 +113,19 @@ tasks {
         from(project.layout.buildDirectory.dir("mappings/generated").get())
     }
 
+    generateVersionsFile {
+        packageName = "com.github.retrooper.packetevents.util"
+    }
+
     test {
         useJUnitPlatform()
+    }
+
+    shadowJar {
+        exclude {
+            val path = it.path
+            path.startsWith("net/kyori") && !path.startsWith("net/kyori/adventure/text/serializer") && !path.startsWith("net/kyori/option")
+        }
     }
 }
 

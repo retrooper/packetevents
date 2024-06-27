@@ -1,6 +1,7 @@
 plugins {
     packetevents.`shadow-conventions`
     packetevents.`library-conventions`
+    alias(libs.plugins.run.velocity)
 }
 
 repositories {
@@ -16,4 +17,15 @@ dependencies {
     shadow(project(":api", "shadow"))
     shadow(project(":netty-common"))
     // Velocity already bundles with adventure
+}
+
+tasks {
+    runVelocity {
+        velocityVersion("3.3.0-SNAPSHOT")
+        runDirectory = rootDir.resolve("run/velocity/")
+
+        javaLauncher = project.javaToolchains.launcherFor {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
 }

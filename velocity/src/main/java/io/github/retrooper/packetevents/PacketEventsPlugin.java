@@ -26,7 +26,6 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -35,9 +34,6 @@ import org.slf4j.Logger;
 
 import java.nio.file.Path;
 
-@Plugin(id = "packetevents", name = "PacketEvents",
-        description = "Packet library.", authors = {"retrooper"},
-        version = "2.3.1") //TODO UPDATE
 public class PacketEventsPlugin {
     private final ProxyServer server;
     private final Logger logger;
