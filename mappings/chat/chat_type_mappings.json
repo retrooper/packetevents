@@ -25,7 +25,7 @@
     "msg_command",
     "team_msg_command",
     "emote_command",
-    "tellraw_command"
+    "raw"
   ],
   "V_1_18_2": [
     "chat",
