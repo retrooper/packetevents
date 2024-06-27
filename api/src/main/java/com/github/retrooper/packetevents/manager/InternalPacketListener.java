@@ -26,8 +26,11 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration;
-import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -98,10 +101,20 @@ public class InternalPacketListener extends PacketListenerAbstract {
             NBTList<NBTCompound> list = null;
             if (registryDataTag != null) { // <1.20.5
                 //Handle dimension type
-                list = registryDataTag
-                        .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString())
-                        .getCompoundListTagOrNull("value");
-
+                NBTCompound dimensionTypes = registryDataTag
+                        .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString());
+                if (dimensionTypes == null) {
+                    dimensionTypes = registryDataTag
+                            .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.getKey());
+                }
+                if (dimensionTypes != null) {
+                    list = dimensionTypes.getCompoundListTagOrNull("value");
+                }
+                if (list == null) {
+                    list = new NBTList<>(NBTType.COMPOUND);
+                    PacketEvents.getAPI().getLogger().warning("Can't find dimension type registry in registry data, "
+                            + "this may cause issues; available registries: " + registryDataTag.getTags().keySet());
+                }
             } else if (DIMENSION_TYPE_REGISTRY_KEY.equals(registryData.getRegistryKey())) { // >=1.20.5
                 // remap to legacy format
                 list = new NBTList<>(NBTType.COMPOUND);
@@ -136,10 +149,22 @@ public class InternalPacketListener extends PacketListenerAbstract {
             // Store world data
             NBTCompound dimensionCodec = joinGame.getDimensionCodec();
             if (dimensionCodec != null) {
-                NBTList<NBTCompound> list = dimensionCodec
-                        .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString())
-                        .getCompoundListTagOrNull("value");
-                user.setWorldNBT(list);
+                NBTList<NBTCompound> types = null;
+                NBTCompound dimensionTypes = dimensionCodec
+                        .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString());
+                if (dimensionTypes == null) {
+                    dimensionTypes = dimensionCodec
+                            .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.getKey());
+                }
+                if (dimensionTypes != null) { // account for dimension type registry somehow going missing
+                    types = dimensionTypes.getCompoundListTagOrNull("value");
+                }
+                if (types == null) {
+                    types = new NBTList<>(NBTType.COMPOUND);
+                    PacketEvents.getAPI().getLogger().warning("Can't find dimension type registry in join packet, "
+                            + "this may cause issues; available registries: " + dimensionCodec.getTags().keySet());
+                }
+                user.setWorldNBT(types);
             }
 
             // Update world height
