@@ -26,11 +26,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+import java.util.Collections;
 import java.util.UUID;
 
 public final class BackwardCompatUtil {
 
     public static final boolean IS_4_15_0_OR_NEWER;
+    public static final boolean IS_4_17_0_OR_NEWER;
 
     static {
         boolean is4_15_0OrNewer = false;
@@ -40,6 +42,15 @@ public final class BackwardCompatUtil {
         } catch (Throwable ignored) {
         }
         IS_4_15_0_OR_NEWER = is4_15_0OrNewer;
+
+        boolean is4_17_0OrNewer = false;
+        try {
+            // data components support was added in 4.17.0
+            HoverEvent.ShowItem.showItem(Key.key("air"), 1, Collections.emptyMap());
+            is4_17_0OrNewer = true;
+        } catch (Throwable ignored) {
+        }
+        IS_4_17_0_OR_NEWER = is4_17_0OrNewer;
     }
 
     private BackwardCompatUtil() {

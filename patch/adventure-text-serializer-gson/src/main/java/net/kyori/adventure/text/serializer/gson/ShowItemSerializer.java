@@ -31,6 +31,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import net.kyori.adventure.key.Key;
@@ -134,7 +135,8 @@ final class ShowItemSerializer extends TypeAdapter<HoverEvent.ShowItem> {
             out.value(count);
         }
 
-        final @NotNull Map<Key, DataComponentValue> dataComponents = value.dataComponents();
+        final @NotNull Map<Key, DataComponentValue> dataComponents = !BackwardCompatUtil.IS_4_17_0_OR_NEWER
+                ? Collections.emptyMap() : value.dataComponents();
         if (!dataComponents.isEmpty() && this.itemDataMode != JSONOptions.ShowItemHoverDataMode.EMIT_LEGACY_NBT) {
             out.name(SHOW_ITEM_COMPONENTS);
             out.beginObject();

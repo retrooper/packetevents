@@ -44,6 +44,7 @@ public class AdventureSerializer {
                 builder.value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.BOTH);
                 builder.value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_ID_AS_INT_ARRAY, is_1_20_3_or_new);
                 builder.value(JSONOptions.VALIDATE_STRICT_EVENTS, is_1_20_3_or_new);
+                builder.value(JSONOptions.SHOW_ITEM_HOVER_DATA_MODE, JSONOptions.ShowItemHoverDataMode.EMIT_EITHER);
             })
                     .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
                     .showAchievementToComponent(input -> Statistics.getById(input).display())
