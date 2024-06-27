@@ -43,6 +43,7 @@ import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerA
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import io.github.retrooper.packetevents.injector.VelocityPipelineInjector;
+import io.github.retrooper.packetevents.manager.InternalVelocityPacketListener;
 import io.github.retrooper.packetevents.manager.PlayerManagerImpl;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
@@ -144,7 +145,7 @@ public class VelocityPacketEventsBuilder {
 
                     // Register internal packet listener (should be the first listener)
                     // This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListener(new InternalPacketListener());
+                    getEventManager().registerListener(new InternalVelocityPacketListener());
                 }
             }
 

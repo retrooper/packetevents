@@ -7,6 +7,7 @@ protocol-support = "3d24efeda6"
 paper = "1.20.6-R0.1-SNAPSHOT"
 bungeecord = "1.20-R0.1-SNAPSHOT"
 velocity = "3.1.0"
+velocity-native = "3.3.0-SNAPSHOT"
 run-paper = "2.3.0"
 
 [libraries]
@@ -23,6 +24,7 @@ protocol-support = { group = "com.github.ProtocolSupport", name = "ProtocolSuppo
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungeecord" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+velocity-native = { group = "com.velocitypowered", name = "velocity-native", version.ref = "velocity-native" }
 
 [bundles]
 adventure = [ "adventure-api", "adventure-nbt" ]

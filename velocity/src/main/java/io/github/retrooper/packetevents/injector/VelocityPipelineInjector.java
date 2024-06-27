@@ -43,6 +43,10 @@ public class VelocityPipelineInjector implements ChannelInjector {
         this.server = server;
     }
 
+    public ProxyServer getServer() {
+        return this.server;
+    }
+
     @Override
     public boolean isServerBound() {
         return true;
