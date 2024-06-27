@@ -53,14 +53,9 @@ public class BungeePipelineInjector implements ChannelInjector {
             try {
                 Field f = handler.getClass().getDeclaredField("childHandler");
                 f.setAccessible(true);
-                if (f.getType().isAssignableFrom(ChannelInitializer.class)) {
-                    bootstrapAcceptor = handler;
-                    initializerField = f;
-
-                    System.out.println("Found: " + f.getType() + ", name: " + f.getName());
-                }
-            }
-			catch (Exception ignore) {
+                bootstrapAcceptor = handler;
+                initializerField = f;
+            } catch (Exception ignore) {
             }
         }
 
