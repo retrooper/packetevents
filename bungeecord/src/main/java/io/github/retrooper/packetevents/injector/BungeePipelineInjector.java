@@ -73,25 +73,18 @@ public class BungeePipelineInjector implements ChannelInjector {
             return;
         }
 
-        Field finalInitializerField = initializerField;
-        ChannelHandler finalBootstrapAcceptor = bootstrapAcceptor;
-        ChannelInitializer<Channel> newInitializer = new ChannelInitializer<Channel>() {
-            @Override
-            protected void initChannel(@NotNull Channel channel) throws Exception {
-                if (!channel.isActive()) return;
-                Method initChannelMethod = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
-                initChannelMethod.setAccessible(true);
-
-                Object initializer = finalInitializerField.get(finalBootstrapAcceptor);
-                initChannelMethod.invoke(initializer, channel);
-
-                ServerConnectionInitializer.initChannel(channel, ConnectionState.HANDSHAKING);
-            }
-        };
+        ChannelInitializer<Channel> newInitializer;
+        try {
+            newInitializer = new BungeeChannelInitializer(initializerField.get(bootstrapAcceptor));
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         try {
-            finalInitializerField.set(bootstrapAcceptor, newInitializer);
-        } catch (IllegalAccessException e) {
+            Field f = bootstrapAcceptor.getClass().getDeclaredField("childHandler");
+            f.setAccessible(true);
+            f.set(bootstrapAcceptor, newInitializer);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
 

@@ -209,9 +209,9 @@ public class User {
     }
 
     public void sendTitle(Component title, Component subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        ServerVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion().toServerVersion() :
-                PacketEvents.getAPI().getServerManager().getVersion();
-        boolean modern = version.isNewerThanOrEquals(ServerVersion.V_1_17);
+        ClientVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion() :
+                PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        boolean modern = version.isNewerThanOrEquals(ClientVersion.V_1_17);
         PacketWrapper<?> animation;
         PacketWrapper<?> setTitle = null;
         PacketWrapper<?> setSubtitle = null;
