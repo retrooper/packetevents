@@ -147,12 +147,12 @@ public class PotionTypes {
     public static final PotionType DARKNESS = define("darkness");
 
     // Added in 1.20.5
-    public static final PotionType TRIAL_OMEN = define("darkness");
-    public static final PotionType RAID_OMEN = define("darkness");
-    public static final PotionType WIND_CHARGED = define("darkness");
-    public static final PotionType WEAVING = define("darkness");
-    public static final PotionType OOZING = define("darkness");
-    public static final PotionType INFESTED = define("darkness");
+    public static final PotionType TRIAL_OMEN = define("trial_omen");
+    public static final PotionType RAID_OMEN = define("raid_omen");
+    public static final PotionType WIND_CHARGED = define("wind_charged");
+    public static final PotionType WEAVING = define("weaving");
+    public static final PotionType OOZING = define("oozing");
+    public static final PotionType INFESTED = define("infested");
 
     /**
      * Returns an immutable view of the potion types.
