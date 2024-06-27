@@ -72,7 +72,6 @@ import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
-import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.ApiStatus;
@@ -957,13 +956,15 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     public Dimension readDimension() {
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            return new Dimension(this.readVarInt());
+            return this.user != null
+                    ? this.user.getDimensionData(this.readVarInt())
+                    : new Dimension(this.readVarInt());
         }
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
                 || this.serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
-            Dimension dimension = new Dimension(new NBTCompound());
-            dimension.setDimensionName(readIdentifier().toString());
-            return dimension;
+            return this.user != null
+                    ? this.user.getDimensionData(this.readIdentifier())
+                    : new Dimension(this.readIdentifier());
         } else {
             return new Dimension(readNBT());
         }
@@ -972,13 +973,11 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     public void writeDimension(Dimension dimension) {
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             this.writeVarInt(dimension.getId());
-            return;
-        }
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+        } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
                 || this.serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
-            writeString(dimension.getDimensionName(), 32767);
+            this.writeIdentifier(dimension.getName());
         } else {
-            writeNBT(dimension.getAttributes());
+            this.writeNBT(dimension.getData());
         }
     }
 

@@ -35,6 +35,7 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData.RegistryElement;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleSubtitle;
@@ -47,6 +48,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,10 +61,9 @@ public class User {
     private ClientVersion clientVersion;
     private final UserProfile profile;
     private int entityId = -1;
-    private int minWorldHeight = 0;
-    private int totalWorldHeight = 256;
-    private List<NBTCompound> worldNBT;
-    private Dimension dimension = new Dimension(0);
+
+    private List<Dimension> dimensions = Collections.emptyList();
+    private Dimension dimension = null;
 
     private final Map<ResourceLocation, IRegistry<?>> synchronizedRegistries = new HashMap<>();
 
@@ -280,70 +281,67 @@ public class User {
     //TODO sendTitle that is cross-version
 
     public int getMinWorldHeight() {
-        return minWorldHeight;
+        return this.dimension.getMinWorldHeight();
     }
 
+    @Deprecated
     public void setMinWorldHeight(int minWorldHeight) {
-        this.minWorldHeight = minWorldHeight;
+        throw new UnsupportedOperationException();
     }
 
     public int getTotalWorldHeight() {
-        return totalWorldHeight;
+        return this.dimension.getTotalWorldHeight();
     }
 
+    @Deprecated
     public void setTotalWorldHeight(int totalWorldHeight) {
-        this.totalWorldHeight = totalWorldHeight;
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public void switchDimensionType(ServerVersion version, Dimension dimension) {
-        NBTCompound dimensionData = this.getWorldNBT(dimension);
-        if (dimensionData != null) {
-            NBTCompound worldNBT = dimensionData.getCompoundTagOrNull("element");
-            if (worldNBT != null) {
-                this.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-                this.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
-                return;
-            } else {
-                this.setDefaultWorldHeights(version, dimension);
-            }
-        }
-        if (version.isOlderThan(ServerVersion.V_1_20_5)
-                || this.clientVersion.isOlderThan(ClientVersion.V_1_20_5)) {
-            // hide this warning on 1.20.5, as the server does no longer send
-            // vanilla datapack dimension type contents
-            //
-            // this 1.20.5 feature can be fully worked around with by clearing the
-            // known packs sent by the client to the server durings config phase
-            PacketEvents.getAPI().getLogger().warning(
-                    "No data was sent for dimension " + dimensionData + " to " + this.getName());
-        }
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public void setDefaultWorldHeights(ServerVersion version, Dimension dimension) {
-        boolean extended = version.isNewerThanOrEquals(ServerVersion.V_1_18)
-                && "minecraft:overworld".equals(this.getWorldName(dimension));
-        this.setDefaultWorldHeights(extended);
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public void setDefaultWorldHeights(boolean extended) {
-        this.minWorldHeight = extended ? -64 : 0;
-        this.totalWorldHeight = extended ? 256 + 128 : 256;
+        throw new UnsupportedOperationException();
     }
 
+    @ApiStatus.Internal
+    public void setWorldData(List<RegistryElement> elements) {
+
+    }
+
+    @Deprecated
     public void setWorldNBT(NBTList<NBTCompound> worldNBT) {
-        this.worldNBT = worldNBT.getTags();
+        this.setWorldData(RegistryElement.convertNbt(worldNBT));
+    }
+
+    public @Nullable Dimension getDimensionData(ResourceLocation name) {
+        for (Dimension dimension : this.dimensions) {
+
+        }
     }
 
     public Dimension getDimension() {
-        return dimension;
+        return this.dimension;
     }
 
     public void setDimension(Dimension dimension) {
         this.dimension = dimension;
     }
 
-    @Nullable
-    public NBTCompound getWorldNBT(String worldName) {
+    @Deprecated
+    public @Nullable NBTCompound getWorldNBT(String worldName) {
+        for (Dimension dimension : this.dimensions) {
+
+        }
         if (worldNBT == null) {
             return null;
         }
@@ -355,6 +353,7 @@ public class User {
         return null;
     }
 
+    @Deprecated
     public @Nullable NBTCompound getWorldNBT(int worldId) {
         if (this.worldNBT == null) {
             return null;
@@ -367,28 +366,22 @@ public class User {
         return null;
     }
 
+    @Deprecated
     public @Nullable NBTCompound getWorldNBT(Dimension dimension) {
-        String dimensionName = dimension.getDimensionName();
-        if (!dimensionName.isEmpty()) {
-            return this.getWorldNBT(dimensionName);
-        }
-        return this.getWorldNBT(dimension.getId());
+        return dimension.getData();
     }
 
+    @Deprecated
     public @Nullable String getWorldName(int worldId) {
-        if (this.worldNBT == null) {
-            return null;
-        }
-        for (NBTCompound element : this.worldNBT) {
-            if (element.getNumberTagOrNull("id").getAsInt() == worldId) {
-                return element.getStringTagValueOrNull("name");
-            }
+        if (worldId >= 0 && worldId < this.dimensions.size()) {
+            Dimension dimension = this.dimensions.get(worldId);
+            return dimension.getName().toString();
         }
         return null;
     }
 
-    public @Nullable String getWorldName(Dimension dimension) {
-        String dimensionName = dimension.getDimensionName();
-        return dimensionName.isEmpty() ? this.getWorldName(dimension.getId()) : dimensionName;
+    @Deprecated
+    public String getWorldName(Dimension dimension) {
+        return dimension.getName().toString();
     }
 }

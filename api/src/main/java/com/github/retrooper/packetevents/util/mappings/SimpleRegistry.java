@@ -18,15 +18,18 @@
 
 package com.github.retrooper.packetevents.util.mappings;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData.RegistryElement;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T> {
@@ -42,6 +45,23 @@ public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T
 
     public SimpleRegistry(ResourceLocation registryKey) {
         this.registryKey = registryKey;
+    }
+
+    @ApiStatus.Internal
+    public static <T extends MappedEntity> IRegistry<T> fromNetwork(
+            IRegistry<T> base, List<RegistryElement> elements) {
+        SimpleRegistry<T> registry = new SimpleRegistry<>(base.getRegistryKey());
+        for (int id = 0; id < elements.size(); id++) {
+            ResourceLocation elementName = elements.get(id).getId();
+            T baseEntry = base.getByName(elementName);
+            if (baseEntry == null) {
+                PacketEvents.getAPI().getLogger().warning("Unknown registry entry "
+                        + elementName + " for " + base.getRegistryKey());
+                continue;
+            }
+            registry.define(elementName, id, baseEntry);
+        }
+        return registry;
     }
 
     @ApiStatus.Internal

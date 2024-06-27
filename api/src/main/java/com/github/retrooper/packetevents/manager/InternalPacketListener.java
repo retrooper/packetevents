@@ -26,13 +26,17 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration;
-import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
+import com.github.retrooper.packetevents.util.mappings.SimpleRegistry;
 import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData;
 import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData.RegistryElement;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
@@ -41,12 +45,17 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJo
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InternalPacketListener extends PacketListenerAbstract {
 
-    private static final ResourceLocation DIMENSION_TYPE_REGISTRY_KEY =
-            ResourceLocation.minecraft("dimension_type");
+    private static final Map<ResourceLocation, IRegistry<?>> REGISTRY_KEYS = new HashMap<>();
+
+    static {
+        REGISTRY_KEYS.put(ResourceLocation.minecraft("banner_pattern"), BannerPatterns.getRegistry());
+    }
 
     public InternalPacketListener() {
         this(PacketListenerPriority.LOWEST);
@@ -54,6 +63,34 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
     public InternalPacketListener(PacketListenerPriority priority) {
         super(priority);
+    }
+
+    private void handleRegistry(User user, ResourceLocation registryName, List<RegistryElement> elements) {
+        IRegistry<?> registry = REGISTRY_KEYS.get(registryName);
+        if (registry != null) {
+            IRegistry<?> syncedRegistry = SimpleRegistry.fromNetwork(registry, elements);
+            user.putSynchronizedRegistry(syncedRegistry);
+        }
+
+        // temporary hard-coding for dimension type registries
+        if (ResourceLocation.minecraft("dimension_type").equals(registryName)) {
+            user.setWorldData(elements);
+        }
+    }
+
+    private void handleLegacyRegistries(User user, NBTCompound registryData) {
+        for (NBT tag : registryData.getTags().values()) {
+            NBTCompound compound = (NBTCompound) tag;
+            // extract registry name
+            ResourceLocation registryName = new ResourceLocation(
+                    compound.getStringTagValueOrThrow("type"));
+            // extract registry entries
+            NBTList<NBTCompound> nbtElements =
+                    compound.getCompoundListTagOrThrow("value");
+            // store registry elements
+            this.handleRegistry(user, registryName,
+                    RegistryElement.convertNbt(nbtElements));
+        }
     }
 
     @Override
@@ -89,57 +126,30 @@ public class InternalPacketListener extends PacketListenerAbstract {
             }
         }
 
-        // The server sends dimension information in configuration phase >= 1.20.2
+        // The server sends dimension information in configuration phase, since 1.20.2
         else if (event.getPacketType() == PacketType.Configuration.Server.REGISTRY_DATA) {
-            WrapperConfigServerRegistryData registryData = new WrapperConfigServerRegistryData(event);
+            WrapperConfigServerRegistryData packet = new WrapperConfigServerRegistryData(event);
 
-            // Store world data
-            NBTCompound registryDataTag = registryData.getRegistryData();
-            NBTList<NBTCompound> list = null;
-            if (registryDataTag != null) { // <1.20.5
-                //Handle dimension type
-                list = registryDataTag
-                        .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString())
-                        .getCompoundListTagOrNull("value");
-
-            } else if (DIMENSION_TYPE_REGISTRY_KEY.equals(registryData.getRegistryKey())) { // >=1.20.5
-                // remap to legacy format
-                list = new NBTList<>(NBTType.COMPOUND);
-                List<RegistryElement> elements = registryData.getElements();
-                if (elements != null) {
-                    int i = 0;
-                    for (RegistryElement element : elements) {
-                        NBTCompound tag = new NBTCompound();
-                        tag.setTag("name", new NBTString(element.getId().toString()));
-                        tag.setTag("id", new NBTInt(i++));
-                        if (element.getData() != null) { // may be null because of known packs not being sent
-                            tag.setTag("element", element.getData());
-                        }
-                        list.addTag(tag);
-                    }
-                }
+            if (packet.getElements() != null) { // 1.20.2 to 1.20.5
+                this.handleRegistry(user, packet.getRegistryKey(), packet.getElements());
             }
-            if (list != null) {
-                user.setWorldNBT(list);
+            if (packet.getRegistryData() != null) { // since 1.20.5
+                this.handleLegacyRegistries(user, packet.getRegistryData());
             }
         }
 
-        // The server sends dimension information in login packet for >= 1.17 and < 1.20.2
+        // The server sends registry info in login packet for 1.17 to 1.20.1
         else if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
             WrapperPlayServerJoinGame joinGame = new WrapperPlayServerJoinGame(event);
             user.setEntityId(joinGame.getEntityId());
             user.setDimension(joinGame.getDimension());
+
             if (event.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 return; // Fixed world height, no tags are sent to the client
             }
 
-            // Store world data
-            NBTCompound dimensionCodec = joinGame.getDimensionCodec();
-            if (dimensionCodec != null) {
-                NBTList<NBTCompound> list = dimensionCodec
-                        .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString())
-                        .getCompoundListTagOrNull("value");
-                user.setWorldNBT(list);
+            if (joinGame.getDimensionCodec() != null) { // 1.16 to 1.20.1
+                this.handleLegacyRegistries(user, joinGame.getDimensionCodec());
             }
 
             // Update world height
