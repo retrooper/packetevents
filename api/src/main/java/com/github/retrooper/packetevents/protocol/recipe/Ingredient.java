@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.protocol.recipe;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-// From MCProtocolLib
 public class Ingredient {
 
     private final ItemStack[] options;

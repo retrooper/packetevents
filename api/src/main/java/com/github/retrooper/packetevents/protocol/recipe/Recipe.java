@@ -23,7 +23,6 @@ import com.github.retrooper.packetevents.protocol.recipe.data.RecipeData;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-// From MCProtocolLib
 public class Recipe<T extends RecipeData> {
 
     private final ResourceLocation key;
