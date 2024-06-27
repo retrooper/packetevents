@@ -48,6 +48,10 @@ public class BungeePipelineInjector implements ChannelInjector {
         Field initializerField = null;
         ChannelHandler bootstrapAcceptor = null;
         for (String channelName : channel.pipeline().names()) {
+            if (channelName.contains("QueryHandler")) {
+                return; // query handler, abort injection
+            }
+
             ChannelHandler handler = channel.pipeline().get(channelName);
             if (handler == null) continue;
             try {
@@ -67,10 +71,6 @@ public class BungeePipelineInjector implements ChannelInjector {
             } catch (NoSuchFieldException e) {
                 throw new RuntimeException(e);
             }
-        }
-
-        if (bootstrapAcceptor.getClass().getName().equals("net.md_5.bungee.query.QueryHandler")) {
-            return;
         }
 
         ChannelInitializer<Channel> newInitializer;
