@@ -103,6 +103,10 @@ public class InternalPacketListener extends PacketListenerAbstract {
                 //Handle dimension type
                 NBTCompound dimensionTypes = registryDataTag
                         .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString());
+                if (dimensionTypes == null) {
+                    dimensionTypes = registryDataTag
+                            .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.getKey());
+                }
                 if (dimensionTypes != null) {
                     list = dimensionTypes.getCompoundListTagOrNull("value");
                 }
@@ -148,6 +152,10 @@ public class InternalPacketListener extends PacketListenerAbstract {
                 NBTList<NBTCompound> types = null;
                 NBTCompound dimensionTypes = dimensionCodec
                         .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.toString());
+                if (dimensionTypes == null) {
+                    dimensionTypes = dimensionCodec
+                            .getCompoundTagOrNull(DIMENSION_TYPE_REGISTRY_KEY.getKey());
+                }
                 if (dimensionTypes != null) { // account for dimension type registry somehow going missing
                     types = dimensionTypes.getCompoundListTagOrNull("value");
                 }
