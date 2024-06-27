@@ -46,7 +46,7 @@ public class BungeePipelineInjector implements ChannelInjector {
 
     public void injectChannel(Channel channel) {
         Field initializerField = null;
-        ChannelHandler handlerInstance = null;
+        ChannelHandler bootstrapAcceptor = null;
         for (String channelName : channel.pipeline().names()) {
             ChannelHandler handler = channel.pipeline().get(channelName);
             if (handler == null) continue;
@@ -54,15 +54,26 @@ public class BungeePipelineInjector implements ChannelInjector {
                 Field f = handler.getClass().getDeclaredField("childHandler");
                 f.setAccessible(true);
                 if (f.getType().isAssignableFrom(ChannelInitializer.class)) {
-                    handlerInstance = handler;
+                    bootstrapAcceptor = handler;
                     initializerField = f;
+
+                    System.out.println("Found: " + f.getType() + ", name: " + f.getName());
                 }
             }
 			catch (Exception ignore) {
             }
         }
+
+        if (bootstrapAcceptor == null) {
+            bootstrapAcceptor = channel.pipeline().first();
+        }
+
+        if (bootstrapAcceptor.getClass().getName().equals("net.md_5.bungee.query.QueryHandler")) {
+            return;
+        }
+
         Field finalInitializerField = initializerField;
-        ChannelHandler finalHandlerInstance = handlerInstance;
+        ChannelHandler finalBootstrapAcceptor = bootstrapAcceptor;
         ChannelInitializer<Channel> newInitializer = new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(@NotNull Channel channel) throws Exception {
@@ -70,17 +81,16 @@ public class BungeePipelineInjector implements ChannelInjector {
                 Method initChannelMethod = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
                 initChannelMethod.setAccessible(true);
 
-                initChannelMethod.invoke(finalInitializerField.get(finalHandlerInstance), channel);
+                Object initializer = finalInitializerField.get(finalBootstrapAcceptor);
+                initChannelMethod.invoke(initializer, channel);
 
                 ServerConnectionInitializer.initChannel(channel, ConnectionState.HANDSHAKING);
             }
         };
 
         try {
-            Field childHandlerField = handlerInstance.getClass().getDeclaredField("childHandler");
-            childHandlerField.setAccessible(true);
-            childHandlerField.set(handlerInstance, newInitializer);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+            finalInitializerField.set(bootstrapAcceptor, newInitializer);
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
 
