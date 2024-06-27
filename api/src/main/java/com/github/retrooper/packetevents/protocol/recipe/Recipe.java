@@ -18,39 +18,89 @@
 
 package com.github.retrooper.packetevents.protocol.recipe;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.recipe.data.RecipeData;
-import org.jetbrains.annotations.NotNull;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-// From MCProtocolLib
-public class Recipe {
-    private final @NotNull RecipeType type;
-    private final @NotNull String identifier;
-    private final RecipeData data;
+public class Recipe<T extends RecipeData> {
 
-    public Recipe(@NotNull RecipeType type, @NotNull String identifier, RecipeData data) {
-        this.type = type;
-        this.identifier = identifier;
+    private final ResourceLocation key;
+    private final RecipeSerializer<T> serializer;
+    private final T data;
+
+    @SuppressWarnings("unchecked") // backwards compat
+    @Deprecated
+    public Recipe(RecipeType serializer, String key, RecipeData data) {
+        this(
+                new ResourceLocation(key),
+                (RecipeSerializer<T>) serializer.getSerializer(),
+                (T) data
+        );
+    }
+
+    public Recipe(ResourceLocation key, RecipeSerializer<T> serializer, T data) {
+        this.key = key;
+        this.serializer = serializer;
         this.data = data;
     }
 
-    public @NotNull RecipeType getType() {
-        return type;
+    public static Recipe<?> read(PacketWrapper<?> wrapper) {
+        ResourceLocation key;
+        RecipeSerializer<?> serializer;
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            key = wrapper.readIdentifier();
+            serializer = wrapper.readMappedEntity(RecipeSerializers::getById);
+        } else {
+            serializer = RecipeSerializers.getByName(wrapper.readIdentifier().toString());
+            key = wrapper.readIdentifier();
+        }
+        return read(wrapper, key, serializer);
     }
 
-    public @NotNull String getIdentifier() {
-        return identifier;
+    private static <T extends RecipeData> Recipe<T> read(
+            PacketWrapper<?> wrapper,
+            ResourceLocation key,
+            RecipeSerializer<T> serializer
+    ) {
+        T data = serializer.read(wrapper);
+        return new Recipe<>(key, serializer, data);
     }
 
-    public @NotNull RecipeData getData() {
-        return data;
+    public static <T extends RecipeData> void write(PacketWrapper<?> wrapper, Recipe<T> recipe) {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            wrapper.writeIdentifier(recipe.key);
+            wrapper.writeMappedEntity(recipe.serializer);
+        } else {
+            wrapper.writeIdentifier(recipe.serializer.getName());
+            wrapper.writeIdentifier(recipe.key);
+        }
+        recipe.serializer.write(wrapper, recipe.data);
+    }
+
+    @Deprecated
+    public RecipeType getType() {
+        return this.serializer.getLegacyType();
+    }
+
+    public String getIdentifier() {
+        return this.key.toString();
+    }
+
+    public ResourceLocation getKey() {
+        return this.key;
+    }
+
+    public RecipeSerializer<T> getSerializer() {
+        return this.serializer;
+    }
+
+    public T getData() {
+        return this.data;
     }
 
     @Override
     public String toString() {
-        return "Recipe{" +
-                "type=" + type +
-                ", identifier='" + identifier + '\'' +
-                ", data=" + data +
-                '}';
+        return "Recipe{key=" + this.key + ", serializer=" + this.serializer + ", data=" + this.data + '}';
     }
 }

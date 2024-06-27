@@ -79,6 +79,7 @@ import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.time.Instant;
@@ -1396,6 +1397,23 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         writeVarInt(list.size());
         for (K key : list) {
             writer.accept(this, key);
+        }
+    }
+
+    @SuppressWarnings("unchecked") // not unchecked
+    public <K> K[] readArray(Reader<K> reader, Class<K> clazz) {
+        int length = this.readVarInt();
+        K[] array = (K[]) Array.newInstance(clazz, length);
+        for (int i = 0; i < length; i++) {
+            array[i] = reader.apply(this);
+        }
+        return array;
+    }
+
+    public <K> void writeArray(K[] array, Writer<K> writer) {
+        this.writeVarInt(array.length);
+        for (K element : array) {
+            writer.accept(this, element);
         }
     }
 
