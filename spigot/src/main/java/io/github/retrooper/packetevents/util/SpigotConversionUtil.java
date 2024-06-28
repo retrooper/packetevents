@@ -138,9 +138,6 @@ public class SpigotConversionUtil {
 
     /**
      * Converts a {@link WrappedBlockState} object to a Bukkit {@link org.bukkit.material.MaterialData} object.
-     * <p>
-     * This method is compatible with Minecraft versions from 1.8.8 to 1.12.2.
-     * </p>
      *
      * @param state The {@link WrappedBlockState} object to convert.
      * @return The corresponding Bukkit {@link org.bukkit.material.MaterialData} object.

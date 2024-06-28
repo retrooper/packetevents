@@ -845,7 +845,6 @@ public final class SpigotReflectionUtil {
     }
 
     public static MaterialData getBlockDataByCombinedId(int combinedID) {
-        // TODO: Add 1.7.10 support
         Object iBlockDataObj = null;
         try {
             iBlockDataObj = GET_BY_COMBINED_ID.invoke(null, combinedID);
