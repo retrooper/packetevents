@@ -120,4 +120,26 @@ final class BinaryBufferTypes {
             }
         }
     }
+    static final class VarLong implements BinaryBufferType<java.lang.Long> {
+
+        @Override
+        public java.lang.Long read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            long value = 0;
+            int size = 0;
+            int b;
+            while (((b = ByteBufHelper.readByte(buffer)) & 0x80) == 0x80) {
+                value |= (long) (b & 0x7F) << (size++ * 7);
+            }
+            return value | ((long) (b & 0x7F) << (size * 7));        }
+
+        @Override
+        public void write(BinaryBuffer buffer, java.lang.Long value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            while ((value & ~0x7F) != 0) {
+                ByteBufHelper.writeByte(buffer, (int) (value & 0x7F) | 0x80);
+                value >>>= 7;
+            }
+
+            ByteBufHelper.writeByte(buffer, value.intValue());
+        }
+    }
 }
