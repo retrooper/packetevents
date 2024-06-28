@@ -35,12 +35,14 @@ public interface ByteBufOperator {
 
     byte readByte(Object buffer);
     short readShort(Object buffer);
+    int readMedium(Object buffer);
     int readInt(Object buffer);
     long readUnsignedInt(Object buffer);
     long readLong(Object buffer);
 
     void writeByte(Object buffer, int value);
     void writeShort(Object buffer, int value);
+    void writeMedium(Object buffer, int value);
     void writeInt(Object buffer, int value);
     void writeLong(Object buffer, long value);
 
