@@ -80,6 +80,11 @@ public class ByteBufOperatorImpl implements ByteBufOperator {
     }
 
     @Override
+    public int readMedium(Object buffer) {
+        return ((ByteBuf)buffer).readMedium();
+    }
+
+    @Override
     public int readInt(Object buffer) {
         return ((ByteBuf)buffer).readInt();
     }
@@ -102,6 +107,11 @@ public class ByteBufOperatorImpl implements ByteBufOperator {
     @Override
     public void writeShort(Object buffer, int value) {
         ((ByteBuf)buffer).writeShort(value);
+    }
+
+    @Override
+    public void writeMedium(Object buffer, int value) {
+        ((ByteBuf)buffer).writeMedium(value);
     }
 
     @Override

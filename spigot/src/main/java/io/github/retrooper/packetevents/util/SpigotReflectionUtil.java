@@ -823,11 +823,8 @@ public final class SpigotReflectionUtil {
     }
 
     public static int getBlockDataCombinedId(MaterialData materialData) {
-        if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
-            //TODO Finish for 1.7.10
-            throw new IllegalStateException("This operation is not supported yet on 1.7.10!");
-        }
-        //TODO Finish
+        // TODO: Add 1.7.10 support
+        // TODO: Finish adding 1.13+ support
         int combinedID;
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
             combinedID = -1;
@@ -848,10 +845,6 @@ public final class SpigotReflectionUtil {
     }
 
     public static MaterialData getBlockDataByCombinedId(int combinedID) {
-        if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
-            //TODO Finish for 1.7.10
-            throw new IllegalStateException("This operation is not supported yet on 1.7.10!");
-        }
         Object iBlockDataObj = null;
         try {
             iBlockDataObj = GET_BY_COMBINED_ID.invoke(null, combinedID);

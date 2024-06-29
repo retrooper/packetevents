@@ -121,12 +121,27 @@ public class SpigotConversionUtil {
         return bukkitStack.getType();
     }
 
+    /**
+     * Converts a Bukkit {@link org.bukkit.material.MaterialData} object to a {@link WrappedBlockState} object.
+     * <p>
+     * This method is compatible with Minecraft versions from 1.8.8 to 1.12.2.
+     * </p>
+     *
+     * @param materialData The Bukkit {@link org.bukkit.material.MaterialData} object to convert.
+     * @return The corresponding {@link WrappedBlockState} object.
+     */
     public static WrappedBlockState fromBukkitMaterialData(org.bukkit.material.MaterialData materialData) {
         int combinedID = SpigotReflectionUtil.getBlockDataCombinedId(materialData);
         ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
         return WrappedBlockState.getByGlobalId(serverVersion.toClientVersion(), combinedID);
     }
 
+    /**
+     * Converts a {@link WrappedBlockState} object to a Bukkit {@link org.bukkit.material.MaterialData} object.
+     *
+     * @param state The {@link WrappedBlockState} object to convert.
+     * @return The corresponding Bukkit {@link org.bukkit.material.MaterialData} object.
+     */
     public static org.bukkit.material.MaterialData toBukkitMaterialData(WrappedBlockState state) {
         return SpigotReflectionUtil.getBlockDataByCombinedId(state.getGlobalId());
     }
@@ -168,7 +183,8 @@ public class SpigotConversionUtil {
 
     /**
      * Access the Bukkit Entity associated to the Entity ID.
-     * @param world The world they are in. This field is optional, but is recommended as it could boost performance.
+     *
+     * @param world    The world they are in. This field is optional, but is recommended as it could boost performance.
      * @param entityId The associated Entity ID
      * @return The Bukkit Entity
      */

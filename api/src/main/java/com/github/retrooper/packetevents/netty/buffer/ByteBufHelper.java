@@ -103,6 +103,14 @@ public class ByteBufHelper {
         PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeShort(buffer, value);
     }
 
+    public static int readMedium(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readMedium(buffer);
+    }
+
+    public static void writeMedium(Object buffer, int value) {
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeMedium(buffer, value);
+    }
+
     public static int readInt(Object buffer) {
         return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readInt(buffer);
     }

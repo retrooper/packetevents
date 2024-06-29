@@ -1,6 +1,6 @@
 group = "com.github.retrooper"
 description = rootProject.name
-version = "2.3.1-SNAPSHOT" //TODO UPDATE - ADD "-SNAPSHOT" if we are dealing with snapshot versions
+version = "2.4.0-SNAPSHOT" //TODO UPDATE - ADD "-SNAPSHOT" if we are dealing with snapshot versions
 
 tasks {
     wrapper {
