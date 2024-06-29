@@ -1,6 +1,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -12,7 +12,7 @@ public class WrapperPlayServerEffect extends PacketWrapper<WrapperPlayServerEffe
     private boolean globalEvent;
 
 
-    public WrapperPlayServerEffect(PacketReceiveEvent event) {
+    public WrapperPlayServerEffect(PacketSendEvent event) {
         super(event);
     }
 
