@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,27 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.recipe;
 
-import com.github.retrooper.packetevents.protocol.item.ItemStack;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+public enum CraftingCategory {
 
-public class Ingredient {
-
-    private final ItemStack[] options;
-
-    public Ingredient(ItemStack... options) {
-        this.options = options;
-    }
-
-    public static Ingredient read(PacketWrapper<?> wrapper) {
-        ItemStack[] options = wrapper.readArray(PacketWrapper::readItemStack, ItemStack.class);
-        return new Ingredient(options);
-    }
-
-    public static void write(PacketWrapper<?> wrapper, Ingredient ingredient) {
-        wrapper.writeArray(ingredient.options, PacketWrapper::writeItemStack);
-    }
-
-    public ItemStack[] getOptions() {
-        return this.options;
-    }
+    BUILDING,
+    REDSTONE,
+    EQUIPMENT,
+    MISC,
 }

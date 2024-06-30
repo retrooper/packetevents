@@ -18,23 +18,108 @@
 
 package com.github.retrooper.packetevents.protocol.recipe.data;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.recipe.CraftingCategory;
 import com.github.retrooper.packetevents.protocol.recipe.Ingredient;
-import org.jetbrains.annotations.NotNull;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class ShapedRecipeData implements RecipeData {
+
+    private final String group;
+    private final CraftingCategory category;
+    private final ItemStack result;
+    private final boolean showNotification;
+
+    // pattern
     private final int width;
     private final int height;
-    private final @NotNull String group;
-    private final @NotNull Ingredient[] ingredients;
-    private final ItemStack result;
+    private final Ingredient[] ingredients;
 
-    public ShapedRecipeData(final int width, final int height, final @NotNull String group, final @NotNull Ingredient[] ingredients, final ItemStack result) {
+    @Deprecated
+    public ShapedRecipeData(int width, int height, String group, Ingredient[] ingredients, ItemStack result) {
+        this(group, CraftingCategory.MISC, result, true, width, height, ingredients);
+    }
+
+    public ShapedRecipeData(
+            String group, CraftingCategory category, ItemStack result, boolean showNotification,
+            int width, int height, Ingredient[] ingredients
+    ) {
+        if (width * height != ingredients.length) {
+            throw new IllegalArgumentException("Illegal ingredients length, found " + ingredients.length
+                    + " but expected " + width + " * " + height);
+        }
+
+        this.group = group;
+        this.category = category;
+        this.result = result;
+        this.showNotification = showNotification;
         this.width = width;
         this.height = height;
-        this.group = group;
         this.ingredients = ingredients;
-        this.result = result;
+    }
+
+    public static ShapedRecipeData read(PacketWrapper<?> wrapper) {
+        int width = 0, height = 0;
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_20_3)) {
+            width = wrapper.readVarInt();
+            height = wrapper.readVarInt();
+        }
+        String group = wrapper.readString();
+        CraftingCategory category = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)
+                ? wrapper.readEnum(CraftingCategory.values()) : CraftingCategory.MISC;
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            width = wrapper.readVarInt();
+            height = wrapper.readVarInt();
+        }
+        Ingredient[] ingredients = new Ingredient[width * height];
+        for (int i = 0; i < ingredients.length; i++) {
+            ingredients[i] = Ingredient.read(wrapper);
+        }
+        ItemStack result = wrapper.readItemStack();
+        boolean showNotification = true;
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
+            showNotification = wrapper.readBoolean();
+        }
+        return new ShapedRecipeData(group, category, result, showNotification, width, height, ingredients);
+    }
+
+    public static void write(PacketWrapper<?> wrapper, ShapedRecipeData data) {
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_20_3)) {
+            wrapper.writeVarInt(data.width);
+            wrapper.writeVarInt(data.height);
+        }
+        wrapper.writeString(data.group);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            wrapper.writeEnum(data.category);
+        }
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            wrapper.writeVarInt(data.width);
+            wrapper.writeVarInt(data.height);
+        }
+        for (Ingredient ingredient : data.ingredients) {
+            Ingredient.write(wrapper, ingredient);
+        }
+        wrapper.writeItemStack(data.result);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
+            wrapper.writeBoolean(data.showNotification);
+        }
+    }
+
+    public String getGroup() {
+        return this.group;
+    }
+
+    public CraftingCategory getCategory() {
+        return this.category;
+    }
+
+    public ItemStack getResult() {
+        return this.result;
+    }
+
+    public boolean isShowNotification() {
+        return this.showNotification;
     }
 
     public int getWidth() {
@@ -45,15 +130,7 @@ public class ShapedRecipeData implements RecipeData {
         return this.height;
     }
 
-    public @NotNull String getGroup() {
-        return this.group;
-    }
-
-    public @NotNull Ingredient[] getIngredients() {
+    public Ingredient[] getIngredients() {
         return this.ingredients;
-    }
-
-    public ItemStack getResult() {
-        return this.result;
     }
 }

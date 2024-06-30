@@ -46,40 +46,44 @@ public class BungeePipelineInjector implements ChannelInjector {
 
     public void injectChannel(Channel channel) {
         Field initializerField = null;
-        ChannelHandler handlerInstance = null;
+        ChannelHandler bootstrapAcceptor = null;
         for (String channelName : channel.pipeline().names()) {
+            if (channelName.contains("QueryHandler")) {
+                return; // query handler, abort injection
+            }
+
             ChannelHandler handler = channel.pipeline().get(channelName);
             if (handler == null) continue;
             try {
                 Field f = handler.getClass().getDeclaredField("childHandler");
                 f.setAccessible(true);
-                if (f.getType().isAssignableFrom(ChannelInitializer.class)) {
-                    handlerInstance = handler;
-                    initializerField = f;
-                }
-            }
-			catch (Exception ignore) {
+                bootstrapAcceptor = handler;
+                initializerField = f;
+            } catch (Exception ignore) {
             }
         }
-        Field finalInitializerField = initializerField;
-        ChannelHandler finalHandlerInstance = handlerInstance;
-        ChannelInitializer<Channel> newInitializer = new ChannelInitializer<Channel>() {
-            @Override
-            protected void initChannel(@NotNull Channel channel) throws Exception {
-                if (!channel.isActive()) return;
-                Method initChannelMethod = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
-                initChannelMethod.setAccessible(true);
 
-                initChannelMethod.invoke(finalInitializerField.get(finalHandlerInstance), channel);
-
-                ServerConnectionInitializer.initChannel(channel, ConnectionState.HANDSHAKING);
+        if (bootstrapAcceptor == null) {
+            bootstrapAcceptor = channel.pipeline().first();
+            try {
+                initializerField = bootstrapAcceptor.getClass().getDeclaredField("childHandler");
+                initializerField.setAccessible(true);
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
             }
-        };
+        }
+
+        ChannelInitializer<Channel> newInitializer;
+        try {
+            newInitializer = new BungeeChannelInitializer(initializerField.get(bootstrapAcceptor));
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         try {
-            Field childHandlerField = handlerInstance.getClass().getDeclaredField("childHandler");
-            childHandlerField.setAccessible(true);
-            childHandlerField.set(handlerInstance, newInitializer);
+            Field f = bootstrapAcceptor.getClass().getDeclaredField("childHandler");
+            f.setAccessible(true);
+            f.set(bootstrapAcceptor, newInitializer);
         } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
