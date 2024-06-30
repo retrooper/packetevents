@@ -26,7 +26,9 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.item.banner.BannerPattern;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
@@ -34,6 +36,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.util.mappings.SimpleRegistry;
@@ -45,17 +49,22 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJo
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InternalPacketListener extends PacketListenerAbstract {
 
-    private static final Map<ResourceLocation, IRegistry<?>> REGISTRY_KEYS = new HashMap<>();
-
-    static {
-        REGISTRY_KEYS.put(ResourceLocation.minecraft("banner_pattern"), BannerPatterns.getRegistry());
-    }
+    private static final Map<ResourceLocation, RegistryEntry<?>> REGISTRY_KEYS = Stream.of(
+            new RegistryEntry<>(BannerPatterns.getRegistry(),
+                    BannerPattern::decode, BannerPattern::encode),
+            new RegistryEntry<>(DimensionTypes.getRegistry(),
+                    DimensionType::decode, DimensionType::encode)
+    ).collect(Collectors.toMap(
+            entry -> entry.registry.getRegistryKey(),
+            Function.identity()));
 
     public InternalPacketListener() {
         this(PacketListenerPriority.LOWEST);
@@ -66,15 +75,10 @@ public class InternalPacketListener extends PacketListenerAbstract {
     }
 
     private void handleRegistry(User user, ResourceLocation registryName, List<RegistryElement> elements) {
-        IRegistry<?> registry = REGISTRY_KEYS.get(registryName);
+        RegistryEntry<?> registry = REGISTRY_KEYS.get(registryName);
         if (registry != null) {
             IRegistry<?> syncedRegistry = SimpleRegistry.fromNetwork(registry, elements);
             user.putSynchronizedRegistry(syncedRegistry);
-        }
-
-        // temporary hard-coding for dimension type registries
-        if (ResourceLocation.minecraft("dimension_type").equals(registryName)) {
-            user.setWorldData(elements);
         }
     }
 
@@ -192,6 +196,19 @@ public class InternalPacketListener extends PacketListenerAbstract {
             user.setDecoderState(ConnectionState.CONFIGURATION);
         } else if (event.getPacketType() == PacketType.Configuration.Client.CONFIGURATION_END_ACK) {
             user.setDecoderState(ConnectionState.PLAY);
+        }
+    }
+
+    private static final class RegistryEntry<T extends MappedEntity> {
+
+        private final IRegistry<T> registry;
+        private final Function<NBT, T> decoder;
+        private final Function<T, NBT> encoder;
+
+        public RegistryEntry(IRegistry<T> registry, Function<NBT, T> decoder, Function<T, NBT> encoder) {
+            this.registry = registry;
+            this.decoder = decoder;
+            this.encoder = encoder;
         }
     }
 }
