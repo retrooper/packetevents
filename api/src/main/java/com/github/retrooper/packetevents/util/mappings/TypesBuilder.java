@@ -54,8 +54,13 @@ public class TypesBuilder {
         final ClientVersion[] versions = new ClientVersion[entries.size()];
         int index = 0;
         for (final String name : entries.getTagNames()) {
-            versions[index] = ClientVersion.valueOf(name);
-            index++;
+            try {
+                versions[index] = ClientVersion.valueOf(name);
+                index++;
+            }
+            catch(IllegalArgumentException ex) {
+                throw new RuntimeException("Issue found in PacketEvents " + mapPath + " mappings. '" + name + "' is not a unique protocol release version! (It might just be a minecraft release version, not necessarily a unique protocol version)");
+            }
         }
 
         this.versionMapper = new VersionMapper(versions);
