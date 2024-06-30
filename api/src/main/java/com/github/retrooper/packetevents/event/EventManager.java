@@ -23,7 +23,7 @@ import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 
 public class EventManager {
@@ -82,7 +82,7 @@ public class EventManager {
     public PacketListenerCommon registerListener(PacketListenerCommon listener) {
         Set<PacketListenerCommon> listenerSet = listenersMap.get(listener.getPriority());
         if (listenerSet == null) {
-            listenerSet = ConcurrentHashMap.newKeySet();
+            listenerSet = new CopyOnWriteArraySet<>();
         }
         listenerSet.add(listener);
         listenersMap.put(listener.getPriority(), listenerSet);
