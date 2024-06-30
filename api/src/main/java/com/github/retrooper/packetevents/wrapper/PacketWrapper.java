@@ -1003,15 +1003,13 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     public Dimension readDimension() {
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            return this.user != null
-                    ? this.user.getDimensionData(this.readVarInt())
-                    : new Dimension(this.readVarInt());
+            return new Dimension(this.readVarInt());
         }
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
                 || this.serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
-            return this.user != null
-                    ? this.user.getDimensionData(this.readIdentifier())
-                    : new Dimension(this.readIdentifier());
+            Dimension dimension = new Dimension(new NBTCompound());
+            dimension.setDimensionName(readIdentifier().toString());
+            return dimension;
         } else {
             return new Dimension(readNBT());
         }
@@ -1022,9 +1020,9 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
             this.writeVarInt(dimension.getId());
         } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
                 || this.serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
-            this.writeIdentifier(dimension.getName());
+            this.writeString(dimension.getDimensionName());
         } else {
-            this.writeNBT(dimension.getData());
+            this.writeNBT(dimension.getAttributes());
         }
     }
 
