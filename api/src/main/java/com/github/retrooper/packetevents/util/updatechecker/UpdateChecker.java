@@ -69,19 +69,19 @@ public class UpdateChecker {
         if (localVersion.isOlderThan(newVersion)) {
             PacketEvents.getAPI().getLogManager().warn("There is an update available for PacketEvents! Your build: ("
                     + ColorUtil.toString(NamedTextColor.YELLOW) + localVersion
-                    + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
+                    + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest release: ("
                     + ColorUtil.toString(NamedTextColor.GREEN) + newVersion
                     + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             return UpdateCheckerStatus.OUTDATED;
         } else if (localVersion.isNewerThan(newVersion)) {
-            PacketEvents.getAPI().getLogManager().info("You are on a dev or pre-released build of PacketEvents. Your build: ("
+            PacketEvents.getAPI().getLogManager().info("You are running a development build of PacketEvents. Your build: ("
                     + ColorUtil.toString(NamedTextColor.AQUA) + localVersion
-                    + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
+                    + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest release: ("
                     + ColorUtil.toString(NamedTextColor.DARK_AQUA) + newVersion
                     + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             return UpdateCheckerStatus.PRE_RELEASE;
         } else if (localVersion.equals(newVersion)) {
-            PacketEvents.getAPI().getLogManager().info("You are on the latest released version of PacketEvents. Your build: ("
+            PacketEvents.getAPI().getLogManager().info("You are running the latest release of PacketEvents. Your build: ("
                     + ColorUtil.toString(NamedTextColor.GREEN) + newVersion + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {
@@ -114,7 +114,7 @@ public class UpdateChecker {
          */
         OUTDATED,
         /**
-         * You are on a dev or pre-released build. Not on the latest stable release(not necessarily bad).
+         * You are on a development build. Not on the latest stable release(not necessarily bad).
          */
         PRE_RELEASE,
         /**
