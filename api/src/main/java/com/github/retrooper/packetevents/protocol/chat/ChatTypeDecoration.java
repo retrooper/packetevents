@@ -18,15 +18,17 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
-import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.util.Index;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -34,7 +36,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.*;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.CONTENT;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.SENDER;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.TARGET;
 import static java.util.Arrays.asList;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 import static net.kyori.adventure.text.format.Style.empty;
@@ -53,32 +57,6 @@ public class ChatTypeDecoration {
         this.style = style;
     }
 
-    public ChatTypeDecoration(NBTCompound nbt) {
-        //Read the translation key
-        this.translationKey = nbt.getStringTagValueOrDefault("translation_key", null);
-
-        //Read parameters
-        List<Parameter> temporaryList = new ArrayList<>();
-        NBTList<NBTString> parametersTag = nbt.getStringListTagOrNull("parameters");
-        if (parametersTag != null) {
-            for (NBTString p : parametersTag.getTags()) {
-                Parameter parameter = Parameter.valueByName(p.getValue().toUpperCase());
-                if (parameter != null) {
-                    temporaryList.add(parameter);
-                }
-            }
-        }
-        this.parameters = Collections.unmodifiableList(temporaryList);
-
-        //Read style
-        NBTCompound styleTag = nbt.getCompoundTagOrNull("style");
-        if (styleTag != null) {
-            style = AdventureSerializer.getNBTSerializer().deserializeStyle(styleTag);
-        } else {
-            style = empty();
-        }
-    }
-
     public static ChatTypeDecoration read(PacketWrapper<?> wrapper) {
         String translationKey = wrapper.readString();
         List<Parameter> parameters = wrapper.readList(ew -> ew.readEnum(Parameter.values()));
@@ -90,6 +68,36 @@ public class ChatTypeDecoration {
         wrapper.writeString(decoration.translationKey);
         wrapper.writeList(decoration.parameters, PacketWrapper::writeEnum);
         wrapper.writeStyle(decoration.style);
+    }
+
+    public static ChatTypeDecoration decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+        String translationKey = compound.getStringTagValueOrThrow("translation_key");
+        List<Parameter> params = new ArrayList<>();
+        NBTList<NBTString> paramsTag = compound.getStringListTagOrThrow("parameters");
+        for (NBTString paramTag : paramsTag.getTags()) {
+            params.add(Parameter.ID_INDEX.valueOrThrow(paramTag.getValue()));
+        }
+        NBTCompound styleTag = compound.getCompoundTagOrNull("style");
+        Style style = styleTag == null ? empty() :
+                AdventureSerializer.getNBTSerializer().deserializeStyle(styleTag);
+        return new ChatTypeDecoration(translationKey, params, style);
+    }
+
+    public static NBT encode(ChatTypeDecoration decoration, ClientVersion version) {
+        NBTList<NBTString> paramsTag = NBTList.createStringList();
+        for (Parameter param : decoration.parameters) {
+            paramsTag.addTag(new NBTString(param.getId()));
+        }
+
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("translation_key", new NBTString(decoration.translationKey));
+        compound.setTag("parameters", paramsTag);
+        if (!decoration.style.isEmpty()) {
+            compound.setTag("style", AdventureSerializer.getNBTSerializer()
+                    .serializeStyle(decoration.style));
+        }
+        return compound;
     }
 
     public static ChatTypeDecoration withSender(String translationKey) {
@@ -132,23 +140,30 @@ public class ChatTypeDecoration {
     }
 
     public enum Parameter {
-        SENDER((component, type) -> type.getName()),
-        TARGET((component, type) -> type.getTargetName() != null ? type.getTargetName() : Component.empty()),
-        CONTENT((component, type) -> component);
 
+        SENDER("sender", (component, type) -> type.getName()),
+        TARGET("target", (component, type) -> type.getTargetName() != null
+                ? type.getTargetName() : Component.empty()),
+        CONTENT("content", (component, type) -> component);
+
+        public static final Index<String, Parameter> ID_INDEX = Index.create(
+                Parameter.class, Parameter::getId);
+
+        private final String id;
         private final BiFunction<Component, ChatType.Bound, Component> selector;
 
-        Parameter(BiFunction<Component, ChatType.Bound, Component> selector) {
+        Parameter(String id, BiFunction<Component, ChatType.Bound, Component> selector) {
+            this.id = id;
             this.selector = selector;
         }
 
-        @Nullable
-        public static Parameter valueByName(String name) {
-            try {
-                return valueOf(name);
-            } catch (IllegalArgumentException ex) {
-                return null;
-            }
+        public String getId() {
+            return this.id;
+        }
+
+        @Deprecated
+        public static @Nullable Parameter valueByName(String id) {
+            return ID_INDEX.value(id);
         }
     }
 }

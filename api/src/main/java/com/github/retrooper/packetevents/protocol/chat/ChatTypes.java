@@ -19,71 +19,50 @@
 package com.github.retrooper.packetevents.protocol.chat;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.incomingDirectMessage;
 import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.outgoingDirectMessage;
 import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.teamMessage;
 import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.withSender;
 
-public class ChatTypes {
+public final class ChatTypes {
 
-    private static final Map<String, ChatType> CHAT_TYPE_MAP = new HashMap<>();
-    //Key - mappings version, value - map with chat type ids and chat types
-    private static final Map<Byte, Map<Integer, ChatType>> CHAT_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("chat/chat_type_mappings");
+    private static final VersionedRegistry<ChatType> REGISTRY = new VersionedRegistry<>(
+            "chat_type", "chat/chat_type_mappings");
 
+    private ChatTypes() {
+    }
+
+    @ApiStatus.Internal
     public static ChatType define(String key) {
         return define(key, withSender("chat.type.text"));
     }
 
+    @ApiStatus.Internal
     public static ChatType define(String key, ChatTypeDecoration chatDeco) {
         return define(key, chatDeco, withSender("chat.type.text.narrate"));
     }
 
+    @ApiStatus.Internal
     public static ChatType define(String key, ChatTypeDecoration chatDeco, ChatTypeDecoration narrationDeco) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        ChatType chatType = new ChatType() {
-            @Override
-            public ChatTypeDecoration getChatDecoration() {
-                return chatDeco;
-            }
-
-            @Override
-            public ChatTypeDecoration getNarrationDecoration() {
-                return narrationDeco;
-            }
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-        };
-        MappingHelper.registerMapping(TYPES_BUILDER, CHAT_TYPE_MAP, CHAT_TYPE_ID_MAP, chatType);
-        return chatType;
+        return REGISTRY.define(key, data ->
+                new StaticChatType(data, chatDeco, narrationDeco));
     }
 
-    //with minecraft:key
+    public static VersionedRegistry<ChatType> getRegistry() {
+        return REGISTRY;
+    }
+
     public static ChatType getByName(String name) {
-        return CHAT_TYPE_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static ChatType getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        return CHAT_TYPE_ID_MAP.get((byte) index).get(id);
+        return REGISTRY.getById(version, id);
     }
 
     public static final ChatType CHAT = define("chat");
@@ -115,13 +94,14 @@ public class ChatTypes {
 
     /**
      * Returns an immutable view of the chat types.
+     *
      * @return Chat Types
      */
     public static Collection<ChatType> values() {
-        return Collections.unmodifiableCollection(CHAT_TYPE_MAP.values());
+        return REGISTRY.getEntries();
     }
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
 }

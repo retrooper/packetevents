@@ -47,7 +47,11 @@ mappingCompression {
         compress("block/legacy_block_mappings.json")
         compress("block/modern_block_mappings.json")
 
+        compress("enchantment/enchantment_type_data.json")
+
         compress("stats/statistics.json")
+
+        compress("world/biome_data.json")
     }
 
     with<JsonArrayCompressionStrategy> {
@@ -59,6 +63,8 @@ mappingCompression {
         compress("chat/chat_type_mappings.json")
 
         compress("command/argument_parser_mappings.json")
+
+        compress("enchantment/effect_component_type.json")
 
         compress("entity/entity_data_type_mappings.json")
         compress("entity/painting_mappings.json")
@@ -88,6 +94,8 @@ mappingCompression {
         compress("entity/legacy_entity_type_mappings.json")
 
         compress("item/item_type_mappings.json")
+
+        compress("world/dimension_type_mappings.json")
     }
 }
 

@@ -18,17 +18,35 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import org.jetbrains.annotations.Nullable;
 
-public class StaticChatType implements ChatType {
+public class StaticChatType extends AbstractMappedEntity implements ChatType {
 
     private final ChatTypeDecoration chatDecoration;
     private final ChatTypeDecoration narrationDecoration;
 
-    public StaticChatType(ChatTypeDecoration chatDecoration, ChatTypeDecoration narrationDecoration) {
+    public StaticChatType(
+            ChatTypeDecoration chatDecoration,
+            ChatTypeDecoration narrationDecoration
+    ) {
+        this(null, chatDecoration, narrationDecoration);
+    }
+
+    public StaticChatType(
+            @Nullable TypesBuilderData data,
+            ChatTypeDecoration chatDecoration,
+            ChatTypeDecoration narrationDecoration
+    ) {
+        super(data);
         this.chatDecoration = chatDecoration;
         this.narrationDecoration = narrationDecoration;
+    }
+
+    @Override
+    public ChatType copy(@Nullable TypesBuilderData newData) {
+        return new StaticChatType(newData, this.chatDecoration, this.narrationDecoration);
     }
 
     @Override
@@ -39,20 +57,5 @@ public class StaticChatType implements ChatType {
     @Override
     public ChatTypeDecoration getNarrationDecoration() {
         return this.narrationDecoration;
-    }
-
-    @Override
-    public ResourceLocation getName() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int getId(ClientVersion version) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isRegistered() {
-        return false;
     }
 }

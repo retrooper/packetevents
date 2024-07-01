@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.world;
 
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
 import org.jetbrains.annotations.NotNull;
@@ -36,9 +37,13 @@ public class WorldBlockPosition {
         this.blockPosition = new Vector3i(x, y, z);
     }
 
+    @Deprecated
     public WorldBlockPosition(@NotNull Dimension dimension, @NotNull Vector3i blockPosition) {
-        this.world = new ResourceLocation(dimension.getDimensionName());
-        this.blockPosition = blockPosition;
+        this(new ResourceLocation(dimension.getDimensionName()), blockPosition);
+    }
+
+    public WorldBlockPosition(@NotNull DimensionType dimensionType, @NotNull Vector3i blockPosition) {
+        this(dimensionType.getName(), blockPosition);
     }
 
     public ResourceLocation getWorld() {

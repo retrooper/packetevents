@@ -39,7 +39,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
-*/
+ */
 package com.github.retrooper.packetevents.wrapper;
 
 import com.github.retrooper.packetevents.PacketEvents;
@@ -62,7 +62,6 @@ import com.github.retrooper.packetevents.protocol.chat.RemoteChatSession;
 import com.github.retrooper.packetevents.protocol.chat.SignedCommandArgument;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
-import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
 import com.github.retrooper.packetevents.protocol.component.ComponentType;
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
@@ -96,6 +95,7 @@ import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.util.crypto.SignatureData;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.ApiStatus;
@@ -1001,6 +1001,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         writeEntityMetadata(metadata.entityData(serverVersion.toClientVersion()));
     }
 
+    @Deprecated
     public Dimension readDimension() {
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             return new Dimension(this.readVarInt());
@@ -1015,6 +1016,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         }
     }
 
+    @Deprecated
     public void writeDimension(Dimension dimension) {
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             this.writeVarInt(dimension.getId());
@@ -1158,7 +1160,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public MessageSignature readMessageSignature() {
-        if(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) return new MessageSignature(readBytes(256));
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) return new MessageSignature(readBytes(256));
         else return new MessageSignature(readByteArray());
     }
 
@@ -1288,8 +1290,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     public ChatType.Bound readChatTypeBoundNetwork() {
         ChatType type = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)
-                ? this.readMappedEntityOrDirect(ChatTypes::getById, ChatType::readDirect)
-                : this.readMappedEntity(ChatTypes::getById);
+                ? this.readMappedEntityOrDirect(ChatTypes.getRegistry(), ChatType::readDirect)
+                : this.readMappedEntity(ChatTypes.getRegistry());
         Component name = readComponent();
         Component targetName = readOptional(PacketWrapper::readComponent);
         return new ChatType.Bound(type, name, targetName);
@@ -1486,6 +1488,21 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
             return getter.apply(this.serverVersion.toClientVersion(), id - 1);
         }
         return directReader.apply(this);
+    }
+
+    public <Z extends MappedEntity> Z readMappedEntity(IRegistry<Z> registry) {
+        if (this.user != null) {
+            registry = this.user.getUserRegistryOrFallback(registry);
+        }
+        return this.readMappedEntity(registry::getById);
+    }
+
+    public <Z extends MappedEntity> Z readMappedEntityOrDirect(
+            IRegistry<Z> registry, Reader<Z> directReader) {
+        if (this.user != null) {
+            registry = this.user.getUserRegistryOrFallback(registry);
+        }
+        return this.readMappedEntityOrDirect(registry::getById, directReader);
     }
 
     public void writeMappedEntity(MappedEntity entity) {

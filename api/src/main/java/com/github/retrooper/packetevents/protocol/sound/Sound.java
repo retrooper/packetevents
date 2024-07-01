@@ -19,6 +19,9 @@
 package com.github.retrooper.packetevents.protocol.sound;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -47,5 +50,19 @@ public interface Sound extends MappedEntity {
     static void writeDirect(PacketWrapper<?> wrapper, Sound sound) {
         wrapper.writeIdentifier(sound.getSoundId());
         wrapper.writeOptional(sound.getRange(), PacketWrapper::writeFloat);
+    }
+
+    static Sound decode(NBT nbt, ClientVersion version) {
+        if (nbt instanceof NBTString) {
+            return Sounds.getByName(((NBTString) nbt).getValue());
+        }
+        // FIXME
+    }
+
+    static NBT encode(Sound sound, ClientVersion version) {
+        if (sound.isRegistered()) {
+            return new NBTString(sound.getName().toString());
+        }
+        // FIXME
     }
 }

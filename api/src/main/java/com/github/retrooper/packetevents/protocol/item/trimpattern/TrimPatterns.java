@@ -22,20 +22,19 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 
-import java.util.HashMap;
-import java.util.Map;
+public final class TrimPatterns {
 
-public class TrimPatterns {
+    private static final VersionedRegistry<TrimPattern> REGISTRY = new VersionedRegistry<>(
+            "trim_pattern", "item/item_trim_pattern_mappings");
 
-    private static final Map<String, TrimPattern> PATTERN_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, TrimPattern>> PATTERN_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_trim_pattern_mappings");
+    private TrimPatterns() {
+    }
 
+    @ApiStatus.Internal
     public static TrimPattern define(String key) {
         ResourceLocation assetId = ResourceLocation.minecraft(key);
         ItemType templateItem = ItemTypes.getByName(assetId + "_armor_trim_smithing_template");
@@ -44,63 +43,25 @@ public class TrimPatterns {
         return define(key, assetId, templateItem, description, decal);
     }
 
+    @ApiStatus.Internal
     public static TrimPattern define(
             String key, ResourceLocation assetId, ItemType templateItem,
             Component description, boolean decal
     ) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        TrimPattern pattern = new TrimPattern() {
-            @Override
-            public ResourceLocation getAssetId() {
-                return assetId;
-            }
-
-            @Override
-            public ItemType getTemplateItem() {
-                return templateItem;
-            }
-
-            @Override
-            public Component getDescription() {
-                return description;
-            }
-
-            @Override
-            public boolean isDecal() {
-                return decal;
-            }
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof TrimPattern) {
-                    return this.getName().equals(((TrimPattern) obj).getName());
-                }
-                return false;
-            }
-        };
-        MappingHelper.registerMapping(TYPES_BUILDER, PATTERN_TYPE_MAP, PATTERN_TYPE_ID_MAP, pattern);
-        return pattern;
+        return REGISTRY.define(key, data ->
+                new StaticTrimPattern(data, assetId, templateItem, description, decal));
     }
 
-    // with key
+    public static VersionedRegistry<TrimPattern> getRegistry() {
+        return REGISTRY;
+    }
+
     public static TrimPattern getByName(String name) {
-        return PATTERN_TYPE_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static TrimPattern getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, TrimPattern> idMap = PATTERN_TYPE_ID_MAP.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
 
     // Added in 1.19.4
@@ -128,6 +89,6 @@ public class TrimPatterns {
     public static final TrimPattern FLOW = define("flow");
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
 }

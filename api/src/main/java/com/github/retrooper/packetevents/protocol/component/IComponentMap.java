@@ -18,12 +18,43 @@
 
 package com.github.retrooper.packetevents.protocol.component;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Optional;
 
 public interface IComponentMap {
+
+    @SuppressWarnings("unchecked") // safe in this case
+    static StaticComponentMap decode(NBT nbt, ClientVersion version, IRegistry<? extends ComponentType<?>> registry) {
+        NBTCompound compound = (NBTCompound) nbt;
+        StaticComponentMap.Builder components = StaticComponentMap.builder();
+        for (Map.Entry<String, NBT> entry : compound.getTags().entrySet()) {
+            ComponentType<?> type = registry.getByName(entry.getKey());
+            if (type == null) {
+                throw new IllegalStateException("Unknown component type named " + entry.getKey() + " encountered");
+            }
+            Object value = type.decode(entry.getValue(), version);
+            components.set((ComponentType<? super Object>) type, value);
+        }
+        return components.build();
+    }
+
+    @SuppressWarnings("unchecked") // safe in this case
+    static NBT encode(StaticComponentMap components, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        for (Map.Entry<ComponentType<?>, ?> entry : components.getDelegate().entrySet()) {
+            String key = entry.getKey().getName().toString();
+            NBT value = ((ComponentType<? super Object>) entry.getKey()).encode(entry.getValue(), version);
+            compound.setTag(key, value);
+        }
+        return compound;
+    }
 
     default <T> Optional<T> getOptional(ComponentType<T> type) {
         return Optional.ofNullable(this.get(type));

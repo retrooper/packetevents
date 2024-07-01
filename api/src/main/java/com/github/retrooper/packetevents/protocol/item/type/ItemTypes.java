@@ -45,9 +45,7 @@ import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,14 +85,15 @@ import static com.github.retrooper.packetevents.protocol.component.ComponentType
 import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.WRITABLE_BOOK_CONTENT;
 
 public class ItemTypes {
-    private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, ItemType>> ITEM_TYPE_ID_MAP = new HashMap<>();
+
+    private static final VersionedRegistry<ItemType> REGISTRY = new VersionedRegistry<>(
+            "item", "item/item_type_mappings");
     private static final Map<StateType, ItemType> HELD_TO_PLACED_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_type_mappings");
 
     private static final UUID TOOL_MODIFIER_ATTACK_DAMAGE_UUID = UUID.fromString("cb3f55d3-645c-4f38-a497-9c13a33db5cf");
     private static final UUID TOOL_MODIFIER_ATTACK_SPEED_UUID = UUID.fromString("fa233e1c-4180-4865-b01b-bcce9785aca3");
 
+    // <editor-fold desc="item type definitions" defaultstate="collapsed">
     public static final ItemType GILDED_BLACKSTONE = builder("gilded_blackstone").setMaxAmount(64).setPlacedType(StateTypes.GILDED_BLACKSTONE).build();
     public static final ItemType NETHER_BRICK_SLAB = builder("nether_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.NETHER_BRICK_SLAB).build();
     public static final ItemType ANDESITE_SLAB = builder("andesite_slab").setMaxAmount(64).setPlacedType(StateTypes.ANDESITE_SLAB).build();
@@ -1488,8 +1487,15 @@ public class ItemTypes {
     @Deprecated
     public static final ItemType POTTERY_SHARD_SKULL = builder("POTTERY_SHARD_SKULL").setMaxAmount(64).build();
 
+    // </editor-fold>
+
+
+    public static VersionedRegistry<ItemType> getRegistry() {
+        return REGISTRY;
+    }
+
     public static Collection<ItemType> values() {
-        return ITEM_TYPE_MAP.values();
+        return REGISTRY.getEntries();
     }
 
     public static Builder builder(String key) {
@@ -1516,10 +1522,7 @@ public class ItemTypes {
         }
         StaticComponentMap components = mapBuilder.build();
 
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        ItemType type = new ItemType() {
-            private final int[] ids = data.getData();
-
+        return REGISTRY.define(key, data -> new ItemType() {
             @Override
             public int getMaxAmount() {
                 return maxAmount;
@@ -1537,8 +1540,7 @@ public class ItemTypes {
 
             @Override
             public int getId(ClientVersion version) {
-                int index = TYPES_BUILDER.getDataIndex(version);
-                return ids[index];
+                return data.getId(version);
             }
 
             @Override
@@ -1579,21 +1581,15 @@ public class ItemTypes {
                 }
                 return false;
             }
-        };
-        MappingHelper.registerMapping(TYPES_BUILDER, ITEM_TYPE_MAP, ITEM_TYPE_ID_MAP, type);
-        return type;
+        });
     }
 
-    @Nullable
-    public static ItemType getByName(String name) {
-        return ITEM_TYPE_MAP.get(name);
+    public static @Nullable ItemType getByName(String name) {
+        return REGISTRY.getByName(name);
     }
 
-    @NotNull
-    public static ItemType getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, ItemType> typeIdMap = ITEM_TYPE_ID_MAP.get((byte) index);
-        return typeIdMap.getOrDefault(id, ItemTypes.AIR);
+    public static @Nullable ItemType getById(ClientVersion version, int id) {
+        return REGISTRY.getById(version, id);
     }
 
     public static ItemType getTypePlacingState(StateType type) {
@@ -1662,6 +1658,6 @@ public class ItemTypes {
     }
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
 }

@@ -20,71 +20,42 @@ package com.github.retrooper.packetevents.protocol.item.banner;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
-public class BannerPatterns {
+public final class BannerPatterns {
 
-    private static final Map<String, BannerPattern> PATTERN_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, BannerPattern>> PATTERN_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_banner_pattern_mappings");
+    private static final VersionedRegistry<BannerPattern> REGISTRY = new VersionedRegistry<>(
+            "banner_pattern", "item/item_banner_pattern_mappings");
 
+    private BannerPatterns() {
+    }
+
+    @ApiStatus.Internal
     public static BannerPattern define(String key) {
         ResourceLocation assetId = ResourceLocation.minecraft(key);
         String translationKey = "block.minecraft.banner." + key;
         return define(key, assetId, translationKey);
     }
 
+    @ApiStatus.Internal
     public static BannerPattern define(String key, ResourceLocation assetId, String translationKey) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        BannerPattern pattern = new BannerPattern() {
-            @Override
-            public ResourceLocation getAssetId() {
-                return assetId;
-            }
-
-            @Override
-            public String getTranslationKey() {
-                return translationKey;
-            }
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof BannerPattern) {
-                    return getName().equals(((BannerPattern) obj).getName());
-                }
-                return false;
-            }
-        };
-        MappingHelper.registerMapping(TYPES_BUILDER, PATTERN_TYPE_MAP, PATTERN_TYPE_ID_MAP, pattern);
-        return pattern;
+        return REGISTRY.define(key, data ->
+                new StaticBannerPattern(data, assetId, translationKey));
     }
 
-    // with key
+    public static VersionedRegistry<BannerPattern> getRegistry() {
+        return REGISTRY;
+    }
+
     public static BannerPattern getByName(String name) {
-        return PATTERN_TYPE_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static BannerPattern getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, BannerPattern> idMap = PATTERN_TYPE_ID_MAP.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
 
     public static final BannerPattern SQUARE_BOTTOM_LEFT = define("square_bottom_left");
@@ -135,13 +106,14 @@ public class BannerPatterns {
 
     /**
      * Returns an immutable view of the banner patterns.
+     *
      * @return Banner Patterns
      */
     public static Collection<BannerPattern> values() {
-        return Collections.unmodifiableCollection(PATTERN_TYPE_MAP.values());
+        return REGISTRY.getEntries();
     }
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
 }

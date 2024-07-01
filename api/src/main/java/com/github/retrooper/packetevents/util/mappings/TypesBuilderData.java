@@ -18,22 +18,38 @@
 
 package com.github.retrooper.packetevents.util.mappings;
 
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 
 public class TypesBuilderData {
-    private final int[] data;
-    private final ResourceLocation name;
 
+    protected final TypesBuilder typesBuilder;
+    protected final int[] data;
+    protected final ResourceLocation name;
+
+    @Deprecated
     public TypesBuilderData(ResourceLocation name, int[] data) {
+        this(new TypesBuilder("", true), name, data);
+    }
+
+    @ApiStatus.Internal
+    public TypesBuilderData(TypesBuilder typesBuilder, ResourceLocation name, int[] data) {
+        this.typesBuilder = typesBuilder;
         this.name = name;
         this.data = data;
     }
 
+    public int getId(ClientVersion version) {
+        return this.data[this.typesBuilder.getDataIndex(version)];
+    }
+
+    @Deprecated
     public int[] getData() {
         return data;
     }
 
     public ResourceLocation getName() {
-        return name;
+        return this.name;
     }
 }

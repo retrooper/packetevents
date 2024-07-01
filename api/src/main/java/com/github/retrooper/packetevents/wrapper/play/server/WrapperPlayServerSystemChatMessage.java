@@ -91,7 +91,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
             overlay = readBoolean();
         } else {
-            type = ChatTypes.getById(serverVersion.toClientVersion(), readVarInt());
+            this.type = this.readMappedEntity(ChatTypes.getRegistry());
         }
     }
 
@@ -103,12 +103,12 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         } else {
             if (type == null) {
                 if (overlay) {
-                    writeVarInt(ChatTypes.GAME_INFO.getId(serverVersion.toClientVersion()));
+                    this.writeMappedEntity(ChatTypes.GAME_INFO);
                 } else {
-                    writeVarInt(ChatTypes.SYSTEM.getId(serverVersion.toClientVersion()));
+                    this.writeMappedEntity(ChatTypes.SYSTEM);
                 }
             } else {
-                writeVarInt(type.getId(serverVersion.toClientVersion()));
+                this.writeMappedEntity(this.type);
             }
         }
     }

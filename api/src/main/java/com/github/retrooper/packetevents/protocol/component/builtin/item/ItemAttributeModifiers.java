@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.protocol.attribute.Attribute;
 import com.github.retrooper.packetevents.protocol.attribute.AttributeOperation;
 import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.util.Index;
 
 import java.util.Collections;
 import java.util.List;
@@ -250,15 +251,29 @@ public class ItemAttributeModifiers {
     }
 
     public enum EquipmentSlotGroup {
-        ANY,
-        MAINHAND,
-        OFFHAND,
-        HAND,
-        FEET,
-        LEGS,
-        CHEST,
-        HEAD,
-        ARMOR,
-        BODY,
+
+        ANY("any"),
+        MAINHAND("mainhand"),
+        OFFHAND("offhand"),
+        HAND("hand"),
+        FEET("feet"),
+        LEGS("legs"),
+        CHEST("chest"),
+        HEAD("head"),
+        ARMOR("armor"),
+        BODY("body");
+
+        public static final Index<String, EquipmentSlotGroup> ID_INDEX = Index.create(
+                EquipmentSlotGroup.class, EquipmentSlotGroup::getId);
+
+        private final String id;
+
+        EquipmentSlotGroup(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return this.id;
+        }
     }
 }
