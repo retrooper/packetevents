@@ -18,11 +18,13 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
-import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
@@ -32,9 +34,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.BiFunction;
 
-import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.*;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.CONTENT;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.SENDER;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.TARGET;
 import static java.util.Arrays.asList;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 import static net.kyori.adventure.text.format.Style.empty;
@@ -53,32 +58,6 @@ public class ChatTypeDecoration {
         this.style = style;
     }
 
-    public ChatTypeDecoration(NBTCompound nbt) {
-        //Read the translation key
-        this.translationKey = nbt.getStringTagValueOrDefault("translation_key", null);
-
-        //Read parameters
-        List<Parameter> temporaryList = new ArrayList<>();
-        NBTList<NBTString> parametersTag = nbt.getStringListTagOrNull("parameters");
-        if (parametersTag != null) {
-            for (NBTString p : parametersTag.getTags()) {
-                Parameter parameter = Parameter.valueByName(p.getValue().toUpperCase());
-                if (parameter != null) {
-                    temporaryList.add(parameter);
-                }
-            }
-        }
-        this.parameters = Collections.unmodifiableList(temporaryList);
-
-        //Read style
-        NBTCompound styleTag = nbt.getCompoundTagOrNull("style");
-        if (styleTag != null) {
-            style = AdventureSerializer.getNBTSerializer().deserializeStyle(styleTag);
-        } else {
-            style = empty();
-        }
-    }
-
     public static ChatTypeDecoration read(PacketWrapper<?> wrapper) {
         String translationKey = wrapper.readString();
         List<Parameter> parameters = wrapper.readList(ew -> ew.readEnum(Parameter.values()));
@@ -90,6 +69,41 @@ public class ChatTypeDecoration {
         wrapper.writeString(decoration.translationKey);
         wrapper.writeList(decoration.parameters, PacketWrapper::writeEnum);
         wrapper.writeStyle(decoration.style);
+    }
+
+    public static ChatTypeDecoration decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
+        NBTCompound compound = (NBTCompound) nbt;
+        String translationKey = compound.getStringTagValueOrThrow("translation_key");
+        List<Parameter> params = new ArrayList<>();
+        NBTList<NBTString> paramsTag = compound.getStringListTagOrNull("parameters");
+        if (paramsTag != null) {
+            for (NBTString paramTag : paramsTag.getTags()) {
+                Parameter parameter = Parameter.valueByName(paramTag.getValue().toUpperCase());
+                if (parameter != null) {
+                    params.add(parameter);
+                }
+            }
+        }
+        NBTCompound styleTag = compound.getCompoundTagOrNull("style");
+        Style style = styleTag == null ? empty() :
+                AdventureSerializer.getNBTSerializer().deserializeStyle(styleTag);
+        return new ChatTypeDecoration(translationKey, params, style);
+    }
+
+    public static NBT encode(ChatTypeDecoration decoration, ClientVersion version) {
+        NBTList<NBTString> paramsTag = NBTList.createStringList();
+        for (Parameter param : decoration.parameters) {
+            paramsTag.addTag(new NBTString(param.name().toLowerCase(Locale.ROOT)));
+        }
+
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("translation_key", new NBTString(decoration.translationKey));
+        compound.setTag("parameters", paramsTag);
+        if (!decoration.style.isEmpty()) {
+            compound.setTag("style", AdventureSerializer.getNBTSerializer()
+                    .serializeStyle(decoration.style));
+        }
+        return compound;
     }
 
     public static ChatTypeDecoration withSender(String translationKey) {

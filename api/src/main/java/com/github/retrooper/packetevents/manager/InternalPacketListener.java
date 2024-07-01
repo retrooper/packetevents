@@ -26,6 +26,8 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPattern;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
@@ -62,8 +64,17 @@ import java.util.stream.Stream;
 public class InternalPacketListener extends PacketListenerAbstract {
 
     private static final Map<ResourceLocation, RegistryEntry<?>> REGISTRY_KEYS = Stream.of(
-            new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode),
-            new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType::decode)
+            // TODO: biome
+            new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
+            // TODO: trim_pattern
+            // TODO: trim_material
+            // TODO: wolf_variant
+            // TODO: painting_variant
+            new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType::decode),
+            // TODO: damage_type
+            new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode)
+            // TODO: enchantment
+            // TODO: jukebox_song
     ).collect(Collectors.toMap(RegistryEntry::getRegistryKey, Function.identity()));
 
     public InternalPacketListener() {

@@ -80,7 +80,7 @@ public class BannerLayers {
 
         public static Layer read(PacketWrapper<?> wrapper) {
             BannerPattern pattern = wrapper.readMappedEntityOrDirect(
-                    BannerPatterns::getById, BannerPattern::readDirect);
+                    BannerPatterns.getRegistry(), BannerPattern::readDirect);
             DyeColor color = wrapper.readEnum(DyeColor.values());
             return new Layer(pattern, color);
         }

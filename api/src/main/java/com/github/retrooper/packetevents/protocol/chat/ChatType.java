@@ -19,12 +19,17 @@
 package com.github.retrooper.packetevents.protocol.chat;
 
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
+import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
-public interface ChatType extends MappedEntity {
+public interface ChatType extends MappedEntity, CopyableEntity<ChatType> {
 
     ChatTypeDecoration getChatDecoration();
 
@@ -39,6 +44,22 @@ public interface ChatType extends MappedEntity {
     static void writeDirect(PacketWrapper<?> wrapper, ChatType chatType) {
         ChatTypeDecoration.write(wrapper, chatType.getChatDecoration());
         ChatTypeDecoration.write(wrapper, chatType.getNarrationDecoration());
+    }
+
+    static ChatType decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
+        NBTCompound compound = (NBTCompound) nbt;
+        NBTCompound chatTag = compound.getCompoundTagOrThrow("chat");
+        ChatTypeDecoration chatDeco = ChatTypeDecoration.decode(chatTag, version, data);
+        NBTCompound narrationTag = compound.getCompoundTagOrThrow("narration");
+        ChatTypeDecoration narrationDeco = ChatTypeDecoration.decode(narrationTag, version, data);
+        return new StaticChatType(data, chatDeco, narrationDeco);
+    }
+
+    static NBT encode(ChatType chatType, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("chat", ChatTypeDecoration.encode(chatType.getChatDecoration(), version));
+        compound.setTag("narration", ChatTypeDecoration.encode(chatType.getNarrationDecoration(), version));
+        return compound;
     }
 
     class Bound extends ChatMessage_v1_19_1.ChatTypeBoundNetwork {
