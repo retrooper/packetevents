@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8.Chunk_v1
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v_1_18.Chunk_v1_18;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.*;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.io.ByteArrayInputStream;
@@ -140,11 +141,13 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
         boolean hasBlocklight = (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThan(ServerVersion.V_1_14))
                 && !serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8);
-        boolean checkForSky = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8) || user.getDimension().getId() == 0;
+        boolean checkForSky = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)
+                || this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)
+                || (this.user != null && this.user.getDimensionType().equals(DimensionTypes.OVERWORLD));
 
         // 1.7/1.8 don't use this NetStreamInput
         NetStreamInput dataIn = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? new NetStreamInput(new ByteArrayInputStream(data)) : null;
-        BaseChunk[] chunks = getChunkReader().read(user.getDimension(), chunkMask, secondaryChunkMask, fullChunk, hasBlocklight, checkForSky, chunkSize, data, dataIn);
+        BaseChunk[] chunks = getChunkReader().read(this.user.getDimensionType(), chunkMask, secondaryChunkMask, fullChunk, hasBlocklight, checkForSky, chunkSize, data, dataIn);
 
         if (hasBiomeData && serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) { // Uses ints

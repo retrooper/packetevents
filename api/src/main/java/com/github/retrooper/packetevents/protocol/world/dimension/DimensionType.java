@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.protocol.world.dimension;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
@@ -30,10 +32,14 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTLong;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.OptionalLong;
 
-public interface DimensionType extends MappedEntity {
+public interface DimensionType extends MappedEntity, CopyableEntity<DimensionType> {
 
     OptionalLong getFixedTime();
 
@@ -85,7 +91,51 @@ public interface DimensionType extends MappedEntity {
 
     int getMonsterSpawnBlockLightLimit();
 
-    static DimensionType decode(NBT nbt, ClientVersion version) {
+    // codec related stuff
+
+    static DimensionType read(PacketWrapper<?> wrapper) {
+        ServerVersion version = wrapper.getServerVersion();
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            return wrapper.readMappedEntity(DimensionTypes.getRegistry());
+        }
+        boolean v1162 = version.isNewerThanOrEquals(ServerVersion.V_1_16_2);
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_19)
+                || (!v1162 && version.isNewerThanOrEquals(ServerVersion.V_1_16))) {
+            return DimensionTypes.getRegistry().getByName(wrapper.readIdentifier());
+        } else if (v1162) {
+            return DimensionType.decode(wrapper.readNBTRaw(), version.toClientVersion(), null);
+        } else {
+            int id = wrapper instanceof WrapperPlayServerJoinGame
+                    && version.isOlderThan(ServerVersion.V_1_9_2)
+                    ? wrapper.readByte() : wrapper.readInt();
+            return DimensionTypes.getRegistry().getById(version.toClientVersion(), id);
+        }
+    }
+
+    static void write(PacketWrapper<?> wrapper, DimensionType type) {
+        ServerVersion version = wrapper.getServerVersion();
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            wrapper.writeMappedEntity(type);
+            return;
+        }
+        boolean v1162 = version.isNewerThanOrEquals(ServerVersion.V_1_16_2);
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_19)
+                || (!v1162 && version.isNewerThanOrEquals(ServerVersion.V_1_16))) {
+            wrapper.writeIdentifier(type.getName());
+        } else if (v1162) {
+            wrapper.writeNBTRaw(DimensionType.encode(type, version.toClientVersion()));
+        } else {
+            int id = type.getId(version.toClientVersion());
+            if (wrapper instanceof WrapperPlayServerJoinGame
+                    && version.isOlderThan(ServerVersion.V_1_9_2)) {
+                wrapper.writeByte(id);
+            } else {
+                wrapper.writeInt(id);
+            }
+        }
+    }
+
+    static DimensionType decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
         OptionalLong fixedTime = !compound.getTags().containsKey("fixed_time") ? OptionalLong.empty() :
                 OptionalLong.of(compound.getNumberTagOrThrow("fixed_time").getAsLong());
@@ -106,7 +156,7 @@ public interface DimensionType extends MappedEntity {
         boolean hasRaids = compound.getBoolean("has_raids");
         NBT monsterSpawnLightLevel = compound.getTagOrThrow("monster_spawn_light_level");
         int monsterSpawnBlockLightLimit = compound.getNumberTagOrThrow("monster_spawn_block_light_limit").getAsInt();
-        return new StaticDimensionType(fixedTime, hasSkylight, hasCeiling, ultrawarm, natural, coordinateScale,
+        return new StaticDimensionType(data, fixedTime, hasSkylight, hasCeiling, ultrawarm, natural, coordinateScale,
                 bedWorking, respawnAnchorWorking, minY, height, logicalHeight, infiniburnTag, effectsLocation,
                 ambientLight, piglinSafe, hasRaids, monsterSpawnLightLevel, monsterSpawnBlockLightLimit);
     }
@@ -127,10 +177,10 @@ public interface DimensionType extends MappedEntity {
         compound.setTag("logical_height", new NBTInt(dimensionType.getLogicalHeight(version)));
         compound.setTag("infiniburn", new NBTString(dimensionType.getInfiniburnTag()));
         compound.setTag("effects", new NBTString(dimensionType.getEffectsLocation().toString()));
-        compound.setTag("ambient_light",new NBTFloat(dimensionType.getAmbientLight()));
-        compound.setTag("piglin_safe",new NBTByte(dimensionType.isPiglinSafe()));
-        compound.setTag("has_raids",new NBTByte(dimensionType.hasRaids()));
-        compound.setTag("monster_spawn_light_level",dimensionType.getMonsterSpawnLightLevel());
+        compound.setTag("ambient_light", new NBTFloat(dimensionType.getAmbientLight()));
+        compound.setTag("piglin_safe", new NBTByte(dimensionType.isPiglinSafe()));
+        compound.setTag("has_raids", new NBTByte(dimensionType.hasRaids()));
+        compound.setTag("monster_spawn_light_level", dimensionType.getMonsterSpawnLightLevel());
         compound.setTag("monster_spawn_block_light_limit", new NBTInt(dimensionType.getMonsterSpawnBlockLightLimit()));
         return compound;
     }

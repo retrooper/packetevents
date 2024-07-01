@@ -41,6 +41,11 @@ public class StaticBannerPattern extends AbstractMappedEntity implements BannerP
     }
 
     @Override
+    public BannerPattern copy(@Nullable TypesBuilderData newData) {
+        return new StaticBannerPattern(newData, this.assetId, this.translationKey);
+    }
+
+    @Override
     public ResourceLocation getAssetId() {
         return this.assetId;
     }

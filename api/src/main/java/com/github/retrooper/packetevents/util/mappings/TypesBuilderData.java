@@ -27,8 +27,8 @@ import org.jetbrains.annotations.Nullable;
 public class TypesBuilderData {
 
     private final TypesBuilder typesBuilder;
-    private final int[] data;
-    private final ResourceLocation name;
+    protected final int[] data;
+    protected final ResourceLocation name;
 
     @Deprecated
     public TypesBuilderData(ResourceLocation name, int[] data) {
@@ -48,7 +48,7 @@ public class TypesBuilderData {
 
     public int getId(@Nullable User user, ClientVersion version) {
         if (user != null && this.typesBuilder.registry != null) {
-            IRegistry<?> userRegistry = user.getRegistry(this.typesBuilder.registry.getRegistryKey());
+            IRegistry<?> userRegistry = user.getUserRegistry(this.typesBuilder.registry.getRegistryKey());
             if (userRegistry != null) {
                 System.out.println("using user registry for " + this.getName());
                 return userRegistry.getId(this.getName().toString(), version);

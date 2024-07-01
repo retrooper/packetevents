@@ -39,7 +39,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
-*/
+ */
 package com.github.retrooper.packetevents.wrapper;
 
 import com.github.retrooper.packetevents.PacketEvents;
@@ -1001,6 +1001,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         writeEntityMetadata(metadata.entityData(serverVersion.toClientVersion()));
     }
 
+    @Deprecated
     public Dimension readDimension() {
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             return new Dimension(this.readVarInt());
@@ -1015,14 +1016,17 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         }
     }
 
+    @Deprecated
     public void writeDimension(Dimension dimension) {
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             this.writeVarInt(dimension.getId());
-        } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+            return;
+        }
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
                 || this.serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
-            this.writeString(dimension.getDimensionName());
+            writeString(dimension.getDimensionName(), 32767);
         } else {
-            this.writeNBT(dimension.getAttributes());
+            writeNBT(dimension.getAttributes());
         }
     }
 
@@ -1489,7 +1493,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     public <Z extends MappedEntity> Z readMappedEntity(IRegistry<Z> registry) {
         if (this.user != null) {
             IRegistry<Z> prevReg = registry;
-            registry = this.user.replaceRegistry(registry);
+            registry = this.user.getUserRegistryOrFallback(registry);
             if (prevReg != registry) {
                 this.user.sendMessage("1replaced registry: " + registry.getRegistryKey());
             }
@@ -1501,7 +1505,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
             IRegistry<Z> registry, Reader<Z> directReader) {
         if (this.user != null) {
             IRegistry<Z> prevReg = registry;
-            registry = this.user.replaceRegistry(registry);
+            registry = this.user.getUserRegistryOrFallback(registry);
             if (prevReg != registry) {
                 this.user.sendMessage("2replaced registry: " + registry.getRegistryKey());
             }

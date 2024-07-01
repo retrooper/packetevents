@@ -88,6 +88,8 @@ mappingCompression {
         compress("entity/legacy_entity_type_mappings.json")
 
         compress("item/item_type_mappings.json")
+
+        compress("world/dimension_type_mappings.json")
     }
 }
 

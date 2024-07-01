@@ -18,16 +18,14 @@
 
 package com.github.retrooper.packetevents.protocol.world.dimension;
 
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.OptionalLong;
-import java.util.function.Supplier;
 
 public final class DimensionTypes {
 
@@ -37,65 +35,89 @@ public final class DimensionTypes {
     private DimensionTypes() {
     }
 
-    @ApiStatus.Internal
-    public static DimensionType define(
-            String key, OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling,
-            boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorking, boolean respawnAnchorWorking,
-            int minY, int height, int logicalHeight, String infiniburnTag, ResourceLocation effectsLocation,
-            float ambientLight, boolean piglinSafe, boolean hasRaids, Supplier<NBT> monsterSpawnLightLevel,
-            int monsterSpawnBlockLightLimit
-    ) {
-        return REGISTRY.define(key, data ->
-                new StaticDimensionType(data, fixedTime, hasSkyLight, hasCeiling, ultraWarm, natural, coordinateScale,
-                        bedWorking, respawnAnchorWorking, minY, height, logicalHeight, infiniburnTag, effectsLocation,
-                        ambientLight, piglinSafe, hasRaids, monsterSpawnLightLevel.get(), monsterSpawnBlockLightLimit));
-    }
-
     public static VersionedRegistry<DimensionType> getRegistry() {
         return REGISTRY;
     }
 
-    public static final DimensionType OVERWORLD = define("overworld", OptionalLong.empty(), true,
-            false, false, true, 1d, true, false,
-            -64, 384, 384, "#minecraft:infiniburn_overworld",
-            ResourceLocation.minecraft("overworld"), 0f, false,
-            true, () -> {
-                NBTCompound compound = new NBTCompound();
-                compound.setTag("type", new NBTString("minecraft:uniform"));
-                compound.setTag("min_inclusive", new NBTInt(0));
-                compound.setTag("max_inclusive", new NBTInt(7));
-                return compound;
-            }, 0);
+    private static final int PRE118_MIN_Y = 0, PRE118_HEIGHT = 256 - PRE118_MIN_Y;
+    private static final int POST118_MIN_Y = -64, POST118_HEIGHT = 256 + 64 - POST118_MIN_Y;
 
-    public static final DimensionType OVERWORLD_CAVES = define("overworld_caves", OptionalLong.empty(), true,
-            true, false, true, 1d, true, false,
-            -64, 384, 384, "#minecraft:infiniburn_overworld",
-            ResourceLocation.minecraft("overworld"), 0f, false,
-            true, () -> {
-                NBTCompound compound = new NBTCompound();
-                compound.setTag("type", new NBTString("minecraft:uniform"));
-                compound.setTag("min_inclusive", new NBTInt(0));
-                compound.setTag("max_inclusive", new NBTInt(7));
-                return compound;
-            }, 0);
+    public static final DimensionType OVERWORLD = REGISTRY.define("overworld", data -> {
+        NBTCompound monsterSpawnLightLevel = new NBTCompound();
+        monsterSpawnLightLevel.setTag("type", new NBTString("minecraft:uniform"));
+        monsterSpawnLightLevel.setTag("min_inclusive", new NBTInt(0));
+        monsterSpawnLightLevel.setTag("max_inclusive", new NBTInt(7));
 
-    public static final DimensionType THE_END = define("the_end", OptionalLong.of(6000L), false,
-            false, false, false, 1d, false, false,
-            0, 256, 256, "#minecraft:infiniburn_end",
-            ResourceLocation.minecraft("the_end"), 0f, false, true,
-            () -> {
-                NBTCompound compound = new NBTCompound();
-                compound.setTag("type", new NBTString("minecraft:uniform"));
-                compound.setTag("min_inclusive", new NBTInt(0));
-                compound.setTag("max_inclusive", new NBTInt(7));
-                return compound;
-            }, 0);
+        return new StaticDimensionType(OptionalLong.empty(), true, false,
+                false, true, 1d, true, false,
+                POST118_MIN_Y, POST118_HEIGHT, POST118_HEIGHT, "#minecraft:infiniburn_overworld",
+                ResourceLocation.minecraft("overworld"), 0f, false,
+                true, monsterSpawnLightLevel, 0) {
+            @Override
+            public int getMinY(ClientVersion version) {
+                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_MIN_Y : PRE118_MIN_Y;
+            }
 
-    public static final DimensionType THE_NETHER = define("the_nether", OptionalLong.of(18000L), false,
-            true, true, false, 8d, false, true, 0,
-            256, 128, "#minecraft:infiniburn_nether",
-            ResourceLocation.minecraft("the_nether"), 0.1f, true, false,
-            () -> new NBTInt(7), 15);
+            @Override
+            public int getHeight(ClientVersion version) {
+                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_HEIGHT : PRE118_HEIGHT;
+            }
+
+            @Override
+            public int getLogicalHeight(ClientVersion version) {
+                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_HEIGHT : PRE118_HEIGHT;
+            }
+        };
+    });
+
+    public static final DimensionType OVERWORLD_CAVES = REGISTRY.define("overworld_caves", data -> {
+        NBTCompound monsterSpawnLightLevel = new NBTCompound();
+        monsterSpawnLightLevel.setTag("type", new NBTString("minecraft:uniform"));
+        monsterSpawnLightLevel.setTag("min_inclusive", new NBTInt(0));
+        monsterSpawnLightLevel.setTag("max_inclusive", new NBTInt(7));
+
+        return new StaticDimensionType(OptionalLong.empty(), true, true,
+                false, true, 1d, true, false,
+                POST118_MIN_Y, POST118_HEIGHT, POST118_HEIGHT, "#minecraft:infiniburn_overworld",
+                ResourceLocation.minecraft("overworld"), 0f, false,
+                true, monsterSpawnLightLevel, 0) {
+            @Override
+            public int getMinY(ClientVersion version) {
+                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_MIN_Y : PRE118_MIN_Y;
+            }
+
+            @Override
+            public int getHeight(ClientVersion version) {
+                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_HEIGHT : PRE118_HEIGHT;
+            }
+
+            @Override
+            public int getLogicalHeight(ClientVersion version) {
+                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_HEIGHT : PRE118_HEIGHT;
+            }
+        };
+    });
+
+    public static final DimensionType THE_END = REGISTRY.define("the_end", data -> {
+        NBTCompound monsterSpawnLightLevel = new NBTCompound();
+        monsterSpawnLightLevel.setTag("type", new NBTString("minecraft:uniform"));
+        monsterSpawnLightLevel.setTag("min_inclusive", new NBTInt(0));
+        monsterSpawnLightLevel.setTag("max_inclusive", new NBTInt(7));
+
+        return new StaticDimensionType(OptionalLong.of(6000L), false, false,
+                false, false, 1d, false, false,
+                0, 256, 256, "#minecraft:infiniburn_end",
+                ResourceLocation.minecraft("the_end"), 0f, false, true,
+                monsterSpawnLightLevel, 0);
+    });
+
+    public static final DimensionType THE_NETHER = REGISTRY.define("the_nether",
+            data -> new StaticDimensionType(OptionalLong.of(18000L), false,
+                    true, true, false, 8d, false,
+                    true, 0, 256, 128,
+                    "#minecraft:infiniburn_nether", ResourceLocation.minecraft("the_nether"),
+                    0.1f, true, false, new NBTInt(7),
+                    15));
 
     static {
         REGISTRY.unloadMappings();
