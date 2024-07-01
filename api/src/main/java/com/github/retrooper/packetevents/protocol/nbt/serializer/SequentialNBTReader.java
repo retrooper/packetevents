@@ -28,9 +28,9 @@ public final class SequentialNBTReader implements Closeable {
 
         NBT nbt;
         if (type == NBTType.COMPOUND) {
-            nbt = new Compound(stream, () -> {});
+            nbt = new Compound(() -> {});
         } else if (type == NBTType.LIST) {
-            nbt = new List(stream, () -> {});
+            nbt = new List(() -> {});
         } else {
             nbt = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, type);
         }
@@ -50,17 +50,15 @@ public final class SequentialNBTReader implements Closeable {
         stream.close();
     }
 
-    public static class Compound extends NBT implements Iterator<Map.Entry<String, NBT>>, Iterable<Map.Entry<String, NBT>>, Skippable, Closeable {
+    public class Compound extends NBT implements Iterator<Map.Entry<String, NBT>>, Iterable<Map.Entry<String, NBT>>, Skippable, Closeable {
 
-        private final DataInputStream stream;
         private final Runnable onComplete;
         private NBTType<?> nextType;
         private NBT lastRead;
         private boolean hasReadType;
 
 
-        private Compound(DataInputStream stream, Runnable onComplete) {
-            this.stream = stream;
+        private Compound(Runnable onComplete) {
             this.onComplete = onComplete;
         }
 
@@ -111,9 +109,9 @@ public final class SequentialNBTReader implements Closeable {
                 String name = DefaultNBTSerializer.INSTANCE.readTagName(DUMMY_LIMITER, stream);
 
                 if (nextType == NBTType.COMPOUND) {
-                    lastRead = new Compound(stream, this::runCompleted);
+                    lastRead = new Compound(this::runCompleted);
                 } else if (nextType == NBTType.LIST) {
-                    lastRead = new List(stream, this::runCompleted);
+                    lastRead = new List(this::runCompleted);
                 } else {
                     lastRead = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, nextType);
                     runCompleted();
@@ -215,16 +213,14 @@ public final class SequentialNBTReader implements Closeable {
         }
     }
 
-    public static class List extends NBT implements Iterator<NBT>, Iterable<NBT>, Skippable, Closeable {
+    public class List extends NBT implements Iterator<NBT>, Iterable<NBT>, Skippable, Closeable {
 
-        private final DataInputStream stream;
         private final Runnable onComplete;
         private final NBTType<?> listType;
         private NBT lastRead;
         public int remaining;
 
-        private List(DataInputStream stream, Runnable onComplete) {
-            this.stream = stream;
+        private List(Runnable onComplete) {
             this.onComplete = onComplete;
             try {
                 this.listType = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, stream);
@@ -269,9 +265,9 @@ public final class SequentialNBTReader implements Closeable {
             try {
                 remaining--;
                 if (listType == NBTType.COMPOUND) {
-                    lastRead = new Compound(stream, this::runCompleted);
+                    lastRead = new Compound(this::runCompleted);
                 } else if (listType == NBTType.LIST) {
-                    lastRead = new List(stream, this::runCompleted);
+                    lastRead = new List(this::runCompleted);
                 } else {
                     lastRead = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, listType);
                     runCompleted();
