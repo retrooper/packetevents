@@ -1,25 +1,25 @@
 package com.github.retrooper.packetevents.protocol.nbt.serializer;
 
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter;
-import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.nbt.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Closeable;
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.*;
 
-public final class SequentialNBTReader implements Iterator<NBT> {
+public final class SequentialNBTReader implements Iterator<NBT>, Closeable {
 
     private static final NBTLimiter DUMMY_LIMITER = NBTLimiter.noop();
     private static final Map<NBTType<?>, TagSkip> TAG_SKIPS = new HashMap<>(16, 1);
 
-    private final DataInput stream;
+    private final DataInputStream stream;
     private NBTType<?> nextType = null;
     private boolean hasReadType = false;
     private NBT lastRead = null;
 
-    public SequentialNBTReader(DataInput stream) {
+    public SequentialNBTReader(DataInputStream stream) {
         this.stream = stream;
     }
 
@@ -69,12 +69,17 @@ public final class SequentialNBTReader implements Iterator<NBT> {
         }
     }
 
-    public static class Compound extends NBT implements Iterator<Map.Entry<String, NBT>>, Iterable<Map.Entry<String, NBT>>, Skippable {
+    @Override
+    public void close() throws IOException {
+        stream.close();
+    }
+
+    public static class Compound extends NBT implements Iterator<Map.Entry<String, NBT>>, Iterable<Map.Entry<String, NBT>>, Skippable, Closeable {
 
         private boolean hasReadCompletely = false;
         private final SequentialNBTReader reader;
 
-        private Compound(DataInput stream) {
+        private Compound(DataInputStream stream) {
             this.reader = new SequentialNBTReader(stream);
         }
 
@@ -139,6 +144,8 @@ public final class SequentialNBTReader implements Iterator<NBT> {
 
         @Override
         public void skip() {
+            if (hasReadCompletely) return;
+
             try {
                 if (reader.lastRead instanceof Skippable) {
                     ((Skippable) reader.lastRead).skip();
@@ -150,15 +157,35 @@ public final class SequentialNBTReader implements Iterator<NBT> {
             }
             hasReadCompletely = true;
         }
+
+        public NBTCompound readFully() {
+            try {
+                NBTCompound compound = new NBTCompound();
+                NBTType<?> valueType;
+                while ((valueType = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, reader.stream)) != NBTType.END) {
+                    String name = DefaultNBTSerializer.INSTANCE.readTagName(DUMMY_LIMITER, reader.stream);
+                    NBT nbt = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, reader.stream, valueType);
+                    compound.setTag(name, nbt);
+                }
+                return compound;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void close() throws IOException {
+            reader.close();
+        }
     }
 
-    public static class List extends NBT implements Iterator<NBT>, Iterable<NBT>, Skippable {
+    public static class List extends NBT implements Iterator<NBT>, Iterable<NBT>, Skippable, Closeable {
 
         private final SequentialNBTReader reader;
         private final NBTType<?> listType;
         private int remaining;
 
-        private List(DataInput stream) {
+        private List(DataInputStream stream) {
             this.reader = new SequentialNBTReader(stream);
             try {
                 this.listType = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, stream);
@@ -198,8 +225,13 @@ public final class SequentialNBTReader implements Iterator<NBT> {
             if (!hasNext()) {
                 throw new IllegalStateException("No more elements in list");
             }
-            remaining--;
-            return reader.next();
+            try {
+                NBT nbt = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, reader.stream, listType);
+                remaining--;
+                return nbt;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @NotNull
@@ -210,6 +242,8 @@ public final class SequentialNBTReader implements Iterator<NBT> {
 
         @Override
         public void skip() {
+            if (remaining == 0) return;
+
             try {
                 if (reader.lastRead instanceof Skippable) {
                     ((Skippable) reader.lastRead).skip();
@@ -222,6 +256,24 @@ public final class SequentialNBTReader implements Iterator<NBT> {
                 throw new RuntimeException(e);
             }
             remaining = 0;
+        }
+
+        public NBTList<NBT> readFully() {
+            try {
+                NBTList<NBT> list = new NBTList<>((NBTType<NBT>) listType, remaining);
+                for (int i = 0; i < remaining; i++) {
+                    list.addTag(DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, reader.stream, listType));
+                }
+                remaining = 0;
+                return list;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void close() throws IOException {
+            reader.close();
         }
     }
 
