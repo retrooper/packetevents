@@ -32,6 +32,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 public interface EnchantmentType extends MappedEntity, CopyableEntity<EnchantmentType> {
 
     Component getDescription();
@@ -46,17 +48,20 @@ public interface EnchantmentType extends MappedEntity, CopyableEntity<Enchantmen
         NBTCompound compound = (NBTCompound) nbt;
         Component description = AdventureSerializer.fromNbt(compound.getTagOrThrow("description"));
         EnchantmentDefinition definition = EnchantmentDefinition.decode(compound, version, data);
-        MappedEntitySet<EnchantmentType> exclusiveSet = MappedEntitySet.decode(
-                compound.getTagOrThrow("exclusive_set"), version, EnchantmentTypes.getRegistry());
-        IComponentMap effects = StaticComponentMap.EMPTY;//IComponentMap.decode(compound.getTagOrThrow("effects"), version, ); FIXME
+        MappedEntitySet<EnchantmentType> exclusiveSet = Optional.ofNullable(compound.getTagOrNull("exclusive_set"))
+                .map(tag -> MappedEntitySet.decode(tag, version, EnchantmentTypes.getRegistry())) // TODO use user registry
+                .orElseGet(MappedEntitySet::createEmpty);
+        IComponentMap effects = StaticComponentMap.EMPTY;//IComponentMap.decode(compound.getTagOrThrow("effects"), version, ); FIXME (OPTIONAL)
         return new StaticEnchantmentType(data, description, definition, exclusiveSet, effects);
     }
 
     static NBT encode(EnchantmentType type, ClientVersion version) {
         NBTCompound compound = (NBTCompound) EnchantmentDefinition.encode(type.getDefinition(), version);
         compound.setTag("description", AdventureSerializer.toNbt(type.getDescription()));
-        compound.setTag("exclusive_set", MappedEntitySet.encode(type.getExclusiveSet(), version));
-        // compound.setTag("effects", IComponentMap.encode(type.getEffects(), version)); FIXME
+        if (!type.getExclusiveSet().isEmpty()) {
+            compound.setTag("exclusive_set", MappedEntitySet.encode(type.getExclusiveSet(), version));
+        }
+        // compound.setTag("effects", IComponentMap.encode(type.getEffects(), version)); FIXME (OPTIONAL)
         return compound;
     }
 }

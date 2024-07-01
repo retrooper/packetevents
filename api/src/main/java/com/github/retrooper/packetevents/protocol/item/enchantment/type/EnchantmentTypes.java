@@ -45,8 +45,11 @@ public final class EnchantmentTypes {
 
     static {
         ENCHANTMENT_DATA = new HashMap<>();
-        NBTCompound dataTag = MappingHelper.decompress("mappings/enchantment_type_data.json");
+        NBTCompound dataTag = MappingHelper.decompress("mappings/enchantment/enchantment_type_data");
         for (Map.Entry<String, NBT> entry : dataTag.getTags().entrySet()) {
+            if (entry.getKey().equals("version")) {
+                continue; // skip version field
+            }
             ResourceLocation enchantKey = new ResourceLocation(entry.getKey());
             ENCHANTMENT_DATA.put(enchantKey, (NBTCompound) entry.getValue());
         }

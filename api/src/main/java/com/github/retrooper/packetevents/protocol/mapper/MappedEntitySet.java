@@ -58,6 +58,10 @@ public class MappedEntitySet<T> {
         this.entities = entities;
     }
 
+    public static <Z extends MappedEntity> MappedEntitySet<Z> createEmpty() {
+        return new MappedEntitySet<>(new ArrayList<>(0));
+    }
+
     public static <Z extends MappedEntity> MappedEntitySet<Z> read(
             PacketWrapper<?> wrapper, BiFunction<ClientVersion, Integer, Z> getter) {
         int count = wrapper.readVarInt() - 1;
@@ -116,5 +120,17 @@ public class MappedEntitySet<T> {
             listTag.addTag(new NBTString(entity.getName().toString()));
         }
         return listTag;
+    }
+
+    public boolean isEmpty() {
+        return this.entities != null && this.entities.isEmpty();
+    }
+
+    public @Nullable ResourceLocation getTagKey() {
+        return this.tagKey;
+    }
+
+    public @Nullable List<T> getEntities() {
+        return this.entities;
     }
 }
