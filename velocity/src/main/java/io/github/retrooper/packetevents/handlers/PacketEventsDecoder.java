@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.handlers;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EnumUtil;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
@@ -39,10 +38,10 @@ import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
-    private static Enum<?> VELOCITY_CONNECTION_EVENT_CONSTANT;
+    private static Enum<?> VELOCITY_CONNECTION_EVENT_COMPRESSION_ENABLED;
+    private static Enum<?> VELOCITY_CONNECTION_EVENT_COMPRESSION_DISABLED;
     public User user;
     public Player player;
-    public boolean handledCompression;
     public PacketEventsDecoder(User user) {
         this.user = user;
     }
@@ -83,19 +82,30 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object event) throws Exception {
-        if (VELOCITY_CONNECTION_EVENT_CONSTANT == null) {
+        if (VELOCITY_CONNECTION_EVENT_COMPRESSION_ENABLED == null) {
             Class<? extends Enum<?>> clazz = (Class<? extends Enum<?>>) Reflection.getClassByNameWithoutException("com.velocitypowered.proxy.protocol.VelocityConnectionEvent");
-            VELOCITY_CONNECTION_EVENT_CONSTANT = EnumUtil.valueOf(clazz, "COMPRESSION_ENABLED");
+            VELOCITY_CONNECTION_EVENT_COMPRESSION_ENABLED = EnumUtil.valueOf(clazz, "COMPRESSION_ENABLED");
+            VELOCITY_CONNECTION_EVENT_COMPRESSION_DISABLED = EnumUtil.valueOf(clazz, "COMPRESSION_DISABLED");
         }
         //We can use == as it is an enum constant
-        if (event == VELOCITY_CONNECTION_EVENT_CONSTANT && !handledCompression) {
+        if (event == VELOCITY_CONNECTION_EVENT_COMPRESSION_ENABLED || event == VELOCITY_CONNECTION_EVENT_COMPRESSION_DISABLED) {
             ChannelPipeline pipe = ctx.pipeline();
+
+            // TODO: cache this reflection
+            ChannelHandlerContext context = pipe.context("fastprepare-encoder");
+            if (context != null) {
+                context.handler().getClass().getDeclaredMethod("setShouldSendUncompressed", boolean.class).invoke(context.handler(), true);
+            }
+
+            // TODO: this code runs 2 times due to handlers replacement.
+            ((PacketEventsEncoder) pipe.get(PacketEvents.ENCODER_NAME)).suppressRemoval = true;
             PacketEventsEncoder encoder = (PacketEventsEncoder) pipe.remove(PacketEvents.ENCODER_NAME);
             pipe.addBefore("minecraft-encoder", PacketEvents.ENCODER_NAME, encoder);
+            encoder.suppressRemoval = false;
+
             PacketEventsDecoder decoder = (PacketEventsDecoder) pipe.remove(PacketEvents.DECODER_NAME);
             pipe.addBefore("minecraft-decoder", PacketEvents.DECODER_NAME, decoder);
             //System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
-            handledCompression = true;
         }
         super.userEventTriggered(ctx, event);
     }
