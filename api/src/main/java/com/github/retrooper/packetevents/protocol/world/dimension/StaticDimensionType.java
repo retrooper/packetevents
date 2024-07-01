@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.OptionalLong;
 
 public class StaticDimensionType extends AbstractMappedEntity implements DimensionType {
@@ -184,5 +185,36 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     @Override
     public int getMonsterSpawnBlockLightLimit() {
         return this.monsterSpawnBlockLightLimit;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticDimensionType)) return false;
+        if (!super.equals(obj)) return false;
+        StaticDimensionType that = (StaticDimensionType) obj;
+        if (this.hasSkyLight != that.hasSkyLight) return false;
+        if (this.hasCeiling != that.hasCeiling) return false;
+        if (this.ultraWarm != that.ultraWarm) return false;
+        if (this.natural != that.natural) return false;
+        if (Double.compare(that.coordinateScale, this.coordinateScale) != 0) return false;
+        if (this.bedWorking != that.bedWorking) return false;
+        if (this.respawnAnchorWorking != that.respawnAnchorWorking) return false;
+        if (this.minY != that.minY) return false;
+        if (this.height != that.height) return false;
+        if (this.logicalHeight != that.logicalHeight) return false;
+        if (Float.compare(that.ambientLight, this.ambientLight) != 0) return false;
+        if (this.piglinSafe != that.piglinSafe) return false;
+        if (this.hasRaids != that.hasRaids) return false;
+        if (this.monsterSpawnBlockLightLimit != that.monsterSpawnBlockLightLimit) return false;
+        if (!this.fixedTime.equals(that.fixedTime)) return false;
+        if (!this.infiniburnTag.equals(that.infiniburnTag)) return false;
+        if (!this.effectsLocation.equals(that.effectsLocation)) return false;
+        return this.monsterSpawnLightLevel.equals(that.monsterSpawnLightLevel);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.fixedTime, this.hasSkyLight, this.hasCeiling, this.ultraWarm, this.natural, this.coordinateScale, this.bedWorking, this.respawnAnchorWorking, this.minY, this.height, this.logicalHeight, this.infiniburnTag, this.effectsLocation, this.ambientLight, this.piglinSafe, this.hasRaids, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit);
     }
 }
