@@ -20,15 +20,14 @@ package com.github.retrooper.packetevents.protocol.item.trimmaterial;
 
 import com.github.retrooper.packetevents.protocol.item.armormaterial.ArmorMaterial;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.Objects;
 
-public class StaticTrimMaterial implements TrimMaterial {
+public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMaterial {
 
     private final String assetName;
     private final ItemType ingredient;
@@ -40,6 +39,15 @@ public class StaticTrimMaterial implements TrimMaterial {
             String assetName, ItemType ingredient, float itemModelIndex,
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
+        this(null, assetName, ingredient, itemModelIndex, overrideArmorMaterials, description);
+    }
+
+    public StaticTrimMaterial(
+            @Nullable TypesBuilderData data,
+            String assetName, ItemType ingredient, float itemModelIndex,
+            Map<ArmorMaterial, String> overrideArmorMaterials, Component description
+    ) {
+        super(data);
         this.assetName = assetName;
         this.ingredient = ingredient;
         this.itemModelIndex = itemModelIndex;
@@ -48,18 +56,9 @@ public class StaticTrimMaterial implements TrimMaterial {
     }
 
     @Override
-    public ResourceLocation getName() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int getId(ClientVersion version) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isRegistered() {
-        return false;
+    public TrimMaterial copy(@Nullable TypesBuilderData newData) {
+        return new StaticTrimMaterial(newData, this.assetName, this.ingredient, this.itemModelIndex,
+                this.overrideArmorMaterials, this.description);
     }
 
     @Override
@@ -85,22 +84,5 @@ public class StaticTrimMaterial implements TrimMaterial {
     @Override
     public Component getDescription() {
         return this.description;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof StaticTrimMaterial)) return false;
-        StaticTrimMaterial material = (StaticTrimMaterial) obj;
-        if (Float.compare(material.itemModelIndex, this.itemModelIndex) != 0) return false;
-        if (!this.assetName.equals(material.assetName)) return false;
-        if (!this.ingredient.equals(material.ingredient)) return false;
-        if (!this.overrideArmorMaterials.equals(material.overrideArmorMaterials)) return false;
-        return this.description.equals(material.description);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.assetName, this.ingredient, this.itemModelIndex, this.overrideArmorMaterials, this.description);
     }
 }

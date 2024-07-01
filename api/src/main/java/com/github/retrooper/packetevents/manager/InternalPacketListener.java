@@ -30,6 +30,8 @@ import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPattern;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
+import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterial;
+import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterials;
 import com.github.retrooper.packetevents.protocol.item.trimpattern.TrimPattern;
 import com.github.retrooper.packetevents.protocol.item.trimpattern.TrimPatterns;
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
@@ -69,7 +71,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             // TODO: biome
             new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
             new RegistryEntry<>(TrimPatterns.getRegistry(), TrimPattern::decode),
-            // TODO: trim_material
+            new RegistryEntry<>(TrimMaterials.getRegistry(), TrimMaterial::decode),
             // TODO: wolf_variant
             // TODO: painting_variant
             new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType::decode),
