@@ -79,8 +79,8 @@ object JsonObjectCompressionStrategy : JsonCompressionStrategy() {
                 }
             }
 
-            versionTag.put("additions", additions)
             versionTag.put("removals", removals)
+            versionTag.put("additions", additions)
             nbtEntries.put(key.toString(), versionTag)
 
             ent = map

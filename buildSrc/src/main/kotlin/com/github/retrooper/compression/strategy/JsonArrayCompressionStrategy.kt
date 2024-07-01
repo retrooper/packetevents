@@ -80,8 +80,8 @@ object JsonArrayCompressionStrategy : JsonCompressionStrategy() {
                 }
             }
 
-            versionTag.put("additions", additions)
             versionTag.put("removals", removals)
+            versionTag.put("additions", additions)
             versionTag.put("changes", changes)
             nbtEntries.put(key.toString(), versionTag)
 
