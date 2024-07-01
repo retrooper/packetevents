@@ -283,7 +283,7 @@ public class User {
             version = PacketEvents.getAPI().getInjector().isProxy() ? this.getClientVersion() :
                     PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
         }
-        return this.dimensionType.getMinY();
+        return this.dimensionType.getMinY(version);
     }
 
     public int getTotalWorldHeight() {
