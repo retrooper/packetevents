@@ -28,9 +28,9 @@ public final class SequentialNBTReader implements Closeable {
 
         NBT nbt;
         if (type == NBTType.COMPOUND) {
-            nbt = new Compound("root", stream, () -> {});
+            nbt = new Compound(stream, () -> {});
         } else if (type == NBTType.LIST) {
-            nbt = new List("root", stream, () -> {});
+            nbt = new List(stream, () -> {});
         } else {
             nbt = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, type);
         }
@@ -52,7 +52,6 @@ public final class SequentialNBTReader implements Closeable {
 
     public static class Compound extends NBT implements Iterator<Map.Entry<String, NBT>>, Iterable<Map.Entry<String, NBT>>, Skippable, Closeable {
 
-        private final String name;
         private final DataInputStream stream;
         private final Runnable onComplete;
         private NBTType<?> nextType;
@@ -60,8 +59,7 @@ public final class SequentialNBTReader implements Closeable {
         private boolean hasReadType;
 
 
-        private Compound(String name, DataInputStream stream, Runnable onComplete) {
-            this.name = name;
+        private Compound(DataInputStream stream, Runnable onComplete) {
             this.stream = stream;
             this.onComplete = onComplete;
         }
@@ -113,9 +111,9 @@ public final class SequentialNBTReader implements Closeable {
                 String name = DefaultNBTSerializer.INSTANCE.readTagName(DUMMY_LIMITER, stream);
 
                 if (nextType == NBTType.COMPOUND) {
-                    lastRead = new Compound(name, stream, this::runCompleted);
+                    lastRead = new Compound(stream, this::runCompleted);
                 } else if (nextType == NBTType.LIST) {
-                    lastRead = new List(name, stream, this::runCompleted);
+                    lastRead = new List(stream, this::runCompleted);
                 } else {
                     lastRead = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, nextType);
                     runCompleted();
@@ -129,7 +127,6 @@ public final class SequentialNBTReader implements Closeable {
 
         private void runCompleted() {
             if (!hasNext()) {
-                System.out.println("Running complete for " + name + "'s parent");
                 onComplete.run();
             }
         }
@@ -222,15 +219,13 @@ public final class SequentialNBTReader implements Closeable {
 
     public static class List extends NBT implements Iterator<NBT>, Iterable<NBT>, Skippable, Closeable {
 
-        private final String name;
         private final DataInputStream stream;
         private final Runnable onComplete;
         private final NBTType<?> listType;
         private NBT lastRead;
         public int remaining;
 
-        private List(String name, DataInputStream stream, Runnable onComplete) {
-            this.name = name;
+        private List(DataInputStream stream, Runnable onComplete) {
             this.stream = stream;
             this.onComplete = onComplete;
             try {
@@ -275,9 +270,9 @@ public final class SequentialNBTReader implements Closeable {
             try {
                 remaining--;
                 if (listType == NBTType.COMPOUND) {
-                    lastRead = new Compound(String.valueOf(this.remaining), stream, this::runCompleted);
+                    lastRead = new Compound(stream, this::runCompleted);
                 } else if (listType == NBTType.LIST) {
-                    lastRead = new List(String.valueOf(this.remaining), stream, this::runCompleted);
+                    lastRead = new List(stream, this::runCompleted);
                 } else {
                     lastRead = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, listType);
                     runCompleted();
@@ -291,7 +286,6 @@ public final class SequentialNBTReader implements Closeable {
 
         private void runCompleted() {
             if (!hasNext()) {
-                System.out.println("Running complete for " + name + "'s parent");
                 onComplete.run();
             }
         }
