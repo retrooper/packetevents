@@ -24,17 +24,16 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.util.Index;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.BiFunction;
 
 import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.CONTENT;
@@ -71,18 +70,13 @@ public class ChatTypeDecoration {
         wrapper.writeStyle(decoration.style);
     }
 
-    public static ChatTypeDecoration decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
+    public static ChatTypeDecoration decode(NBT nbt, ClientVersion version) {
         NBTCompound compound = (NBTCompound) nbt;
         String translationKey = compound.getStringTagValueOrThrow("translation_key");
         List<Parameter> params = new ArrayList<>();
-        NBTList<NBTString> paramsTag = compound.getStringListTagOrNull("parameters");
-        if (paramsTag != null) {
-            for (NBTString paramTag : paramsTag.getTags()) {
-                Parameter parameter = Parameter.valueByName(paramTag.getValue().toUpperCase());
-                if (parameter != null) {
-                    params.add(parameter);
-                }
-            }
+        NBTList<NBTString> paramsTag = compound.getStringListTagOrThrow("parameters");
+        for (NBTString paramTag : paramsTag.getTags()) {
+            params.add(Parameter.ID_INDEX.valueOrThrow(paramTag.getValue()));
         }
         NBTCompound styleTag = compound.getCompoundTagOrNull("style");
         Style style = styleTag == null ? empty() :
@@ -93,7 +87,7 @@ public class ChatTypeDecoration {
     public static NBT encode(ChatTypeDecoration decoration, ClientVersion version) {
         NBTList<NBTString> paramsTag = NBTList.createStringList();
         for (Parameter param : decoration.parameters) {
-            paramsTag.addTag(new NBTString(param.name().toLowerCase(Locale.ROOT)));
+            paramsTag.addTag(new NBTString(param.getId()));
         }
 
         NBTCompound compound = new NBTCompound();
@@ -146,23 +140,30 @@ public class ChatTypeDecoration {
     }
 
     public enum Parameter {
-        SENDER((component, type) -> type.getName()),
-        TARGET((component, type) -> type.getTargetName() != null ? type.getTargetName() : Component.empty()),
-        CONTENT((component, type) -> component);
 
+        SENDER("sender", (component, type) -> type.getName()),
+        TARGET("target", (component, type) -> type.getTargetName() != null
+                ? type.getTargetName() : Component.empty()),
+        CONTENT("content", (component, type) -> component);
+
+        public static final Index<String, Parameter> ID_INDEX = Index.create(
+                Parameter.class, Parameter::getId);
+
+        private final String id;
         private final BiFunction<Component, ChatType.Bound, Component> selector;
 
-        Parameter(BiFunction<Component, ChatType.Bound, Component> selector) {
+        Parameter(String id, BiFunction<Component, ChatType.Bound, Component> selector) {
+            this.id = id;
             this.selector = selector;
         }
 
-        @Nullable
-        public static Parameter valueByName(String name) {
-            try {
-                return valueOf(name);
-            } catch (IllegalArgumentException ex) {
-                return null;
-            }
+        public String getId() {
+            return this.id;
+        }
+
+        @Deprecated
+        public static @Nullable Parameter valueByName(String id) {
+            return ID_INDEX.value(id);
         }
     }
 }

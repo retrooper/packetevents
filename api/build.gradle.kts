@@ -50,6 +50,8 @@ mappingCompression {
         compress("enchantment/enchantment_type_data.json")
 
         compress("stats/statistics.json")
+
+        compress("world/biome_data.json")
     }
 
     with<JsonArrayCompressionStrategy> {

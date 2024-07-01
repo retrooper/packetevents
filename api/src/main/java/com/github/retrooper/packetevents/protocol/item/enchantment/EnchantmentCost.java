@@ -22,8 +22,6 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -37,7 +35,7 @@ public final class EnchantmentCost {
         this.perLevelAboveFirst = perLevelAboveFirst;
     }
 
-    public static EnchantmentCost decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
+    public static EnchantmentCost decode(NBT nbt, ClientVersion version) {
         NBTCompound compound = (NBTCompound) nbt;
         int base = compound.getNumberTagOrThrow("base").getAsInt();
         int perLevelAboveFirst = compound.getNumberTagOrThrow("per_level_above_first").getAsInt();

@@ -21,8 +21,12 @@ package com.github.retrooper.packetevents.util.mappings;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
+import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfVariant;
+import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfVariants;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPattern;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
+import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
+import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterial;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterials;
 import com.github.retrooper.packetevents.protocol.item.trimpattern.TrimPattern;
@@ -53,12 +57,12 @@ public final class SynchronizedRegistriesHandler {
             new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
             new RegistryEntry<>(TrimPatterns.getRegistry(), TrimPattern::decode),
             new RegistryEntry<>(TrimMaterials.getRegistry(), TrimMaterial::decode),
-            // TODO: wolf_variant
+            new RegistryEntry<>(WolfVariants.getRegistry(), WolfVariant::decode),
             // TODO: painting_variant
             new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType::decode),
             // TODO: damage_type
-            new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode)
-            // TODO: enchantment
+            new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode),
+            new RegistryEntry<>(EnchantmentTypes.getRegistry(), EnchantmentType::decode)
             // TODO: jukebox_song
     ).collect(Collectors.toMap(RegistryEntry::getRegistryKey, Function.identity()));
 

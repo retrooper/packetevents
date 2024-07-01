@@ -28,8 +28,6 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +62,7 @@ public final class EnchantmentDefinition {
         this.slots = slots;
     }
 
-    public static EnchantmentDefinition decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
+    public static EnchantmentDefinition decode(NBT nbt, ClientVersion version) {
         NBTCompound compound = (NBTCompound) nbt;
         MappedEntitySet<ItemType> supportedItems = MappedEntitySet.decode(
                 compound.getTagOrThrow("supported_items"), version, ItemTypes.getRegistry());
@@ -72,8 +70,8 @@ public final class EnchantmentDefinition {
                 .map(items -> MappedEntitySet.decode(items, version, ItemTypes.getRegistry()));
         int weight = compound.getNumberTagOrThrow("weight").getAsInt();
         int maxLevel = compound.getNumberTagOrThrow("max_level").getAsInt();
-        EnchantmentCost minCost = EnchantmentCost.decode(compound.getTagOrThrow("min_cost"), version, data);
-        EnchantmentCost maxCost = EnchantmentCost.decode(compound.getTagOrThrow("max_cost"), version, data);
+        EnchantmentCost minCost = EnchantmentCost.decode(compound.getTagOrThrow("min_cost"), version);
+        EnchantmentCost maxCost = EnchantmentCost.decode(compound.getTagOrThrow("max_cost"), version);
         int anvilCost = compound.getNumberTagOrThrow("anvil_cost").getAsInt();
         NBTList<NBTString> slotsTag = compound.getStringListTagOrThrow("slots");
         List<EquipmentSlotGroup> slots = new ArrayList<>(slotsTag.size());

@@ -29,13 +29,9 @@ public interface ComponentType<T> extends MappedEntity {
 
     void write(PacketWrapper<?> wrapper, T content);
 
-    default T decode(NBT nbt, ClientVersion version) {
-        throw new UnsupportedOperationException();
-    }
+    T decode(NBT nbt, ClientVersion version);
 
-    default NBT encode(T value, ClientVersion version) {
-        throw new UnsupportedOperationException();
-    }
+    NBT encode(T value, ClientVersion version);
 
     interface Decoder<T> {
 

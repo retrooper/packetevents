@@ -49,9 +49,9 @@ public interface ChatType extends MappedEntity, CopyableEntity<ChatType> {
     static ChatType decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
         NBTCompound chatTag = compound.getCompoundTagOrThrow("chat");
-        ChatTypeDecoration chatDeco = ChatTypeDecoration.decode(chatTag, version, data);
+        ChatTypeDecoration chatDeco = ChatTypeDecoration.decode(chatTag, version);
         NBTCompound narrationTag = compound.getCompoundTagOrThrow("narration");
-        ChatTypeDecoration narrationDeco = ChatTypeDecoration.decode(narrationTag, version, data);
+        ChatTypeDecoration narrationDeco = ChatTypeDecoration.decode(narrationTag, version);
         return new StaticChatType(data, chatDeco, narrationDeco);
     }
 

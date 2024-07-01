@@ -48,7 +48,7 @@ public interface EnchantmentType extends MappedEntity, CopyableEntity<Enchantmen
     static EnchantmentType decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
         Component description = AdventureSerializer.fromNbt(compound.getTagOrThrow("description"));
-        EnchantmentDefinition definition = EnchantmentDefinition.decode(compound, version, data);
+        EnchantmentDefinition definition = EnchantmentDefinition.decode(compound, version);
         MappedEntitySet<EnchantmentType> exclusiveSet = Optional.ofNullable(compound.getTagOrNull("exclusive_set"))
                 .map(tag -> MappedEntitySet.decode(tag, version, EnchantmentTypes.getRegistry())) // TODO use user registry
                 .orElseGet(MappedEntitySet::createEmpty);
