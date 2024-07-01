@@ -23,6 +23,7 @@ import com.github.difflib.patch.ChangeDelta
 import com.github.difflib.patch.DeleteDelta
 import com.github.difflib.patch.InsertDelta
 import com.github.retrooper.compression.asStringList
+import com.github.steveice10.opennbt.tag.builtin.ByteTag
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag
 import com.github.steveice10.opennbt.tag.builtin.IntTag
 import com.github.steveice10.opennbt.tag.builtin.ListTag
@@ -33,9 +34,11 @@ object JsonArrayCompressionStrategy : JsonCompressionStrategy() {
 
     override fun serialize(tag: CompoundTag, json: JsonObject) {
         val entries = separateVersions(json)
+
+        tag.put("length", ByteTag(entries.size.toByte()))
+
         // we will remove the first entry, which is the oldest version
         val oldestVersion = entries.pollFirstEntry()
-        tag.put("start", StringTag(oldestVersion.key.toString()))
 
         val nbtEntries = CompoundTag()
         var ent = oldestVersion.value.asJsonArray.asStringList
