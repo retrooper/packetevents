@@ -48,23 +48,6 @@ public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T
     }
 
     @ApiStatus.Internal
-    public static <T extends MappedEntity> IRegistry<T> fromNetwork(
-            IRegistry<T> base, List<RegistryElement> elements) {
-        SimpleRegistry<T> registry = new SimpleRegistry<>(base.getRegistryKey());
-        for (int id = 0; id < elements.size(); id++) {
-            ResourceLocation elementName = elements.get(id).getId();
-            T baseEntry = base.getByName(elementName);
-            if (baseEntry == null) {
-                PacketEvents.getAPI().getLogger().warning("Unknown registry entry "
-                        + elementName + " for " + base.getRegistryKey());
-                continue;
-            }
-            registry.define(elementName, id, baseEntry);
-        }
-        return registry;
-    }
-
-    @ApiStatus.Internal
     public <Z extends T> Z define(String name, int id, Z instance) {
         return this.define(new ResourceLocation(name), id, instance);
     }

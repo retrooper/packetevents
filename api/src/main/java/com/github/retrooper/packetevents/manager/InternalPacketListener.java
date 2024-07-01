@@ -51,6 +51,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRe
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,7 +64,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             new RegistryEntry<>(DimensionTypes.getRegistry(),
                     DimensionType::decode, DimensionType::encode)
     ).collect(Collectors.toMap(
-            entry -> entry.registry.getRegistryKey(),
+            entry -> entry.baseRegistry.getRegistryKey(),
             Function.identity()));
 
     public InternalPacketListener() {
@@ -77,7 +78,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
     private void handleRegistry(User user, ResourceLocation registryName, List<RegistryElement> elements) {
         RegistryEntry<?> registry = REGISTRY_KEYS.get(registryName);
         if (registry != null) {
-            IRegistry<?> syncedRegistry = SimpleRegistry.fromNetwork(registry, elements);
+            IRegistry<?> syncedRegistry = registry.createFromElements(elements);
             user.putSynchronizedRegistry(syncedRegistry);
         }
     }
@@ -201,14 +202,63 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
     private static final class RegistryEntry<T extends MappedEntity> {
 
-        private final IRegistry<T> registry;
-        private final Function<NBT, T> decoder;
-        private final Function<T, NBT> encoder;
+        private final IRegistry<T> baseRegistry;
+        private final BiFunction<NBT, ClientVersion, T> decoder;
+        private final BiFunction<T, ClientVersion, NBT> encoder;
 
-        public RegistryEntry(IRegistry<T> registry, Function<NBT, T> decoder, Function<T, NBT> encoder) {
-            this.registry = registry;
+        public RegistryEntry(
+                IRegistry<T> baseRegistry,
+                BiFunction<NBT, ClientVersion, T> decoder,
+                BiFunction<T, ClientVersion, NBT> encoder
+        ) {
+            this.baseRegistry = baseRegistry;
             this.decoder = decoder;
             this.encoder = encoder;
+        }
+
+        private void handleElement(
+                SimpleRegistry<T> registry,
+                RegistryElement element,
+                int id, ClientVersion version
+        ) {
+            if (element.getData() != null) {
+                // data was provided, use registry element sent over network
+                T value = this.decoder.apply(element.getData(), version);
+                registry.define(element.getId(), id, value);
+                return;
+            }
+
+            // fallback to looking up in vanilla registry
+            // this isn't a 100% valid solution, but a full solution to this
+            // is not possible with Mojang's concept of known packs
+            //
+            // if packetevents isn't running on a proxy and two backend servers
+            // share the same custom datapack, the entries wouldn't be sent as
+            // the player would tell the server it already knows about them
+            //
+            // this will cause issues, especially when some datapack overrides world height
+            // of a vanilla dimension - and this can't be fixed (or I missed something)
+
+            ResourceLocation elementName = element.getId();
+            T baseEntry = this.baseRegistry.getByName(elementName);
+            if (baseEntry != null) {
+                registry.define(elementName, id, baseEntry);
+                return;
+            }
+
+            // can't find this element anywhere
+            // TODO dummy values make at least simple stuff work?
+            PacketEvents.getAPI().getLogger().warning("Unknown registry entry "
+                    + elementName + " for " + this.baseRegistry.getRegistryKey());
+        }
+
+        public IRegistry<T> createFromElements(List<RegistryElement> elements, ClientVersion version) {
+            SimpleRegistry<T> registry = new SimpleRegistry<>(this.baseRegistry.getRegistryKey());
+            for (int id = 0; id < elements.size(); id++) {
+                RegistryElement element = elements.get(id);
+                this.handleElement(registry, element, id, version);
+            }
+            return registry;
         }
     }
 }
