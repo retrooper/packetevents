@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.VersionMapper;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -46,17 +47,20 @@ public class TypesBuilder {
     }
 
     public void load() {
-        final SequentialNBTReader.Compound compound = MappingHelper.decompress("mappings/" + mapPath);
-        compound.next(); // skip version tag for now
-        int length = ((NBTNumber) compound.next().getValue()).getAsInt(); // Second tag is the start version
-        final SequentialNBTReader.Compound entries = (SequentialNBTReader.Compound) compound.next().getValue(); // Third tag are the entries
+        try (final SequentialNBTReader.Compound compound = MappingHelper.decompress("mappings/" + mapPath)) {
+            compound.next(); // skip version tag for now
+            int length = ((NBTNumber) compound.next().getValue()).getAsInt(); // Second tag is the start version
+            final SequentialNBTReader.Compound entries = (SequentialNBTReader.Compound) compound.next().getValue(); // Third tag are the entries
 
-        final ClientVersion[] versions = new ClientVersion[length];
-        final Map.Entry<String, NBT> first = entries.next();
-        if (first.getValue().getType() == NBTType.LIST) {
-            loadAsArray(first, entries, versions);
-        } else {
-            loadAsMap(first, entries, versions);
+            final ClientVersion[] versions = new ClientVersion[length];
+            final Map.Entry<String, NBT> first = entries.next();
+            if (first.getValue().getType() == NBTType.LIST) {
+                loadAsArray(first, entries, versions);
+            } else {
+                loadAsMap(first, entries, versions);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to load mapping files.", e);
         }
     }
 

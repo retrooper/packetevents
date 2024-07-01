@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -36,10 +37,11 @@ import java.util.zip.GZIPInputStream;
 public class MappingHelper {
 
     public static SequentialNBTReader.Compound decompress(final String path) {
-        try (final DataInputStream dataInput = new DataInputStream(new GZIPInputStream(new BufferedInputStream(
-                PacketEvents.getAPI().getSettings().getResourceProvider().apply( "assets/" + path + ".nbt"))))) {
+        try {
+            final DataInputStream dataInput = new DataInputStream(new GZIPInputStream(new BufferedInputStream(
+                    PacketEvents.getAPI().getSettings().getResourceProvider().apply( "assets/" + path + ".nbt"))));
             return (SequentialNBTReader.Compound) new SequentialNBTReader(dataInput).next(); // All mappings only contain one compound tag
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException("Cannot find resource file " + path + ".nbt", e);
         }
     }
