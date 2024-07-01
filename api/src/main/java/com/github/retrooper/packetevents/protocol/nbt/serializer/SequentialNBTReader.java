@@ -3,13 +3,11 @@ package com.github.retrooper.packetevents.protocol.nbt.serializer;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public final class SequentialNBTReader implements Iterator<NBT> {
 
@@ -71,7 +69,7 @@ public final class SequentialNBTReader implements Iterator<NBT> {
         }
     }
 
-    public static class Compound extends NBT implements Iterator<Map.Entry<String, NBT>>, Skippable {
+    public static class Compound extends NBT implements Iterator<Map.Entry<String, NBT>>, Iterable<Map.Entry<String, NBT>>, Skippable {
 
         private boolean hasReadCompletely = false;
         private final SequentialNBTReader reader;
@@ -133,6 +131,12 @@ public final class SequentialNBTReader implements Iterator<NBT> {
             }
         }
 
+        @NotNull
+        @Override
+        public Iterator<Map.Entry<String, NBT>> iterator() {
+            return this;
+        }
+
         @Override
         public void skip() {
             try {
@@ -148,7 +152,7 @@ public final class SequentialNBTReader implements Iterator<NBT> {
         }
     }
 
-    public static class List extends NBT implements Iterator<NBT>, Skippable {
+    public static class List extends NBT implements Iterator<NBT>, Iterable<NBT>, Skippable {
 
         private final SequentialNBTReader reader;
         private final NBTType<?> listType;
@@ -196,6 +200,12 @@ public final class SequentialNBTReader implements Iterator<NBT> {
             }
             remaining--;
             return reader.next();
+        }
+
+        @NotNull
+        @Override
+        public Iterator<NBT> iterator() {
+            return this;
         }
 
         @Override
