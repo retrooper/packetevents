@@ -47,6 +47,8 @@ mappingCompression {
         compress("block/legacy_block_mappings.json")
         compress("block/modern_block_mappings.json")
 
+        compress("enchantment/enchantment_type_data.json")
+
         compress("stats/statistics.json")
     }
 

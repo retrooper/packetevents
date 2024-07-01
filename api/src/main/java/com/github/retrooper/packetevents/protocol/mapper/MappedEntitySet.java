@@ -18,8 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.mapper;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,5 +83,38 @@ public class MappedEntitySet<T> {
         for (Z entity : set.entities) {
             wrapper.writeMappedEntity(entity);
         }
+    }
+
+    public static <Z extends MappedEntity> MappedEntitySet<Z> decode(
+            NBT nbt, ClientVersion version, IRegistry<Z> registry) {
+        if (nbt instanceof NBTString) {
+            String tagName = ((NBTString) nbt).getValue();
+            if (tagName.charAt(0) != '#') {
+                throw new IllegalStateException("Illegal tag name encountered: " + tagName
+                        + "; expected to start with \"#\"");
+            }
+            ResourceLocation tagKey = new ResourceLocation(tagName.substring(1));
+            return new MappedEntitySet<>(tagKey);
+        }
+        NBTList<?> listTag = (NBTList<?>) nbt;
+        List<Z> list = new ArrayList<>(listTag.size());
+        for (NBT tag : listTag.getTags()) {
+            ResourceLocation tagKey = new ResourceLocation(((NBTString) tag).getValue());
+            list.add(registry.getByName(tagKey));
+        }
+        return new MappedEntitySet<>(list);
+    }
+
+    public static <Z extends MappedEntity> NBT encode(MappedEntitySet<Z> set, ClientVersion version) {
+        if (set.tagKey != null) {
+            return new NBTString("#" + set.tagKey);
+        }
+
+        assert set.entities != null; // can't be null, verified in ctor
+        NBTList<NBTString> listTag = NBTList.createStringList();
+        for (Z entity : set.entities) {
+            listTag.addTag(new NBTString(entity.getName().toString()));
+        }
+        return listTag;
     }
 }

@@ -18,17 +18,20 @@
 
 package com.github.retrooper.packetevents.protocol.item.enchantment.type;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class EnchantmentTypes {
+public final class EnchantmentTypes {
 
     private static final Map<String, String> STRING_UPDATER = new HashMap<>();
 
@@ -37,47 +40,44 @@ public class EnchantmentTypes {
         STRING_UPDATER.put("minecraft:sweeping", "minecraft:sweeping_edge");
     }
 
-    private static final Map<String, EnchantmentType> ENCHANTMENT_TYPE_MAPPINGS = new HashMap<>();
-    private static final Map<Byte, Map<Integer, EnchantmentType>> ENCHANTMENT_TYPE_ID_MAPPINGS = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("enchantment/enchantment_type_mappings");
+    // load data from file, enchantment types are too complex to define in code here
+    private static final Map<ResourceLocation, NBTCompound> ENCHANTMENT_DATA;
 
+    static {
+        ENCHANTMENT_DATA = new HashMap<>();
+        NBTCompound dataTag = MappingHelper.decompress("mappings/enchantment_type_data.json");
+        for (Map.Entry<String, NBT> entry : dataTag.getTags().entrySet()) {
+            ResourceLocation enchantKey = new ResourceLocation(entry.getKey());
+            ENCHANTMENT_DATA.put(enchantKey, (NBTCompound) entry.getValue());
+        }
+    }
+
+    private static final VersionedRegistry<EnchantmentType> REGISTRY = new VersionedRegistry<>(
+            "enchantment", "enchantment/enchantment_type_mappings");
+
+    @ApiStatus.Internal
     public static EnchantmentType define(String key) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        EnchantmentType enchantmentType = new EnchantmentType() {
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
+        return REGISTRY.define(key, data -> {
+            NBTCompound dataTag = ENCHANTMENT_DATA.get(data.getName());
+            if (dataTag == null) {
+                throw new IllegalArgumentException("Can't define enchantment " + data.getName() + ", no data found");
             }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof EnchantmentType) {
-                    return getName() == ((EnchantmentType) obj).getName();
-                }
-                return false;
-            }
-        };
-
-        MappingHelper.registerMapping(TYPES_BUILDER, ENCHANTMENT_TYPE_MAPPINGS, ENCHANTMENT_TYPE_ID_MAPPINGS, enchantmentType);
-        return enchantmentType;
+            ClientVersion version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+            return EnchantmentType.decode(dataTag, version, data);
+        });
     }
 
-    @Nullable
-    public static EnchantmentType getByName(String name) {
+    public static VersionedRegistry<EnchantmentType> getRegistry() {
+        return REGISTRY;
+    }
+
+    public static @Nullable EnchantmentType getByName(String name) {
         String fixedName = STRING_UPDATER.getOrDefault(name, name);
-        return ENCHANTMENT_TYPE_MAPPINGS.get(fixedName);
+        return REGISTRY.getByName(fixedName);
     }
 
-    @Nullable
-    public static EnchantmentType getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, EnchantmentType> typeIdMap = ENCHANTMENT_TYPE_ID_MAPPINGS.get((byte) index);
-        return typeIdMap.get(id);
+    public static @Nullable EnchantmentType getById(ClientVersion version, int id) {
+        return REGISTRY.getById(version, id);
     }
 
     public static final EnchantmentType ALL_DAMAGE_PROTECTION = define("protection");
@@ -126,6 +126,7 @@ public class EnchantmentTypes {
     public static final EnchantmentType WIND_BURST = define("wind_burst");
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        ENCHANTMENT_DATA.clear();
+        REGISTRY.unloadMappings();
     }
 }
