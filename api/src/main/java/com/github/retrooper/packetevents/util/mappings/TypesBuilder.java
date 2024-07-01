@@ -59,6 +59,8 @@ public class TypesBuilder {
             } else {
                 loadAsMap(first, entries, versions);
             }
+
+            versionMapper = new VersionMapper(versions);
         } catch (IOException e) {
             throw new RuntimeException("Unable to load mapping files.", e);
         }
