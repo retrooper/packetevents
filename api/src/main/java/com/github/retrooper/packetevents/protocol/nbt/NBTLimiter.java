@@ -2,31 +2,49 @@ package com.github.retrooper.packetevents.protocol.nbt;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class NBTLimiter {
+public interface NBTLimiter {
 
-    private final int max;
-    @Nullable
-    private Object byteBuf;
-    private int bytes;
+    int DEFAULT_MAX_SIZE = 2097152;
 
-    public NBTLimiter() {
-        this.max = Integer.MAX_VALUE;
+    static NBTLimiter noop() {
+        return new NBTLimiter() {
+            @Override
+            public void increment(int amount) {
+                // no-op
+            }
+
+            @Override
+            public void checkReadability(int length) {
+                // no-op
+            }
+        };
     }
 
-    public NBTLimiter(@NotNull Object byteBuf) {
-        this.byteBuf = byteBuf;
-        this.max = 2097152;
+    static NBTLimiter forBuffer(final @NotNull Object byteBuf) {
+        return forBuffer(byteBuf, DEFAULT_MAX_SIZE);
     }
 
-    public void increment(int amount) {
-        bytes += amount;
+    static NBTLimiter forBuffer(final @NotNull Object byteBuf, final int max) {
+        return new NBTLimiter() {
+            private int bytes;
 
-        if (bytes > max) throw new IllegalArgumentException("NBT size limit reached (" + bytes + "/" + max + ")");
+            @Override
+            public void increment(int amount) {
+                bytes += amount;
+
+                if (bytes > max) throw new IllegalArgumentException("NBT size limit reached (" + bytes + "/" + max + ")");
+            }
+
+            @Override
+            public void checkReadability(int length) {
+                if (length > ByteBufHelper.readableBytes(byteBuf)) throw new IllegalArgumentException("Length is too large: " + length + ", readable: " + ByteBufHelper.readableBytes(byteBuf));
+            }
+        };
     }
 
-    public void checkReadability(int length) {
-        if(byteBuf != null && length > ByteBufHelper.readableBytes(byteBuf)) throw new IllegalArgumentException("Length is too large: " + length + ", readable: " + ByteBufHelper.readableBytes(byteBuf));
-    }
+    void increment(int amount);
+
+    void checkReadability(int length);
+
 }
