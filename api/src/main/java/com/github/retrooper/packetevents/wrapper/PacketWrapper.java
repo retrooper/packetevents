@@ -1290,8 +1290,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     public ChatType.Bound readChatTypeBoundNetwork() {
         ChatType type = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)
-                ? this.readMappedEntityOrDirect(ChatTypes::getById, ChatType::readDirect)
-                : this.readMappedEntity(ChatTypes::getById);
+                ? this.readMappedEntityOrDirect(ChatTypes.getRegistry(), ChatType::readDirect)
+                : this.readMappedEntity(ChatTypes.getRegistry());
         Component name = readComponent();
         Component targetName = readOptional(PacketWrapper::readComponent);
         return new ChatType.Bound(type, name, targetName);
