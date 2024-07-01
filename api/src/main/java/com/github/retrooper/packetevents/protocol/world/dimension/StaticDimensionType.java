@@ -35,7 +35,7 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     private final boolean ultraWarm;
     private final boolean natural;
     private final double coordinateScale;
-    private final boolean bedWorks;
+    private final boolean bedWorking;
     private final boolean respawnAnchorWorking;
     private final int minY;
     private final int height;
@@ -50,19 +50,19 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
 
     public StaticDimensionType(
             OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling,
-            boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorks, boolean respawnAnchorWorking,
+            boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorking, boolean respawnAnchorWorking,
             int minY, int height, int logicalHeight, String infiniburnTag, ResourceLocation effectsLocation,
             float ambientLight, boolean piglinSafe, boolean hasRaids, NBT monsterSpawnLightLevel,
             int monsterSpawnBlockLightLimit
     ) {
-        this(null, fixedTime, hasSkyLight, hasCeiling, ultraWarm, natural, coordinateScale, bedWorks, respawnAnchorWorking,
+        this(null, fixedTime, hasSkyLight, hasCeiling, ultraWarm, natural, coordinateScale, bedWorking, respawnAnchorWorking,
                 minY, height, logicalHeight, infiniburnTag, effectsLocation, ambientLight, piglinSafe, hasRaids,
                 monsterSpawnLightLevel, monsterSpawnBlockLightLimit);
     }
 
     public StaticDimensionType(
             @Nullable TypesBuilderData data, OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling,
-            boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorks, boolean respawnAnchorWorking,
+            boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorking, boolean respawnAnchorWorking,
             int minY, int height, int logicalHeight, String infiniburnTag, ResourceLocation effectsLocation,
             float ambientLight, boolean piglinSafe, boolean hasRaids, NBT monsterSpawnLightLevel,
             int monsterSpawnBlockLightLimit
@@ -74,7 +74,7 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
         this.ultraWarm = ultraWarm;
         this.natural = natural;
         this.coordinateScale = coordinateScale;
-        this.bedWorks = bedWorks;
+        this.bedWorking = bedWorking;
         this.respawnAnchorWorking = respawnAnchorWorking;
         this.minY = minY;
         this.height = height;
@@ -119,8 +119,8 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     }
 
     @Override
-    public boolean isBedWorks() {
-        return this.bedWorks;
+    public boolean isBedWorking() {
+        return this.bedWorking;
     }
 
     @Override

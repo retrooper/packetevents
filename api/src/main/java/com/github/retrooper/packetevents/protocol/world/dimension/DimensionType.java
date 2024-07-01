@@ -21,7 +21,13 @@ package com.github.retrooper.packetevents.protocol.world.dimension;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTDouble;
+import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.nbt.NBTLong;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 
@@ -41,7 +47,7 @@ public interface DimensionType extends MappedEntity {
 
     double getCoordinateScale();
 
-    boolean isBedWorks();
+    boolean isBedWorking();
 
     boolean isRespawnAnchorWorking();
 
@@ -79,7 +85,7 @@ public interface DimensionType extends MappedEntity {
 
     int getMonsterSpawnBlockLightLimit();
 
-    static DimensionType decode(NBT nbt) {
+    static DimensionType decode(NBT nbt, ClientVersion version) {
         NBTCompound compound = (NBTCompound) nbt;
         OptionalLong fixedTime = !compound.getTags().containsKey("fixed_time") ? OptionalLong.empty() :
                 OptionalLong.of(compound.getNumberTagOrThrow("fixed_time").getAsLong());
@@ -88,11 +94,11 @@ public interface DimensionType extends MappedEntity {
         boolean ultrawarm = compound.getBoolean("ultrawarm");
         boolean natural = compound.getBoolean("natural");
         double coordinateScale = compound.getNumberTagOrThrow("coordinate_scale").getAsDouble();
-        boolean bedWorks = compound.getBoolean("bed_works");
+        boolean bedWorking = compound.getBoolean("bed_works");
         boolean respawnAnchorWorking = compound.getBoolean("respawn_anchor_works");
         int minY = compound.getNumberTagOrThrow("min_y").getAsInt();
-        int height = compound.getNumberTagOrThrow("min_y").getAsInt();
-        int logicalHeight = compound.getNumberTagOrThrow("min_y").getAsInt();
+        int height = compound.getNumberTagOrThrow("height").getAsInt();
+        int logicalHeight = compound.getNumberTagOrThrow("logical_height").getAsInt();
         String infiniburnTag = compound.getStringTagValueOrThrow("infiniburn");
         ResourceLocation effectsLocation = new ResourceLocation(compound.getStringTagValueOrThrow("effects"));
         float ambientLight = compound.getNumberTagOrThrow("ambient_light").getAsFloat();
@@ -101,11 +107,31 @@ public interface DimensionType extends MappedEntity {
         NBT monsterSpawnLightLevel = compound.getTagOrThrow("monster_spawn_light_level");
         int monsterSpawnBlockLightLimit = compound.getNumberTagOrThrow("monster_spawn_block_light_limit").getAsInt();
         return new StaticDimensionType(fixedTime, hasSkylight, hasCeiling, ultrawarm, natural, coordinateScale,
-                bedWorks, respawnAnchorWorking, minY, height, logicalHeight, infiniburnTag, effectsLocation,
+                bedWorking, respawnAnchorWorking, minY, height, logicalHeight, infiniburnTag, effectsLocation,
                 ambientLight, piglinSafe, hasRaids, monsterSpawnLightLevel, monsterSpawnBlockLightLimit);
     }
 
-    static NBT encode(DimensionType dimensionType) {
-        // TODO
+    static NBT encode(DimensionType dimensionType, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        dimensionType.getFixedTime().ifPresent(fixedTime ->
+                compound.setTag("fixed_time", new NBTLong(fixedTime)));
+        compound.setTag("has_skylight", new NBTByte(dimensionType.hasSkyLight()));
+        compound.setTag("has_ceiling", new NBTByte(dimensionType.hasCeiling()));
+        compound.setTag("ultrawarm", new NBTByte(dimensionType.isUltraWarm()));
+        compound.setTag("natural", new NBTByte(dimensionType.isNatural()));
+        compound.setTag("coordinate_scale", new NBTDouble(dimensionType.getCoordinateScale()));
+        compound.setTag("bed_works", new NBTByte(dimensionType.isBedWorking()));
+        compound.setTag("respawn_anchor_works", new NBTByte(dimensionType.isRespawnAnchorWorking()));
+        compound.setTag("min_y", new NBTInt(dimensionType.getMinY(version)));
+        compound.setTag("height", new NBTInt(dimensionType.getHeight(version)));
+        compound.setTag("logical_height", new NBTInt(dimensionType.getLogicalHeight(version)));
+        compound.setTag("infiniburn", new NBTString(dimensionType.getInfiniburnTag()));
+        compound.setTag("effects", new NBTString(dimensionType.getEffectsLocation().toString()));
+        compound.setTag("ambient_light",new NBTFloat(dimensionType.getAmbientLight()));
+        compound.setTag("piglin_safe",new NBTByte(dimensionType.isPiglinSafe()));
+        compound.setTag("has_raids",new NBTByte(dimensionType.hasRaids()));
+        compound.setTag("monster_spawn_light_level",dimensionType.getMonsterSpawnLightLevel());
+        compound.setTag("monster_spawn_block_light_limit", new NBTInt(dimensionType.getMonsterSpawnBlockLightLimit()));
+        return compound;
     }
 }

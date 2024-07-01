@@ -40,14 +40,14 @@ public final class DimensionTypes {
     @ApiStatus.Internal
     public static DimensionType define(
             String key, OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling,
-            boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorks, boolean respawnAnchorWorking,
+            boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorking, boolean respawnAnchorWorking,
             int minY, int height, int logicalHeight, String infiniburnTag, ResourceLocation effectsLocation,
             float ambientLight, boolean piglinSafe, boolean hasRaids, Supplier<NBT> monsterSpawnLightLevel,
             int monsterSpawnBlockLightLimit
     ) {
         return REGISTRY.define(key, data ->
                 new StaticDimensionType(data, fixedTime, hasSkyLight, hasCeiling, ultraWarm, natural, coordinateScale,
-                        bedWorks, respawnAnchorWorking, minY, height, logicalHeight, infiniburnTag, effectsLocation,
+                        bedWorking, respawnAnchorWorking, minY, height, logicalHeight, infiniburnTag, effectsLocation,
                         ambientLight, piglinSafe, hasRaids, monsterSpawnLightLevel.get(), monsterSpawnBlockLightLimit));
     }
 
