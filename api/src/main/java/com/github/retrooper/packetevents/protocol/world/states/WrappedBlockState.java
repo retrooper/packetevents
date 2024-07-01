@@ -194,16 +194,17 @@ public class WrappedBlockState {
         Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
 
         try (final SequentialNBTReader.Compound compound = MappingHelper.decompress("mappings/block/legacy_block_mappings")) {
-            compound.next(); // Skip version
+            compound.skipOne(); // Skip version
 
             for (Map.Entry<String, NBT> entry : compound) {
+                SequentialNBTReader.Compound inner = (SequentialNBTReader.Compound) entry.getValue();
+
                 StateType type = StateTypes.getByName(entry.getKey());
                 if (type == null) {
                     PacketEvents.getAPI().getLogger().warning("Could not find type for " + entry.getKey());
+                    inner.skip();
                     continue;
                 }
-
-                SequentialNBTReader.Compound inner = (SequentialNBTReader.Compound) entry.getValue();
 
                 for (Map.Entry<String, NBT> element : inner) {
                     String[] ids = element.getKey().split(":");
@@ -281,7 +282,7 @@ public class WrappedBlockState {
 
     private static void loadModern(Map<NBTCompound, Map.Entry<Map<StateValue, Object>, String>> cache) {
         try (final SequentialNBTReader.Compound compound = MappingHelper.decompress("mappings/block/modern_block_mappings")) {
-            compound.next(); // Skip version
+            compound.skipOne(); // Skip version
 
             for (Map.Entry<String, NBT> versionEntry : compound) {
                 ClientVersion version = ClientVersion.valueOf(versionEntry.getKey());
@@ -297,7 +298,7 @@ public class WrappedBlockState {
                 int id = 0;
                 for (NBT e : list) {
                     SequentialNBTReader.Compound element = (SequentialNBTReader.Compound) e;
-                    String typeString = ((NBTString) element.next()).getValue();
+                    String typeString = ((NBTString) element.next().getValue()).getValue();
                     StateType type = StateTypes.getByName(typeString);
                     if (type == null) {
                         // Let's update the state type to a modern version
@@ -324,8 +325,8 @@ public class WrappedBlockState {
                     }
 
                     int index = 0;
-                    for (Map.Entry<String, NBT> nbt : ((SequentialNBTReader.Compound) next.getValue())) {
-                        SequentialNBTReader.Compound dataContent = (SequentialNBTReader.Compound) nbt.getValue();
+                    for (NBT nbt : ((SequentialNBTReader.List) next.getValue())) {
+                        SequentialNBTReader.Compound dataContent = (SequentialNBTReader.Compound) nbt;
                         Map.Entry<Map<StateValue, Object>, String> dataEntry = cache.computeIfAbsent(dataContent.readFully(), (key) -> {
                             StringBuilder dataStringBuilder = new StringBuilder();
                             Map<StateValue, Object> dataMap = new HashMap<>(key.size());

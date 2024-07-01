@@ -47,7 +47,7 @@ public class Statistics {
             try (final SequentialNBTReader.Compound mapping = MappingHelper.decompress("mappings/stats/statistics")) {
 
                 if (version.isNewerThan(ServerVersion.V_1_8_3)) {
-                    mapping.next(); // Skip version 1.8
+                    mapping.skipOne(); // Skip version 1.8
                 }
 
                 SequentialNBTReader.Compound toLoad = (SequentialNBTReader.Compound) mapping.next();

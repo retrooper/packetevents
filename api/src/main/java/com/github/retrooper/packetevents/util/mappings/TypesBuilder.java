@@ -48,8 +48,8 @@ public class TypesBuilder {
 
     public void load() {
         try (final SequentialNBTReader.Compound compound = MappingHelper.decompress("mappings/" + mapPath)) {
-            compound.next(); // skip version tag for now
-            int length = ((NBTNumber) compound.next().getValue()).getAsInt(); // Second tag is the start version
+            compound.skipOne(); // skip version tag for now
+            int length = ((NBTNumber) compound.next().getValue()).getAsInt(); // Second tag is the length
             final SequentialNBTReader.Compound entries = (SequentialNBTReader.Compound) compound.next().getValue(); // Third tag are the entries
 
             final ClientVersion[] versions = new ClientVersion[length];
@@ -90,14 +90,13 @@ public class TypesBuilder {
         int i = 1;
         for (Map.Entry<String, NBT> entry : entries) {
             final ClientVersion version = ClientVersion.valueOf(entry.getKey());
-            versions[i] = version;
+            versions[i++] = version;
             final List<ListDiff<String>> diff = MappingHelper.createListDiff((SequentialNBTReader.Compound) entry.getValue());
 
             for (int j = diff.size() - 1; j >= 0; j--) {
                 diff.get(j).applyTo(lastEntries);
             }
             mapLoader.accept(version);
-            i++;
         }
     }
 
@@ -120,14 +119,13 @@ public class TypesBuilder {
         int i = 1;
         for (Map.Entry<String, NBT> entry : entries) {
             final ClientVersion version = ClientVersion.valueOf(entry.getKey());
-            versions[i] = version;
+            versions[i++] = version;
             final List<MapDiff<String, Integer>> diff = MappingHelper.createDiff((SequentialNBTReader.Compound) entry.getValue());
 
             for (MapDiff<String, Integer> d : diff) {
                 d.applyTo(lastEntries);
             }
             mapLoader.accept(version);
-            i++;
         }
     }
 
