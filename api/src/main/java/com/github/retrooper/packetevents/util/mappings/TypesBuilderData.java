@@ -19,14 +19,12 @@
 package com.github.retrooper.packetevents.util.mappings;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 public class TypesBuilderData {
 
-    private final TypesBuilder typesBuilder;
+    protected final TypesBuilder typesBuilder;
     protected final int[] data;
     protected final ResourceLocation name;
 
@@ -43,17 +41,6 @@ public class TypesBuilderData {
     }
 
     public int getId(ClientVersion version) {
-        return this.getId(null, version);
-    }
-
-    public int getId(@Nullable User user, ClientVersion version) {
-        if (user != null && this.typesBuilder.registry != null) {
-            IRegistry<?> userRegistry = user.getUserRegistry(this.typesBuilder.registry.getRegistryKey());
-            if (userRegistry != null) {
-                System.out.println("using user registry for " + this.getName());
-                return userRegistry.getId(this.getName().toString(), version);
-            }
-        }
         return this.data[this.typesBuilder.getDataIndex(version)];
     }
 

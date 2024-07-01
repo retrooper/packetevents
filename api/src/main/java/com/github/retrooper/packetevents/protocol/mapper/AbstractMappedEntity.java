@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.protocol.mapper;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
@@ -42,14 +41,6 @@ public abstract class AbstractMappedEntity implements MappedEntity {
     public ResourceLocation getName() {
         if (this.data != null) {
             return this.data.getName();
-        }
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int getId(@Nullable User user, ClientVersion version) {
-        if (this.data != null) {
-            return this.data.getId(user, version);
         }
         throw new UnsupportedOperationException();
     }

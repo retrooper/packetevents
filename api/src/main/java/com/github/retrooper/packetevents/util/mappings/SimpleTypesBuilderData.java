@@ -19,9 +19,7 @@
 package com.github.retrooper.packetevents.util.mappings;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 public class SimpleTypesBuilderData extends TypesBuilderData {
 
@@ -30,7 +28,7 @@ public class SimpleTypesBuilderData extends TypesBuilderData {
     }
 
     @Override
-    public int getId(@Nullable User user, ClientVersion version) {
+    public int getId(ClientVersion version) {
         return this.data[0];
     }
 }

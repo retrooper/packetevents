@@ -1492,11 +1492,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     public <Z extends MappedEntity> Z readMappedEntity(IRegistry<Z> registry) {
         if (this.user != null) {
-            IRegistry<Z> prevReg = registry;
             registry = this.user.getUserRegistryOrFallback(registry);
-            if (prevReg != registry) {
-                this.user.sendMessage("1replaced registry: " + registry.getRegistryKey());
-            }
         }
         return this.readMappedEntity(registry::getById);
     }
@@ -1504,11 +1500,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     public <Z extends MappedEntity> Z readMappedEntityOrDirect(
             IRegistry<Z> registry, Reader<Z> directReader) {
         if (this.user != null) {
-            IRegistry<Z> prevReg = registry;
             registry = this.user.getUserRegistryOrFallback(registry);
-            if (prevReg != registry) {
-                this.user.sendMessage("2replaced registry: " + registry.getRegistryKey());
-            }
         }
         return this.readMappedEntityOrDirect(registry::getById, directReader);
     }
@@ -1518,7 +1510,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
             throw new IllegalArgumentException("Can't write id of unregistered entity "
                     + entity.getName() + " (" + entity + ")");
         }
-        this.writeVarInt(entity.getId(this.user, this.serverVersion.toClientVersion()));
+        this.writeVarInt(entity.getId(this.serverVersion.toClientVersion()));
     }
 
     public <Z extends MappedEntity> void writeMappedEntityOrDirect(Z entity, Writer<Z> writer) {
@@ -1527,7 +1519,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
             writer.accept(this, entity);
             return;
         }
-        int id = entity.getId(this.user, this.serverVersion.toClientVersion());
+        int id = entity.getId(this.serverVersion.toClientVersion());
         this.writeVarInt(id + 1);
     }
 

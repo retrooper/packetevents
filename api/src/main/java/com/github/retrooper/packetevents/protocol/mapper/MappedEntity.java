@@ -19,17 +19,11 @@
 package com.github.retrooper.packetevents.protocol.mapper;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 public interface MappedEntity {
 
     ResourceLocation getName();
-
-    default int getId(@Nullable User user, ClientVersion version) {
-        return this.getId(version);
-    }
 
     int getId(ClientVersion version);
 
