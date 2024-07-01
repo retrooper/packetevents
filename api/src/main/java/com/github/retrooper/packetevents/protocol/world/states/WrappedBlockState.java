@@ -298,7 +298,7 @@ public class WrappedBlockState {
                 int id = 0;
                 for (NBT e : list) {
                     SequentialNBTReader.Compound element = (SequentialNBTReader.Compound) e;
-                    String typeString = ((NBTString) element.next().getValue()).getValue();
+                    String typeString = ((NBTString) element.next().getValue()).getValue(); // type
                     StateType type = StateTypes.getByName(typeString);
                     if (type == null) {
                         // Let's update the state type to a modern version
@@ -314,14 +314,14 @@ public class WrappedBlockState {
                         }
                     }
 
-                    Map.Entry<String, NBT> next = element.next();
+                    Map.Entry<String, NBT> next = element.next(); // def
 
                     int defaultIdx = 0;
                     if (!next.getKey().equals("def")) {
                         PacketEvents.getAPI().getLogger().warning("No default state for " + type + " using 0");
                     } else {
                         defaultIdx = ((NBTNumber) next.getValue()).getAsInt();
-                        next = element.next();
+                        next = element.next(); // entries
                     }
 
                     int index = 0;

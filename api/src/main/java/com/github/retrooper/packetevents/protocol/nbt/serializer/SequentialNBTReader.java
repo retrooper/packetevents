@@ -139,15 +139,13 @@ public final class SequentialNBTReader implements Closeable {
 
         @Override
         public void skip() {
+            if (lastRead instanceof Skippable) {
+                ((Skippable) lastRead).skip();
+            }
+
             if (!hasNext()) return;
 
             try {
-                if (lastRead instanceof Skippable) {
-                    ((Skippable) lastRead).skip();
-                }
-
-                if (!hasNext()) return;
-
                 int len = stream.readUnsignedShort();
                 stream.skipBytes(len);
 
@@ -164,9 +162,9 @@ public final class SequentialNBTReader implements Closeable {
 
         @Override
         public void skipOne() {
-            if (!hasNext()) return;
-
             checkRead(lastRead);
+
+            if (!hasNext()) return;
 
             try {
                 int len = stream.readUnsignedShort();
@@ -263,6 +261,7 @@ public final class SequentialNBTReader implements Closeable {
 
         @Override
         public NBT next() {
+            checkRead(lastRead);
             if (!hasNext()) {
                 throw new IllegalStateException("No more elements in list");
             }
@@ -298,15 +297,13 @@ public final class SequentialNBTReader implements Closeable {
 
         @Override
         public void skip() {
+            if (lastRead instanceof Skippable) {
+                ((Skippable) lastRead).skip();
+            }
+
             if (!hasNext()) return;
 
             try {
-                if (lastRead instanceof Skippable) {
-                    ((Skippable) lastRead).skip();
-                }
-
-                if (!hasNext()) return;
-
                 TagSkip typeSkip = TAG_SKIPS.get(listType);
                 for (int i = 0; i < remaining; i++) {
                     typeSkip.skip(stream);
@@ -321,9 +318,9 @@ public final class SequentialNBTReader implements Closeable {
 
         @Override
         public void skipOne() {
-            if (!hasNext()) return;
-
             checkRead(lastRead);
+
+            if (!hasNext()) return;
 
             try {
                 TAG_SKIPS.get(listType).skip(stream);
