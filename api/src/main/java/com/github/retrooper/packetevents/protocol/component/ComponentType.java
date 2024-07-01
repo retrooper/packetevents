@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.protocol.component;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public interface ComponentType<T> extends MappedEntity {
@@ -26,4 +28,22 @@ public interface ComponentType<T> extends MappedEntity {
     T read(PacketWrapper<?> wrapper);
 
     void write(PacketWrapper<?> wrapper, T content);
+
+    default T decode(NBT nbt, ClientVersion version) {
+        throw new UnsupportedOperationException();
+    }
+
+    default NBT encode(T value, ClientVersion version) {
+        throw new UnsupportedOperationException();
+    }
+
+    interface Decoder<T> {
+
+        T decode(NBT nbt, ClientVersion version);
+    }
+
+    interface Encoder<T> {
+
+        NBT encode(T value, ClientVersion version);
+    }
 }

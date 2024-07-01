@@ -62,6 +62,8 @@ mappingCompression {
 
         compress("command/argument_parser_mappings.json")
 
+        compress("enchantment/effect_component_type.json")
+
         compress("entity/entity_data_type_mappings.json")
         compress("entity/painting_mappings.json")
 

@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.item.enchantment.type;
 
 import com.github.retrooper.packetevents.protocol.component.IComponentMap;
+import com.github.retrooper.packetevents.protocol.component.StaticComponentMap;
 import com.github.retrooper.packetevents.protocol.item.enchantment.EnchantmentDefinition;
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
@@ -31,13 +32,13 @@ public class StaticEnchantmentType extends AbstractMappedEntity implements Encha
     private final Component description;
     private final EnchantmentDefinition definition;
     private final MappedEntitySet<EnchantmentType> exclusiveSet;
-    private final IComponentMap effects;
+    private final StaticComponentMap effects;
 
     public StaticEnchantmentType(
             Component description,
             EnchantmentDefinition definition,
             MappedEntitySet<EnchantmentType> exclusiveSet,
-            IComponentMap effects
+            StaticComponentMap effects
     ) {
         this(null, description, definition, exclusiveSet, effects);
     }
@@ -47,7 +48,7 @@ public class StaticEnchantmentType extends AbstractMappedEntity implements Encha
             Component description,
             EnchantmentDefinition definition,
             MappedEntitySet<EnchantmentType> exclusiveSet,
-            IComponentMap effects
+            StaticComponentMap effects
     ) {
         super(data);
         this.description = description;
@@ -78,7 +79,7 @@ public class StaticEnchantmentType extends AbstractMappedEntity implements Encha
     }
 
     @Override
-    public IComponentMap getEffects() {
+    public StaticComponentMap getEffects() {
         return this.effects;
     }
 }

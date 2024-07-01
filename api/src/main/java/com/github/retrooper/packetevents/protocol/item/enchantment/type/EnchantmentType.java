@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.item.enchantment.type;
 
+import com.github.retrooper.packetevents.protocol.component.EnchantEffectComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.IComponentMap;
 import com.github.retrooper.packetevents.protocol.component.StaticComponentMap;
 import com.github.retrooper.packetevents.protocol.item.enchantment.EnchantmentDefinition;
@@ -42,7 +43,7 @@ public interface EnchantmentType extends MappedEntity, CopyableEntity<Enchantmen
 
     MappedEntitySet<EnchantmentType> getExclusiveSet();
 
-    IComponentMap getEffects();
+    StaticComponentMap getEffects();
 
     static EnchantmentType decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
@@ -51,7 +52,10 @@ public interface EnchantmentType extends MappedEntity, CopyableEntity<Enchantmen
         MappedEntitySet<EnchantmentType> exclusiveSet = Optional.ofNullable(compound.getTagOrNull("exclusive_set"))
                 .map(tag -> MappedEntitySet.decode(tag, version, EnchantmentTypes.getRegistry())) // TODO use user registry
                 .orElseGet(MappedEntitySet::createEmpty);
-        IComponentMap effects = StaticComponentMap.EMPTY;//IComponentMap.decode(compound.getTagOrThrow("effects"), version, ); FIXME (OPTIONAL)
+        StaticComponentMap effects = Optional.ofNullable(compound.getTagOrNull("effects"))
+                .map(tag -> IComponentMap.decode(tag, version,
+                        EnchantEffectComponentTypes.getRegistry()))
+                .orElse(StaticComponentMap.EMPTY);
         return new StaticEnchantmentType(data, description, definition, exclusiveSet, effects);
     }
 
@@ -61,7 +65,9 @@ public interface EnchantmentType extends MappedEntity, CopyableEntity<Enchantmen
         if (!type.getExclusiveSet().isEmpty()) {
             compound.setTag("exclusive_set", MappedEntitySet.encode(type.getExclusiveSet(), version));
         }
-        // compound.setTag("effects", IComponentMap.encode(type.getEffects(), version)); FIXME (OPTIONAL)
+        if (!type.getEffects().isEmpty()) {
+            compound.setTag("effects", IComponentMap.encode(type.getEffects(), version));
+        }
         return compound;
     }
 }
