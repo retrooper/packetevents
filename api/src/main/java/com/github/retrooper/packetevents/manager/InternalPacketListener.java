@@ -106,14 +106,12 @@ public class InternalPacketListener extends PacketListenerAbstract {
                         joinGame.getDimensionCodec());
             }
 
-            // FIXME registries need to be used WHILE decoding this packet
             user.setDimensionType(joinGame.getDimensionType());
         }
 
         // Respawn is used to switch dimensions
         else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
             WrapperPlayServerRespawn packet = new WrapperPlayServerRespawn(event);
-            // FIXME registries need to be used WHILE decoding this packet
             user.setDimensionType(packet.getDimensionType());
         } else if (event.getPacketType() == PacketType.Play.Server.CONFIGURATION_START) {
             user.setEncoderState(ConnectionState.CONFIGURATION);

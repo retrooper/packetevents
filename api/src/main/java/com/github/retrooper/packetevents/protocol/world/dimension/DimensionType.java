@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.protocol.world.dimension;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
@@ -33,8 +32,6 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.OptionalLong;
@@ -91,49 +88,13 @@ public interface DimensionType extends MappedEntity, CopyableEntity<DimensionTyp
 
     int getMonsterSpawnBlockLightLimit();
 
-    // codec related stuff
+    // conversion utilities
 
-    static DimensionType read(PacketWrapper<?> wrapper) {
-        ServerVersion version = wrapper.getServerVersion();
-        if (version.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            return wrapper.readMappedEntity(DimensionTypes.getRegistry());
-        }
-        boolean v1162 = version.isNewerThanOrEquals(ServerVersion.V_1_16_2);
-        if (version.isNewerThanOrEquals(ServerVersion.V_1_19)
-                || (!v1162 && version.isNewerThanOrEquals(ServerVersion.V_1_16))) {
-            return DimensionTypes.getRegistry().getByName(wrapper.readIdentifier());
-        } else if (v1162) {
-            return DimensionType.decode(wrapper.readNBTRaw(), version.toClientVersion(), null);
-        } else {
-            int id = wrapper instanceof WrapperPlayServerJoinGame
-                    && version.isOlderThan(ServerVersion.V_1_9_2)
-                    ? wrapper.readByte() : wrapper.readInt();
-            return DimensionTypes.getRegistry().getById(version.toClientVersion(), id);
-        }
+    default DimensionTypeRef asRef(ClientVersion version) {
+        return new DimensionTypeRef.DirectRef(this, version);
     }
 
-    static void write(PacketWrapper<?> wrapper, DimensionType type) {
-        ServerVersion version = wrapper.getServerVersion();
-        if (version.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            wrapper.writeMappedEntity(type);
-            return;
-        }
-        boolean v1162 = version.isNewerThanOrEquals(ServerVersion.V_1_16_2);
-        if (version.isNewerThanOrEquals(ServerVersion.V_1_19)
-                || (!v1162 && version.isNewerThanOrEquals(ServerVersion.V_1_16))) {
-            wrapper.writeIdentifier(type.getName());
-        } else if (v1162) {
-            wrapper.writeNBTRaw(DimensionType.encode(type, version.toClientVersion()));
-        } else {
-            int id = type.getId(version.toClientVersion());
-            if (wrapper instanceof WrapperPlayServerJoinGame
-                    && version.isOlderThan(ServerVersion.V_1_9_2)) {
-                wrapper.writeByte(id);
-            } else {
-                wrapper.writeInt(id);
-            }
-        }
-    }
+    // nbt decoding/encoding
 
     static DimensionType decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
