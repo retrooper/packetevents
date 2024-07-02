@@ -21,6 +21,7 @@ java {
 
 dependencies {
     compileOnlyApi(libs.bundles.adventure)
+    compileOnlyApi(libs.bundles.adventure.serializers)
     implementation(libs.adventure.api)
     api(project(":patch:adventure-text-serializer-gson", "shadow")) {
         excludeAdventure()

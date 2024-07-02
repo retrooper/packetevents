@@ -22,7 +22,7 @@ import java.nio.file.Path
 interface CompressionStrategy {
 
     companion object {
-        const val COMPRESSION_VERSION: Byte = 1
+        const val COMPRESSION_VERSION: Byte = 2
     }
 
     fun compress(from: Path, to: Path)
