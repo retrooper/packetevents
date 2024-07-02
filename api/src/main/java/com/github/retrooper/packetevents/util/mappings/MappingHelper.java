@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.util.mappings;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter;
 import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
@@ -40,7 +41,7 @@ public class MappingHelper {
         try {
             final DataInputStream dataInput = new DataInputStream(new GZIPInputStream(new BufferedInputStream(
                     PacketEvents.getAPI().getSettings().getResourceProvider().apply( "assets/" + path + ".nbt"))));
-            return (SequentialNBTReader.Compound) new SequentialNBTReader(dataInput).read();
+            return (SequentialNBTReader.Compound) SequentialNBTReader.INSTANCE.deserializeTag(NBTLimiter.noop(), dataInput);
         } catch (IOException e) {
             throw new RuntimeException("Cannot find resource file " + path + ".nbt", e);
         }

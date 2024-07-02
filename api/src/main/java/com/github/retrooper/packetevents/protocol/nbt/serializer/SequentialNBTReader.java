@@ -26,30 +26,29 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.*;
 
-public final class SequentialNBTReader implements Closeable {
+public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream> {
 
-    private static final NBTLimiter DUMMY_LIMITER = NBTLimiter.noop();
+    public static final SequentialNBTReader INSTANCE = new SequentialNBTReader();
+
     private static final Map<NBTType<?>, TagSkip> TAG_SKIPS = new HashMap<>(16, 1);
 
-    private final DataInputStream stream;
+    @Override
+    public NBT deserializeTag(NBTLimiter limiter, DataInputStream from, boolean named) throws IOException {
+        NBTType<?> type = DefaultNBTSerializer.INSTANCE.readTagType(limiter, from);
 
-    public SequentialNBTReader(DataInputStream stream) {
-        this.stream = stream;
-    }
-
-    public NBT read() throws IOException {
-        NBTType<?> type = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, stream);
-        // skip name
-        int len = stream.readUnsignedShort();
-        stream.skipBytes(len);
+        if (named) {
+            // skip name
+            int len = from.readUnsignedShort();
+            from.skipBytes(len);
+        }
 
         NBT nbt;
         if (type == NBTType.COMPOUND) {
-            nbt = new Compound(() -> {});
+            nbt = new Compound(from, limiter, () -> {});
         } else if (type == NBTType.LIST) {
-            nbt = new List(() -> {});
+            nbt = new List(from, limiter, () -> {});
         } else {
-            nbt = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, type);
+            nbt = DefaultNBTSerializer.INSTANCE.readTag(limiter, from, type);
         }
 
         return nbt;
@@ -62,20 +61,20 @@ public final class SequentialNBTReader implements Closeable {
         }
     }
 
-    @Override
-    public void close() throws IOException {
-        stream.close();
-    }
+    public static class Compound extends NBT implements Iterator<Map.Entry<String, NBT>>, Iterable<Map.Entry<String, NBT>>, Skippable, Closeable {
 
-    public class Compound extends NBT implements Iterator<Map.Entry<String, NBT>>, Iterable<Map.Entry<String, NBT>>, Skippable, Closeable {
-
+        private final DataInputStream stream;
+        private final NBTLimiter limiter;
         private final Runnable onComplete;
         private NBTType<?> nextType;
         private NBT lastRead;
         private boolean hasReadType;
 
-        private Compound(Runnable onComplete) {
+        private Compound(DataInputStream stream, NBTLimiter limiter, Runnable onComplete) {
+            this.stream = stream;
+            this.limiter = limiter;
             this.onComplete = onComplete;
+            limiter.increment(48);
             runCompleted();
         }
 
@@ -104,7 +103,7 @@ public final class SequentialNBTReader implements Closeable {
             checkReadable(lastRead);
             if (!hasReadType) {
                 try {
-                    nextType = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, stream);
+                    nextType = DefaultNBTSerializer.INSTANCE.readTagType(limiter, stream);
                     hasReadType = true;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -123,16 +122,17 @@ public final class SequentialNBTReader implements Closeable {
             try {
                 hasReadType = false;
 
-                String name = DefaultNBTSerializer.INSTANCE.readTagName(DUMMY_LIMITER, stream);
+                String name = DefaultNBTSerializer.INSTANCE.readTagName(limiter, stream);
 
                 if (nextType == NBTType.COMPOUND) {
-                    lastRead = new Compound(this::runCompleted);
+                    lastRead = new Compound(stream, limiter, this::runCompleted);
                 } else if (nextType == NBTType.LIST) {
-                    lastRead = new List(this::runCompleted);
+                    lastRead = new List(stream, limiter, this::runCompleted);
                 } else {
-                    lastRead = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, nextType);
+                    lastRead = DefaultNBTSerializer.INSTANCE.readTag(limiter, stream, nextType);
                     runCompleted();
                 }
+                limiter.increment(36);
 
                 return new AbstractMap.SimpleEntry<>(name, lastRead);
             } catch (IOException e) {
@@ -164,9 +164,10 @@ public final class SequentialNBTReader implements Closeable {
                 int len = stream.readUnsignedShort();
                 stream.skipBytes(len);
 
-                TAG_SKIPS.get(nextType).skip(stream);
+                TAG_SKIPS.get(nextType).skip(limiter, stream);
+                limiter.increment(36);
 
-                TAG_SKIPS.get(NBTType.COMPOUND).skip(stream);
+                TAG_SKIPS.get(NBTType.COMPOUND).skip(limiter, stream);
 
                 hasReadType = true;
                 nextType = NBTType.END;
@@ -187,7 +188,8 @@ public final class SequentialNBTReader implements Closeable {
                 int len = stream.readUnsignedShort();
                 stream.skipBytes(len);
 
-                TAG_SKIPS.get(nextType).skip(stream);
+                TAG_SKIPS.get(nextType).skip(limiter, stream);
+                limiter.increment(36);
                 hasReadType = false;
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -209,10 +211,11 @@ public final class SequentialNBTReader implements Closeable {
 
                 // we have read a tag type, so we can start reading the tag
                 do {
-                    String name = DefaultNBTSerializer.INSTANCE.readTagName(DUMMY_LIMITER, stream);
-                    NBT nbt = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, nextType);
+                    String name = DefaultNBTSerializer.INSTANCE.readTagName(limiter, stream);
+                    NBT nbt = DefaultNBTSerializer.INSTANCE.readTag(limiter, stream, nextType);
+                    limiter.increment(36);
                     compound.setTag(name, nbt);
-                } while ((nextType = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, stream)) != NBTType.END);
+                } while ((nextType = DefaultNBTSerializer.INSTANCE.readTagType(limiter, stream)) != NBTType.END);
 
                 hasReadType = true;
                 runCompleted();
@@ -228,18 +231,24 @@ public final class SequentialNBTReader implements Closeable {
         }
     }
 
-    public class List extends NBT implements Iterator<NBT>, Iterable<NBT>, Skippable, Closeable {
+    public static class List extends NBT implements Iterator<NBT>, Iterable<NBT>, Skippable, Closeable {
 
+        private final DataInputStream stream;
+        private final NBTLimiter limiter;
         private final Runnable onComplete;
         private final NBTType<?> listType;
         private NBT lastRead;
         public int remaining;
 
-        private List(Runnable onComplete) {
+        private List(DataInputStream stream, NBTLimiter limiter, Runnable onComplete) {
+            this.stream = stream;
+            this.limiter = limiter;
             this.onComplete = onComplete;
+            limiter.increment(37);
             try {
-                this.listType = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, stream);
+                this.listType = DefaultNBTSerializer.INSTANCE.readTagType(limiter, stream);
                 this.remaining = stream.readInt();
+                limiter.increment(remaining * 4);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -281,11 +290,11 @@ public final class SequentialNBTReader implements Closeable {
             try {
                 remaining--;
                 if (listType == NBTType.COMPOUND) {
-                    lastRead = new Compound(this::runCompleted);
+                    lastRead = new Compound(stream, limiter, this::runCompleted);
                 } else if (listType == NBTType.LIST) {
-                    lastRead = new List(this::runCompleted);
+                    lastRead = new List(stream, limiter, this::runCompleted);
                 } else {
-                    lastRead = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, listType);
+                    lastRead = DefaultNBTSerializer.INSTANCE.readTag(limiter, stream, listType);
                     runCompleted();
                 }
 
@@ -318,7 +327,7 @@ public final class SequentialNBTReader implements Closeable {
             try {
                 TagSkip typeSkip = TAG_SKIPS.get(listType);
                 for (int i = 0; i < remaining; i++) {
-                    typeSkip.skip(stream);
+                    typeSkip.skip(limiter, stream);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -335,7 +344,7 @@ public final class SequentialNBTReader implements Closeable {
             if (!hasNext()) return;
 
             try {
-                TAG_SKIPS.get(listType).skip(stream);
+                TAG_SKIPS.get(listType).skip(limiter, stream);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -355,7 +364,7 @@ public final class SequentialNBTReader implements Closeable {
 
                 NBTList<NBT> list = new NBTList<>((NBTType<NBT>) listType, remaining);
                 for (int i = 0; i < remaining; i++) {
-                    list.addTag(DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, listType));
+                    list.addTag(DefaultNBTSerializer.INSTANCE.readTag(limiter, stream, listType));
                 }
 
                 remaining = 0;
@@ -380,47 +389,84 @@ public final class SequentialNBTReader implements Closeable {
 
     @FunctionalInterface
     private interface TagSkip {
-        void skip(DataInput in) throws IOException;
+        void skip(NBTLimiter limiter, DataInput in) throws IOException;
     }
 
     static {
-        TAG_SKIPS.put(NBTType.BYTE, in -> in.skipBytes(Byte.BYTES));
-        TAG_SKIPS.put(NBTType.SHORT, in -> in.skipBytes(Short.BYTES));
-        TAG_SKIPS.put(NBTType.INT, in -> in.skipBytes(Integer.BYTES));
-        TAG_SKIPS.put(NBTType.LONG, in -> in.skipBytes(Long.BYTES));
-        TAG_SKIPS.put(NBTType.FLOAT, in -> in.skipBytes(Float.BYTES));
-        TAG_SKIPS.put(NBTType.DOUBLE, in -> in.skipBytes(Double.BYTES));
-        TAG_SKIPS.put(NBTType.BYTE_ARRAY, in -> {
+        TAG_SKIPS.put(NBTType.BYTE, (limiter, in) -> {
+            limiter.increment(9);
+            in.skipBytes(Byte.BYTES);
+        });
+        TAG_SKIPS.put(NBTType.SHORT, (limiter, in) -> {
+            limiter.increment(10);
+            in.skipBytes(Short.BYTES);
+        });
+        TAG_SKIPS.put(NBTType.INT, (limiter, in) -> {
+            limiter.increment(12);
+            in.skipBytes(Integer.BYTES);
+        });
+        TAG_SKIPS.put(NBTType.LONG, (limiter, in) -> {
+            limiter.increment(16);
+            in.skipBytes(Long.BYTES);
+        });
+        TAG_SKIPS.put(NBTType.FLOAT, (limiter, in) -> {
+            limiter.increment(12);
+            in.skipBytes(Float.BYTES);
+        });
+        TAG_SKIPS.put(NBTType.DOUBLE, (limiter, in) -> {
+            limiter.increment(16);
+            in.skipBytes(Double.BYTES);
+        });
+        TAG_SKIPS.put(NBTType.BYTE_ARRAY, (limiter, in) -> {
+            limiter.increment(24);
             int length = in.readInt();
+
+            limiter.checkReadability(length);
+            limiter.increment(length);
+
             in.skipBytes(length);
         });
-        TAG_SKIPS.put(NBTType.STRING, in -> {
+        TAG_SKIPS.put(NBTType.STRING, (limiter, in) -> {
+            limiter.increment(36);
             int length = in.readUnsignedShort();
+            limiter.increment(length * 2);
             in.skipBytes(length);
         });
-        TAG_SKIPS.put(NBTType.LIST, in -> {
-            NBTType<?> listType = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, in);
+        TAG_SKIPS.put(NBTType.LIST, (limiter, in) -> {
+            limiter.increment(37);
+            NBTType<?> listType = DefaultNBTSerializer.INSTANCE.readTagType(limiter, in);
             int length = in.readInt();
+            limiter.increment(length * 4);
             for (int i = 0; i < length; i++) {
-                TAG_SKIPS.get(listType).skip(in);
+                TAG_SKIPS.get(listType).skip(limiter, in);
             }
         });
-        TAG_SKIPS.put(NBTType.COMPOUND, in -> {
+        TAG_SKIPS.put(NBTType.COMPOUND, (limiter, in) -> {
+            limiter.increment(48);
             NBTType<?> valueType;
-            while ((valueType = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, in)) != NBTType.END) {
-
+            while ((valueType = DefaultNBTSerializer.INSTANCE.readTagType(limiter, in)) != NBTType.END) {
                 int utfLen = in.readUnsignedShort();
                 in.skipBytes(utfLen);
-
-                TAG_SKIPS.get(valueType).skip(in);
+                limiter.increment(36);
+                TAG_SKIPS.get(valueType).skip(limiter, in);
             }
         });
-        TAG_SKIPS.put(NBTType.INT_ARRAY, in -> {
+        TAG_SKIPS.put(NBTType.INT_ARRAY, (limiter, in) -> {
+            limiter.increment(24);
             int length = in.readInt();
+
+            limiter.checkReadability(length * 4);
+            limiter.increment(length * 4);
+
             in.skipBytes(length * Integer.BYTES);
         });
-        TAG_SKIPS.put(NBTType.LONG_ARRAY, in -> {
+        TAG_SKIPS.put(NBTType.LONG_ARRAY, (limiter, in) -> {
+            limiter.increment(24);
             int length = in.readInt();
+
+            limiter.checkReadability(length * 8);
+            limiter.increment(length * 8);
+
             in.skipBytes(length * Long.BYTES);
         });
     }
