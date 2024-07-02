@@ -310,6 +310,7 @@ public class WrappedBlockState {
 
                         if (type == null) {
                             PacketEvents.getAPI().getLogger().warning("Unknown block type: " + typeString);
+                            element.skip();
                             continue;
                         }
                     }

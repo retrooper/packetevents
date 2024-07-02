@@ -55,7 +55,7 @@ public final class SequentialNBTReader implements Closeable {
         return nbt;
     }
 
-    private static void checkRead(NBT lastRead) {
+    private static void checkReadable(NBT lastRead) {
         if (lastRead == null) return;
         if (lastRead instanceof Iterator && ((Iterator<NBT>) lastRead).hasNext()) {
             throw new IllegalStateException("Previous nbt has not been read completely");
@@ -74,9 +74,9 @@ public final class SequentialNBTReader implements Closeable {
         private NBT lastRead;
         private boolean hasReadType;
 
-
         private Compound(Runnable onComplete) {
             this.onComplete = onComplete;
+            runCompleted();
         }
 
         @Override
@@ -101,7 +101,7 @@ public final class SequentialNBTReader implements Closeable {
 
         @Override
         public boolean hasNext() {
-            checkRead(lastRead);
+            checkReadable(lastRead);
             if (!hasReadType) {
                 try {
                     nextType = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, stream);
@@ -165,9 +165,11 @@ public final class SequentialNBTReader implements Closeable {
                 stream.skipBytes(len);
 
                 TAG_SKIPS.get(nextType).skip(stream);
-                hasReadType = false;
 
                 TAG_SKIPS.get(NBTType.COMPOUND).skip(stream);
+
+                hasReadType = true;
+                nextType = NBTType.END;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -177,7 +179,7 @@ public final class SequentialNBTReader implements Closeable {
 
         @Override
         public void skipOne() {
-            checkRead(lastRead);
+            checkReadable(lastRead);
 
             if (!hasNext()) return;
 
@@ -203,18 +205,14 @@ public final class SequentialNBTReader implements Closeable {
 
                 if (!hasNext()) return new NBTCompound();
 
-                // we have read a tag type
                 NBTCompound compound = new NBTCompound();
-                String name = DefaultNBTSerializer.INSTANCE.readTagName(DUMMY_LIMITER, stream);
-                NBT nbt = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, nextType);
-                compound.setTag(name, nbt);
 
-                // rest tags
-                while ((nextType = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, stream)) != NBTType.END) {
-                    name = DefaultNBTSerializer.INSTANCE.readTagName(DUMMY_LIMITER, stream);
-                    nbt = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, nextType);
+                // we have read a tag type, so we can start reading the tag
+                do {
+                    String name = DefaultNBTSerializer.INSTANCE.readTagName(DUMMY_LIMITER, stream);
+                    NBT nbt = DefaultNBTSerializer.INSTANCE.readTag(DUMMY_LIMITER, stream, nextType);
                     compound.setTag(name, nbt);
-                }
+                } while ((nextType = DefaultNBTSerializer.INSTANCE.readTagType(DUMMY_LIMITER, stream)) != NBTType.END);
 
                 hasReadType = true;
                 runCompleted();
@@ -245,6 +243,7 @@ public final class SequentialNBTReader implements Closeable {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            runCompleted();
         }
 
         @Override
@@ -274,7 +273,7 @@ public final class SequentialNBTReader implements Closeable {
 
         @Override
         public NBT next() {
-            checkRead(lastRead);
+            checkReadable(lastRead);
             if (!hasNext()) {
                 throw new IllegalStateException("No more elements in list");
             }
@@ -331,7 +330,7 @@ public final class SequentialNBTReader implements Closeable {
 
         @Override
         public void skipOne() {
-            checkRead(lastRead);
+            checkReadable(lastRead);
 
             if (!hasNext()) return;
 
