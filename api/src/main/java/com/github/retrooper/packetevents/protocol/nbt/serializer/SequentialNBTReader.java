@@ -30,7 +30,7 @@ public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream
 
     public static final SequentialNBTReader INSTANCE = new SequentialNBTReader();
 
-    private static final Map<NBTType<?>, TagSkip> TAG_SKIPS = new HashMap<>(16, 1);
+    private static final Map<NBTType<?>, TagSkip> TAG_SKIPS = new HashMap<>(16);
 
     @Override
     public NBT deserializeTag(NBTLimiter limiter, DataInputStream from, boolean named) throws IOException {
