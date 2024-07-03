@@ -19,7 +19,7 @@
 package com.github.retrooper.packetevents.protocol.particle.type;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -33,9 +33,9 @@ public interface ParticleType<T extends ParticleData> extends MappedEntity {
 
     void writeData(PacketWrapper<?> wrapper, T data);
 
-    T decodeData(NBT nbt, ClientVersion version);
+    T decodeData(NBTCompound compound, ClientVersion version);
 
-    NBT encodeData(T data, ClientVersion version);
+    void encodeData(T data, ClientVersion version, NBTCompound compound);
 
     @Deprecated
     default Function<PacketWrapper<?>, ParticleData> readDataFunction() {

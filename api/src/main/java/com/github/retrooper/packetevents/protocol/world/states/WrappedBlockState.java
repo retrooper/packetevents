@@ -1,17 +1,49 @@
 package com.github.retrooper.packetevents.protocol.world.states;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
-import com.github.retrooper.packetevents.protocol.world.states.enums.*;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Attachment;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Axis;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Bloom;
+import com.github.retrooper.packetevents.protocol.world.states.enums.East;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Face;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Half;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Hinge;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Instrument;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Leaves;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Mode;
+import com.github.retrooper.packetevents.protocol.world.states.enums.North;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Orientation;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Part;
+import com.github.retrooper.packetevents.protocol.world.states.enums.SculkSensorPhase;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Shape;
+import com.github.retrooper.packetevents.protocol.world.states.enums.South;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Thickness;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Tilt;
+import com.github.retrooper.packetevents.protocol.world.states.enums.TrialSpawnerState;
+import com.github.retrooper.packetevents.protocol.world.states.enums.Type;
+import com.github.retrooper.packetevents.protocol.world.states.enums.VerticalDirection;
+import com.github.retrooper.packetevents.protocol.world.states.enums.West;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateValue;
 import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * This class is designed to take advantage of modern minecraft versions
@@ -88,6 +120,71 @@ public class WrappedBlockState {
         this.type = type;
         this.data = data;
         this.mappingsIndex = mappingsIndex;
+    }
+
+    public static WrappedBlockState decode(NBT nbt, ClientVersion version) {
+        if (nbt instanceof NBTString) {
+            StateType type = StateTypes.getByName(((NBTString) nbt).getValue());
+            return WrappedBlockState.getDefaultState(version, type);
+        }
+
+        NBTCompound compound = (NBTCompound) nbt;
+        String blockName = compound.getStringTagValueOrThrow("Name");
+        StateType block = StateTypes.getByName(blockName);
+        WrappedBlockState state = WrappedBlockState.getDefaultState(version, block);
+
+        if (state != AIR) { // don't modify global air state
+            NBTCompound propsTag = compound.getCompoundTagOrNull("Properties");
+            if (propsTag != null) {
+                for (Map.Entry<String, NBT> entry : propsTag.getTags().entrySet()) {
+                    StateValue stateValue = StateValue.NAME_INDEX.valueOrThrow(entry.getKey());
+                    Object value;
+                    if (stateValue.getDataClass() == boolean.class) {
+                        // special parsing
+                        value = ((NBTByte) entry.getValue()).getAsBool();
+                    } else if (entry.getValue() instanceof NBTNumber) {
+                        Number num = ((NBTNumber) entry.getValue()).getAsNumber();
+                        value = stateValue.parse(num.toString());
+                    } else {
+                        value = stateValue.parse((((NBTString) entry.getValue()).getValue()));
+                    }
+                    // safe to modify, gets cloned (if not air)
+                    state.getInternalData().put(stateValue, value);
+                }
+            }
+        }
+
+        return state;
+    }
+
+    public static NBT encode(WrappedBlockState state, ClientVersion version) {
+        String stateTypeStr = state.type.getMapped().getName().toString();
+        WrappedBlockState defaultState;
+        if (state.getInternalData().isEmpty() || state.equals(defaultState = getDefaultState(version, state.type))) {
+            return new NBTString(stateTypeStr);
+        }
+
+        NBTCompound propsTag = new NBTCompound();
+        for (Map.Entry<StateValue, Object> dataEntry : state.getInternalData().entrySet()) {
+            StateValue stateValue = dataEntry.getKey();
+            if (Objects.equals(defaultState.getInternalData().get(stateValue), dataEntry.getValue())) {
+                continue; // don't encode default property values
+            }
+            NBT valueTag;
+            if (stateValue.getDataClass() == boolean.class) {
+                valueTag = new NBTByte((boolean) dataEntry.getValue());
+            } else if (stateValue.getDataClass() == int.class) {
+                valueTag = new NBTInt((int) dataEntry.getValue());
+            } else {
+                valueTag = new NBTString(dataEntry.getValue().toString());
+            }
+            propsTag.setTag(stateValue.getName(), valueTag);
+        }
+
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("Name", new NBTString(stateTypeStr));
+        compound.setTag("Properties", propsTag);
+        return compound;
     }
 
     @NotNull
@@ -1311,5 +1408,5 @@ public class WrappedBlockState {
         return INTO_STRING.get(mappingsIndex).get(this);
     }
 
-    public static void ensureLoad() {}
+    public static void ensureLoad() { /**/ }
 }

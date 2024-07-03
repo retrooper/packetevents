@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.particle;
 
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
@@ -55,14 +56,18 @@ public class Particle<T extends ParticleData> {
     @SuppressWarnings("unchecked")
     public static Particle<?> decode(NBT nbt, ClientVersion version) {
         NBTCompound compound = (NBTCompound) nbt;
-        ParticleType<?> type = ParticleTypes.getByName(compound.getStringTagValueOrThrow("type"));
-        ParticleData data = type.decodeData(nbt, version);
+        NBT typeTag = compound.getTagOrThrow("type");
+        ParticleType<?> type = typeTag instanceof NBTNumber
+                ? ParticleTypes.getById(version, ((NBTNumber) typeTag).getAsInt())
+                : ParticleTypes.getByName(((NBTString) typeTag).getValue());
+        ParticleData data = type.decodeData(compound, version);
         return new Particle<>((ParticleType<? super ParticleData>) type, data);
     }
 
     public static <T extends ParticleData> NBT encode(Particle<T> particle, ClientVersion version) {
-        NBTCompound compound = (NBTCompound) particle.type.encodeData(particle.getData(), version);
+        NBTCompound compound = new NBTCompound();
         compound.setTag("type", new NBTString(particle.type.getName().toString()));
+        particle.type.encodeData(particle.getData(), version, compound);
         return compound;
     }
 
