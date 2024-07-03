@@ -19,7 +19,9 @@
 package com.github.retrooper.packetevents.protocol.world.biome;
 
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTDouble;
 import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
@@ -88,9 +90,9 @@ public class BiomeEffects {
         Optional<Sound> ambientSound = Optional.ofNullable(compound.getTagOrNull("ambient_sound"))
                 .map(tag -> Sound.decode(tag, version));
         Optional<MoodSettings> moodSound = Optional.ofNullable(compound.getTagOrNull("mood_sound"))
-                .map(tag -> AmbientMoodSettings.decode(tag, version));
+                .map(tag -> MoodSettings.decode(tag, version));
         Optional<AdditionsSettings> additionsSound = Optional.ofNullable(compound.getTagOrNull("additions_sound"))
-                .map(tag -> AmbientMoodSettings.decode(tag, version));
+                .map(tag -> AdditionsSettings.decode(tag, version));
         Optional<MusicSettings> music = Optional.ofNullable(compound.getTagOrNull("music"))
                 .map(tag -> MusicSettings.decode(tag, version));
         return new BiomeEffects(fogColor, waterColor, waterFogColor, skyColor, foliageColor, grassColor,
@@ -209,6 +211,137 @@ public class BiomeEffects {
 
         public float getProbability() {
             return this.probability;
+        }
+    }
+
+    public static final class MoodSettings {
+
+        private final Sound sound;
+        private final int tickDelay;
+        private final int blockSearchExtent;
+        private final double soundOffset;
+
+        public MoodSettings(Sound sound, int tickDelay, int blockSearchExtent, double soundOffset) {
+            this.sound = sound;
+            this.tickDelay = tickDelay;
+            this.blockSearchExtent = blockSearchExtent;
+            this.soundOffset = soundOffset;
+        }
+
+        public static MoodSettings decode(NBT nbt, ClientVersion version) {
+            NBTCompound compound = (NBTCompound) nbt;
+            Sound sound = Sound.decode(compound.getTagOrThrow("sound"), version);
+            int tickDelay = compound.getNumberTagOrThrow("tick_delay").getAsInt();
+            int blockSearchExtent = compound.getNumberTagOrThrow("block_search_extent").getAsInt();
+            double soundOffset = compound.getNumberTagOrThrow("offset").getAsDouble();
+            return new MoodSettings(sound, tickDelay, blockSearchExtent, soundOffset);
+        }
+
+        public static NBT encode(MoodSettings settings, ClientVersion version) {
+            NBTCompound compound = new NBTCompound();
+            compound.setTag("sound", Sound.encode(settings.sound, version));
+            compound.setTag("tick_delay", new NBTInt(settings.tickDelay));
+            compound.setTag("block_search_extent", new NBTInt(settings.blockSearchExtent));
+            compound.setTag("offset", new NBTDouble(settings.soundOffset));
+            return compound;
+        }
+
+        public Sound getSound() {
+            return this.sound;
+        }
+
+        public int getTickDelay() {
+            return this.tickDelay;
+        }
+
+        public int getBlockSearchExtent() {
+            return this.blockSearchExtent;
+        }
+
+        public double getSoundOffset() {
+            return this.soundOffset;
+        }
+    }
+
+    public static final class AdditionsSettings {
+
+        private final Sound sound;
+        private final double tickChance;
+
+        public AdditionsSettings(Sound sound, double tickChance) {
+            this.sound = sound;
+            this.tickChance = tickChance;
+        }
+
+        public static AdditionsSettings decode(NBT nbt, ClientVersion version) {
+            NBTCompound compound = (NBTCompound) nbt;
+            Sound sound = Sound.decode(compound.getTagOrThrow("sound"), version);
+            double tickChance = compound.getNumberTagOrThrow("tick_chance").getAsDouble();
+            return new AdditionsSettings(sound, tickChance);
+        }
+
+        public static NBT encode(AdditionsSettings settings, ClientVersion version) {
+            NBTCompound compound = new NBTCompound();
+            compound.setTag("sound", Sound.encode(settings.sound, version));
+            compound.setTag("tick_chance", new NBTDouble(settings.tickChance));
+            return compound;
+        }
+
+        public Sound getSound() {
+            return this.sound;
+        }
+
+        public double getTickChance() {
+            return this.tickChance;
+        }
+    }
+
+    public static final class MusicSettings {
+
+        private final Sound sound;
+        private final int minDelay;
+        private final int maxDelay;
+        private final boolean replaceMusic;
+
+        public MusicSettings(Sound sound, int minDelay, int maxDelay, boolean replaceMusic) {
+            this.sound = sound;
+            this.minDelay = minDelay;
+            this.maxDelay = maxDelay;
+            this.replaceMusic = replaceMusic;
+        }
+
+        public static MusicSettings decode(NBT nbt, ClientVersion version) {
+            NBTCompound compound = (NBTCompound) nbt;
+            Sound sound = Sound.decode(compound.getTagOrThrow("sound"), version);
+            int minDelay = compound.getNumberTagOrThrow("min_delay").getAsInt();
+            int maxDelay = compound.getNumberTagOrThrow("max_delay").getAsInt();
+            boolean replaceMusic = compound.getBoolean("replace_current_music");
+            return new MusicSettings(sound, minDelay, maxDelay, replaceMusic);
+        }
+
+        public static NBT encode(MusicSettings settings, ClientVersion version) {
+            NBTCompound compound = new NBTCompound();
+            compound.setTag("sound", Sound.encode(settings.sound, version));
+            compound.setTag("min_delay", new NBTInt(settings.minDelay));
+            compound.setTag("max_delay", new NBTInt(settings.maxDelay));
+            compound.setTag("replace_current_music", new NBTByte(settings.replaceMusic));
+            return compound;
+        }
+
+        public Sound getSound() {
+            return this.sound;
+        }
+
+        public int getMinDelay() {
+            return this.minDelay;
+        }
+
+        public int getMaxDelay() {
+            return this.maxDelay;
+        }
+
+        public boolean isReplaceMusic() {
+            return this.replaceMusic;
         }
     }
 }
