@@ -22,10 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
@@ -140,19 +137,23 @@ public class EventManager {
      */
     public void unregisterAllListeners() {
         this.listenersMap.clear();
-        this.listeners = new PacketListenerCommon[0];
+        synchronized (this) {//like booky10 said, the synchronization is necessary here
+            this.listeners = new PacketListenerCommon[0];
+        }
     }
 
     //Needs to be synchronized in order to avoid race conditions (for example where the 'listeners' variable
     //is overridden by its non-up-to-date value, simply because it finished a bit later than the most recent update)
-    private synchronized void recalculateListeners() {
-        List<PacketListenerCommon> list = new ArrayList<>();
-        //adds from LOWEST to MONITOR, so in the correct order
-        for (PacketListenerPriority priority : PacketListenerPriority.values()) {
-            Set<PacketListenerCommon> set = this.listenersMap.get(priority);
-            if (set != null) list.addAll(set);
+    private void recalculateListeners() {
+        synchronized (this) {
+            List<PacketListenerCommon> list = new ArrayList<>();
+            //adds from LOWEST to MONITOR, so in the correct order
+            for (PacketListenerPriority priority : PacketListenerPriority.values()) {
+                Set<PacketListenerCommon> set = this.listenersMap.get(priority);
+                if (set != null) list.addAll(set);
+            }
+            this.listeners = list.toArray(new PacketListenerCommon[0]);
         }
-        this.listeners = list.toArray(new PacketListenerCommon[0]);
     }
 
     //Internal registration methods, specifically separated for lesser overhead when registering an array of Listeners
