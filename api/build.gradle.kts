@@ -83,6 +83,7 @@ mappingCompression {
 
         compress("sound/sound_mappings.json")
 
+        compress("world/biome_mappings.json")
         compress("world/world_position_source_mappings.json")
     }
 
