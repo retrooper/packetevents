@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(net.minecraft.network.Connection.class)
 public class PacketEventsInjectorMixin {
     @Inject(method = "configureSerialization", at = @At("TAIL"))
-    private static void configureSerialization(ChannelPipeline pipeline, PacketFlow flow, BandwidthDebugMonitor bandwithMonitor, CallbackInfo ci) throws Exception {
+    private static void configureSerialization(ChannelPipeline pipeline, PacketFlow flow, boolean memoryOnly, BandwidthDebugMonitor bandwithDebugMonitor, CallbackInfo ci) throws Exception {
         PacketEventsMod.LOGGER.info("Connected!");
         Channel channel = pipeline.channel();
         User user = new User(channel, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
