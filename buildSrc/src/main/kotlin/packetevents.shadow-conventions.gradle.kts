@@ -3,7 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     java
-    com.github.johnrengelman.shadow
+    io.github.goooler.shadow
 }
 
 tasks {
