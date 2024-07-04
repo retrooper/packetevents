@@ -27,6 +27,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 
+/**
+ * Class for event managing. Implements both, internal and API methods.
+ *
+ * @author retrooper
+ * @author ShadowOfHeaven (optimization)
+ *
+ */
+
 public class EventManager {
 
     //Using a ConcurrentHashMap is faster and more secure here, compared to Collections.synchronizedMap(new EnumMap<>(PacketListenerPriority.class))
