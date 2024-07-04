@@ -29,9 +29,6 @@ import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
-import com.github.retrooper.packetevents.protocol.player.storage.FastUserStorage;
-import com.github.retrooper.packetevents.protocol.player.storage.StorageValueId;
-import com.github.retrooper.packetevents.protocol.player.storage.TypedStorageValueId;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -60,7 +57,6 @@ public class User {
     private int totalWorldHeight = 256;
     private List<NBTCompound> worldNBT;
     private Dimension dimension = new Dimension(0);
-    private final FastUserStorage fastUserStorage = new FastUserStorage();
 
     public User(Object channel,
                 ConnectionState connectionState, ClientVersion clientVersion,
@@ -364,53 +360,5 @@ public class User {
     public @Nullable String getWorldName(Dimension dimension) {
         String dimensionName = dimension.getDimensionName();
         return dimensionName.isEmpty() ? this.getWorldName(dimension.getId()) : dimensionName;
-    }
-
-    /**
-     * Stores the given {@param value} with the given {@param identifier}.
-     * This essentially makes this User object associated with the stored value.
-     * Enables a quick look-up of the associated value with the {@code getStored(StorageValueId)}
-     * method.
-     *
-     * @param identifier The plugin's constant identifier created from {@link StorageValueId#identifierFor StorageValueId.identifierFor}
-     *
-     */
-
-    public void storeRuntime(StorageValueId identifier, Object value) {
-        this.fastUserStorage.store(identifier, value);
-    }
-
-    /**
-     * Stores the given {@param value} with the given {@param identifier}.
-     * This essentially makes this User object associated with the stored value.
-     * Enables a quick look-up of the associated value with the {@code getStored(StorageValueId)}
-     * method.
-     *
-     * @param identifier The plugin's constant identifier created from {@link TypedStorageValueId#identifierFor TypedStorageValueId.identifierFor}
-     *
-     */
-
-    public void storeRuntime(TypedStorageValueId<?> identifier, Object value) {
-        this.fastUserStorage.store(identifier, value);
-    }
-
-    /**
-     * Gets the runtime-stored value by the given identifier.
-     *
-     * @param identifier The plugin's constant identifier created from {@link StorageValueId#identifierFor StorageValueId.identifierFor}
-     *
-     */
-    public Object getStored(StorageValueId identifier) {
-        return this.fastUserStorage.get(identifier);
-    }
-
-    /**
-     * Gets the runtime-stored value by the given identifier, and automatically performs type casting.
-     *
-     * @param identifier The plugin's constant identifier created from {@link TypedStorageValueId#identifierFor TypedStorageValueId.identifierFor}
-     *
-     */
-    public <T> T getStored(TypedStorageValueId<T> identifier) {
-        return this.fastUserStorage.get(identifier);
     }
 }
