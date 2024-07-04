@@ -31,4 +31,4 @@ adventure-serializers = [ "adventure-text-serializer-gson", "adventure-text-seri
 [plugins]
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-paper" }
-fabric = { id = "fabric-loom", version = "0.11-SNAPSHOT" }
+fabric-loom = { id = "fabric-loom", version = "1.7.2" }

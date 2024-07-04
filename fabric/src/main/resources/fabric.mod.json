@@ -4,7 +4,7 @@
   "version": "${version}",
   "name": "PacketEvents",
   "description": "",
-  "authors": [],
+  "authors": ["retrooper"],
   "contact": {},
   "license": "GPL-3.0",
   "icon": "assets/packetevents/icon.png",
@@ -22,7 +22,6 @@
   ],
   "depends": {
     "fabricloader": ">=0.15.11",
-    "fabric": "*",
-    "minecraft": "1.20"
+    "fabric-api": "*"
   }
 }

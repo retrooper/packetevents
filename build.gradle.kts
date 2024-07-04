@@ -4,7 +4,7 @@ version = "2.4.1-SNAPSHOT" //TODO UPDATE - ADD "-SNAPSHOT" if we are dealing wit
 
 tasks {
     wrapper {
-        gradleVersion = "8.5"
+        gradleVersion = "8.8"
         distributionType = Wrapper.DistributionType.ALL
     }
 
