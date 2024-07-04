@@ -14,7 +14,8 @@ repositories {
 val includeAll: Configuration by configurations.creating
 
 val minecraft_version: String by project
-val yarn_mappings: String by project
+val parchment_minecraft_version: String by project
+val parchment_mappings: String by project
 val fabric_version: String by project
 val loader_version: String by project
 
@@ -26,9 +27,13 @@ dependencies {
     include(project(":api", "shadow"))
     include(project(":netty-common"))
 
-    // To change the versions see the gradle.properties file
+    // To change the versions, see the gradle.properties file
     minecraft("com.mojang:minecraft:$minecraft_version")
-    mappings("net.fabricmc:yarn:${yarn_mappings}:v2")
+    mappings(loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-$parchment_minecraft_version:$parchment_mappings")
+    })
+
     modImplementation("net.fabricmc:fabric-loader:$loader_version")
 
     // Fabric API. This is technically optional, but you probably want it anyway.
@@ -41,5 +46,9 @@ tasks {
         if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
             options.release = targetJavaVersion
         }
+    }
+
+    remapJar {
+        archiveBaseName.set("${rootProject.name}-fabric")
     }
 }
