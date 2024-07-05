@@ -10,7 +10,7 @@ import com.github.retrooper.packetevents.protocol.world.states.enums.*;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateValue;
-import com.github.retrooper.packetevents.util.HashedByteArray;
+import com.github.retrooper.packetevents.util.BinaryNBTCompound;
 import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,7 +53,7 @@ public class WrappedBlockState {
         // 6160 total combinations, last updated with 1.20.5
         // This brings total memory usage from 62 MB to 34 MB, a 28 MB reduction
         // Using a HashMap reduces memory usage to less than a megabyte, I can't get precise numbers because it is hard to see on a heapdump
-        Map<HashedByteArray, Map.Entry<Map<StateValue, Object>, String>> cache = new HashMap<>(6160, 70);
+        Map<BinaryNBTCompound, Map.Entry<Map<StateValue, Object>, String>> cache = new HashMap<>(6160, 70);
 
         loadLegacy(cache);
         loadModern(cache);
@@ -190,7 +190,7 @@ public class WrappedBlockState {
         return 13;
     }
 
-    private static void loadLegacy(Map<HashedByteArray, Map.Entry<Map<StateValue, Object>, String>> cache) {
+    private static void loadLegacy(Map<BinaryNBTCompound, Map.Entry<Map<StateValue, Object>, String>> cache) {
         Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
         Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
         Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
@@ -217,7 +217,7 @@ public class WrappedBlockState {
                     int combinedID = (id << 4) | data;
 
                     SequentialNBTReader.Compound dataContent = (SequentialNBTReader.Compound) element.getValue();
-                    Map.Entry<Map<StateValue, Object>, String> dataEntry = cache.computeIfAbsent(new HashedByteArray(dataContent.readFullyAsBytes()), (bin) -> {
+                    Map.Entry<Map<StateValue, Object>, String> dataEntry = cache.computeIfAbsent(new BinaryNBTCompound(dataContent.readFullyAsBytes()), (bin) -> {
                         NBTCompound key;
                         try (ByteArrayInputStream stream = new ByteArrayInputStream(bin.getData()); DataInputStream in = new DataInputStream(stream)) {
                             key = (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(NBTLimiter.noop(), in, false);
@@ -291,7 +291,7 @@ public class WrappedBlockState {
         }
     }
 
-    private static void loadModern(Map<HashedByteArray, Map.Entry<Map<StateValue, Object>, String>> cache) {
+    private static void loadModern(Map<BinaryNBTCompound, Map.Entry<Map<StateValue, Object>, String>> cache) {
         try (final SequentialNBTReader.Compound compound = MappingHelper.decompress("mappings/block/modern_block_mappings")) {
             compound.skipOne(); // Skip version
 
@@ -339,7 +339,7 @@ public class WrappedBlockState {
                     int index = 0;
                     for (NBT nbt : ((SequentialNBTReader.List) next.getValue())) {
                         SequentialNBTReader.Compound dataContent = (SequentialNBTReader.Compound) nbt;
-                        Map.Entry<Map<StateValue, Object>, String> dataEntry = cache.computeIfAbsent(new HashedByteArray(dataContent.readFullyAsBytes()), (bin) -> {
+                        Map.Entry<Map<StateValue, Object>, String> dataEntry = cache.computeIfAbsent(new BinaryNBTCompound(dataContent.readFullyAsBytes()), (bin) -> {
                             NBTCompound key;
                             try (ByteArrayInputStream stream = new ByteArrayInputStream(bin.getData()); DataInputStream in = new DataInputStream(stream)) {
                                 key = (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(NBTLimiter.noop(), in, false);
