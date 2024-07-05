@@ -153,7 +153,7 @@ public class CustomPipelineUtil {
         if (BUNGEE_PACKET_DECODE_BYTEBUF == null) {
             try {
                 BUNGEE_PACKET_DECODE_BYTEBUF = decoder.getClass().getDeclaredMethod("decode", ChannelHandlerContext.class,
-                        ByteBuf.class, List.class);
+                        Object.class, List.class);
                 BUNGEE_PACKET_DECODE_BYTEBUF.setAccessible(true);
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
