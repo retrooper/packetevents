@@ -11,8 +11,6 @@ repositories {
     }
 }
 
-val includeAll: Configuration by configurations.creating
-
 val minecraft_version: String by project
 val parchment_minecraft_version: String by project
 val parchment_mappings: String by project
@@ -24,6 +22,7 @@ dependencies {
     api(project(":api", "shadow"))
     api(project(":netty-common"))
 
+    include(libs.bundles.adventure)
     include(project(":api", "shadow"))
     include(project(":netty-common"))
 
