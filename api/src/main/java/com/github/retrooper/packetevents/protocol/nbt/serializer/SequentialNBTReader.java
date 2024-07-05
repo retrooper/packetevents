@@ -20,10 +20,7 @@ package com.github.retrooper.packetevents.protocol.nbt.serializer;
 import com.github.retrooper.packetevents.protocol.nbt.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Closeable;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream> {
@@ -31,6 +28,7 @@ public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream
     public static final SequentialNBTReader INSTANCE = new SequentialNBTReader();
 
     private static final Map<NBTType<?>, TagSkip> TAG_SKIPS = new HashMap<>(16);
+    private static final Map<NBTType<?>, TagBinaryReader> TAG_BINARY_READERS = new HashMap<>(16);
 
     @Override
     public NBT deserializeTag(NBTLimiter limiter, DataInputStream from, boolean named) throws IOException {
@@ -225,6 +223,43 @@ public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream
             }
         }
 
+        public byte[] readFullyAsBytes() {
+            try {
+                // skip last read
+                if (lastRead instanceof Skippable) {
+                    ((Skippable) lastRead).skip();
+                }
+
+                if (!hasNext()) return new byte[] { 10, 0 }; // empty compound
+
+                try (ByteArrayOutputStream bytes = new ByteArrayOutputStream(); DataOutputStream out = new DataOutputStream(bytes)) {
+                    out.write(10); // compound type
+
+                    do {
+                        out.write(DefaultNBTSerializer.INSTANCE.typeToId.get(nextType));
+
+                        // name
+                        byte[] name = TAG_BINARY_READERS.get(NBTType.STRING).read(NBTLimiter.noop(), stream);
+                        limiter.increment(name.length * 2 + 28);
+                        out.write(name);
+
+                        // nbt
+                        byte[] nbt = TAG_BINARY_READERS.get(nextType).read(limiter, stream);
+                        limiter.increment(36);
+
+                        out.write(nbt);
+                    } while ((nextType = DefaultNBTSerializer.INSTANCE.readTagType(limiter, stream)) != NBTType.END);
+
+                    out.write(0);
+                    hasReadType = true;
+                    runCompleted();
+                    return bytes.toByteArray();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         @Override
         public void close() throws IOException {
             stream.close();
@@ -375,6 +410,42 @@ public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream
             }
         }
 
+        public byte[] readFullyAsBinary() {
+            try {
+                // skip last read
+                if (lastRead instanceof Skippable) {
+                    ((Skippable) lastRead).skip();
+                }
+
+                if (!hasNext()) return new byte[] { 9 };
+
+                byte[] array = null;
+                for (int i = 0; i < remaining; i++) {
+                    byte[] element = TAG_BINARY_READERS.get(listType).read(limiter, stream);
+
+                    if (array == null) {
+                        array = new byte[2 + Integer.BYTES + remaining * element.length]; // all the remaining child tags will be of same size
+                        array[0] = 9; // list tag
+                        array[1] = DefaultNBTSerializer.INSTANCE.typeToId.get(listType).byteValue();
+
+                        // write length
+                        array[2] = (byte) (remaining >>> 24);
+                        array[3] = (byte) (remaining >>> 16);
+                        array[4] = (byte) (remaining >>> 8);
+                        array[5] = (byte) remaining;
+                    }
+
+                    System.arraycopy(element, 0, array, 1 + Integer.BYTES + i * element.length, element.length);
+                }
+
+                remaining = 0;
+                runCompleted();
+                return array;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         @Override
         public void close() throws IOException {
             stream.close();
@@ -390,6 +461,11 @@ public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream
     @FunctionalInterface
     private interface TagSkip {
         void skip(NBTLimiter limiter, DataInput in) throws IOException;
+    }
+
+    @FunctionalInterface
+    private interface TagBinaryReader {
+        byte[] read(NBTLimiter limiter, DataInput in) throws IOException;
     }
 
     static {
@@ -469,6 +545,154 @@ public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream
 
             in.skipBytes(length * Long.BYTES);
         });
+
+        TAG_BINARY_READERS.put(NBTType.BYTE, (limiter, in) -> {
+            limiter.increment(9);
+            return new byte[] { in.readByte() };
+        });
+        TAG_BINARY_READERS.put(NBTType.SHORT, (limiter, in) -> {
+            limiter.increment(10);
+            return new byte[] { in.readByte(), in.readByte() };
+        });
+        TAG_BINARY_READERS.put(NBTType.INT, (limiter, in) -> {
+            limiter.increment(12);
+            byte[] bytes = new byte[Integer.BYTES];
+            in.readFully(bytes);
+            return bytes;
+        });
+        TAG_BINARY_READERS.put(NBTType.LONG, (limiter, in) -> {
+            limiter.increment(16);
+            byte[] bytes = new byte[Long.BYTES];
+            in.readFully(bytes);
+            return bytes;
+        });
+        TAG_BINARY_READERS.put(NBTType.FLOAT, (limiter, in) -> {
+            limiter.increment(12);
+            byte[] bytes = new byte[Float.BYTES];
+            in.readFully(bytes);
+            return bytes;
+        });
+        TAG_BINARY_READERS.put(NBTType.DOUBLE, (limiter, in) -> {
+            limiter.increment(16);
+            byte[] bytes = new byte[Double.BYTES];
+            in.readFully(bytes);
+            return bytes;
+        });
+        TAG_BINARY_READERS.put(NBTType.BYTE_ARRAY, (limiter, in) -> {
+            limiter.increment(24);
+            byte[] length = new byte[Integer.BYTES];
+            in.readFully(length);
+            int len = bytesToInt(length);
+
+            if (len >= 1 << 24)
+                throw new IllegalArgumentException("Byte array length is too large: " + len);
+
+            limiter.checkReadability(len);
+            limiter.increment(len);
+
+            byte[] array = new byte[Integer.BYTES + len];
+            System.arraycopy(length, 0, array, 0, Integer.BYTES);
+            in.readFully(array, Integer.BYTES, len);
+            return array;
+        });
+        TAG_BINARY_READERS.put(NBTType.STRING, (limiter, in) -> {
+            limiter.increment(36);
+            byte[] length = new byte[Short.BYTES];
+            in.readFully(length);
+            // read len
+            short signedVal = (short) ((length[0] & 0xFF) << 8 | (length[1] & 0xFF));
+            int len = signedVal >= 0 ? signedVal : 0x10000 + signedVal;
+
+            limiter.increment(len * 2);
+
+            byte[] array = new byte[Short.BYTES + len];
+            System.arraycopy(length, 0, array, 0, Short.BYTES);
+            in.readFully(array, Short.BYTES, len);
+            return array;
+        });
+        TAG_BINARY_READERS.put(NBTType.LIST, (limiter, in) -> {
+            limiter.increment(37);
+            byte type = in.readByte();
+            NBTType<? extends NBT> nbtType = DefaultNBTSerializer.INSTANCE.idToType.get((int) type);
+
+            byte[] length = new byte[Integer.BYTES];
+            in.readFully(length);
+            int len = bytesToInt(length);
+
+            limiter.increment(len * 4);
+
+            byte[] array = null;
+            for (int i = 0; i < len; i++) {
+                byte[] element = TAG_BINARY_READERS.get(nbtType).read(limiter, in);
+
+                if (array == null) {
+                    array = new byte[1 + Integer.BYTES + len * element.length]; // all the remaining child tags will be of same size
+                    array[0] = type;
+                    System.arraycopy(length, 0, array, 1, Integer.BYTES);
+                }
+
+                System.arraycopy(element, 0, array, 1 + Integer.BYTES + i * element.length, element.length);
+            }
+            return array;
+        });
+        TAG_BINARY_READERS.put(NBTType.COMPOUND, (limiter, in) -> {
+            limiter.increment(48);
+            try (ByteArrayOutputStream bytes = new ByteArrayOutputStream(); DataOutputStream out = new DataOutputStream(bytes)) {
+                byte type;
+                while ((type = in.readByte()) != 0) {
+                    out.writeByte(type);
+
+                    // name
+                    byte[] name = TAG_BINARY_READERS.get(NBTType.STRING).read(NBTLimiter.noop(), in);
+                    limiter.increment(name.length * 2 + 28);
+                    out.write(name);
+
+                    // nbt
+                    byte[] nbt = TAG_BINARY_READERS.get(DefaultNBTSerializer.INSTANCE.idToType.get((int) type)).read(limiter, in);
+                    limiter.increment(36);
+
+                    out.write(nbt);
+                }
+
+                out.write(0); // end
+                return bytes.toByteArray();
+            }
+        });
+        TAG_BINARY_READERS.put(NBTType.INT_ARRAY, (limiter, in) -> {
+            limiter.increment(24);
+            byte[] length = new byte[Integer.BYTES];
+            in.readFully(length);
+            int len = bytesToInt(length);
+
+            limiter.checkReadability(len * 4);
+            limiter.increment(len * 4);
+
+            byte[] array = new byte[Integer.BYTES + len * Integer.BYTES];
+            System.arraycopy(length, 0, array, 0, Integer.BYTES);
+            in.readFully(array, Integer.BYTES, len * Integer.BYTES);
+            return array;
+        });
+        TAG_BINARY_READERS.put(NBTType.LONG_ARRAY, (limiter, in) -> {
+            limiter.increment(24);
+            byte[] length = new byte[Integer.BYTES];
+            in.readFully(length);
+            int len = bytesToInt(length);
+
+            limiter.checkReadability(len * 8);
+            limiter.increment(len * 8);
+
+            byte[] array = new byte[Integer.BYTES + len * Long.BYTES];
+            System.arraycopy(length, 0, array, 0, Integer.BYTES);
+            in.readFully(array, Integer.BYTES, len * Long.BYTES);
+            return array;
+        });
+    }
+
+    private static int bytesToInt(byte[] bytes) {
+        return ((bytes[0] & 0xFF) << 24) |
+                ((bytes[1] & 0xFF) << 16) |
+                ((bytes[2] & 0xFF) << 8 ) |
+                ((bytes[3] & 0xFF));
     }
 
 }
