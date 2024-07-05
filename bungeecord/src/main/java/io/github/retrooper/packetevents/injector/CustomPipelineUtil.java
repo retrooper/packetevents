@@ -42,7 +42,7 @@ public class CustomPipelineUtil {
         try {
             DECODE_METHOD = ByteToMessageDecoder.class
                     .getDeclaredMethod("decode", ChannelHandlerContext.class,
-                            ByteBuf.class, List.class);
+                            Object.class, List.class);
             DECODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
