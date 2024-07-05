@@ -28,6 +28,10 @@ public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
         if (!channel.isActive()) return;
         INIT_CHANNEL_METHOD.invoke(oldInitializer, channel);
 
+        //No injection if no minecraft handlers are present
+        if (channel.pipeline().get("packet-decoder") == null) return;
+        if (channel.pipeline().get("packet-encoder") == null) return;
+
         ServerConnectionInitializer.initChannel(channel, ConnectionState.HANDSHAKING);
     }
 }
