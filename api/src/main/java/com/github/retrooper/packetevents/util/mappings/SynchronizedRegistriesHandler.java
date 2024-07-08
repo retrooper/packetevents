@@ -38,6 +38,8 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.world.biome.Biome;
+import com.github.retrooper.packetevents.protocol.world.biome.Biomes;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
 import com.github.retrooper.packetevents.protocol.world.painting.PaintingVariant;
@@ -55,7 +57,7 @@ import java.util.stream.Stream;
 public final class SynchronizedRegistriesHandler {
 
     private static final Map<ResourceLocation, RegistryEntry<?>> REGISTRY_KEYS = Stream.of(
-            // TODO: biome
+            new RegistryEntry<>(Biomes.getRegistry(), Biome::decode),
             new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
             new RegistryEntry<>(TrimPatterns.getRegistry(), TrimPattern::decode),
             new RegistryEntry<>(TrimMaterials.getRegistry(), TrimMaterial::decode),
