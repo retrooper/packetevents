@@ -18,7 +18,6 @@
 
 package com.github.retrooper.packetevents.protocol.item.enchantment.type;
 
-import com.github.retrooper.packetevents.protocol.component.IComponentMap;
 import com.github.retrooper.packetevents.protocol.component.StaticComponentMap;
 import com.github.retrooper.packetevents.protocol.item.enchantment.EnchantmentDefinition;
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;

@@ -48,7 +48,7 @@ public final class DimensionTypes {
         monsterSpawnLightLevel.setTag("min_inclusive", new NBTInt(0));
         monsterSpawnLightLevel.setTag("max_inclusive", new NBTInt(7));
 
-        return new StaticDimensionType(OptionalLong.empty(), true, false,
+        return new StaticDimensionType(data, OptionalLong.empty(), true, false,
                 false, true, 1d, true, false,
                 POST118_MIN_Y, POST118_HEIGHT, POST118_HEIGHT, "#minecraft:infiniburn_overworld",
                 ResourceLocation.minecraft("overworld"), 0f, false,
@@ -76,7 +76,7 @@ public final class DimensionTypes {
         monsterSpawnLightLevel.setTag("min_inclusive", new NBTInt(0));
         monsterSpawnLightLevel.setTag("max_inclusive", new NBTInt(7));
 
-        return new StaticDimensionType(OptionalLong.empty(), true, true,
+        return new StaticDimensionType(data, OptionalLong.empty(), true, true,
                 false, true, 1d, true, false,
                 POST118_MIN_Y, POST118_HEIGHT, POST118_HEIGHT, "#minecraft:infiniburn_overworld",
                 ResourceLocation.minecraft("overworld"), 0f, false,
@@ -104,7 +104,7 @@ public final class DimensionTypes {
         monsterSpawnLightLevel.setTag("min_inclusive", new NBTInt(0));
         monsterSpawnLightLevel.setTag("max_inclusive", new NBTInt(7));
 
-        return new StaticDimensionType(OptionalLong.of(6000L), false, false,
+        return new StaticDimensionType(data, OptionalLong.of(6000L), false, false,
                 false, false, 1d, false, false,
                 0, 256, 256, "#minecraft:infiniburn_end",
                 ResourceLocation.minecraft("the_end"), 0f, false, true,
@@ -112,7 +112,7 @@ public final class DimensionTypes {
     });
 
     public static final DimensionType THE_NETHER = REGISTRY.define("the_nether",
-            data -> new StaticDimensionType(OptionalLong.of(18000L), false,
+            data -> new StaticDimensionType(data, OptionalLong.of(18000L), false,
                     true, true, false, 8d, false,
                     true, 0, 256, 128,
                     "#minecraft:infiniburn_nether", ResourceLocation.minecraft("the_nether"),

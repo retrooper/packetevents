@@ -63,7 +63,7 @@ public final class TrimMaterials {
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
         return REGISTRY.define(key, data ->
-                new StaticTrimMaterial(assetName, ingredient, itemModelIndex, overrideArmorMaterials, description));
+                new StaticTrimMaterial(data, assetName, ingredient, itemModelIndex, overrideArmorMaterials, description));
     }
 
     public static VersionedRegistry<TrimMaterial> getRegistry() {

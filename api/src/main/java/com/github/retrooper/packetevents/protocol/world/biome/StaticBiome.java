@@ -31,6 +31,14 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
     private final BiomeEffects effects;
 
     public StaticBiome(
+            boolean precipitation,
+            float temperature, TemperatureModifier temperatureModifier,
+            float downfall, BiomeEffects effects
+    ) {
+        this(null, precipitation, temperature, temperatureModifier, downfall, effects);
+    }
+
+    public StaticBiome(
             @Nullable TypesBuilderData data, boolean precipitation,
             float temperature, TemperatureModifier temperatureModifier,
             float downfall, BiomeEffects effects

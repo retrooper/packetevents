@@ -26,8 +26,6 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class ParticleBlockStateData extends ParticleData implements LegacyConvertible {
 
-    private static final WrappedBlockState AIR_STATE = WrappedBlockState.getDefaultState(null);
-
     private WrappedBlockState blockState;
 
     public ParticleBlockStateData(WrappedBlockState blockState) {
