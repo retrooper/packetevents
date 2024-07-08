@@ -63,7 +63,10 @@ tasks {
         }
     }
 
-    remapJar {
-        archiveBaseName.set("${rootProject.name}-fabric")
+    sequenceOf(remapJar, remapSourcesJar).forEach {
+        it {
+            archiveBaseName = "${rootProject.name}-fabric"
+            archiveVersion = rootProject.ext["versionNoHash"] as String
+        }
     }
 }

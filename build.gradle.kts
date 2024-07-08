@@ -7,12 +7,12 @@ val snapshot = true
 group = "com.github.retrooper"
 description = rootProject.name
 
-fun getVersionMeta(): String {
+fun getVersionMeta(includeHash: Boolean): String {
     if (!snapshot) {
         return ""
     }
     var commitHash = ""
-    if (file(".git").isDirectory) {
+    if (includeHash && file(".git").isDirectory) {
         val stdout = ByteArrayOutputStream()
         exec {
             commandLine("git", "rev-parse", "--short", "HEAD")
@@ -22,7 +22,8 @@ fun getVersionMeta(): String {
     }
     return "$commitHash-SNAPSHOT"
 }
-version = "$fullVersion${getVersionMeta()}"
+version = "$fullVersion${getVersionMeta(true)}"
+ext["versionNoHash"] = "$fullVersion${getVersionMeta(false)}"
 
 tasks {
     wrapper {
@@ -62,4 +63,10 @@ tasks {
     }
 
     defaultTasks("build")
+}
+
+allprojects {
+    tasks.withType<Jar> {
+        archiveVersion = rootProject.ext["versionNoHash"] as String
+    }
 }
