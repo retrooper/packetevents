@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -33,6 +34,42 @@ public class PEVersion implements Comparable<PEVersion> {
     private final int minor;
     private final int patch;
     private final boolean snapshot;
+    private final @Nullable String snapshotCommit;
+
+    /**
+     * Constructs a {@link PEVersion} instance.
+     *
+     * @param major          the major version number.
+     * @param minor          the minor version number.
+     * @param patch          the patch version number.
+     * @param snapshot       whether the version is a snapshot.
+     * @param snapshotCommit the snapshot commit hash, if available.
+     */
+    public PEVersion(
+            final int major, final int minor, final int patch,
+            final boolean snapshot, final @Nullable String snapshotCommit
+    ) {
+        this.major = major;
+        this.minor = minor;
+        this.patch = patch;
+        this.snapshot = snapshot;
+        this.snapshotCommit = snapshotCommit;
+    }
+
+    /**
+     * Constructs a {@link PEVersion} instance.
+     *
+     * @param major          the major version number.
+     * @param minor          the minor version number.
+     * @param patch          the patch version number.
+     * @param snapshotCommit the snapshot commit hash, if available.
+     */
+    public PEVersion(
+            final int major, final int minor, final int patch,
+            final @Nullable String snapshotCommit
+    ) {
+        this(major, minor, patch, snapshotCommit != null, snapshotCommit);
+    }
 
     /**
      * Constructs a {@link PEVersion} instance.
@@ -43,10 +80,7 @@ public class PEVersion implements Comparable<PEVersion> {
      * @param snapshot whether the version is a snapshot.
      */
     public PEVersion(final int major, final int minor, final int patch, final boolean snapshot) {
-        this.major = major;
-        this.minor = minor;
-        this.patch = patch;
-        this.snapshot = snapshot;
+        this(major, minor, patch, snapshot, null);
     }
 
     /**
@@ -81,16 +115,19 @@ public class PEVersion implements Comparable<PEVersion> {
     @Deprecated
     public PEVersion(@NotNull final String version) {
         String versionWithoutSnapshot = version.replace("-SNAPSHOT", "");
-        String[] parts = versionWithoutSnapshot.split("\\.");
+        String[] largeParts = versionWithoutSnapshot.split("\\+");
+        String[] parts = largeParts.length > 0 ? largeParts[0].split("\\.") : null;
 
-        if (parts.length < 2 || parts.length > 3) {
-            throw new IllegalArgumentException("Version string must be in the format 'major.minor[.patch][-SNAPSHOT]' found '" + version + "' instead.");
+        if (largeParts.length < 1 || largeParts.length > 2
+                || parts.length < 2 || parts.length > 3) {
+            throw new IllegalArgumentException("Version string must be in the format 'major.minor[.patch][+commit][-SNAPSHOT]', found '" + version + "' instead");
         }
 
         this.major = Integer.parseInt(parts[0]);
         this.minor = Integer.parseInt(parts[1]);
         this.patch = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
         this.snapshot = version.contains("-SNAPSHOT");
+        this.snapshotCommit = largeParts.length > 1 ? largeParts[1] : null;
     }
 
     /**
@@ -140,6 +177,17 @@ public class PEVersion implements Comparable<PEVersion> {
     }
 
     /**
+     * Gets the snapshot commit hash. May be of any length.
+     * May always be present or absent, doesn't matter
+     * wether this is a snapshot version or not.
+     *
+     * @return the snapshot commit hash, if available.
+     */
+    public @Nullable String snapshotCommit() {
+        return snapshotCommit;
+    }
+
+    /**
      * Compares this {@link PEVersion} with another {@link PEVersion}.
      *
      * @param other the other {@link PEVersion}.
@@ -175,7 +223,8 @@ public class PEVersion implements Comparable<PEVersion> {
         return this.major == other.major &&
                 this.minor == other.minor &&
                 this.patch == other.patch &&
-                this.snapshot == other.snapshot;
+                this.snapshot == other.snapshot &&
+                Objects.equals(this.snapshotCommit, other.snapshotCommit);
     }
 
     /**
@@ -205,7 +254,7 @@ public class PEVersion implements Comparable<PEVersion> {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(major, minor, patch, snapshot);
+        return Objects.hash(major, minor, patch, snapshot, snapshotCommit);
     }
 
     /**
@@ -215,7 +264,7 @@ public class PEVersion implements Comparable<PEVersion> {
      */
     @Override
     public PEVersion clone() {
-        return new PEVersion(major, minor, patch, snapshot);
+        return new PEVersion(major, minor, patch, snapshot, snapshotCommit);
     }
 
     /**
@@ -225,7 +274,9 @@ public class PEVersion implements Comparable<PEVersion> {
      */
     @Override
     public String toString() {
-        return major + "." + minor + "." + patch + (snapshot ? "-SNAPSHOT" : "");
+        return major + "." + minor + "." + patch
+                + (snapshotCommit != null ? "+" + snapshotCommit : "")
+                + (snapshot ? "-SNAPSHOT" : "");
     }
 
     /**
