@@ -73,10 +73,18 @@ public class ChatTypeDecoration {
     public static ChatTypeDecoration decode(NBT nbt, ClientVersion version) {
         NBTCompound compound = (NBTCompound) nbt;
         String translationKey = compound.getStringTagValueOrThrow("translation_key");
-        List<Parameter> params = new ArrayList<>();
-        NBTList<NBTString> paramsTag = compound.getStringListTagOrThrow("parameters");
-        for (NBTString paramTag : paramsTag.getTags()) {
-            params.add(Parameter.ID_INDEX.valueOrThrow(paramTag.getValue()));
+        NBT paramsTag = compound.getTagOrThrow("parameters");
+        List<Parameter> params;
+        if (paramsTag instanceof NBTList<?>) {
+            params = new ArrayList<>();
+            NBTList<?> paramsTagList = (NBTList<?>) paramsTag;
+            for (NBT paramTag : paramsTagList.getTags()) {
+                String paramId = ((NBTString) paramTag).getValue();
+                params.add(Parameter.ID_INDEX.valueOrThrow(paramId));
+            }
+        } else {
+            String paramId = ((NBTString) paramsTag).getValue();
+            params = Collections.singletonList(Parameter.ID_INDEX.valueOrThrow(paramId));
         }
         NBTCompound styleTag = compound.getCompoundTagOrNull("style");
         Style style = styleTag == null ? empty() :
