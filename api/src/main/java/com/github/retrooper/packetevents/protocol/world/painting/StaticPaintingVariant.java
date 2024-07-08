@@ -18,19 +18,31 @@
 
 package com.github.retrooper.packetevents.protocol.world.painting;
 
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import org.jetbrains.annotations.Nullable;
 
-public class StaticPaintingVariant implements PaintingVariant {
+public class StaticPaintingVariant extends AbstractMappedEntity implements PaintingVariant {
 
     private final int width;
     private final int height;
     private final ResourceLocation assetId;
 
     public StaticPaintingVariant(int width, int height, ResourceLocation assetId) {
+        this(null, width, height, assetId);
+    }
+
+    public StaticPaintingVariant(@Nullable TypesBuilderData data, int width, int height, ResourceLocation assetId) {
+        super(data);
         this.width = width;
         this.height = height;
         this.assetId = assetId;
+    }
+
+    @Override
+    public PaintingVariant copy(@Nullable TypesBuilderData newData) {
+        return new StaticPaintingVariant(newData, this.width, this.height, this.assetId);
     }
 
     @Override
@@ -46,20 +58,5 @@ public class StaticPaintingVariant implements PaintingVariant {
     @Override
     public ResourceLocation getAssetId() {
         return this.assetId;
-    }
-
-    @Override
-    public ResourceLocation getName() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int getId(ClientVersion version) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isRegistered() {
-        return false;
     }
 }

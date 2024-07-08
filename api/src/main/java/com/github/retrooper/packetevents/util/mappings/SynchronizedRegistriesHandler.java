@@ -40,6 +40,8 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
+import com.github.retrooper.packetevents.protocol.world.painting.PaintingVariant;
+import com.github.retrooper.packetevents.protocol.world.painting.PaintingVariants;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData.RegistryElement;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +60,7 @@ public final class SynchronizedRegistriesHandler {
             new RegistryEntry<>(TrimPatterns.getRegistry(), TrimPattern::decode),
             new RegistryEntry<>(TrimMaterials.getRegistry(), TrimMaterial::decode),
             new RegistryEntry<>(WolfVariants.getRegistry(), WolfVariant::decode),
-            // TODO: painting_variant
+            new RegistryEntry<>(PaintingVariants.getRegistry(), PaintingVariant::decode),
             new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType::decode),
             // TODO: damage_type
             new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode),
