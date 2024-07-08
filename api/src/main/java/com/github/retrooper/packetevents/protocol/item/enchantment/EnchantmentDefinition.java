@@ -30,6 +30,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -73,11 +74,22 @@ public final class EnchantmentDefinition {
         EnchantmentCost minCost = EnchantmentCost.decode(compound.getTagOrThrow("min_cost"), version);
         EnchantmentCost maxCost = EnchantmentCost.decode(compound.getTagOrThrow("max_cost"), version);
         int anvilCost = compound.getNumberTagOrThrow("anvil_cost").getAsInt();
-        NBTList<NBTString> slotsTag = compound.getStringListTagOrThrow("slots");
-        List<EquipmentSlotGroup> slots = new ArrayList<>(slotsTag.size());
-        for (NBTString tag : slotsTag.getTags()) {
-            slots.add(EquipmentSlotGroup.ID_INDEX.valueOrThrow(tag.getValue()));
+
+        NBT slotsTag = compound.getTagOrThrow("slots");
+        List<EquipmentSlotGroup> slots;
+        if (slotsTag instanceof NBTList<?>) {
+            NBTList<?> slotsTagList = (NBTList<?>) slotsTag;
+            slots = new ArrayList<>(slotsTagList.size());
+            for (NBT tag : slotsTagList.getTags()) {
+                String slotGroupId = ((NBTString) tag).getValue();
+                slots.add(EquipmentSlotGroup.ID_INDEX.valueOrThrow(slotGroupId));
+            }
+        } else {
+            String slotGroupId = ((NBTString) slotsTag).getValue();
+            EquipmentSlotGroup slotGroup = EquipmentSlotGroup.ID_INDEX.valueOrThrow(slotGroupId);
+            slots = Collections.singletonList(slotGroup);
         }
+
         return new EnchantmentDefinition(supportedItems, primaryItems, weight,
                 maxLevel, minCost, maxCost, anvilCost, slots);
     }
