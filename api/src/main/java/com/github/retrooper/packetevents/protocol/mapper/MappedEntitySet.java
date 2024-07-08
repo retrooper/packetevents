@@ -93,11 +93,7 @@ public class MappedEntitySet<T> {
             NBT nbt, ClientVersion version, IRegistry<Z> registry) {
         if (nbt instanceof NBTString) {
             String tagName = ((NBTString) nbt).getValue();
-            if (tagName.charAt(0) != '#') {
-                throw new IllegalStateException("Illegal tag name encountered: " + tagName
-                        + "; expected to start with \"#\"");
-            }
-            ResourceLocation tagKey = new ResourceLocation(tagName.substring(1));
+            ResourceLocation tagKey = new ResourceLocation(tagName);
             return new MappedEntitySet<>(tagKey);
         }
         NBTList<?> listTag = (NBTList<?>) nbt;
@@ -111,7 +107,7 @@ public class MappedEntitySet<T> {
 
     public static <Z extends MappedEntity> NBT encode(MappedEntitySet<Z> set, ClientVersion version) {
         if (set.tagKey != null) {
-            return new NBTString("#" + set.tagKey);
+            return new NBTString(set.tagKey.toString());
         }
 
         assert set.entities != null; // can't be null, verified in ctor
