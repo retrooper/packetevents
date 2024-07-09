@@ -44,7 +44,7 @@ abstract class PEVersionTask : DefaultTask() {
             public final class PEVersions {
             
                 public static final String RAW = "$version";
-                public static final PEVersion CURRENT = new PEVersion(${ver.major}, ${ver.minor}, ${ver.patch}, "${ver.snapshotCommit}");
+                public static final PEVersion CURRENT = new PEVersion(${ver.major}, ${ver.minor}, ${ver.patch}, ${ver.quotedSnapshotCommit()});
                 public static final PEVersion UNKNOWN = new PEVersion(0, 0, 0);
                 
                 private PEVersions() {
@@ -72,6 +72,13 @@ abstract class PEVersionTask : DefaultTask() {
                     match.groupValues[4].ifEmpty { null }
                 )
             }
+        }
+
+        fun quotedSnapshotCommit(): String {
+            if (snapshotCommit == null) {
+                return "null"
+            }
+            return "\"$snapshotCommit\"";
         }
     }
 
