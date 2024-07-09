@@ -26,7 +26,9 @@ import java.util.Objects;
 /**
  * Represents a PacketEvents version using Semantic Versioning.
  * Supports version comparison, cloning, and provides a string representation.
- * Snapshots will always resolve to a newer version than the non-snapshot version if major, minor, and patch are the same.
+ * Snapshot versioning is also supported.
+ * Generally a snapshot version is published before the release version,
+ * and thus, is considered "older" than the release version.
  */
 public class PEVersion implements Comparable<PEVersion> {
 
@@ -178,8 +180,8 @@ public class PEVersion implements Comparable<PEVersion> {
 
     /**
      * Gets the snapshot commit hash. May be of any length.
-     * May always be present or absent, doesn't matter
-     * wether this is a snapshot version or not.
+     * Availability is not guaranteed.
+     * Additionally, its presence is not contingent on this being a snapshot version.
      *
      * @return the snapshot commit hash, if available.
      */
@@ -191,7 +193,7 @@ public class PEVersion implements Comparable<PEVersion> {
      * Compares this {@link PEVersion} with another {@link PEVersion}.
      *
      * @param other the other {@link PEVersion}.
-     * @return a negative integer, zero, or a positive integer as this version is less than,
+     * @return a negative integer, zero, or a positive integer as this version can be less than,
      * equal to, or greater than the specified version.
      */
     @Override
@@ -281,7 +283,7 @@ public class PEVersion implements Comparable<PEVersion> {
 
     /**
      * Converts the {@link PEVersion} to an array of version numbers.
-     *
+     * @deprecated since {@link PEVersion} instances now always use Semantic Versioning.
      * @return an array of version numbers.
      */
     @Deprecated
