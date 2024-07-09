@@ -180,8 +180,8 @@ public class PEVersion implements Comparable<PEVersion> {
 
     /**
      * Gets the snapshot commit hash. May be of any length.
-     * Availability is not guaranteed.
-     * Additionally, its presence is not contingent on this being a snapshot version.
+     * Availability is not guaranteed since it is contingent on how the program was built.
+     * Generally speaking, the commit hash is only available if the version is a snapshot version.
      *
      * @return the snapshot commit hash, if available.
      */
