@@ -283,7 +283,8 @@ public class PEVersion implements Comparable<PEVersion> {
 
     /**
      * Converts the {@link PEVersion} to an array of version numbers.
-     * @deprecated since {@link PEVersion} instances now always use Semantic Versioning.
+     * @deprecated since {@link PEVersion} instances now always use Semantic Versioning, and thus, returning an "amorphous" array,
+     * with no definitive size, seems redundant.
      * @return an array of version numbers.
      */
     @Deprecated
