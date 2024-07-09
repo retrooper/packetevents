@@ -54,7 +54,7 @@ publishing {
         create<MavenPublication>("shadow") {
             groupId = project.group as String
             artifactId = "packetevents-" + project.name
-            version = project.version as String
+            version = rootProject.ext["versionNoHash"] as String
 
             if (isShadow) {
                 artifact(project.tasks.withType<ShadowJar>().getByName("shadowJar").archiveFile)

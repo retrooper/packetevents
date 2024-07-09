@@ -1,6 +1,29 @@
+import java.io.ByteArrayOutputStream
+
+// TODO UPDATE
+val fullVersion = "2.4.1"
+val snapshot = true
+
 group = "com.github.retrooper"
 description = rootProject.name
-version = "2.4.1-SNAPSHOT" //TODO UPDATE - ADD "-SNAPSHOT" if we are dealing with snapshot versions
+
+fun getVersionMeta(includeHash: Boolean): String {
+    if (!snapshot) {
+        return ""
+    }
+    var commitHash = ""
+    if (includeHash && file(".git").isDirectory) {
+        val stdout = ByteArrayOutputStream()
+        exec {
+            commandLine("git", "rev-parse", "--short", "HEAD")
+            standardOutput = stdout
+        }
+        commitHash = "+${stdout.toString().trim()}"
+    }
+    return "$commitHash-SNAPSHOT"
+}
+version = "$fullVersion${getVersionMeta(true)}"
+ext["versionNoHash"] = "$fullVersion${getVersionMeta(false)}"
 
 tasks {
     wrapper {
@@ -40,4 +63,10 @@ tasks {
     }
 
     defaultTasks("build")
+}
+
+allprojects {
+    tasks.withType<Jar> {
+        archiveVersion = rootProject.ext["versionNoHash"] as String
+    }
 }
