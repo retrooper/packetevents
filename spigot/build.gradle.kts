@@ -40,6 +40,10 @@ tasks {
         "-Dcom.mojang.eula.agree=true"
     )
 
+    withType<Javadoc> {
+        isFailOnError = false // FIXME something with protocolsupport?
+    }
+
     runServer {
         minecraftVersion(version)
         runDirectory = rootDir.resolve("run/paper/$version")

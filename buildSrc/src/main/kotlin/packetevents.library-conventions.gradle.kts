@@ -24,6 +24,7 @@ dependencies {
 
 java {
     withSourcesJar()
+    withJavadocJar()
     disableAutoTargetJvm()
 }
 
