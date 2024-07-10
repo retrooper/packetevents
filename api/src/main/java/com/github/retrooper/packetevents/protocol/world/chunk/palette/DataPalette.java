@@ -187,6 +187,6 @@ public class DataPalette {
     }
 
     private static int index(PaletteType paletteType, int x, int y, int z) {
-        return (y << paletteType.getBitShift() | z) | x << paletteType.getBitShift();
+        return (y << paletteType.getBitShift() | z) << x | paletteType.getBitShift();
     }
 }
