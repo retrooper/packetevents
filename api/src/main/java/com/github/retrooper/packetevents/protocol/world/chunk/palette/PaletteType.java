@@ -19,16 +19,18 @@
 package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 
 public enum PaletteType {
-    BIOME(1, 3, 64),
-    CHUNK(4, 8, 4096);
+    BIOME(1, 3, 2, 64),
+    CHUNK(4, 8, 4, 4096);
 
     private final int minBitsPerEntry;
     private final int maxBitsPerEntry;
+    private final int bitShift;
     private final int storageSize;
 
-    PaletteType(int minBitsPerEntry, int maxBitsPerEntry, int storageSize) {
+    PaletteType(int minBitsPerEntry, int maxBitsPerEntry, int bitShift, int storageSize) {
         this.minBitsPerEntry = minBitsPerEntry;
         this.maxBitsPerEntry = maxBitsPerEntry;
+        this.bitShift = bitShift;
         this.storageSize = storageSize;
     }
 
@@ -38,6 +40,10 @@ public enum PaletteType {
 
     public int getMinBitsPerEntry() {
         return minBitsPerEntry;
+    }
+
+    public int getBitShift() {
+        return bitShift;
     }
 
     public int getStorageSize() {

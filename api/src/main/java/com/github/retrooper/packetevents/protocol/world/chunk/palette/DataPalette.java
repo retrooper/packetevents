@@ -108,7 +108,7 @@ public class DataPalette {
 
     public int get(int x, int y, int z) {
         if (storage != null) {
-            int id = this.storage.get(index(x, y, z));
+            int id = this.storage.get(index(this.paletteType, x, y, z));
             return this.palette.idToState(id);
         } else {
             return this.palette.idToState(0);
@@ -126,7 +126,7 @@ public class DataPalette {
         }
 
         if (this.storage != null) {
-            int index = index(x, y, z);
+            int index = index(this.paletteType, x, y, z);
             int curr = this.storage.get(index);
 
             this.storage.set(index, id);
@@ -186,7 +186,7 @@ public class DataPalette {
         }
     }
 
-    private static int index(int x, int y, int z) {
-        return y << 8 | z << 4 | x;
+    private static int index(PaletteType paletteType, int x, int y, int z) {
+        return (y << paletteType.getBitShift() | z) | x << paletteType.getBitShift();
     }
 }
