@@ -66,7 +66,14 @@ tasks {
 }
 
 allprojects {
-    tasks.withType<Jar> {
-        archiveVersion = rootProject.ext["versionNoHash"] as String
+    tasks {
+        withType<Jar> {
+            archiveVersion = rootProject.ext["versionNoHash"] as String
+        }
+
+        withType<Javadoc> {
+            title = "packetevents-${project.name} v${rootProject.version}"
+            options.encoding = Charsets.UTF_8.name()
+        }
     }
 }

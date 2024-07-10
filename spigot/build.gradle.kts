@@ -41,7 +41,8 @@ tasks {
     )
 
     withType<Javadoc> {
-        isFailOnError = false // FIXME something with protocolsupport?
+        // javadoc generation tries to load some random nms classes and fails
+        exclude("io/github/retrooper/packetevents/util/protocolsupport/**")
     }
 
     runServer {
