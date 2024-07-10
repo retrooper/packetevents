@@ -63,3 +63,26 @@ jobs:
         with:
           name: fabric-build
           path: fabric/build/libs
+
+  javadoc:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+
+    needs:
+      - build
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+
+      - run: |
+          ls | xargs -L 1 | awk '/.+-javadoc\.jar/{print $0}' | awk 'BEGIN{FS=OFS="-"}{NF-=3; print}' | awk '!NF || !seen[$0]++' | awk '{cmd="mkdir "$0" && unzip -d ./"$0"/ "$0"-*-javadoc.jar"; print cmd}' | tr '\n' ';' | sh && rm *'.jar'
+
+      - name: Upload build artifacts pages
+        uses: actions/upload-artifact@v4
+        with:
+          name: pages-build
+          path: ./
