@@ -65,6 +65,8 @@ jobs:
           path: fabric/build/libs
 
   extract-javadoc:
+    if: github.repository == 'retrooper/packetevents' && 'tag' == github.event.ref_type
+
     runs-on: ubuntu-latest
     permissions:
       contents: read
