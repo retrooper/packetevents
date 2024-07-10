@@ -81,6 +81,9 @@ jobs:
         run: |
           ls | xargs -L 1 | awk '/.+-javadoc\.jar/{print $0}' | awk 'BEGIN{FS=OFS="-"}{NF-=3; print}' | awk '!NF || !seen[$0]++' | awk '{cmd="mkdir "$0" && unzip -d ./"$0"/ "$0"-*-javadoc.jar"; print cmd}' | tr '\n' ';' | sh && rm *'.jar'
 
+      - name: Move api javadoc to root directory
+        run: mv api/* ./ && rmdir api
+
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
