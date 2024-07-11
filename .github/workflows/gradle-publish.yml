@@ -8,7 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
 
     steps:
       - uses: actions/checkout@v4
@@ -63,46 +62,3 @@ jobs:
         with:
           name: fabric-build
           path: fabric/build/libs
-
-  extract-javadoc:
-    if: github.repository == 'retrooper/packetevents' && 'tag' == github.event.ref_type
-
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    needs:
-      - build
-
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-
-      - name: Extract Javadoc Jars
-        run: |
-          ls | xargs -L 1 | awk '/.+-javadoc\.jar/{print $0}' | awk 'BEGIN{FS=OFS="-"}{NF-=3; print}' | awk '!NF || !seen[$0]++' | awk '{cmd="mkdir "$0" && unzip -d ./"$0"/ "$0"-*-javadoc.jar"; print cmd}' | tr '\n' ';' | sh && rm *'.jar'
-
-      - name: Move api javadoc to root directory
-        run: mv api/* ./ && rmdir api
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./
-
-  deploy-javadoc:
-    needs: extract-javadoc
-
-    permissions:
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
