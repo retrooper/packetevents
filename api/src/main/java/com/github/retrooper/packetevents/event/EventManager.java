@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
