@@ -2,7 +2,9 @@ package com.github.retrooper.packetevents.protocol.player.storage;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -41,7 +43,7 @@ public final class FastUserStorage {
     //It was found to be slightly faster than VarHandles with excessive amount of calls
     private static final MethodHandle setElement = MethodHandles.arrayElementSetter(Object[].class);//array, index, value
     private static final MethodHandle getElement = MethodHandles.arrayElementGetter(Object[].class);//array, index
-    private static final Map<Object, Integer> pluginToId = new ConcurrentHashMap<>(2);
+    private static final Map<Object, Integer> pluginToId = Collections.synchronizedMap(new WeakHashMap<>());//new MapMaker().weakKeys().makeMap() could be used if PE used Guava
     private static volatile int idCounter;
     private volatile Object[] data;
     private final ReentrantLock lock = new ReentrantLock();
@@ -95,7 +97,7 @@ public final class FastUserStorage {
             }
             return null;
         }
-        if (this.lock.isLocked()) {//await during any array modifications
+        if (this.lock.isLocked()) {//await during any array size modifications
             try {
                 this.condition.await();
             } catch (InterruptedException e) {
