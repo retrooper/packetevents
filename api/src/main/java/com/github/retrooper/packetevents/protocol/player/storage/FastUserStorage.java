@@ -4,7 +4,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Fast User Storage - An API usage class
@@ -43,17 +44,32 @@ public final class FastUserStorage {
     private static final Map<Object, Integer> pluginToId = new ConcurrentHashMap<>(2);
     private static volatile int idCounter;
     private volatile Object[] data;
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition condition = lock.newCondition();
 
     public FastUserStorage() {
         this.data = new Object[idCounter];
     }
 
     public void store(StorageIdBase identifier, Object value) {
-        this.store0(identifier.id(), value);
+        this.store(identifier.id(), value);
+    }
+
+    private void store(int index, Object value) {
+        if (index >= data.length) {
+            this.lock.lock();
+            try {
+                this.regrow();
+                this.store0(index, value);//perform the storage synchronously to ensure no data can be discarded
+            } finally {
+                this.lock.unlock();
+            }
+            return;
+        }
+        this.store0(index, value);
     }
 
     private void store0(int index, Object value) {
-        if (index >= data.length) this.regrow();
         try {
             setElement.invokeExact(this.data, index, value);//must be invoked with an int
         } catch (Throwable e) {
@@ -71,8 +87,20 @@ public final class FastUserStorage {
 
     private Object get0(int index) {
         if (index >= data.length) {
-            this.regrow();
+            this.lock.lock();
+            try {
+                this.regrow();
+            } finally {
+                this.lock.unlock();
+            }
             return null;
+        }
+        if (this.lock.isLocked()) {//await during any array modifications
+            try {
+                this.condition.await();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         try {
             return getElement.invokeExact(this.data, index);//must be invoked with an int
@@ -84,7 +112,7 @@ public final class FastUserStorage {
     //This method is invoked in case of a late initialization of the Identifier by a plugin,
     //where a user joined and the Identifier was only then constructed
     //Normally, this is unlikely to be executed
-    private synchronized void regrow() {
+    private void regrow() {
         Object[] array = new Object[idCounter];
         System.arraycopy(this.data, 0, array, 0, this.data.length);
         this.data = array;

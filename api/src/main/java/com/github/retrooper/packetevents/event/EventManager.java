@@ -20,18 +20,20 @@ package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 
 /**
- * Class for event managing. Implements both, internal and API methods.
+ * Class for event management. Implements both, internal and API methods.
  *
- * @apiNote It is highly recommended to register the event listeners at server start-up,
+ * @apiNote It is highly recommended to register the event listeners during server start-up,
  * without frequent modifications during runtime, since this class needs to recalculate all of
  * its event listeners during any modifications. In other words, it assumes that reads (events fired)
  * greatly outnumber writes (listeners modifications). If your case requires frequent listener modifications,
