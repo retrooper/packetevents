@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -47,11 +46,8 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class User {
     private final Object channel;
@@ -380,7 +376,7 @@ public class User {
      * @param value The value to store.
      */
 
-    public void storeRuntime(StorageValueId identifier, Object value) {
+    public void store(StorageValueId identifier, Object value) {
         this.fastUserStorage.store(identifier, value);
     }
 
@@ -394,7 +390,7 @@ public class User {
      *
      */
 
-    public void storeRuntime(TypedStorageValueId<?> identifier, Object value) {
+    public void store(TypedStorageValueId<?> identifier, Object value) {
         this.fastUserStorage.store(identifier, value);
     }
 
