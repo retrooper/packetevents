@@ -390,7 +390,7 @@ public class User {
      *
      */
 
-    public void store(TypedStorageValueId<?> identifier, Object value) {
+    public <T> void store(TypedStorageValueId<T> identifier, T value) {
         this.fastUserStorage.store(identifier, value);
     }
 

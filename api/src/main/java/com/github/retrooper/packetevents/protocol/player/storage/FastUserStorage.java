@@ -40,7 +40,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class FastUserStorage {
 
     //Ensure the array's element thread visibility by using MethodHandles
-    //It was found to be slightly faster than VarHandles with excessive amount of calls
+    //It was found to be slightly faster than VarHandles with an excessive amount of calls
     private static final MethodHandle setElement = MethodHandles.arrayElementSetter(Object[].class);//array, index, value
     private static final MethodHandle getElement = MethodHandles.arrayElementGetter(Object[].class);//array, index
     private static final Map<Object, Integer> pluginToId = Collections.synchronizedMap(new WeakHashMap<>());//new MapMaker().weakKeys().makeMap() could be used if PE used Guava
