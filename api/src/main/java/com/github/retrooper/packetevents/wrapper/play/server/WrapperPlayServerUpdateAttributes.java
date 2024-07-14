@@ -229,7 +229,8 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
             this.operation = operation;
         }
 
-        private static UUID generateSemiUniqueId(ResourceLocation name) {
+        @ApiStatus.Internal
+        public static UUID generateSemiUniqueId(ResourceLocation name) {
             String extendedName = "packetevents_" + name.toString();
             return UUID.nameUUIDFromBytes(extendedName.getBytes(StandardCharsets.UTF_8));
         }

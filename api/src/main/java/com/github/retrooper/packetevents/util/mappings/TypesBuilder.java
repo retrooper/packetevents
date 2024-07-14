@@ -19,16 +19,16 @@
 package com.github.retrooper.packetevents.util.mappings;
 
 import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.VersionMapper;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class TypesBuilder {
     private final String mapPath;
@@ -47,33 +47,36 @@ public class TypesBuilder {
     }
 
     public void load() {
-        final NBTCompound compound = MappingHelper.decompress("mappings/" + mapPath);
-        final ClientVersion start = ClientVersion.valueOf(compound.getStringTagValueOrThrow("start"));
-        final NBTCompound entries = compound.getCompoundTagOrThrow("entries");
+        try (final SequentialNBTReader.Compound compound = MappingHelper.decompress("mappings/" + mapPath)) {
+            compound.skipOne(); // skip version tag for now
+            int length = ((NBTNumber) compound.next().getValue()).getAsInt(); // Second tag is the length
+            final SequentialNBTReader.Compound entries = (SequentialNBTReader.Compound) compound.next().getValue(); // Third tag are the entries
 
-        final ClientVersion[] versions = new ClientVersion[entries.size()];
-        int index = 0;
-        for (final String name : entries.getTagNames()) {
-            try {
-                versions[index] = ClientVersion.valueOf(name);
-                index++;
+            final ClientVersion[] versions = new ClientVersion[length];
+            final Map.Entry<String, NBT> first = entries.next();
+            if (first.getValue().getType() == NBTType.LIST) {
+                loadAsArray(first, entries, versions);
+            } else {
+                loadAsMap(first, entries, versions);
             }
-            catch(IllegalArgumentException ex) {
-                throw new RuntimeException("Issue found in PacketEvents " + mapPath + " mappings. '" + name + "' is not a unique protocol release version! (It might just be a minecraft release version, not necessarily a unique protocol version)");
-            }
-        }
 
-        this.versionMapper = new VersionMapper(versions);
-
-        if (entries.getTagOrThrow(start.name()).getType().equals(NBTType.LIST)) {
-            loadAsArray(start, entries, versions);
-        } else {
-            loadAsMap(start, entries, versions);
+            versionMapper = new VersionMapper(versions);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to load mapping files.", e);
         }
     }
 
-    private void loadAsArray(final ClientVersion start, final NBTCompound entries, final ClientVersion[] versions) {
-        final List<String> lastEntries = entries.getStringListTagOrThrow(start.name()).getTags().stream().map(NBTString::getValue).collect(Collectors.toList());
+    private void loadAsArray(
+            final Map.Entry<String, NBT> first,
+            final SequentialNBTReader.Compound entries,
+            final ClientVersion[] versions
+    ) {
+        final ClientVersion start = ClientVersion.valueOf(first.getKey());
+        versions[0] = start;
+        final List<String> lastEntries = new ArrayList<>();
+        for (NBT entry : ((SequentialNBTReader.List) first.getValue())) {
+            lastEntries.add(((NBTString) entry).getValue());
+        }
 
         final Consumer<ClientVersion> mapLoader = version -> {
             final Map<String, Integer> map = new HashMap<>();
@@ -84,21 +87,28 @@ public class TypesBuilder {
         };
         mapLoader.accept(start);
 
-        for (int i = 1; i < versions.length; i++) {
-            final ClientVersion version = versions[i];
-            final ListDiff<String>[] diff = MappingHelper.createListDiff(entries.getCompoundTagOrThrow(version.name()));
+        int i = 1;
+        for (Map.Entry<String, NBT> entry : entries) {
+            final ClientVersion version = ClientVersion.valueOf(entry.getKey());
+            versions[i++] = version;
+            final List<ListDiff<String>> diff = MappingHelper.createListDiff((SequentialNBTReader.Compound) entry.getValue());
 
-            for (int j = diff.length - 1; j >= 0; j--) {
-                diff[j].applyTo(lastEntries);
+            for (int j = diff.size() - 1; j >= 0; j--) {
+                diff.get(j).applyTo(lastEntries);
             }
             mapLoader.accept(version);
         }
     }
 
-    private void loadAsMap(final ClientVersion start, final NBTCompound entries, final ClientVersion[] versions) {
-        final Map<String, Integer> lastEntries = entries.getCompoundTagOrThrow(start.name()).getTags().entrySet().stream()
-                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), ((NBTNumber) entry.getValue()).getAsInt()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    private void loadAsMap(
+            final Map.Entry<String, NBT> first,
+            final SequentialNBTReader.Compound entries,
+            final ClientVersion[] versions
+    ) {
+        final ClientVersion start = ClientVersion.valueOf(first.getKey());
+        versions[0] = start;
+        final Map<String, Integer> lastEntries = StreamSupport.stream(((SequentialNBTReader.Compound) first.getValue()).spliterator(), false)
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> ((NBTNumber) entry.getValue()).getAsInt()));
 
         final Consumer<ClientVersion> mapLoader = version -> {
             final Map<String, Integer> map = new HashMap<>(lastEntries);
@@ -106,9 +116,11 @@ public class TypesBuilder {
         };
         mapLoader.accept(start);
 
-        for (int i = 1; i < versions.length; i++) {
-            final ClientVersion version = versions[i];
-            final MapDiff<String, Integer>[] diff = MappingHelper.createDiff(entries.getCompoundTagOrThrow(version.name()));
+        int i = 1;
+        for (Map.Entry<String, NBT> entry : entries) {
+            final ClientVersion version = ClientVersion.valueOf(entry.getKey());
+            versions[i++] = version;
+            final List<MapDiff<String, Integer>> diff = MappingHelper.createDiff((SequentialNBTReader.Compound) entry.getValue());
 
             for (MapDiff<String, Integer> d : diff) {
                 d.applyTo(lastEntries);

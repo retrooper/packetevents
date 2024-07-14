@@ -20,77 +20,84 @@ package com.github.retrooper.packetevents.util.mappings;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
-import com.github.retrooper.packetevents.protocol.nbt.*;
-import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import java.util.zip.GZIPInputStream;
 
 public class MappingHelper {
 
-    public static NBTCompound decompress(final String path) {
-        NBTLimiter limiter = new NBTLimiter();
-        try (final DataInputStream dataInput = new DataInputStream(new GZIPInputStream(new BufferedInputStream(
-                PacketEvents.getAPI().getSettings().getResourceProvider().apply( "assets/" + path + ".nbt"))))) {
-            return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(limiter, dataInput);
-        } catch (Exception e) {
+    public static SequentialNBTReader.Compound decompress(final String path) {
+        try {
+            final DataInputStream dataInput = new DataInputStream(new GZIPInputStream(new BufferedInputStream(
+                    PacketEvents.getAPI().getSettings().getResourceProvider().apply( "assets/" + path + ".nbt"))));
+            return (SequentialNBTReader.Compound) SequentialNBTReader.INSTANCE.deserializeTag(NBTLimiter.noop(), dataInput);
+        } catch (IOException e) {
             throw new RuntimeException("Cannot find resource file " + path + ".nbt", e);
         }
     }
 
-    public static ListDiff<String>[] createListDiff(final NBTCompound compound) {
-        final NBTList<NBTCompound> additions = compound.getCompoundListTagOrThrow("additions");
-        final NBTList<NBTCompound> removals = compound.getCompoundListTagOrThrow("removals");
-        final NBTList<NBTCompound> changes = compound.getCompoundListTagOrThrow("changes");
+    public static List<ListDiff<String>> createListDiff(final SequentialNBTReader.Compound compound) {
+        final List<ListDiff<String>> diffs = new ArrayList<>();
 
-        final ListDiff<String>[] diffs = new ListDiff[additions.size() + removals.size() + changes.size()];
-        int index = 0;
-        for (NBTCompound entry : removals.getTags()) {
-            diffs[index++] = new ListDiff.Removal<>(
-                    entry.getNumberTagOrThrow("pos").getAsInt(),
-                    entry.getNumberTagOrThrow("size").getAsInt()
-            );
+        final SequentialNBTReader.List removals = (SequentialNBTReader.List) compound.next().getValue(); // First tag is the removals
+        for (NBT entry : removals) {
+            final SequentialNBTReader.Compound c = (SequentialNBTReader.Compound) entry;
+            diffs.add(new ListDiff.Removal<>(
+                    ((NBTNumber) c.next().getValue()).getAsInt(), // pos
+                    ((NBTNumber) c.next().getValue()).getAsInt() // size
+            ));
         }
 
-        for (NBTCompound entry : additions.getTags()) {
-            diffs[index++] = new ListDiff.Addition<>(
-                    entry.getNumberTagOrThrow("pos").getAsInt(),
-                    entry.getStringListTagOrThrow("lines").getTags().stream().map(NBTString::getValue).collect(Collectors.toList())
-            );
+        final SequentialNBTReader.List additions = (SequentialNBTReader.List) compound.next().getValue(); // Second tag is the additions
+        for (NBT entry : additions) {
+            final SequentialNBTReader.Compound c = (SequentialNBTReader.Compound) entry;
+            diffs.add(new ListDiff.Addition<>(
+                    ((NBTNumber) c.next().getValue()).getAsInt(), // pos
+                    StreamSupport.stream(((SequentialNBTReader.List) c.next().getValue()).spliterator(), false)
+                            .map(nbt -> ((NBTString) nbt).getValue())
+                            .collect(Collectors.toList()) // lines
+            ));
         }
 
-        for (NBTCompound entry : changes.getTags()) {
-            diffs[index++] = new ListDiff.Changed<>(
-                    entry.getNumberTagOrThrow("pos").getAsInt(),
-                    entry.getNumberTagOrThrow("size").getAsInt(),
-                    entry.getStringListTagOrThrow("lines").getTags().stream().map(NBTString::getValue).collect(Collectors.toList())
-            );
+        final SequentialNBTReader.List changes = (SequentialNBTReader.List) compound.next().getValue(); // Third tag is the changes
+        for (NBT entry : changes) {
+            final SequentialNBTReader.Compound c = (SequentialNBTReader.Compound) entry;
+            diffs.add(new ListDiff.Changed<>(
+                    ((NBTNumber) c.next().getValue()).getAsInt(), // pos
+                    ((NBTNumber) c.next().getValue()).getAsInt(), // size
+                    StreamSupport.stream(((SequentialNBTReader.List) c.next().getValue()).spliterator(), false)
+                            .map(nbt -> ((NBTString) nbt).getValue())
+                            .collect(Collectors.toList()) // lines
+            ));
         }
 
-        Arrays.sort(diffs, Comparator.comparingInt(ListDiff::getIndex));
+        diffs.sort(Comparator.comparingInt(ListDiff::getIndex));
 
         return diffs;
     }
 
-    public static MapDiff<String, Integer>[] createDiff(final NBTCompound compound) {
-        final NBTCompound additions = compound.getCompoundTagOrThrow("additions");
-        final NBTCompound removal = compound.getCompoundTagOrThrow("removals");
+    public static List<MapDiff<String, Integer>> createDiff(final SequentialNBTReader.Compound compound) {
+        final List<MapDiff<String, Integer>> diffs = new ArrayList<>();
 
-        final MapDiff<String, Integer>[] diffs = new MapDiff[additions.size() + removal.size()];
-        int index = 0;
-        for (Map.Entry<String, NBT> entry : removal.getTags().entrySet()) {
-            diffs[index++] = new MapDiff.Removal<>(entry.getKey());
+        final SequentialNBTReader.Compound removal = (SequentialNBTReader.Compound) compound.next().getValue(); // First tag is the removals
+        for (Map.Entry<String, NBT> entry : removal) {
+            diffs.add(new MapDiff.Removal<>(entry.getKey()));
         }
 
-        for (Map.Entry<String, NBT> entry : additions.getTags().entrySet()) {
-            diffs[index++] = new MapDiff.Addition<>(entry.getKey(), ((NBTNumber) entry.getValue()).getAsInt());
+        final SequentialNBTReader.Compound additions = (SequentialNBTReader.Compound) compound.next().getValue(); // Second tag is the additions
+        for (Map.Entry<String, NBT> entry : additions) {
+            diffs.add(new MapDiff.Addition<>(entry.getKey(), ((NBTNumber) entry.getValue()).getAsInt()));
         }
 
         return diffs;

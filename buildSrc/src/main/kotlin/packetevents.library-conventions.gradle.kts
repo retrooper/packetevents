@@ -24,6 +24,7 @@ dependencies {
 
 java {
     withSourcesJar()
+    withJavadocJar()
     disableAutoTargetJvm()
 }
 
@@ -54,7 +55,7 @@ publishing {
         create<MavenPublication>("shadow") {
             groupId = project.group as String
             artifactId = "packetevents-" + project.name
-            version = project.version as String
+            version = rootProject.ext["versionNoHash"] as String
 
             if (isShadow) {
                 artifact(project.tasks.withType<ShadowJar>().getByName("shadowJar").archiveFile)
@@ -77,11 +78,13 @@ publishing {
                             dependencyNode.appendNode("scope", "compile")
                         }
 
+                        // project dependencies are other packetevents subprojects
+                        // which this subproject depends on, so it's fine to assume some stuff here
                         projectDeps.forEach {
                             val dependencyNode = dependenciesNode.appendNode("dependency")
                             dependencyNode.appendNode("groupId", it.group)
                             dependencyNode.appendNode("artifactId", "packetevents-" + it.name)
-                            dependencyNode.appendNode("version", it.version)
+                            dependencyNode.appendNode("version", rootProject.ext["versionNoHash"])
                             dependencyNode.appendNode("scope", "compile")
                         }
                     }
