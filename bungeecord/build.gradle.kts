@@ -3,6 +3,10 @@ plugins {
     packetevents.`library-conventions`
 }
 
+repositories {
+    maven("https://repo.glaremasters.me/repository/public/") // brigadier
+}
+
 dependencies {
     compileOnly(libs.bungeecord)
     shadow(libs.bundles.adventure)
