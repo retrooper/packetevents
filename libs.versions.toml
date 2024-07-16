@@ -3,7 +3,7 @@ adventure = "4.17.0"
 netty = "4.1.72.Final"
 jetbrains-annotations = "24.1.0"
 via-version = "5.0.2-SNAPSHOT"
-protocol-support = "dev_1_20_1-SNAPSHOT"
+protocol-support = "2fa883d6e5"
 paper = "1.21-R0.1-SNAPSHOT"
 bungeecord = "1.21-R0.1-SNAPSHOT"
 velocity = "3.3.0-SNAPSHOT"
@@ -31,4 +31,4 @@ adventure-serializers = [ "adventure-text-serializer-gson", "adventure-text-seri
 [plugins]
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-paper" }
-fabric = { id = "fabric-loom", version = "1.7-SNAPSHOT" }
+fabric = { id = "fabric-loom", version = "0.11-SNAPSHOT" }

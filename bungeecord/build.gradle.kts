@@ -4,7 +4,7 @@ plugins {
 }
 
 repositories {
-    maven("https://repo.glaremasters.me/repository/public/") // brigadier
+    maven("https://repo.glaremasters.me/repository/public/") // brigadier 1.2.9 for BungeeCord 1.21 API
 }
 
 dependencies {

@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    io.github.goooler.shadow
+    com.github.johnrengelman.shadow
 }
 
 group = rootProject.group
