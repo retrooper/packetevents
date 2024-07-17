@@ -144,6 +144,11 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
             }
         }
 
+        holderClass = NMSUtils.getNMClassWithoutException("core.Holder");
+        if (holderClass != null) {
+            hasHolder = Reflection.getField(attributeSnapshotClass, holderClass, 0) != null;
+        }
+
         if (attributeSnapshotConstructor == null) {
             try {
                 attributeSnapshotConstructor = attributeSnapshotClass.getConstructor(attributeBaseClass, double.class, Collection.class);
