@@ -24,6 +24,7 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -40,6 +41,7 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
     private static Class<?> attributeSnapshotClass, attributeBaseClass;
     private static Field iRegistryAttributeBaseField;
     private static Method getiRegistryByMinecraftKeyMethod;
+    private static Method readStringMethod;
 
     private static Class<?> holderClass;
     private static Method accessHolderValueMethod;
@@ -183,8 +185,19 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
             } else {
                 attributeBase = readObject(0, attributeBaseClass);
             }
-            WrappedPacket attributeBaseWrapper = new WrappedPacket(new NMSPacket(attributeBase), attributeBaseClass);
-            return attributeBaseWrapper.readString(0);
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_21)) {
+                if (readStringMethod== null) {
+                    readStringMethod = Reflection.getMethod(attributeBaseClass, String.class, 0);
+                }
+                try {
+                    return (String) readStringMethod.invoke(attributeBase);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                WrappedPacket attributeBaseWrapper = new WrappedPacket(new NMSPacket(attributeBase), attributeBaseClass);
+                return attributeBaseWrapper.readString(0);
+            }
         }
     }
 
