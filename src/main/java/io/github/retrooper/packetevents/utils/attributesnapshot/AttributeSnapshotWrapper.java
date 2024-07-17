@@ -56,15 +56,16 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
 
     public static AttributeSnapshotWrapper create(String key, double value, Collection<AttributeModifierWrapper> modifiers) {
         Object nmsAttributeSnapshot = null;
-        holderClass = NMSUtils.getNMClassWithoutException("core.Holder");
-        if (holderClass != null) {
-            hasHolder = Reflection.getField(PacketTypeClasses.Play.Server.UPDATE_ATTRIBUTES, holderClass, 0) != null;
-        }
         if (attributeSnapshotClass == null) {
             attributeSnapshotClass = NMSUtils.getNMSClassWithoutException("AttributeSnapshot");
             if (attributeSnapshotClass == null) {
                 attributeSnapshotClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.UPDATE_ATTRIBUTES, "AttributeSnapshot");
             }
+        }
+
+        holderClass = NMSUtils.getNMClassWithoutException("core.Holder");
+        if (holderClass != null) {
+            hasHolder = Reflection.getField(attributeSnapshotClass, holderClass, 0) != null;
         }
         if (attributeSnapshotConstructor == null) {
             try {
@@ -169,9 +170,9 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
             return readString(0);
         } else {
             Object attributeBase = null;
-                if (hasHolder) {
-                    Object holder = readObject(0, holderClass);
-                    if (accessHolderValueMethod == null) {
+            if (hasHolder) {
+                Object holder = readObject(0, holderClass);
+                if (accessHolderValueMethod == null) {
                     accessHolderValueMethod = Reflection.getMethod(holderClass, 0);
                 }
                 try {
@@ -179,8 +180,7 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
-            }
-            else {
+            } else {
                 attributeBase = readObject(0, attributeBaseClass);
             }
             WrappedPacket attributeBaseWrapper = new WrappedPacket(new NMSPacket(attributeBase), attributeBaseClass);
