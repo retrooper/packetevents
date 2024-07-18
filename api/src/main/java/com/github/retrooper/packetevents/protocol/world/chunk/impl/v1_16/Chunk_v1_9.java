@@ -20,14 +20,12 @@ package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.DataPalette;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.PaletteType;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
 public class Chunk_v1_9 implements BaseChunk {
     private static final int AIR = 0;
@@ -56,7 +54,8 @@ public class Chunk_v1_9 implements BaseChunk {
         }
 
         if (isSixteen) {
-            dataPalette = DataPalette.read(in, PaletteType.CHUNK);
+            // singleton palette got added with 1.18 which isn't supported by this chunk section implementation
+            dataPalette = DataPalette.read(in, PaletteType.CHUNK, false);
         } else {
             dataPalette = DataPalette.readLegacy(in);
         }

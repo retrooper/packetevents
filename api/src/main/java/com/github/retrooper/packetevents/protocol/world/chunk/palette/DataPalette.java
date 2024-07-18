@@ -55,8 +55,12 @@ public class DataPalette {
     }
 
     public static DataPalette read(NetStreamInput in, PaletteType paletteType) {
+        return read(in, paletteType, true);
+    }
+
+    public static DataPalette read(NetStreamInput in, PaletteType paletteType, boolean allowSingletonPalette) {
         int bitsPerEntry = in.readByte();
-        Palette palette = readPalette(paletteType, bitsPerEntry, in);
+        Palette palette = readPalette(paletteType, bitsPerEntry, in, allowSingletonPalette);
         BitStorage storage;
         if (!(palette instanceof SingletonPalette)) {
             int length = in.readVarInt();
@@ -94,7 +98,7 @@ public class DataPalette {
 
     public static DataPalette readLegacy(NetStreamInput in) {
         int bitsPerEntry = in.readByte() & 0xff;
-        Palette palette = readPalette(PaletteType.CHUNK, bitsPerEntry, in);
+        Palette palette = readPalette(PaletteType.CHUNK, bitsPerEntry, in, false);
         BaseStorage storage;
         if (!(palette instanceof SingletonPalette)) {
             int length = in.readVarInt();
@@ -137,11 +141,16 @@ public class DataPalette {
         }
     }
 
-    private static Palette readPalette(PaletteType paletteType, int bitsPerEntry, NetStreamInput in) {
+    private static Palette readPalette(
+            PaletteType paletteType,
+            int bitsPerEntry,
+            NetStreamInput in,
+            boolean allowSingletonPalette
+    ) {
         if (bitsPerEntry > paletteType.getMaxBitsPerEntry()) {
             return new GlobalPalette();
         }
-        if (bitsPerEntry == 0) {
+        if (bitsPerEntry == 0 && allowSingletonPalette) {
             return new SingletonPalette(in);
         }
         if (bitsPerEntry <= paletteType.getMinBitsPerEntry()) {
