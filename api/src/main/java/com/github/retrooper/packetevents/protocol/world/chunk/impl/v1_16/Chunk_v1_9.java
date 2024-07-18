@@ -116,4 +116,20 @@ public class Chunk_v1_9 implements BaseChunk {
         // 1.14+, we can rely on the value
         return this.blockCount == 0;
     }
+
+    public NibbleArray3d getSkyLight() {
+        return this.skyLight;
+    }
+
+    public void setSkyLight(NibbleArray3d skyLight) {
+        this.skyLight = skyLight;
+    }
+
+    public NibbleArray3d getBlockLight() {
+        return this.blockLight;
+    }
+
+    public void setBlockLight(NibbleArray3d blockLight) {
+        this.blockLight = blockLight;
+    }
 }
