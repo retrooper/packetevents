@@ -23,10 +23,7 @@ import com.github.difflib.patch.ChangeDelta
 import com.github.difflib.patch.DeleteDelta
 import com.github.difflib.patch.InsertDelta
 import com.github.retrooper.compression.asPrimitiveMap
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag
-import com.github.steveice10.opennbt.tag.builtin.IntTag
-import com.github.steveice10.opennbt.tag.builtin.StringTag
-import com.github.steveice10.opennbt.tag.builtin.Tag
+import com.github.steveice10.opennbt.tag.builtin.*
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
@@ -34,9 +31,11 @@ object JsonObjectCompressionStrategy : JsonCompressionStrategy() {
 
     override fun serialize(tag: CompoundTag, json: JsonObject) {
         val entries = separateVersions(json)
+
+        tag.put("length", ByteTag(entries.size.toByte()))
+
         // we will remove the first entry, which is the oldest version
         val oldestVersion = entries.pollFirstEntry()
-        tag.put("start", StringTag(oldestVersion.key.toString()))
 
         val nbtEntries = CompoundTag()
         var ent = oldestVersion.value.asJsonObject.asPrimitiveMap
@@ -80,8 +79,8 @@ object JsonObjectCompressionStrategy : JsonCompressionStrategy() {
                 }
             }
 
-            versionTag.put("additions", additions)
             versionTag.put("removals", removals)
+            versionTag.put("additions", additions)
             nbtEntries.put(key.toString(), versionTag)
 
             ent = map

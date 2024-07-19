@@ -40,6 +40,11 @@ tasks {
         "-Dcom.mojang.eula.agree=true"
     )
 
+    withType<Javadoc> {
+        // javadoc generation tries to load some random nms classes and fails
+        exclude("io/github/retrooper/packetevents/util/protocolsupport/**")
+    }
+
     runServer {
         minecraftVersion(version)
         runDirectory = rootDir.resolve("run/paper/$version")

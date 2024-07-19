@@ -769,9 +769,19 @@ public class Sounds {
     public static final Sound BLOCK_TRIAL_SPAWNER_SPAWN_ITEM = define("block.trial_spawner.spawn_item");
     public static final Sound BLOCK_TRIAL_SPAWNER_SPAWN_ITEM_BEGIN = define("block.trial_spawner.spawn_item_begin");
     public static final Sound BLOCK_TRIAL_SPAWNER_DETECT_PLAYER = define("block.trial_spawner.detect_player");
-    public static final Sound BLOCK_TRIAL_SPAWNER_CHARGE_ACTIVATE = define("block.trial_spawner.charge_activate");
+    public static final Sound BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE = define("block.trial_spawner.ominous_activate");
+    /**
+     * Removed in 1.21
+     */
+    @Deprecated
+    public static final Sound BLOCK_TRIAL_SPAWNER_CHARGE_ACTIVATE = BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE;
     public static final Sound BLOCK_TRIAL_SPAWNER_AMBIENT = define("block.trial_spawner.ambient");
-    public static final Sound BLOCK_TRIAL_SPAWNER_AMBIENT_CHARGED = define("block.trial_spawner.ambient_charged");
+    public static final Sound BLOCK_TRIAL_SPAWNER_AMBIENT_OMINOUS = define("block.trial_spawner.ambient_ominous");
+    /**
+     * Removed in 1.21
+     */
+    @Deprecated
+    public static final Sound BLOCK_TRIAL_SPAWNER_AMBIENT_CHARGED = BLOCK_TRIAL_SPAWNER_AMBIENT_OMINOUS;
     public static final Sound BLOCK_TRIAL_SPAWNER_OPEN_SHUTTER = define("block.trial_spawner.open_shutter");
     public static final Sound BLOCK_TRIAL_SPAWNER_CLOSE_SHUTTER = define("block.trial_spawner.close_shutter");
     public static final Sound BLOCK_TRIAL_SPAWNER_EJECT_ITEM = define("block.trial_spawner.eject_item");
@@ -1693,6 +1703,12 @@ public class Sounds {
     public static final Sound EVENT_MOB_EFFECT_BAD_OMEN = define("event.mob_effect.bad_omen");
     public static final Sound EVENT_MOB_EFFECT_TRIAL_OMEN = define("event.mob_effect.trial_omen");
     public static final Sound EVENT_MOB_EFFECT_RAID_OMEN = define("event.mob_effect.raid_omen");
+
+    // Added with 1.21
+    public static final Sound MUSIC_DISC_CREATOR = define("music_disc.creator");
+    public static final Sound MUSIC_DISC_CREATOR_MUSIC_BOX = define("music_disc.creator_music_box");
+    public static final Sound MUSIC_DISC_PRECIPICE = define("music_disc.precipice");
+    public static final Sound BLOCK_VAULT_REJECT_REWARDED_PLAYER = define("block.vault.reject_rewarded_player");
 
     /**
      * Returns an immutable view of the sounds.

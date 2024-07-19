@@ -8,7 +8,7 @@ plugins {
 
 tasks {
     shadowJar {
-        archiveFileName = "packetevents-${project.name}-${project.version}.jar"
+        archiveFileName = "packetevents-${project.name}-${rootProject.ext["versionNoHash"]}.jar"
         archiveClassifier = null
 
         relocate("net.kyori.adventure.text.serializer", "io.github.retrooper.packetevents.adventure.serializer")
