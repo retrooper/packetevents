@@ -12,6 +12,7 @@ import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,23 +25,8 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
     @Override
     public void onPreLaunch() {
         PacketEvents.setAPI(FabricPacketEventsBuilder.build("packetevents"));
-        PacketEvents.getAPI().getSettings().debug(true);
+        //PacketEvents.getAPI().getSettings().debug(true);
         PacketEvents.getAPI().load();
-        /*PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
-            @Override
-            public void onPacketSend(PacketSendEvent event) {
-                if (event.getPacketType() == PacketType.Play.Server.KEEP_ALIVE) {
-                    WrapperPlayServerKeepAlive kp = new WrapperPlayServerKeepAlive(event);
-                    Minecraft.getInstance().gui.getChat().addMessage(MutableComponent.create(new LiteralContents("keep alive: " +  kp.getId())));
-                    LOGGER.info("debug Keep alive: " + kp.getId());
-                }
-            }
-
-            @Override
-            public void onUserDisconnect(UserDisconnectEvent event) {
-                LOGGER.info("DISCONNECTED PACKETEVENTS");
-            }
-        });*/
     }
 
     @Override

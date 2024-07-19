@@ -21,12 +21,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Arrays;
+
 
 @Mixin(net.minecraft.network.Connection.class)
 public class PacketEventsInjectorMixin {
     @Inject(method = "configureSerialization", at = @At("TAIL"))
     private static void configureSerialization(ChannelPipeline pipeline, PacketFlow flow, boolean memoryOnly, BandwidthDebugMonitor bandwithDebugMonitor, CallbackInfo ci) throws Exception {
-        PacketEventsMod.LOGGER.info("Connected!");
+        PacketEvents.getAPI().getLogManager().debug("Game connected!");
         Channel channel = pipeline.channel();
         User user = new User(channel, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
                 new UserProfile(null, null));
