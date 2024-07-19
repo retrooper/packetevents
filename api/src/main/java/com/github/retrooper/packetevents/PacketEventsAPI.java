@@ -34,22 +34,22 @@ import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 import java.util.logging.Logger;
 
 public abstract class PacketEventsAPI<T> {
-    private static final EventManager EVENT_MANAGER = new EventManager();
-    private static final PacketEventsSettings SETTINGS = new PacketEventsSettings();
-    private static final UpdateChecker UPDATE_CHECKER = new UpdateChecker();
-    private static final LogManager LOG_MANAGER = new LogManager();
+    private final EventManager eventManager = new EventManager();
+    private final PacketEventsSettings settings = new PacketEventsSettings();
+    private final UpdateChecker updateChecker = new UpdateChecker();
+    private final LogManager logManager = new LogManager();
     private static final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
 
     public EventManager getEventManager() {
-        return EVENT_MANAGER;
+        return eventManager;
     }
 
     public PacketEventsSettings getSettings() {
-        return SETTINGS;
+        return settings;
     }
 
     public UpdateChecker getUpdateChecker() {
-        return UPDATE_CHECKER;
+        return updateChecker;
     }
 
     public PEVersion getVersion() {
@@ -62,7 +62,7 @@ public abstract class PacketEventsAPI<T> {
     }
 
     public LogManager getLogManager() {
-        return LOG_MANAGER;
+        return logManager;
     }
 
     public abstract void load();
