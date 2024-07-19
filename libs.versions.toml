@@ -2,7 +2,7 @@
 adventure = "4.17.0"
 netty = "4.1.72.Final"
 jetbrains-annotations = "24.1.0"
-via-version = "5.0.2-SNAPSHOT"
+via-version = "5.0.1"
 protocol-support = "2fa883d6e5"
 paper = "1.21-R0.1-SNAPSHOT"
 bungeecord = "1.21-R0.1-SNAPSHOT"

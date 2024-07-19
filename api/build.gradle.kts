@@ -13,7 +13,11 @@ plugins {
 // papermc repo + disableAutoTargetJvm needed for mockbukkit
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://jitpack.io") // for MockBukkit 1.21 (until it's added to Paper's Maven repo)
+    maven("https://jitpack.io/") {
+        content {
+            includeGroup("com.github.MockBukkit")
+        }
+    }
 }
 
 java {
