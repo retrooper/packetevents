@@ -93,8 +93,8 @@ public class EventManager {
             }
         }
         // For performance reasons, we don't want to re-encode the packet if it's not needed.
-        if (event instanceof ProtocolPacketEvent && !((ProtocolPacketEvent<?>) event).needsReEncode()) {
-            ((ProtocolPacketEvent<?>) event).setLastUsedWrapper(null);
+        if (event instanceof ProtocolPacketEvent && !((ProtocolPacketEvent) event).needsReEncode()) {
+            ((ProtocolPacketEvent) event).setLastUsedWrapper(null);
         }
     }
 

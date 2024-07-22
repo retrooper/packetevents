@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.protocol.player.User;
 
-public class UserLoginEvent extends PacketEvent implements CallableEvent, UserEvent, PlayerEvent<Object> {
+public class UserLoginEvent extends PacketEvent implements CallableEvent, UserEvent, PlayerEvent {
     private final User user;
     private final Object player;
 
@@ -35,8 +35,8 @@ public class UserLoginEvent extends PacketEvent implements CallableEvent, UserEv
     }
 
     @Override
-    public Object getPlayer() {
-        return player;
+    public <T> T getPlayer() {
+        return (T) player;
     }
 
     @Override
