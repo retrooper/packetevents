@@ -346,7 +346,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                 } else {
                     NBTReader child = hoverEvent.child("contents");
                     Key itemId = child.readUTF("id", Key::key);
-                    Integer count = child.readInt("count", Function.identity());
+                    Integer count = child.readNumber("count", Number::intValue);
                     int nonNullCount = count == null ? 1 : count;
 
                     BinaryTagHolder tag = child.readUTF("tag", BinaryTagHolder::binaryTagHolder);
@@ -598,36 +598,24 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             return withTag(key, tag -> function.apply(requireType(tag, NBTType.SHORT).getAsShort()));
         }
 
-        public void useInt(String key, Consumer<Integer> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.INT).getAsInt()));
+        public void useNumber(String key, Consumer<Number> consumer) {
+            useTag(key, tag -> {
+                if (tag instanceof NBTNumber) {
+                    consumer.accept(((NBTNumber) tag).getAsNumber());
+                } else {
+                    throw new IllegalArgumentException("Expected number but got " + tag.getType());
+                }
+            });
         }
 
-        public <R> R readInt(String key, Function<Integer, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.INT).getAsInt()));
-        }
-
-        public void useLong(String key, Consumer<Long> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.LONG).getAsLong()));
-        }
-
-        public <R> R readLong(String key, Function<Long, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.LONG).getAsLong()));
-        }
-
-        public void useFloat(String key, Consumer<Float> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.FLOAT).getAsFloat()));
-        }
-
-        public <R> R readFloat(String key, Function<Float, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.FLOAT).getAsFloat()));
-        }
-
-        public void useDouble(String key, Consumer<Double> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.DOUBLE).getAsDouble()));
-        }
-
-        public <R> R readDouble(String key, Function<Double, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.DOUBLE).getAsDouble()));
+        public <R> R readNumber(String key, Function<Number, R> function) {
+            return withTag(key, tag -> {
+                if (tag instanceof NBTNumber) {
+                    return function.apply(((NBTNumber) tag).getAsNumber());
+                } else {
+                    throw new IllegalArgumentException("Expected number but got " + tag.getType());
+                }
+            });
         }
 
         public void useUTF(String key, Consumer<String> consumer) {
