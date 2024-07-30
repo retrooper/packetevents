@@ -18,72 +18,96 @@
 
 package com.github.retrooper.packetevents.protocol.item.jukebox;
 
-import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
-import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
-import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
-public interface JukeboxSong extends MappedEntity, CopyableEntity<JukeboxSong> {
-    Sound getSound();
+import java.util.Objects;
 
-    void setSound(Sound sound);
+public class JukeboxSong extends AbstractMappedEntity implements JukeboxSongInterface {
+    private Sound sound;
+    private Component description;
+    private float lengthInSeconds;
+    private int comparatorOutput;
 
-    Component getDescription();
-
-    void setDescription(Component description);
-
-    float getLengthInSeconds();
-
-    void setLengthInSeconds(float lengthInSeconds);
-
-    int getComparatorOutput();
-
-    void setComparatorOutput(int comparatorOutput);
-
-    static JukeboxSong decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
-        NBTCompound compound = (NBTCompound) nbt;
-
-        Sound sound = Sound.decode(compound.getCompoundTagOrThrow("sound_event"), version);
-        Component description = AdventureSerializer.fromNbt(compound.getCompoundTagOrThrow("description"));
-        float length = compound.getNumberTagOrThrow("length_in_seconds").getAsFloat();
-        int comparator_output = compound.getNumberTagOrThrow("comparator_output").getAsInt();
-
-        return new StaticJukeboxSong(data, sound, description, length, comparator_output);
+    public JukeboxSong(Sound sound, Component description, float lengthInSeconds, int comparatorOutput) {
+        this(null, sound, description, lengthInSeconds, comparatorOutput);
     }
 
-    static NBT encode(JukeboxSong jukeboxSong, ClientVersion version) {
-        NBTCompound compound = new NBTCompound();
-
-        compound.setTag("sound_event", Sound.encode(jukeboxSong.getSound(), version));
-        compound.setTag("description", AdventureSerializer.toNbt(jukeboxSong.getDescription()));
-        compound.setTag("length_in_seconds", new NBTFloat(jukeboxSong.getLengthInSeconds()));
-        compound.setTag("comparator_output", new NBTInt(jukeboxSong.getComparatorOutput()));
-
-        return compound;
+    public JukeboxSong(@Nullable TypesBuilderData data, Sound sound, Component description, float lengthInSeconds,
+            int comparatorOutput) {
+        super(data);
+        this.sound = sound;
+        this.description = description;
+        this.lengthInSeconds = lengthInSeconds;
+        this.comparatorOutput = comparatorOutput;
     }
 
-    static JukeboxSong read(PacketWrapper<?> wrapper) {
-        Sound sound = Sound.read(wrapper);
-        Component description = wrapper.readComponent();
-        float lengthInSeconds = wrapper.readFloat();
-        int comparatorOutput = wrapper.readVarInt();
-
-        return new StaticJukeboxSong(null, sound, description, lengthInSeconds, comparatorOutput);
+    @Override
+    public JukeboxSongInterface copy(@Nullable TypesBuilderData newData) {
+        return new JukeboxSong(newData, sound, description, lengthInSeconds, comparatorOutput);
     }
 
-    static void write(PacketWrapper<?> wrapper, JukeboxSong song) {
-        Sound.write(wrapper, song.getSound());
-        wrapper.writeComponent(song.getDescription());
-        wrapper.writeFloat(song.getLengthInSeconds());
-        wrapper.writeVarInt(song.getComparatorOutput());
+    @Override
+    public Sound getSound() {
+        return this.sound;
+    }
+
+    @Override
+    public void setSound(Sound sound) {
+        this.sound = sound;
+    }
+
+    @Override
+    public Component getDescription() {
+        return this.description;
+    }
+
+    @Override
+    public void setDescription(Component description) {
+        this.description = description;
+    }
+
+    @Override
+    public float getLengthInSeconds() {
+        return this.lengthInSeconds;
+    }
+
+    @Override
+    public void setLengthInSeconds(float lengthInSeconds) {
+        this.lengthInSeconds = lengthInSeconds;
+    }
+
+    @Override
+    public int getComparatorOutput() {
+        return this.comparatorOutput;
+    }
+
+    @Override
+    public void setComparatorOutput(int comparatorOutput) {
+        this.comparatorOutput = comparatorOutput;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        if (!super.equals(object)) {
+            return false;
+        }
+        JukeboxSong that = (JukeboxSong) object;
+        return Float.compare(lengthInSeconds, that.lengthInSeconds) == 0 && comparatorOutput == that.comparatorOutput &&
+                Objects.equals(sound, that.sound) && Objects.equals(description, that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), sound, description, lengthInSeconds, comparatorOutput);
     }
 }

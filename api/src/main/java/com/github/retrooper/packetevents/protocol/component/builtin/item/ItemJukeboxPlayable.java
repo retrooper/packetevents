@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
-import com.github.retrooper.packetevents.protocol.item.jukebox.JukeboxSong;
+import com.github.retrooper.packetevents.protocol.item.jukebox.JukeboxSongInterface;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -27,12 +27,12 @@ import java.util.Objects;
 
 public class ItemJukeboxPlayable {
 
-    private @Nullable JukeboxSong song;
+    private @Nullable JukeboxSongInterface song;
     private @Nullable ResourceLocation songKey;
     private boolean showInTooltip;
 
     public ItemJukeboxPlayable(
-            @Nullable JukeboxSong song,
+            @Nullable JukeboxSongInterface song,
             @Nullable ResourceLocation songKey,
             boolean showInTooltip
     ) {
@@ -47,10 +47,10 @@ public class ItemJukeboxPlayable {
     }
 
     public static ItemJukeboxPlayable read(PacketWrapper<?> wrapper) {
-        JukeboxSong song;
+        JukeboxSongInterface song;
         ResourceLocation songKey;
         if (wrapper.readBoolean()) {
-            song = JukeboxSong.read(wrapper);
+            song = JukeboxSongInterface.read(wrapper);
             songKey = null;
         } else {
             song = null;
@@ -63,7 +63,7 @@ public class ItemJukeboxPlayable {
     public static void write(PacketWrapper<?> wrapper, ItemJukeboxPlayable jukeboxPlayable) {
         if (jukeboxPlayable.song != null) {
             wrapper.writeBoolean(true);
-            JukeboxSong.write(wrapper, jukeboxPlayable.song);
+            JukeboxSongInterface.write(wrapper, jukeboxPlayable.song);
         } else {
             assert jukeboxPlayable.songKey != null;
             wrapper.writeBoolean(false);
@@ -72,11 +72,11 @@ public class ItemJukeboxPlayable {
         wrapper.writeBoolean(jukeboxPlayable.showInTooltip);
     }
 
-    public @Nullable JukeboxSong getSong() {
+    public @Nullable JukeboxSongInterface getSong() {
         return this.song;
     }
 
-    public void setSong(JukeboxSong song) {
+    public void setSong(JukeboxSongInterface song) {
         this.song = song;
         this.songKey = null;
     }
