@@ -27,6 +27,8 @@ import com.github.retrooper.packetevents.protocol.item.banner.BannerPattern;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
+import com.github.retrooper.packetevents.protocol.item.jukebox.JukeboxSong;
+import com.github.retrooper.packetevents.protocol.item.jukebox.JukeboxSongs;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterial;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterials;
 import com.github.retrooper.packetevents.protocol.item.trimpattern.TrimPattern;
@@ -40,6 +42,8 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.biome.Biome;
 import com.github.retrooper.packetevents.protocol.world.biome.Biomes;
+import com.github.retrooper.packetevents.protocol.world.damagetype.DamageType;
+import com.github.retrooper.packetevents.protocol.world.damagetype.DamageTypes;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
 import com.github.retrooper.packetevents.protocol.world.painting.PaintingVariant;
@@ -64,10 +68,10 @@ public final class SynchronizedRegistriesHandler {
             new RegistryEntry<>(WolfVariants.getRegistry(), WolfVariant::decode),
             new RegistryEntry<>(PaintingVariants.getRegistry(), PaintingVariant::decode),
             new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType::decode),
-            // TODO: damage_type
+            new RegistryEntry<>(DamageTypes.getRegistry(), DamageType::decode),
             new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode),
-            new RegistryEntry<>(EnchantmentTypes.getRegistry(), EnchantmentType::decode)
-            // TODO: jukebox_song
+            new RegistryEntry<>(EnchantmentTypes.getRegistry(), EnchantmentType::decode),
+            new RegistryEntry<>(JukeboxSongs.getRegistry(), JukeboxSong::decode)
     ).collect(Collectors.toMap(RegistryEntry::getRegistryKey, Function.identity()));
 
     private SynchronizedRegistriesHandler() {

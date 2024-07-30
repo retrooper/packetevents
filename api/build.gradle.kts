@@ -64,6 +64,8 @@ mappingCompression {
 
         compress("command/argument_parser_mappings.json")
 
+        compress("damage/damagetype_mappings.json")
+
         compress("enchantment/effect_component_type.json")
 
         compress("entity/entity_data_type_mappings.json")
@@ -74,6 +76,7 @@ mappingCompression {
         compress("item/item_banner_pattern_mappings.json")
         compress("item/item_component_mappings.json")
         compress("item/item_instrument_mappings.json")
+        compress("item/item_jukebox_song_mappings.json")
         compress("item/item_map_decoration_type_mappings.json")
         compress("item/item_potion_mappings.json")
         compress("item/item_trim_material_mappings.json")

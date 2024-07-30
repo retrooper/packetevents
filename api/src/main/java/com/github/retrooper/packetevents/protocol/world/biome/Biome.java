@@ -20,14 +20,12 @@ package com.github.retrooper.packetevents.protocol.world.biome;
 
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import net.kyori.adventure.util.Codec;
 import net.kyori.adventure.util.Index;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -35,6 +33,9 @@ import java.util.Optional;
 public interface Biome extends MappedEntity, CopyableEntity<Biome> {
 
     boolean hasPrecipitation();
+
+    @Deprecated
+    Precipitation getPrecipitation();
 
     float getTemperature();
 
@@ -46,7 +47,6 @@ public interface Biome extends MappedEntity, CopyableEntity<Biome> {
 
     static Biome decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
-        boolean precipitation = compound.getBoolean("has_precipitation");
         float temperature = compound.getNumberTagOrThrow("temperature").getAsFloat();
         TemperatureModifier temperatureModifier =
                 Optional.ofNullable(compound.getStringTagValueOrNull("temperature_modifier"))
@@ -54,12 +54,26 @@ public interface Biome extends MappedEntity, CopyableEntity<Biome> {
                         .orElse(TemperatureModifier.NONE);
         float downfall = compound.getNumberTagOrThrow("downfall").getAsFloat();
         BiomeEffects effects = BiomeEffects.decode(compound.getTagOrThrow("effects"), version);
-        return new StaticBiome(data, precipitation, temperature, temperatureModifier, downfall, effects);
+
+
+        if (version.isNewerThan(ClientVersion.V_1_19_3)) {
+            boolean hasPrecipitation = compound.getBoolean("has_precipitation");
+
+            return new StaticBiome(data, hasPrecipitation, temperature, temperatureModifier, downfall, effects);
+        } else {
+            Precipitation precipitation = Precipitation.ID_INDEX.valueOrThrow(compound.getStringTagValueOrThrow("precipitation"));
+
+            return new StaticBiome(data, precipitation, temperature, temperatureModifier, downfall, effects);
+        }
     }
 
     static NBT encode(Biome biome, ClientVersion version) {
         NBTCompound compound = new NBTCompound();
-        compound.setTag("has_precipitation", new NBTByte(biome.hasPrecipitation()));
+        if (version.isNewerThan(ClientVersion.V_1_19_3)) {
+            compound.setTag("has_precipitation", new NBTByte(biome.hasPrecipitation()));
+        } else {
+            compound.setTag("precipitation", new NBTString(biome.getPrecipitation().getId()));
+        }
         compound.setTag("temperature", new NBTFloat(biome.getTemperature()));
         if (biome.getTemperatureModifier() != TemperatureModifier.NONE) {
             compound.setTag("temperature_modifier", new NBTString(biome.getTemperatureModifier().getId()));
@@ -67,6 +81,25 @@ public interface Biome extends MappedEntity, CopyableEntity<Biome> {
         compound.setTag("downfall", new NBTFloat(biome.getDownfall()));
         compound.setTag("effects", BiomeEffects.encode(biome.getEffects(), version));
         return compound;
+    }
+
+    @Deprecated
+    enum Precipitation {
+        NONE("none"),
+        RAIN("rain"),
+        SNOW("snow");
+
+        public static final Index<String, Precipitation> ID_INDEX = Index.create(Precipitation.class,
+                Precipitation::getId);
+        private final String id;
+
+        Precipitation(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return this.id;
+        }
     }
 
     enum TemperatureModifier {
