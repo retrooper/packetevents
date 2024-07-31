@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class JukeboxSong extends AbstractMappedEntity implements JukeboxSongInterface {
+public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
     private Sound sound;
     private Component description;
     private float lengthInSeconds;
@@ -46,7 +46,7 @@ public class JukeboxSong extends AbstractMappedEntity implements JukeboxSongInte
     }
 
     @Override
-    public JukeboxSongInterface copy(@Nullable TypesBuilderData newData) {
+    public IJukeboxSong copy(@Nullable TypesBuilderData newData) {
         return new JukeboxSong(newData, sound, description, lengthInSeconds, comparatorOutput);
     }
 

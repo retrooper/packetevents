@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 public class JukeboxSongs {
-    private static final VersionedRegistry<JukeboxSongInterface> REGISTRY = new VersionedRegistry<>("jukebox_song",
+    private static final VersionedRegistry<IJukeboxSong> REGISTRY = new VersionedRegistry<>("jukebox_song",
             "item/item_jukebox_song_mappings");
 
     private JukeboxSongs() {
@@ -42,43 +42,43 @@ public class JukeboxSongs {
     }
 
     @ApiStatus.Internal
-    public static JukeboxSongInterface define(String key, Sound sound, float lengthInSeconds, int comparatorOutput) {
+    public static IJukeboxSong define(String key, Sound sound, float lengthInSeconds, int comparatorOutput) {
         return REGISTRY.define(key, data -> new JukeboxSong(data, sound,
                 Component.translatable(makeDescriptionId("jukebox_song", data.getName())), lengthInSeconds,
                 comparatorOutput));
     }
 
-    public static VersionedRegistry<JukeboxSongInterface> getRegistry() {
+    public static VersionedRegistry<IJukeboxSong> getRegistry() {
         return REGISTRY;
     }
 
-    public static JukeboxSongInterface getByName(String name) {
+    public static IJukeboxSong getByName(String name) {
         return REGISTRY.getByName(name);
     }
 
-    public static JukeboxSongInterface getById(ClientVersion version, int id) {
+    public static IJukeboxSong getById(ClientVersion version, int id) {
         return REGISTRY.getById(version, id);
     }
 
-    public static final JukeboxSongInterface THIRTEEN = define("13", Sounds.MUSIC_DISC_13, 178, 1);
-    public static final JukeboxSongInterface CAT = define("cat", Sounds.MUSIC_DISC_CAT, 185, 2);
-    public static final JukeboxSongInterface BLOCKS = define("blocks", Sounds.MUSIC_DISC_BLOCKS, 345, 3);
-    public static final JukeboxSongInterface CHIRP = define("chirp", Sounds.MUSIC_DISC_CHIRP, 185, 4);
-    public static final JukeboxSongInterface FAR = define("far", Sounds.MUSIC_DISC_FAR, 174, 5);
-    public static final JukeboxSongInterface MALL = define("mall", Sounds.MUSIC_DISC_MALL, 197, 6);
-    public static final JukeboxSongInterface MELLOHI = define("mellohi", Sounds.MUSIC_DISC_MELLOHI, 96, 7);
-    public static final JukeboxSongInterface STAL = define("stal", Sounds.MUSIC_DISC_STAL, 150, 8);
-    public static final JukeboxSongInterface STRAD = define("strad", Sounds.MUSIC_DISC_STRAD, 188, 9);
-    public static final JukeboxSongInterface WARD = define("ward", Sounds.MUSIC_DISC_WARD, 251, 10);
-    public static final JukeboxSongInterface ELEVEN = define("11", Sounds.MUSIC_DISC_11, 71, 11);
-    public static final JukeboxSongInterface WAIT = define("wait", Sounds.MUSIC_DISC_WAIT, 238, 12);
-    public static final JukeboxSongInterface PIGSTEP = define("pigstep", Sounds.MUSIC_DISC_PIGSTEP, 149, 13);
-    public static final JukeboxSongInterface OTHERSIDE = define("otherside", Sounds.MUSIC_DISC_OTHERSIDE, 195, 14);
-    public static final JukeboxSongInterface FIVE = define("5", Sounds.MUSIC_DISC_5, 178, 15);
-    public static final JukeboxSongInterface RELIC = define("relic", Sounds.MUSIC_DISC_RELIC, 218, 14);
-    public static final JukeboxSongInterface PRECIPICE = define("precipice", Sounds.MUSIC_DISC_PRECIPICE, 299, 13);
-    public static final JukeboxSongInterface CREATOR = define("creator", Sounds.MUSIC_DISC_CREATOR, 176, 12);
-    public static final JukeboxSongInterface CREATOR_MUSIC_BOX = define("creator_music_box", Sounds.MUSIC_DISC_CREATOR_MUSIC_BOX,
+    public static final IJukeboxSong THIRTEEN = define("13", Sounds.MUSIC_DISC_13, 178, 1);
+    public static final IJukeboxSong CAT = define("cat", Sounds.MUSIC_DISC_CAT, 185, 2);
+    public static final IJukeboxSong BLOCKS = define("blocks", Sounds.MUSIC_DISC_BLOCKS, 345, 3);
+    public static final IJukeboxSong CHIRP = define("chirp", Sounds.MUSIC_DISC_CHIRP, 185, 4);
+    public static final IJukeboxSong FAR = define("far", Sounds.MUSIC_DISC_FAR, 174, 5);
+    public static final IJukeboxSong MALL = define("mall", Sounds.MUSIC_DISC_MALL, 197, 6);
+    public static final IJukeboxSong MELLOHI = define("mellohi", Sounds.MUSIC_DISC_MELLOHI, 96, 7);
+    public static final IJukeboxSong STAL = define("stal", Sounds.MUSIC_DISC_STAL, 150, 8);
+    public static final IJukeboxSong STRAD = define("strad", Sounds.MUSIC_DISC_STRAD, 188, 9);
+    public static final IJukeboxSong WARD = define("ward", Sounds.MUSIC_DISC_WARD, 251, 10);
+    public static final IJukeboxSong ELEVEN = define("11", Sounds.MUSIC_DISC_11, 71, 11);
+    public static final IJukeboxSong WAIT = define("wait", Sounds.MUSIC_DISC_WAIT, 238, 12);
+    public static final IJukeboxSong PIGSTEP = define("pigstep", Sounds.MUSIC_DISC_PIGSTEP, 149, 13);
+    public static final IJukeboxSong OTHERSIDE = define("otherside", Sounds.MUSIC_DISC_OTHERSIDE, 195, 14);
+    public static final IJukeboxSong FIVE = define("5", Sounds.MUSIC_DISC_5, 178, 15);
+    public static final IJukeboxSong RELIC = define("relic", Sounds.MUSIC_DISC_RELIC, 218, 14);
+    public static final IJukeboxSong PRECIPICE = define("precipice", Sounds.MUSIC_DISC_PRECIPICE, 299, 13);
+    public static final IJukeboxSong CREATOR = define("creator", Sounds.MUSIC_DISC_CREATOR, 176, 12);
+    public static final IJukeboxSong CREATOR_MUSIC_BOX = define("creator_music_box", Sounds.MUSIC_DISC_CREATOR_MUSIC_BOX,
             73, 11);
 
     /**
@@ -86,7 +86,7 @@ public class JukeboxSongs {
      *
      * @return Trim Materials
      */
-    public static Collection<JukeboxSongInterface> values() {
+    public static Collection<IJukeboxSong> values() {
         return REGISTRY.getEntries();
     }
 

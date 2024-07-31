@@ -27,7 +27,7 @@ import com.github.retrooper.packetevents.protocol.item.banner.BannerPattern;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
-import com.github.retrooper.packetevents.protocol.item.jukebox.JukeboxSongInterface;
+import com.github.retrooper.packetevents.protocol.item.jukebox.IJukeboxSong;
 import com.github.retrooper.packetevents.protocol.item.jukebox.JukeboxSongs;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterial;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterials;
@@ -71,7 +71,7 @@ public final class SynchronizedRegistriesHandler {
             new RegistryEntry<>(DamageTypes.getRegistry(), DamageType::decode),
             new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode),
             new RegistryEntry<>(EnchantmentTypes.getRegistry(), EnchantmentType::decode),
-            new RegistryEntry<>(JukeboxSongs.getRegistry(), JukeboxSongInterface::decode)
+            new RegistryEntry<>(JukeboxSongs.getRegistry(), IJukeboxSong::decode)
     ).collect(Collectors.toMap(RegistryEntry::getRegistryKey, Function.identity()));
 
     private SynchronizedRegistriesHandler() {

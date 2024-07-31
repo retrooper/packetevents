@@ -32,7 +32,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
-public interface JukeboxSongInterface extends MappedEntity, CopyableEntity<JukeboxSongInterface> {
+public interface IJukeboxSong extends MappedEntity, CopyableEntity<IJukeboxSong> {
     Sound getSound();
 
     void setSound(Sound sound);
@@ -49,7 +49,7 @@ public interface JukeboxSongInterface extends MappedEntity, CopyableEntity<Jukeb
 
     void setComparatorOutput(int comparatorOutput);
 
-    static JukeboxSongInterface decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
+    static IJukeboxSong decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
 
         Sound sound = Sound.decode(compound.getCompoundTagOrThrow("sound_event"), version);
@@ -60,7 +60,7 @@ public interface JukeboxSongInterface extends MappedEntity, CopyableEntity<Jukeb
         return new JukeboxSong(data, sound, description, length, comparator_output);
     }
 
-    static NBT encode(JukeboxSongInterface jukeboxSong, ClientVersion version) {
+    static NBT encode(IJukeboxSong jukeboxSong, ClientVersion version) {
         NBTCompound compound = new NBTCompound();
 
         compound.setTag("sound_event", Sound.encode(jukeboxSong.getSound(), version));
@@ -71,7 +71,7 @@ public interface JukeboxSongInterface extends MappedEntity, CopyableEntity<Jukeb
         return compound;
     }
 
-    static JukeboxSongInterface read(PacketWrapper<?> wrapper) {
+    static IJukeboxSong read(PacketWrapper<?> wrapper) {
         Sound sound = Sound.read(wrapper);
         Component description = wrapper.readComponent();
         float lengthInSeconds = wrapper.readFloat();
@@ -80,7 +80,7 @@ public interface JukeboxSongInterface extends MappedEntity, CopyableEntity<Jukeb
         return new JukeboxSong(null, sound, description, lengthInSeconds, comparatorOutput);
     }
 
-    static void write(PacketWrapper<?> wrapper, JukeboxSongInterface song) {
+    static void write(PacketWrapper<?> wrapper, IJukeboxSong song) {
         Sound.write(wrapper, song.getSound());
         wrapper.writeComponent(song.getDescription());
         wrapper.writeFloat(song.getLengthInSeconds());
