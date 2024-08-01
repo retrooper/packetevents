@@ -49,7 +49,12 @@ public class PlayerManagerImpl extends PlayerManagerAbstract {
             ReflectionObject reflectConnectedPlayer = new ReflectionObject(connectedPlayer);
             Object minecraftConnection = reflectConnectedPlayer.readObject(0, MINECRAFT_CONNECTION_CLASS);
             ReflectionObject reflectConnection = new ReflectionObject(minecraftConnection);
-            channel = reflectConnection.readObject(0, Channel.class);
+            // In cases where the player has a custom connection, for example, Fake Players, this will not find the channel.
+            try {
+              channel = reflectConnection.readObject(0, Channel.class);
+            } catch (IllegalStateException ignored) {
+              return null;
+            }
 
             synchronized (channel) {
                 ProtocolManager.CHANNELS.put(((Player) player).getUniqueId(), channel);
