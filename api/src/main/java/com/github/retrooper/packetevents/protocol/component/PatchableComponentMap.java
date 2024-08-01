@@ -97,6 +97,20 @@ public class PatchableComponentMap implements IComponentMap {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof PatchableComponentMap)) return false;
+        PatchableComponentMap that = (PatchableComponentMap) obj;
+        if (!this.base.equals(that.base)) return false;
+        return this.patches.equals(that.patches);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.base, this.patches);
+    }
+
+    @Override
     public String toString() {
         return "PatchableComponentMap{base=" + this.base + ", patches=" + this.patches + '}';
     }
