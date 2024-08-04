@@ -38,6 +38,12 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
         this(null, precipitation, temperature, temperatureModifier, downfall, effects);
     }
 
+    @Deprecated
+    public StaticBiome(@Nullable TypesBuilderData data, Precipitation precipitation, float temperature,
+            TemperatureModifier temperatureModifier, float downfall, BiomeEffects effects) {
+        this(data, precipitation != Precipitation.NONE, temperature, temperatureModifier, downfall, effects);
+    }
+
     public StaticBiome(
             @Nullable TypesBuilderData data, boolean precipitation,
             float temperature, TemperatureModifier temperatureModifier,
@@ -60,6 +66,22 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
     @Override
     public boolean hasPrecipitation() {
         return this.precipitation;
+    }
+
+    @Override
+    public Precipitation getPrecipitation() {
+        if (!hasPrecipitation()) {
+            return Precipitation.NONE;
+        }
+
+        switch (getTemperatureModifier()) {
+            case NONE:
+                return Precipitation.RAIN;
+            case FROZEN:
+                return Precipitation.SNOW;
+            default:
+                throw new IllegalArgumentException("Unrecognized Temperature Modifier " + getTemperatureModifier());
+        }
     }
 
     @Override
