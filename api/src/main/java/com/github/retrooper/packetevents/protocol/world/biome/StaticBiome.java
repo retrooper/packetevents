@@ -92,8 +92,8 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
 
     @Override
     public Biome copy(@Nullable TypesBuilderData newData) {
-        return new StaticBiome(newData, this.precipitation, this.temperature,
-                this.temperatureModifier, this.downfall, this.effects);
+        return new StaticBiome(newData, this.precipitation, this.temperature, this.temperatureModifier,
+                this.downfall, this.category, this.depth, this.scale, this.effects);
     }
 
     @Override

@@ -25,13 +25,15 @@ import org.jetbrains.annotations.Nullable;
 public class StaticChatType extends AbstractMappedEntity implements ChatType {
 
     private final ChatTypeDecoration chatDecoration;
+    private final @Nullable ChatTypeDecoration overlayDecoration;
     private final ChatTypeDecoration narrationDecoration;
+    private final @Nullable NarrationPriority narrationPriority;
 
     public StaticChatType(
             ChatTypeDecoration chatDecoration,
             ChatTypeDecoration narrationDecoration
     ) {
-        this(null, chatDecoration, narrationDecoration);
+        this(null, chatDecoration, null, narrationDecoration, null);
     }
 
     public StaticChatType(
@@ -39,14 +41,36 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
             ChatTypeDecoration chatDecoration,
             ChatTypeDecoration narrationDecoration
     ) {
+        this(data, chatDecoration, null, narrationDecoration, null);
+    }
+
+    public StaticChatType(
+            ChatTypeDecoration chatDecoration,
+            @Nullable ChatTypeDecoration overlayDecoration,
+            ChatTypeDecoration narrationDecoration,
+            @Nullable NarrationPriority narrationPriority
+    ) {
+        this(null, chatDecoration, overlayDecoration, narrationDecoration, narrationPriority);
+    }
+
+    public StaticChatType(
+            @Nullable TypesBuilderData data,
+            ChatTypeDecoration chatDecoration,
+            @Nullable ChatTypeDecoration overlayDecoration,
+            ChatTypeDecoration narrationDecoration,
+            @Nullable NarrationPriority narrationPriority
+    ) {
         super(data);
         this.chatDecoration = chatDecoration;
+        this.overlayDecoration = overlayDecoration;
         this.narrationDecoration = narrationDecoration;
+        this.narrationPriority = narrationPriority;
     }
 
     @Override
     public ChatType copy(@Nullable TypesBuilderData newData) {
-        return new StaticChatType(newData, this.chatDecoration, this.narrationDecoration);
+        return new StaticChatType(newData, this.chatDecoration,
+                this.overlayDecoration, this.narrationDecoration, this.narrationPriority);
     }
 
     @Override
@@ -55,7 +79,17 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
     }
 
     @Override
+    public @Nullable ChatTypeDecoration getOverlayDecoration() {
+        return this.overlayDecoration;
+    }
+
+    @Override
     public ChatTypeDecoration getNarrationDecoration() {
         return this.narrationDecoration;
+    }
+
+    @Override
+    public @Nullable NarrationPriority getNarrationPriority() {
+        return this.narrationPriority;
     }
 }
