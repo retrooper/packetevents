@@ -50,6 +50,10 @@ public interface DimensionType extends MappedEntity, CopyableEntity<DimensionTyp
 
     double getCoordinateScale();
 
+    default boolean isShrunk() {
+        return this.getCoordinateScale() > 1d;
+    }
+
     boolean isBedWorking();
 
     boolean isRespawnAnchorWorking();
@@ -104,19 +108,35 @@ public interface DimensionType extends MappedEntity, CopyableEntity<DimensionTyp
         boolean hasCeiling = compound.getBoolean("has_ceiling");
         boolean ultrawarm = compound.getBoolean("ultrawarm");
         boolean natural = compound.getBoolean("natural");
-        double coordinateScale = compound.getNumberTagOrThrow("coordinate_scale").getAsDouble();
         boolean bedWorking = compound.getBoolean("bed_works");
         boolean respawnAnchorWorking = compound.getBoolean("respawn_anchor_works");
-        int minY = compound.getNumberTagOrThrow("min_y").getAsInt();
-        int height = compound.getNumberTagOrThrow("height").getAsInt();
         int logicalHeight = compound.getNumberTagOrThrow("logical_height").getAsInt();
         String infiniburnTag = compound.getStringTagValueOrThrow("infiniburn");
-        ResourceLocation effectsLocation = new ResourceLocation(compound.getStringTagValueOrThrow("effects"));
         float ambientLight = compound.getNumberTagOrThrow("ambient_light").getAsFloat();
         boolean piglinSafe = compound.getBoolean("piglin_safe");
         boolean hasRaids = compound.getBoolean("has_raids");
-        NBT monsterSpawnLightLevel = compound.getTagOrThrow("monster_spawn_light_level");
-        int monsterSpawnBlockLightLimit = compound.getNumberTagOrThrow("monster_spawn_block_light_limit").getAsInt();
+
+        double coordinateScale;
+        int minY = 0;
+        int height = 256;
+        ResourceLocation effectsLocation = null;
+        NBT monsterSpawnLightLevel = null;
+        Integer monsterSpawnBlockLightLimit = null;
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_16_2)) {
+            coordinateScale = compound.getNumberTagOrThrow("coordinate_scale").getAsDouble();
+            effectsLocation = new ResourceLocation(compound.getStringTagValueOrThrow("effects"));
+            if (version.isNewerThanOrEquals(ClientVersion.V_1_17)) {
+                minY = compound.getNumberTagOrThrow("min_y").getAsInt();
+                height = compound.getNumberTagOrThrow("height").getAsInt();
+                if (version.isNewerThanOrEquals(ClientVersion.V_1_19)) {
+                    monsterSpawnLightLevel = compound.getTagOrThrow("monster_spawn_light_level");
+                    monsterSpawnBlockLightLimit = compound.getNumberTagOrThrow("monster_spawn_block_light_limit").getAsInt();
+                }
+            }
+        } else {
+            coordinateScale = compound.getBoolean("shrunk") ? 8d : 1d;
+        }
+
         return new StaticDimensionType(data, fixedTime, hasSkylight, hasCeiling, ultrawarm, natural, coordinateScale,
                 bedWorking, respawnAnchorWorking, minY, height, logicalHeight, infiniburnTag, effectsLocation,
                 ambientLight, piglinSafe, hasRaids, monsterSpawnLightLevel, monsterSpawnBlockLightLimit);
@@ -130,19 +150,28 @@ public interface DimensionType extends MappedEntity, CopyableEntity<DimensionTyp
         compound.setTag("has_ceiling", new NBTByte(dimensionType.hasCeiling()));
         compound.setTag("ultrawarm", new NBTByte(dimensionType.isUltraWarm()));
         compound.setTag("natural", new NBTByte(dimensionType.isNatural()));
-        compound.setTag("coordinate_scale", new NBTDouble(dimensionType.getCoordinateScale()));
         compound.setTag("bed_works", new NBTByte(dimensionType.isBedWorking()));
         compound.setTag("respawn_anchor_works", new NBTByte(dimensionType.isRespawnAnchorWorking()));
-        compound.setTag("min_y", new NBTInt(dimensionType.getMinY(version)));
-        compound.setTag("height", new NBTInt(dimensionType.getHeight(version)));
         compound.setTag("logical_height", new NBTInt(dimensionType.getLogicalHeight(version)));
         compound.setTag("infiniburn", new NBTString(dimensionType.getInfiniburnTag()));
-        compound.setTag("effects", new NBTString(dimensionType.getEffectsLocation().toString()));
         compound.setTag("ambient_light", new NBTFloat(dimensionType.getAmbientLight()));
         compound.setTag("piglin_safe", new NBTByte(dimensionType.isPiglinSafe()));
         compound.setTag("has_raids", new NBTByte(dimensionType.hasRaids()));
-        compound.setTag("monster_spawn_light_level", dimensionType.getMonsterSpawnLightLevel());
-        compound.setTag("monster_spawn_block_light_limit", new NBTInt(dimensionType.getMonsterSpawnBlockLightLimit()));
+
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_16_2)) {
+            compound.setTag("coordinate_scale", new NBTDouble(dimensionType.getCoordinateScale()));
+            compound.setTag("effects", new NBTString(dimensionType.getEffectsLocation().toString()));
+            if (version.isNewerThanOrEquals(ClientVersion.V_1_17)) {
+                compound.setTag("min_y", new NBTInt(dimensionType.getMinY(version)));
+                compound.setTag("height", new NBTInt(dimensionType.getHeight(version)));
+                if (version.isNewerThanOrEquals(ClientVersion.V_1_19)) {
+                    compound.setTag("monster_spawn_light_level", dimensionType.getMonsterSpawnLightLevel());
+                    compound.setTag("monster_spawn_block_light_limit", new NBTInt(dimensionType.getMonsterSpawnBlockLightLimit()));
+                }
+            }
+        } else {
+            compound.setTag("shrunk", new NBTByte(dimensionType.isShrunk()));
+        }
         return compound;
     }
 }
