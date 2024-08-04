@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.minecraft.client.player.LocalPlayer;
 
@@ -31,7 +32,6 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
             ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(msg);
             boolean recompress = handleCompression(ctx, outputBuffer);
             PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, outputBuffer, false);
-            //TODO hasTasksAfter
             if (outputBuffer.isReadable()) {
                 if (recompress) {
                     recompress(ctx, outputBuffer);

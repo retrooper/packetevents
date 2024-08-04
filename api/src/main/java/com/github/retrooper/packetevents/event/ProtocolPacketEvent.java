@@ -39,11 +39,11 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ProtocolPacketEvent<T> extends PacketEvent implements PlayerEvent<T>, CancellableEvent, UserEvent {
+public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerEvent, CancellableEvent, UserEvent {
     private final Object channel;
     private final ConnectionState connectionState;
     private final User user;
-    private final T player;
+    private final Object player;
     private Object byteBuf;
     private final int packetID;
     private final PacketTypeCommon packetType;
@@ -55,7 +55,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private boolean needsReEncode = PacketEvents.getAPI().getSettings().reEncodeByDefault();
 
     public ProtocolPacketEvent(PacketSide packetSide, Object channel,
-                               User user, T player, Object byteBuf,
+                               User user, Object player, Object byteBuf,
                                boolean autoProtocolTranslation) throws PacketProcessException {
         this.channel = channel;
         this.user = user;
@@ -92,7 +92,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, Object channel,
-                               User user, T player, Object byteBuf) {
+                               User user, Object player, Object byteBuf) {
         this.channel = channel;
         this.user = user;
         this.player = player;
@@ -133,8 +133,8 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     @Override
-    public T getPlayer() {
-        return player;
+    public <T> T getPlayer() {
+        return (T) player;
     }
 
     public ConnectionState getConnectionState() {
@@ -213,7 +213,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     @Override
-    public ProtocolPacketEvent<?> clone() {
+    public ProtocolPacketEvent clone() {
         return this instanceof PacketReceiveEvent ? ((PacketReceiveEvent) this).clone()
                 : ((PacketSendEvent) this).clone();
     }

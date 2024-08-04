@@ -30,8 +30,7 @@ package com.github.retrooper.packetevents.event;
  */
 public enum PacketListenerPriority {
     /**
-     * Listener is of very low importance.
-     * This listener will be ran first.
+     * This listener will be run first and has little say in the outcome of events.
      */
     LOWEST,
 
@@ -41,8 +40,11 @@ public enum PacketListenerPriority {
     LOW,
 
     /**
-     * Default listener priority.
-     * Listener is neither important nor unimportant and may run normally.
+     * The normal listener priority.
+     * If possible, always pick this.
+     * It allows other projects to easily overturn your decisions.
+     * Moreover, it is pretty bold to assume that your project should
+     * always have the final say.
      */
     NORMAL,
 
@@ -52,13 +54,13 @@ public enum PacketListenerPriority {
     HIGH,
 
     /**
-     * Listener is of critical importance and wants to decide the cancellation of an event.
+     * Listener is of critical importance. Use this to decide the final state of packets.
      */
     HIGHEST,
 
     /**
-     * Listener is purely trying to decide the cancellation of an event.
-     * This listener should be ran last.
+     * Only use this priority if you want to perform logic based on the outcome of an event.
+     * Please do not modify packets in this stage.
      */
     MONITOR;
 

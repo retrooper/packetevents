@@ -3,12 +3,12 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     java
-    com.github.johnrengelman.shadow
+    io.github.goooler.shadow
 }
 
 tasks {
     shadowJar {
-        archiveFileName = "packetevents-${project.name}-${project.version}.jar"
+        archiveFileName = "packetevents-${project.name}-${rootProject.ext["versionNoHash"]}.jar"
         archiveClassifier = null
 
         relocate("net.kyori.adventure.text.serializer", "io.github.retrooper.packetevents.adventure.serializer")

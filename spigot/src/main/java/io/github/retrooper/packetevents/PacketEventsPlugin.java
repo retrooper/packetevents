@@ -29,6 +29,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientIn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import io.github.retrooper.packetevents.manager.InternalTestingListener;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -101,6 +102,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             }
         };
 //        PacketEvents.getAPI().getEventManager().registerListener(listener);
+//        PacketEvents.getAPI().getEventManager().registerListener(new InternalTestingListener());
     }
 
     @Override

@@ -55,8 +55,12 @@ public class DataPalette {
     }
 
     public static DataPalette read(NetStreamInput in, PaletteType paletteType) {
+        return read(in, paletteType, true);
+    }
+
+    public static DataPalette read(NetStreamInput in, PaletteType paletteType, boolean allowSingletonPalette) {
         int bitsPerEntry = in.readByte();
-        Palette palette = readPalette(paletteType, bitsPerEntry, in);
+        Palette palette = readPalette(paletteType, bitsPerEntry, in, allowSingletonPalette);
         BitStorage storage;
         if (!(palette instanceof SingletonPalette)) {
             int length = in.readVarInt();
@@ -94,7 +98,7 @@ public class DataPalette {
 
     public static DataPalette readLegacy(NetStreamInput in) {
         int bitsPerEntry = in.readByte() & 0xff;
-        Palette palette = readPalette(PaletteType.CHUNK, bitsPerEntry, in);
+        Palette palette = readPalette(PaletteType.CHUNK, bitsPerEntry, in, false);
         BaseStorage storage;
         if (!(palette instanceof SingletonPalette)) {
             int length = in.readVarInt();
@@ -108,7 +112,7 @@ public class DataPalette {
 
     public int get(int x, int y, int z) {
         if (storage != null) {
-            int id = this.storage.get(index(x, y, z));
+            int id = this.storage.get(index(this.paletteType, x, y, z));
             return this.palette.idToState(id);
         } else {
             return this.palette.idToState(0);
@@ -126,7 +130,7 @@ public class DataPalette {
         }
 
         if (this.storage != null) {
-            int index = index(x, y, z);
+            int index = index(this.paletteType, x, y, z);
             int curr = this.storage.get(index);
 
             this.storage.set(index, id);
@@ -137,11 +141,16 @@ public class DataPalette {
         }
     }
 
-    private static Palette readPalette(PaletteType paletteType, int bitsPerEntry, NetStreamInput in) {
+    private static Palette readPalette(
+            PaletteType paletteType,
+            int bitsPerEntry,
+            NetStreamInput in,
+            boolean allowSingletonPalette
+    ) {
         if (bitsPerEntry > paletteType.getMaxBitsPerEntry()) {
             return new GlobalPalette();
         }
-        if (bitsPerEntry == 0) {
+        if (bitsPerEntry == 0 && allowSingletonPalette) {
             return new SingletonPalette(in);
         }
         if (bitsPerEntry <= paletteType.getMinBitsPerEntry()) {
@@ -186,7 +195,7 @@ public class DataPalette {
         }
     }
 
-    private static int index(int x, int y, int z) {
-        return y << 8 | z << 4 | x;
+    private static int index(PaletteType paletteType, int x, int y, int z) {
+        return (y << paletteType.getBitShift() | z) << paletteType.getBitShift() | x;
     }
 }

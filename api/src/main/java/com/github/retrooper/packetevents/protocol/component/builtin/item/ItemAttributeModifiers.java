@@ -18,11 +18,15 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.attribute.Attribute;
 import com.github.retrooper.packetevents.protocol.attribute.AttributeOperation;
 import com.github.retrooper.packetevents.protocol.attribute.Attributes;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes.PropertyModifier;
 import net.kyori.adventure.util.Index;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collections;
 import java.util.List;
@@ -169,11 +173,16 @@ public class ItemAttributeModifiers {
 
     public static class Modifier {
 
-        private UUID id;
-        private String name;
+        private UUID id; // removed in 1.21
+        private String name; // ResourceLocation since 1.21
         private double value;
         private AttributeOperation operation;
 
+        public Modifier(ResourceLocation name, double value, AttributeOperation operation) {
+            this(PropertyModifier.generateSemiUniqueId(name), name.toString(), value, operation);
+        }
+
+        @ApiStatus.Obsolete
         public Modifier(UUID id, String name, double value, AttributeOperation operation) {
             this.id = id;
             this.name = name;
@@ -182,32 +191,56 @@ public class ItemAttributeModifiers {
         }
 
         public static Modifier read(PacketWrapper<?> wrapper) {
-            UUID id = wrapper.readUUID();
-            String name = wrapper.readString();
+            UUID id;
+            String name;
+            if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21)) {
+                ResourceLocation nameKey = wrapper.readIdentifier();
+                name = nameKey.toString();
+                id = PropertyModifier.generateSemiUniqueId(nameKey);
+            } else {
+                id = wrapper.readUUID();
+                name = wrapper.readString();
+            }
             double value = wrapper.readDouble();
             AttributeOperation operation = wrapper.readEnum(AttributeOperation.values());
             return new Modifier(id, name, value, operation);
         }
 
         public static void write(PacketWrapper<?> wrapper, Modifier modifier) {
-            wrapper.writeUUID(modifier.id);
-            wrapper.writeString(modifier.name);
+            if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21)) {
+                wrapper.writeIdentifier(new ResourceLocation(modifier.name));
+            } else {
+                wrapper.writeUUID(modifier.id);
+                wrapper.writeString(modifier.name);
+            }
             wrapper.writeDouble(modifier.value);
             wrapper.writeEnum(modifier.operation);
         }
 
+        public ResourceLocation getNameKey() {
+            return new ResourceLocation(this.name);
+        }
+
+        public void setNameKey(ResourceLocation nameKey) {
+            this.name = nameKey.toString();
+        }
+
+        @ApiStatus.Obsolete
         public UUID getId() {
             return this.id;
         }
 
+        @ApiStatus.Obsolete
         public void setId(UUID id) {
             this.id = id;
         }
 
+        @ApiStatus.Obsolete
         public String getName() {
             return this.name;
         }
 
+        @ApiStatus.Obsolete
         public void setName(String name) {
             this.name = name;
         }

@@ -1,5 +1,6 @@
 [versions]
 adventure = "4.17.0"
+examination = "1.3.0"
 netty = "4.1.72.Final"
 jetbrains-annotations = "23.0.0"
 via-version = "4.5.0"
@@ -12,6 +13,9 @@ run-paper = "2.3.0"
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventure-nbt = { group = "net.kyori", name = "adventure-nbt", version.ref = "adventure" }
+adventure-key = { group = "net.kyori", name = "adventure-key", version.ref = "adventure" }
+adventure-examination-api = { group = "net.kyori", name = "examination-api", version.ref = "examination" }
+adventure-examination-string = { group = "net.kyori", name = "examination-string", version.ref = "examination" }
 adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
 adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
 adventure-text-serializer-json-legacy = { group = "net.kyori", name = "adventure-text-serializer-json-legacy-impl", version.ref = "adventure" }
@@ -25,10 +29,10 @@ bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bunge
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 
 [bundles]
-adventure = [ "adventure-api", "adventure-nbt" ]
+adventure = [ "adventure-api", "adventure-nbt", "adventure-key", "adventure-examination-api", "adventure-examination-string" ]
 adventure-serializers = [ "adventure-text-serializer-gson", "adventure-text-serializer-json-legacy", "adventure-text-serializer-legacy" ]
 
 [plugins]
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-paper" }
-fabric = { id = "fabric-loom", version = "0.11-SNAPSHOT" }
+fabric-loom = { id = "fabric-loom", version = "1.7.2" }
