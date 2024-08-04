@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.world.biome;
 
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 public class StaticBiome extends AbstractMappedEntity implements Biome {
@@ -28,19 +29,21 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
     private final float temperature;
     private final TemperatureModifier temperatureModifier;
     private final float downfall;
+    private final @Nullable Category category;
+    private final @Nullable Float depth;
+    private final @Nullable Float scale;
     private final BiomeEffects effects;
 
     public StaticBiome(
-            boolean precipitation,
-            float temperature, TemperatureModifier temperatureModifier,
+            boolean precipitation, float temperature, TemperatureModifier temperatureModifier,
             float downfall, BiomeEffects effects
     ) {
         this(null, precipitation, temperature, temperatureModifier, downfall, effects);
     }
 
-    @Deprecated
+    @ApiStatus.Obsolete
     public StaticBiome(@Nullable TypesBuilderData data, Precipitation precipitation, float temperature,
-            TemperatureModifier temperatureModifier, float downfall, BiomeEffects effects) {
+                       TemperatureModifier temperatureModifier, float downfall, BiomeEffects effects) {
         this(data, precipitation != Precipitation.NONE, temperature, temperatureModifier, downfall, effects);
     }
 
@@ -49,11 +52,41 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
             float temperature, TemperatureModifier temperatureModifier,
             float downfall, BiomeEffects effects
     ) {
+        this(data, precipitation, temperature, temperatureModifier,
+                downfall, null, null, null, effects);
+    }
+
+    public StaticBiome(
+            boolean precipitation, float temperature, TemperatureModifier temperatureModifier,
+            float downfall, @Nullable Category category, @Nullable Float depth,
+            @Nullable Float scale, BiomeEffects effects
+    ) {
+        this(null, precipitation, temperature, temperatureModifier, downfall,
+                category, depth, scale, effects);
+    }
+
+    @ApiStatus.Obsolete
+    public StaticBiome(@Nullable TypesBuilderData data, Precipitation precipitation, float temperature,
+                       TemperatureModifier temperatureModifier, float downfall, @Nullable Category category,
+                       @Nullable Float depth, @Nullable Float scale, BiomeEffects effects) {
+        this(data, precipitation != Precipitation.NONE, temperature, temperatureModifier,
+                downfall, category, depth, scale, effects);
+    }
+
+    public StaticBiome(
+            @Nullable TypesBuilderData data, boolean precipitation,
+            float temperature, TemperatureModifier temperatureModifier,
+            float downfall, @Nullable Category category, @Nullable Float depth,
+            @Nullable Float scale, BiomeEffects effects
+    ) {
         super(data);
         this.precipitation = precipitation;
         this.temperature = temperature;
         this.temperatureModifier = temperatureModifier;
         this.downfall = downfall;
+        this.category = category;
+        this.depth = depth;
+        this.scale = scale;
         this.effects = effects;
     }
 
@@ -70,17 +103,16 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
 
     @Override
     public Precipitation getPrecipitation() {
-        if (!hasPrecipitation()) {
+        if (!this.hasPrecipitation()) {
             return Precipitation.NONE;
         }
-
-        switch (getTemperatureModifier()) {
+        switch (this.getTemperatureModifier()) {
             case NONE:
                 return Precipitation.RAIN;
             case FROZEN:
                 return Precipitation.SNOW;
             default:
-                throw new IllegalArgumentException("Unrecognized Temperature Modifier " + getTemperatureModifier());
+                throw new AssertionError();
         }
     }
 
@@ -97,6 +129,21 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
     @Override
     public float getDownfall() {
         return this.downfall;
+    }
+
+    @Override
+    public @Nullable Category getCategory() {
+        return this.category;
+    }
+
+    @Override
+    public @Nullable Float getDepth() {
+        return this.depth;
+    }
+
+    @Override
+    public @Nullable Float getScale() {
+        return this.scale;
     }
 
     @Override

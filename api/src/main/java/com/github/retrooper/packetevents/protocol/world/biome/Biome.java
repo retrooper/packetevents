@@ -20,12 +20,15 @@ package com.github.retrooper.packetevents.protocol.world.biome;
 
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
-import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
-import net.kyori.adventure.util.Codec;
 import net.kyori.adventure.util.Index;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -34,7 +37,7 @@ public interface Biome extends MappedEntity, CopyableEntity<Biome> {
 
     boolean hasPrecipitation();
 
-    @Deprecated
+    @ApiStatus.Obsolete(since = "1.19.3")
     Precipitation getPrecipitation();
 
     float getTemperature();
@@ -42,6 +45,15 @@ public interface Biome extends MappedEntity, CopyableEntity<Biome> {
     TemperatureModifier getTemperatureModifier();
 
     float getDownfall();
+
+    @ApiStatus.Obsolete(since = "1.19")
+    @Nullable Category getCategory();
+
+    @ApiStatus.Obsolete(since = "1.18")
+    @Nullable Float getDepth();
+
+    @ApiStatus.Obsolete(since = "1.18")
+    @Nullable Float getScale();
 
     BiomeEffects getEffects();
 
@@ -53,18 +65,20 @@ public interface Biome extends MappedEntity, CopyableEntity<Biome> {
                         .map(TemperatureModifier.ID_INDEX::valueOrThrow)
                         .orElse(TemperatureModifier.NONE);
         float downfall = compound.getNumberTagOrThrow("downfall").getAsFloat();
+        boolean precipitation = version.isNewerThan(ClientVersion.V_1_19_3) ? compound.getBoolean("has_precipitation") :
+                Precipitation.ID_INDEX.valueOrThrow(compound.getStringTagValueOrThrow("precipitation")) != Precipitation.NONE;
         BiomeEffects effects = BiomeEffects.decode(compound.getTagOrThrow("effects"), version);
 
+        // removed with 1.19
+        Category category = version.isNewerThanOrEquals(ClientVersion.V_1_19) ? null :
+                Category.ID_INDEX.valueOrThrow(compound.getStringTagValueOrThrow("category"));
+        Float depth = version.isNewerThanOrEquals(ClientVersion.V_1_18) ? null :
+                compound.getNumberTagOrThrow("depth").getAsFloat();
+        Float scale = version.isNewerThanOrEquals(ClientVersion.V_1_18) ? null :
+                compound.getNumberTagOrThrow("scale").getAsFloat();
 
-        if (version.isNewerThan(ClientVersion.V_1_19_3)) {
-            boolean hasPrecipitation = compound.getBoolean("has_precipitation");
-
-            return new StaticBiome(data, hasPrecipitation, temperature, temperatureModifier, downfall, effects);
-        } else {
-            Precipitation precipitation = Precipitation.ID_INDEX.valueOrThrow(compound.getStringTagValueOrThrow("precipitation"));
-
-            return new StaticBiome(data, precipitation, temperature, temperatureModifier, downfall, effects);
-        }
+        return new StaticBiome(data, precipitation, temperature, temperatureModifier, downfall,
+                category, depth, scale, effects);
     }
 
     static NBT encode(Biome biome, ClientVersion version) {
@@ -79,11 +93,60 @@ public interface Biome extends MappedEntity, CopyableEntity<Biome> {
             compound.setTag("temperature_modifier", new NBTString(biome.getTemperatureModifier().getId()));
         }
         compound.setTag("downfall", new NBTFloat(biome.getDownfall()));
+        if (version.isOlderThan(ClientVersion.V_1_19)) {
+            if (biome.getCategory() != null) {
+                compound.setTag("category", new NBTString(Category.ID_INDEX.keyOrThrow(biome.getCategory())));
+            }
+            if (version.isOlderThan(ClientVersion.V_1_18)) {
+                if (biome.getDepth() != null) {
+                    compound.setTag("depth", new NBTFloat(biome.getDepth()));
+                }
+                if (biome.getScale() != null) {
+                    compound.setTag("scale", new NBTFloat(biome.getScale()));
+                }
+            }
+        }
         compound.setTag("effects", BiomeEffects.encode(biome.getEffects(), version));
         return compound;
     }
 
-    @Deprecated
+    @ApiStatus.Obsolete(since = "1.19")
+    enum Category {
+
+        NONE("none"),
+        TAIGA("taiga"),
+        EXTREME_HILLS("extreme_hills"),
+        JUNGLE("jungle"),
+        MESA("mesa"),
+        PLAINS("plains"),
+        SAVANNA("savanna"),
+        ICY("icy"),
+        THE_END("the_end"),
+        BEACH("beach"),
+        FOREST("forest"),
+        OCEAN("ocean"),
+        DESERT("desert"),
+        RIVER("river"),
+        SWAMP("swamp"),
+        MUSHROOM("mushroom"),
+        NETHER("nether"),
+        UNDERGROUND("underground"),
+        MOUNTAIN("mountain");
+
+        public static final Index<String, Category> ID_INDEX = Index.create(Category.class,
+                Category::getId);
+        private final String id;
+
+        Category(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return this.id;
+        }
+    }
+
+    @ApiStatus.Obsolete(since = "1.19.3")
     enum Precipitation {
         NONE("none"),
         RAIN("rain"),
