@@ -38,8 +38,9 @@ public class MappingIntegrityTest extends BaseDummyAPITest {
     @Test
     @DisplayName("Test biome mapping")
     public void testBiomeMapping() {
-        assertEquals(34, Biomes.SOUL_SAND_VALLEY.getId(ClientVersion.V_1_21));
-        // TODO: more versions
+        assertEquals(48, Biomes.SOUL_SAND_VALLEY.getId(ClientVersion.V_1_21));
+        assertEquals(24, Biomes.GROVE.getId(ClientVersion.V_1_19_4));
+        assertEquals(0, Biomes.OCEAN.getId(ClientVersion.V_1_15_1));
     }
 
     @Test
