@@ -72,7 +72,7 @@ public interface TrimPattern extends MappedEntity, CopyableEntity<TrimPattern> {
         ResourceLocation assetId = new ResourceLocation(compound.getStringTagValueOrThrow("asset_id"));
         ItemType templateItem = ItemTypes.getByName(compound.getStringTagValueOrThrow("template_item"));
         Component description = AdventureSerializer.fromNbt(compound.getTagOrThrow("description"));
-        boolean decal = compound.getBoolean("decal");
+        boolean decal = version.isNewerThanOrEquals(ClientVersion.V_1_20_2) && compound.getBoolean("decal");
         return new StaticTrimPattern(data, assetId, templateItem, description, decal);
     }
 
@@ -81,7 +81,9 @@ public interface TrimPattern extends MappedEntity, CopyableEntity<TrimPattern> {
         compound.setTag("asset_id", new NBTString(pattern.getAssetId().toString()));
         compound.setTag("template_item", new NBTString(pattern.getTemplateItem().getName().toString()));
         compound.setTag("description", AdventureSerializer.toNbt(pattern.getDescription()));
-        compound.setTag("decal", new NBTByte(pattern.isDecal()));
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_2)) {
+            compound.setTag("decal", new NBTByte(pattern.isDecal()));
+        }
         return compound;
     }
 }
