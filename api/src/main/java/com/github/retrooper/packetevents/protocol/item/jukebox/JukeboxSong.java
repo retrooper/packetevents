@@ -66,7 +66,7 @@ public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
         return this.sound;
     }
 
-    @Override
+    @Deprecated
     public void setSound(Sound sound) {
         this.sound = sound;
     }
@@ -76,7 +76,7 @@ public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
         return this.description;
     }
 
-    @Override
+    @Deprecated
     public void setDescription(Component description) {
         this.description = description;
     }
@@ -86,7 +86,7 @@ public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
         return this.lengthInSeconds;
     }
 
-    @Override
+    @Deprecated
     public void setLengthInSeconds(float lengthInSeconds) {
         this.lengthInSeconds = lengthInSeconds;
     }
@@ -96,7 +96,7 @@ public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
         return this.comparatorOutput;
     }
 
-    @Override
+    @Deprecated
     public void setComparatorOutput(int comparatorOutput) {
         this.comparatorOutput = comparatorOutput;
     }

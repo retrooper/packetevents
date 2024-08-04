@@ -35,19 +35,11 @@ import org.jetbrains.annotations.Nullable;
 public interface IJukeboxSong extends MappedEntity, CopyableEntity<IJukeboxSong> {
     Sound getSound();
 
-    void setSound(Sound sound);
-
     Component getDescription();
-
-    void setDescription(Component description);
 
     float getLengthInSeconds();
 
-    void setLengthInSeconds(float lengthInSeconds);
-
     int getComparatorOutput();
-
-    void setComparatorOutput(int comparatorOutput);
 
     static IJukeboxSong decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
