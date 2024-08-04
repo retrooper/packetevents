@@ -21,12 +21,14 @@ package com.github.retrooper.packetevents.protocol.world.biome;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,13 +42,17 @@ public final class Biomes {
 
     static {
         BIOME_DATA = new HashMap<>();
-        NBTCompound dataTag = MappingHelper.decompress("mappings/world/biome_data");
-        for (Map.Entry<String, NBT> entry : dataTag.getTags().entrySet()) {
-            if (entry.getKey().equals("version")) {
-                continue; // skip version field
+        try (SequentialNBTReader.Compound dataTag = MappingHelper.decompress("mappings/world/biome_data")) {
+            while (dataTag.hasNext()) {
+                Map.Entry<String, NBT> entry = dataTag.next();
+                if (entry.getKey().equals("version")) {
+                    continue; // skip version field
+                }
+                ResourceLocation biomeKey = new ResourceLocation(entry.getKey());
+                BIOME_DATA.put(biomeKey, ((SequentialNBTReader.Compound) entry.getValue()).readFully());
             }
-            ResourceLocation enchantKey = new ResourceLocation(entry.getKey());
-            BIOME_DATA.put(enchantKey, (NBTCompound) entry.getValue());
+        } catch (IOException exception) {
+            throw new RuntimeException("Error while reading biome data", exception);
         }
     }
 

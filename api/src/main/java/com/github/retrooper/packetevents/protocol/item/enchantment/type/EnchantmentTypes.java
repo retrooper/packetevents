@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.item.enchantment.type;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.MappingHelper;
@@ -28,6 +29,7 @@ import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,13 +47,17 @@ public final class EnchantmentTypes {
 
     static {
         ENCHANTMENT_DATA = new HashMap<>();
-        NBTCompound dataTag = MappingHelper.decompress("mappings/enchantment/enchantment_type_data");
-        for (Map.Entry<String, NBT> entry : dataTag.getTags().entrySet()) {
-            if (entry.getKey().equals("version")) {
-                continue; // skip version field
+        try (SequentialNBTReader.Compound dataTag = MappingHelper.decompress("mappings/enchantment/enchantment_type_data")) {
+            while (dataTag.hasNext()) {
+                Map.Entry<String, NBT> entry = dataTag.next();
+                if (entry.getKey().equals("version")) {
+                    continue; // skip version field
+                }
+                ResourceLocation enchantKey = new ResourceLocation(entry.getKey());
+                ENCHANTMENT_DATA.put(enchantKey, ((SequentialNBTReader.Compound) entry.getValue()).readFully());
             }
-            ResourceLocation enchantKey = new ResourceLocation(entry.getKey());
-            ENCHANTMENT_DATA.put(enchantKey, (NBTCompound) entry.getValue());
+        } catch (IOException exception) {
+            throw new RuntimeException("Error while reading enchantment type data", exception);
         }
     }
 
