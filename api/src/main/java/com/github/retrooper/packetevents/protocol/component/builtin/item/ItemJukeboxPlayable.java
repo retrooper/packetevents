@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.protocol.item.jukebox.IJukeboxSong;
+import com.github.retrooper.packetevents.protocol.item.jukebox.JukeboxSong;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +31,14 @@ public class ItemJukeboxPlayable {
     private @Nullable IJukeboxSong song;
     private @Nullable ResourceLocation songKey;
     private boolean showInTooltip;
+
+    public ItemJukeboxPlayable(
+            @Nullable JukeboxSong song,
+            @Nullable ResourceLocation songKey,
+            boolean showInTooltip
+    ) {
+        this((IJukeboxSong) song, songKey, showInTooltip);
+    }
 
     public ItemJukeboxPlayable(
             @Nullable IJukeboxSong song,
@@ -72,11 +81,27 @@ public class ItemJukeboxPlayable {
         wrapper.writeBoolean(jukeboxPlayable.showInTooltip);
     }
 
-    public @Nullable IJukeboxSong getSong() {
+    public @Nullable IJukeboxSong getJukeboxSong() {
         return this.song;
     }
 
-    public void setSong(IJukeboxSong song) {
+    public void setJukeboxSong(@Nullable JukeboxSong song) {
+        this.song = song;
+        this.songKey = null;
+    }
+
+    @Deprecated
+    public @Nullable JukeboxSong getSong() {
+        if (this.song == null) {
+            return null;
+        } else if (this.song instanceof JukeboxSong) {
+            return (JukeboxSong) this.song;
+        }
+        return (JukeboxSong) this.song.copy(null);
+    }
+
+    @Deprecated
+    public void setSong(JukeboxSong song) {
         this.song = song;
         this.songKey = null;
     }

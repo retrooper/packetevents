@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.item.jukebox;
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,6 +44,16 @@ public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
         this.description = description;
         this.lengthInSeconds = lengthInSeconds;
         this.comparatorOutput = comparatorOutput;
+    }
+
+    @Deprecated
+    public static JukeboxSong read(PacketWrapper<?> wrapper) {
+        return (JukeboxSong) IJukeboxSong.read(wrapper);
+    }
+
+    @Deprecated
+    public static void write(PacketWrapper<?> wrapper, JukeboxSong song) {
+        IJukeboxSong.write(wrapper, song);
     }
 
     @Override
