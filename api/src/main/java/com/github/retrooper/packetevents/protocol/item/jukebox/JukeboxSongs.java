@@ -82,9 +82,9 @@ public class JukeboxSongs {
             73, 11);
 
     /**
-     * Returns an immutable view of the trim materials.
+     * Returns an immutable view of the jukebox songs.
      *
-     * @return Trim Materials
+     * @return Jukebox Songs
      */
     public static Collection<IJukeboxSong> values() {
         return REGISTRY.getEntries();
