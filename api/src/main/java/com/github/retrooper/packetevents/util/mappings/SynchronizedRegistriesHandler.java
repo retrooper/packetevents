@@ -112,7 +112,8 @@ public final class SynchronizedRegistriesHandler {
 
     public static void handleLegacyRegistries(
             User user, ClientVersion version,
-            NBTCompound registryData
+            NBTCompound registryData,
+            boolean cache
     ) {
         for (NBT tag : registryData.getTags().values()) {
             NBTCompound compound = (NBTCompound) tag;
@@ -124,7 +125,7 @@ public final class SynchronizedRegistriesHandler {
                     compound.getCompoundListTagOrThrow("value");
             // store registry elements
             handleRegistry(user, version, registryName,
-                    RegistryElement.convertNbt(nbtElements), false);
+                    RegistryElement.convertNbt(nbtElements), cache);
         }
     }
 
