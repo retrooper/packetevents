@@ -156,13 +156,14 @@ public class ParticleDustData extends ParticleData {
     }
 
     public static ParticleDustData decode(NBTCompound compound, ClientVersion version) {
-        float[] color = decodeColor(compound.getTagOrThrow("colors"));
+        NBT colorNBT = compound.getTagOrNull("color");
+        float[] color = decodeColor(colorNBT);
         float scale = compound.getNumberTagOrThrow("scale").getAsFloat();
         return new ParticleDustData(scale, color);
     }
 
     public static void encode(ParticleDustData data, ClientVersion version, NBTCompound compound) {
-        compound.setTag("colors", encodeColor(null, data.red, data.green, data.blue));
+        compound.setTag("color", encodeColor(null, data.red, data.green, data.blue));
         compound.setTag("scale", new NBTFloat(data.scale));
     }
 
