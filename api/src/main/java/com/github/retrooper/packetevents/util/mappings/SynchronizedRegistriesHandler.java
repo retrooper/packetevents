@@ -50,6 +50,7 @@ import com.github.retrooper.packetevents.protocol.world.painting.PaintingVariant
 import com.github.retrooper.packetevents.protocol.world.painting.PaintingVariants;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData.RegistryElement;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -61,17 +62,17 @@ import java.util.stream.Stream;
 public final class SynchronizedRegistriesHandler {
 
     private static final Map<ResourceLocation, RegistryEntry<?>> REGISTRY_KEYS = Stream.of(
-            new RegistryEntry<>(Biomes.getRegistry(), Biome::decode),
-            new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
-            new RegistryEntry<>(TrimPatterns.getRegistry(), TrimPattern::decode),
-            new RegistryEntry<>(TrimMaterials.getRegistry(), TrimMaterial::decode),
-            new RegistryEntry<>(WolfVariants.getRegistry(), WolfVariant::decode),
-            new RegistryEntry<>(PaintingVariants.getRegistry(), PaintingVariant::decode),
-            new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType::decode),
-            new RegistryEntry<>(DamageTypes.getRegistry(), DamageType::decode),
-            new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode),
-            new RegistryEntry<>(EnchantmentTypes.getRegistry(), EnchantmentType::decode),
-            new RegistryEntry<>(JukeboxSongs.getRegistry(), IJukeboxSong::decode)
+            new RegistryEntry<>(Biomes.getRegistry(), Biomes.class, Biome::decode),
+            new RegistryEntry<>(ChatTypes.getRegistry(), ChatTypes.class, ChatType::decode),
+            new RegistryEntry<>(TrimPatterns.getRegistry(), TrimPatterns.class, TrimPattern::decode),
+            new RegistryEntry<>(TrimMaterials.getRegistry(), TrimMaterials.class, TrimMaterial::decode),
+            new RegistryEntry<>(WolfVariants.getRegistry(), WolfVariant.class, WolfVariant::decode),
+            new RegistryEntry<>(PaintingVariants.getRegistry(), PaintingVariants.class, PaintingVariant::decode),
+            new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionTypes.class, DimensionType::decode),
+            new RegistryEntry<>(DamageTypes.getRegistry(), DamageTypes.class, DamageType::decode),
+            new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPatterns.class, BannerPattern::decode),
+            new RegistryEntry<>(EnchantmentTypes.getRegistry(), EnchantmentTypes.class, EnchantmentType::decode),
+            new RegistryEntry<>(JukeboxSongs.getRegistry(), IJukeboxSong.class, IJukeboxSong::decode)
     ).collect(Collectors.toMap(RegistryEntry::getRegistryKey, Function.identity()));
 
     private SynchronizedRegistriesHandler() {
@@ -80,12 +81,32 @@ public final class SynchronizedRegistriesHandler {
     public static void handleRegistry(
             User user, ClientVersion version,
             ResourceLocation registryName,
-            List<RegistryElement> elements
+            List<RegistryElement> elements,
+            boolean caching
     ) {
         RegistryEntry<?> registry = REGISTRY_KEYS.get(registryName);
         if (registry != null) {
-            IRegistry<?> syncedRegistry = registry.createFromElements(elements, version);
-            user.putUserRegistry(syncedRegistry);
+            SimpleRegistry<?> syncedRegistry = registry.createFromElements(elements, version);
+            if (caching) {
+                // Cache the synchronized registries within each VersionedRegistry.
+                if (registry.baseRegistry instanceof VersionedRegistry) {
+                    VersionedRegistry<?> versionedRegistry = (VersionedRegistry<?>) registry.baseRegistry;
+
+                    //Did we already cache these? If so, skip...
+                    if (versionedRegistry.getSynchronizedRegistry() != null) return;
+
+                    versionedRegistry.synchronizeRegistry(syncedRegistry);
+                }
+
+                // Dimension type registry is the one exception that we always store for each user.
+                if (syncedRegistry.getRegistryKey().equals(DimensionTypes.getRegistry().getRegistryKey())) {
+                    user.putUserRegistry(syncedRegistry);
+                }
+            }
+            else {
+                // If we opt not to cache, we shall store the registries within each user.
+                user.putUserRegistry(syncedRegistry);
+            }
         }
     }
 
@@ -103,7 +124,7 @@ public final class SynchronizedRegistriesHandler {
                     compound.getCompoundListTagOrThrow("value");
             // store registry elements
             handleRegistry(user, version, registryName,
-                    RegistryElement.convertNbt(nbtElements));
+                    RegistryElement.convertNbt(nbtElements), false);
         }
     }
 
@@ -116,13 +137,16 @@ public final class SynchronizedRegistriesHandler {
     private static final class RegistryEntry<T extends MappedEntity & CopyableEntity<T>> {
 
         private final IRegistry<T> baseRegistry;
+        private final Class<?> registryContainerClass;
         private final NbtEntryDecoder<T> decoder;
 
         public RegistryEntry(
                 IRegistry<T> baseRegistry,
+                Class<?> registryContainerClass,
                 NbtEntryDecoder<T> decoder
         ) {
             this.baseRegistry = baseRegistry;
+            this.registryContainerClass = registryContainerClass;
             this.decoder = decoder;
         }
 
@@ -163,7 +187,7 @@ public final class SynchronizedRegistriesHandler {
                     + elementName + " for " + this.getRegistryKey());
         }
 
-        public IRegistry<T> createFromElements(List<RegistryElement> elements, ClientVersion version) {
+        public SimpleRegistry<T> createFromElements(List<RegistryElement> elements, ClientVersion version) {
             SimpleRegistry<T> registry = new SimpleRegistry<>(this.getRegistryKey());
             for (int id = 0; id < elements.size(); id++) {
                 RegistryElement element = elements.get(id);
@@ -174,6 +198,11 @@ public final class SynchronizedRegistriesHandler {
 
         public ResourceLocation getRegistryKey() {
             return this.baseRegistry.getRegistryKey();
+        }
+
+        @ApiStatus.Internal
+        public Class<?> getRegistryContainerClass() {
+            return registryContainerClass;
         }
     }
 }

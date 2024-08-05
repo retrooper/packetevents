@@ -88,7 +88,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
             if (packet.getElements() != null) { // 1.20.2 to 1.20.5
                 SynchronizedRegistriesHandler.handleRegistry(user, packet.getServerVersion().toClientVersion(),
-                        packet.getRegistryKey(), packet.getElements());
+                        packet.getRegistryKey(), packet.getElements(), !PacketEvents.getAPI().getInjector().isProxy());
             }
             if (packet.getRegistryData() != null) { // since 1.20.5
                 SynchronizedRegistriesHandler.handleLegacyRegistries(user, packet.getServerVersion()

@@ -50,7 +50,7 @@ public interface EnchantmentType extends MappedEntity, CopyableEntity<Enchantmen
         Component description = AdventureSerializer.fromNbt(compound.getTagOrThrow("description"));
         EnchantmentDefinition definition = EnchantmentDefinition.decode(compound, version);
         MappedEntitySet<EnchantmentType> exclusiveSet = Optional.ofNullable(compound.getTagOrNull("exclusive_set"))
-                .map(tag -> MappedEntitySet.decode(tag, version, EnchantmentTypes.getRegistry())) // TODO use user registry
+                .map(tag -> MappedEntitySet.decode(tag, version, EnchantmentTypes.getRegistry()))
                 .orElseGet(MappedEntitySet::createEmpty);
         StaticComponentMap effects = Optional.ofNullable(compound.getTagOrNull("effects"))
                 .map(tag -> IComponentMap.decode(tag, version,

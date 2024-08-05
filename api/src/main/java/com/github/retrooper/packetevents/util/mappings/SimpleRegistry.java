@@ -73,7 +73,7 @@ public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T
 
     @Override
     public int getId(String entityName, ClientVersion version) {
-        return this.reverseTypeIdMap.get(entityName);
+        return this.reverseTypeIdMap.getOrDefault(entityName, -1);
     }
 
     @Override
