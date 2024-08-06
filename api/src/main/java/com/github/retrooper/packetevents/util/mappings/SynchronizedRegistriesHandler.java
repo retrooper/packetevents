@@ -62,6 +62,7 @@ import java.util.stream.Stream;
 
 public final class SynchronizedRegistriesHandler {
 
+    private static final boolean FORCE_PER_USER_REGISTRIES = Boolean.getBoolean("packetevents.force-per-user-registries");
     private static final Map<ResourceLocation, RegistryEntry<?>> REGISTRY_KEYS = Stream.of(
             new RegistryEntry<>(Biomes.getRegistry(), Biomes.class, Biome::decode),
             new RegistryEntry<>(ChatTypes.getRegistry(), ChatTypes.class, ChatType::decode),
@@ -88,7 +89,7 @@ public final class SynchronizedRegistriesHandler {
         RegistryEntry<?> registry = REGISTRY_KEYS.get(registryName);
         if (registry != null) {
             Supplier<SimpleRegistry<?>> syncedRegistrySupplier = () -> registry.createFromElements(elements, version);
-            if (caching) {
+            if (!FORCE_PER_USER_REGISTRIES && caching) {
                 // Cache the synchronized registries within each VersionedRegistry.
                 SimpleRegistry<?> syncedRegistry;
                 if (registry.baseRegistry instanceof VersionedRegistry) {
