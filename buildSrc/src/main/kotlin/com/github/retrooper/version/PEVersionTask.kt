@@ -41,9 +41,12 @@ abstract class PEVersionTask : DefaultTask() {
              */
             package $packageName;
             
+            import java.time.Instant;
+            
             public final class PEVersions {
             
                 public static final String RAW = "$version";
+                public static final Instant BUILD_TIMESTAMP = Instant.ofEpochMilli(${System.currentTimeMillis()}L);
                 public static final PEVersion CURRENT = new PEVersion(${ver.major}, ${ver.minor}, ${ver.patch}, ${ver.quotedSnapshotCommit()});
                 public static final PEVersion UNKNOWN = new PEVersion(0, 0, 0);
                 
