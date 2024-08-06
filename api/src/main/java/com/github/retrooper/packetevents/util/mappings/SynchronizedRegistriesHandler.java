@@ -166,12 +166,23 @@ public final class SynchronizedRegistriesHandler {
                 RegistryElement element,
                 int id, ClientVersion version
         ) {
-            TypesBuilderData data = new SimpleTypesBuilderData(element.getId(), id);
+            ResourceLocation elementName = element.getId();
+            T baseEntry = this.baseRegistry.getByName(elementName);
+
+            // save new element definition in base entry for comparison - and fallback
+            TypesBuilderData data = new SimpleTypesBuilderData(elementName, id);
+            T copiedBaseEntry = baseEntry == null ? null : baseEntry.copy(data);
+
             if (element.getData() != null) {
                 // data was provided, use registry element sent over network
                 T value = this.decoder.decode(element.getData(), version, data);
-                registry.define(element.getId(), id, value);
-                return;
+                if (!value.equals(copiedBaseEntry)) {
+                    // only define decoded value if it doesn't match the base
+                    // registry value this ensures we don't save everything twice,
+                    // if it has been already stored in memory
+                    registry.define(elementName, id, value);
+                    return;
+                }
             }
 
             // fallback to looking up in vanilla registry
@@ -185,10 +196,8 @@ public final class SynchronizedRegistriesHandler {
             // this will cause issues, especially when some datapack overrides world height
             // of a vanilla dimension - and this can't be fixed (or I missed something)
 
-            ResourceLocation elementName = element.getId();
-            T baseEntry = this.baseRegistry.getByName(elementName);
-            if (baseEntry != null) {
-                registry.define(elementName, id, baseEntry.copy(data));
+            if (copiedBaseEntry != null) {
+                registry.define(elementName, id, copiedBaseEntry);
                 return;
             }
 
