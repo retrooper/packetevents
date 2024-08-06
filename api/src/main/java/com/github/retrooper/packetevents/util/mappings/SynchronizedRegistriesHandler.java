@@ -56,6 +56,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,26 +87,30 @@ public final class SynchronizedRegistriesHandler {
     ) {
         RegistryEntry<?> registry = REGISTRY_KEYS.get(registryName);
         if (registry != null) {
-            SimpleRegistry<?> syncedRegistry = registry.createFromElements(elements, version);
+            Supplier<SimpleRegistry<?>> syncedRegistrySupplier = () -> registry.createFromElements(elements, version);
             if (caching) {
                 // Cache the synchronized registries within each VersionedRegistry.
+                SimpleRegistry<?> syncedRegistry;
                 if (registry.baseRegistry instanceof VersionedRegistry) {
                     VersionedRegistry<?> versionedRegistry = (VersionedRegistry<?>) registry.baseRegistry;
 
                     //Did we already cache these? If so, skip...
                     if (versionedRegistry.getSynchronizedRegistry() != null) return;
 
+                    syncedRegistry = syncedRegistrySupplier.get();
                     versionedRegistry.synchronizeRegistry(syncedRegistry);
+                } else {
+                    syncedRegistry = syncedRegistrySupplier.get();
                 }
 
                 // Dimension type registry is the one exception that we always store for each user.
-                if (syncedRegistry.getRegistryKey().equals(DimensionTypes.getRegistry().getRegistryKey())) {
+                if (registryName.equals(DimensionTypes.getRegistry().getRegistryKey())) {
                     user.putUserRegistry(syncedRegistry);
                 }
             }
             else {
                 // If we opt not to cache, we shall store the registries within each user.
-                user.putUserRegistry(syncedRegistry);
+                user.putUserRegistry(syncedRegistrySupplier.get());
             }
         }
     }
