@@ -18,7 +18,6 @@
 
 package com.github.retrooper.packetevents.protocol.world.biome;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
@@ -66,8 +65,7 @@ public final class Biomes {
             if (dataTag == null) {
                 throw new IllegalArgumentException("Can't define biome " + data.getName() + ", no data found");
             }
-            ClientVersion version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
-            return Biome.decode(dataTag, version, data);
+            return Biome.decode(dataTag, ClientVersion.getLatest(), data);
         });
     }
 

@@ -18,7 +18,6 @@
 
 package com.github.retrooper.packetevents.protocol.item.enchantment.type;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
@@ -71,8 +70,7 @@ public final class EnchantmentTypes {
             if (dataTag == null) {
                 throw new IllegalArgumentException("Can't define enchantment " + data.getName() + ", no data found");
             }
-            ClientVersion version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
-            return EnchantmentType.decode(dataTag, version, data);
+            return EnchantmentType.decode(dataTag, ClientVersion.getLatest(), data);
         });
     }
 
