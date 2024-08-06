@@ -38,10 +38,6 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
     private final Map<String, T> typeMap = new HashMap<>();
     private final Map<Byte, Map<Integer, T>> typeIdMap = new HashMap<>();
 
-    //Each version registry may have a synchronized registry cache, for convenience and enhanced performance.
-    @Nullable
-    private SimpleRegistry<T> synchedRegistry = null;
-
     public VersionedRegistry(String registry, String mappingsPath) {
         this(new ResourceLocation(registry), mappingsPath);
     }
@@ -60,34 +56,17 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
     }
 
     @ApiStatus.Internal
-    public void synchronizeRegistry(SimpleRegistry<?> registry) {
-        this.synchedRegistry = (SimpleRegistry<T>) registry;
-    }
-
-    @ApiStatus.Internal
-    @Nullable
-    public SimpleRegistry<T> getSynchronizedRegistry() {
-        return synchedRegistry;
-    }
-
-    @ApiStatus.Internal
     public void unloadMappings() {
         this.typesBuilder.unloadFileMappings();
     }
 
     @Override
     public @Nullable T getByName(String name) {
-        if (synchedRegistry != null) {
-            return synchedRegistry.getByName(name);
-        }
         return this.typeMap.get(name);
     }
 
     @Override
     public @Nullable T getById(ClientVersion version, int id) {
-        if (synchedRegistry != null) {
-            return synchedRegistry.getById(version, id);
-        }
         int index = this.typesBuilder.getDataIndex(version);
         Map<Integer, T> idMap = this.typeIdMap.get((byte) index);
         return idMap.get(id);
@@ -95,9 +74,6 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
 
     @Override
     public int getId(MappedEntity entity, ClientVersion version) {
-        if (synchedRegistry != null) {
-            return synchedRegistry.getId(entity, version);
-        }
         return entity.getId(version);
     }
 
@@ -106,17 +82,11 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
      */
     @Override
     public Collection<T> getEntries() {
-        if (synchedRegistry != null) {
-            return synchedRegistry.getEntries();
-        }
         return Collections.unmodifiableCollection(this.typeMap.values());
     }
 
     @Override
     public ResourceLocation getRegistryKey() {
-        if (synchedRegistry != null) {
-            return synchedRegistry.getRegistryKey();
-        }
         return this.registryKey;
     }
 }

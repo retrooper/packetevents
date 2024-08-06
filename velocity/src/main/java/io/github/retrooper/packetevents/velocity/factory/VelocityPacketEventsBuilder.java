@@ -29,6 +29,7 @@ import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
@@ -37,6 +38,7 @@ import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.ServerConnection;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
@@ -48,7 +50,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.lang.reflect.Field;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class VelocityPacketEventsBuilder {
@@ -66,7 +70,7 @@ public class VelocityPacketEventsBuilder {
     }
 
     public static PacketEventsAPI<PluginContainer> build(ProxyServer server, PluginContainer plugin, Logger logger, Path dataDirectory,
-            PacketEventsSettings settings) {
+                                                         PacketEventsSettings settings) {
         if (INSTANCE == null) {
             INSTANCE = buildNoCache(server, plugin, logger, dataDirectory, settings);
         }
@@ -78,7 +82,7 @@ public class VelocityPacketEventsBuilder {
     }
 
     public static PacketEventsAPI<PluginContainer> buildNoCache(ProxyServer server, PluginContainer plugin, Logger logger, Path dataDirectory,
-            PacketEventsSettings inSettings) {
+                                                                PacketEventsSettings inSettings) {
         return new PacketEventsAPI<PluginContainer>() {
             private final PacketEventsSettings settings = inSettings;
             // TODO Implement platform version
@@ -89,7 +93,22 @@ public class VelocityPacketEventsBuilder {
                 }
             };
             private final ServerManager serverManager = new ServerManagerAbstract() {
+
+                private final Field connectionInFlight, registeredServer;
                 private ServerVersion version;
+
+                {
+                    try {
+                        Class<?> playerClass = Class.forName("com.velocitypowered.proxy.connection.client.ConnectedPlayer");
+                        this.connectionInFlight = playerClass.getDeclaredField("connectionInFlight");
+                        this.connectionInFlight.setAccessible(true);
+                        Class<?> serverConnectionClass = Class.forName("com.velocitypowered.proxy.connection.backend.VelocityServerConnection");
+                        this.registeredServer = serverConnectionClass.getDeclaredField("registeredServer");
+                        this.registeredServer.setAccessible(true);
+                    } catch (ReflectiveOperationException exception) {
+                        throw new RuntimeException("Error while resolving methods for getting player server connection");
+                    }
+                }
 
                 @Override
                 public ServerVersion getVersion() {
@@ -111,6 +130,24 @@ public class VelocityPacketEventsBuilder {
                         throw new IllegalStateException("Can't find any version compatible with this velocity instance");
                     }
                     return this.version;
+                }
+
+                private Object getTargetServer(Player player) {
+                    ServerConnection server = player.getCurrentServer().orElse(null);
+                    if (server != null) {
+                        return server;
+                    }
+                    try {
+                        return this.registeredServer.get(this.connectionInFlight.get(player));
+                    } catch (IllegalAccessException exception) {
+                        throw new RuntimeException(exception);
+                    }
+                }
+
+                @Override
+                public Object getRegistryCacheKey(User user, ClientVersion version) {
+                    Player player = server.getPlayer(user.getUUID()).orElse(null);
+                    return player == null ? null : Objects.hash(this.getTargetServer(player), version);
                 }
             };
 

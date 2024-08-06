@@ -52,7 +52,6 @@ public class InternalPacketListener extends PacketListenerAbstract {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         User user = event.getUser();
-        boolean proxy = PacketEvents.getAPI().getInjector().isProxy();
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             Object channel = event.getChannel();
             //Process outgoing login success packet
@@ -74,6 +73,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
             // Switch the user's connection state to new state, but the variable event.getConnectionState() remains LOGIN
             // We switch user state immediately to remain in sync with vanilla, allowing you to encode packets immediately
+            boolean proxy = PacketEvents.getAPI().getInjector().isProxy();
             if (proxy ? event.getUser().getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_20_2)
                     : event.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
                 user.setEncoderState(ConnectionState.CONFIGURATION);
@@ -88,11 +88,11 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
             if (packet.getElements() != null) { // 1.20.2 to 1.20.5
                 SynchronizedRegistriesHandler.handleRegistry(user, packet.getServerVersion().toClientVersion(),
-                        packet.getRegistryKey(), packet.getElements(), !proxy);
+                        packet.getRegistryKey(), packet.getElements());
             }
             if (packet.getRegistryData() != null) { // since 1.20.5
                 SynchronizedRegistriesHandler.handleLegacyRegistries(user, packet.getServerVersion()
-                        .toClientVersion(), packet.getRegistryData(), proxy);
+                        .toClientVersion(), packet.getRegistryData());
             }
         }
 
@@ -103,7 +103,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
             if (joinGame.getDimensionCodec() != null) { // 1.16 to 1.20.1
                 SynchronizedRegistriesHandler.handleLegacyRegistries(user, joinGame.getServerVersion().toClientVersion(),
-                        joinGame.getDimensionCodec(), proxy);
+                        joinGame.getDimensionCodec());
             }
 
             user.setDimensionType(joinGame.getDimensionType());

@@ -55,26 +55,28 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@ApiStatus.Internal
 public final class SynchronizedRegistriesHandler {
 
     private static final boolean FORCE_PER_USER_REGISTRIES = Boolean.getBoolean("packetevents.force-per-user-registries");
     private static final Map<ResourceLocation, RegistryEntry<?>> REGISTRY_KEYS = Stream.of(
-            new RegistryEntry<>(Biomes.getRegistry(), Biomes.class, Biome::decode),
-            new RegistryEntry<>(ChatTypes.getRegistry(), ChatTypes.class, ChatType::decode),
-            new RegistryEntry<>(TrimPatterns.getRegistry(), TrimPatterns.class, TrimPattern::decode),
-            new RegistryEntry<>(TrimMaterials.getRegistry(), TrimMaterials.class, TrimMaterial::decode),
-            new RegistryEntry<>(WolfVariants.getRegistry(), WolfVariant.class, WolfVariant::decode),
-            new RegistryEntry<>(PaintingVariants.getRegistry(), PaintingVariants.class, PaintingVariant::decode),
-            new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionTypes.class, DimensionType::decode),
-            new RegistryEntry<>(DamageTypes.getRegistry(), DamageTypes.class, DamageType::decode),
-            new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPatterns.class, BannerPattern::decode),
-            new RegistryEntry<>(EnchantmentTypes.getRegistry(), EnchantmentTypes.class, EnchantmentType::decode),
-            new RegistryEntry<>(JukeboxSongs.getRegistry(), IJukeboxSong.class, IJukeboxSong::decode)
+            new RegistryEntry<>(Biomes.getRegistry(), Biome::decode),
+            new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
+            new RegistryEntry<>(TrimPatterns.getRegistry(), TrimPattern::decode),
+            new RegistryEntry<>(TrimMaterials.getRegistry(), TrimMaterial::decode),
+            new RegistryEntry<>(WolfVariants.getRegistry(), WolfVariant::decode),
+            new RegistryEntry<>(PaintingVariants.getRegistry(), PaintingVariant::decode),
+            new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType::decode),
+            new RegistryEntry<>(DamageTypes.getRegistry(), DamageType::decode),
+            new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode),
+            new RegistryEntry<>(EnchantmentTypes.getRegistry(), EnchantmentType::decode),
+            new RegistryEntry<>(JukeboxSongs.getRegistry(), IJukeboxSong::decode)
     ).collect(Collectors.toMap(RegistryEntry::getRegistryKey, Function.identity()));
 
     private SynchronizedRegistriesHandler() {
@@ -83,44 +85,37 @@ public final class SynchronizedRegistriesHandler {
     public static void handleRegistry(
             User user, ClientVersion version,
             ResourceLocation registryName,
-            List<RegistryElement> elements,
-            boolean caching
+            List<RegistryElement> elements
     ) {
-        RegistryEntry<?> registry = REGISTRY_KEYS.get(registryName);
-        if (registry != null) {
-            Supplier<SimpleRegistry<?>> syncedRegistrySupplier = () -> registry.createFromElements(elements, version);
-            if (!FORCE_PER_USER_REGISTRIES && caching) {
-                // Cache the synchronized registries within each VersionedRegistry.
-                SimpleRegistry<?> syncedRegistry;
-                if (registry.baseRegistry instanceof VersionedRegistry) {
-                    VersionedRegistry<?> versionedRegistry = (VersionedRegistry<?>) registry.baseRegistry;
+        Object cacheKey = PacketEvents.getAPI().getServerManager().getRegistryCacheKey(user, version);
+        handleRegistry(user, version, registryName, elements, cacheKey);
+    }
 
-                    //Did we already cache these? If so, skip...
-                    if (versionedRegistry.getSynchronizedRegistry() != null) return;
-
-                    syncedRegistry = syncedRegistrySupplier.get();
-                    versionedRegistry.synchronizeRegistry(syncedRegistry);
-                } else {
-                    syncedRegistry = syncedRegistrySupplier.get();
-                }
-
-                // Dimension type registry is the one exception that we always store for each user.
-                if (registryName.equals(DimensionTypes.getRegistry().getRegistryKey())) {
-                    user.putUserRegistry(syncedRegistry);
-                }
-            }
-            else {
-                // If we opt not to cache, we shall store the registries within each user.
-                user.putUserRegistry(syncedRegistrySupplier.get());
-            }
+    public static void handleRegistry(
+            User user, ClientVersion version,
+            ResourceLocation registryName,
+            List<RegistryElement> elements,
+            Object cacheKey
+    ) {
+        RegistryEntry<?> registryData = REGISTRY_KEYS.get(registryName);
+        if (registryData == null) {
+            return;
         }
+        SimpleRegistry<?> syncedRegistry;
+        if (FORCE_PER_USER_REGISTRIES || cacheKey == null) {
+            syncedRegistry = registryData.createFromElements(elements, version); // no caching
+        } else {
+            syncedRegistry = registryData.computeSyncedRegistry(cacheKey, () ->
+                    registryData.createFromElements(elements, version));
+        }
+        user.putUserRegistry(syncedRegistry);
     }
 
     public static void handleLegacyRegistries(
             User user, ClientVersion version,
-            NBTCompound registryData,
-            boolean cache
+            NBTCompound registryData
     ) {
+        Object cacheKey = PacketEvents.getAPI().getServerManager().getRegistryCacheKey(user, version);
         for (NBT tag : registryData.getTags().values()) {
             NBTCompound compound = (NBTCompound) tag;
             // extract registry name
@@ -131,7 +126,7 @@ public final class SynchronizedRegistriesHandler {
                     compound.getCompoundListTagOrThrow("value");
             // store registry elements
             handleRegistry(user, version, registryName,
-                    RegistryElement.convertNbt(nbtElements), cache);
+                    RegistryElement.convertNbt(nbtElements), cacheKey);
         }
     }
 
@@ -144,17 +139,26 @@ public final class SynchronizedRegistriesHandler {
     private static final class RegistryEntry<T extends MappedEntity & CopyableEntity<T>> {
 
         private final IRegistry<T> baseRegistry;
-        private final Class<?> registryContainerClass;
         private final NbtEntryDecoder<T> decoder;
+
+        // each registry may have a synchronized registry cache, for convenience and enhanced performance
+        //
+        // the key to this cache depends on the platform - it may be a constant value for bukkit servers
+        // or some backend server related value for proxy servers
+        private final Map<Object, SimpleRegistry<T>> syncedRegistries = new ConcurrentHashMap<>(2);
 
         public RegistryEntry(
                 IRegistry<T> baseRegistry,
-                Class<?> registryContainerClass,
                 NbtEntryDecoder<T> decoder
         ) {
             this.baseRegistry = baseRegistry;
-            this.registryContainerClass = registryContainerClass;
             this.decoder = decoder;
+        }
+
+        @SuppressWarnings("unchecked")
+        public SimpleRegistry<T> computeSyncedRegistry(Object key, Supplier<SimpleRegistry<?>> registry) {
+            return this.syncedRegistries.computeIfAbsent(key,
+                    $ -> (SimpleRegistry<T>) registry.get());
         }
 
         private void handleElement(
@@ -205,11 +209,6 @@ public final class SynchronizedRegistriesHandler {
 
         public ResourceLocation getRegistryKey() {
             return this.baseRegistry.getRegistryKey();
-        }
-
-        @ApiStatus.Internal
-        public Class<?> getRegistryContainerClass() {
-            return registryContainerClass;
         }
     }
 }
