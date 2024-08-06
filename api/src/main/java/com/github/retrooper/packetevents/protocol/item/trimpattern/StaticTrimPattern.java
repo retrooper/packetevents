@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class StaticTrimPattern extends AbstractMappedEntity implements TrimPattern {
 
     private final ResourceLocation assetId;
@@ -75,5 +77,22 @@ public class StaticTrimPattern extends AbstractMappedEntity implements TrimPatte
     @Override
     public boolean isDecal() {
         return this.decal;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticTrimPattern)) return false;
+        if (!super.equals(obj)) return false;
+        StaticTrimPattern that = (StaticTrimPattern) obj;
+        if (this.decal != that.decal) return false;
+        if (!this.assetId.equals(that.assetId)) return false;
+        if (!this.templateItem.equals(that.templateItem)) return false;
+        return this.description.equals(that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.assetId, this.templateItem, this.description, this.decal);
     }
 }

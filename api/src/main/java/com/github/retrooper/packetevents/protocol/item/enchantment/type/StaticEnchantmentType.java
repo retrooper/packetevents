@@ -26,6 +26,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class StaticEnchantmentType extends AbstractMappedEntity implements EnchantmentType {
 
     private final Component description;
@@ -80,5 +82,22 @@ public class StaticEnchantmentType extends AbstractMappedEntity implements Encha
     @Override
     public StaticComponentMap getEffects() {
         return this.effects;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticEnchantmentType)) return false;
+        if (!super.equals(obj)) return false;
+        StaticEnchantmentType that = (StaticEnchantmentType) obj;
+        if (!this.description.equals(that.description)) return false;
+        if (!this.definition.equals(that.definition)) return false;
+        if (!this.exclusiveSet.equals(that.exclusiveSet)) return false;
+        return this.effects.equals(that.effects);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.description, this.definition, this.exclusiveSet, this.effects);
     }
 }

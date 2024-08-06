@@ -23,6 +23,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class StaticBiome extends AbstractMappedEntity implements Biome {
 
     private final boolean precipitation;
@@ -149,5 +151,27 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
     @Override
     public BiomeEffects getEffects() {
         return this.effects;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticBiome)) return false;
+        if (!super.equals(obj)) return false;
+        StaticBiome that = (StaticBiome) obj;
+        if (this.precipitation != that.precipitation) return false;
+        if (Float.compare(that.temperature, this.temperature) != 0) return false;
+        if (Float.compare(that.downfall, this.downfall) != 0) return false;
+        if (this.temperatureModifier != that.temperatureModifier) return false;
+        if (this.category != that.category) return false;
+        if (!Objects.equals(this.depth, that.depth)) return false;
+        if (!Objects.equals(this.scale, that.scale)) return false;
+        return this.effects.equals(that.effects);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.precipitation, this.temperature,
+                this.temperatureModifier, this.downfall, this.category, this.depth, this.scale, this.effects);
     }
 }

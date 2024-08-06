@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class StaticChatType extends AbstractMappedEntity implements ChatType {
 
     private final ChatTypeDecoration chatDecoration;
@@ -91,5 +93,22 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
     @Override
     public @Nullable NarrationPriority getNarrationPriority() {
         return this.narrationPriority;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticChatType)) return false;
+        if (!super.equals(obj)) return false;
+        StaticChatType that = (StaticChatType) obj;
+        if (!this.chatDecoration.equals(that.chatDecoration)) return false;
+        if (!Objects.equals(this.overlayDecoration, that.overlayDecoration)) return false;
+        if (!this.narrationDecoration.equals(that.narrationDecoration)) return false;
+        return this.narrationPriority == that.narrationPriority;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.chatDecoration, this.overlayDecoration, this.narrationDecoration, this.narrationPriority);
     }
 }

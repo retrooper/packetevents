@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import net.kyori.adventure.util.Index;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 
@@ -161,6 +162,30 @@ public class BiomeEffects {
         return this.ambientSound;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof BiomeEffects)) return false;
+        BiomeEffects that = (BiomeEffects) obj;
+        if (this.fogColor != that.fogColor) return false;
+        if (this.waterColor != that.waterColor) return false;
+        if (this.waterFogColor != that.waterFogColor) return false;
+        if (this.skyColor != that.skyColor) return false;
+        if (!this.foliageColor.equals(that.foliageColor)) return false;
+        if (!this.grassColor.equals(that.grassColor)) return false;
+        if (this.grassColorModifier != that.grassColorModifier) return false;
+        if (!this.particle.equals(that.particle)) return false;
+        if (!this.ambientSound.equals(that.ambientSound)) return false;
+        if (!this.moodSound.equals(that.moodSound)) return false;
+        if (!this.additionsSound.equals(that.additionsSound)) return false;
+        return this.music.equals(that.music);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.fogColor, this.waterColor, this.waterFogColor, this.skyColor, this.foliageColor, this.grassColor, this.grassColorModifier, this.particle, this.ambientSound, this.moodSound, this.additionsSound, this.music);
+    }
+
     public enum GrassColorModifier {
 
         NONE("none"),
@@ -261,6 +286,22 @@ public class BiomeEffects {
         public double getSoundOffset() {
             return this.soundOffset;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof MoodSettings)) return false;
+            MoodSettings that = (MoodSettings) obj;
+            if (this.tickDelay != that.tickDelay) return false;
+            if (this.blockSearchExtent != that.blockSearchExtent) return false;
+            if (Double.compare(that.soundOffset, this.soundOffset) != 0) return false;
+            return this.sound.equals(that.sound);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.sound, this.tickDelay, this.blockSearchExtent, this.soundOffset);
+        }
     }
 
     public static final class AdditionsSettings {
@@ -293,6 +334,20 @@ public class BiomeEffects {
 
         public double getTickChance() {
             return this.tickChance;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof AdditionsSettings)) return false;
+            AdditionsSettings that = (AdditionsSettings) obj;
+            if (Double.compare(that.tickChance, this.tickChance) != 0) return false;
+            return this.sound.equals(that.sound);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.sound, this.tickChance);
         }
     }
 
@@ -342,6 +397,22 @@ public class BiomeEffects {
 
         public boolean isReplaceMusic() {
             return this.replaceMusic;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof MusicSettings)) return false;
+            MusicSettings that = (MusicSettings) obj;
+            if (this.minDelay != that.minDelay) return false;
+            if (this.maxDelay != that.maxDelay) return false;
+            if (this.replaceMusic != that.replaceMusic) return false;
+            return this.sound.equals(that.sound);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.sound, this.minDelay, this.maxDelay, this.replaceMusic);
         }
     }
 }

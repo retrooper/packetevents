@@ -23,6 +23,8 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class StaticPaintingVariant extends AbstractMappedEntity implements PaintingVariant {
 
     private final int width;
@@ -58,5 +60,21 @@ public class StaticPaintingVariant extends AbstractMappedEntity implements Paint
     @Override
     public ResourceLocation getAssetId() {
         return this.assetId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticPaintingVariant)) return false;
+        if (!super.equals(obj)) return false;
+        StaticPaintingVariant that = (StaticPaintingVariant) obj;
+        if (this.width != that.width) return false;
+        if (this.height != that.height) return false;
+        return this.assetId.equals(that.assetId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.width, this.height, this.assetId);
     }
 }

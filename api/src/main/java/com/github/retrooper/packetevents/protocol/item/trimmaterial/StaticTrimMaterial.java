@@ -26,6 +26,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMaterial {
 
@@ -84,5 +85,23 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
     @Override
     public Component getDescription() {
         return this.description;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticTrimMaterial)) return false;
+        if (!super.equals(obj)) return false;
+        StaticTrimMaterial that = (StaticTrimMaterial) obj;
+        if (Float.compare(that.itemModelIndex, this.itemModelIndex) != 0) return false;
+        if (!this.assetName.equals(that.assetName)) return false;
+        if (!this.ingredient.equals(that.ingredient)) return false;
+        if (!this.overrideArmorMaterials.equals(that.overrideArmorMaterials)) return false;
+        return this.description.equals(that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.assetName, this.ingredient, this.itemModelIndex, this.overrideArmorMaterials, this.description);
     }
 }

@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.CONTENT;
@@ -145,6 +146,21 @@ public class ChatTypeDecoration {
 
     public Style getStyle() {
         return this.style;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ChatTypeDecoration)) return false;
+        ChatTypeDecoration that = (ChatTypeDecoration) obj;
+        if (!this.translationKey.equals(that.translationKey)) return false;
+        if (!this.parameters.equals(that.parameters)) return false;
+        return this.style.equals(that.style);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.translationKey, this.parameters, this.style);
     }
 
     public enum Parameter {

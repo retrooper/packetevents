@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class StaticWolfVariant extends AbstractMappedEntity implements WolfVariant {
 
     private final ResourceLocation wildTexture;
@@ -78,5 +80,22 @@ public class StaticWolfVariant extends AbstractMappedEntity implements WolfVaria
     @Override
     public MappedEntitySet<Biome> getBiomes() {
         return this.biomes;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticWolfVariant)) return false;
+        if (!super.equals(obj)) return false;
+        StaticWolfVariant that = (StaticWolfVariant) obj;
+        if (!this.wildTexture.equals(that.wildTexture)) return false;
+        if (!this.tameTexture.equals(that.tameTexture)) return false;
+        if (!this.angryTexture.equals(that.angryTexture)) return false;
+        return this.biomes.equals(that.biomes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.wildTexture, this.tameTexture, this.angryTexture, this.biomes);
     }
 }

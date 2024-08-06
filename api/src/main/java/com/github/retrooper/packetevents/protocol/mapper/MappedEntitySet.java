@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 /**
@@ -128,5 +129,19 @@ public class MappedEntitySet<T> {
 
     public @Nullable List<T> getEntities() {
         return this.entities;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof MappedEntitySet)) return false;
+        MappedEntitySet<?> that = (MappedEntitySet<?>) obj;
+        if (!Objects.equals(this.tagKey, that.tagKey)) return false;
+        return Objects.equals(this.entities, that.entities);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.tagKey, this.entities);
     }
 }

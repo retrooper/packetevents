@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class StaticDamageType extends AbstractMappedEntity implements DamageType {
     private String messageId;
     private DamageScaling scaling;
@@ -69,5 +71,23 @@ public class StaticDamageType extends AbstractMappedEntity implements DamageType
     @Override
     public DeathMessageType getDeathMessageType() {
         return this.deathMessageType;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticDamageType)) return false;
+        if (!super.equals(obj)) return false;
+        StaticDamageType that = (StaticDamageType) obj;
+        if (Float.compare(that.exhaustion, this.exhaustion) != 0) return false;
+        if (!this.messageId.equals(that.messageId)) return false;
+        if (this.scaling != that.scaling) return false;
+        if (this.effects != that.effects) return false;
+        return this.deathMessageType == that.deathMessageType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.messageId, this.scaling, this.exhaustion, this.effects, this.deathMessageType);
     }
 }
