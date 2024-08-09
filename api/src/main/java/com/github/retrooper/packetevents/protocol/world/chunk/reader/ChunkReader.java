@@ -21,9 +21,27 @@ package com.github.retrooper.packetevents.protocol.world.chunk.reader;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 
 import java.util.BitSet;
 
 public interface ChunkReader {
-    BaseChunk[] read(Dimension dimension, BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn);
+
+    @Deprecated
+    default BaseChunk[] read(
+            Dimension dimension, BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight,
+            boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn
+    ) {
+        DimensionType dimensionType = dimension.asDimensionType(null, null);
+        return this.read(dimensionType, set, sevenExtendedMask, fullChunk,
+                hasSkyLight, checkForSky, chunkSize, data, dataIn);
+    }
+
+    default BaseChunk[] read(
+            DimensionType dimensionType, BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight,
+            boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn
+    ) {
+        Dimension dimension = Dimension.fromDimensionType(dimensionType, null, null);
+        return this.read(dimension, set, sevenExtendedMask, fullChunk, hasSkyLight, checkForSky, chunkSize, data, dataIn);
+    }
 }

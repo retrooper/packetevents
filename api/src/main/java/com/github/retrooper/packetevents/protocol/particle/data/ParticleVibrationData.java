@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.particle.data;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSource;
 import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSourceType;
@@ -150,6 +151,14 @@ public class ParticleVibrationData extends ParticleData {
         sourceType.write(wrapper, data.getSource());
 
         wrapper.writeVarInt(data.getTicks());
+    }
+
+    public static ParticleVibrationData decode(NBTCompound compound, ClientVersion version) {
+        throw new UnsupportedOperationException(); // FIXME
+    }
+
+    public static void encode(ParticleVibrationData data, ClientVersion version, NBTCompound compound) {
+        throw new UnsupportedOperationException(); // FIXME
     }
 
     @ApiStatus.Obsolete

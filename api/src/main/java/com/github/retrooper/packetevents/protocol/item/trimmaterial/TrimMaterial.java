@@ -22,14 +22,24 @@ import com.github.retrooper.packetevents.protocol.item.armormaterial.ArmorMateri
 import com.github.retrooper.packetevents.protocol.item.armormaterial.ArmorMaterials;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
-public interface TrimMaterial extends MappedEntity {
+public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial> {
 
     String getAssetName();
 
@@ -46,7 +56,7 @@ public interface TrimMaterial extends MappedEntity {
     Component getDescription();
 
     static TrimMaterial read(PacketWrapper<?> wrapper) {
-        return wrapper.readMappedEntityOrDirect(TrimMaterials::getById, TrimMaterial::readDirect);
+        return wrapper.readMappedEntityOrDirect(TrimMaterials.getRegistry(), TrimMaterial::readDirect);
     }
 
     static TrimMaterial readDirect(PacketWrapper<?> wrapper) {
@@ -71,5 +81,50 @@ public interface TrimMaterial extends MappedEntity {
         wrapper.writeMap(material.getOverrideArmorMaterials(),
                 PacketWrapper::writeMappedEntity, PacketWrapper::writeString);
         wrapper.writeComponent(material.getDescription());
+    }
+
+    static TrimMaterial decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
+        NBTCompound compound = (NBTCompound) nbt;
+        String assetName = compound.getStringTagValueOrThrow("asset_name");
+        ItemType ingredient = ItemTypes.getByName(compound.getStringTagValueOrThrow("ingredient"));
+        float itemModelIndex = compound.getNumberTagOrThrow("item_model_index").getAsFloat();
+        NBTCompound overrideArmorMaterialsTag = compound.getCompoundTagOrNull("override_armor_materials");
+        Map<ArmorMaterial, String> overrideArmorMaterials;
+        if (overrideArmorMaterialsTag != null) {
+            overrideArmorMaterials = new HashMap<>();
+            for (Map.Entry<String, NBT> entry : overrideArmorMaterialsTag.getTags().entrySet()) {
+                ArmorMaterial material = ArmorMaterials.getByName(entry.getKey());
+                String override = ((NBTString) entry.getValue()).getValue();
+                overrideArmorMaterials.put(material, override);
+            }
+        } else {
+            overrideArmorMaterials = Collections.emptyMap();
+        }
+        Component description = AdventureSerializer.fromNbt(((NBTCompound) nbt).getTagOrThrow("description"));
+        return new StaticTrimMaterial(data, assetName, ingredient, itemModelIndex, overrideArmorMaterials, description);
+    }
+
+    static NBT encode(TrimMaterial material, ClientVersion version) {
+        NBTCompound overrideArmorMaterialsTag;
+        if (!material.getOverrideArmorMaterials().isEmpty()) {
+            overrideArmorMaterialsTag = new NBTCompound();
+            for (Map.Entry<ArmorMaterial, String> entry : material.getOverrideArmorMaterials().entrySet()) {
+                String materialName = entry.getKey().getName().toString();
+                NBTString overrideTag = new NBTString(entry.getValue());
+                overrideArmorMaterialsTag.setTag(materialName, overrideTag);
+            }
+        } else {
+            overrideArmorMaterialsTag = null;
+        }
+
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("asset_name", new NBTString(material.getAssetName()));
+        compound.setTag("ingredient", new NBTString(material.getIngredient().getName().toString()));
+        compound.setTag("item_model_index", new NBTFloat(material.getItemModelIndex()));
+        if (overrideArmorMaterialsTag != null) {
+            compound.setTag("override_armor_materials", overrideArmorMaterialsTag);
+        }
+        compound.setTag("description", AdventureSerializer.toNbt(material.getDescription()));
+        return compound;
     }
 }

@@ -19,8 +19,20 @@
 package com.github.retrooper.packetevents.protocol.particle.data;
 
 import com.github.retrooper.packetevents.protocol.color.Color;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTByteArray;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
+import com.github.retrooper.packetevents.protocol.nbt.NBTIntArray;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTLongArray;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 public class ParticleDustData extends ParticleData {
     //0.01 - 4
@@ -36,6 +48,10 @@ public class ParticleDustData extends ParticleData {
         this.red = red;
         this.green = green;
         this.blue = blue;
+    }
+
+    public ParticleDustData(float scale, float[] rgb) {
+        this(scale, rgb[0], rgb[1], rgb[2]);
     }
 
     public ParticleDustData(float scale, Vector3f rgb) {
@@ -93,6 +109,63 @@ public class ParticleDustData extends ParticleData {
         wrapper.writeFloat(data.getScale());
     }
 
+    @ApiStatus.Internal
+    public static float[] decodeColor(NBT tag) {
+        // I hate how nbt works
+        if (tag instanceof NBTList<?>) {
+            NBTList<?> colorTagList = (NBTList<?>) tag;
+            float first = ((NBTNumber) colorTagList.getTag(0)).getAsFloat();
+            float second = ((NBTNumber) colorTagList.getTag(1)).getAsFloat();
+            float third = ((NBTNumber) colorTagList.getTag(2)).getAsFloat();
+            if (colorTagList.size() > 3) {
+                float fourth = ((NBTNumber) colorTagList.getTag(3)).getAsFloat();
+                return new float[]{first, second, third, fourth}; // ARGB
+            }
+            return new float[]{first, second, third}; // RGB
+        } else if (tag instanceof NBTByteArray) {
+            byte[] colors = ((NBTByteArray) tag).getValue();
+            return colors.length > 3
+                    ? new float[]{colors[0], colors[1], colors[2], colors[3]}
+                    : new float[]{colors[0], colors[1], colors[2]};
+        } else if (tag instanceof NBTIntArray) {
+            int[] colors = ((NBTIntArray) tag).getValue();
+            return colors.length > 3
+                    ? new float[]{colors[0], colors[1], colors[2], colors[3]}
+                    : new float[]{colors[0], colors[1], colors[2]};
+        } else if (tag instanceof NBTLongArray) {
+            long[] colors = ((NBTLongArray) tag).getValue();
+            return colors.length > 3
+                    ? new float[]{colors[0], colors[1], colors[2], colors[3]}
+                    : new float[]{colors[0], colors[1], colors[2]};
+        } else {
+            throw new UnsupportedOperationException("Unsupported color nbt tag: " + tag);
+        }
+    }
+
+    @ApiStatus.Internal
+    public static NBT encodeColor(@Nullable Float alpha, float red, float green, float blue) {
+        NBTList<NBTFloat> nbtList = new NBTList<>(NBTType.FLOAT,
+                alpha == null ? 3 : 4);
+        if (alpha != null) {
+            nbtList.addTag(new NBTFloat(alpha));
+        }
+        nbtList.addTag(new NBTFloat(red));
+        nbtList.addTag(new NBTFloat(green));
+        nbtList.addTag(new NBTFloat(blue));
+        return nbtList;
+    }
+
+    public static ParticleDustData decode(NBTCompound compound, ClientVersion version) {
+        NBT colorNBT = compound.getTagOrNull("color");
+        float[] color = decodeColor(colorNBT);
+        float scale = compound.getNumberTagOrThrow("scale").getAsFloat();
+        return new ParticleDustData(scale, color);
+    }
+
+    public static void encode(ParticleDustData data, ClientVersion version, NBTCompound compound) {
+        compound.setTag("color", encodeColor(null, data.red, data.green, data.blue));
+        compound.setTag("scale", new NBTFloat(data.scale));
+    }
 
     @Override
     public boolean isEmpty() {

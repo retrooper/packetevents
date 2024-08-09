@@ -76,6 +76,14 @@ public class Sounds {
         return soundType;
     }
 
+    public static Sound getByNameOrCreate(String name) {
+        Sound builtinSound = getByName(name);
+        if (builtinSound == null) {
+            return new StaticSound(new ResourceLocation(name), null);
+        }
+        return builtinSound;
+    }
+
     public static @Nullable Sound getByName(String name) {
         return SOUND_TYPE_MAP.get(name);
     }

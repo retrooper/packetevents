@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
@@ -33,7 +34,11 @@ import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.mappings.SimpleTypesBuilderData;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Pose;
@@ -154,6 +159,28 @@ public class SpigotConversionUtil {
         return SpigotReflectionUtil.encodeBukkitItemStack(itemStack);
     }
 
+    public static DimensionType typeFromBukkitWorld(World world) {
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        if (version.isOlderThan(ServerVersion.V_1_14)) {
+            int environmentId = world.getEnvironment().getId();
+            return DimensionTypes.getRegistry().getById(version.toClientVersion(), environmentId);
+        } else if (version.isOlderThan(ServerVersion.V_1_16)) {
+            Object worldServer = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
+            int dimensionTypeId = SpigotReflectionUtil.getDimensionId(worldServer);
+            return DimensionTypes.getRegistry().getById(version.toClientVersion(), dimensionTypeId);
+        } else {
+            Object serverLevel = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
+            Object nbt = SpigotReflectionUtil.convertWorldServerDimensionToNMSNbt(serverLevel);
+
+            NBTCompound peNbt = SpigotReflectionUtil.fromMinecraftNBT(nbt);
+            ResourceLocation dimensionName = new ResourceLocation(SpigotReflectionUtil.getDimensionKey(serverLevel));
+            int dimensionId = SpigotReflectionUtil.getDimensionId(serverLevel);
+            return DimensionType.decode(peNbt, version.toClientVersion(),
+                    new SimpleTypesBuilderData(dimensionName, dimensionId));
+        }
+    }
+
+    @Deprecated
     public static Dimension fromBukkitWorld(World world) {
         ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
         if (version.isOlderThan(ServerVersion.V_1_14)) {

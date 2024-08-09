@@ -20,73 +20,40 @@ package com.github.retrooper.packetevents.protocol.world.painting;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
+public final class PaintingVariants {
 
-public class PaintingVariants {
+    private static final VersionedRegistry<PaintingVariant> REGISTRY = new VersionedRegistry<>(
+            "painting_variant", "entity/painting_mappings");
 
-    private static final Map<String, PaintingVariant> PAINTING_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, PaintingVariant>> PAINTING_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_banner_pattern_mappings");
+    private PaintingVariants() {
+    }
 
+    @ApiStatus.Internal
     public static PaintingVariant define(String key, int width, int height) {
         ResourceLocation assetId = ResourceLocation.minecraft(key);
         return define(key, width, height, assetId);
     }
 
+    @ApiStatus.Internal
     public static PaintingVariant define(String key, int width, int height, ResourceLocation assetId) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        PaintingVariant variant = new PaintingVariant() {
-            @Override
-            public int getWidth() {
-                return width;
-            }
-
-            @Override
-            public int getHeight() {
-                return height;
-            }
-
-            @Override
-            public ResourceLocation getAssetId() {
-                return assetId;
-            }
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return TYPES_BUILDER.getDataIndex(version);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof PaintingVariant) {
-                    return this.getName().equals(((PaintingVariant) obj).getName());
-                }
-                return false;
-            }
-        };
-        MappingHelper.registerMapping(TYPES_BUILDER, PAINTING_TYPE_MAP, PAINTING_TYPE_ID_MAP, variant);
-        return variant;
+        return REGISTRY.define(key, data ->
+                new StaticPaintingVariant(data, width, height, assetId));
     }
 
-    // with key
-    public static PaintingVariant getByName(String name) {
-        return PAINTING_TYPE_MAP.get(name);
+    public static VersionedRegistry<PaintingVariant> getRegistry() {
+        return REGISTRY;
     }
 
-    public static PaintingVariant getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, PaintingVariant> idMap = PAINTING_TYPE_ID_MAP.get((byte) index);
-        return idMap.get(id);
+    public static @Nullable PaintingVariant getByName(String name) {
+        return REGISTRY.getByName(name);
+    }
+
+    public static @Nullable PaintingVariant getById(ClientVersion version, int id) {
+        return REGISTRY.getById(version, id);
     }
 
     public static final PaintingVariant POINTER = define("pointer", 4, 4);
@@ -141,6 +108,6 @@ public class PaintingVariants {
     public static final PaintingVariant OWLEMONS = define("owlemons", 3, 3);
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
 }

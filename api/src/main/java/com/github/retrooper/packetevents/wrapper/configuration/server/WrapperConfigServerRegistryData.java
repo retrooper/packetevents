@@ -22,12 +22,15 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -135,9 +138,22 @@ public class WrapperConfigServerRegistryData extends PacketWrapper<WrapperConfig
         private final ResourceLocation id;
         private final @Nullable NBT data;
 
+        public RegistryElement(NBTCompound nbt) {
+            this(new ResourceLocation(nbt.getStringTagValueOrThrow("name")),
+                    nbt.getTagOrNull("element"));
+        }
+
         public RegistryElement(ResourceLocation id, @Nullable NBT data) {
             this.id = id;
             this.data = data;
+        }
+
+        public static List<RegistryElement> convertNbt(NBTList<NBTCompound> list) {
+            List<RegistryElement> elements = new ArrayList<>(list.size());
+            for (NBTCompound tag : list.getTags()) {
+                elements.add(new RegistryElement(tag));
+            }
+            return Collections.unmodifiableList(elements);
         }
 
         public ResourceLocation getId() {

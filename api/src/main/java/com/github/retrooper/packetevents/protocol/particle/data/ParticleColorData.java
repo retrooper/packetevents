@@ -19,7 +19,15 @@
 package com.github.retrooper.packetevents.protocol.particle.data;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
+import static com.github.retrooper.packetevents.protocol.particle.data.ParticleDustData.decodeColor;
+import static com.github.retrooper.packetevents.util.MathUtil.floor;
 
 public class ParticleColorData extends ParticleData {
 
@@ -38,6 +46,26 @@ public class ParticleColorData extends ParticleData {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             wrapper.writeInt(data.color);
         }
+    }
+
+    public static ParticleColorData decode(NBTCompound compound, ClientVersion version) {
+        int argb;
+        NBT colorTag = compound.getTagOrThrow("color");
+        if (colorTag instanceof NBTNumber) {
+            argb = ((NBTNumber) colorTag).getAsInt();
+        } else {
+            float[] color = decodeColor(colorTag);
+            assert color.length == 4; // required by vanilla protocol
+            argb = (floor(color[0] * 255f) << 24)
+                    | (floor(color[1] * 255f) << 16)
+                    | (floor(color[2] * 255f) << 8)
+                    | floor(color[3] * 255f);
+        }
+        return new ParticleColorData(argb);
+    }
+
+    public static void encode(ParticleColorData data, ClientVersion version, NBTCompound compound) {
+        compound.setTag("color", new NBTInt(data.color));
     }
 
     public int getColor() {
