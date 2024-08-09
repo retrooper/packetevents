@@ -276,9 +276,7 @@ public class PEVersion implements Comparable<PEVersion> {
      */
     @Override
     public String toString() {
-        return major + "." + minor + "." + patch
-                + (snapshotCommit != null ? "+" + snapshotCommit : "")
-                + (snapshot ? "-SNAPSHOT" : "");
+        return major + "." + minor + "." + patch + (snapshot && snapshotCommit != null ? ("+" + snapshotCommit + "-SNAPSHOT") : "");
     }
 
     /**
