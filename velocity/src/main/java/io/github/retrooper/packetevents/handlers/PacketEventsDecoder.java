@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.handlers;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EnumUtil;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
@@ -39,10 +38,12 @@ import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
-    private static Enum<?> VELOCITY_CONNECTION_EVENT_CONSTANT;
+    private static Enum<?> VELOCITY_CONNECTION_EVENT_COMPRESSION_ENABLED;
+    private static Enum<?> VELOCITY_CONNECTION_EVENT_COMPRESSION_DISABLED;
     public User user;
     public Player player;
     public boolean handledCompression;
+
     public PacketEventsDecoder(User user) {
         this.user = user;
     }
@@ -83,19 +84,43 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object event) throws Exception {
-        if (VELOCITY_CONNECTION_EVENT_CONSTANT == null) {
+        if (VELOCITY_CONNECTION_EVENT_COMPRESSION_ENABLED == null) {
             Class<? extends Enum<?>> clazz = (Class<? extends Enum<?>>) Reflection.getClassByNameWithoutException("com.velocitypowered.proxy.protocol.VelocityConnectionEvent");
-            VELOCITY_CONNECTION_EVENT_CONSTANT = EnumUtil.valueOf(clazz, "COMPRESSION_ENABLED");
+            VELOCITY_CONNECTION_EVENT_COMPRESSION_ENABLED = EnumUtil.valueOf(clazz, "COMPRESSION_ENABLED");
+            VELOCITY_CONNECTION_EVENT_COMPRESSION_DISABLED = EnumUtil.valueOf(clazz, "COMPRESSION_DISABLED");
         }
         //We can use == as it is an enum constant
-        if (event == VELOCITY_CONNECTION_EVENT_CONSTANT && !handledCompression) {
-            ChannelPipeline pipe = ctx.pipeline();
-            PacketEventsEncoder encoder = (PacketEventsEncoder) pipe.remove(PacketEvents.ENCODER_NAME);
-            pipe.addBefore("minecraft-encoder", PacketEvents.ENCODER_NAME, encoder);
-            PacketEventsDecoder decoder = (PacketEventsDecoder) pipe.remove(PacketEvents.DECODER_NAME);
-            pipe.addBefore("minecraft-decoder", PacketEvents.DECODER_NAME, decoder);
-            //System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
-            handledCompression = true;
+        if (event == VELOCITY_CONNECTION_EVENT_COMPRESSION_ENABLED || event == VELOCITY_CONNECTION_EVENT_COMPRESSION_DISABLED) {
+            ChannelPipeline pipeline = ctx.pipeline();
+
+            // Check if FastPrepareAPI is injected
+            ChannelHandlerContext context = pipeline.context("fastprepare-encoder");
+            if (context != null) {
+                // Use uncompressed packets instead of compressed ones.
+                context.handler().getClass().getDeclaredMethod("setShouldSendUncompressed", boolean.class).invoke(context.handler(), true);
+            }
+
+            PacketEventsEncoder encoder = (PacketEventsEncoder) pipeline.get(PacketEvents.ENCODER_NAME);
+            encoder.enableCompression = event == VELOCITY_CONNECTION_EVENT_COMPRESSION_ENABLED;
+
+            // Relocate handlers if FastPrepareAPI was injected or dejected
+            boolean wasInjected = encoder.fastPrepareApiInjected;
+            encoder.fastPrepareApiInjected = context != null;
+            if (wasInjected != encoder.fastPrepareApiInjected) {
+                handledCompression = false;
+            }
+
+            if (!handledCompression) {
+                encoder.ignoreRemoval = true;
+                encoder = (PacketEventsEncoder) pipeline.remove(PacketEvents.ENCODER_NAME);
+                pipeline.addBefore("minecraft-encoder", PacketEvents.ENCODER_NAME, encoder);
+                encoder.ignoreRemoval = false;
+
+                PacketEventsDecoder decoder = (PacketEventsDecoder) pipeline.remove(PacketEvents.DECODER_NAME);
+                pipeline.addBefore("minecraft-decoder", PacketEvents.DECODER_NAME, decoder);
+                //System.out.println("Pipe: " + ChannelHelper.pipelineHandlerNamesAsString(ctx.channel()));
+                handledCompression = true;
+            }
         }
         super.userEventTriggered(ctx, event);
     }

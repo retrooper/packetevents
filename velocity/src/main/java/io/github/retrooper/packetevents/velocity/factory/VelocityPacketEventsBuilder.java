@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
@@ -45,6 +44,7 @@ import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerA
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import io.github.retrooper.packetevents.injector.VelocityPipelineInjector;
+import io.github.retrooper.packetevents.manager.InternalVelocityPacketListener;
 import io.github.retrooper.packetevents.manager.PlayerManagerImpl;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
@@ -181,7 +181,7 @@ public class VelocityPacketEventsBuilder {
 
                     // Register internal packet listener (should be the first listener)
                     // This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListener(new InternalPacketListener());
+                    getEventManager().registerListener(new InternalVelocityPacketListener());
                 }
             }
 

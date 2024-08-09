@@ -13,6 +13,7 @@ repositories {
 dependencies {
     compileOnly(libs.netty)
     compileOnly(libs.velocity)
+    compileOnly(libs.velocity.native)
     annotationProcessor(libs.velocity)
     shadow(project(":api", "shadow"))
     shadow(project(":netty-common"))
