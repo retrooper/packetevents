@@ -43,12 +43,10 @@ public interface IJukeboxSong extends MappedEntity, CopyableEntity<IJukeboxSong>
 
     static IJukeboxSong decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
-
-        Sound sound = Sound.decode(compound.getCompoundTagOrThrow("sound_event"), version);
+        Sound sound = Sound.decode(compound.getTagOrThrow("sound_event"), version);
         Component description = AdventureSerializer.fromNbt(compound.getTagOrThrow("description"));
         float length = compound.getNumberTagOrThrow("length_in_seconds").getAsFloat();
         int comparator_output = compound.getNumberTagOrThrow("comparator_output").getAsInt();
-
         return new JukeboxSong(data, sound, description, length, comparator_output);
     }
 
