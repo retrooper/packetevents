@@ -121,7 +121,7 @@ public interface DimensionType extends MappedEntity, CopyableEntity<DimensionTyp
         int height = 256;
         ResourceLocation effectsLocation = null;
         NBT monsterSpawnLightLevel = null;
-        Integer monsterSpawnBlockLightLimit = null;
+        int monsterSpawnBlockLightLimit = 0;
         if (version.isNewerThanOrEquals(ClientVersion.V_1_16_2)) {
             coordinateScale = compound.getNumberTagOrThrow("coordinate_scale").getAsDouble();
             effectsLocation = new ResourceLocation(compound.getStringTagValueOrThrow("effects"));
