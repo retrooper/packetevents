@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    io.github.goooler.shadow
+    com.gradleup.shadow
 }
 
 group = rootProject.group
