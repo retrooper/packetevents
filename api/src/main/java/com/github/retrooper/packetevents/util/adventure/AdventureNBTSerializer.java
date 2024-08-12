@@ -163,14 +163,17 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         if (text != null) {
             builder = Component.text().content(text);
         } else if (translate != null) {
+            TranslatableComponent.Builder i18nBuilder;
+            builder = i18nBuilder = Component.translatable().key(translate);
             if (translateWith != null) {
                 if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
-                    builder = Component.translatable().key(translate).fallback(translateFallback).arguments(translateWith);
+                    i18nBuilder.arguments(translateWith);
                 } else {
-                    builder = Component.translatable().key(translate).fallback(translateFallback).args(translateWith);
+                    i18nBuilder.args(translateWith);
                 }
-            } else {
-                builder = Component.translatable().key(translate).fallback(translateFallback);
+            }
+            if (BackwardCompatUtil.IS_4_13_0_OR_NEWER) {
+                i18nBuilder.fallback(translateFallback);
             }
         } else if (score != null) {
             builder = Component.score()
@@ -230,9 +233,11 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             writer.writeUTF("translate", ((TranslatableComponent) component).key());
 
             // translation fallback
-            String fallback = ((TranslatableComponent) component).fallback();
-            if (fallback != null) {
-                writer.writeUTF("fallback", fallback);
+            if (BackwardCompatUtil.IS_4_13_0_OR_NEWER) {
+                String fallback = ((TranslatableComponent) component).fallback();
+                if (fallback != null) {
+                    writer.writeUTF("fallback", fallback);
+                }
             }
 
             // translation arguments
