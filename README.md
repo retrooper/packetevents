@@ -10,6 +10,7 @@
 PacketEvents is emerging as a strong contender in the realm of Minecraft packet processing libraries. Designed to simplify packet manipulation while delivering high performance, this powerful tool aims to demystify the complexities of projects utilizing packets. Imbued with versatility, PacketEvents supports various platforms such as Spigot, BungeeCord, Velocity, and Fabric.
 
 <h3><i>Resources</i></h3>
+
 - [Read documentation](https://packetevents.gitbook.io/)
     - [Getting Started](https://packetevents.gitbook.io/docs/getting-started)
     - [JavaDocs](https://packetevents.github.io) 
