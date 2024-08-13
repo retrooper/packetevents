@@ -23,7 +23,8 @@ PacketEvents is emerging as a strong contender in the realm of Minecraft packet 
 
 <h3>Sponsors</h3>
 
-Thanks to the following sponsors for supporting this project:\
+<i>Thanks to the following sponsors for supporting this project:</i>
+
 <a href="https://pebblehost.com"><img src="https://pebblehost.com/src/img/logos/main-old.png" width=150><br>
 
 <a href="https://www.ej-technologies.com"><img src="https://www.ej-technologies.com/images/product_banners/jprofiler_small.png"><br>
