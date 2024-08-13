@@ -4,8 +4,8 @@
     <a href="https://github.com/retrooper/packetevents/actions"><img src="https://img.shields.io/github/actions/workflow/status/retrooper/packetevents/build.yml?style=for-the-badge&logo=github"></a>
     <a href="https://discord.gg/DVHxPPxHZc"><img src="https://img.shields.io/discord/721686193061888071?color=5562e9&logo=discord&logoColor=white&style=for-the-badge"></a>
     <img src="https://img.shields.io/github/license/retrooper/packetevents?style=for-the-badge&logo=github">
-    <a href="https://bstats.org/plugin/bukkit/MagicSpells/892"><img src="https://img.shields.io/bstats/servers/11327?style=for-the-badge"></a>
-    <a href="https://github.com/TheComputerGeek2/MagicSpells/releases"><img src="https://img.shields.io/github/downloads/retrooper/packetevents/total.svg?style=for-the-badge&logo=github"></a>
+    <a href="https://bstats.org/plugin/bukkit/packetevents/11327"><img src="https://img.shields.io/bstats/servers/11327?style=for-the-badge"></a>
+    <a href="https://github.com/retrooper/packetevents/releases"><img src="https://img.shields.io/github/downloads/retrooper/packetevents/total.svg?style=for-the-badge&logo=github"></a>
 </div>
 PacketEvents is emerging as a strong contender in the realm of Minecraft packet processing libraries. Designed to simplify packet manipulation while delivering high performance, this powerful tool aims to demystify the complexities of projects utilizing packets. Imbued with versatility, PacketEvents supports various platforms such as Spigot, BungeeCord, Velocity, and Fabric.
 
