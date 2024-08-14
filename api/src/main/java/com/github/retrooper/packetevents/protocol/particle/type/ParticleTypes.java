@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.particle.type;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleBlockStateData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleColorData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
@@ -33,6 +34,9 @@ import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper.Reader;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper.Writer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -47,13 +51,17 @@ public class ParticleTypes {
     private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("particle/particle_type_mappings");
 
     public static ParticleType<ParticleData> define(String key) {
-        return define(key, wrapper -> ParticleData.emptyData(), null);
+        return define(
+                key,
+                wrapper -> ParticleData.emptyData(), null,
+                (nbt, version) -> ParticleData.emptyData(), null
+        );
     }
 
     public static <T extends ParticleData> ParticleType<T> define(
             String key,
-            PacketWrapper.Reader<T> reader,
-            @Nullable PacketWrapper.Writer<T> writer
+            Reader<T> reader, @Nullable Writer<T> writer,
+            Decoder<T> decoder, @Nullable Encoder<T> encoder
     ) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
         ParticleType<T> particleType = new ParticleType<T>() {
@@ -67,7 +75,21 @@ public class ParticleTypes {
                 if (writer != null) {
                     writer.accept(wrapper, data);
                 } else if (!data.isEmpty()) {
-                    throw new UnsupportedOperationException("Trying to serialize non-empty data for " + this.getName());
+                    throw new UnsupportedOperationException("Trying to write non-empty data for " + this.getName());
+                }
+            }
+
+            @Override
+            public T decodeData(NBTCompound compound, ClientVersion version) {
+                return decoder.decode(compound, version);
+            }
+
+            @Override
+            public void encodeData(T data, ClientVersion version, NBTCompound compound) {
+                if (encoder != null) {
+                    encoder.encode(data, version, compound);
+                } else if (!data.isEmpty()) {
+                    throw new UnsupportedOperationException("Trying to encode non-empty data for " + this.getName());
                 }
             }
 
@@ -107,8 +129,12 @@ public class ParticleTypes {
     @Deprecated // Removed in 1.20.5
     public static final ParticleType<ParticleData> AMBIENT_ENTITY_EFFECT = define("ambient_entity_effect");
     public static final ParticleType<ParticleData> ANGRY_VILLAGER = define("angry_villager");
-    public static final ParticleType<ParticleBlockStateData> BLOCK = define("block", ParticleBlockStateData::read, ParticleBlockStateData::write);
-    public static final ParticleType<ParticleBlockStateData> BLOCK_MARKER = define("block_marker", ParticleBlockStateData::read, ParticleBlockStateData::write);
+    public static final ParticleType<ParticleBlockStateData> BLOCK = define("block",
+            ParticleBlockStateData::read, ParticleBlockStateData::write,
+            ParticleBlockStateData::decode, ParticleBlockStateData::encode);
+    public static final ParticleType<ParticleBlockStateData> BLOCK_MARKER = define("block_marker",
+            ParticleBlockStateData::read, ParticleBlockStateData::write,
+            ParticleBlockStateData::decode, ParticleBlockStateData::encode);
     public static final ParticleType<ParticleData> BUBBLE = define("bubble");
     public static final ParticleType<ParticleData> CLOUD = define("cloud");
     public static final ParticleType<ParticleData> CRIT = define("crit");
@@ -119,23 +145,33 @@ public class ParticleTypes {
     public static final ParticleType<ParticleData> LANDING_LAVA = define("landing_lava");
     public static final ParticleType<ParticleData> DRIPPING_WATER = define("dripping_water");
     public static final ParticleType<ParticleData> FALLING_WATER = define("falling_water");
-    public static final ParticleType<ParticleDustData> DUST = define("dust", ParticleDustData::read, ParticleDustData::write);
-    public static final ParticleType<ParticleDustColorTransitionData> DUST_COLOR_TRANSITION = define("dust_color_transition", ParticleDustColorTransitionData::read, ParticleDustColorTransitionData::write);
+    public static final ParticleType<ParticleDustData> DUST = define("dust",
+            ParticleDustData::read, ParticleDustData::write,
+            ParticleDustData::decode, ParticleDustData::encode);
+    public static final ParticleType<ParticleDustColorTransitionData> DUST_COLOR_TRANSITION = define("dust_color_transition",
+            ParticleDustColorTransitionData::read, ParticleDustColorTransitionData::write,
+            ParticleDustColorTransitionData::decode, ParticleDustColorTransitionData::encode);
     public static final ParticleType<ParticleData> EFFECT = define("effect");
     public static final ParticleType<ParticleData> ELDER_GUARDIAN = define("elder_guardian");
     public static final ParticleType<ParticleData> ENCHANTED_HIT = define("enchanted_hit");
     public static final ParticleType<ParticleData> ENCHANT = define("enchant");
     public static final ParticleType<ParticleData> END_ROD = define("end_rod");
-    public static final ParticleType<ParticleColorData> ENTITY_EFFECT = define("entity_effect", ParticleColorData::read, ParticleColorData::write);
+    public static final ParticleType<ParticleColorData> ENTITY_EFFECT = define("entity_effect",
+            ParticleColorData::read, ParticleColorData::write,
+            ParticleColorData::decode, ParticleColorData::encode);
     public static final ParticleType<ParticleData> EXPLOSION_EMITTER = define("explosion_emitter");
     public static final ParticleType<ParticleData> EXPLOSION = define("explosion");
     public static final ParticleType<ParticleData> SONIC_BOOM = define("sonic_boom");
-    public static final ParticleType<ParticleBlockStateData> FALLING_DUST = define("falling_dust", ParticleBlockStateData::read, ParticleBlockStateData::write);
+    public static final ParticleType<ParticleBlockStateData> FALLING_DUST = define("falling_dust",
+            ParticleBlockStateData::read, ParticleBlockStateData::write,
+            ParticleBlockStateData::decode, ParticleBlockStateData::encode);
     public static final ParticleType<ParticleData> FIREWORK = define("firework");
     public static final ParticleType<ParticleData> FISHING = define("fishing");
     public static final ParticleType<ParticleData> FLAME = define("flame");
     public static final ParticleType<ParticleData> SCULK_SOUL = define("sculk_soul");
-    public static final ParticleType<ParticleSculkChargeData> SCULK_CHARGE = define("sculk_charge", ParticleSculkChargeData::read, ParticleSculkChargeData::write);
+    public static final ParticleType<ParticleSculkChargeData> SCULK_CHARGE = define("sculk_charge",
+            ParticleSculkChargeData::read, ParticleSculkChargeData::write,
+            ParticleSculkChargeData::decode, ParticleSculkChargeData::encode);
     public static final ParticleType<ParticleData> SCULK_CHARGE_POP = define("sculk_charge_pop");
     public static final ParticleType<ParticleData> SOUL_FIRE_FLAME = define("soul_fire_flame");
     public static final ParticleType<ParticleData> SOUL = define("soul");
@@ -144,8 +180,12 @@ public class ParticleTypes {
     public static final ParticleType<ParticleData> COMPOSTER = define("composter");
     public static final ParticleType<ParticleData> HEART = define("heart");
     public static final ParticleType<ParticleData> INSTANT_EFFECT = define("instant_effect");
-    public static final ParticleType<ParticleItemStackData> ITEM = define("item", ParticleItemStackData::read, ParticleItemStackData::write);
-    public static final ParticleType<ParticleVibrationData> VIBRATION = define("vibration", ParticleVibrationData::read, ParticleVibrationData::write);
+    public static final ParticleType<ParticleItemStackData> ITEM = define("item",
+            ParticleItemStackData::read, ParticleItemStackData::write,
+            ParticleItemStackData::decode, ParticleItemStackData::encode);
+    public static final ParticleType<ParticleVibrationData> VIBRATION = define("vibration",
+            ParticleVibrationData::read, ParticleVibrationData::write,
+            ParticleVibrationData::decode, ParticleVibrationData::encode);
     public static final ParticleType<ParticleData> ITEM_SLIME = define("item_slime");
     public static final ParticleType<ParticleData> ITEM_SNOWBALL = define("item_snowball");
     public static final ParticleType<ParticleData> LARGE_SMOKE = define("large_smoke");
@@ -197,7 +237,9 @@ public class ParticleTypes {
     public static final ParticleType<ParticleData> WAX_OFF = define("wax_off");
     public static final ParticleType<ParticleData> ELECTRIC_SPARK = define("electric_spark");
     public static final ParticleType<ParticleData> SCRAPE = define("scrape");
-    public static final ParticleType<ParticleShriekData> SHRIEK = define("shriek", ParticleShriekData::read, ParticleShriekData::write);
+    public static final ParticleType<ParticleShriekData> SHRIEK = define("shriek",
+            ParticleShriekData::read, ParticleShriekData::write,
+            ParticleShriekData::decode, ParticleShriekData::encode);
     //Added in 1.19.3, BUT REMOVED in 1.20, replaced with CHERRY_LEAVES
     public static final ParticleType<ParticleData> DRIPPING_CHERRY_LEAVES = define("dripping_cherry_leaves");
     public static final ParticleType<ParticleData> FALLING_CHERRY_LEAVES = define("falling_cherry_leaves");
@@ -224,13 +266,16 @@ public class ParticleTypes {
     public static final ParticleType<ParticleData> ITEM_COBWEB = define("item_cobweb");
     public static final ParticleType<ParticleData> TRIAL_SPAWNER_DETECTION_OMINOUS = define("trial_spawner_detection_ominous");
     public static final ParticleType<ParticleData> VAULT_CONNECTION = define("vault_connection");
-    public static final ParticleType<ParticleBlockStateData> DUST_PILLAR = define("dust_pillar", ParticleBlockStateData::read, ParticleBlockStateData::write);
+    public static final ParticleType<ParticleBlockStateData> DUST_PILLAR = define("dust_pillar",
+            ParticleBlockStateData::read, ParticleBlockStateData::write,
+            ParticleBlockStateData::decode, ParticleBlockStateData::encode);
     public static final ParticleType<ParticleData> OMINOUS_SPAWNING = define("ominous_spawning");
     public static final ParticleType<ParticleData> RAID_OMEN = define("raid_omen");
     public static final ParticleType<ParticleData> TRIAL_OMEN = define("trial_omen");
 
     /**
      * Returns an immutable view of the particle types.
+     *
      * @return Particle Types
      */
     public static Collection<ParticleType<?>> values() {
@@ -239,5 +284,17 @@ public class ParticleTypes {
 
     static {
         TYPES_BUILDER.unloadFileMappings();
+    }
+
+    @ApiStatus.Internal
+    @FunctionalInterface
+    public interface Decoder<T> {
+        T decode(NBTCompound compound, ClientVersion version);
+    }
+
+    @ApiStatus.Internal
+    @FunctionalInterface
+    public interface Encoder<T> {
+        void encode(T value, ClientVersion version, NBTCompound compound);
     }
 }

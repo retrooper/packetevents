@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.item.jukebox.IJukeboxSong;
 import com.github.retrooper.packetevents.protocol.item.jukebox.JukeboxSong;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -27,12 +28,20 @@ import java.util.Objects;
 
 public class ItemJukeboxPlayable {
 
-    private @Nullable JukeboxSong song;
+    private @Nullable IJukeboxSong song;
     private @Nullable ResourceLocation songKey;
     private boolean showInTooltip;
 
     public ItemJukeboxPlayable(
             @Nullable JukeboxSong song,
+            @Nullable ResourceLocation songKey,
+            boolean showInTooltip
+    ) {
+        this((IJukeboxSong) song, songKey, showInTooltip);
+    }
+
+    public ItemJukeboxPlayable(
+            @Nullable IJukeboxSong song,
             @Nullable ResourceLocation songKey,
             boolean showInTooltip
     ) {
@@ -47,10 +56,10 @@ public class ItemJukeboxPlayable {
     }
 
     public static ItemJukeboxPlayable read(PacketWrapper<?> wrapper) {
-        JukeboxSong song;
+        IJukeboxSong song;
         ResourceLocation songKey;
         if (wrapper.readBoolean()) {
-            song = JukeboxSong.read(wrapper);
+            song = IJukeboxSong.read(wrapper);
             songKey = null;
         } else {
             song = null;
@@ -63,7 +72,7 @@ public class ItemJukeboxPlayable {
     public static void write(PacketWrapper<?> wrapper, ItemJukeboxPlayable jukeboxPlayable) {
         if (jukeboxPlayable.song != null) {
             wrapper.writeBoolean(true);
-            JukeboxSong.write(wrapper, jukeboxPlayable.song);
+            IJukeboxSong.write(wrapper, jukeboxPlayable.song);
         } else {
             assert jukeboxPlayable.songKey != null;
             wrapper.writeBoolean(false);
@@ -72,10 +81,26 @@ public class ItemJukeboxPlayable {
         wrapper.writeBoolean(jukeboxPlayable.showInTooltip);
     }
 
-    public @Nullable JukeboxSong getSong() {
+    public @Nullable IJukeboxSong getJukeboxSong() {
         return this.song;
     }
 
+    public void setJukeboxSong(@Nullable JukeboxSong song) {
+        this.song = song;
+        this.songKey = null;
+    }
+
+    @Deprecated
+    public @Nullable JukeboxSong getSong() {
+        if (this.song == null) {
+            return null;
+        } else if (this.song instanceof JukeboxSong) {
+            return (JukeboxSong) this.song;
+        }
+        return (JukeboxSong) this.song.copy(null);
+    }
+
+    @Deprecated
     public void setSong(JukeboxSong song) {
         this.song = song;
         this.songKey = null;

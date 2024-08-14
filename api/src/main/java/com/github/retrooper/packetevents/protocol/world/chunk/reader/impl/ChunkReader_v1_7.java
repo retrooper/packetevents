@@ -19,19 +19,19 @@
 package com.github.retrooper.packetevents.protocol.world.chunk.reader.impl;
 
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
-import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.ByteArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.NetworkChunkData;
 import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_7.Chunk_v1_7;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 
 import java.util.BitSet;
 
 public class ChunkReader_v1_7 implements ChunkReader {
     @Override
-    public BaseChunk[] read(Dimension dimension, BitSet primarySet, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn) {
+    public BaseChunk[] read(DimensionType dimensionType, BitSet primarySet, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn) {
         Chunk_v1_7[] chunks = new Chunk_v1_7[16];
         int pos = 0;
         int expected = 0;

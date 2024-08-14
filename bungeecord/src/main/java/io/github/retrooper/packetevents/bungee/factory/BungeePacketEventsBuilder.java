@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -45,11 +46,13 @@ import io.github.retrooper.packetevents.processor.InternalBungeeProcessor;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -102,6 +105,22 @@ public class BungeePacketEventsBuilder {
                         }
                     }
                     return version;
+                }
+
+                @Override
+                public Object getRegistryCacheKey(User user, ClientVersion version) {
+                    ProxiedPlayer player = ProxyServer.getInstance().getPlayer(user.getUUID());
+                    if (player == null) {
+                        return null;
+                    }
+                    Server server = player.getServer();
+                    if (server == null) {
+                        // seems to be null during server switch or on join,
+                        // but only for some specific bungee forks?
+                        // BungeeCord would be a lot safer if they were to use nullability annotations...
+                        return null;
+                    }
+                    return Objects.hash(server.getInfo(), version);
                 }
             };
 

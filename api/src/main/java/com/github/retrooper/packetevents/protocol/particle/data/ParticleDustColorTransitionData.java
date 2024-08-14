@@ -20,8 +20,14 @@ package com.github.retrooper.packetevents.protocol.particle.data;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.color.Color;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
+import static com.github.retrooper.packetevents.protocol.particle.data.ParticleDustData.decodeColor;
+import static com.github.retrooper.packetevents.protocol.particle.data.ParticleDustData.encodeColor;
 
 public class ParticleDustColorTransitionData extends ParticleData {
     //0.01 - 4
@@ -47,6 +53,10 @@ public class ParticleDustColorTransitionData extends ParticleData {
         this.endRed = endRed;
         this.endGreen = endGreen;
         this.endBlue = endBlue;
+    }
+
+    public ParticleDustColorTransitionData(float scale, float[] startRGB, float[] endRGB) {
+        this(scale, startRGB[0], startRGB[1], startRGB[2], endRGB[0], endRGB[1], endRGB[2]);
     }
 
     public ParticleDustColorTransitionData(float scale, Vector3f startRGB, Vector3f endRGB) {
@@ -143,6 +153,19 @@ public class ParticleDustColorTransitionData extends ParticleData {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             wrapper.writeFloat(data.getScale());
         }
+    }
+
+    public static ParticleDustColorTransitionData decode(NBTCompound compound, ClientVersion version) {
+        float[] fromColor = decodeColor(compound.getTagOrThrow("from_color"));
+        float[] toColor = decodeColor(compound.getTagOrThrow("to_color"));
+        float scale = compound.getNumberTagOrThrow("scale").getAsFloat();
+        return new ParticleDustColorTransitionData(scale, fromColor, toColor);
+    }
+
+    public static void encode(ParticleDustColorTransitionData data, ClientVersion version, NBTCompound compound) {
+        compound.setTag("from_color", encodeColor(null, data.startRed, data.startGreen, data.startBlue));
+        compound.setTag("to_color", encodeColor(null, data.endRed, data.endGreen, data.endBlue));
+        compound.setTag("scale", new NBTFloat(data.scale));
     }
 
     @Override

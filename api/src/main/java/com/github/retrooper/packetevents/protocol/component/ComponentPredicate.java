@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -87,5 +88,23 @@ public class ComponentPredicate implements Predicate<IComponentMap> {
 
     public void setRequiredComponents(List<ComponentValue<?>> requiredComponents) {
         this.requiredComponents = requiredComponents;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ComponentPredicate)) return false;
+        ComponentPredicate that = (ComponentPredicate) obj;
+        return this.requiredComponents.equals(that.requiredComponents);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.requiredComponents);
+    }
+
+    @Override
+    public String toString() {
+        return "ComponentPredicate{requiredComponents=" + this.requiredComponents + '}';
     }
 }

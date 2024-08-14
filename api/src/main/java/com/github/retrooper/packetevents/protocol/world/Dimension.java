@@ -18,9 +18,21 @@
 
 package com.github.retrooper.packetevents.protocol.world;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypeRef;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
+import org.jetbrains.annotations.Nullable;
 
+/**
+ * @deprecated use {@link com.github.retrooper.packetevents.protocol.world.dimension.DimensionType instead}
+ */
+@Deprecated
 public class Dimension {
     private int id;
     private NBTCompound attributes;
@@ -38,6 +50,68 @@ public class Dimension {
 
     public Dimension(NBTCompound attributes) {
         this.attributes = attributes;
+    }
+
+    @Deprecated
+    public Dimension(int id, NBTCompound attributes) {
+        this.id = id;
+        this.attributes = attributes;
+    }
+
+    public static Dimension fromDimensionTypeRef(DimensionTypeRef ref) {
+        if (ref instanceof DimensionTypeRef.NameRef) {
+            Dimension dimension = new Dimension(0);
+            dimension.setDimensionName(ref.getName().toString());
+            return dimension;
+        } else if (ref instanceof DimensionTypeRef.IdRef) {
+            return new Dimension(ref.getId());
+        } else if (ref instanceof DimensionTypeRef.DataRef) {
+            return new Dimension((NBTCompound) ref.getData());
+        } else if (ref instanceof DimensionTypeRef.DirectRef) {
+            return fromDimensionType(((DimensionTypeRef.DirectRef) ref).getDimensionType(),
+                    null, ((DimensionTypeRef.DirectRef) ref).getVersion());
+        } else {
+            throw new UnsupportedOperationException("Unsupported DimensionTypeRef implementation: " + ref);
+        }
+    }
+
+    public static Dimension fromDimensionType(
+            com.github.retrooper.packetevents.protocol.world.dimension.DimensionType dimensionType,
+            @Nullable User user, @Nullable ClientVersion version
+    ) {
+        if (version == null) {
+            version = user != null && PacketEvents.getAPI().getInjector().isProxy() ? user.getClientVersion() :
+                    PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        }
+        NBTCompound encodedType = (NBTCompound) com.github.retrooper.packetevents.protocol.world.dimension.DimensionType.encode(dimensionType, version);
+        return new Dimension(dimensionType.getId(version), encodedType);
+    }
+
+    public DimensionTypeRef asDimensionTypeRef() {
+        if (this.attributes == null) {
+            return new DimensionTypeRef.IdRef(this.id);
+        } else if (this.attributes.size() > 1) {
+            // seems to contain more than just "effects"
+            return new DimensionTypeRef.DataRef(this.attributes);
+        } else {
+            ResourceLocation dimensionName = new ResourceLocation(this.getDimensionName());
+            return new DimensionTypeRef.NameRef(dimensionName);
+        }
+    }
+
+    public com.github.retrooper.packetevents.protocol.world.dimension.DimensionType asDimensionType(
+            @Nullable User user, @Nullable ClientVersion version) {
+        IRegistry<com.github.retrooper.packetevents.protocol.world.dimension.DimensionType> registry = user != null
+                ? user.getUserRegistryOrFallback(DimensionTypes.getRegistry()) : DimensionTypes.getRegistry();
+        String dimName = this.getDimensionName();
+        if (!dimName.isEmpty()) {
+            return registry.getByName(new ResourceLocation(dimName));
+        }
+        if (version == null) {
+            version = user != null && PacketEvents.getAPI().getInjector().isProxy() ? user.getClientVersion() :
+                    PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        }
+        return registry.getById(version, this.id);
     }
 
     public String getDimensionName() {

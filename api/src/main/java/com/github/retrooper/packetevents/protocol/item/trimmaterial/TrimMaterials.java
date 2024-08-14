@@ -24,25 +24,26 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.format.TextColor.color;
 
-public class TrimMaterials {
+public final class TrimMaterials {
 
-    private static final Map<String, TrimMaterial> TRIM_MATERIAL_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, TrimMaterial>> TRIM_MATERIAL_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_trim_material_mappings");
+    private static final VersionedRegistry<TrimMaterial> REGISTRY = new VersionedRegistry<>(
+            "trim_material", "item/item_trim_material_mappings");
 
+    private TrimMaterials() {
+    }
+
+    @ApiStatus.Internal
     public static TrimMaterial define(String key, ItemType ingredient, float itemModelIndex, int color) {
         // darken own armor material - if present
         Map<ArmorMaterial, String> overrideArmorMaterials = new HashMap<>(2);
@@ -56,68 +57,25 @@ public class TrimMaterials {
         return define(key, key, ingredient, itemModelIndex, overrideArmorMaterials, description);
     }
 
+    @ApiStatus.Internal
     public static TrimMaterial define(
             String key, String assetName, ItemType ingredient, float itemModelIndex,
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        TrimMaterial material = new TrimMaterial() {
-            @Override
-            public String getAssetName() {
-                return assetName;
-            }
-
-            @Override
-            public ItemType getIngredient() {
-                return ingredient;
-            }
-
-            @Override
-            public float getItemModelIndex() {
-                return itemModelIndex;
-            }
-
-            @Override
-            public Map<ArmorMaterial, String> getOverrideArmorMaterials() {
-                return overrideArmorMaterials;
-            }
-
-            @Override
-            public Component getDescription() {
-                return description;
-            }
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof TrimMaterial) {
-                    return this.getName().equals(((TrimMaterial) obj).getName());
-                }
-                return false;
-            }
-        };
-        MappingHelper.registerMapping(TYPES_BUILDER, TRIM_MATERIAL_MAP, TRIM_MATERIAL_ID_MAP, material);
-        return material;
+        return REGISTRY.define(key, data ->
+                new StaticTrimMaterial(data, assetName, ingredient, itemModelIndex, overrideArmorMaterials, description));
     }
 
-    // with key
+    public static VersionedRegistry<TrimMaterial> getRegistry() {
+        return REGISTRY;
+    }
+
     public static TrimMaterial getByName(String name) {
-        return TRIM_MATERIAL_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static TrimMaterial getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, TrimMaterial> idMap = TRIM_MATERIAL_ID_MAP.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
 
     // Added in 1.19.4
@@ -134,13 +92,14 @@ public class TrimMaterials {
 
     /**
      * Returns an immutable view of the trim materials.
+     *
      * @return Trim Materials
      */
     public static Collection<TrimMaterial> values() {
-        return Collections.unmodifiableCollection(TRIM_MATERIAL_MAP.values());
+        return REGISTRY.getEntries();
     }
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
 }

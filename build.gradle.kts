@@ -1,7 +1,7 @@
 import java.io.ByteArrayOutputStream
 
 // TODO UPDATE
-val fullVersion = "2.4.1"
+val fullVersion = "2.5.0"
 val snapshot = true
 
 group = "com.github.retrooper"

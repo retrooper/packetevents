@@ -32,10 +32,12 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -80,6 +82,54 @@ public class ItemStack {
         this.components = components;
         this.legacyData = legacyData;
         updateCachedEmptyStatus();
+    }
+
+    public static ItemStack decode(NBT nbt, ClientVersion version) {
+        if (nbt instanceof NBTString) {
+            ResourceLocation itemName = new ResourceLocation(((NBTString) nbt).getValue());
+            return ItemStack.builder().type(ItemTypes.getByName(itemName.toString())).build();
+        }
+        NBTCompound compound = (NBTCompound) nbt;
+        ItemStack.Builder builder = ItemStack.builder();
+
+        ResourceLocation itemName = Optional.ofNullable(compound.getStringTagValueOrNull("id")).map(Optional::of)
+                .orElseGet(() -> Optional.ofNullable(compound.getStringTagValueOrNull("item")))
+                .map(ResourceLocation::new).orElseThrow(() -> new IllegalArgumentException(
+                        "No item type specified: " + compound.getTags().keySet()));
+        builder.type(ItemTypes.getByName(itemName.toString()));
+        builder.nbt(compound.getCompoundTagOrNull("tag"));
+
+        Optional.ofNullable(compound.getNumberTagOrNull("Count")).map(Optional::of)
+                .orElseGet(() -> Optional.ofNullable(compound.getNumberTagOrNull("count")))
+                .map(NBTNumber::getAsInt).ifPresent(builder::amount);
+
+        // TODO components
+
+        return builder.build();
+    }
+
+    public static NBT encodeForParticle(ItemStack itemStack, ClientVersion version) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            boolean simple = itemStack.isEmpty()
+                    || itemStack.components == null
+                    || itemStack.components.getPatches().isEmpty();
+            if (simple) {
+                return new NBTString(itemStack.type.getName().toString());
+            }
+        }
+
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("id", new NBTString(itemStack.type.getName().toString()));
+        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
+            compound.setTag("Count", new NBTInt(itemStack.amount));
+            if (itemStack.nbt != null) {
+                compound.setTag("tag", itemStack.nbt);
+            }
+        }
+
+        // TODO components
+
+        return compound;
     }
 
     public int getMaxStackSize() {

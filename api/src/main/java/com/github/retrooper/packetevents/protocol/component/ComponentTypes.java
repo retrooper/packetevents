@@ -56,85 +56,51 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Dummy;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper.Reader;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper.Writer;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
-public class ComponentTypes {
+/**
+ * Contains all item data component types.
+ *
+ * @see EnchantEffectComponentTypes
+ */
+public final class ComponentTypes {
 
-    private static final Map<String, ComponentType<?>> COMPONENT_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, ComponentType<?>>> COMPONENT_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_component_mappings");
+    private static final VersionedRegistry<ComponentType<?>> REGISTRY = new VersionedRegistry<>(
+            "data_component_type", "item/item_component_mappings");
 
+    private ComponentTypes() {
+    }
+
+    @ApiStatus.Internal
     public static <T> ComponentType<T> define(String key) {
         return define(key, null, null);
     }
 
+    @ApiStatus.Internal
     public static <T> ComponentType<T> define(String key, @Nullable Reader<T> reader, @Nullable Writer<T> writer) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        ComponentType<T> type = new ComponentType<T>() {
-            @Override
-            public T read(PacketWrapper<?> wrapper) {
-                return reader == null ? null : reader.apply(wrapper);
-            }
-
-            @Override
-            public void write(PacketWrapper<?> wrapper, T content) {
-                if (writer != null) {
-                    writer.accept(wrapper, content);
-                }
-            }
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof ComponentType<?>) {
-                    return this.getName().equals(((ComponentType<?>) obj).getName());
-                }
-                return false;
-            }
-
-            @Override
-            public String toString() {
-                return "Component[" + this.getName() + "]";
-            }
-        };
-
-        MappingHelper.registerMapping(TYPES_BUILDER, COMPONENT_TYPE_MAP, COMPONENT_TYPE_ID_MAP, type);
-        return type;
+        return REGISTRY.define(key, data -> new StaticComponentType<>(data, reader, writer));
     }
 
-    // with key
+    public static VersionedRegistry<ComponentType<?>> getRegistry() {
+        return REGISTRY;
+    }
+
     public static ComponentType<?> getByName(String name) {
-        return COMPONENT_TYPE_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static ComponentType<?> getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, ComponentType<?>> idMap = COMPONENT_TYPE_ID_MAP.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
 
-    // item component types
     public static final ComponentType<NBTCompound> CUSTOM_DATA = define("custom_data",
             // mojang wraps their "persistent" codec as a stream codec just here,
             // so packetevents has to handle nbt strings
@@ -260,16 +226,10 @@ public class ComponentTypes {
      * @return Component Types
      */
     public static Collection<ComponentType<?>> values() {
-        return Collections.unmodifiableCollection(COMPONENT_TYPE_MAP.values());
+        return REGISTRY.getEntries();
     }
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
-
-    @FunctionalInterface
-    public interface Reader<T> extends Function<PacketWrapper<?>, T> {}
-
-    @FunctionalInterface
-    public interface Writer<T> extends BiConsumer<PacketWrapper<?>, T> {}
 }

@@ -3,6 +3,7 @@ package com.github.retrooper.packetevents.test;
 import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.world.biome.Biomes;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.protocol.world.states.enums.East;
 import com.github.retrooper.packetevents.protocol.world.states.enums.North;
@@ -32,6 +33,14 @@ public class MappingIntegrityTest extends BaseDummyAPITest {
         assertEquals(13, EnchantmentTypes.SMITE.getId(ClientVersion.V_1_17_1));
         assertEquals(12, EnchantmentTypes.SMITE.getId(ClientVersion.V_1_13_2));
         assertEquals(17, EnchantmentTypes.SMITE.getId(ClientVersion.V_1_12));
+    }
+
+    @Test
+    @DisplayName("Test biome mapping")
+    public void testBiomeMapping() {
+        assertEquals(48, Biomes.SOUL_SAND_VALLEY.getId(ClientVersion.V_1_21));
+        assertEquals(24, Biomes.GROVE.getId(ClientVersion.V_1_19_4));
+        assertEquals(0, Biomes.OCEAN.getId(ClientVersion.V_1_15_1));
     }
 
     @Test

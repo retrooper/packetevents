@@ -47,9 +47,8 @@ public class ItemEnchantments implements Iterable<Map.Entry<EnchantmentType, Int
     }
 
     public static ItemEnchantments read(PacketWrapper<?> wrapper) {
-        ClientVersion version = wrapper.getServerVersion().toClientVersion();
         Map<EnchantmentType, Integer> enchantments = wrapper.readMap(
-                ew -> EnchantmentTypes.getById(version, ew.readVarInt()),
+                ew -> wrapper.readMappedEntity(EnchantmentTypes.getRegistry()),
                 PacketWrapper::readVarInt
         );
         boolean showInTooltip = wrapper.readBoolean();

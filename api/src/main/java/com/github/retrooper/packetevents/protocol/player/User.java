@@ -27,10 +27,15 @@ import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
@@ -40,10 +45,12 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTitle;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class User {
@@ -53,10 +60,9 @@ public class User {
     private ClientVersion clientVersion;
     private final UserProfile profile;
     private int entityId = -1;
-    private int minWorldHeight = 0;
-    private int totalWorldHeight = 256;
-    private List<NBTCompound> worldNBT;
-    private Dimension dimension = new Dimension(0);
+
+    private DimensionType dimensionType = DimensionTypes.OVERWORLD;
+    private final Map<ResourceLocation, IRegistry<?>> registries = new HashMap<>();
 
     public User(Object channel,
                 ConnectionState connectionState, ClientVersion clientVersion,
@@ -66,6 +72,23 @@ public class User {
         this.encoderState = connectionState;
         this.clientVersion = clientVersion;
         this.profile = profile;
+    }
+
+    @ApiStatus.Internal
+    @SuppressWarnings("unchecked") // should be fine
+    public <T extends MappedEntity> IRegistry<T> getUserRegistryOrFallback(IRegistry<T> fallbackRegistry) {
+        IRegistry<?> replacedRegistry = this.registries.get(fallbackRegistry.getRegistryKey());
+        return replacedRegistry != null ? (IRegistry<T>) replacedRegistry : fallbackRegistry;
+    }
+
+    @ApiStatus.Internal
+    public IRegistry<?> getUserRegistry(ResourceLocation registryKey) {
+        return this.registries.get(registryKey);
+    }
+
+    @ApiStatus.Internal
+    public void putUserRegistry(IRegistry<?> registry) {
+        this.registries.put(registry.getRegistryKey(), registry);
     }
 
     public Object getChannel() {
@@ -249,116 +272,105 @@ public class User {
 
     //TODO sendTitle that is cross-version
 
+    // dimension type related methods
+
     public int getMinWorldHeight() {
-        return minWorldHeight;
+        return this.getMinWorldHeight(null);
     }
 
-    public void setMinWorldHeight(int minWorldHeight) {
-        this.minWorldHeight = minWorldHeight;
+    public int getMinWorldHeight(@Nullable ClientVersion version) {
+        if (version == null) {
+            version = PacketEvents.getAPI().getInjector().isProxy() ? this.getClientVersion() :
+                    PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        }
+        return this.dimensionType.getMinY(version);
     }
 
     public int getTotalWorldHeight() {
-        return totalWorldHeight;
+        return this.getTotalWorldHeight(null);
     }
 
+    public int getTotalWorldHeight(@Nullable ClientVersion version) {
+        if (version == null) {
+            version = PacketEvents.getAPI().getInjector().isProxy() ? this.getClientVersion() :
+                    PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        }
+        return this.dimensionType.getHeight(version);
+    }
+
+    public DimensionType getDimensionType() {
+        return this.dimensionType;
+    }
+
+    @ApiStatus.Internal
+    public void setDimensionType(DimensionType dimensionType) {
+        this.dimensionType = dimensionType;
+    }
+
+    // legacy dimension type related methods
+
+    @Deprecated
+    public void setMinWorldHeight(int minWorldHeight) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Deprecated
     public void setTotalWorldHeight(int totalWorldHeight) {
-        this.totalWorldHeight = totalWorldHeight;
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public void switchDimensionType(ServerVersion version, Dimension dimension) {
-        NBTCompound dimensionData = this.getWorldNBT(dimension);
-        if (dimensionData != null) {
-            NBTCompound worldNBT = dimensionData.getCompoundTagOrNull("element");
-            if (worldNBT != null) {
-                this.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-                this.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
-                return;
-            } else {
-                this.setDefaultWorldHeights(version, dimension);
-            }
-        }
-        if (version.isOlderThan(ServerVersion.V_1_20_5)
-                || this.clientVersion.isOlderThan(ClientVersion.V_1_20_5)) {
-            // hide this warning on 1.20.5, as the server does no longer send
-            // vanilla datapack dimension type contents
-            //
-            // this 1.20.5 feature can be fully worked around with by clearing the
-            // known packs sent by the client to the server durings config phase
-            PacketEvents.getAPI().getLogger().warning(
-                    "No data was sent for dimension " + dimensionData + " to " + this.getName());
-        }
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public void setDefaultWorldHeights(ServerVersion version, Dimension dimension) {
-        boolean extended = version.isNewerThanOrEquals(ServerVersion.V_1_18)
-                && "minecraft:overworld".equals(this.getWorldName(dimension));
-        this.setDefaultWorldHeights(extended);
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public void setDefaultWorldHeights(boolean extended) {
-        this.minWorldHeight = extended ? -64 : 0;
-        this.totalWorldHeight = extended ? 256 + 128 : 256;
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public void setWorldNBT(NBTList<NBTCompound> worldNBT) {
-        this.worldNBT = worldNBT.getTags();
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public Dimension getDimension() {
-        return dimension;
+        return Dimension.fromDimensionType(this.dimensionType, this, null);
     }
 
+    @Deprecated
     public void setDimension(Dimension dimension) {
-        this.dimension = dimension;
+        this.dimensionType = dimension.asDimensionType(this, null);
     }
 
-    @Nullable
-    public NBTCompound getWorldNBT(String worldName) {
-        if (worldNBT == null) {
-            return null;
-        }
-        for (NBTCompound compound : worldNBT) {
-            if (compound.getStringTagOrNull("name").getValue().equals(worldName)) {
-                return compound;
-            }
-        }
-        return null;
+    @Deprecated
+    public @Nullable NBTCompound getWorldNBT(String worldName) {
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public @Nullable NBTCompound getWorldNBT(int worldId) {
-        if (this.worldNBT == null) {
-            return null;
-        }
-        for (NBTCompound element : this.worldNBT) {
-            if (element.getNumberTagOrNull("id").getAsInt() == worldId) {
-                return element;
-            }
-        }
-        return null;
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public @Nullable NBTCompound getWorldNBT(Dimension dimension) {
-        String dimensionName = dimension.getDimensionName();
-        if (!dimensionName.isEmpty()) {
-            return this.getWorldNBT(dimensionName);
-        }
-        return this.getWorldNBT(dimension.getId());
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public @Nullable String getWorldName(int worldId) {
-        if (this.worldNBT == null) {
-            return null;
-        }
-        for (NBTCompound element : this.worldNBT) {
-            if (element.getNumberTagOrNull("id").getAsInt() == worldId) {
-                return element.getStringTagValueOrNull("name");
-            }
-        }
-        return null;
+        throw new UnsupportedOperationException();
     }
 
-    public @Nullable String getWorldName(Dimension dimension) {
-        String dimensionName = dimension.getDimensionName();
-        return dimensionName.isEmpty() ? this.getWorldName(dimension.getId()) : dimensionName;
+    @Deprecated
+    public String getWorldName(Dimension dimension) {
+        throw new UnsupportedOperationException();
     }
 }

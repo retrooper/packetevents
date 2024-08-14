@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import java.util.zip.GZIPInputStream;
 
+@ApiStatus.Internal
 public class MappingHelper {
 
     public static SequentialNBTReader.Compound decompress(final String path) {

@@ -31,10 +31,20 @@ import java.util.UUID;
 
 public final class BackwardCompatUtil {
 
+    public static final boolean IS_4_13_0_OR_NEWER;
     public static final boolean IS_4_15_0_OR_NEWER;
     public static final boolean IS_4_17_0_OR_NEWER;
 
     static {
+        boolean is4_13_0OrNewer = false;
+        try {
+            // translatable fallback support was added in 4.13.0
+            Component.translatable().fallback("");
+            is4_13_0OrNewer = true;
+        } catch (Throwable ignored) {
+        }
+        IS_4_13_0_OR_NEWER = is4_13_0OrNewer;
+
         boolean is4_15_0OrNewer = false;
         try {
             Component.translatable().arguments(Component.empty()); // TranslatableComponent#arguments method was added in 4.15.0

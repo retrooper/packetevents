@@ -31,14 +31,13 @@ public class ChatMessageProcessorLegacy implements ChatMessageProcessor {
     @Override
     public ChatMessage readChatMessage(@NotNull PacketWrapper<?> wrapper) {
         Component chatContent = wrapper.readComponent();
-        int id = wrapper.readByte();
-        ChatType type = ChatTypes.getById(wrapper.getServerVersion().toClientVersion(), id);
+        ChatType type = wrapper.readMappedEntity(ChatTypes.getRegistry());
         return new ChatMessageLegacy(chatContent, type);
     }
 
     @Override
     public void writeChatMessage(@NotNull PacketWrapper<?> wrapper, @NotNull ChatMessage data) {
         wrapper.writeComponent(data.getChatContent());
-        wrapper.writeByte(data.getType().getId(wrapper.getServerVersion().toClientVersion()));
+        wrapper.writeMappedEntity(data.getType());
     }
 }

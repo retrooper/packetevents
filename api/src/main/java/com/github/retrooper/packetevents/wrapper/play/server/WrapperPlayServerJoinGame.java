@@ -25,9 +25,12 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.Difficulty;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
-import com.github.retrooper.packetevents.protocol.world.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.protocol.world.WorldType;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypeRef;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +48,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
 
     private List<String> worldNames;
     private NBTCompound dimensionCodec;
-    private Dimension dimension;
+    private DimensionTypeRef dimensionTypeRef;
     private Difficulty difficulty;
     private String worldName;
     private long hashedSeed;
@@ -65,39 +68,146 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         super(event);
     }
 
-    public WrapperPlayServerJoinGame(int entityID, boolean hardcore, GameMode gameMode,
-                                     @Nullable GameMode previousGameMode, List<String> worldNames,
-                                     NBTCompound dimensionCodec, Dimension dimension,
-                                     Difficulty difficulty, String worldName, long hashedSeed,
-                                     int maxPlayers, int viewDistance, int simulationDistance,
-                                     boolean reducedDebugInfo, boolean enableRespawnScreen,
-                                     boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition, @Nullable Integer portalCooldown) {
-        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, dimension,
+    @Deprecated
+    public WrapperPlayServerJoinGame(
+            int entityID, boolean hardcore, GameMode gameMode,
+            @Nullable GameMode previousGameMode, List<String> worldNames,
+            NBTCompound dimensionCodec, Dimension dimension,
+            Difficulty difficulty, String worldName, long hashedSeed,
+            int maxPlayers, int viewDistance, int simulationDistance,
+            boolean reducedDebugInfo, boolean enableRespawnScreen,
+            boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
+            @Nullable Integer portalCooldown
+    ) {
+        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, dimension.asDimensionTypeRef(),
+                difficulty, worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo, enableRespawnScreen,
+                isDebug, isFlat, lastDeathPosition, portalCooldown);
+    }
+
+    @Deprecated
+    public WrapperPlayServerJoinGame(
+            int entityID, boolean hardcore, GameMode gameMode,
+            @Nullable GameMode previousGameMode, List<String> worldNames,
+            NBTCompound dimensionCodec, Dimension dimension,
+            Difficulty difficulty, String worldName, long hashedSeed,
+            int maxPlayers, int viewDistance, int simulationDistance,
+            boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
+            boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
+            @Nullable Integer portalCooldown
+    ) {
+        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, dimension.asDimensionTypeRef(), difficulty,
+                worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo,
+                enableRespawnScreen, limitedCrafting, isDebug, isFlat, lastDeathPosition,
+                portalCooldown);
+    }
+
+    @Deprecated
+    public WrapperPlayServerJoinGame(
+            int entityID, boolean hardcore, GameMode gameMode,
+            @Nullable GameMode previousGameMode, List<String> worldNames,
+            NBTCompound dimensionCodec, Dimension dimension,
+            Difficulty difficulty, String worldName, long hashedSeed,
+            int maxPlayers, int viewDistance, int simulationDistance,
+            boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
+            boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
+            @Nullable Integer portalCooldown, boolean enforcesSecureChat
+    ) {
+        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec,
+                dimension.asDimensionTypeRef(), difficulty, worldName, hashedSeed, maxPlayers, viewDistance,
+                simulationDistance, reducedDebugInfo, enableRespawnScreen, limitedCrafting,
+                isDebug, isFlat, lastDeathPosition, portalCooldown, enforcesSecureChat);
+    }
+
+    public WrapperPlayServerJoinGame(
+            int entityID, boolean hardcore, GameMode gameMode,
+            @Nullable GameMode previousGameMode, List<String> worldNames,
+            NBTCompound dimensionCodec, DimensionType dimensionType,
+            Difficulty difficulty, String worldName, long hashedSeed,
+            int maxPlayers, int viewDistance, int simulationDistance,
+            boolean reducedDebugInfo, boolean enableRespawnScreen,
+            boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
+            @Nullable Integer portalCooldown
+    ) {
+        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, (DimensionTypeRef) null,
+                difficulty, worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo, enableRespawnScreen,
+                isDebug, isFlat, lastDeathPosition, portalCooldown);
+        this.dimensionTypeRef = dimensionType.asRef(this.serverVersion.toClientVersion());
+    }
+
+    public WrapperPlayServerJoinGame(
+            int entityID, boolean hardcore, GameMode gameMode,
+            @Nullable GameMode previousGameMode, List<String> worldNames,
+            NBTCompound dimensionCodec, DimensionType dimensionType,
+            Difficulty difficulty, String worldName, long hashedSeed,
+            int maxPlayers, int viewDistance, int simulationDistance,
+            boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
+            boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
+            @Nullable Integer portalCooldown
+    ) {
+        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, (DimensionTypeRef) null, difficulty,
+                worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo,
+                enableRespawnScreen, limitedCrafting, isDebug, isFlat, lastDeathPosition,
+                portalCooldown);
+        this.dimensionTypeRef = dimensionType.asRef(this.serverVersion.toClientVersion());
+    }
+
+    public WrapperPlayServerJoinGame(
+            int entityID, boolean hardcore, GameMode gameMode,
+            @Nullable GameMode previousGameMode, List<String> worldNames,
+            NBTCompound dimensionCodec, DimensionType dimensionType,
+            Difficulty difficulty, String worldName, long hashedSeed,
+            int maxPlayers, int viewDistance, int simulationDistance,
+            boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
+            boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
+            @Nullable Integer portalCooldown, boolean enforcesSecureChat
+    ) {
+        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, (DimensionTypeRef) null,
+                difficulty, worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo,
+                enableRespawnScreen, limitedCrafting, isDebug, isFlat, lastDeathPosition, portalCooldown, enforcesSecureChat);
+        this.dimensionTypeRef = dimensionType.asRef(this.serverVersion.toClientVersion());
+    }
+
+    public WrapperPlayServerJoinGame(
+            int entityID, boolean hardcore, GameMode gameMode,
+            @Nullable GameMode previousGameMode, List<String> worldNames,
+            NBTCompound dimensionCodec, DimensionTypeRef dimensionTypeRef,
+            Difficulty difficulty, String worldName, long hashedSeed,
+            int maxPlayers, int viewDistance, int simulationDistance,
+            boolean reducedDebugInfo, boolean enableRespawnScreen,
+            boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
+            @Nullable Integer portalCooldown
+    ) {
+        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, dimensionTypeRef,
                 difficulty, worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo, enableRespawnScreen,
                 false, isDebug, isFlat, lastDeathPosition, portalCooldown);
     }
 
-    public WrapperPlayServerJoinGame(int entityID, boolean hardcore, GameMode gameMode,
-                                     @Nullable GameMode previousGameMode, List<String> worldNames,
-                                     NBTCompound dimensionCodec, Dimension dimension,
-                                     Difficulty difficulty, String worldName, long hashedSeed,
-                                     int maxPlayers, int viewDistance, int simulationDistance,
-                                     boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
-                                     boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition, @Nullable Integer portalCooldown) {
-        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, dimension, difficulty,
+    public WrapperPlayServerJoinGame(
+            int entityID, boolean hardcore, GameMode gameMode,
+            @Nullable GameMode previousGameMode, List<String> worldNames,
+            NBTCompound dimensionCodec, DimensionTypeRef dimensionTypeRef,
+            Difficulty difficulty, String worldName, long hashedSeed,
+            int maxPlayers, int viewDistance, int simulationDistance,
+            boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
+            boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
+            @Nullable Integer portalCooldown
+    ) {
+        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, dimensionTypeRef, difficulty,
                 worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo,
                 enableRespawnScreen, limitedCrafting, isDebug, isFlat, lastDeathPosition,
                 portalCooldown, false);
     }
 
-    public WrapperPlayServerJoinGame(int entityID, boolean hardcore, GameMode gameMode,
-                                     @Nullable GameMode previousGameMode, List<String> worldNames,
-                                     NBTCompound dimensionCodec, Dimension dimension,
-                                     Difficulty difficulty, String worldName, long hashedSeed,
-                                     int maxPlayers, int viewDistance, int simulationDistance,
-                                     boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
-                                     boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
-                                     @Nullable Integer portalCooldown, boolean enforcesSecureChat) {
+    public WrapperPlayServerJoinGame(
+            int entityID, boolean hardcore, GameMode gameMode,
+            @Nullable GameMode previousGameMode, List<String> worldNames,
+            NBTCompound dimensionCodec, DimensionTypeRef dimensionTypeRef,
+            Difficulty difficulty, String worldName, long hashedSeed,
+            int maxPlayers, int viewDistance, int simulationDistance,
+            boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
+            boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
+            @Nullable Integer portalCooldown, boolean enforcesSecureChat
+    ) {
         super(PacketType.Play.Server.JOIN_GAME);
         this.entityID = entityID;
         this.hardcore = hardcore;
@@ -105,7 +215,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         this.previousGameMode = previousGameMode;
         this.worldNames = worldNames;
         this.dimensionCodec = dimensionCodec;
-        this.dimension = dimension;
+        this.dimensionTypeRef = dimensionTypeRef;
         this.difficulty = difficulty;
         this.worldName = worldName;
         this.hashedSeed = hashedSeed;
@@ -153,13 +263,13 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             }
             if (!v1_20_2) {
                 dimensionCodec = readNBT();
-                dimension = readDimension();
+                this.dimensionTypeRef = DimensionTypeRef.read(this);
                 worldName = readString();
             }
         } else {
             previousGameMode = gameMode;
             dimensionCodec = new NBTCompound();
-            dimension = new Dimension(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9_2) ? readInt() : readByte());
+            this.dimensionTypeRef = DimensionTypeRef.read(this);
             if (!v1_14) {
                 difficulty = Difficulty.getById(readByte());
             }
@@ -175,7 +285,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             enableRespawnScreen = readBoolean();
             if (v1_20_2) {
                 limitedCrafting = readBoolean();
-                dimension = readDimension();
+                this.dimensionTypeRef = DimensionTypeRef.read(this);
                 worldName = readString();
                 hashedSeed = readLong();
                 gameMode = readGameMode();
@@ -186,8 +296,8 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         } else {
             maxPlayers = readUnsignedByte();
             String levelType = readString(16);
-            isFlat = DimensionType.isFlat(levelType);
-            isDebug = DimensionType.isDebug(levelType);
+            isFlat = com.github.retrooper.packetevents.protocol.world.DimensionType.isFlat(levelType);
+            isDebug = com.github.retrooper.packetevents.protocol.world.DimensionType.isDebug(levelType);
             if (v1_14) {
                 viewDistance = readVarInt();
             }
@@ -242,16 +352,12 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             }
             if (!v1_20_2) {
                 writeNBT(dimensionCodec);
-                writeDimension(dimension);
+                DimensionTypeRef.write(this, this.dimensionTypeRef);
                 writeString(worldName);
             }
         } else {
             previousGameMode = gameMode;
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                writeInt(dimension.getId());
-            } else {
-                writeByte(dimension.getId());
-            }
+            DimensionTypeRef.write(this, this.dimensionTypeRef);
             if (!v1_14) {
                 writeByte(difficulty.getId());
             }
@@ -271,7 +377,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             writeBoolean(enableRespawnScreen);
             if (v1_20_2) {
                 writeBoolean(limitedCrafting);
-                writeDimension(dimension);
+                DimensionTypeRef.write(this, this.dimensionTypeRef);
                 writeString(worldName);
                 writeLong(hashedSeed);
                 writeGameMode(gameMode);
@@ -319,7 +425,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         previousGameMode = wrapper.previousGameMode;
         worldNames = wrapper.worldNames;
         dimensionCodec = wrapper.dimensionCodec;
-        dimension = wrapper.dimension;
+        dimensionTypeRef = wrapper.dimensionTypeRef;
         difficulty = wrapper.difficulty;
         worldName = wrapper.worldName;
         hashedSeed = wrapper.hashedSeed;
@@ -385,12 +491,32 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         this.dimensionCodec = dimensionCodec;
     }
 
-    public Dimension getDimension() {
-        return dimension;
+    public DimensionTypeRef getDimensionTypeRef() {
+        return this.dimensionTypeRef;
     }
 
+    public void setDimensionTypeRef(DimensionTypeRef dimensionTypeRef) {
+        this.dimensionTypeRef = dimensionTypeRef;
+    }
+
+    public DimensionType getDimensionType() {
+        IRegistry<DimensionType> registry = this.user == null ? DimensionTypes.getRegistry() :
+                this.user.getUserRegistryOrFallback(DimensionTypes.getRegistry());
+        return this.dimensionTypeRef.resolve(registry, this.serverVersion.toClientVersion());
+    }
+
+    public void setDimensionType(DimensionType dimensionType) {
+        this.dimensionTypeRef = dimensionType.asRef(this.serverVersion.toClientVersion());
+    }
+
+    @Deprecated
+    public Dimension getDimension() {
+        return Dimension.fromDimensionTypeRef(this.dimensionTypeRef);
+    }
+
+    @Deprecated
     public void setDimension(Dimension dimension) {
-        this.dimension = dimension;
+        this.dimensionTypeRef = dimension.asDimensionTypeRef();
     }
 
     public Difficulty getDifficulty() {

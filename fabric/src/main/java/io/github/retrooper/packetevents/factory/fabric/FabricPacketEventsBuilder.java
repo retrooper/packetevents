@@ -13,6 +13,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
@@ -87,6 +88,11 @@ public class FabricPacketEventsBuilder {
                         }
                     }
                     return VERSION;
+                }
+
+                @Override
+                public Object getRegistryCacheKey(User user, ClientVersion version) {
+                    return version; // global registries, only depends on packet version
                 }
             };
 
