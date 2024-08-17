@@ -32,6 +32,8 @@ import net.kyori.adventure.util.Index;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
+
 public interface ChatType extends MappedEntity, CopyableEntity<ChatType> {
 
     ChatTypeDecoration getChatDecoration();
@@ -64,7 +66,7 @@ public interface ChatType extends MappedEntity, CopyableEntity<ChatType> {
         NarrationPriority narrationPriority = null;
         if (version.isOlderThan(ClientVersion.V_1_19_1)) {
             overlay = ChatTypeDecoration.decode(compound.getCompoundTagOrThrow("overlay"), version);
-            narrationPriority = NarrationPriority.ID_INDEX.valueOrThrow(
+            narrationPriority = indexValueOrThrow(NarrationPriority.ID_INDEX,
                     narrationTag.getStringTagValueOrThrow("priority"));
             chatTag = chatTag.getCompoundTagOrThrow("description");
             narrationTag = narrationTag.getCompoundTagOrThrow("description");

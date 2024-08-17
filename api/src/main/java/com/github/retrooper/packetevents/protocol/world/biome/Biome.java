@@ -33,6 +33,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
+
 public interface Biome extends MappedEntity, CopyableEntity<Biome> {
 
     boolean hasPrecipitation();
@@ -62,16 +64,16 @@ public interface Biome extends MappedEntity, CopyableEntity<Biome> {
         float temperature = compound.getNumberTagOrThrow("temperature").getAsFloat();
         TemperatureModifier temperatureModifier =
                 Optional.ofNullable(compound.getStringTagValueOrNull("temperature_modifier"))
-                        .map(TemperatureModifier.ID_INDEX::valueOrThrow)
+                        .map(id -> indexValueOrThrow(TemperatureModifier.ID_INDEX, id))
                         .orElse(TemperatureModifier.NONE);
         float downfall = compound.getNumberTagOrThrow("downfall").getAsFloat();
         boolean precipitation = version.isNewerThan(ClientVersion.V_1_19_3) ? compound.getBoolean("has_precipitation") :
-                Precipitation.ID_INDEX.valueOrThrow(compound.getStringTagValueOrThrow("precipitation")) != Precipitation.NONE;
+                indexValueOrThrow(Precipitation.ID_INDEX, compound.getStringTagValueOrThrow("precipitation")) != Precipitation.NONE;
         BiomeEffects effects = BiomeEffects.decode(compound.getTagOrThrow("effects"), version);
 
         // removed with 1.19
         Category category = version.isNewerThanOrEquals(ClientVersion.V_1_19) ? null :
-                Category.ID_INDEX.valueOrThrow(compound.getStringTagValueOrThrow("category"));
+                indexValueOrThrow(Category.ID_INDEX, compound.getStringTagValueOrThrow("category"));
         Float depth = version.isNewerThanOrEquals(ClientVersion.V_1_18) ? null :
                 compound.getNumberTagOrThrow("depth").getAsFloat();
         Float scale = version.isNewerThanOrEquals(ClientVersion.V_1_18) ? null :
@@ -95,7 +97,7 @@ public interface Biome extends MappedEntity, CopyableEntity<Biome> {
         compound.setTag("downfall", new NBTFloat(biome.getDownfall()));
         if (version.isOlderThan(ClientVersion.V_1_19)) {
             if (biome.getCategory() != null) {
-                compound.setTag("category", new NBTString(Category.ID_INDEX.keyOrThrow(biome.getCategory())));
+                compound.setTag("category", new NBTString(biome.getCategory().getId()));
             }
             if (version.isOlderThan(ClientVersion.V_1_18)) {
                 if (biome.getDepth() != null) {
