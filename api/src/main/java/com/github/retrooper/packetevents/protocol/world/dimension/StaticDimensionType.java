@@ -42,18 +42,18 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     private final int height;
     private final int logicalHeight;
     private final String infiniburnTag;
-    private final ResourceLocation effectsLocation;
+    private final @Nullable ResourceLocation effectsLocation;
     private final float ambientLight;
     private final boolean piglinSafe;
     private final boolean hasRaids;
-    private final NBT monsterSpawnLightLevel;
+    private final @Nullable NBT monsterSpawnLightLevel;
     private final int monsterSpawnBlockLightLimit;
 
     public StaticDimensionType(
             OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling,
             boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorking, boolean respawnAnchorWorking,
-            int minY, int height, int logicalHeight, String infiniburnTag, ResourceLocation effectsLocation,
-            float ambientLight, boolean piglinSafe, boolean hasRaids, NBT monsterSpawnLightLevel,
+            int minY, int height, int logicalHeight, String infiniburnTag, @Nullable ResourceLocation effectsLocation,
+            float ambientLight, boolean piglinSafe, boolean hasRaids, @Nullable NBT monsterSpawnLightLevel,
             int monsterSpawnBlockLightLimit
     ) {
         this(null, fixedTime, hasSkyLight, hasCeiling, ultraWarm, natural, coordinateScale, bedWorking, respawnAnchorWorking,
@@ -64,8 +64,8 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     public StaticDimensionType(
             @Nullable TypesBuilderData data, OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling,
             boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorking, boolean respawnAnchorWorking,
-            int minY, int height, int logicalHeight, String infiniburnTag, ResourceLocation effectsLocation,
-            float ambientLight, boolean piglinSafe, boolean hasRaids, NBT monsterSpawnLightLevel,
+            int minY, int height, int logicalHeight, String infiniburnTag, @Nullable ResourceLocation effectsLocation,
+            float ambientLight, boolean piglinSafe, boolean hasRaids, @Nullable NBT monsterSpawnLightLevel,
             int monsterSpawnBlockLightLimit
     ) {
         super(data);
@@ -158,7 +158,7 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     }
 
     @Override
-    public ResourceLocation getEffectsLocation() {
+    public @Nullable ResourceLocation getEffectsLocation() {
         return this.effectsLocation;
     }
 
@@ -178,7 +178,7 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     }
 
     @Override
-    public NBT getMonsterSpawnLightLevel() {
+    public @Nullable NBT getMonsterSpawnLightLevel() {
         return this.monsterSpawnLightLevel;
     }
 
@@ -209,8 +209,8 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
         if (this.monsterSpawnBlockLightLimit != that.monsterSpawnBlockLightLimit) return false;
         if (!this.fixedTime.equals(that.fixedTime)) return false;
         if (!this.infiniburnTag.equals(that.infiniburnTag)) return false;
-        if (!this.effectsLocation.equals(that.effectsLocation)) return false;
-        return this.monsterSpawnLightLevel.equals(that.monsterSpawnLightLevel);
+        if (!Objects.equals(this.effectsLocation, that.effectsLocation)) return false;
+        return Objects.equals(this.monsterSpawnLightLevel, that.monsterSpawnLightLevel);
     }
 
     @Override
