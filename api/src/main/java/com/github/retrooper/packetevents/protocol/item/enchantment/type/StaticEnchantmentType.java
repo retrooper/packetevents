@@ -84,8 +84,7 @@ public class StaticEnchantmentType extends AbstractMappedEntity implements Encha
         return this.effects;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticEnchantmentType)) return false;
         if (!super.equals(obj)) return false;
@@ -96,8 +95,12 @@ public class StaticEnchantmentType extends AbstractMappedEntity implements Encha
         return this.effects.equals(that.effects);
     }
 
-    @Override
-    public int hashCode() {
+    public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.description, this.definition, this.exclusiveSet, this.effects);
+    }
+
+    @Override
+    public String toString() {
+        return "StaticEnchantmentType{description=" + this.description + ", definition=" + this.definition + ", exclusiveSet=" + this.exclusiveSet + ", effects=" + this.effects + "}";
     }
 }

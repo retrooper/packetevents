@@ -144,4 +144,9 @@ public class MappedEntitySet<T> {
     public int hashCode() {
         return Objects.hash(this.tagKey, this.entities);
     }
+
+    @Override
+    public String toString() {
+        return "MappedEntitySet{tagKey=" + this.tagKey + ", entities=" + this.entities + '}';
+    }
 }
