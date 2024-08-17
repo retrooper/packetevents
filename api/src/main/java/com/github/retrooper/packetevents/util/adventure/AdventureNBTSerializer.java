@@ -70,6 +70,8 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
+
 public class AdventureNBTSerializer implements ComponentSerializer<Component, Component, NBT> {
 
     private final boolean downsampleColor;
@@ -327,8 +329,10 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             if (color != null) style.color(color);
         });
 
-        for (Map.Entry<TextDecoration, String> decoration : TextDecoration.NAMES.valueToKey().entrySet()) {
-            reader.useBoolean(decoration.getValue(), value -> style.decoration(decoration.getKey(), TextDecoration.State.byBoolean(value)));
+        for (String decorationKey : TextDecoration.NAMES.keys()) {
+            reader.useBoolean(decorationKey, value -> style.decoration(
+                    indexValueOrThrow(TextDecoration.NAMES, decorationKey),
+                    TextDecoration.State.byBoolean(value)));
         }
         reader.useUTF("insertion", style::insertion);
 
@@ -399,10 +403,10 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         TextColor color = style.color();
         if (color != null) writer.writeUTF("color", serializeColor(color));
 
-        for (Map.Entry<TextDecoration, String> decoration : TextDecoration.NAMES.valueToKey().entrySet()) {
-            TextDecoration.State state = style.decoration(decoration.getKey());
+        for (TextDecoration decoration : TextDecoration.NAMES.values()) {
+            TextDecoration.State state = style.decoration(decoration);
             if (state != TextDecoration.State.NOT_SET) {
-                writer.writeBoolean(decoration.getValue(), state == TextDecoration.State.TRUE);
+                writer.writeBoolean(decoration.toString(), state == TextDecoration.State.TRUE);
             }
         }
 

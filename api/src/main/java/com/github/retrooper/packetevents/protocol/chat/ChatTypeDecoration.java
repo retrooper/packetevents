@@ -40,6 +40,7 @@ import java.util.function.BiFunction;
 import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.CONTENT;
 import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.SENDER;
 import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.Parameter.TARGET;
+import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
 import static java.util.Arrays.asList;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 import static net.kyori.adventure.text.format.Style.empty;
@@ -81,11 +82,11 @@ public class ChatTypeDecoration {
             NBTList<?> paramsTagList = (NBTList<?>) paramsTag;
             for (NBT paramTag : paramsTagList.getTags()) {
                 String paramId = ((NBTString) paramTag).getValue();
-                params.add(Parameter.ID_INDEX.valueOrThrow(paramId));
+                params.add(indexValueOrThrow(Parameter.ID_INDEX, paramId));
             }
         } else {
             String paramId = ((NBTString) paramsTag).getValue();
-            params = Collections.singletonList(Parameter.ID_INDEX.valueOrThrow(paramId));
+            params = Collections.singletonList(indexValueOrThrow(Parameter.ID_INDEX, paramId));
         }
         NBTCompound styleTag = compound.getCompoundTagOrNull("style");
         Style style = styleTag == null ? empty() :

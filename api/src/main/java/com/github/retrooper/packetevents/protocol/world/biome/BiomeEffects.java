@@ -35,6 +35,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
+
 public class BiomeEffects {
 
     private final int fogColor;
@@ -85,7 +87,7 @@ public class BiomeEffects {
         OptionalInt grassColor = Optional.ofNullable(compound.getNumberTagOrNull("grass_color"))
                 .map(NBTNumber::getAsInt).map(OptionalInt::of).orElseGet(OptionalInt::empty);
         GrassColorModifier grassColorModifier = Optional.ofNullable(compound.getStringTagValueOrNull("grass_color_modifier"))
-                .map(GrassColorModifier.ID_INDEX::valueOrThrow).orElse(GrassColorModifier.NONE);
+                .map(id -> indexValueOrThrow(GrassColorModifier.ID_INDEX, id)).orElse(GrassColorModifier.NONE);
         Optional<ParticleSettings> particle = Optional.ofNullable(compound.getTagOrNull("particle"))
                 .map(tag -> ParticleSettings.decode(tag, version));
         Optional<Sound> ambientSound = Optional.ofNullable(compound.getTagOrNull("ambient_sound"))

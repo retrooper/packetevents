@@ -51,6 +51,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
+
 /**
  * This class is designed to take advantage of modern minecraft versions
  * It has also been designed so that legacy versions can use this system
@@ -143,7 +145,7 @@ public class WrappedBlockState {
             NBTCompound propsTag = compound.getCompoundTagOrNull("Properties");
             if (propsTag != null) {
                 for (Map.Entry<String, NBT> entry : propsTag.getTags().entrySet()) {
-                    StateValue stateValue = StateValue.NAME_INDEX.valueOrThrow(entry.getKey());
+                    StateValue stateValue = indexValueOrThrow(StateValue.NAME_INDEX, entry.getKey());
                     Object value;
                     if (stateValue.getDataClass() == boolean.class) {
                         // special parsing
