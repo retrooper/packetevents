@@ -32,6 +32,7 @@ import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -152,8 +153,8 @@ public class RecipeSerializers {
             CookedRecipeData::read, CookedRecipeData::write, RecipeType.CAMPFIRE_COOKING);
     public static final RecipeSerializer<StoneCuttingRecipeData> STONECUTTING = define("stonecutting",
             StoneCuttingRecipeData::read, StoneCuttingRecipeData::write, RecipeType.STONECUTTING);
-    @Deprecated
-    public static final RecipeSerializer<SmithingRecipeData> SMITHING = define("smithing_transform",
+    @ApiStatus.Obsolete
+    public static final RecipeSerializer<SmithingRecipeData> SMITHING = define("smithing",
             ew -> SmithingRecipeData.read(ew, true),
             (ew, data) -> SmithingRecipeData.write(ew, data, true),
             RecipeType.SMITHING);
