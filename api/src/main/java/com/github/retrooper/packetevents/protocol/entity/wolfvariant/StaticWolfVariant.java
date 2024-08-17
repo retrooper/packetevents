@@ -82,8 +82,7 @@ public class StaticWolfVariant extends AbstractMappedEntity implements WolfVaria
         return this.biomes;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticWolfVariant)) return false;
         if (!super.equals(obj)) return false;
@@ -94,8 +93,12 @@ public class StaticWolfVariant extends AbstractMappedEntity implements WolfVaria
         return this.biomes.equals(that.biomes);
     }
 
-    @Override
-    public int hashCode() {
+    public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.wildTexture, this.tameTexture, this.angryTexture, this.biomes);
+    }
+
+    @Override
+    public String toString() {
+        return "StaticWolfVariant{wildTexture=" + this.wildTexture + ", tameTexture=" + this.tameTexture + ", angryTexture=" + this.angryTexture + ", biomes=" + this.biomes + '}';
     }
 }

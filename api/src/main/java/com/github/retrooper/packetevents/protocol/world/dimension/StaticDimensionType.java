@@ -187,8 +187,7 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
         return this.monsterSpawnBlockLightLimit;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticDimensionType)) return false;
         if (!super.equals(obj)) return false;
@@ -213,8 +212,12 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
         return Objects.equals(this.monsterSpawnLightLevel, that.monsterSpawnLightLevel);
     }
 
-    @Override
-    public int hashCode() {
+    public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.fixedTime, this.hasSkyLight, this.hasCeiling, this.ultraWarm, this.natural, this.coordinateScale, this.bedWorking, this.respawnAnchorWorking, this.minY, this.height, this.logicalHeight, this.infiniburnTag, this.effectsLocation, this.ambientLight, this.piglinSafe, this.hasRaids, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit);
+    }
+
+    @Override
+    public String toString() {
+        return "StaticDimensionType{fixedTime=" + this.fixedTime + ", hasSkyLight=" + this.hasSkyLight + ", hasCeiling=" + this.hasCeiling + ", ultraWarm=" + this.ultraWarm + ", natural=" + this.natural + ", coordinateScale=" + this.coordinateScale + ", bedWorking=" + this.bedWorking + ", respawnAnchorWorking=" + this.respawnAnchorWorking + ", minY=" + this.minY + ", height=" + this.height + ", logicalHeight=" + this.logicalHeight + ", infiniburnTag='" + this.infiniburnTag + '\'' + ", effectsLocation=" + this.effectsLocation + ", ambientLight=" + this.ambientLight + ", piglinSafe=" + this.piglinSafe + ", hasRaids=" + this.hasRaids + ", monsterSpawnLightLevel=" + this.monsterSpawnLightLevel + ", monsterSpawnBlockLightLimit=" + this.monsterSpawnBlockLightLimit + '}';
     }
 }

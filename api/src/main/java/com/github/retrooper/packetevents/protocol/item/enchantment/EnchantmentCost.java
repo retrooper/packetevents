@@ -70,4 +70,9 @@ public final class EnchantmentCost {
     public int hashCode() {
         return Objects.hash(this.base, this.perLevelAboveFirst);
     }
+
+    @Override
+    public String toString() {
+        return "EnchantmentCost{base=" + this.base + ", perLevelAboveFirst=" + this.perLevelAboveFirst + '}';
+    }
 }

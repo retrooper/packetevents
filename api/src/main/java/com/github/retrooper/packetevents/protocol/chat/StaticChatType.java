@@ -95,8 +95,7 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
         return this.narrationPriority;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticChatType)) return false;
         if (!super.equals(obj)) return false;
@@ -107,8 +106,12 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
         return this.narrationPriority == that.narrationPriority;
     }
 
-    @Override
-    public int hashCode() {
+    public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.chatDecoration, this.overlayDecoration, this.narrationDecoration, this.narrationPriority);
+    }
+
+    @Override
+    public String toString() {
+        return "StaticChatType{chatDecoration=" + this.chatDecoration + ", overlayDecoration=" + this.overlayDecoration + ", narrationDecoration=" + this.narrationDecoration + ", narrationPriority=" + this.narrationPriority + '}';
     }
 }

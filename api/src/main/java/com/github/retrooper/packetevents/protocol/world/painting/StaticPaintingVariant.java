@@ -62,8 +62,7 @@ public class StaticPaintingVariant extends AbstractMappedEntity implements Paint
         return this.assetId;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticPaintingVariant)) return false;
         if (!super.equals(obj)) return false;
@@ -73,8 +72,12 @@ public class StaticPaintingVariant extends AbstractMappedEntity implements Paint
         return this.assetId.equals(that.assetId);
     }
 
-    @Override
-    public int hashCode() {
+    public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.width, this.height, this.assetId);
+    }
+
+    @Override
+    public String toString() {
+        return "StaticPaintingVariant{width=" + this.width + ", height=" + this.height + ", assetId=" + this.assetId + '}';
     }
 }
