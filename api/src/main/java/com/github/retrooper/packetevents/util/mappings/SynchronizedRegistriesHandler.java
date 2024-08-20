@@ -119,14 +119,14 @@ public final class SynchronizedRegistriesHandler {
         for (NBT tag : registryData.getTags().values()) {
             NBTCompound compound = (NBTCompound) tag;
             // extract registry name
-            ResourceLocation registryName = new ResourceLocation(
-                    compound.getStringTagValueOrThrow("type"));
+            ResourceLocation registryName = new ResourceLocation(compound.getStringTagValueOrThrow("type"));
             // extract registry entries
-            NBTList<NBTCompound> nbtElements =
-                    compound.getCompoundListTagOrThrow("value");
-            // store registry elements
-            handleRegistry(user, version, registryName,
-                    RegistryElement.convertNbt(nbtElements), cacheKey);
+            NBTList<NBTCompound> nbtElements = compound.getCompoundListTagOrNull("value");
+            if (nbtElements != null) {
+                // store registry elements
+                handleRegistry(user, version, registryName,
+                        RegistryElement.convertNbt(nbtElements), cacheKey);
+            }
         }
     }
 

@@ -21,14 +21,15 @@ package com.github.retrooper.packetevents.protocol.chat;
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.Objects;
 
 public class StaticChatType extends AbstractMappedEntity implements ChatType {
 
-    private final ChatTypeDecoration chatDecoration;
+    private final @UnknownNullability("only nullable for 1.19") ChatTypeDecoration chatDecoration;
     private final @Nullable ChatTypeDecoration overlayDecoration;
-    private final ChatTypeDecoration narrationDecoration;
+    private final @UnknownNullability("only nullable for 1.19") ChatTypeDecoration narrationDecoration;
     private final @Nullable NarrationPriority narrationPriority;
 
     public StaticChatType(
@@ -47,9 +48,9 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
     }
 
     public StaticChatType(
-            ChatTypeDecoration chatDecoration,
+            @UnknownNullability("only nullable for 1.19") ChatTypeDecoration chatDecoration,
             @Nullable ChatTypeDecoration overlayDecoration,
-            ChatTypeDecoration narrationDecoration,
+            @UnknownNullability("only nullable for 1.19") ChatTypeDecoration narrationDecoration,
             @Nullable NarrationPriority narrationPriority
     ) {
         this(null, chatDecoration, overlayDecoration, narrationDecoration, narrationPriority);
@@ -57,9 +58,9 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
 
     public StaticChatType(
             @Nullable TypesBuilderData data,
-            ChatTypeDecoration chatDecoration,
+            @UnknownNullability("only nullable for 1.19") ChatTypeDecoration chatDecoration,
             @Nullable ChatTypeDecoration overlayDecoration,
-            ChatTypeDecoration narrationDecoration,
+            @UnknownNullability("only nullable for 1.19") ChatTypeDecoration narrationDecoration,
             @Nullable NarrationPriority narrationPriority
     ) {
         super(data);
@@ -76,7 +77,7 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
     }
 
     @Override
-    public ChatTypeDecoration getChatDecoration() {
+    public @UnknownNullability("only nullable for 1.19") ChatTypeDecoration getChatDecoration() {
         return this.chatDecoration;
     }
 
@@ -86,7 +87,7 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
     }
 
     @Override
-    public ChatTypeDecoration getNarrationDecoration() {
+    public @UnknownNullability("only nullable for 1.19") ChatTypeDecoration getNarrationDecoration() {
         return this.narrationDecoration;
     }
 
@@ -100,9 +101,9 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
         if (!(obj instanceof StaticChatType)) return false;
         if (!super.equals(obj)) return false;
         StaticChatType that = (StaticChatType) obj;
-        if (!this.chatDecoration.equals(that.chatDecoration)) return false;
+        if (!Objects.equals(this.chatDecoration, that.chatDecoration)) return false;
         if (!Objects.equals(this.overlayDecoration, that.overlayDecoration)) return false;
-        if (!this.narrationDecoration.equals(that.narrationDecoration)) return false;
+        if (!Objects.equals(this.narrationDecoration, that.narrationDecoration)) return false;
         return this.narrationPriority == that.narrationPriority;
     }
 

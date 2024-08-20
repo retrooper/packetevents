@@ -31,20 +31,25 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.util.Index;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
+
+import java.util.Objects;
 
 import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
 
 public interface ChatType extends MappedEntity, CopyableEntity<ChatType> {
 
+    @UnknownNullability("only nullable for 1.19")
     ChatTypeDecoration getChatDecoration();
 
     @ApiStatus.Obsolete(since = "1.19.1")
-    ChatTypeDecoration getOverlayDecoration();
+    @Nullable ChatTypeDecoration getOverlayDecoration();
 
+    @UnknownNullability("only nullable for 1.19")
     ChatTypeDecoration getNarrationDecoration();
 
     @ApiStatus.Obsolete(since = "1.19.1")
-    NarrationPriority getNarrationPriority();
+    @Nullable NarrationPriority getNarrationPriority();
 
     static ChatType readDirect(PacketWrapper<?> wrapper) {
         ChatTypeDecoration chatDecoration = ChatTypeDecoration.read(wrapper);
@@ -58,48 +63,78 @@ public interface ChatType extends MappedEntity, CopyableEntity<ChatType> {
     }
 
     static ChatType decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
+        // everything is nullable in 1.19, even the chat format!
         NBTCompound compound = (NBTCompound) nbt;
-        NBTCompound chatTag = compound.getCompoundTagOrThrow("chat");
-        NBTCompound narrationTag = compound.getCompoundTagOrThrow("narration");
+        NBTCompound chatTag = compound.getCompoundTagOrNull("chat");
+        NBTCompound narrationTag = compound.getCompoundTagOrNull("narration");
 
         ChatTypeDecoration overlay = null;
         NarrationPriority narrationPriority = null;
         if (version.isOlderThan(ClientVersion.V_1_19_1)) {
-            overlay = ChatTypeDecoration.decode(compound.getCompoundTagOrThrow("overlay"), version);
-            narrationPriority = indexValueOrThrow(NarrationPriority.ID_INDEX,
-                    narrationTag.getStringTagValueOrThrow("priority"));
-            chatTag = chatTag.getCompoundTagOrThrow("description");
-            narrationTag = narrationTag.getCompoundTagOrThrow("description");
+            NBTCompound overlayTag = compound.getCompoundTagOrNull("overlay");
+            if (overlayTag != null) {
+                // why is this nullable? why is this wrapped? There is no reason to wrap this...
+                overlayTag = overlayTag.getCompoundTagOrNull("description");
+                if (overlayTag != null) {
+                    overlay = ChatTypeDecoration.decode(overlayTag, version);
+                }
+            }
+            if (chatTag != null) {
+                chatTag = chatTag.getCompoundTagOrNull("description");
+            }
+            if (narrationTag != null) {
+                // the priority is the ONLY value which isn't nullable!
+                narrationPriority = indexValueOrThrow(NarrationPriority.ID_INDEX,
+                        narrationTag.getStringTagValueOrThrow("priority"));
+                narrationTag = narrationTag.getCompoundTagOrNull("description");
+            }
+        } else {
+            // ensure this isn't null in everything but 1.19
+            Objects.requireNonNull(chatTag, "NBT chat does not exist");
+            Objects.requireNonNull(narrationTag, "NBT narration does not exist");
         }
 
-        ChatTypeDecoration chat = ChatTypeDecoration.decode(chatTag, version);
-        ChatTypeDecoration narration = ChatTypeDecoration.decode(narrationTag, version);
+        ChatTypeDecoration chat = chatTag == null ? null : ChatTypeDecoration.decode(chatTag, version);
+        ChatTypeDecoration narration = narrationTag == null ? null : ChatTypeDecoration.decode(narrationTag, version);
         return new StaticChatType(data, chat, overlay, narration, narrationPriority);
     }
 
     static NBT encode(ChatType chatType, ClientVersion version) {
         NBTCompound compound = new NBTCompound();
-        NBT chatTag = ChatTypeDecoration.encode(chatType.getChatDecoration(), version);
-        NBT narrationTag = ChatTypeDecoration.encode(chatType.getNarrationDecoration(), version);
+        NBT chatTag = chatType.getChatDecoration() == null ? null :
+                ChatTypeDecoration.encode(chatType.getChatDecoration(), version);
+        NBT narrationTag = chatType.getNarrationDecoration() == null ? null :
+                ChatTypeDecoration.encode(chatType.getNarrationDecoration(), version);
 
         if (version.isOlderThan(ClientVersion.V_1_19_1)) {
-            if (chatType.getOverlayDecoration() != null) {
-                compound.setTag("overlay",
-                        ChatTypeDecoration.encode(chatType.getOverlayDecoration(), version));
+            ChatTypeDecoration overlayDeco = chatType.getOverlayDecoration();
+            if (overlayDeco != null) {
+                NBTCompound overlayCompound = new NBTCompound();
+                overlayCompound.setTag("description",
+                        ChatTypeDecoration.encode(overlayDeco, version));
+                compound.setTag("overlay", overlayCompound);
             }
-            NBTCompound narrationCompound = new NBTCompound();
-            narrationCompound.setTag("description", narrationTag);
-            if (chatType.getNarrationPriority() != null) {
-                narrationCompound.setTag("priority", new NBTString(chatType.getNarrationPriority().getId()));
+            if (narrationTag != null) {
+                NBTCompound narrationCompound = new NBTCompound();
+                narrationCompound.setTag("description", narrationTag);
+                if (chatType.getNarrationPriority() != null) {
+                    narrationCompound.setTag("priority", new NBTString(chatType.getNarrationPriority().getId()));
+                }
+                narrationTag = narrationCompound;
             }
-            narrationTag = narrationCompound;
-            NBTCompound chatCompound = new NBTCompound();
-            chatCompound.setTag("description", chatTag);
-            chatTag = chatCompound;
+            if (chatTag != null) {
+                NBTCompound chatCompound = new NBTCompound();
+                chatCompound.setTag("description", chatTag);
+                chatTag = chatCompound;
+            }
         }
 
-        compound.setTag("chat", chatTag);
-        compound.setTag("narration", narrationTag);
+        if (chatTag != null) {
+            compound.setTag("chat", chatTag);
+        }
+        if (narrationTag != null) {
+            compound.setTag("narration", narrationTag);
+        }
         return compound;
     }
 
