@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.world.positionsource;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.positionsource.builtin.BlockPositionSource;
 import com.github.retrooper.packetevents.protocol.world.positionsource.builtin.EntityPositionSource;
@@ -26,6 +27,10 @@ import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper.Reader;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper.Writer;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +41,11 @@ public class PositionSourceTypes {
     private static final Map<Byte, Map<Integer, PositionSourceType<?>>> POS_SOURCE_ID_MAP = new HashMap<>();
     private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("world/world_position_source_mappings");
 
+    @ApiStatus.Internal
     public static <T extends PositionSource> PositionSourceType<T> define(
-            String key, PacketWrapper.Reader<T> reader, PacketWrapper.Writer<T> writer
+            String key,
+            Reader<T> reader, Writer<T> writer,
+            Decoder<T> decoder, Encoder<T> encoder
     ) {
         TypesBuilderData data = TYPES_BUILDER.define(key);
         PositionSourceType<T> sourceType = new PositionSourceType<T>() {
@@ -49,6 +57,16 @@ public class PositionSourceTypes {
             @Override
             public void write(PacketWrapper<?> wrapper, T source) {
                 writer.accept(wrapper, source);
+            }
+
+            @Override
+            public T decode(NBTCompound compound, ClientVersion version) {
+                return decoder.decode(compound, version);
+            }
+
+            @Override
+            public void encode(T source, ClientVersion version, NBTCompound compound) {
+                encoder.encode(source, version, compound);
             }
 
             @Override
@@ -74,6 +92,7 @@ public class PositionSourceTypes {
     }
 
     // with minecraft:key
+    @Nullable
     public static PositionSourceType<?> getByName(String name) {
         return POS_SOURCE_MAP.get(name);
     }
@@ -85,11 +104,25 @@ public class PositionSourceTypes {
     }
 
     public static final PositionSourceType<BlockPositionSource> BLOCK = define("block",
-            BlockPositionSource::read, BlockPositionSource::write);
+            BlockPositionSource::read, BlockPositionSource::write,
+            BlockPositionSource::decodeSource, BlockPositionSource::encodeSource);
     public static final PositionSourceType<EntityPositionSource> ENTITY = define("entity",
-            EntityPositionSource::read, EntityPositionSource::write);
+            EntityPositionSource::read, EntityPositionSource::write,
+            EntityPositionSource::decodeSource, EntityPositionSource::encodeSource);
 
     static {
         TYPES_BUILDER.unloadFileMappings();
+    }
+
+    @FunctionalInterface
+    public interface Decoder<T> {
+
+        T decode(NBTCompound compound, ClientVersion version);
+    }
+
+    @FunctionalInterface
+    public interface Encoder<T> {
+
+        void encode(T value, ClientVersion version, NBTCompound compound);
     }
 }
