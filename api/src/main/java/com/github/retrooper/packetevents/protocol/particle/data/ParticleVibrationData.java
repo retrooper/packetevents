@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.nbt.NBTIntArray;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSource;
 import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSourceType;
@@ -154,11 +156,31 @@ public class ParticleVibrationData extends ParticleData {
     }
 
     public static ParticleVibrationData decode(NBTCompound compound, ClientVersion version) {
-        throw new UnsupportedOperationException(); // FIXME
+        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
+            compound = compound.getCompoundTagOrThrow("value");
+        }
+        Vector3i origin = version.isNewerThanOrEquals(ClientVersion.V_1_19) ? null :
+                new Vector3i(compound.getTagOfTypeOrThrow("origin", NBTIntArray.class).getValue());
+        PositionSource destination = PositionSource.decode(compound.getCompoundTagOrThrow("destination"), version);
+        int arrivalInTicks = compound.getNumberTagOrThrow("arrival_in_ticks").getAsInt();
+        return new ParticleVibrationData(origin, destination, arrivalInTicks);
     }
 
     public static void encode(ParticleVibrationData data, ClientVersion version, NBTCompound compound) {
-        throw new UnsupportedOperationException(); // FIXME
+        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
+            NBTCompound innerCompound = new NBTCompound();
+            compound.setTag("value", innerCompound);
+            compound = innerCompound;
+        }
+        if (version.isOlderThan(ClientVersion.V_1_19)) {
+            Vector3i startPos = data.getStartingPosition();
+            if (startPos != null) {
+                compound.setTag("origin", new NBTIntArray(
+                        new int[]{startPos.x, startPos.y, startPos.z}));
+            }
+        }
+        compound.setTag("destination", PositionSource.encode(data.source, version));
+        compound.setTag("arrival_in_ticks", new NBTInt(data.ticks));
     }
 
     @ApiStatus.Obsolete

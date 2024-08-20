@@ -156,15 +156,31 @@ public class ParticleDustColorTransitionData extends ParticleData {
     }
 
     public static ParticleDustColorTransitionData decode(NBTCompound compound, ClientVersion version) {
-        float[] fromColor = decodeColor(compound.getTagOrThrow("from_color"));
-        float[] toColor = decodeColor(compound.getTagOrThrow("to_color"));
+        String fromColorKey = "from_color";
+        String toColorKey = "to_color";
+        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
+            compound = compound.getCompoundTagOrThrow("value");
+            fromColorKey = "fromColor";
+            toColorKey = "toColor";
+        }
+        float[] fromColor = decodeColor(compound.getTagOrThrow(fromColorKey));
+        float[] toColor = decodeColor(compound.getTagOrThrow(toColorKey));
         float scale = compound.getNumberTagOrThrow("scale").getAsFloat();
         return new ParticleDustColorTransitionData(scale, fromColor, toColor);
     }
 
     public static void encode(ParticleDustColorTransitionData data, ClientVersion version, NBTCompound compound) {
-        compound.setTag("from_color", encodeColor(null, data.startRed, data.startGreen, data.startBlue));
-        compound.setTag("to_color", encodeColor(null, data.endRed, data.endGreen, data.endBlue));
+        String fromColorKey = "from_color";
+        String toColorKey = "to_color";
+        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
+            NBTCompound innerCompound = new NBTCompound();
+            compound.setTag("value", innerCompound);
+            compound = innerCompound;
+            fromColorKey = "fromColor";
+            toColorKey = "toColor";
+        }
+        compound.setTag(fromColorKey, encodeColor(null, data.startRed, data.startGreen, data.startBlue));
+        compound.setTag(toColorKey, encodeColor(null, data.endRed, data.endGreen, data.endBlue));
         compound.setTag("scale", new NBTFloat(data.scale));
     }
 

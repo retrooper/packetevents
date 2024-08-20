@@ -55,12 +55,14 @@ public class ParticleItemStackData extends ParticleData implements LegacyConvert
     }
 
     public static ParticleItemStackData decode(NBTCompound compound, ClientVersion version) {
-        ItemStack stack = ItemStack.decode(compound.getTagOrThrow("item"), version);
+        String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "item" : "value";
+        ItemStack stack = ItemStack.decode(compound.getTagOrThrow(key), version);
         return new ParticleItemStackData(stack);
     }
 
     public static void encode(ParticleItemStackData data, ClientVersion version, NBTCompound compound) {
-        compound.setTag("item", ItemStack.encodeForParticle(data.itemStack, version));
+        String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "item" : "value";
+        compound.setTag(key, ItemStack.encodeForParticle(data.itemStack, version));
     }
 
     @Override
