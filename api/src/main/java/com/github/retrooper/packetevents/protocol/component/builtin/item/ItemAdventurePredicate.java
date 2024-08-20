@@ -104,8 +104,9 @@ public class ItemAdventurePredicate {
         public static BlockPredicate read(PacketWrapper<?> wrapper) {
             MappedEntitySet<StateType.Mapped> blocks = wrapper.readOptional(
                     ew -> MappedEntitySet.read(ew, StateTypes::getMappedById));
-            List<PropertyMatcher> properties = wrapper.readList(PropertyMatcher::read);
-            NBTCompound nbt = wrapper.readNBT();
+            List<PropertyMatcher> properties = wrapper.readOptional(
+                    ew -> wrapper.readList(PropertyMatcher::read));
+            NBTCompound nbt = wrapper.readOptional(PacketWrapper::readNBT);
             return new BlockPredicate(blocks, properties, nbt);
         }
 
