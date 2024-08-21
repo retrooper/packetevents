@@ -134,7 +134,7 @@ public class TestPacketEventsBuilder {
 
             @Override
             public boolean isTerminated() {
-                return false;
+                return terminated;
             }
 
             @Override
