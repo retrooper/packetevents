@@ -39,6 +39,7 @@ public class PacketEventsSettings {
     private boolean debugEnabled = false;
     private boolean fullStackTraceEnabled = false;
     private boolean kickOnPacketExceptionEnabled = true;
+    private boolean kickIfTerminated = true;
     private Function<String, InputStream> resourceProvider = path -> PacketEventsSettings.class
             .getClassLoader()
             .getResourceAsStream(path);
@@ -140,6 +141,18 @@ public class PacketEventsSettings {
     }
 
     /**
+     * This decides if PacketEvents should kick the player on join if PacketEvents is terminated.
+     *
+     * @param kickIfTerminated Value
+     * @return Settings instance.
+     */
+    @ApiStatus.Internal
+    public PacketEventsSettings kickIfTerminated(boolean kickIfTerminated) {
+        this.kickIfTerminated = kickIfTerminated;
+        return this;
+    }
+
+    /**
      * Some projects may want to implement a CDN with resources like asset mappings
      * By default, all resources are retrieved from the ClassLoader
      *
@@ -217,6 +230,15 @@ public class PacketEventsSettings {
      */
     public boolean isKickOnPacketExceptionEnabled() {
         return kickOnPacketExceptionEnabled;
+    }
+
+    /**
+     * Should packetevents kick the player on join if PacketEvents is terminated?
+     *
+     * @return Getter for {@link #kickIfTerminated}
+     */
+    public boolean isKickIfTerminated() {
+        return kickIfTerminated;
     }
 
     /**

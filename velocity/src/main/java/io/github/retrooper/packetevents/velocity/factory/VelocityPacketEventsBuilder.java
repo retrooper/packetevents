@@ -163,6 +163,7 @@ public class VelocityPacketEventsBuilder {
             };
             private boolean loaded;
             private boolean initialized;
+            private boolean terminated;
 
             @Override
             public void load() {
@@ -244,7 +245,13 @@ public class VelocityPacketEventsBuilder {
                     // Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;
+                    terminated = true;
                 }
+            }
+
+            @Override
+            public boolean isTerminated() {
+                return terminated;
             }
 
             @Override
