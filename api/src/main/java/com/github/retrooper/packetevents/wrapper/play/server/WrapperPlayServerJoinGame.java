@@ -301,7 +301,9 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             if (v1_14) {
                 viewDistance = readVarInt();
             }
-            reducedDebugInfo = readBoolean();
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+                reducedDebugInfo = readBoolean();
+            }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
                 enableRespawnScreen = readBoolean();
             }
@@ -400,7 +402,9 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             if (v1_14) {
                 writeVarInt(viewDistance);
             }
-            writeBoolean(reducedDebugInfo);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+                writeBoolean(reducedDebugInfo);
+            }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
                 writeBoolean(enableRespawnScreen);
             }
