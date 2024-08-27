@@ -70,27 +70,33 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         super.exceptionCaught(ctx, cause);
         //Check if the minecraft server will already print our exception for us.
         //Don't print errors during handshake
-        if (ExceptionUtil.isException(cause, PacketProcessException.class)
-                && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
-                && (user != null && user.getDecoderState() != ConnectionState.HANDSHAKING)) {
-            if (PacketEvents.getAPI().getSettings().isFullStackTraceEnabled()) {
-                cause.printStackTrace();
-            } else {
-                PacketEvents.getAPI().getLogManager().warn(cause.getMessage());
+        boolean didWeCauseThis = ExceptionUtil.isException(cause, PacketProcessException.class);
+        if (didWeCauseThis
+                && (user == null || user.getDecoderState() != ConnectionState.HANDSHAKING)) {
+            if (!SpigotReflectionUtil.isMinecraftServerInstanceDebugging()) {
+                if (PacketEvents.getAPI().getSettings().isFullStackTraceEnabled()) {
+                    cause.printStackTrace();
+                } else {
+                    PacketEvents.getAPI().getLogManager().warn(cause.getMessage());
+                }
             }
 
             if (PacketEvents.getAPI().getSettings().isKickOnPacketExceptionEnabled()) {
                 try {
-                    user.sendPacket(new WrapperPlayServerDisconnect(Component.text("Invalid packet")));
+                    if (user != null) {
+                        user.sendPacket(new WrapperPlayServerDisconnect(Component.text("Invalid packet")));
+                    }
                 } catch (Exception ignored) { // There may (?) be an exception if the player is in the wrong state...
                     // Do nothing.
                 }
-                user.closeConnection();
+                ctx.channel().close();
                 if (player != null) {
                     FoliaScheduler.getEntityScheduler().runDelayed(player, (Plugin) PacketEvents.getAPI().getPlugin(), (o) -> player.kickPlayer("Invalid packet"), null, 1);
                 }
 
-                PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to invalid packet!");
+                if (user != null) {
+                    PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to invalid packet!");
+                }
             }
         }
     }

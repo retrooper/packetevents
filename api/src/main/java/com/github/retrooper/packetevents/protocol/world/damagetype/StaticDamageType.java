@@ -32,7 +32,7 @@ public class StaticDamageType extends AbstractMappedEntity implements DamageType
     private DeathMessageType deathMessageType;
 
     protected StaticDamageType(@Nullable TypesBuilderData data, String messageId, DamageScaling scaling,
-            float exhaustion, DamageEffects effects, DeathMessageType deathMessageType) {
+                               float exhaustion, DamageEffects effects, DeathMessageType deathMessageType) {
         super(data);
 
         this.messageId = messageId;
@@ -73,8 +73,7 @@ public class StaticDamageType extends AbstractMappedEntity implements DamageType
         return this.deathMessageType;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticDamageType)) return false;
         if (!super.equals(obj)) return false;
@@ -86,8 +85,12 @@ public class StaticDamageType extends AbstractMappedEntity implements DamageType
         return this.deathMessageType == that.deathMessageType;
     }
 
-    @Override
-    public int hashCode() {
+    public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.messageId, this.scaling, this.exhaustion, this.effects, this.deathMessageType);
+    }
+
+    @Override
+    public String toString() {
+        return "StaticDamageType{messageId='" + this.messageId + '\'' + ", scaling=" + this.scaling + ", exhaustion=" + this.exhaustion + ", effects=" + this.effects + ", deathMessageType=" + this.deathMessageType + '}';
     }
 }

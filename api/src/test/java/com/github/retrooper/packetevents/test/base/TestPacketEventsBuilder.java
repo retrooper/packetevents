@@ -83,6 +83,7 @@ public class TestPacketEventsBuilder {
 
             private boolean loaded;
             private boolean initialized;
+            private boolean terminated;
 
             @Override
             public void load() {
@@ -127,7 +128,13 @@ public class TestPacketEventsBuilder {
             public void terminate() {
                 if (initialized) {
                     initialized = false;
+                    terminated = true;
                 }
+            }
+
+            @Override
+            public boolean isTerminated() {
+                return terminated;
             }
 
             @Override

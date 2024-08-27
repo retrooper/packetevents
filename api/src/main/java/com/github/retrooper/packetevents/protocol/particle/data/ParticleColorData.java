@@ -50,22 +50,29 @@ public class ParticleColorData extends ParticleData {
 
     public static ParticleColorData decode(NBTCompound compound, ClientVersion version) {
         int argb;
-        NBT colorTag = compound.getTagOrThrow("color");
-        if (colorTag instanceof NBTNumber) {
-            argb = ((NBTNumber) colorTag).getAsInt();
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            NBT colorTag = compound.getTagOrThrow("color");
+            if (colorTag instanceof NBTNumber) {
+                argb = ((NBTNumber) colorTag).getAsInt();
+            } else {
+                float[] color = decodeColor(colorTag);
+                assert color.length == 4; // required by vanilla protocol
+                argb = (floor(color[0] * 255f) << 24)
+                        | (floor(color[1] * 255f) << 16)
+                        | (floor(color[2] * 255f) << 8)
+                        | floor(color[3] * 255f);
+            }
         } else {
-            float[] color = decodeColor(colorTag);
-            assert color.length == 4; // required by vanilla protocol
-            argb = (floor(color[0] * 255f) << 24)
-                    | (floor(color[1] * 255f) << 16)
-                    | (floor(color[2] * 255f) << 8)
-                    | floor(color[3] * 255f);
+            // no data to decode for <1.20.5
+            argb = 0xFFFFFFFF;
         }
         return new ParticleColorData(argb);
     }
 
     public static void encode(ParticleColorData data, ClientVersion version, NBTCompound compound) {
-        compound.setTag("color", new NBTInt(data.color));
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            compound.setTag("color", new NBTInt(data.color));
+        }
     }
 
     public int getColor() {

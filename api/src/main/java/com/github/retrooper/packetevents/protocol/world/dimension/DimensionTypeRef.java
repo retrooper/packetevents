@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
+import org.jetbrains.annotations.Nullable;
 
 public interface DimensionTypeRef {
 
@@ -172,18 +173,37 @@ public interface DimensionTypeRef {
 
         @Override
         public DimensionType resolve(IRegistry<DimensionType> registry, ClientVersion version) {
+            // workaround to make DimensionType#getId work
+            //
+            // some 1.16 versions don't send any info about the registry id or name
+            // of the dimension type, so technically we have to assume it is never defined in a registry
+            //
+            // as some projects depend on getId working, this is a workaround
+            // which will hopefully work for nearly everything
+            ResourceLocation name = this.getNullableName();
+            if (name != null) {
+                DimensionType dimensionType = registry.getByName(name);
+                if (dimensionType != null) {
+                    return dimensionType;
+                }
+            }
             return DimensionType.decode(this.data, version, null);
         }
 
-        @Override
-        public ResourceLocation getName() {
+        public @Nullable ResourceLocation getNullableName() {
             if (this.data instanceof NBTCompound) {
                 String effectsName = ((NBTCompound) this.data).getStringTagValueOrNull("effects");
                 if (effectsName != null) {
                     return new ResourceLocation(effectsName);
                 }
             }
-            return DimensionTypeRef.super.getName();
+            return null;
+        }
+
+        @Override
+        public ResourceLocation getName() {
+            ResourceLocation name = this.getNullableName();
+            return name != null ? name : DimensionTypeRef.super.getName();
         }
 
         @Override

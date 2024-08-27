@@ -87,6 +87,7 @@ public class SpigotPacketEventsBuilder {
             private boolean loaded;
             private boolean initialized;
             private boolean lateBind = false;
+            private boolean terminated = false;
 
             @Override
             public void load() {
@@ -222,7 +223,13 @@ public class SpigotPacketEventsBuilder {
                     //Unregister all listeners. Because if we attempt to reload, we will end up with duplicate listeners.
                     getEventManager().unregisterAllListeners();
                     initialized = false;
+                    terminated = true;
                 }
+            }
+
+            @Override
+            public boolean isTerminated() {
+                return terminated;
             }
 
             @Override

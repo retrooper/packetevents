@@ -62,12 +62,14 @@ public class ParticleBlockStateData extends ParticleData implements LegacyConver
     }
 
     public static ParticleBlockStateData decode(NBTCompound compound, ClientVersion version) {
-        WrappedBlockState state = WrappedBlockState.decode(compound.getTagOrThrow("block_state"), version);
+        String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "block_state" : "value";
+        WrappedBlockState state = WrappedBlockState.decode(compound.getTagOrThrow(key), version);
         return new ParticleBlockStateData(state);
     }
 
     public static void encode(ParticleBlockStateData data, ClientVersion version, NBTCompound compound) {
-        compound.setTag("block_state", WrappedBlockState.encode(data.blockState, version));
+        String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "block_state" : "value";
+        compound.setTag(key, WrappedBlockState.encode(data.blockState, version));
     }
 
     @Override

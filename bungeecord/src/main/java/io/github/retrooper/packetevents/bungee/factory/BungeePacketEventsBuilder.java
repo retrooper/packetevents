@@ -46,6 +46,7 @@ import io.github.retrooper.packetevents.processor.InternalBungeeProcessor;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import org.jetbrains.annotations.NotNull;
@@ -109,7 +110,17 @@ public class BungeePacketEventsBuilder {
                 @Override
                 public Object getRegistryCacheKey(User user, ClientVersion version) {
                     ProxiedPlayer player = ProxyServer.getInstance().getPlayer(user.getUUID());
-                    return player == null ? null : Objects.hash(player.getServer().getInfo(), version);
+                    if (player == null) {
+                        return null;
+                    }
+                    Server server = player.getServer();
+                    if (server == null) {
+                        // seems to be null during server switch or on join,
+                        // but only for some specific bungee forks?
+                        // BungeeCord would be a lot safer if they were to use nullability annotations...
+                        return null;
+                    }
+                    return Objects.hash(server.getInfo(), version);
                 }
             };
 
@@ -174,6 +185,7 @@ public class BungeePacketEventsBuilder {
             };
             private boolean loaded;
             private boolean initialized;
+            private boolean terminated;
 
             @Override
             public void load() {
@@ -236,7 +248,13 @@ public class BungeePacketEventsBuilder {
                     // Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;
+                    terminated = true;
                 }
+            }
+
+            @Override
+            public boolean isTerminated() {
+                return terminated;
             }
 
             @Override

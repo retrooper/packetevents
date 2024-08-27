@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
+
 public final class EnchantmentDefinition {
 
     private final MappedEntitySet<ItemType> supportedItems;
@@ -82,11 +84,11 @@ public final class EnchantmentDefinition {
             slots = new ArrayList<>(slotsTagList.size());
             for (NBT tag : slotsTagList.getTags()) {
                 String slotGroupId = ((NBTString) tag).getValue();
-                slots.add(EquipmentSlotGroup.ID_INDEX.valueOrThrow(slotGroupId));
+                slots.add(indexValueOrThrow(EquipmentSlotGroup.ID_INDEX, slotGroupId));
             }
         } else {
             String slotGroupId = ((NBTString) slotsTag).getValue();
-            EquipmentSlotGroup slotGroup = EquipmentSlotGroup.ID_INDEX.valueOrThrow(slotGroupId);
+            EquipmentSlotGroup slotGroup = indexValueOrThrow(EquipmentSlotGroup.ID_INDEX, slotGroupId);
             slots = Collections.singletonList(slotGroup);
         }
 
@@ -164,5 +166,10 @@ public final class EnchantmentDefinition {
     @Override
     public int hashCode() {
         return Objects.hash(this.supportedItems, this.primaryItems, this.weight, this.maxLevel, this.minCost, this.maxCost, this.anvilCost, this.slots);
+    }
+
+    @Override
+    public String toString() {
+        return "EnchantmentDefinition{supportedItems=" + this.supportedItems + ", primaryItems=" + this.primaryItems + ", weight=" + this.weight + ", maxLevel=" + this.maxLevel + ", minCost=" + this.minCost + ", maxCost=" + this.maxCost + ", anvilCost=" + this.anvilCost + ", slots=" + this.slots + '}';
     }
 }

@@ -30,6 +30,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
+
 public interface DamageType extends MappedEntity, CopyableEntity<DamageType> {
     String getMessageId();
 
@@ -44,13 +46,13 @@ public interface DamageType extends MappedEntity, CopyableEntity<DamageType> {
     static DamageType decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
         String messageId = ((NBTCompound) nbt).getStringTagValueOrThrow("message_id");
-        DamageScaling scaling = DamageScaling.ID_INDEX.valueOrThrow(
+        DamageScaling scaling = indexValueOrThrow(DamageScaling.ID_INDEX,
                 ((NBTCompound) nbt).getStringTagValueOrThrow("scaling"));
         float exhaustion = ((NBTCompound) nbt).getNumberTagOrThrow("exhaustion").getAsFloat();
         DamageEffects effects = Optional.ofNullable(compound.getStringTagValueOrNull("effects"))
-                .map(DamageEffects.ID_INDEX::valueOrThrow).orElse(DamageEffects.HURT);
+                .map(id -> indexValueOrThrow(DamageEffects.ID_INDEX, id)).orElse(DamageEffects.HURT);
         DeathMessageType deathMessageType = Optional.ofNullable(compound.getStringTagValueOrNull("death_message_type"))
-                .map(DeathMessageType.ID_INDEX::valueOrThrow).orElse(DeathMessageType.DEFAULT);
+                .map(id -> indexValueOrThrow(DeathMessageType.ID_INDEX, id)).orElse(DeathMessageType.DEFAULT);
 
         return new StaticDamageType(data, messageId, scaling, exhaustion, effects, deathMessageType);
     }

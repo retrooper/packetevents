@@ -87,8 +87,7 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
         return this.description;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticTrimMaterial)) return false;
         if (!super.equals(obj)) return false;
@@ -100,8 +99,12 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
         return this.description.equals(that.description);
     }
 
-    @Override
-    public int hashCode() {
+    public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.assetName, this.ingredient, this.itemModelIndex, this.overrideArmorMaterials, this.description);
+    }
+
+    @Override
+    public String toString() {
+        return "StaticTrimMaterial{assetName='" + this.assetName + '\'' + ", ingredient=" + this.ingredient + ", itemModelIndex=" + this.itemModelIndex + ", overrideArmorMaterials=" + this.overrideArmorMaterials + ", description=" + this.description + '}';
     }
 }

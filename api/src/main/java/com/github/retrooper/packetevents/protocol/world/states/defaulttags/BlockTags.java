@@ -478,7 +478,7 @@ public class BlockTags {
         return this.name;
     }
 
-    public BlockTags getByName(String name) {
+    public static BlockTags getByName(String name) {
         return byName.get(name);
     }
 

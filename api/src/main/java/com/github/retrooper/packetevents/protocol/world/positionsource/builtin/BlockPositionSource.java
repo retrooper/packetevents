@@ -18,6 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.world.positionsource.builtin;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTIntArray;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSource;
 import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSourceTypes;
 import com.github.retrooper.packetevents.util.Vector3i;
@@ -38,6 +41,15 @@ public class BlockPositionSource extends PositionSource {
 
     public static void write(PacketWrapper<?> wrapper, BlockPositionSource source) {
         wrapper.writeBlockPosition(source.pos);
+    }
+
+    public static BlockPositionSource decodeSource(NBTCompound compound, ClientVersion version) {
+        NBTIntArray arr = compound.getTagOfTypeOrThrow("pos", NBTIntArray.class);
+        return new BlockPositionSource(new Vector3i(arr.getValue()));
+    }
+
+    public static void encodeSource(BlockPositionSource source, ClientVersion version, NBTCompound compound) {
+        compound.setTag("pos", new NBTIntArray(new int[]{source.pos.x, source.pos.y, source.pos.z}));
     }
 
     public Vector3i getPos() {

@@ -38,7 +38,7 @@ public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
     }
 
     public JukeboxSong(@Nullable TypesBuilderData data, Sound sound, Component description, float lengthInSeconds,
-            int comparatorOutput) {
+                       int comparatorOutput) {
         super(data);
         this.sound = sound;
         this.description = description;
@@ -101,24 +101,23 @@ public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
         this.comparatorOutput = comparatorOutput;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-        if (!super.equals(object)) {
-            return false;
-        }
-        JukeboxSong that = (JukeboxSong) object;
-        return Float.compare(lengthInSeconds, that.lengthInSeconds) == 0 && comparatorOutput == that.comparatorOutput &&
-                Objects.equals(sound, that.sound) && Objects.equals(description, that.description);
+    public boolean deepEquals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof JukeboxSong)) return false;
+        if (!super.equals(obj)) return false;
+        JukeboxSong that = (JukeboxSong) obj;
+        if (Float.compare(that.lengthInSeconds, this.lengthInSeconds) != 0) return false;
+        if (this.comparatorOutput != that.comparatorOutput) return false;
+        if (!this.sound.equals(that.sound)) return false;
+        return this.description.equals(that.description);
+    }
+
+    public int deepHashCode() {
+        return Objects.hash(super.hashCode(), this.sound, this.description, this.lengthInSeconds, this.comparatorOutput);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), sound, description, lengthInSeconds, comparatorOutput);
+    public String toString() {
+        return "JukeboxSong{sound=" + this.sound + ", description=" + this.description + ", lengthInSeconds=" + this.lengthInSeconds + ", comparatorOutput=" + this.comparatorOutput + '}';
     }
 }

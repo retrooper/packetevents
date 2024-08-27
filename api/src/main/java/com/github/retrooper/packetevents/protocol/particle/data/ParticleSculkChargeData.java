@@ -30,11 +30,19 @@ public class ParticleSculkChargeData extends ParticleData {
     }
 
     public static ParticleSculkChargeData decode(NBTCompound compound, ClientVersion version) {
+        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
+            compound = compound.getCompoundTagOrThrow("value");
+        }
         float roll = compound.getNumberTagOrThrow("roll").getAsFloat();
         return new ParticleSculkChargeData(roll);
     }
 
     public static void encode(ParticleSculkChargeData data, ClientVersion version, NBTCompound compound) {
+        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
+            NBTCompound innerCompound = new NBTCompound();
+            compound.setTag("value", innerCompound);
+            compound = innerCompound;
+        }
         compound.setTag("roll", new NBTFloat(data.roll));
     }
 

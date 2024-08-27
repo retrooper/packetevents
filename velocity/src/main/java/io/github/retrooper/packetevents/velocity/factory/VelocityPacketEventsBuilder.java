@@ -163,6 +163,7 @@ public class VelocityPacketEventsBuilder {
             };
             private boolean loaded;
             private boolean initialized;
+            private boolean terminated;
 
             @Override
             public void load() {
@@ -199,6 +200,10 @@ public class VelocityPacketEventsBuilder {
                             (event) -> {
                                 Player player = event.getPlayer();
                                 Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+                                // This only happens if a player is a fake player
+                                if(channel == null) {
+                                    return;
+                                }
                                 PacketEvents.getAPI().getInjector().setPlayer(channel, player);
 
                                 User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
@@ -240,7 +245,13 @@ public class VelocityPacketEventsBuilder {
                     // Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;
+                    terminated = true;
                 }
+            }
+
+            @Override
+            public boolean isTerminated() {
+                return terminated;
             }
 
             @Override

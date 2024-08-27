@@ -55,8 +55,7 @@ public class StaticBannerPattern extends AbstractMappedEntity implements BannerP
         return this.translationKey;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticBannerPattern)) return false;
         if (!super.equals(obj)) return false;
@@ -65,8 +64,12 @@ public class StaticBannerPattern extends AbstractMappedEntity implements BannerP
         return this.translationKey.equals(that.translationKey);
     }
 
-    @Override
-    public int hashCode() {
+    public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.assetId, this.translationKey);
+    }
+
+    @Override
+    public String toString() {
+        return "StaticBannerPattern{assetId=" + this.assetId + ", translationKey='" + this.translationKey + '\'' + '}';
     }
 }
