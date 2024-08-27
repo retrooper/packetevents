@@ -27,7 +27,7 @@ ext["versionNoHash"] = "$fullVersion${getVersionMeta(false)}"
 
 tasks {
     wrapper {
-        gradleVersion = "8.9"
+        gradleVersion = "8.10"
         distributionType = Wrapper.DistributionType.ALL
     }
 
