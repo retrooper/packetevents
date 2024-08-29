@@ -16,7 +16,7 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/")
 }
 
-val isShadow = project.pluginManager.hasPlugin("io.github.goooler.shadow")
+val isShadow = project.pluginManager.hasPlugin("com.gradleup.shadow")
 
 dependencies {
     compileOnly("org.jetbrains:annotations:23.0.0")
