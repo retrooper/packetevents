@@ -82,6 +82,10 @@ public final class SynchronizedRegistriesHandler {
     private SynchronizedRegistriesHandler() {
     }
 
+    public static @Nullable RegistryEntry<?> getRegistryEntry(ResourceLocation registryKey) {
+        return REGISTRY_KEYS.get(registryKey);
+    }
+
     public static void handleRegistry(
             User user, ClientVersion version,
             ResourceLocation registryName,
@@ -108,7 +112,7 @@ public final class SynchronizedRegistriesHandler {
             syncedRegistry = registryData.computeSyncedRegistry(cacheKey, () ->
                     registryData.createFromElements(elements, version));
         }
-        user.putUserRegistry(syncedRegistry);
+        user.putRegistry(syncedRegistry);
     }
 
     public static void handleLegacyRegistries(
@@ -130,13 +134,15 @@ public final class SynchronizedRegistriesHandler {
         }
     }
 
+    @ApiStatus.Internal
     @FunctionalInterface
-    private interface NbtEntryDecoder<T> {
+    public interface NbtEntryDecoder<T> {
 
         T decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data);
     }
 
-    private static final class RegistryEntry<T extends MappedEntity & CopyableEntity<T>> {
+    @ApiStatus.Internal
+    public static final class RegistryEntry<T extends MappedEntity & CopyableEntity<T>> {
 
         private final IRegistry<T> baseRegistry;
         private final NbtEntryDecoder<T> decoder;
@@ -153,6 +159,10 @@ public final class SynchronizedRegistriesHandler {
         ) {
             this.baseRegistry = baseRegistry;
             this.decoder = decoder;
+        }
+
+        public @Nullable SimpleRegistry<T> getSyncedRegistry(Object key) {
+            return this.syncedRegistries.get(key);
         }
 
         @SuppressWarnings("unchecked")

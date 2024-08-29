@@ -102,7 +102,7 @@ public class Dimension {
     public com.github.retrooper.packetevents.protocol.world.dimension.DimensionType asDimensionType(
             @Nullable User user, @Nullable ClientVersion version) {
         IRegistry<com.github.retrooper.packetevents.protocol.world.dimension.DimensionType> registry = user != null
-                ? user.getUserRegistryOrFallback(DimensionTypes.getRegistry()) : DimensionTypes.getRegistry();
+                ? user.getRegistryOr(DimensionTypes.getRegistry()) : DimensionTypes.getRegistry();
         String dimName = this.getDimensionName();
         if (!dimName.isEmpty()) {
             return registry.getByName(new ResourceLocation(dimName));

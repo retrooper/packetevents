@@ -89,4 +89,9 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
     public ResourceLocation getRegistryKey() {
         return this.registryKey;
     }
+
+    @Override
+    public String toString() {
+        return "VersionedRegistry[" + this.registryKey + ']';
+    }
 }

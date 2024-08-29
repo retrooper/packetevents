@@ -504,8 +504,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     }
 
     public DimensionType getDimensionType() {
-        IRegistry<DimensionType> registry = this.user == null ? DimensionTypes.getRegistry() :
-                this.user.getUserRegistryOrFallback(DimensionTypes.getRegistry());
+        IRegistry<DimensionType> registry = this.getRegistryHolder().getRegistryOr(DimensionTypes.getRegistry());
         return this.dimensionTypeRef.resolve(registry, this.serverVersion.toClientVersion());
     }
 

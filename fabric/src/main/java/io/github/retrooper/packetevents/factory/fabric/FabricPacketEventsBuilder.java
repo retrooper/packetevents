@@ -17,6 +17,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
+import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handler.PacketDecoder;
 import io.github.retrooper.packetevents.handler.PacketEncoder;
@@ -92,7 +93,7 @@ public class FabricPacketEventsBuilder {
 
                 @Override
                 public Object getRegistryCacheKey(User user, ClientVersion version) {
-                    return version; // global registries, only depends on packet version
+                    return GlobalRegistryHolder.getGlobalRegistryCacheKey(user, version);
                 }
             };
 

@@ -69,7 +69,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             @Nullable ResourceLocation deathDimensionName, @Nullable WorldBlockPosition lastDeathPosition,
             @Nullable Integer portalCooldown
     ) {
-        this( dimension.asDimensionTypeRef(), worldName, difficulty, hashedSeed, gameMode, previousGameMode,
+        this(dimension.asDimensionTypeRef(), worldName, difficulty, hashedSeed, gameMode, previousGameMode,
                 worldDebug, worldFlat, keepingAllPlayerData, deathDimensionName, lastDeathPosition, portalCooldown);
     }
 
@@ -79,7 +79,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             @Nullable GameMode previousGameMode, boolean worldDebug, boolean worldFlat, byte keptData,
             @Nullable WorldBlockPosition lastDeathPosition, @Nullable Integer portalCooldown
     ) {
-        this( dimension.asDimensionTypeRef(), worldName, difficulty, hashedSeed, gameMode, previousGameMode,
+        this(dimension.asDimensionTypeRef(), worldName, difficulty, hashedSeed, gameMode, previousGameMode,
                 worldDebug, worldFlat, keptData, lastDeathPosition, portalCooldown);
     }
 
@@ -266,8 +266,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     }
 
     public DimensionType getDimensionType() {
-        IRegistry<DimensionType> registry = this.user == null ? DimensionTypes.getRegistry() :
-                this.user.getUserRegistryOrFallback(DimensionTypes.getRegistry());
+        IRegistry<DimensionType> registry = this.getRegistryHolder().getRegistryOr(DimensionTypes.getRegistry());
         return this.dimensionTypeRef.resolve(registry, this.serverVersion.toClientVersion());
     }
 
