@@ -18,43 +18,29 @@
 
 package com.github.retrooper.packetevents.util.mappings;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.function.BiFunction;
+@ApiStatus.Internal
+public interface IRegistryHolder {
 
-public interface IRegistry<T extends MappedEntity> extends BiFunction<ClientVersion, Integer, T> {
-
-    default @Nullable T getByName(ResourceLocation name) {
-        return this.getByName(name.toString());
+    default <T extends MappedEntity> IRegistry<T> getRegistryOr(IRegistry<T> fallbackRegistry) {
+        return this.getRegistryOr(fallbackRegistry, PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
     }
 
-    @Nullable
-    T getByName(String name);
-
-    @Nullable
-    T getById(ClientVersion version, int id);
-
-    default int getId(String entityName, ClientVersion version) {
-        return this.getId(this.getByName(entityName), version);
+    @SuppressWarnings("unchecked") // should be fine
+    default <T extends MappedEntity> IRegistry<T> getRegistryOr(IRegistry<T> fallbackRegistry, ClientVersion version) {
+        IRegistry<?> replacedRegistry = this.getRegistry(fallbackRegistry.getRegistryKey(), version);
+        return replacedRegistry != null ? (IRegistry<T>) replacedRegistry : fallbackRegistry;
     }
 
-    int getId(MappedEntity entity, ClientVersion version);
-
-    /**
-     * Returns an immutable view of the registry entries.
-     *
-     * @return Registry entries
-     */
-    Collection<T> getEntries();
-
-    ResourceLocation getRegistryKey();
-
-    @Override
-    default T apply(ClientVersion version, Integer id) {
-        return this.getById(version, id);
+    default @Nullable IRegistry<?> getRegistry(ResourceLocation registryKey) {
+        return this.getRegistry(registryKey, PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
     }
+
+    @Nullable IRegistry<?> getRegistry(ResourceLocation registryKey, ClientVersion version);
 }

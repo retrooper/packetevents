@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
-import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
@@ -36,6 +35,7 @@ import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
+import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
@@ -53,7 +53,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class User {
+public class User implements IRegistryHolder {
+
     private final Object channel;
     private ConnectionState decoderState;
     private ConnectionState encoderState;
@@ -75,19 +76,13 @@ public class User {
     }
 
     @ApiStatus.Internal
-    @SuppressWarnings("unchecked") // should be fine
-    public <T extends MappedEntity> IRegistry<T> getUserRegistryOrFallback(IRegistry<T> fallbackRegistry) {
-        IRegistry<?> replacedRegistry = this.registries.get(fallbackRegistry.getRegistryKey());
-        return replacedRegistry != null ? (IRegistry<T>) replacedRegistry : fallbackRegistry;
-    }
-
-    @ApiStatus.Internal
-    public IRegistry<?> getUserRegistry(ResourceLocation registryKey) {
+    @Override
+    public @Nullable IRegistry<?> getRegistry(ResourceLocation registryKey, ClientVersion version) {
         return this.registries.get(registryKey);
     }
 
     @ApiStatus.Internal
-    public void putUserRegistry(IRegistry<?> registry) {
+    public void putRegistry(IRegistry<?> registry) {
         this.registries.put(registry.getRegistryKey(), registry);
     }
 

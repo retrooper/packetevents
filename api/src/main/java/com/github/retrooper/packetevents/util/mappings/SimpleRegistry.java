@@ -18,18 +18,15 @@
 
 package com.github.retrooper.packetevents.util.mappings;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData.RegistryElement;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T> {
@@ -92,5 +89,10 @@ public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T
     @Override
     public ResourceLocation getRegistryKey() {
         return this.registryKey;
+    }
+
+    @Override
+    public String toString() {
+        return "SimpleRegistry[" + this.registryKey + ']';
     }
 }

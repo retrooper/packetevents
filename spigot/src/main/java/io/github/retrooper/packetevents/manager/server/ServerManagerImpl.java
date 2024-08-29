@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PEVersion;
+import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -69,6 +70,6 @@ public class ServerManagerImpl implements ServerManager {
 
     @Override
     public Object getRegistryCacheKey(User user, ClientVersion version) {
-        return version; // global registries, only depends on packet version
+        return GlobalRegistryHolder.getGlobalRegistryCacheKey(user, version);
     }
 }

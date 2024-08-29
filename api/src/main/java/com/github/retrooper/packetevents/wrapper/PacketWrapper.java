@@ -51,8 +51,15 @@ import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.protocol.chat.*;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
+import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
+import com.github.retrooper.packetevents.protocol.chat.MessageSignature;
+import com.github.retrooper.packetevents.protocol.chat.Node;
+import com.github.retrooper.packetevents.protocol.chat.Parsers;
 import com.github.retrooper.packetevents.protocol.chat.Parsers.Parser;
+import com.github.retrooper.packetevents.protocol.chat.RemoteChatSession;
+import com.github.retrooper.packetevents.protocol.chat.SignedCommandArgument;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
 import com.github.retrooper.packetevents.protocol.component.ComponentType;
@@ -88,7 +95,9 @@ import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.util.crypto.SignatureData;
+import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
+import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.ApiStatus;
@@ -100,7 +109,16 @@ import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -1462,31 +1480,42 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public <Z extends MappedEntity> Z readMappedEntity(BiFunction<ClientVersion, Integer, Z> getter) {
-        return getter.apply(this.serverVersion.toClientVersion(), this.readVarInt());
+        int id = this.readVarInt();
+        Z entity = getter.apply(this.serverVersion.toClientVersion(), id);
+        if (entity == null) {
+            throw new IllegalStateException("Can't find mapped entity with id " + id + " using " + getter);
+        }
+        return entity;
+    }
+
+    public IRegistryHolder getRegistryHolder() {
+        // workaround to make packet wrappers work without user context on spigot/fabric servers
+        // this will not work for bungee or velocity, as we need to have some reference to get
+        // the actual cache key
+        return this.user != null ? this.user : GlobalRegistryHolder.INSTANCE;
     }
 
     public <Z extends MappedEntity> Z readMappedEntityOrDirect(
             BiFunction<ClientVersion, Integer, Z> getter, Reader<Z> directReader) {
         int id = this.readVarInt();
-        if (id != 0) { // registered in registry
-            return getter.apply(this.serverVersion.toClientVersion(), id - 1);
+        if (id == 0) { // not registered in registry
+            return directReader.apply(this);
         }
-        return directReader.apply(this);
+        Z entity = getter.apply(this.serverVersion.toClientVersion(), id - 1);
+        if (entity == null) {
+            throw new IllegalStateException("Can't find mapped entity with id " + id + " using " + getter);
+        }
+        return entity;
     }
 
     public <Z extends MappedEntity> Z readMappedEntity(IRegistry<Z> registry) {
-        if (this.user != null) {
-            registry = this.user.getUserRegistryOrFallback(registry);
-        }
-        return this.readMappedEntity(registry::getById);
+        IRegistry<Z> replacedRegistry = this.getRegistryHolder().getRegistryOr(registry);
+        return this.readMappedEntity((BiFunction<ClientVersion, Integer, Z>) replacedRegistry);
     }
 
-    public <Z extends MappedEntity> Z readMappedEntityOrDirect(
-            IRegistry<Z> registry, Reader<Z> directReader) {
-        if (this.user != null) {
-            registry = this.user.getUserRegistryOrFallback(registry);
-        }
-        return this.readMappedEntityOrDirect(registry::getById, directReader);
+    public <Z extends MappedEntity> Z readMappedEntityOrDirect(IRegistry<Z> registry, Reader<Z> directReader) {
+        IRegistry<Z> replacedRegistry = this.getRegistryHolder().getRegistryOr(registry);
+        return this.readMappedEntityOrDirect((BiFunction<ClientVersion, Integer, Z>) replacedRegistry, directReader);
     }
 
     public void writeMappedEntity(MappedEntity entity) {
