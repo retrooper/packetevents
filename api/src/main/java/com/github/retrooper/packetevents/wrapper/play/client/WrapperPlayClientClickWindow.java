@@ -58,7 +58,7 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
     @Override
     public void read() {
         boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
-        this.windowID = readUnsignedByte();
+        this.windowID = this.readContainerId();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
             this.stateID = Optional.of(readVarInt());
         } else {
@@ -99,7 +99,7 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
     @Override
     public void write() {
         boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
-        writeByte(windowID);
+        this.writeContainerId(this.windowID);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
             writeVarInt(this.stateID.orElse(-1));
         }

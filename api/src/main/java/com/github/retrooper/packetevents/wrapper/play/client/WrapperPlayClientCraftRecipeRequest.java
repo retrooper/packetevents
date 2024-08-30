@@ -50,7 +50,7 @@ public class WrapperPlayClientCraftRecipeRequest extends PacketWrapper<WrapperPl
 
     @Override
     public void read() {
-        this.windowId = readByte();
+        this.windowId = this.readContainerId();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             this.recipeModern = readString();
         } else {
@@ -61,7 +61,7 @@ public class WrapperPlayClientCraftRecipeRequest extends PacketWrapper<WrapperPl
 
     @Override
     public void write() {
-        writeByte(this.windowId);
+        this.writeContainerId(this.windowId);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             writeString(this.recipeModern);
         } else {

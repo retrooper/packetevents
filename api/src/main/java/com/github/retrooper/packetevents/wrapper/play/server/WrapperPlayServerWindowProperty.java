@@ -23,7 +23,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlayServerWindowProperty> {
-    private byte windowId;
+
+    private int windowId;
     private int id;
     private int value;
 
@@ -32,6 +33,10 @@ public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlaySe
     }
 
     public WrapperPlayServerWindowProperty(byte windowId, int id, int value) {
+        this((int) windowId, id, value);
+    }
+
+    public WrapperPlayServerWindowProperty(int windowId, int id, int value) {
         super(PacketType.Play.Server.WINDOW_PROPERTY);
         this.windowId = windowId;
         this.id = id;
@@ -40,14 +45,14 @@ public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void read() {
-        this.windowId = (byte) readUnsignedByte();
+        this.windowId = this.readContainerId();
         this.id = readShort();
         this.value = readShort();
     }
 
     @Override
     public void write() {
-        writeByte(this.windowId);
+        this.writeContainerId(this.windowId);
         writeShort(this.id);
         writeShort(this.value);
     }
@@ -59,12 +64,22 @@ public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlaySe
         this.value = wrapper.value;
     }
 
-    public byte getWindowId() {
-        return windowId;
+    public int getContainerId() {
+        return this.windowId;
     }
 
-    public void setWindowId(byte windowId) {
+    public void setContainerId(int windowId) {
         this.windowId = windowId;
+    }
+
+    @Deprecated
+    public byte getWindowIdB() {
+        return (byte) this.getContainerId();
+    }
+
+    @Deprecated
+    public void setWindowId(byte windowId) {
+        this.setContainerId(windowId);
     }
 
     public int getId() {

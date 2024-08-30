@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,52 +19,56 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayServerCloseWindow extends PacketWrapper<WrapperPlayServerCloseWindow> {
+public class WrapperPlayServerSetPlayerInventory extends PacketWrapper<WrapperPlayServerSetPlayerInventory> {
 
-    private int windowId;
+    private int slot;
+    private ItemStack stack;
 
-    public WrapperPlayServerCloseWindow(PacketSendEvent event) {
+    public WrapperPlayServerSetPlayerInventory(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerCloseWindow() {
-        this(0);
-    }
-
-    public WrapperPlayServerCloseWindow(int id) {
-        super(PacketType.Play.Server.CLOSE_WINDOW);
-        this.windowId = id;
+    public WrapperPlayServerSetPlayerInventory(int slot, ItemStack stack) {
+        super(PacketType.Play.Server.SET_PLAYER_INVENTORY);
+        this.slot = slot;
+        this.stack = stack;
     }
 
     @Override
     public void read() {
-        this.windowId = this.readContainerId();
+        this.slot = this.readVarInt();
+        this.stack = this.readItemStack();
     }
 
     @Override
     public void write() {
-        this.writeContainerId(this.windowId);
+        this.writeVarInt(this.slot);
+        this.writeItemStack(this.stack);
     }
 
     @Override
-    public void copy(WrapperPlayServerCloseWindow wrapper) {
-        this.windowId = wrapper.windowId;
+    public void copy(WrapperPlayServerSetPlayerInventory wrapper) {
+        this.slot = wrapper.slot;
+        this.stack = wrapper.stack;
     }
 
-    /**
-     * Note: Window ID is ignored by the client on all versions.
-     */
-    public int getWindowId() {
-        return this.windowId;
+    public int getSlot() {
+        return this.slot;
     }
 
-    /**
-     * Note: Window ID is ignored by the client on all versions.
-     */
-    public void setWindowId(int windowId) {
-        this.windowId = windowId;
+    public void setSlot(int slot) {
+        this.slot = slot;
+    }
+
+    public ItemStack getStack() {
+        return this.stack;
+    }
+
+    public void setStack(ItemStack stack) {
+        this.stack = stack;
     }
 }

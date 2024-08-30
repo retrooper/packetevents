@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,44 +16,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.wrapper.play.client;
+package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayClientCloseWindow extends PacketWrapper<WrapperPlayClientCloseWindow> {
-    private int windowID;
+public class WrapperPlayServerSetCursorItem extends PacketWrapper<WrapperPlayServerSetCursorItem> {
 
-    public WrapperPlayClientCloseWindow(PacketReceiveEvent event) {
+    private ItemStack stack;
+
+    public WrapperPlayServerSetCursorItem(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientCloseWindow(int windowID) {
-        super(PacketType.Play.Client.CLOSE_WINDOW);
-        this.windowID = windowID;
+    public WrapperPlayServerSetCursorItem(ItemStack stack) {
+        super(PacketType.Play.Server.SET_CURSOR_ITEM);
+        this.stack = stack;
     }
 
     @Override
     public void read() {
-        this.windowID = this.readContainerId();
+        this.stack = this.readItemStack();
     }
 
     @Override
     public void write() {
-        this.writeContainerId(this.windowID);
+        this.writeItemStack(this.stack);
     }
 
     @Override
-    public void copy(WrapperPlayClientCloseWindow wrapper) {
-        this.windowID = wrapper.windowID;
+    public void copy(WrapperPlayServerSetCursorItem wrapper) {
+        this.stack = wrapper.stack;
     }
 
-    public int getWindowId() {
-        return windowID;
+    public ItemStack getStack() {
+        return this.stack;
     }
 
-    public void setWindowId(int windowID) {
-        this.windowID = windowID;
+    public void setStack(ItemStack stack) {
+        this.stack = stack;
     }
 }
