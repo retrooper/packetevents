@@ -34,6 +34,7 @@ import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterial
 import com.github.retrooper.packetevents.protocol.item.trimpattern.TrimPattern;
 import com.github.retrooper.packetevents.protocol.item.trimpattern.TrimPatterns;
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
+import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
@@ -142,7 +143,7 @@ public final class SynchronizedRegistriesHandler {
     }
 
     @ApiStatus.Internal
-    public static final class RegistryEntry<T extends MappedEntity & CopyableEntity<T>> {
+    public static final class RegistryEntry<T extends MappedEntity & CopyableEntity<T> & DeepComparableEntity> {
 
         private final IRegistry<T> baseRegistry;
         private final NbtEntryDecoder<T> decoder;
@@ -186,7 +187,7 @@ public final class SynchronizedRegistriesHandler {
             if (element.getData() != null) {
                 // data was provided, use registry element sent over network
                 T value = this.decoder.decode(element.getData(), version, data);
-                if (!value.equals(copiedBaseEntry)) {
+                if (!value.deepEquals(copiedBaseEntry)) {
                     // only define decoded value if it doesn't match the base
                     // registry value this ensures we don't save everything twice,
                     // if it has been already stored in memory
