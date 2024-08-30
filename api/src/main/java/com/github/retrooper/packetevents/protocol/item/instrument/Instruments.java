@@ -21,74 +21,40 @@ package com.github.retrooper.packetevents.protocol.item.instrument;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 
-import java.util.HashMap;
-import java.util.Map;
+public final class Instruments {
 
-public class Instruments {
+    private static final VersionedRegistry<Instrument> REGISTRY = new VersionedRegistry<>(
+            "instrument", "item/item_instrument_mappings");
 
-    private static final Map<String, Instrument> INSTRUMENT_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, Instrument>> INSTRUMENT_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_instrument_mappings");
+    private Instruments() {
+    }
 
     public static Instrument define(String key, Sound sound) {
         // vanilla defaults for goat horns
-        return define(key, sound, 140, 256f);
+        return define(key, sound, 20 * 7, 256f);
     }
 
+    @ApiStatus.Internal
     public static Instrument define(String key, Sound sound, int useDuration, float range) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        Instrument instrument = new Instrument() {
-            @Override
-            public Sound getSound() {
-                return sound;
-            }
-
-            @Override
-            public int getUseDuration() {
-                return useDuration;
-            }
-
-            @Override
-            public float getRange() {
-                return range;
-            }
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof Instrument) {
-                    return getName().equals(((Instrument) obj).getName());
-                }
-                return false;
-            }
-        };
-        MappingHelper.registerMapping(TYPES_BUILDER, INSTRUMENT_MAP, INSTRUMENT_ID_MAP, instrument);
-        return instrument;
+        return REGISTRY.define(key, data -> new StaticInstrument(
+                data, sound, useDuration, range,
+                Component.translatable("instrument.minecraft." + key)));
     }
 
-    // with key
+    public static VersionedRegistry<Instrument> getRegistry() {
+        return REGISTRY;
+    }
+
     public static Instrument getByName(String name) {
-        return INSTRUMENT_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static Instrument getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, Instrument> idMap = INSTRUMENT_ID_MAP.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
 
     public static final Instrument PONDER_GOAT_HORN = define("ponder_goat_horn", Sounds.ITEM_GOAT_HORN_SOUND_0);
@@ -101,6 +67,6 @@ public class Instruments {
     public static final Instrument DREAM_GOAT_HORN = define("dream_goat_horn", Sounds.ITEM_GOAT_HORN_SOUND_7);
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
 }
