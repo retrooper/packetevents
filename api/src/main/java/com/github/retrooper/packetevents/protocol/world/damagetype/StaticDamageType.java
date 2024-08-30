@@ -73,6 +73,7 @@ public class StaticDamageType extends AbstractMappedEntity implements DamageType
         return this.deathMessageType;
     }
 
+    @Override
     public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticDamageType)) return false;
@@ -85,6 +86,7 @@ public class StaticDamageType extends AbstractMappedEntity implements DamageType
         return this.deathMessageType == that.deathMessageType;
     }
 
+    @Override
     public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.messageId, this.scaling, this.exhaustion, this.effects, this.deathMessageType);
     }

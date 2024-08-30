@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.world.dimension;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
+import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
@@ -36,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.OptionalLong;
 
-public interface DimensionType extends MappedEntity, CopyableEntity<DimensionType> {
+public interface DimensionType extends MappedEntity, CopyableEntity<DimensionType>, DeepComparableEntity {
 
     OptionalLong getFixedTime();
 

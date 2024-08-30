@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.world.damagetype;
 
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
+import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
@@ -32,7 +33,7 @@ import java.util.Optional;
 
 import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
 
-public interface DamageType extends MappedEntity, CopyableEntity<DamageType> {
+public interface DamageType extends MappedEntity, CopyableEntity<DamageType>, DeepComparableEntity {
     String getMessageId();
 
     DamageScaling getScaling();

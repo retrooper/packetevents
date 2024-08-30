@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.chat;
 
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_19_1;
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
+import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
@@ -37,7 +38,7 @@ import java.util.Objects;
 
 import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
 
-public interface ChatType extends MappedEntity, CopyableEntity<ChatType> {
+public interface ChatType extends MappedEntity, CopyableEntity<ChatType>, DeepComparableEntity {
 
     @UnknownNullability("only nullable for 1.19")
     ChatTypeDecoration getChatDecoration();
