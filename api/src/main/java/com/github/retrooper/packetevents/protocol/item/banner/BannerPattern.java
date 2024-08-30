@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.item.banner;
 
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
+import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
@@ -29,7 +30,7 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
-public interface BannerPattern extends MappedEntity, CopyableEntity<BannerPattern> {
+public interface BannerPattern extends MappedEntity, CopyableEntity<BannerPattern>, DeepComparableEntity {
 
     ResourceLocation getAssetId();
 

@@ -153,6 +153,7 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
         return this.effects;
     }
 
+    @Override
     public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticBiome)) return false;
@@ -168,6 +169,7 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
         return this.effects.equals(that.effects);
     }
 
+    @Override
     public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.precipitation, this.temperature,
                 this.temperatureModifier, this.downfall, this.category, this.depth, this.scale, this.effects);

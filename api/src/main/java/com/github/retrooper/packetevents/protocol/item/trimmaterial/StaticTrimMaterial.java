@@ -87,6 +87,7 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
         return this.description;
     }
 
+    @Override
     public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticTrimMaterial)) return false;
@@ -99,6 +100,7 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
         return this.description.equals(that.description);
     }
 
+    @Override
     public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.assetName, this.ingredient, this.itemModelIndex, this.overrideArmorMaterials, this.description);
     }

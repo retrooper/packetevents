@@ -79,6 +79,7 @@ public class StaticTrimPattern extends AbstractMappedEntity implements TrimPatte
         return this.decal;
     }
 
+    @Override
     public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticTrimPattern)) return false;
@@ -90,6 +91,7 @@ public class StaticTrimPattern extends AbstractMappedEntity implements TrimPatte
         return this.description.equals(that.description);
     }
 
+    @Override
     public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.assetId, this.templateItem, this.description, this.decal);
     }

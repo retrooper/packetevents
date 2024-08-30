@@ -101,6 +101,7 @@ public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
         this.comparatorOutput = comparatorOutput;
     }
 
+    @Override
     public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof JukeboxSong)) return false;
@@ -112,6 +113,7 @@ public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
         return this.description.equals(that.description);
     }
 
+    @Override
     public int deepHashCode() {
         return Objects.hash(super.hashCode(), this.sound, this.description, this.lengthInSeconds, this.comparatorOutput);
     }

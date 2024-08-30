@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.entity.wolfvariant;
 
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
+import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
@@ -31,7 +32,7 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.Nullable;
 
-public interface WolfVariant extends MappedEntity, CopyableEntity<WolfVariant> {
+public interface WolfVariant extends MappedEntity, CopyableEntity<WolfVariant>, DeepComparableEntity {
 
     ResourceLocation getWildTexture();
 

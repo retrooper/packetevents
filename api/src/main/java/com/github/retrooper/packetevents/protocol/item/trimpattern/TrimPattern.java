@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.item.trimpattern;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
+import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
@@ -34,7 +35,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
-public interface TrimPattern extends MappedEntity, CopyableEntity<TrimPattern> {
+public interface TrimPattern extends MappedEntity, CopyableEntity<TrimPattern>, DeepComparableEntity {
 
     ResourceLocation getAssetId();
 
