@@ -19,13 +19,15 @@
 package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.protocol.world.chunk.LightData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetCursorItem;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPlayerInventory;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateLight;
 
 import java.util.Collections;
@@ -72,6 +74,18 @@ public class PacketTransformationUtil {
                 output[1] = chunkData;
 
                 return output;
+            }
+        } else if (wrapper instanceof WrapperPlayServerSetSlot) {
+            // some plugins will probably fail to update this correctly, so just transform it when sending
+            WrapperPlayServerSetSlot setSlot = (WrapperPlayServerSetSlot) wrapper;
+            if (setSlot.getSlot() == -1) { // transform to cursor item
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+                    wrapper = new WrapperPlayServerSetCursorItem(setSlot.getItem());
+                }
+            } else if (setSlot.getWindowId() == -2) { // transform to player inventory set
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+                    wrapper = new WrapperPlayServerSetPlayerInventory(setSlot.getSlot(), setSlot.getItem());
+                }
             }
         }
         return new PacketWrapper<?>[]{wrapper};
