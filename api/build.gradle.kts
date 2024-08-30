@@ -73,6 +73,7 @@ mappingCompression {
         compress("entity/painting_mappings.json")
         compress("entity/wolf_variant_mappings.json")
 
+        compress("item/consume_effect_type_mappings.json")
         compress("item/item_armor_material_mappings.json")
         compress("item/item_banner_pattern_mappings.json")
         compress("item/item_component_mappings.json")
