@@ -13,7 +13,7 @@ PacketEvents is emerging as a strong contender in the realm of Minecraft packet 
 
 - [Read documentation](https://docs.packetevents.com/)
     - [Getting Started](https://docs.packetevents.com/getting-started)
-    - [JavaDocs](https://packetevents.github.io) 
+    - [JavaDocs](javadocs.packetevents.com) 
 - [Releases](https://github.com/retrooper/packetevents/releases/)
     - [GitHub](https://github.com/retrooper/packetevents/releases/)
     - [Modrinth](https://modrinth.com/plugin/packetevents)
