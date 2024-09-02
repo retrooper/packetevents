@@ -11,8 +11,8 @@ PacketEvents is emerging as a strong contender in the realm of Minecraft packet 
 
 <h3>Resources</h3>
 
-- [Read documentation](https://packetevents.gitbook.io/)
-    - [Getting Started](https://packetevents.gitbook.io/docs/getting-started)
+- [Read documentation](https://docs.packetevents.com/)
+    - [Getting Started](https://docs.packetevents.com/getting-started)
     - [JavaDocs](https://packetevents.github.io) 
 - [Releases](https://github.com/retrooper/packetevents/releases/)
     - [GitHub](https://github.com/retrooper/packetevents/releases/)
