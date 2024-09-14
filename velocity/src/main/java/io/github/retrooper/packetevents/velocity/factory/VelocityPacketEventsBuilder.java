@@ -138,7 +138,12 @@ public class VelocityPacketEventsBuilder {
                         return server;
                     }
                     try {
-                        return this.registeredServer.get(this.connectionInFlight.get(player));
+                        Object connectionInFlight = this.connectionInFlight.get(player);
+                        if (connectionInFlight == null) {
+                          return null;
+                        }
+
+                        return this.registeredServer.get(connectionInFlight);
                     } catch (IllegalAccessException exception) {
                         throw new RuntimeException(exception);
                     }
@@ -147,7 +152,16 @@ public class VelocityPacketEventsBuilder {
                 @Override
                 public Object getRegistryCacheKey(User user, ClientVersion version) {
                     Player player = server.getPlayer(user.getUUID()).orElse(null);
-                    return player == null ? null : Objects.hash(this.getTargetServer(player), version);
+                    if (player == null) {
+                        return null;
+                    }
+
+                    Object targetServer = this.getTargetServer(player);
+                    if (targetServer == null) {
+                        return null;
+                    }
+
+                    return Objects.hash(targetServer, version);
                 }
             };
 
