@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import java.util.UUID;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.color.DyeColor;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -193,5 +194,4 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
             return color;
         }
     }
-}
 }
