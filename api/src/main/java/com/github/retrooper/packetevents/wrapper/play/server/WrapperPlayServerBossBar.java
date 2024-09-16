@@ -18,12 +18,10 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumSet;
 import java.util.UUID;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.color.DyeColor;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.bossbar.BossBar;
@@ -37,7 +35,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
     private float health;
     private BossBar.Color color;
     private BossBar.Overlay overlay;
-    private List<BossBar.Flag> flags;
+    private EnumSet<BossBar.Flag> flags;
 
     public WrapperPlayServerBossBar(PacketSendEvent event) {
         super(event);
@@ -120,8 +118,8 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
         flags = wrapper.flags;
     }
 
-    private List<BossBar.Flag> getFlagsFromBytes(short b) {
-        List<BossBar.Flag> list = new ArrayList<>();
+    private EnumSet<BossBar.Flag> getFlagsFromBytes(short b) {
+        EnumSet<BossBar.Flag> list = EnumSet.noneOf(BossBar.Flag.class);
         if((b & 0x01) != 0)
             list.add(BossBar.Flag.DARKEN_SCREEN);
         if((b & 0x02) != 0)
@@ -202,11 +200,11 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
         this.overlay = overlay;
     }
     
-    public List<BossBar.Flag> getFlags() {
+    public EnumSet<BossBar.Flag> getFlags() {
         return flags;
     }
     
-    public void setFlags(List<BossBar.Flag> flags) {
+    public void setFlags(EnumSet<BossBar.Flag> flags) {
         this.flags = flags;
     }
     
