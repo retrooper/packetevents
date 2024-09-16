@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.color.DyeColor;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 
 public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBossBar> {
@@ -32,8 +33,8 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
     private Action action;
     private Component title;
     private float health;
-    private Color color;
-    private Division division;
+    private BossBar.Color color;
+    private BossBar.Overlay division;
     private short flags;
 
     public WrapperPlayServerBossBar(PacketSendEvent event) {
@@ -54,8 +55,8 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
         case ADD:
             title = readComponent();
             health = readFloat();
-            color = readEnum(Color.class);
-            division = readEnum(Division.class);
+            color = readEnum(BossBar.Color.class);
+            division = readEnum(BossBar.Overlay.class);
             flags = readUnsignedByte();
             break;
         case REMOVE: // do nothing
@@ -67,8 +68,8 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
             title = readComponent();
             break;
         case UPDATE_STYLE:
-            color = readEnum(Color.class);
-            division = readEnum(Division.class);
+            color = readEnum(BossBar.Color.class);
+            division = readEnum(BossBar.Overlay.class);
             break;
         case UPDATE_FLAGS:
             flags = readUnsignedByte();
@@ -149,19 +150,19 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
         this.health = health;
     }
     
-    public Color getColor() {
+    public BossBar.Color getColor() {
         return color;
     }
     
-    public void setColor(Color color) {
+    public void setColor(BossBar.Color color) {
         this.color = color;
     }
     
-    public Division getDivision() {
+    public BossBar.Overlay getDivision() {
         return division;
     }
     
-    public void setDivision(Division division) {
+    public void setDivision(BossBar.Overlay division) {
         this.division = division;
     }
     
@@ -175,23 +176,5 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
     
     public enum Action {
         ADD, REMOVE, UPDATE_HEALTH, UPDATE_TITLE, UPDATE_STYLE, UPDATE_FLAGS;
-    }
-    
-    public enum Division {
-        NONE, NOTCH_6, NOTCH_10, NOTCH_12, NOTCH_20;
-    }
-    
-    public enum Color {
-        PINK(DyeColor.PINK), BLUE(DyeColor.BLUE), RED(DyeColor.RED), GREEN(DyeColor.GREEN), YELLOW(DyeColor.YELLOW), PURPLE(DyeColor.PURPLE), WHITE(DyeColor.WHITE);
-        
-        private DyeColor color;
-        
-        private Color(DyeColor color) {
-            this.color = color;
-        }
-        
-        public DyeColor getDyeColor() {
-            return color;
-        }
     }
 }
