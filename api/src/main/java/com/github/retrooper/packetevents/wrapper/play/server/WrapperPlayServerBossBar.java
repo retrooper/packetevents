@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
@@ -35,7 +37,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
     private float health;
     private BossBar.Color color;
     private BossBar.Overlay division;
-    private short flags;
+    private List<BossBar.Flag> flags;
 
     public WrapperPlayServerBossBar(PacketSendEvent event) {
         super(event);
@@ -57,7 +59,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
             health = readFloat();
             color = readEnum(BossBar.Color.class);
             division = readEnum(BossBar.Overlay.class);
-            flags = readUnsignedByte();
+            flags = getFlagsFromBytes(readUnsignedByte());
             break;
         case REMOVE: // do nothing
             break;
@@ -72,7 +74,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
             division = readEnum(BossBar.Overlay.class);
             break;
         case UPDATE_FLAGS:
-            flags = readUnsignedByte();
+            flags = getFlagsFromBytes(readUnsignedByte());
             break;
         }
     }
@@ -87,7 +89,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
             writeFloat(health);
             writeEnum(color);
             writeEnum(division);
-            writeByte(flags);
+            writeByte(convertFlagsToBytes());
             break;
         case REMOVE: // do nothing
             break;
@@ -102,7 +104,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
             writeEnum(division);
             break;
         case UPDATE_FLAGS:
-            writeByte(flags);
+            writeByte(convertFlagsToBytes());
             break;
         }
     }
@@ -116,6 +118,40 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
         color = wrapper.color;
         division = wrapper.division;
         flags = wrapper.flags;
+    }
+
+    private List<BossBar.Flag> getFlagsFromBytes(short b) {
+        List<BossBar.Flag> list = new ArrayList<>();
+        if((b & 0x01) != 0)
+            list.add(BossBar.Flag.DARKEN_SCREEN);
+        if((b & 0x02) != 0)
+            list.add(BossBar.Flag.PLAY_BOSS_MUSIC);
+        if((b & 0x04) != 0)
+            list.add(BossBar.Flag.CREATE_WORLD_FOG);
+        return list;
+    }
+
+    private byte convertFlagsToBytes() {
+        int bitmask = 0;
+        for (BossBar.Flag flag : flags) {
+            int id;
+            switch(flag) {
+            case DARKEN_SCREEN:
+                id = 1;
+                break;
+            case PLAY_BOSS_MUSIC:
+                id = 2;
+                break;
+            case CREATE_WORLD_FOG:
+                id = 4;
+                break;
+            default:
+                id = 0;
+                break;
+            }
+            bitmask |= id;
+        }
+        return (byte) bitmask;
     }
     
     public UUID getUuid() {
@@ -166,11 +202,11 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
         this.division = division;
     }
     
-    public short getFlags() {
+    public List<Flag> getFlags() {
         return flags;
     }
     
-    public void setFlags(short flags) {
+    public void setFlags(List<Flag> flags) {
         this.flags = flags;
     }
     
