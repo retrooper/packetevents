@@ -36,7 +36,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
     private Component title;
     private float health;
     private BossBar.Color color;
-    private BossBar.Overlay division;
+    private BossBar.Overlay overlay;
     private List<BossBar.Flag> flags;
 
     public WrapperPlayServerBossBar(PacketSendEvent event) {
@@ -58,7 +58,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
             title = readComponent();
             health = readFloat();
             color = readEnum(BossBar.Color.class);
-            division = readEnum(BossBar.Overlay.class);
+            overlay = readEnum(BossBar.Overlay.class);
             flags = getFlagsFromBytes(readUnsignedByte());
             break;
         case REMOVE: // do nothing
@@ -71,7 +71,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
             break;
         case UPDATE_STYLE:
             color = readEnum(BossBar.Color.class);
-            division = readEnum(BossBar.Overlay.class);
+            overlay = readEnum(BossBar.Overlay.class);
             break;
         case UPDATE_FLAGS:
             flags = getFlagsFromBytes(readUnsignedByte());
@@ -88,7 +88,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
             writeComponent(title);
             writeFloat(health);
             writeEnum(color);
-            writeEnum(division);
+            writeEnum(overlay);
             writeByte(convertFlagsToBytes());
             break;
         case REMOVE: // do nothing
@@ -101,7 +101,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
             break;
         case UPDATE_STYLE:
             writeEnum(color);
-            writeEnum(division);
+            writeEnum(overlay);
             break;
         case UPDATE_FLAGS:
             writeByte(convertFlagsToBytes());
@@ -116,7 +116,7 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
         title = wrapper.title;
         health = wrapper.health;
         color = wrapper.color;
-        division = wrapper.division;
+        overlay = wrapper.overlay;
         flags = wrapper.flags;
     }
 
@@ -194,19 +194,19 @@ public class WrapperPlayServerBossBar extends PacketWrapper<WrapperPlayServerBos
         this.color = color;
     }
     
-    public BossBar.Overlay getDivision() {
-        return division;
+    public BossBar.Overlay getOverlay() {
+        return overlay;
     }
     
-    public void setDivision(BossBar.Overlay division) {
-        this.division = division;
+    public void setOverlay(BossBar.Overlay overlay) {
+        this.overlay = overlay;
     }
     
-    public List<Flag> getFlags() {
+    public List<BossBar.Flag> getFlags() {
         return flags;
     }
     
-    public void setFlags(List<Flag> flags) {
+    public void setFlags(List<BossBar.Flag> flags) {
         this.flags = flags;
     }
     
