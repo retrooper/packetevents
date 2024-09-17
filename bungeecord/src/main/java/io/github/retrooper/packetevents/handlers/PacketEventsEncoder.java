@@ -28,14 +28,15 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.handler.codec.MessageToMessageEncoder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 // Thanks to ViaVersion for the compression method.
 @ChannelHandler.Sharable
-public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
+public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     public ProxiedPlayer player;
     public User user;
     public boolean handledCompression;
@@ -44,7 +45,7 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
         this.user = user;
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
+    public void read(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
         boolean doCompression = handleCompressionOrder(ctx, buffer);
         int firstReaderIndex = buffer.readerIndex();
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player,
@@ -61,7 +62,9 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
                 buffer.readerIndex(firstReaderIndex);
             }
             if (doCompression) {
-                recompress(ctx, buffer);
+                recompress(ctx, buffer, out);
+            } else {
+                out.add(buffer.retain());
             }
         } else {
             ByteBufHelper.clear(packetSendEvent.getByteBuf());
@@ -74,12 +77,11 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         if (!msg.isReadable()) {
             return;
         }
-        read(ctx, msg);
-        out.writeBytes(msg);
+        read(ctx, msg, out);
     }
 
     @Override
@@ -123,18 +125,12 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
         return false;
     }
 
-    private void recompress(ChannelHandlerContext ctx, ByteBuf buffer) {
+    private void recompress(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) {
         ChannelHandler compressor = ctx.pipeline().get("compress");
-        ByteBuf compressed = ctx.alloc().buffer();
         try {
-            CustomPipelineUtil.callPacketEncodeByteBuf(compressor, ctx, buffer, compressed);
+            CustomPipelineUtil.callPacketEncodeByteBuf(compressor, ctx, buffer, out);
         } catch (InvocationTargetException e) {
             e.printStackTrace();
-        }
-        try {
-            buffer.clear().writeBytes(compressed);
-        } finally {
-            compressed.release();
         }
     }
 }
