@@ -76,6 +76,7 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
@@ -611,6 +612,14 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     public NBT readNBTRaw() {
         return NBTCodec.readNBTFromBuffer(buffer, serverVersion);
+    }
+
+    public NBTCompound readUnlimitedNBT() {
+        return (NBTCompound) this.readUnlimitedNBTRaw();
+    }
+
+    public NBT readUnlimitedNBTRaw() {
+        return NBTCodec.readNBTFromBuffer(buffer, serverVersion, NBTLimiter.noop());
     }
 
     public void writeNBT(NBTCompound nbt) {
