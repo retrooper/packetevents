@@ -75,8 +75,8 @@ public class WrapperConfigServerRegistryData extends PacketWrapper<WrapperConfig
 
     @Override
     public void read() {
-        if (!this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            this.registryData = this.readNBT();
+        if (this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
+            this.registryData = this.readUnlimitedNBT();
             return;
         }
         this.registryKey = this.readIdentifier();
@@ -89,7 +89,7 @@ public class WrapperConfigServerRegistryData extends PacketWrapper<WrapperConfig
 
     @Override
     public void write() {
-        if (!this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+        if (this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
             this.writeNBT(this.registryData);
             return;
         }
