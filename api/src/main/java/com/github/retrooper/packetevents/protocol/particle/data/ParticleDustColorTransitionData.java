@@ -159,7 +159,6 @@ public class ParticleDustColorTransitionData extends ParticleData {
         String fromColorKey = "from_color";
         String toColorKey = "to_color";
         if (version.isOlderThan(ClientVersion.V_1_20_5)) {
-            compound = compound.getCompoundTagOrThrow("value");
             fromColorKey = "fromColor";
             toColorKey = "toColor";
         }
@@ -173,9 +172,6 @@ public class ParticleDustColorTransitionData extends ParticleData {
         String fromColorKey = "from_color";
         String toColorKey = "to_color";
         if (version.isOlderThan(ClientVersion.V_1_20_5)) {
-            NBTCompound innerCompound = new NBTCompound();
-            compound.setTag("value", innerCompound);
-            compound = innerCompound;
             fromColorKey = "fromColor";
             toColorKey = "toColor";
         }
