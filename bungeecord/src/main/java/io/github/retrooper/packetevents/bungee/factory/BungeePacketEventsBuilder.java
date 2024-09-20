@@ -226,7 +226,7 @@ public class BungeePacketEventsBuilder {
                     Metrics metrics = new Metrics(plugin, 11327);
                     //Just to have an idea of which versions of packetevents people use
                     metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
-                        return getVersion().toString();
+                        return getVersion().toStringWithoutSnapshot();
                     }));
 
                     PacketType.Play.Client.load();
