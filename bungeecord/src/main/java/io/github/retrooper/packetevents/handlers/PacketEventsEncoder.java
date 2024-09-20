@@ -31,8 +31,6 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.EncoderException;
-import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.util.Recycler;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.PromiseCombiner;
@@ -46,11 +44,10 @@ import java.util.List;
 @ChannelHandler.Sharable
 public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
-    private static final Recycler<List<Object>> OUT_LIST_RECYCLER = new Recycler<List<Object>>() {
+    private static final Recycler<OutList> OUT_LIST_RECYCLER = new Recycler<OutList>() {
         @Override
-        protected List<Object> newObject(Handle<List<Object>> handle) {
-            // the default bungee compressor only produces one output bytebuf
-            return new ArrayList<>(1);
+        protected OutList newObject(Handle<OutList> handle) {
+            return new OutList(handle);
         }
     };
 
@@ -74,8 +71,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
                 ByteBufHelper.clear(packetSendEvent.getByteBuf());
                 packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
                 packetSendEvent.getLastUsedWrapper().write();
-            }
-            else {
+            } else {
                 buffer.readerIndex(firstReaderIndex);
             }
             if (doCompression) {
@@ -144,26 +140,40 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private void recompress(ChannelHandlerContext ctx, ByteBuf buffer, ChannelPromise promise) {
-        List<Object> out = OUT_LIST_RECYCLER.get();
+        OutList outWrapper = OUT_LIST_RECYCLER.get();
+        List<Object> out = outWrapper.list;
         try {
             ChannelHandler compressor = ctx.pipeline().get("compress");
             CustomPipelineUtil.callPacketEncodeByteBuf(compressor, ctx, buffer, out);
+
+            int len = out.size();
+            if (len == 1) {
+                // should be the only case which
+                // happens on vanilla bungeecord
+                ctx.write(out.get(0), promise);
+            } else {
+                // copied from MessageToMessageEncoder#writePromiseCombiner
+                PromiseCombiner combiner = new PromiseCombiner(ctx.executor());
+                for (int i = 0; i < len; i++) {
+                    combiner.add(ctx.write(out.get(i)));
+                }
+                combiner.finish(promise);
+            }
         } catch (InvocationTargetException exception) {
             throw new EncoderException("Error while recompressing bytebuf " + buffer.readableBytes(), exception);
+        } finally {
+            outWrapper.handle.recycle(outWrapper);
         }
+    }
 
-        int len = out.size();
-        if (len == 1) {
-            // should be the only case which
-            // happens on vanilla bungeecord
-            ctx.write(out.get(0), promise);
-        } else {
-            // copied from MessageToMessageEncoder#writePromiseCombiner
-            PromiseCombiner combiner = new PromiseCombiner(ctx.executor());
-            for (int i = 0; i < len; i++) {
-                combiner.add(ctx.write(out.get(i)));
-            }
-            combiner.finish(promise);
+    private static final class OutList {
+
+        // the default bungee compressor only produces one output bytebuf
+        private final List<Object> list = new ArrayList<>(1);
+        private final Recycler.Handle<OutList> handle;
+
+        public OutList(Recycler.Handle<OutList> handle) {
+            this.handle = handle;
         }
     }
 }
