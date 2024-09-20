@@ -30,19 +30,11 @@ public class ParticleShriekData extends ParticleData {
     }
 
     public static ParticleShriekData decode(NBTCompound compound, ClientVersion version) {
-        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
-            compound = compound.getCompoundTagOrThrow("value");
-        }
         int delay = compound.getNumberTagOrThrow("delay").getAsInt();
         return new ParticleShriekData(delay);
     }
 
     public static void encode(ParticleShriekData data, ClientVersion version, NBTCompound compound) {
-        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
-            NBTCompound innerCompound = new NBTCompound();
-            compound.setTag("value", innerCompound);
-            compound = innerCompound;
-        }
         compound.setTag("delay", new NBTInt(data.delay));
     }
 

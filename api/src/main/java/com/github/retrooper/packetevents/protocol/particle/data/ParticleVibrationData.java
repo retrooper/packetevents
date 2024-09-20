@@ -156,9 +156,6 @@ public class ParticleVibrationData extends ParticleData {
     }
 
     public static ParticleVibrationData decode(NBTCompound compound, ClientVersion version) {
-        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
-            compound = compound.getCompoundTagOrThrow("value");
-        }
         Vector3i origin = version.isNewerThanOrEquals(ClientVersion.V_1_19) ? null :
                 new Vector3i(compound.getTagOfTypeOrThrow("origin", NBTIntArray.class).getValue());
         PositionSource destination = PositionSource.decode(compound.getCompoundTagOrThrow("destination"), version);
@@ -167,11 +164,6 @@ public class ParticleVibrationData extends ParticleData {
     }
 
     public static void encode(ParticleVibrationData data, ClientVersion version, NBTCompound compound) {
-        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
-            NBTCompound innerCompound = new NBTCompound();
-            compound.setTag("value", innerCompound);
-            compound = innerCompound;
-        }
         if (version.isOlderThan(ClientVersion.V_1_19)) {
             Vector3i startPos = data.getStartingPosition();
             if (startPos != null) {
