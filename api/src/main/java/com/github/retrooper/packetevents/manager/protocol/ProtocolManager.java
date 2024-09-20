@@ -104,10 +104,13 @@ public interface ProtocolManager {
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
         Object[] buffers = new Object[wrappers.length];
         for (int i = 0; i < wrappers.length; i++) {
-            wrappers[i].prepareForSend(channel, outgoing);
-            buffers[i] = wrappers[i].buffer;
-            // Fix race condition when sending packets to multiple people (due to when the buffer is freed)
-            wrappers[i].buffer = null;
+            PacketWrapper<?> wrappper = wrappers[i];
+            synchronized (wrappper.bufferLock) {
+                wrappper.prepareForSend(channel, outgoing);
+                buffers[i] = wrappper.buffer;
+                // Fix race condition when sending packets to multiple people (due to when the buffer is freed)
+                wrappper.buffer = null;
+            }
         }
         return buffers;
     }

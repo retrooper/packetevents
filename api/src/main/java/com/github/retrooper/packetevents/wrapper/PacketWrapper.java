@@ -129,6 +129,9 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     @Nullable
     public Object buffer;
 
+    @ApiStatus.Internal
+    public final Object bufferLock = new Object();
+
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
     private PacketTypeData packetTypeData;
