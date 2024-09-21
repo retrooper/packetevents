@@ -164,6 +164,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         } finally {
             out.clear();
             outWrapper.handle.recycle(outWrapper);
+            buffer.release();
         }
     }
 
