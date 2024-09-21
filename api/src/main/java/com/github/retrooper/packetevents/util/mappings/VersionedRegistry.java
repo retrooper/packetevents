@@ -61,8 +61,14 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
     }
 
     @Override
+    public @Nullable T getByName(ResourceLocation name) {
+        return this.typeMap.get(name.toString()); // skip norming call
+    }
+
+    @Override
     public @Nullable T getByName(String name) {
-        return this.typeMap.get(name);
+        // prepend "minecraft:" prefix if no other namespace has been specified
+        return this.typeMap.get(ResourceLocation.normString(name));
     }
 
     @Override
