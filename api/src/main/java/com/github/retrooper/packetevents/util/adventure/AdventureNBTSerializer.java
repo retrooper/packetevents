@@ -563,27 +563,11 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         }
 
         public void useBoolean(String key, Consumer<Boolean> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.BYTE).getAsByte() != 0));
+            useNumber(key, num -> consumer.accept(num.byteValue() != 0));
         }
 
         public <R> R readBoolean(String key, Function<Boolean, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.BYTE).getAsByte() != 0));
-        }
-
-        public void useByte(String key, Consumer<Byte> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.BYTE).getAsByte()));
-        }
-
-        public <R> R readByte(String key, Function<Byte, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.BYTE).getAsByte()));
-        }
-
-        public void useShort(String key, Consumer<Short> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.SHORT).getAsShort()));
-        }
-
-        public <R> R readShort(String key, Function<Short, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.SHORT).getAsShort()));
+            return readNumber(key, num -> function.apply(num.byteValue() != 0));
         }
 
         public void useNumber(String key, Consumer<Number> consumer) {
