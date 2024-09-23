@@ -162,7 +162,9 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         } catch (InvocationTargetException exception) {
             throw new EncoderException("Error while recompressing bytebuf " + buffer.readableBytes(), exception);
         } finally {
+            out.clear();
             outWrapper.handle.recycle(outWrapper);
+            buffer.release();
         }
     }
 
