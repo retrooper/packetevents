@@ -13,10 +13,10 @@ repositories {
 }
 
 sponge {
-    apiVersion("11.1.0-SNAPSHOT")
+    apiVersion("12.0.0-SNAPSHOT")
     loader {
         name(PluginLoaders.JAVA_PLAIN)
-        version("2.4.1-SNAPSHOT")
+        version("2.5.1-SNAPSHOT")
     }
 
     plugin("packetevents") {
@@ -37,7 +37,9 @@ sponge {
 
 dependencies {
     compileOnly(libs.netty)
-    shadow(libs.adventure.nbt)
+    shadow(libs.adventure.nbt) {
+        isTransitive = false
+    }
     shadow(project(":api", "shadow"))
     shadow(project(":netty-common"))
 
