@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.item.jukebox;
 
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
+import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
@@ -32,7 +33,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
-public interface IJukeboxSong extends MappedEntity, CopyableEntity<IJukeboxSong> {
+public interface IJukeboxSong extends MappedEntity, CopyableEntity<IJukeboxSong>, DeepComparableEntity {
+
     Sound getSound();
 
     Component getDescription();

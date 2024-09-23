@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.world.painting;
 
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
+import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
@@ -30,7 +31,7 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
-public interface PaintingVariant extends MappedEntity, CopyableEntity<PaintingVariant> {
+public interface PaintingVariant extends MappedEntity, CopyableEntity<PaintingVariant>, DeepComparableEntity {
 
     int getWidth();
 

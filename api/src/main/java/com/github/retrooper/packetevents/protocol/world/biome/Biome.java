@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.world.biome;
 
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
+import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
@@ -35,7 +36,7 @@ import java.util.Optional;
 
 import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
 
-public interface Biome extends MappedEntity, CopyableEntity<Biome> {
+public interface Biome extends MappedEntity, CopyableEntity<Biome>, DeepComparableEntity {
 
     boolean hasPrecipitation();
 
