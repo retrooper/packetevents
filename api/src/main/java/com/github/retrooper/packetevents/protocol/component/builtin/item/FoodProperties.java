@@ -60,9 +60,9 @@ public class FoodProperties {
         float saturation = wrapper.readFloat();
         boolean canAlwaysEat = wrapper.readBoolean();
         float eatSeconds = wrapper.readFloat();
-        List<PossibleEffect> effects = wrapper.readList(PossibleEffect::read);
         ItemStack usingConvertsTo = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21)
                 ? wrapper.readOptional(PacketWrapper::readItemStack) : null;
+        List<PossibleEffect> effects = wrapper.readList(PossibleEffect::read);
         return new FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, effects, usingConvertsTo);
     }
 
@@ -71,10 +71,10 @@ public class FoodProperties {
         wrapper.writeFloat(props.saturation);
         wrapper.writeBoolean(props.canAlwaysEat);
         wrapper.writeFloat(props.eatSeconds);
-        wrapper.writeList(props.effects, PossibleEffect::write);
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21)) {
             wrapper.writeOptional(props.usingConvertsTo, PacketWrapper::writeItemStack);
         }
+        wrapper.writeList(props.effects, PossibleEffect::write);
     }
 
     public int getNutrition() {
