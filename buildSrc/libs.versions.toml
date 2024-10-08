@@ -1,5 +1,5 @@
 [versions]
-shadow = "8.3.0"
+shadow = "8.3.3"
 jetbrains-annotations = "23.0.0"
 via-nbt = "4.1.0"
 fast-util = "8.5.6"
