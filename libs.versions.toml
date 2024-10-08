@@ -8,7 +8,7 @@ protocol-support = "3d24efeda6"
 paper = "1.20.6-R0.1-SNAPSHOT"
 bungeecord = "1.21-R0.1-SNAPSHOT"
 velocity = "3.1.0"
-run-paper = "2.3.0"
+run-paper = "2.3.1"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
