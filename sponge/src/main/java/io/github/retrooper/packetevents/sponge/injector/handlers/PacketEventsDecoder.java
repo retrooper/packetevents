@@ -33,16 +33,16 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.util.List;
+import java.util.UUID;
 
 public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     public User user;
-    public ServerPlayer player;
+    public UUID player;
     public boolean hasBeenRelocated;
 
     public PacketEventsDecoder(User user) {
@@ -56,7 +56,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
-        Object buffer = PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, true);
+        Object buffer = PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player == null ? null : Sponge.server().player(player).orElse(null), input, true);
         out.add(ByteBufHelper.retain(buffer));
     }
 
@@ -89,7 +89,8 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
                 }
                 user.closeConnection();
                 if (player != null) {
-                    Sponge.server().scheduler().submit(Task.builder().plugin((PluginContainer) PacketEvents.getAPI().getPlugin()).execute(() -> player.kick(Component.text("Invalid packet"))).build());
+                    Sponge.server().scheduler().submit(Task.builder().plugin((PluginContainer) PacketEvents.getAPI().getPlugin())
+                            .execute(() -> Sponge.server().player(player).get().kick(Component.text("Invalid packet"))).build());
                 }
 
                 PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to invalid packet!");

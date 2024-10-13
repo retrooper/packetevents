@@ -200,16 +200,17 @@ public class SpongeChannelInjector implements ChannelInjector {
 
     @Override
     public void setPlayer(Object channel, Object player) {
+        final ServerPlayer spongePlayer = (ServerPlayer) player;
         PacketEventsEncoder encoder = getEncoder((Channel) channel);
         if (encoder != null) {
-            encoder.player = (ServerPlayer) player;
+            encoder.player = spongePlayer.uniqueId();
         }
 
         PacketEventsDecoder decoder = getDecoder((Channel) channel);
         if (decoder != null) {
-            decoder.player = (ServerPlayer) player;
-            decoder.user.getProfile().setName(((ServerPlayer) player).name());
-            decoder.user.getProfile().setUUID(((ServerPlayer) player).uniqueId());
+            decoder.player = spongePlayer.uniqueId();
+            decoder.user.getProfile().setName(spongePlayer.name());
+            decoder.user.getProfile().setUUID(spongePlayer.uniqueId());
         }
     }
 

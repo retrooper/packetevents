@@ -254,14 +254,16 @@ public final class SpongeReflectionUtil {
 
     public static ItemStack encodeSpongeItemStack(com.github.retrooper.packetevents.protocol.item.ItemStack in) {
         Object buffer = PooledByteBufAllocator.DEFAULT.buffer();
-        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
-        wrapper.writeItemStack(in);
-        //3 reflection calls
-        Object packetDataSerializer = createPacketDataSerializer(wrapper.getBuffer());
-        Object nmsItemStack = readNMSItemStackPacketDataSerializer(packetDataSerializer);
-        ItemStack stack = (ItemStack) nmsItemStack;
-        ByteBufHelper.release(buffer);
-        return stack;
+        try {
+            PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
+            wrapper.writeItemStack(in);
+            //3 reflection calls
+            Object packetDataSerializer = createPacketDataSerializer(wrapper.getBuffer());
+            Object nmsItemStack = readNMSItemStackPacketDataSerializer(packetDataSerializer);
+            return (ItemStack) nmsItemStack;
+        } finally {
+            ByteBufHelper.release(buffer);
+        }
     }
 
     public static Object createPacketDataSerializer(Object byteBuf) {

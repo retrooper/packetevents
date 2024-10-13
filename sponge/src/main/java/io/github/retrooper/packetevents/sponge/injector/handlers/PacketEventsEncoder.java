@@ -36,15 +36,16 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageEncoder;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.Sponge;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.UUID;
 
 public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     public User user;
-    public ServerPlayer player;
+    public UUID player;
     private boolean handledCompression;
     private ChannelPromise promise;
 
@@ -76,8 +77,8 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
         list.add(byteBuf.retain());
     }
 
-    private PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
-        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, true);
+    private PacketSendEvent handleClientBoundPacket(Channel channel, User user, UUID player, ByteBuf buffer, ChannelPromise promise) throws Exception {
+        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player == null ? null : Sponge.server().player(player).orElse(null), buffer, true);
         if (packetSendEvent.hasTasksAfterSend()) {
             promise.addListener((p) -> {
                 for (Runnable task : packetSendEvent.getTasksAfterSend()) {
