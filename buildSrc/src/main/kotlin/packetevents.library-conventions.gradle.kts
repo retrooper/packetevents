@@ -1,4 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.ShadowExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import groovy.util.Node
 
