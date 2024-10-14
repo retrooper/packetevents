@@ -121,22 +121,27 @@ public class FabricPacketEventsBuilder {
 
                 @Override
                 public Object getChannel(@NotNull Object player) {
-                    if (player instanceof LocalPlayer localPlayer) {
-                        Connection connection = localPlayer.connection.getConnection();
-                        ReflectionObject reflectConnection = new ReflectionObject(connection);
-                        return reflectConnection.readObject(0, Channel.class);
-                    }
-                    UUID uuid = ((ServerPlayer) player).getUUID();
-                    Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(uuid);
-                    if (channel == null) {
-                        Connection connection = ((ServerPlayer) player).connection.connection;
-                        channel = connection.channel;
-                        // This is removed from the HashMap on channel close
-                        // So if the channel is already closed, there will be a memory leak if we add an offline player
-                        if (channel != null) {
-                            synchronized (channel) {
-                                if (ChannelHelper.isOpen(channel)) {
-                                    ProtocolManager.CHANNELS.put(uuid, channel);
+                    Object channel = null;
+                    try {
+                        if (player instanceof LocalPlayer localPlayer) {
+                            Connection connection = localPlayer.connection.getConnection();
+                            ReflectionObject reflectConnection = new ReflectionObject(connection);
+                            return reflectConnection.readObject(0, Channel.class);
+                        }
+                        // java.lang.RuntimeException: Cannot load class net.minecraft.client.player.LocalPlayer in environment type SERVER
+                    } catch (RuntimeException ex) {
+                        UUID uuid = ((ServerPlayer) player).getUUID();
+                        channel = PacketEvents.getAPI().getProtocolManager().getChannel(uuid);
+                        if (channel == null) {
+                            Connection connection = ((ServerPlayer) player).connection.connection;
+                            channel = connection.channel;
+                            // This is removed from the HashMap on channel close
+                            // So if the channel is already closed, there will be a memory leak if we add an offline player
+                            if (channel != null) {
+                                synchronized (channel) {
+                                    if (ChannelHelper.isOpen(channel)) {
+                                        ProtocolManager.CHANNELS.put(uuid, channel);
+                                    }
                                 }
                             }
                         }
