@@ -13,6 +13,8 @@ import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
+import io.github.retrooper.packetevents.mixin.CompressionDecoderMixin;
+import io.github.retrooper.packetevents.mixin.CompressionEncoderMixin;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -143,7 +145,7 @@ public class PacketEventsServerEncoder extends MessageToMessageEncoder<ByteBuf> 
         ByteBuf temp = ctx.alloc().buffer();
         try {
             if (compressor != null) {
-                CustomPipelineUtil.callEncode(compressor, ctx, input, temp);
+                CustomPipelineUtil.callEncode((CompressionEncoderMixin) compressor, ctx, input, temp);
             }
         } finally {
             input.clear().writeBytes(temp);
@@ -154,7 +156,8 @@ public class PacketEventsServerEncoder extends MessageToMessageEncoder<ByteBuf> 
     private void decompress(ChannelHandlerContext ctx, ByteBuf input, ByteBuf output) throws InvocationTargetException {
         ChannelHandler decompressor = ctx.pipeline().get("decompress");
         if (decompressor != null) {
-            ByteBuf temp = (ByteBuf) CustomPipelineUtil.callDecode(decompressor, ctx, input).get(0);
+            ByteBuf temp = (ByteBuf) CustomPipelineUtil.callDecode(
+                (CompressionDecoderMixin) decompressor, ctx, input).get(0);
             try {
                 output.clear().writeBytes(temp);
             } finally {

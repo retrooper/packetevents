@@ -4,14 +4,16 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
+import io.github.retrooper.packetevents.mixin.CompressionDecoderMixin;
+import io.github.retrooper.packetevents.mixin.CompressionEncoderMixin;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.minecraft.client.player.LocalPlayer;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import net.minecraft.network.CompressionEncoder;
 
 @ChannelHandler.Sharable
 public class PacketEventsClientDecoder extends MessageToMessageDecoder<ByteBuf> {
@@ -50,39 +52,31 @@ public class PacketEventsClientDecoder extends MessageToMessageDecoder<ByteBuf> 
             // Need to decompress this packet due to bad order
             ChannelHandler decompressor = ctx.pipeline().get("decompress");
             //CompressionDecoder
-            try {
-                List<?> list = CustomPipelineUtil.callDecode(decompressor, ctx, buffer);
-                ByteBuf decompressed = (ByteBuf) list.get(0);
-                if (buffer != decompressed) {
-                    try {
-                        buffer.clear().writeBytes(decompressed);
-                    } finally {
-                        decompressed.release();
-                    }
-                }
-                //Relocate handlers
-                PacketEventsClientDecoder decoder = (PacketEventsClientDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
-                ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
-                PacketEventsClientEncoder encoder = (PacketEventsClientEncoder) ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
-                ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
-                checkedCompression = true;
-                return true;
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
+          List<?> list = CustomPipelineUtil.callDecode((CompressionDecoderMixin) decompressor, ctx, buffer);
+          ByteBuf decompressed = (ByteBuf) list.get(0);
+          if (buffer != decompressed) {
+              try {
+                  buffer.clear().writeBytes(decompressed);
+              } finally {
+                  decompressed.release();
+              }
+          }
+          //Relocate handlers
+          PacketEventsClientDecoder decoder = (PacketEventsClientDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
+          ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
+          PacketEventsClientEncoder encoder = (PacketEventsClientEncoder) ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
+          ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
+          checkedCompression = true;
+          return true;
         }
         return false;
     }
 
     private void recompress(ChannelHandlerContext ctx, ByteBuf buffer) {
         ByteBuf compressed = ctx.alloc().buffer();
-        try {
-            ChannelHandler compressor = ctx.pipeline().get("compress");
-            CustomPipelineUtil.callEncode(compressor, ctx, buffer, compressed);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        try {
+      ChannelHandler compressor = ctx.pipeline().get("compress");
+      CustomPipelineUtil.callEncode((CompressionEncoderMixin) compressor, ctx, buffer, compressed);
+      try {
             buffer.clear().writeBytes(compressed);
             PacketEvents.getAPI().getLogManager().debug("Recompressed packet!");
         } finally {

@@ -27,7 +27,6 @@ import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
-import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
 import io.netty.channel.Channel;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.SharedConstants;
@@ -199,11 +198,11 @@ public class FabricPacketEventsBuilder {
                     PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
 
-                    try {
-                        CustomPipelineUtil.init();
-                    } catch (Exception ex) {
-                        throw new IllegalStateException(ex);
-                    }
+//                    try {
+//                        CustomPipelineUtil.init();
+//                    } catch (Exception ex) {
+//                        throw new IllegalStateException(ex);
+//                    }
 
                     injector.inject();
 
