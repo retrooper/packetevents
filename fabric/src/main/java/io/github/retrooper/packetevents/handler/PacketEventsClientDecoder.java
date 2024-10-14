@@ -4,8 +4,6 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
-import io.github.retrooper.packetevents.mixin.CompressionDecoderMixin;
-import io.github.retrooper.packetevents.mixin.CompressionEncoderMixin;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,6 +11,7 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import net.minecraft.client.player.LocalPlayer;
 
 import java.util.List;
+import net.minecraft.network.CompressionDecoder;
 import net.minecraft.network.CompressionEncoder;
 
 @ChannelHandler.Sharable
@@ -52,7 +51,7 @@ public class PacketEventsClientDecoder extends MessageToMessageDecoder<ByteBuf> 
             // Need to decompress this packet due to bad order
             ChannelHandler decompressor = ctx.pipeline().get("decompress");
             //CompressionDecoder
-          List<?> list = CustomPipelineUtil.callDecode((CompressionDecoderMixin) decompressor, ctx, buffer);
+          List<?> list = CustomPipelineUtil.callDecode((CompressionDecoder) decompressor, ctx, buffer);
           ByteBuf decompressed = (ByteBuf) list.get(0);
           if (buffer != decompressed) {
               try {
@@ -75,7 +74,7 @@ public class PacketEventsClientDecoder extends MessageToMessageDecoder<ByteBuf> 
     private void recompress(ChannelHandlerContext ctx, ByteBuf buffer) {
         ByteBuf compressed = ctx.alloc().buffer();
       ChannelHandler compressor = ctx.pipeline().get("compress");
-      CustomPipelineUtil.callEncode((CompressionEncoderMixin) compressor, ctx, buffer, compressed);
+      CustomPipelineUtil.callEncode((CompressionEncoder) compressor, ctx, buffer, compressed);
       try {
             buffer.clear().writeBytes(compressed);
             PacketEvents.getAPI().getLogManager().debug("Recompressed packet!");

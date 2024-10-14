@@ -13,8 +13,6 @@ import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
-import io.github.retrooper.packetevents.mixin.CompressionDecoderMixin;
-import io.github.retrooper.packetevents.mixin.CompressionEncoderMixin;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -22,6 +20,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import net.kyori.adventure.text.Component;
+import net.minecraft.network.CompressionDecoder;
+import net.minecraft.network.CompressionEncoder;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -145,7 +145,7 @@ public class PacketEventsServerEncoder extends MessageToMessageEncoder<ByteBuf> 
         ByteBuf temp = ctx.alloc().buffer();
         try {
             if (compressor != null) {
-                CustomPipelineUtil.callEncode((CompressionEncoderMixin) compressor, ctx, input, temp);
+                CustomPipelineUtil.callEncode((CompressionEncoder) compressor, ctx, input, temp);
             }
         } finally {
             input.clear().writeBytes(temp);
@@ -157,7 +157,7 @@ public class PacketEventsServerEncoder extends MessageToMessageEncoder<ByteBuf> 
         ChannelHandler decompressor = ctx.pipeline().get("decompress");
         if (decompressor != null) {
             ByteBuf temp = (ByteBuf) CustomPipelineUtil.callDecode(
-                (CompressionDecoderMixin) decompressor, ctx, input).get(0);
+                (CompressionDecoder) decompressor, ctx, input).get(0);
             try {
                 output.clear().writeBytes(temp);
             } finally {

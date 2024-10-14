@@ -39,6 +39,10 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/packetevents.accesswidener")
+}
+
 tasks {
     withType<JavaCompile> {
         val targetJavaVersion = 17

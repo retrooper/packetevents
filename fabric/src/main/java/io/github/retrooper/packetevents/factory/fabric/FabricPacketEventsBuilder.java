@@ -11,6 +11,7 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -28,6 +29,7 @@ import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerA
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import io.netty.channel.Channel;
+import java.util.UUID;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -119,9 +121,27 @@ public class FabricPacketEventsBuilder {
 
                 @Override
                 public Object getChannel(@NotNull Object player) {
-                    Connection connection = ((LocalPlayer) player).connection.getConnection();
-                    ReflectionObject reflectConnection = new ReflectionObject(connection);
-                    return reflectConnection.readObject(0, Channel.class);
+                    if (player instanceof LocalPlayer localPlayer) {
+                        Connection connection = localPlayer.connection.getConnection();
+                        ReflectionObject reflectConnection = new ReflectionObject(connection);
+                        return reflectConnection.readObject(0, Channel.class);
+                    }
+                    UUID uuid = ((ServerPlayer) player).getUUID();
+                    Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(uuid);
+                    if (channel == null) {
+                        Connection connection = ((ServerPlayer) player).connection.connection;
+                        channel = connection.channel;
+                        // This is removed from the HashMap on channel close
+                        // So if the channel is already closed, there will be a memory leak if we add an offline player
+                        if (channel != null) {
+                            synchronized (channel) {
+                                if (ChannelHelper.isOpen(channel)) {
+                                    ProtocolManager.CHANNELS.put(uuid, channel);
+                                }
+                            }
+                        }
+                    }
+                    return channel;
                 }
             };
 
