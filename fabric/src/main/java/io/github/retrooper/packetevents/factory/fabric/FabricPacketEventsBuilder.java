@@ -199,12 +199,6 @@ public class FabricPacketEventsBuilder {
                     PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
 
-                    try {
-                        CustomPipelineUtil.init();
-                    } catch (Exception ex) {
-                        throw new IllegalStateException(ex);
-                    }
-
                     injector.inject();
 
                     loaded = true;
