@@ -20,16 +20,4 @@ public class CustomPipelineUtil {
     public static void callEncode(CompressionEncoderMixin encoder, ChannelHandlerContext ctx, ByteBuf msg, ByteBuf output) {
         encoder.packetevents_encode(ctx, msg, output);
     }
-
-//    public static List<Object> callMTMEncode(MessageToMessageEncoder<?> encoder, ChannelHandlerContext ctx, Object msg) {
-//        List<Object> output = new ArrayList<>();
-//        encoder.encode(ctx, msg, output);
-//        return output;
-//    }
-//
-//    public static List<Object> callMTMDecode(MessageToMessageDecoder<?> decoder, ChannelHandlerContext ctx, Object msg) {
-//        List<Object> output = new ArrayList<>();
-//        decoder.decode(ctx, msg, output);
-//        return output;
-//    }
 }

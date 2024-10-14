@@ -6,8 +6,6 @@
   "mixins": [
     "CompressionDecoderMixin",
     "CompressionEncoderMixin",
-    "MessageToMessageDecoderMixin",
-    "MessageToMessageEncoderMixin",
     "PacketEventsInjectorMixin"
   ],
   "client": [
