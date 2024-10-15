@@ -48,9 +48,7 @@ public class PacketEventsPlugin {
     @Inject
     public PacketEventsPlugin(PluginContainer pluginContainer, Metrics.Factory metricsFactory) {
         this.pluginContainer = pluginContainer;
-
-        // Enable bStats
-        metrics = metricsFactory.make(11327);
+        this.metrics = metricsFactory.make(11327);
     }
 
     @Listener(order = Order.EARLY)
