@@ -55,8 +55,6 @@ public class PacketEventsPlugin {
         this.pluginContainer = pluginContainer;
         this.dataDirectory = dataDirectory;
         this.metricsFactory = metricsFactory;
-
-        logger.info("Plugin started");
     }
 
     @Subscribe
@@ -99,6 +97,8 @@ public class PacketEventsPlugin {
         Metrics metrics = metricsFactory.make(this, 11327);
         //Just to have an idea of which versions of packetevents people use
         metrics.addCustomChart(new SimplePie("packetevents_version", () -> PacketEvents.getAPI().getVersion().toStringWithoutSnapshot()));
+
+        logger.info("Plugin started");
     }
 
     @Subscribe
