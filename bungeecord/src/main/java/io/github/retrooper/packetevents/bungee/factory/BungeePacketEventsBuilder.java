@@ -36,7 +36,6 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
-import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
@@ -49,6 +48,8 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.protocol.ProtocolConstants;
+import org.bstats.bungeecord.Metrics;
+import org.bstats.charts.SimplePie;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -225,9 +226,7 @@ public class BungeePacketEventsBuilder {
 
                     Metrics metrics = new Metrics(plugin, 11327);
                     //Just to have an idea of which versions of packetevents people use
-                    metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
-                        return getVersion().toStringWithoutSnapshot();
-                    }));
+                    metrics.addCustomChart(new SimplePie("packetevents_version", () -> getVersion().toStringWithoutSnapshot()));
 
                     PacketType.Play.Client.load();
                     PacketType.Play.Server.load();

@@ -5,10 +5,13 @@ netty = "4.1.72.Final"
 jetbrains-annotations = "23.0.0"
 via-version = "4.5.0"
 protocol-support = "3d24efeda6"
+bstats = "3.1.0"
 paper = "1.20.6-R0.1-SNAPSHOT"
 bungeecord = "1.21-R0.1-SNAPSHOT"
 velocity = "3.1.0"
 run-paper = "2.3.0"
+fabric-loom = "1.7.2"
+spongeGradle = "2.2.0"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
@@ -19,6 +22,10 @@ adventure-examination-string = { group = "net.kyori", name = "examination-string
 adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
 adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
 adventure-text-serializer-json-legacy = { group = "net.kyori", name = "adventure-text-serializer-json-legacy-impl", version.ref = "adventure" }
+bstats-bukkit = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
+bstats-bungeecord = { group = "org.bstats", name = "bstats-bungeecord", version.ref = "bstats" }
+bstats-velocity = { group = "org.bstats", name = "bstats-velocity", version.ref = "bstats" }
+bstats-sponge = { group = "org.bstats", name = "bstats-sponge", version.ref = "bstats" }
 jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrains-annotations" }
 gson = { group = "com.google.code.gson", name = "gson", version = "2.11.0" }
 netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
@@ -35,4 +42,5 @@ adventure-serializers = [ "adventure-text-serializer-gson", "adventure-text-seri
 [plugins]
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-paper" }
-fabric-loom = { id = "fabric-loom", version = "1.7.2" }
+fabric-loom = { id = "fabric-loom", version.ref = "fabric-loom" }
+spongeGradle = { id = "org.spongepowered.gradle.plugin", version.ref = "spongeGradle" }
