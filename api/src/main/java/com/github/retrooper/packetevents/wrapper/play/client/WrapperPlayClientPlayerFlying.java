@@ -31,6 +31,7 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
     private boolean rotationChanged;
     private Location location;
     private boolean onGround;
+    private boolean horizontalCollision;
 
     public WrapperPlayClientPlayerFlying(PacketReceiveEvent event) {
         super(event, false);
@@ -42,12 +43,17 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
     }
 
     public WrapperPlayClientPlayerFlying(boolean positionChanged, boolean rotationChanged, boolean onGround, Location location) {
+        this(positionChanged, rotationChanged, onGround, false, location);
+    }
+
+    public WrapperPlayClientPlayerFlying(boolean positionChanged, boolean rotationChanged, boolean onGround, boolean horizontalCollision, Location location) {
         super((positionChanged && rotationChanged) ? PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION :
                 (positionChanged ? PacketType.Play.Client.PLAYER_POSITION : rotationChanged ? PacketType.Play.Client.PLAYER_ROTATION
                         : PacketType.Play.Client.PLAYER_FLYING));
         this.positionChanged = positionChanged;
         this.rotationChanged = rotationChanged;
         this.onGround = onGround;
+        this.horizontalCollision = horizontalCollision;
         this.location = location;
     }
 
@@ -78,7 +84,9 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
             pitch = readFloat();
         }
         location = new Location(position, yaw, pitch);
-        onGround = readBoolean();
+        byte flags = this.readByte();
+        this.onGround = (flags & 0b01) == 0b01;
+        this.horizontalCollision = (flags & 0b10) == 0b10;
     }
 
     @Override
@@ -96,7 +104,7 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
             writeFloat(location.getYaw());
             writeFloat(location.getPitch());
         }
-        writeBoolean(onGround);
+        this.writeByte((this.onGround ? 0b01 : 0b00) | (this.horizontalCollision ? 0b10 : 0b00));
     }
 
     @Override
@@ -105,6 +113,7 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
         rotationChanged = wrapper.rotationChanged;
         location = wrapper.location;
         onGround = wrapper.onGround;
+        horizontalCollision = wrapper.horizontalCollision;
     }
 
     public Location getLocation() {
@@ -137,5 +146,13 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
 
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
+    }
+
+    public boolean isHorizontalCollision() {
+        return this.horizontalCollision;
+    }
+
+    public void setHorizontalCollision(boolean horizontalCollision) {
+        this.horizontalCollision = horizontalCollision;
     }
 }

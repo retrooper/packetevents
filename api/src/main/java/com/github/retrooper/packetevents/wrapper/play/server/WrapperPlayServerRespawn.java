@@ -43,6 +43,9 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     public static final byte KEEP_ENTITY_DATA = 0b10;
     public static final byte KEEP_ALL_DATA = KEEP_ATTRIBUTES | KEEP_ENTITY_DATA;
 
+    // used for backwards compatibility in constructors
+    static final int FALLBACK_SEA_LEVEL = 62;
+
     private DimensionTypeRef dimensionTypeRef;
     private Optional<String> worldName;
     private Difficulty difficulty;
@@ -54,6 +57,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     private byte keptData;
     private WorldBlockPosition lastDeathPosition;
     private Integer portalCooldown;
+    private int seaLevel;
 
     //This should not be accessed
     private String levelType;
@@ -99,8 +103,17 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             @Nullable GameMode previousGameMode, boolean worldDebug, boolean worldFlat, byte keptData,
             @Nullable WorldBlockPosition lastDeathPosition, @Nullable Integer portalCooldown
     ) {
+        this(dimensionType, worldName, difficulty, hashedSeed, gameMode, previousGameMode,
+                worldDebug, worldFlat, keptData, lastDeathPosition, portalCooldown, FALLBACK_SEA_LEVEL);
+    }
+
+    public WrapperPlayServerRespawn(
+            DimensionType dimensionType, @Nullable String worldName, Difficulty difficulty, long hashedSeed, GameMode gameMode,
+            @Nullable GameMode previousGameMode, boolean worldDebug, boolean worldFlat, byte keptData,
+            @Nullable WorldBlockPosition lastDeathPosition, @Nullable Integer portalCooldown, int seaLevel
+    ) {
         this((DimensionTypeRef) null, worldName, difficulty, hashedSeed, gameMode, previousGameMode,
-                worldDebug, worldFlat, keptData, lastDeathPosition, portalCooldown);
+                worldDebug, worldFlat, keptData, lastDeathPosition, portalCooldown, seaLevel);
         this.dimensionTypeRef = dimensionType.asRef(this.serverVersion.toClientVersion());
     }
 
@@ -119,6 +132,15 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             @Nullable GameMode previousGameMode, boolean worldDebug, boolean worldFlat, byte keptData,
             @Nullable WorldBlockPosition lastDeathPosition, @Nullable Integer portalCooldown
     ) {
+        this(dimensionTypeRef, worldName, difficulty, hashedSeed, gameMode, previousGameMode,
+                worldDebug, worldFlat, keptData, lastDeathPosition, portalCooldown, FALLBACK_SEA_LEVEL);
+    }
+
+    public WrapperPlayServerRespawn(
+            DimensionTypeRef dimensionTypeRef, @Nullable String worldName, Difficulty difficulty, long hashedSeed, GameMode gameMode,
+            @Nullable GameMode previousGameMode, boolean worldDebug, boolean worldFlat, byte keptData,
+            @Nullable WorldBlockPosition lastDeathPosition, @Nullable Integer portalCooldown, int seaLevel
+    ) {
         super(PacketType.Play.Server.RESPAWN);
         this.dimensionTypeRef = dimensionTypeRef;
         setWorldName(worldName);
@@ -131,6 +153,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         this.keptData = keptData;
         this.lastDeathPosition = lastDeathPosition;
         this.portalCooldown = portalCooldown;
+        this.seaLevel = seaLevel;
     }
 
     @Override
@@ -166,6 +189,9 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
                 portalCooldown = readVarInt();
+            }
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+                this.seaLevel = this.readVarInt();
             }
             if (v1_20_2) {
                 keptData = readByte();
@@ -218,6 +244,9 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
                 int pCooldown = portalCooldown != null ? portalCooldown : 0;
                 writeVarInt(pCooldown);
             }
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+                this.writeVarInt(this.seaLevel);
+            }
             if (v1_20_2) {
                 writeByte(keptData);
             }
@@ -255,6 +284,9 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         worldFlat = wrapper.worldFlat;
         keptData = wrapper.keptData;
         lastDeathPosition = wrapper.lastDeathPosition;
+        portalCooldown = wrapper.portalCooldown;
+        seaLevel = wrapper.seaLevel;
+        levelType = wrapper.levelType;
     }
 
     public DimensionTypeRef getDimensionTypeRef() {

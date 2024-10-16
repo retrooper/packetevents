@@ -664,7 +664,12 @@ public final class PacketType {
             // Added in 1.20.5
             CHAT_COMMAND_UNSIGNED,
             COOKIE_RESPONSE,
-            DEBUG_SAMPLE_SUBSCRIPTION;
+            DEBUG_SAMPLE_SUBSCRIPTION,
+
+            // added in 1.21.2
+            CLIENT_TICK_END,
+            SELECT_BUNDLE_ITEM,
+            ;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -901,7 +906,13 @@ public final class PacketType {
 
             // added in 1.21
             CUSTOM_REPORT_DETAILS,
-            SERVER_LINKS;
+            SERVER_LINKS,
+
+            // added in 1.21.2
+            MOVE_MINECART,
+            SET_CURSOR_ITEM,
+            SET_PLAYER_INVENTORY,
+            ;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();

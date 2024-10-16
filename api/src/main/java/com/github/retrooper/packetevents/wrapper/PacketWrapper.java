@@ -90,6 +90,7 @@ import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.KnownPack;
+import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
@@ -1546,6 +1547,29 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         }
         int id = entity.getId(this.serverVersion.toClientVersion());
         this.writeVarInt(id + 1);
+    }
+
+    public int readContainerId() {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            return this.readVarInt();
+        }
+        return this.readUnsignedByte();
+    }
+
+    public void writeContainerId(int containerId) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            this.writeVarInt(containerId);
+        } else {
+            this.writeByte(containerId);
+        }
+    }
+
+    public void writeRotation(float rotation) {
+        this.writeByte((byte) MathUtil.floor(rotation * 256f / 360f));
+    }
+
+    public float readRotation() {
+        return (float) (this.readByte() * 360) / 256f;
     }
 
     @FunctionalInterface

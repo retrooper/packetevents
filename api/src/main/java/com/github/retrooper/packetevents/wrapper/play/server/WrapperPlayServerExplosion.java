@@ -24,27 +24,29 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
+import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.protocol.sound.StaticSound;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerExplosion> {
-    private Vector3d position;
-    private float strength;
-    //Chunk posiitons?
-    private List<Vector3i> records;
-    private Vector3f playerMotion;
 
-    private Particle<?> smallExplosionParticles;
-    private Particle<?> largeExplosionParticles;
-    private BlockInteraction blockInteraction;
+    private Vector3d position;
+    private float strength; // removed in 1.21.2
+    private List<Vector3i> records; // removed in 1.21.2
+    private @Nullable Vector3d knockback; // optional since 1.21.2
+
+    private Particle<?> smallParticle; // removed in 1.21.2
+    private Particle<?> particle;
+    private BlockInteraction blockInteraction; // removed in 1.21.2
     private Sound explosionSound;
 
     public WrapperPlayServerExplosion(PacketSendEvent event) {
@@ -65,17 +67,45 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
                 blockInteraction, new StaticSound(explosionSoundKey, explosionSoundRange));
     }
 
+    @Deprecated
     public WrapperPlayServerExplosion(Vector3d position, float strength, List<Vector3i> records, Vector3f playerMotion,
-                                      Particle<?> smallExplosionParticles, Particle<?> largeExplosionParticles,
+                                      Particle<?> smallParticle, Particle<?> particle,
+                                      BlockInteraction blockInteraction, Sound explosionSound) {
+        this(position, strength, records, new Vector3d(playerMotion.x, playerMotion.y, playerMotion.z),
+                smallParticle, particle, blockInteraction, explosionSound);
+    }
+
+    public WrapperPlayServerExplosion(Vector3d position, float strength, List<Vector3i> records, Vector3d playerMotion,
+                                      Particle<?> smallParticle, Particle<?> particle,
                                       BlockInteraction blockInteraction, Sound explosionSound) {
         super(PacketType.Play.Server.EXPLOSION);
         this.position = position;
         this.strength = strength;
         this.records = records;
-        this.playerMotion = playerMotion;
-        this.smallExplosionParticles = smallExplosionParticles;
-        this.largeExplosionParticles = largeExplosionParticles;
+        this.knockback = playerMotion;
+        this.smallParticle = smallParticle;
+        this.particle = particle;
         this.blockInteraction = blockInteraction;
+        this.explosionSound = explosionSound;
+    }
+
+    public WrapperPlayServerExplosion(
+            Vector3d position,
+            @Nullable Vector3d playerMotion
+    ) {
+        this(position, playerMotion,
+                new Particle<>(ParticleTypes.EXPLOSION_EMITTER),
+                Sounds.ENTITY_GENERIC_EXPLODE);
+    }
+
+    public WrapperPlayServerExplosion(
+            Vector3d position, @Nullable Vector3d playerMotion,
+            Particle<?> particle, Sound explosionSound
+    ) {
+        super(PacketType.Play.Server.EXPLOSION);
+        this.position = position;
+        this.knockback = playerMotion;
+        this.particle = particle;
         this.explosionSound = explosionSound;
     }
 
@@ -86,35 +116,42 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         } else {
             position = new Vector3d(readFloat(), readFloat(), readFloat());
         }
-        strength = readFloat();
-        int recordsLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? readVarInt() : readInt();
-        records = new ArrayList<>(recordsLength);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            // this packet has been basically completely emptied with 1.21.2
+            this.knockback = this.readOptional(Vector3d::read);
+            this.particle = Particle.read(this);
+            this.explosionSound = Sound.read(this);
+        } else {
+            strength = readFloat();
+            int recordsLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? readVarInt() : readInt();
+            records = new ArrayList<>(recordsLength);
 
-        Vector3i floor = toFloor(position);
+            Vector3i floor = toFloor(position);
 
-        for (int i = 0; i < recordsLength; i++) {
-            int chunkPosX = readByte() + floor.getX();
-            int chunkPosY = readByte() + floor.getY();
-            int chunkPosZ = readByte() + floor.getZ();
-            records.add(new Vector3i(chunkPosX, chunkPosY, chunkPosZ));
-        }
+            for (int i = 0; i < recordsLength; i++) {
+                int chunkPosX = readByte() + floor.getX();
+                int chunkPosY = readByte() + floor.getY();
+                int chunkPosZ = readByte() + floor.getZ();
+                records.add(new Vector3i(chunkPosX, chunkPosY, chunkPosZ));
+            }
 
-        float motX = readFloat();
-        float motY = readFloat();
-        float motZ = readFloat();
-        playerMotion = new Vector3f(motX, motY, motZ);
+            float motX = readFloat();
+            float motY = readFloat();
+            float motZ = readFloat();
+            knockback = new Vector3d(motX, motY, motZ);
 
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.blockInteraction = BlockInteraction.values()[this.readVarInt()];
-            this.smallExplosionParticles = Particle.read(this);
-            this.largeExplosionParticles = Particle.read(this);
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+                this.blockInteraction = BlockInteraction.values()[this.readVarInt()];
+                this.smallParticle = Particle.read(this);
+                this.particle = Particle.read(this);
 
-            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-                this.explosionSound = Sound.read(this);
-            } else {
-                ResourceLocation explosionSoundKey = this.readIdentifier();
-                Float explosionSoundRange = this.readOptional(PacketWrapper::readFloat);
-                this.explosionSound = new StaticSound(explosionSoundKey, explosionSoundRange);
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                    this.explosionSound = Sound.read(this);
+                } else {
+                    ResourceLocation explosionSoundKey = this.readIdentifier();
+                    Float explosionSoundRange = this.readOptional(PacketWrapper::readFloat);
+                    this.explosionSound = new StaticSound(explosionSoundKey, explosionSoundRange);
+                }
             }
         }
     }
@@ -130,36 +167,43 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
             writeFloat((float) position.getY());
             writeFloat((float) position.getZ());
         }
-        writeFloat(strength);
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            writeVarInt(records.size());
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            // this packet has been basically completely emptied with 1.21.2
+            this.writeOptional(this.knockback, Vector3d::write);
+            Particle.write(this, this.particle);
+            Sound.write(this, this.explosionSound);
         } else {
-            writeInt(records.size());
-        }
+            writeFloat(strength);
 
-        Vector3i floor = toFloor(position);
-
-        for (Vector3i record : records) {
-            writeByte(record.x - floor.getX());
-            writeByte(record.y - floor.getY());
-            writeByte(record.z - floor.getZ());
-        }
-
-        writeFloat(playerMotion.x);
-        writeFloat(playerMotion.y);
-        writeFloat(playerMotion.z);
-
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            this.writeVarInt(this.blockInteraction.ordinal());
-            Particle.write(this, this.smallExplosionParticles);
-            Particle.write(this, this.largeExplosionParticles);
-
-            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-                Sound.write(this, this.explosionSound);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+                writeVarInt(records.size());
             } else {
-                this.writeIdentifier(this.explosionSound.getSoundId());
-                this.writeOptional(this.explosionSound.getRange(), PacketWrapper::writeFloat);
+                writeInt(records.size());
+            }
+
+            Vector3i floor = toFloor(position);
+
+            for (Vector3i record : records) {
+                writeByte(record.x - floor.getX());
+                writeByte(record.y - floor.getY());
+                writeByte(record.z - floor.getZ());
+            }
+
+            writeFloat((float) knockback.x);
+            writeFloat((float) knockback.y);
+            writeFloat((float) knockback.z);
+
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+                this.writeVarInt(this.blockInteraction.ordinal());
+                Particle.write(this, this.smallParticle);
+                Particle.write(this, this.particle);
+
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                    Sound.write(this, this.explosionSound);
+                } else {
+                    this.writeIdentifier(this.explosionSound.getSoundId());
+                    this.writeOptional(this.explosionSound.getRange(), PacketWrapper::writeFloat);
+                }
             }
         }
     }
@@ -169,9 +213,9 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         position = wrapper.position;
         strength = wrapper.strength;
         records = wrapper.records;
-        playerMotion = wrapper.playerMotion;
-        smallExplosionParticles = wrapper.smallExplosionParticles;
-        largeExplosionParticles = wrapper.largeExplosionParticles;
+        knockback = wrapper.knockback;
+        smallParticle = wrapper.smallParticle;
+        particle = wrapper.particle;
         blockInteraction = wrapper.blockInteraction;
         explosionSound = wrapper.explosionSound;
     }
@@ -200,50 +244,83 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         this.position = position;
     }
 
+    @ApiStatus.Obsolete // removed in 1.21.2
     public float getStrength() {
         return strength;
     }
 
+    @ApiStatus.Obsolete // removed in 1.21.2
     public void setStrength(float strength) {
         this.strength = strength;
     }
 
+    @ApiStatus.Obsolete // removed in 1.21.2
     public List<Vector3i> getRecords() {
         return records;
     }
 
+    @ApiStatus.Obsolete // removed in 1.21.2
     public void setRecords(List<Vector3i> records) {
         this.records = records;
     }
 
-    public Vector3f getPlayerMotion() {
-        return playerMotion;
+    public @Nullable Vector3d getKnockback() {
+        return this.knockback;
     }
 
-    public void setPlayerMotion(Vector3f playerMotion) {
-        this.playerMotion = playerMotion;
+    public void setKnockback(@Nullable Vector3d knockback) {
+        this.knockback = knockback;
     }
 
+    @Deprecated
+    public @Nullable Vector3f getPlayerMotion() {
+        return this.knockback == null ? null : new Vector3f(
+                (float) this.knockback.x,
+                (float) this.knockback.y,
+                (float) this.knockback.z
+        );
+    }
+
+    @Deprecated
+    public void setPlayerMotion(@Nullable Vector3f playerMotion) {
+        this.knockback = playerMotion == null ? null : new Vector3d(
+                playerMotion.x, playerMotion.y, playerMotion.z);
+    }
+
+    @ApiStatus.Obsolete // removed in 1.21.2
     public Particle<?> getSmallExplosionParticles() {
-        return this.smallExplosionParticles;
+        return this.smallParticle;
     }
 
+    @ApiStatus.Obsolete // removed in 1.21.2
     public void setSmallExplosionParticles(Particle<?> smallExplosionParticles) {
-        this.smallExplosionParticles = smallExplosionParticles;
+        this.smallParticle = smallExplosionParticles;
     }
 
+    public Particle<?> getParticle() {
+        return this.particle;
+    }
+
+    public void setParticle(Particle<?> particle) {
+        this.particle = particle;
+    }
+
+    @ApiStatus.Obsolete // renamed in 1.21.2
     public Particle<?> getLargeExplosionParticles() {
-        return this.largeExplosionParticles;
+        return this.getParticle();
     }
 
+    @ApiStatus.Obsolete // renamed in 1.21.2
     public void setLargeExplosionParticles(Particle<?> largeExplosionParticles) {
-        this.largeExplosionParticles = largeExplosionParticles;
+        this.setParticle(largeExplosionParticles);
     }
 
+    @ApiStatus.Obsolete // removed in 1.21.2
     public BlockInteraction getBlockInteraction() {
         return this.blockInteraction;
     }
 
+    @ApiStatus.Obsolete // removed in 1.21.2
     public void setBlockInteraction(BlockInteraction blockInteraction) {
         this.blockInteraction = blockInteraction;
     }

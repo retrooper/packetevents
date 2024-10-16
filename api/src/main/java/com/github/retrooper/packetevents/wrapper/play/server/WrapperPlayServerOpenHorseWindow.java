@@ -40,14 +40,14 @@ public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayS
 
     @Override
     public void read() {
-        this.windowId = readUnsignedByte();
+        this.windowId = this.readContainerId();
         this.slotCount = readVarInt();
         this.entityId = readInt();
     }
 
     @Override
     public void write() {
-        writeByte(windowId);
+        this.writeContainerId(windowId);
         writeVarInt(slotCount);
         writeInt(entityId);
     }

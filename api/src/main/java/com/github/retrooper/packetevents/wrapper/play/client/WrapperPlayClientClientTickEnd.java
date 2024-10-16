@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,38 +22,14 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayClientCloseWindow extends PacketWrapper<WrapperPlayClientCloseWindow> {
-    private int windowID;
+// the modern version of the idle packet
+public class WrapperPlayClientClientTickEnd extends PacketWrapper<WrapperPlayClientClientTickEnd> {
 
-    public WrapperPlayClientCloseWindow(PacketReceiveEvent event) {
+    public WrapperPlayClientClientTickEnd(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientCloseWindow(int windowID) {
-        super(PacketType.Play.Client.CLOSE_WINDOW);
-        this.windowID = windowID;
-    }
-
-    @Override
-    public void read() {
-        this.windowID = this.readContainerId();
-    }
-
-    @Override
-    public void write() {
-        this.writeContainerId(this.windowID);
-    }
-
-    @Override
-    public void copy(WrapperPlayClientCloseWindow wrapper) {
-        this.windowID = wrapper.windowID;
-    }
-
-    public int getWindowId() {
-        return windowID;
-    }
-
-    public void setWindowId(int windowID) {
-        this.windowID = windowID;
+    public WrapperPlayClientClientTickEnd() {
+        super(PacketType.Play.Client.CLIENT_TICK_END);
     }
 }

@@ -18,22 +18,41 @@
 
 package com.github.retrooper.packetevents.protocol.item.instrument;
 
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class StaticInstrument implements Instrument {
+public class StaticInstrument extends AbstractMappedEntity implements Instrument {
 
     private final Sound sound;
-    private final int useDuration;
+    private final float useSeconds;
     private final float range;
+    private final Component description;
 
+    @Deprecated // useDuration changed from ticks to seconds in 1.21.2
     public StaticInstrument(Sound sound, int useDuration, float range) {
+        this(sound, useDuration * 20f, range, Component.empty());
+    }
+
+    public StaticInstrument(Sound sound, float useSeconds, float range, Component description) {
+        this(null, sound, useSeconds, range, description);
+    }
+
+    public StaticInstrument(@Nullable TypesBuilderData data, Sound sound, float useSeconds, float range, Component description) {
+        super(data);
         this.sound = sound;
-        this.useDuration = useDuration;
+        this.useSeconds = useSeconds;
         this.range = range;
+        this.description = description;
+    }
+
+    @Override
+    public Instrument copy(@Nullable TypesBuilderData newData) {
+        return new StaticInstrument(newData, this.sound, this.useSeconds, this.range, this.description);
     }
 
     @Override
@@ -42,8 +61,8 @@ public class StaticInstrument implements Instrument {
     }
 
     @Override
-    public int getUseDuration() {
-        return this.useDuration;
+    public float getUseSeconds() {
+        return this.useSeconds;
     }
 
     @Override
@@ -52,32 +71,24 @@ public class StaticInstrument implements Instrument {
     }
 
     @Override
-    public ResourceLocation getName() {
-        throw new UnsupportedOperationException();
+    public Component getDescription() {
+        return this.description;
     }
 
     @Override
-    public int getId(ClientVersion version) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isRegistered() {
-        return false;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
+    public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticInstrument)) return false;
+        if (!super.equals(obj)) return false;
         StaticInstrument that = (StaticInstrument) obj;
-        if (this.useDuration != that.useDuration) return false;
+        if (this.useSeconds != that.useSeconds) return false;
         if (Float.compare(that.range, this.range) != 0) return false;
-        return this.sound.equals(that.sound);
+        if (!this.sound.equals(that.sound)) return false;
+        return this.description.equals(that.description);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(this.sound, this.useDuration, this.range);
+    public int deepHashCode() {
+        return Objects.hash(super.hashCode(), this.sound, this.useSeconds, this.range, this.description);
     }
 }
