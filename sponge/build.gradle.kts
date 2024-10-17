@@ -4,7 +4,7 @@ import org.spongepowered.plugin.metadata.model.PluginDependency
 plugins {
     packetevents.`shadow-conventions`
     packetevents.`library-conventions`
-    id("org.spongepowered.gradle.plugin") version("2.0.2")
+    alias(libs.plugins.spongeGradle)
 }
 
 repositories {
@@ -42,6 +42,7 @@ dependencies {
     }
     shadow(project(":api", "shadow"))
     shadow(project(":netty-common"))
+    shadow(libs.bstats.sponge)
 
     compileOnly(libs.via.version)
 }

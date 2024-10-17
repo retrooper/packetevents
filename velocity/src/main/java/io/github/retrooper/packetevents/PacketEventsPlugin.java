@@ -30,6 +30,8 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import io.github.retrooper.packetevents.velocity.factory.VelocityPacketEventsBuilder;
+import org.bstats.charts.SimplePie;
+import org.bstats.velocity.Metrics;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -39,17 +41,20 @@ public class PacketEventsPlugin {
     private final Logger logger;
     private final PluginContainer pluginContainer;
     private final Path dataDirectory;
+    private final Metrics.Factory metricsFactory;
 
     @Inject
-    public PacketEventsPlugin(final ProxyServer server,
-                              final Logger logger,
-                              final PluginContainer pluginContainer, @DataDirectory Path dataDirectory) {
+    public PacketEventsPlugin(
+            final ProxyServer server,
+            final Logger logger,
+            final PluginContainer pluginContainer,
+            @DataDirectory Path dataDirectory,
+            Metrics.Factory metricsFactory) {
         this.server = server;
         this.logger = logger;
         this.pluginContainer = pluginContainer;
         this.dataDirectory = dataDirectory;
-        logger.info("Plugin started");
-
+        this.metricsFactory = metricsFactory;
     }
 
     @Subscribe
@@ -87,6 +92,13 @@ public class PacketEventsPlugin {
         };
         //PacketEvents.getAPI().getEventManager().registerListener(listener);
         PacketEvents.getAPI().init();
+
+        // Enable bStats
+        Metrics metrics = metricsFactory.make(this, 11327);
+        //Just to have an idea of which versions of packetevents people use
+        metrics.addCustomChart(new SimplePie("packetevents_version", () -> PacketEvents.getAPI().getVersion().toStringWithoutSnapshot()));
+
+        logger.info("Plugin started");
     }
 
     @Subscribe

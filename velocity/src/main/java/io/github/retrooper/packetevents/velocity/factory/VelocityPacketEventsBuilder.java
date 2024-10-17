@@ -39,7 +39,6 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
-import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
@@ -195,42 +194,32 @@ public class VelocityPacketEventsBuilder {
             public void init() {
                 // Load if we haven't loaded already
                 load();
-                if (!initialized) {
-                    server.getEventManager().register(plugin.getInstance().orElse(null), PostLoginEvent.class,
-                            (event) -> {
-                                Player player = event.getPlayer();
-                                Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-                                // This only happens if a player is a fake player
-                                if(channel == null) {
-                                    return;
-                                }
-                                PacketEvents.getAPI().getInjector().setPlayer(channel, player);
+                if (initialized) return;
 
-                                User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
-                                if (user == null)
-                                    return;
+                server.getEventManager().register(plugin.getInstance().orElse(null), PostLoginEvent.class,
+                        (event) -> {
+                            Player player = event.getPlayer();
+                            Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+                            // This only happens if a player is a fake player
+                            if(channel == null) {
+                                return;
+                            }
+                            PacketEvents.getAPI().getInjector().setPlayer(channel, player);
 
-                                UserLoginEvent loginEvent = new UserLoginEvent(user, player);
-                                PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
-                            });
-                    if (settings.shouldCheckForUpdates()) {
-                        getUpdateChecker().handleUpdateCheck();
-                    }
+                            User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+                            if (user == null)
+                                return;
 
-                    Object instance = plugin.getInstance().orElse(null);
-                    if (instance != null) {
-                        Metrics metrics = Metrics.createInstance(plugin, server, logger, dataDirectory, 11327);
-
-                        //Just to have an idea of which versions of packetevents people use
-                        metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
-                            return getVersion().toStringWithoutSnapshot();
-                        }));
-                    }
-
-                    PacketType.Play.Client.load();
-                    PacketType.Play.Server.load();
-                    initialized = true;
+                            UserLoginEvent loginEvent = new UserLoginEvent(user, player);
+                            PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
+                        });
+                if (settings.shouldCheckForUpdates()) {
+                    getUpdateChecker().handleUpdateCheck();
                 }
+
+                PacketType.Play.Client.load();
+                PacketType.Play.Server.load();
+                initialized = true;
             }
 
             @Override

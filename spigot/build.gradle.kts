@@ -13,6 +13,7 @@ repositories {
 dependencies {
     compileOnly(libs.netty)
     shadow(libs.bundles.adventure)
+    shadow(libs.bstats.bukkit)
     shadow(project(":api", "shadow"))
     shadow(project(":netty-common"))
 

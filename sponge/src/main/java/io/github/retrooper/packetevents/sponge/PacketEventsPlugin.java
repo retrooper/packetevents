@@ -19,11 +19,7 @@
 package io.github.retrooper.packetevents.sponge;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListenerPriority;
-import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
-import com.github.retrooper.packetevents.event.UserConnectEvent;
-import com.github.retrooper.packetevents.event.UserDisconnectEvent;
-import com.github.retrooper.packetevents.event.UserLoginEvent;
+import com.github.retrooper.packetevents.event.*;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -32,6 +28,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWi
 import com.google.inject.Inject;
 import io.github.retrooper.packetevents.sponge.factory.SpongePacketEventsBuilder;
 import io.github.retrooper.packetevents.sponge.util.SpongeConversionUtil;
+import org.bstats.charts.SimplePie;
+import org.bstats.sponge.Metrics;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -44,8 +42,14 @@ import org.spongepowered.plugin.builtin.jvm.Plugin;
 @Plugin("packetevents")
 public class PacketEventsPlugin {
 
+    private final PluginContainer pluginContainer;
+    private final Metrics metrics;
+
     @Inject
-    private PluginContainer pluginContainer;
+    public PacketEventsPlugin(PluginContainer pluginContainer, Metrics.Factory metricsFactory) {
+        this.pluginContainer = pluginContainer;
+        this.metrics = metricsFactory.make(11327);
+    }
 
     @Listener(order = Order.EARLY)
     public void onServerStart(final StartingEngineEvent<Server> event) {
@@ -55,6 +59,9 @@ public class PacketEventsPlugin {
         // Register your listeners
         PacketEvents.getAPI().getSettings().debug(false).downsampleColors(false).checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).reEncodeByDefault(true);
         PacketEvents.getAPI().init();
+
+        //Just to have an idea of which versions of packetevents people use
+        metrics.addCustomChart(new SimplePie("packetevents_version", () -> PacketEvents.getAPI().getVersion().toStringWithoutSnapshot()));
 
         SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
 
