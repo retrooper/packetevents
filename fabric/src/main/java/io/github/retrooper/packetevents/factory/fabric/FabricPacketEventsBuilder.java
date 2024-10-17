@@ -11,6 +11,7 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -19,18 +20,23 @@ import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
-import io.github.retrooper.packetevents.handler.PacketDecoder;
-import io.github.retrooper.packetevents.handler.PacketEncoder;
+import io.github.retrooper.packetevents.handler.PacketEventsClientDecoder;
+import io.github.retrooper.packetevents.handler.PacketEventsClientEncoder;
+import io.github.retrooper.packetevents.handler.PacketEventsServerDecoder;
+import io.github.retrooper.packetevents.handler.PacketEventsServerEncoder;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import io.netty.channel.Channel;
+import java.util.UUID;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.Connection;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,9 +106,13 @@ public class FabricPacketEventsBuilder {
             private final PlayerManagerAbstract playerManager = new PlayerManagerAbstract() {
                 @Override
                 public int getPing(@NotNull Object player) {
-                    String name = ((LocalPlayer) player).getGameProfile().getName();
+                    String name = ((Player) player).getGameProfile().getName();
                     try {
-                        return ((LocalPlayer) player).connection.getPlayerInfo(name).getLatency();
+                        if (player instanceof ServerPlayer serverPlayer) {
+                            return serverPlayer.connection.latency();
+                        } else {
+                            return ((LocalPlayer) player).connection.getPlayerInfo(name).getLatency();
+                        }
                     } catch (Exception ex) {
                         PacketEvents.getAPI().getLogManager().debug("Failed to get ping for player " + name);
                         return -1;
@@ -111,9 +121,31 @@ public class FabricPacketEventsBuilder {
 
                 @Override
                 public Object getChannel(@NotNull Object player) {
-                    Connection connection = ((LocalPlayer) player).connection.getConnection();
-                    ReflectionObject reflectConnection = new ReflectionObject(connection);
-                    return reflectConnection.readObject(0, Channel.class);
+                    Channel channel = null;
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        UUID uuid = ((ServerPlayer) player).getUUID();
+                        channel =
+                            (Channel) PacketEvents.getAPI().getProtocolManager().getChannel(uuid);
+                        if (channel == null) {
+                            Connection connection = ((ServerPlayer) player).connection.connection;
+                            channel = connection.channel;
+                            // This is removed from the HashMap on channel close
+                            // So if the channel is already closed, there will be a memory leak if we add an offline player
+                            if (channel != null) {
+                                synchronized (channel) {
+                                    if (ChannelHelper.isOpen(channel)) {
+                                        ProtocolManager.CHANNELS.put(uuid, channel);
+                                    }
+                                }
+                            }
+                        }
+                        return channel;
+                    } else if (player instanceof LocalPlayer localPlayer) {
+                        Connection connection = localPlayer.connection.getConnection();
+                        ReflectionObject reflectConnection = new ReflectionObject(connection);
+                        return reflectConnection.readObject(0, Channel.class);
+                    }
+                    return null;
                 }
             };
 
@@ -136,20 +168,33 @@ public class FabricPacketEventsBuilder {
                 @Override
                 public void updateUser(Object ch, User user) {
                     Channel channel = (Channel) ch;
-                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+                    PacketEventsServerDecoder decoder = (PacketEventsServerDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
                     decoder.user = user;
-                    PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
+                    PacketEventsServerEncoder encoder = (PacketEventsServerEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
                     encoder.user = user;
                 }
 
                 @Override
                 public void setPlayer(Object ch, Object player) {
                     Channel channel = (Channel) ch;
-                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-                    decoder.player = (LocalPlayer) player;
 
-                    PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
-                    encoder.player = (LocalPlayer) player;
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        PacketEventsServerDecoder decoder = (PacketEventsServerDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+                        decoder.player = serverPlayer;
+
+                        PacketEventsServerEncoder encoder = (PacketEventsServerEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
+                        encoder.player = serverPlayer;
+                    } else if (player instanceof LocalPlayer localPlayer) {
+                        PacketEventsClientDecoder decoder =
+                            (PacketEventsClientDecoder) channel.pipeline()
+                                .get(PacketEvents.DECODER_NAME);
+                        decoder.player = localPlayer;
+
+                        PacketEventsClientEncoder encoder =
+                            (PacketEventsClientEncoder) channel.pipeline()
+                                .get(PacketEvents.ENCODER_NAME);
+                        encoder.player = localPlayer;
+                    }
                 }
 
                 @Override
@@ -181,6 +226,12 @@ public class FabricPacketEventsBuilder {
                     PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
 
+//                    try {
+//                        CustomPipelineUtil.init();
+//                    } catch (Exception ex) {
+//                        throw new IllegalStateException(ex);
+//                    }
+
                     injector.inject();
 
                     loaded = true;
@@ -194,7 +245,7 @@ public class FabricPacketEventsBuilder {
                         public void onPacketPlaySend(PacketPlaySendEvent event) {
                             if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
                                 PacketEvents.getAPI().getInjector().setPlayer(event.getChannel(),
-                                        Minecraft.getInstance().player);
+                                        event.getPlayer());
                             }
                         }
                     });

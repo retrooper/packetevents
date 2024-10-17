@@ -8,11 +8,13 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
-import io.github.retrooper.packetevents.PacketEventsMod;
-import io.github.retrooper.packetevents.handler.PacketDecoder;
-import io.github.retrooper.packetevents.handler.PacketEncoder;
+import io.github.retrooper.packetevents.handler.PacketEventsClientDecoder;
+import io.github.retrooper.packetevents.handler.PacketEventsClientEncoder;
+import io.github.retrooper.packetevents.handler.PacketEventsServerDecoder;
+import io.github.retrooper.packetevents.handler.PacketEventsServerEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import net.minecraft.network.BandwidthDebugMonitor;
 import net.minecraft.network.protocol.PacketFlow;
@@ -20,8 +22,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Arrays;
 
 
 @Mixin(net.minecraft.network.Connection.class)
@@ -40,8 +40,17 @@ public class PacketEventsInjectorMixin {
             channel.unsafe().closeForcibly();
             return;
         }
-        PacketDecoder decoder = new PacketDecoder(user);
-        PacketEncoder encoder = new PacketEncoder(user);
+
+        ChannelHandler decoder;
+        ChannelHandler encoder;
+        if (flow == PacketFlow.CLIENTBOUND) {
+            decoder = new PacketEventsClientDecoder(user);
+            encoder = new PacketEventsClientEncoder(user);
+        } else {
+            decoder = new PacketEventsServerDecoder(user);
+            encoder = new PacketEventsServerEncoder(user);
+        }
+
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, encoder);
         channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));

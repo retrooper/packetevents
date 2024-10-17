@@ -17,6 +17,7 @@
       "io.github.retrooper.packetevents.PacketEventsMod"
     ]
   },
+  "accessWidener": "packetevents.accesswidener",
   "mixins": [
     "packetevents.mixins.json"
   ],

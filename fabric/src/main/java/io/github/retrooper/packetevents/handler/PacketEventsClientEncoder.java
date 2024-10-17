@@ -12,11 +12,11 @@ import io.netty.util.ReferenceCountUtil;
 import net.minecraft.client.player.LocalPlayer;
 
 @ChannelHandler.Sharable
-public class PacketEncoder extends MessageToByteEncoder<ByteBuf> {
+public class PacketEventsClientEncoder extends MessageToByteEncoder<ByteBuf> {
     public User user;
     public LocalPlayer player;
 
-    public PacketEncoder(User user) {
+    public PacketEventsClientEncoder(User user) {
         this.user = user;
     }
 
