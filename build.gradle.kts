@@ -70,11 +70,5 @@ allprojects {
         withType<Jar> {
             archiveVersion = rootProject.ext["versionNoHash"] as String
         }
-
-        withType<Javadoc> {
-            title = "packetevents-${project.name} v${rootProject.version}"
-            options.encoding = Charsets.UTF_8.name()
-            options.overview = rootProject.file("buildSrc/src/main/resources/javadoc-overview.html").toString()
-        }
     }
 }

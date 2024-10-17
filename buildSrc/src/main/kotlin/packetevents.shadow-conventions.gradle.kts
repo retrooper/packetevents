@@ -20,8 +20,44 @@ tasks {
         mergeServiceFiles()
     }
 
+    create<ShadowJar>("shadowNoAdventure") {
+        group = rootProject.name
+        description = "Create a combined JAR of project and runtime dependencies without Adventure dependencies."
+        archiveFileName = "packetevents-${project.name}-no-adv-${rootProject.ext["versionNoHash"]}.jar"
+        archiveClassifier = null
+
+        val shadowJar = shadowJar.get()
+        val sourceSets = project.extensions.getByType<SourceSetContainer>()
+
+        manifest.inheritFrom(shadowJar.manifest)
+
+        from(sourceSets.main.get().output)
+        configurations = shadowJar.configurations
+
+        relocate("net.kyori.adventure.text.serializer", "io.github.retrooper.packetevents.adventure.serializer")
+        relocate("net.kyori.option", "io.github.retrooper.packetevents.adventure.option")
+
+        dependencies {
+            exclude(dependency("net.kyori:adventure-api:.*"))
+            exclude(dependency("net.kyori:adventure-key:.*"))
+            exclude(dependency("net.kyori:adventure-nbt:.*"))
+            exclude(dependency("net.kyori:examination-api:.*"))
+            exclude(dependency("net.kyori:examination-string:.*"))
+            exclude(dependency("com.google.code.gson:gson:.*"))
+            exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
+        }
+
+        mergeServiceFiles()
+    }
+
     assemble {
         dependsOn(shadowJar)
+    }
+
+    if (project.properties.contains("no-adv")) {
+        assemble {
+            dependsOn("shadowNoAdventure")
+        }
     }
 }
 

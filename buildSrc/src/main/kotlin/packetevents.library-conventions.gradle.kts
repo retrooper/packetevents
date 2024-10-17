@@ -1,4 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.ShadowExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import groovy.util.Node
 
@@ -34,6 +33,16 @@ tasks {
         // Set the release flag. This configures what version bytecode the compiler will emit, as well as what JDK APIs are usable.
         // See https://openjdk.java.net/jeps/247 for more information.
         options.release = 8
+    }
+
+    javadoc {
+        title = "packetevents-${project.name} v${rootProject.version}"
+        options.encoding = Charsets.UTF_8.name()
+        options.overview = rootProject.file("buildSrc/src/main/resources/javadoc-overview.html").toString()
+        setDestinationDir(file("${project.layout.buildDirectory.asFile.get()}/docs/javadoc"))
+        options {
+            (this as CoreJavadocOptions).addBooleanOption("Xdoclint:none", true)
+        }
     }
 
     processResources {
