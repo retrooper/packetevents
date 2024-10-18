@@ -21,7 +21,12 @@ package com.github.retrooper.packetevents.protocol.recipe;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.recipe.data.RecipeData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * <strong>WARNING:</strong> No longer exists since 1.21.2, network recipe data was rewritten.
+ */
+@ApiStatus.Obsolete
 public interface RecipeSerializer<T extends RecipeData> extends MappedEntity {
 
     @Deprecated
