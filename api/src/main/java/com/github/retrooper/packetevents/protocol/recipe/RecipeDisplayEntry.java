@@ -32,14 +32,14 @@ import java.util.Objects;
 
 public final class RecipeDisplayEntry {
 
-    private int id;
+    private RecipeDisplayId id;
     private RecipeDisplay<?> display;
     private @Nullable Integer group;
     private RecipeBookCategory category;
     private @Nullable List<MappedEntitySet<ItemType>> ingredients;
 
     public RecipeDisplayEntry(
-            int id,
+            RecipeDisplayId id,
             RecipeDisplay<?> display,
             @Nullable Integer group,
             RecipeBookCategory category,
@@ -53,7 +53,7 @@ public final class RecipeDisplayEntry {
     }
 
     public static RecipeDisplayEntry read(PacketWrapper<?> wrapper) {
-        int id = wrapper.readVarInt();
+        RecipeDisplayId id = RecipeDisplayId.read(wrapper);
         RecipeDisplay<?> display = RecipeDisplay.read(wrapper);
         Integer group = wrapper.readNullableVarInt();
         RecipeBookCategory category = wrapper.readMappedEntity(RecipeBookCategories.getRegistry());
@@ -63,7 +63,7 @@ public final class RecipeDisplayEntry {
     }
 
     public static void write(PacketWrapper<?> wrapper, RecipeDisplayEntry entry) {
-        wrapper.writeVarInt(entry.id);
+        RecipeDisplayId.write(wrapper, entry.id);
         RecipeDisplay.write(wrapper, entry.display);
         wrapper.writeNullableVarInt(entry.group);
         wrapper.writeMappedEntity(entry.category);
@@ -71,11 +71,11 @@ public final class RecipeDisplayEntry {
                 ew.writeList(list, MappedEntitySet::write));
     }
 
-    public int getId() {
+    public RecipeDisplayId getId() {
         return this.id;
     }
 
-    public void setId(int id) {
+    public void setId(RecipeDisplayId id) {
         this.id = id;
     }
 
