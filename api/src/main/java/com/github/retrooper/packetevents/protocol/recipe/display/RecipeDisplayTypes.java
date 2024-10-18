@@ -38,12 +38,16 @@ public final class RecipeDisplayTypes {
         return REGISTRY;
     }
 
-    // FIXME implement this
-    public static final RecipeDisplayType<?> CRAFTING_SHAPELESS = register("crafting_shapeless", null, null);
-    public static final RecipeDisplayType<?> CRAFTING_SHAPED = register("crafting_shaped", null, null);
-    public static final RecipeDisplayType<FurnaceRecipeDisplay> FURNACE = register("furnace", null, null);
-    public static final RecipeDisplayType<?> STONECUTTER = register("stonecutter", null, null);
-    public static final RecipeDisplayType<?> SMITHING = register("smithing", null, null);
+    public static final RecipeDisplayType<ShapelessCraftingRecipeDisplay> CRAFTING_SHAPELESS = register(
+            "crafting_shapeless", ShapelessCraftingRecipeDisplay::read, ShapelessCraftingRecipeDisplay::write);
+    public static final RecipeDisplayType<ShapedCraftingRecipeDisplay> CRAFTING_SHAPED = register(
+            "crafting_shaped", ShapedCraftingRecipeDisplay::read, ShapedCraftingRecipeDisplay::write);
+    public static final RecipeDisplayType<FurnaceRecipeDisplay> FURNACE = register(
+            "furnace", FurnaceRecipeDisplay::read, FurnaceRecipeDisplay::write);
+    public static final RecipeDisplayType<StonecutterRecipeDisplay> STONECUTTER = register(
+            "stonecutter", StonecutterRecipeDisplay::read, StonecutterRecipeDisplay::write);
+    public static final RecipeDisplayType<SmithingRecipeDisplay> SMITHING = register(
+            "smithing", SmithingRecipeDisplay::read, SmithingRecipeDisplay::write);
 
     static {
         REGISTRY.unloadMappings();

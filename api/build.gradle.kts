@@ -86,6 +86,7 @@ mappingCompression {
         compress("item/recipe_book_category.json")
         compress("item/recipe_display_types.json")
         compress("item/recipe_serializer_mappings.json")
+        compress("item/recipe_slot_display_types.json")
 
         compress("particle/particle_type_mappings.json")
 
