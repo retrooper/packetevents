@@ -73,6 +73,7 @@ mappingCompression {
         compress("entity/painting_mappings.json")
         compress("entity/wolf_variant_mappings.json")
 
+        compress("item/consume_effect_type_mappings.json")
         compress("item/item_armor_material_mappings.json")
         compress("item/item_banner_pattern_mappings.json")
         compress("item/item_component_mappings.json")
@@ -82,7 +83,10 @@ mappingCompression {
         compress("item/item_potion_mappings.json")
         compress("item/item_trim_material_mappings.json")
         compress("item/item_trim_pattern_mappings.json")
+        compress("item/recipe_book_category.json")
+        compress("item/recipe_display_types.json")
         compress("item/recipe_serializer_mappings.json")
+        compress("item/recipe_slot_display_types.json")
 
         compress("particle/particle_type_mappings.json")
 

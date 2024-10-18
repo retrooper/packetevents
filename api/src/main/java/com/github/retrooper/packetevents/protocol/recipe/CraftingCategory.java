@@ -18,6 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.recipe;
 
+import org.jetbrains.annotations.ApiStatus;
+
+/**
+ * <strong>WARNING:</strong> Replaced with {@link com.github.retrooper.packetevents.protocol.recipe.category.RecipeBookCategories} since 1.21.2.
+ */
+@ApiStatus.Obsolete
 public enum CraftingCategory {
 
     BUILDING,

@@ -40,6 +40,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * <strong>WARNING:</strong> No longer exists since 1.21.2, network recipe data was rewritten.
+ */
+@ApiStatus.Obsolete
 public class RecipeSerializers {
 
     private static final Map<String, RecipeSerializer<?>> PATTERN_TYPE_MAP = new HashMap<>();

@@ -39,6 +39,7 @@ import com.github.retrooper.packetevents.protocol.packettype.clientbound.Clientb
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_20_3;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_20_5;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_21;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_21_2;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_7_10;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_8;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_9;
@@ -64,6 +65,7 @@ import com.github.retrooper.packetevents.protocol.packettype.serverbound.Serverb
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_20_2;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_20_3;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_20_5;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_21_2;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_7_10;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_8;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_9;
@@ -103,7 +105,8 @@ public final class PacketType {
             ClientVersion.V_1_20_2,
             ClientVersion.V_1_20_3,
             ClientVersion.V_1_20_5,
-            ClientVersion.V_1_21);
+            ClientVersion.V_1_21,
+            ClientVersion.V_1_21_2);
 
     //TODO UPDATE Update packet type mappings (serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
@@ -124,7 +127,8 @@ public final class PacketType {
             ClientVersion.V_1_19_4,
             ClientVersion.V_1_20_2,
             ClientVersion.V_1_20_3,
-            ClientVersion.V_1_20_5);
+            ClientVersion.V_1_20_5,
+            ClientVersion.V_1_21_2);
 
     // TODO UPDATE Update packet type mappings (config clientbound pt. 1)
     private static final VersionMapper CLIENTBOUND_CONFIG_VERSION_MAPPER = new VersionMapper(
@@ -664,7 +668,12 @@ public final class PacketType {
             // Added in 1.20.5
             CHAT_COMMAND_UNSIGNED,
             COOKIE_RESPONSE,
-            DEBUG_SAMPLE_SUBSCRIPTION;
+            DEBUG_SAMPLE_SUBSCRIPTION,
+
+            // added in 1.21.2
+            CLIENT_TICK_END,
+            SELECT_BUNDLE_ITEM,
+            ;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -718,6 +727,7 @@ public final class PacketType {
                 loadPacketIds(ServerboundPacketType_1_20_2.values());
                 loadPacketIds(ServerboundPacketType_1_20_3.values());
                 loadPacketIds(ServerboundPacketType_1_20_5.values());
+                loadPacketIds(ServerboundPacketType_1_21_2.values());
                 //TODO UPDATE Update packet type mappings (serverbound pt. 2)
             }
 
@@ -812,7 +822,7 @@ public final class PacketType {
             DEATH_COMBAT_EVENT,
             FACE_PLAYER,
             PLAYER_POSITION_AND_LOOK,
-            UNLOCK_RECIPES,
+            UNLOCK_RECIPES, // removed in 1.21.2
             DESTROY_ENTITIES,
             REMOVE_ENTITY_EFFECT,
             RESOURCE_PACK_SEND,
@@ -901,7 +911,18 @@ public final class PacketType {
 
             // added in 1.21
             CUSTOM_REPORT_DETAILS,
-            SERVER_LINKS;
+            SERVER_LINKS,
+
+            // added in 1.21.2
+            MOVE_MINECART,
+            SET_CURSOR_ITEM,
+            SET_PLAYER_INVENTORY,
+            ENTITY_POSITION_SYNC,
+            PLAYER_ROTATION,
+            RECIPE_BOOK_ADD,
+            RECIPE_BOOK_REMOVE,
+            RECIPE_BOOK_SETTINGS,
+            ;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
@@ -972,6 +993,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_20_3.values());
                 loadPacketIds(ClientboundPacketType_1_20_5.values());
                 loadPacketIds(ClientboundPacketType_1_21.values());
+                loadPacketIds(ClientboundPacketType_1_21_2.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }

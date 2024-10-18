@@ -18,5 +18,11 @@
 
 package com.github.retrooper.packetevents.protocol.recipe.data;
 
+import org.jetbrains.annotations.ApiStatus;
+
+/**
+ * <strong>WARNING:</strong> No longer exists since 1.21.2, network recipe data was rewritten.
+ */
+@ApiStatus.Obsolete
 public interface RecipeData {
 }

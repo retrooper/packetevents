@@ -28,7 +28,11 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.UUID;
 
 public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlayServerPlayerInfoUpdate> {
     //Specify entries using EnumSet.of()
@@ -41,39 +45,65 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
         UPDATE_GAME_MODE,
         UPDATE_LISTED,
         UPDATE_LATENCY,
-        UPDATE_DISPLAY_NAME;
+        UPDATE_DISPLAY_NAME,
+        /**
+         * Updates the order in which the player is listed in the tablist.
+         */
+        UPDATE_LIST_ORDER;
 
         public static final WrapperPlayServerPlayerInfoUpdate.Action[] VALUES = values();
     }
 
     public static class PlayerInfo {
-        private UserProfile gameProfile;
-        private boolean listed;
+        private UserProfile profile;
+        private boolean listed = true;
         private int latency;
         private GameMode gameMode;
         @Nullable
         private Component displayName;
         @Nullable
         private RemoteChatSession chatSession;
+        private int listOrder; // added in 1.21.2
 
-        public PlayerInfo(UserProfile gameProfile, boolean listed,
-                          int latency, GameMode gameMode,
-                          @Nullable Component displayName, @Nullable RemoteChatSession chatSession) {
-            this.gameProfile = gameProfile;
+        public PlayerInfo(UUID profileId) {
+            this(new UserProfile(profileId, ""));
+        }
+
+        public PlayerInfo(UserProfile profile) {
+            this.profile = profile;
+        }
+
+        public PlayerInfo(
+                UserProfile profile, boolean listed,
+                int latency, GameMode gameMode,
+                @Nullable Component displayName,
+                @Nullable RemoteChatSession chatSession
+        ) {
+            this(profile, listed, latency, gameMode, displayName, chatSession, 0);
+        }
+
+        public PlayerInfo(
+                UserProfile profile, boolean listed,
+                int latency, GameMode gameMode,
+                @Nullable Component displayName,
+                @Nullable RemoteChatSession chatSession,
+                int listOrder
+        ) {
+            this.profile = profile;
             this.listed = listed;
             this.latency = latency;
             this.gameMode = gameMode;
             this.displayName = displayName;
             this.chatSession = chatSession;
+            this.listOrder = listOrder;
         }
 
-        @Deprecated
         public UUID getProfileId() {
-            return gameProfile.getUUID();
+            return profile.getUUID();
         }
 
         public UserProfile getGameProfile() {
-            return gameProfile;
+            return profile;
         }
 
         public boolean isListed() {
@@ -96,8 +126,12 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
             return chatSession;
         }
 
+        public int getListOrder() {
+            return this.listOrder;
+        }
+
         public void setGameProfile(UserProfile gameProfile) {
-            this.gameProfile = gameProfile;
+            this.profile = gameProfile;
         }
 
         public void setListed(boolean listed) {
@@ -118,6 +152,10 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
 
         public void setChatSession(@Nullable RemoteChatSession chatSession) {
             this.chatSession = chatSession;
+        }
+
+        public void setListOrder(int listOrder) {
+            this.listOrder = listOrder;
         }
     }
 
@@ -157,6 +195,7 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
             int latency = 0;
             @Nullable RemoteChatSession chatSession = null;
             @Nullable Component displayName = null;
+            int listOrder = 0;
             for (Action action : actions) {
                 switch (action) {
                     case ADD_PLAYER:
@@ -187,9 +226,12 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
                     case UPDATE_DISPLAY_NAME:
                         displayName = wrapper.readOptional(PacketWrapper::readComponent);
                         break;
+                    case UPDATE_LIST_ORDER:
+                        listOrder = wrapper.readVarInt();
+                        break;
                 }
             }
-            return new PlayerInfo(gameProfile, listed, latency, gameMode, displayName, chatSession);
+            return new PlayerInfo(gameProfile, listed, latency, gameMode, displayName, chatSession, listOrder);
         });
     }
 
@@ -222,6 +264,9 @@ public class WrapperPlayServerPlayerInfoUpdate extends PacketWrapper<WrapperPlay
                         break;
                     case UPDATE_DISPLAY_NAME:
                         wrapper.writeOptional(playerInfo.getDisplayName(), PacketWrapper::writeComponent);
+                        break;
+                    case UPDATE_LIST_ORDER:
+                        wrapper.writeVarInt(playerInfo.getListOrder());
                         break;
                 }
             }

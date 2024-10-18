@@ -22,8 +22,13 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.recipe.Ingredient;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.UnknownNullability;
 
+/**
+ * <strong>WARNING:</strong> No longer exists since 1.21.2, network recipe data was rewritten.
+ */
+@ApiStatus.Obsolete
 public class SmithingRecipeData implements RecipeData {
 
     private final @UnknownNullability Ingredient template;

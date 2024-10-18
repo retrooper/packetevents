@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -27,10 +28,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WrapperPlayClientEditBook extends PacketWrapper<WrapperPlayClientEditBook> {
+
+    @Deprecated
     public static final int MAX_BYTES_PER_CHAR = 4;
-    private static final int TITLE_MAX_CHARS = 128;
-    private static final int PAGE_MAX_CHARS = 8192;
-    private static final int AVERAGE_PAGES = 8;
+
+    private static final int TITLE_MAX_CHARS_LEGACY = 128;
+    private static final int TITLE_MAX_CHARS = 32;
+    private static final int PAGE_MAX_CHARS_LEGACY = 8192;
+    private static final int PAGE_MAX_CHARS = 1024;
+    private static final int MAX_PAGES_LEGACY = 200;
+    private static final int MAX_PAGES = 100;
 
     private int slot;
     private List<String> pages;
@@ -49,23 +56,39 @@ public class WrapperPlayClientEditBook extends PacketWrapper<WrapperPlayClientEd
 
     @Override
     public void read() {
-        slot = readVarInt();
-        pages = new ArrayList<>(AVERAGE_PAGES);
-        int pagesSize = readVarInt();
-        for (int i = 0; i < pagesSize; i++) {
-            pages.add(readString(PAGE_MAX_CHARS));
+        boolean modernLimits = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2);
+        int pageLimit = modernLimits ? MAX_PAGES : MAX_PAGES_LEGACY;
+        int pageCharLimit = modernLimits ? PAGE_MAX_CHARS : PAGE_MAX_CHARS_LEGACY;
+
+        this.slot = this.readVarInt();
+        int pageCount = this.readVarInt();
+        if (pageCount > pageLimit) {
+            throw new IllegalStateException("Page count " + pageCount + " is larger than limit of " + pageLimit);
         }
-        title = readOptional(reader -> reader.readString(TITLE_MAX_CHARS));
+        this.pages = new ArrayList<>(pageCount);
+        for (int i = 0; i < pageCount; i++) {
+            this.pages.add(this.readString(pageCharLimit));
+        }
+        this.title = this.readOptional(reader -> {
+            int titleLimit = modernLimits ? TITLE_MAX_CHARS : TITLE_MAX_CHARS_LEGACY;
+            return reader.readString(titleLimit);
+        });
     }
 
     @Override
     public void write() {
-        writeVarInt(slot);
-        writeVarInt(pages.size());
-        for (String page : pages) {
-            writeString(page, PAGE_MAX_CHARS);
+        boolean modernLimits = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2);
+        int pageCharLimit = modernLimits ? PAGE_MAX_CHARS : PAGE_MAX_CHARS_LEGACY;
+
+        this.writeVarInt(this.slot);
+        this.writeVarInt(this.pages.size());
+        for (String page : this.pages) {
+            this.writeString(page, pageCharLimit);
         }
-        writeOptional(title, (writer, innerTitle) -> writer.writeString(innerTitle, TITLE_MAX_CHARS));
+        this.writeOptional(this.title, (writer, innerTitle) -> {
+            int titleLimit = modernLimits ? TITLE_MAX_CHARS : TITLE_MAX_CHARS_LEGACY;
+            writer.writeString(innerTitle, titleLimit);
+        });
     }
 
     @Override

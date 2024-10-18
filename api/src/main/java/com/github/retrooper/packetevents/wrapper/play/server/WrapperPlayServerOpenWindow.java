@@ -74,10 +74,11 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void read() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-            this.containerId = readUnsignedByte();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)
+                || this.serverVersion.isOlderThan(ServerVersion.V_1_14)) {
+            this.containerId = this.readContainerId();
         } else {
-            this.containerId = readVarInt();
+            this.containerId = this.readVarInt();
         }
 
         // 1.7 has a very different packet format
@@ -110,10 +111,11 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void write() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-            writeByte(this.containerId);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)
+                || this.serverVersion.isOlderThan(ServerVersion.V_1_14)) {
+            this.writeContainerId(this.containerId);
         } else {
-            writeVarInt(this.containerId);
+            this.writeVarInt(this.containerId);
         }
 
         // 1.7 has a very different packet format

@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.recipe.Recipe;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -28,6 +30,11 @@ public class WrapperPlayServerDeclareRecipes extends PacketWrapper<WrapperPlaySe
 
     public WrapperPlayServerDeclareRecipes(PacketSendEvent event) {
         super(event);
+    }
+
+    public WrapperPlayServerDeclareRecipes(Recipe<?>[] recipes) {
+        super(PacketType.Play.Server.DECLARE_RECIPES);
+        this.recipes = recipes;
     }
 
     @Override

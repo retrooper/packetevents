@@ -23,10 +23,15 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerCloseWindow extends PacketWrapper<WrapperPlayServerCloseWindow> {
+
     private int windowId;
 
     public WrapperPlayServerCloseWindow(PacketSendEvent event) {
         super(event);
+    }
+
+    public WrapperPlayServerCloseWindow() {
+        this(0);
     }
 
     public WrapperPlayServerCloseWindow(int id) {
@@ -36,12 +41,12 @@ public class WrapperPlayServerCloseWindow extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        this.windowId = readUnsignedByte();
+        this.windowId = this.readContainerId();
     }
 
     @Override
     public void write() {
-        writeByte(windowId);
+        this.writeContainerId(this.windowId);
     }
 
     @Override
@@ -50,17 +55,15 @@ public class WrapperPlayServerCloseWindow extends PacketWrapper<WrapperPlayServe
     }
 
     /**
-     * @deprecated Window ID is ignored by the client on all versions.
+     * Note: Window ID is ignored by the client on all versions.
      */
-    @Deprecated
     public int getWindowId() {
-        return windowId;
+        return this.windowId;
     }
 
     /**
-     * @deprecated Window ID is ignored by the client on all versions.
+     * Note: Window ID is ignored by the client on all versions.
      */
-    @Deprecated
     public void setWindowId(int windowId) {
         this.windowId = windowId;
     }

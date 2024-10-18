@@ -21,7 +21,12 @@ package com.github.retrooper.packetevents.protocol.recipe.data;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.recipe.Ingredient;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * <strong>WARNING:</strong> No longer exists since 1.21.2, network recipe data was rewritten.
+ */
+@ApiStatus.Obsolete
 public class StoneCuttingRecipeData implements RecipeData {
 
     private final String group;

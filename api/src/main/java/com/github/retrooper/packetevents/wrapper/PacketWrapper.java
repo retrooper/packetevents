@@ -90,6 +90,7 @@ import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.KnownPack;
+import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
@@ -466,8 +467,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         if (count <= 0) {
             return ItemStack.EMPTY;
         }
-        ClientVersion version = this.serverVersion.toClientVersion();
-        ItemType itemType = this.readMappedEntity(ItemTypes::getById);
+        ItemType itemType = this.readMappedEntity(ItemTypes.getRegistry());
 
         // read component patch counts
         int presentCount = this.readVarInt();
@@ -479,11 +479,11 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         PatchableComponentMap components = new PatchableComponentMap(
                 itemType.getComponents(), new HashMap<>(4));
         for (int i = 0; i < presentCount; i++) {
-            ComponentType<?> type = ComponentTypes.getById(version, this.readVarInt());
+            ComponentType<?> type = this.readMappedEntity(ComponentTypes.getRegistry());
             components.set((ComponentType<Object>) type, type.read(this));
         }
         for (int i = 0; i < absentCount; i++) {
-            components.unset(ComponentTypes.getById(version, this.readVarInt()));
+            components.unset(this.readMappedEntity(ComponentTypes.getRegistry()));
         }
 
         return ItemStack.builder().type(itemType).amount(count).components(components).build();
@@ -1546,6 +1546,38 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         }
         int id = entity.getId(this.serverVersion.toClientVersion());
         this.writeVarInt(id + 1);
+    }
+
+    public int readContainerId() {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            return this.readVarInt();
+        }
+        return this.readUnsignedByte();
+    }
+
+    public void writeContainerId(int containerId) {
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            this.writeVarInt(containerId);
+        } else {
+            this.writeByte(containerId);
+        }
+    }
+
+    public void writeRotation(float rotation) {
+        this.writeByte((byte) MathUtil.floor(rotation * 256f / 360f));
+    }
+
+    public float readRotation() {
+        return (float) (this.readByte() * 360) / 256f;
+    }
+
+    public @Nullable Integer readNullableVarInt() {
+        int i = this.readVarInt();
+        return i == 0 ? null : i - 1;
+    }
+
+    public void writeNullableVarInt(@Nullable Integer i) {
+        this.writeVarInt(i == null ? 0 : i + 1);
     }
 
     @FunctionalInterface

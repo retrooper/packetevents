@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Objects;
 
@@ -97,6 +98,19 @@ public class Vector3d {
         } else {
             z = 0;
         }
+    }
+
+    public static Vector3d read(PacketWrapper<?> wrapper) {
+        double x = wrapper.readDouble();
+        double y = wrapper.readDouble();
+        double z = wrapper.readDouble();
+        return new Vector3d(x, y, z);
+    }
+
+    public static void write(PacketWrapper<?> wrapper, Vector3d vector) {
+        wrapper.writeDouble(vector.x);
+        wrapper.writeDouble(vector.y);
+        wrapper.writeDouble(vector.z);
     }
 
     public double getX() {
