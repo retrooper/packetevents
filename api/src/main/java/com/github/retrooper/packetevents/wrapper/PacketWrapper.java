@@ -467,8 +467,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         if (count <= 0) {
             return ItemStack.EMPTY;
         }
-        ClientVersion version = this.serverVersion.toClientVersion();
-        ItemType itemType = this.readMappedEntity(ItemTypes::getById);
+        ItemType itemType = this.readMappedEntity(ItemTypes.getRegistry());
 
         // read component patch counts
         int presentCount = this.readVarInt();
@@ -480,11 +479,11 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         PatchableComponentMap components = new PatchableComponentMap(
                 itemType.getComponents(), new HashMap<>(4));
         for (int i = 0; i < presentCount; i++) {
-            ComponentType<?> type = ComponentTypes.getById(version, this.readVarInt());
+            ComponentType<?> type = this.readMappedEntity(ComponentTypes.getRegistry());
             components.set((ComponentType<Object>) type, type.read(this));
         }
         for (int i = 0; i < absentCount; i++) {
-            components.unset(ComponentTypes.getById(version, this.readVarInt()));
+            components.unset(this.readMappedEntity(ComponentTypes.getRegistry()));
         }
 
         return ItemStack.builder().type(itemType).amount(count).components(components).build();
