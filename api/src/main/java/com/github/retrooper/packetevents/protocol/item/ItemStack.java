@@ -512,7 +512,7 @@ public class ItemStack {
             int maxAmount = getType().getMaxAmount();
             return "ItemStack[type=" + identifier + ", amount=" + amount + "/" + maxAmount
                     + ", nbt tag names: " + (nbt != null ? nbt.getTagNames() : "[null]")
-                    + ", legacyData=" + legacyData + ", components=" + components + "]";
+                    + ", legacyData=" + legacyData + ", components=" + (components != null ? components.getPatches() : null) + "]";
         }
     }
 

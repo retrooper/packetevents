@@ -143,8 +143,7 @@ public class SpigotPacketEventsBuilder {
 
                     Metrics metrics = new Metrics((JavaPlugin) plugin, 11327);
                     //Just to have an idea of which versions of packetevents people use
-                    metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> getVersion().toString()));
-
+                    metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> getVersion().toStringWithoutSnapshot()));
                     Bukkit.getPluginManager().registerEvents(new InternalBukkitListener(plugin), plugin);
 
                     if (lateBind) {

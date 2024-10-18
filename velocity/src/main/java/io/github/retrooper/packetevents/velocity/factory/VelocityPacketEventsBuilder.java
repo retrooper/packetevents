@@ -220,9 +220,10 @@ public class VelocityPacketEventsBuilder {
                     Object instance = plugin.getInstance().orElse(null);
                     if (instance != null) {
                         Metrics metrics = Metrics.createInstance(plugin, server, logger, dataDirectory, 11327);
+
                         //Just to have an idea of which versions of packetevents people use
                         metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
-                            return getVersion().toString();
+                            return getVersion().toStringWithoutSnapshot();
                         }));
                     }
 

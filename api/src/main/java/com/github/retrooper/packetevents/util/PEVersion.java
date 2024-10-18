@@ -271,12 +271,23 @@ public class PEVersion implements Comparable<PEVersion> {
 
     /**
      * Converts the {@link PEVersion} to a string representation.
+     * If this is a stable release, the snapshot and the commit will not be included in the representation.
      *
-     * @return a string representation of the version.
+     * @return string representation of the version.
      */
     @Override
     public String toString() {
         return major + "." + minor + "." + patch + (snapshot && snapshotCommit != null ? ("+" + snapshotCommit + "-SNAPSHOT") : "");
+    }
+
+    /**
+     * Converts the {@link PEVersion} to a string representation with guarantee that it will not have the commit attached to it.
+     * Useful for accessing the string representation for metrics
+     * as detailed information, such as the commit, is not required.
+     * @return guaranteed string representation without commit.
+     */
+    public String toStringWithoutSnapshot() {
+        return major + "." + minor + "." + patch;
     }
 
     /**

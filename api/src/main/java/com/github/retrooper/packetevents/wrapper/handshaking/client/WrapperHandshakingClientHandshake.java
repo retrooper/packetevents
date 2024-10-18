@@ -162,8 +162,10 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
         switch (nextConnectionState) {
             case LOGIN:
                 this.intention = ConnectionIntention.LOGIN;
+                break;
             case STATUS:
                 this.intention = ConnectionIntention.STATUS;
+                break;
             default:
                 throw new IllegalArgumentException("Illegal next connection state: " + nextConnectionState);
         }

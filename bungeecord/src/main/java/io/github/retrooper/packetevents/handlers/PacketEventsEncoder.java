@@ -27,15 +27,30 @@ import io.github.retrooper.packetevents.injector.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.EncoderException;
+import io.netty.util.Recycler;
+import io.netty.util.ReferenceCountUtil;
+import io.netty.util.concurrent.PromiseCombiner;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 // Thanks to ViaVersion for the compression method.
 @ChannelHandler.Sharable
-public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
+public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
+
+    private static final Recycler<OutList> OUT_LIST_RECYCLER = new Recycler<OutList>() {
+        @Override
+        protected OutList newObject(Handle<OutList> handle) {
+            return new OutList(handle);
+        }
+    };
+
     public ProxiedPlayer player;
     public User user;
     public boolean handledCompression;
@@ -44,7 +59,7 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
         this.user = user;
     }
 
-    public void read(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
+    public void read(ChannelHandlerContext ctx, ByteBuf buffer, ChannelPromise promise) throws Exception {
         boolean doCompression = handleCompressionOrder(ctx, buffer);
         int firstReaderIndex = buffer.readerIndex();
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player,
@@ -56,15 +71,16 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
                 ByteBufHelper.clear(packetSendEvent.getByteBuf());
                 packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
                 packetSendEvent.getLastUsedWrapper().write();
-            }
-            else {
+            } else {
                 buffer.readerIndex(firstReaderIndex);
             }
             if (doCompression) {
-                recompress(ctx, buffer);
+                this.recompress(ctx, buffer, promise);
+            } else {
+                ctx.write(buffer, promise);
             }
         } else {
-            ByteBufHelper.clear(packetSendEvent.getByteBuf());
+            ReferenceCountUtil.release(packetSendEvent.getByteBuf());
         }
         if (packetSendEvent.hasPostTasks()) {
             for (Runnable task : packetSendEvent.getPostTasks()) {
@@ -74,17 +90,17 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
-        if (!msg.isReadable()) {
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        if (!(msg instanceof ByteBuf)) {
+            super.write(ctx, msg, promise);
             return;
         }
-        read(ctx, msg);
-        out.writeBytes(msg);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+        ByteBuf buf = (ByteBuf) msg;
+        if (!buf.isReadable()) {
+            buf.release();
+        } else {
+            this.read(ctx, buf, promise);
+        }
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {
@@ -123,18 +139,43 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
         return false;
     }
 
-    private void recompress(ChannelHandlerContext ctx, ByteBuf buffer) {
-        ChannelHandler compressor = ctx.pipeline().get("compress");
-        ByteBuf compressed = ctx.alloc().buffer();
+    private void recompress(ChannelHandlerContext ctx, ByteBuf buffer, ChannelPromise promise) {
+        OutList outWrapper = OUT_LIST_RECYCLER.get();
+        List<Object> out = outWrapper.list;
         try {
-            CustomPipelineUtil.callPacketEncodeByteBuf(compressor, ctx, buffer, compressed);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        try {
-            buffer.clear().writeBytes(compressed);
+            ChannelHandler compressor = ctx.pipeline().get("compress");
+            CustomPipelineUtil.callPacketEncodeByteBuf(compressor, ctx, buffer, out);
+
+            int len = out.size();
+            if (len == 1) {
+                // should be the only case which
+                // happens on vanilla bungeecord
+                ctx.write(out.get(0), promise);
+            } else {
+                // copied from MessageToMessageEncoder#writePromiseCombiner
+                PromiseCombiner combiner = new PromiseCombiner(ctx.executor());
+                for (int i = 0; i < len; i++) {
+                    combiner.add(ctx.write(out.get(i)));
+                }
+                combiner.finish(promise);
+            }
+        } catch (InvocationTargetException exception) {
+            throw new EncoderException("Error while recompressing bytebuf " + buffer.readableBytes(), exception);
         } finally {
-            compressed.release();
+            out.clear();
+            outWrapper.handle.recycle(outWrapper);
+            buffer.release();
+        }
+    }
+
+    private static final class OutList {
+
+        // the default bungee compressor only produces one output bytebuf
+        private final List<Object> list = new ArrayList<>(1);
+        private final Recycler.Handle<OutList> handle;
+
+        public OutList(Recycler.Handle<OutList> handle) {
+            this.handle = handle;
         }
     }
 }

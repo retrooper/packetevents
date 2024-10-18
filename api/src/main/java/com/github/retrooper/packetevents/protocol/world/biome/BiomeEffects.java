@@ -164,6 +164,18 @@ public class BiomeEffects {
         return this.ambientSound;
     }
 
+    public Optional<MoodSettings> getMoodSound() {
+        return this.moodSound;
+    }
+
+    public Optional<MusicSettings> getMusic() {
+        return this.music;
+    }
+
+    public Optional<AdditionsSettings> getAdditionsSound() {
+        return this.additionsSound;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

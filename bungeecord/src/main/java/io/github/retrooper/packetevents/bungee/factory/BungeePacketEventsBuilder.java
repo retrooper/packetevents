@@ -178,7 +178,7 @@ public class BungeePacketEventsBuilder {
                 protected void log(Level level, @Nullable NamedTextColor color, String message) {
                     // First we must strip away the color codes that might be in this message
                     message = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
-                    System.out.println(message);
+                    ProxyServer.getInstance().getLogger().info(message);
                     // TODO: Remove "[com.github.retrooper.packetevents.PacketEventsAPI]:" From logger
                     // PacketEvents.getAPI().getLogger().log(level, color != null ? (color.toString()) : "" + message);
                 }
@@ -226,7 +226,7 @@ public class BungeePacketEventsBuilder {
                     Metrics metrics = new Metrics(plugin, 11327);
                     //Just to have an idea of which versions of packetevents people use
                     metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
-                        return getVersion().toString();
+                        return getVersion().toStringWithoutSnapshot();
                     }));
 
                     PacketType.Play.Client.load();

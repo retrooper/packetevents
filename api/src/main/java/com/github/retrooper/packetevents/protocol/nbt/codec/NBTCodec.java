@@ -151,6 +151,10 @@ public class NBTCodec {
 
     public static NBT readNBTFromBuffer(Object byteBuf, ServerVersion serverVersion) {
         NBTLimiter limiter = NBTLimiter.forBuffer(byteBuf);
+        return readNBTFromBuffer(byteBuf, serverVersion, limiter);
+    }
+
+    public static NBT readNBTFromBuffer(Object byteBuf, ServerVersion serverVersion, NBTLimiter limiter) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try {
                 final boolean named = serverVersion.isOlderThan(ServerVersion.V_1_20_2);

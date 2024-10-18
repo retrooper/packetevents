@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.util.protocolsupport;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import protocolsupport.api.ProtocolSupportAPI;
@@ -30,7 +31,8 @@ public class ProtocolSupportUtil {
     public static boolean isAvailable() {
         if (available == ProtocolSupportState.UNKNOWN) {
             try {
-                Class.forName("protocolsupport.api.ProtocolSupportAPI");
+                ClassLoader classLoader = PacketEvents.getAPI().getPlugin().getClass().getClassLoader();
+                classLoader.loadClass("protocolsupport.api.ProtocolSupportAPI");
                 available = ProtocolSupportState.ENABLED;
                 return true;
             } catch (Exception e) {
