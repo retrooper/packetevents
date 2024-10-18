@@ -16,18 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.recipe;
+package com.github.retrooper.packetevents.protocol.recipe.category;
 
-import org.jetbrains.annotations.ApiStatus;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 
-/**
- * <strong>WARNING:</strong> Replaced with {@link com.github.retrooper.packetevents.protocol.recipe.category.RecipeBookCategories} since 1.21.2.
- */
-@ApiStatus.Obsolete
-public enum CraftingCategory {
-
-    BUILDING,
-    REDSTONE,
-    EQUIPMENT,
-    MISC,
+public interface RecipeBookCategory extends MappedEntity {
 }

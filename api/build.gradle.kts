@@ -83,6 +83,8 @@ mappingCompression {
         compress("item/item_potion_mappings.json")
         compress("item/item_trim_material_mappings.json")
         compress("item/item_trim_pattern_mappings.json")
+        compress("item/recipe_book_category.json")
+        compress("item/recipe_display_types.json")
         compress("item/recipe_serializer_mappings.json")
 
         compress("particle/particle_type_mappings.json")

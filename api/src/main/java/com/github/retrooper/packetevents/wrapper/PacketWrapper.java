@@ -1571,6 +1571,15 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         return (float) (this.readByte() * 360) / 256f;
     }
 
+    public @Nullable Integer readNullableVarInt() {
+        int i = this.readVarInt();
+        return i == 0 ? null : i - 1;
+    }
+
+    public void writeNullableVarInt(@Nullable Integer i) {
+        this.writeVarInt(i == null ? 0 : i + 1);
+    }
+
     @FunctionalInterface
     public interface Reader<T> extends Function<PacketWrapper<?>, T> {
     }
