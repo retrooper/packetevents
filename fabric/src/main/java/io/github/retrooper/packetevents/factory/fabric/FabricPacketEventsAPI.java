@@ -30,6 +30,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
+import io.github.retrooper.packetevents.LazyHolder;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import net.fabricmc.api.EnvType;
@@ -42,6 +43,9 @@ import java.util.Locale;
 public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("PacketEvents");
+    // TODO, refactor if booky and retrooper approve, bad design having settable static field, exists to maintain
+    // 100% backward compatability
+    public static LazyHolder<PlayerManagerAbstract> staticLazyPlayerManagerHolder = () -> null;
 
     private final String modId;
     private final EnvType environment;
@@ -49,7 +53,7 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
 
     private final ProtocolManager protocolManager;
     private final ServerManager serverManager;
-    private final PlayerManagerAbstract playerManager;
+    private final LazyHolder<PlayerManagerAbstract> playerManager;
     private final ChannelInjector injector;
     private final NettyManager nettyManager = new NettyManagerImpl();
     private final LogManager logManager = new FabricLogger(LOGGER);
@@ -69,16 +73,12 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
 
         this.protocolManager = new FabricProtocolManager(environment);
         this.serverManager = this.constructServerManager();
-        this.playerManager = this.constructPlayerManager();
+        this.playerManager = null;
         this.injector = new FabricChannelInjector(environment);
     }
 
     protected ServerManager constructServerManager() {
         return new FabricServerManager();
-    }
-
-    protected PlayerManagerAbstract constructPlayerManager() {
-        return new FabricPlayerManager();
     }
 
     @Override
@@ -167,7 +167,7 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
 
     @Override
     public PlayerManager getPlayerManager() {
-        return this.playerManager;
+        return staticLazyPlayerManagerHolder.get();
     }
 
     @Override
