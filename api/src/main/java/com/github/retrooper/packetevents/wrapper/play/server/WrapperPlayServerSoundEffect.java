@@ -136,6 +136,18 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         seed = wrapper.seed;
     }
 
+    public double getX() {
+        return effectPosition.x / 8.0F;
+    }
+
+    public double getY() {
+        return effectPosition.y / 8.0F;
+    }
+
+    public double getZ() {
+        return effectPosition.z / 8.0F;
+    }
+
     public Sound getSound() {
         return this.sound;
     }
@@ -163,6 +175,11 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         this.soundCategory = soundCategory;
     }
 
+    /**
+     * Note, this effect position will be multiplied by 8, use .getX() .getY() .getZ() for the correct coordinates
+     *
+     * @return raw effect position
+     */
     public Vector3i getEffectPosition() {
         return effectPosition;
     }
