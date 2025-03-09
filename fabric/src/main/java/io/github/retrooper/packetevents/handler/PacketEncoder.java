@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.exception.CancelPacketException;
 import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
@@ -57,6 +58,8 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
     public Player player;
     private ChannelPromise promise;
     private boolean handledCompression;
+    private final boolean isPre1_20_5 = PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(
+        ServerVersion.V_1_20_5);
 
     public PacketEncoder(PacketSide side, User user) {
         this.side = side;
@@ -109,7 +112,11 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
             in.release();
             throw CancelPacketException.INSTANCE;
         } else {
-            this.read(ctx, in, promise);
+            if (isPre1_20_5) {
+                this.read(ctx, in, promise);
+            } else {
+                ctx.write(in, promise);
+            }
         }
     }
 
@@ -224,7 +231,7 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private void decompress(ChannelPipeline pipe, ByteBuf buffer) {
-        ChannelHandler decompressor = pipe.get("decompress");
+        CompressionDecoder decompressor = (CompressionDecoder) pipe.get("decompress");
         ChannelHandlerContext decompressorCtx = pipe.context("decompress");
 
         ByteBuf decompressed = null;
