@@ -81,7 +81,7 @@ public class FabricCustomPipelineUtil {
         }
     }
 
-    public static List<Object> callPacketDecodeByteBuf(Object decoder, ChannelHandlerContext ctx, ByteBuf msg) throws InvocationTargetException {
+    public static List<Object> callPacketDecodeByteBuf(CompressionDecoder decoder, ChannelHandlerContext ctx, ByteBuf msg) throws InvocationTargetException {
         List<Object> output = new ArrayList<>(1);
         try {
             FABRIC_PACKET_DECODE_BYTEBUF.invokeExact(decoder, ctx, msg, output);
