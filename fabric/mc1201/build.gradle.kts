@@ -19,7 +19,7 @@ dependencies {
     implementation(libs.bundles.adventure)
     implementation(project(":api"))
     implementation(project(":netty-common"))
-    implementation(project(":fabric"))
+    implementation(project(":fabric", configuration = "namedElements"))
 
     // To change the versions, see the gradle.properties file
     minecraft("com.mojang:minecraft:$minecraft_version")
