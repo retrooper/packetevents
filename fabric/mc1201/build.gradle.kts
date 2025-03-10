@@ -38,19 +38,12 @@ tasks {
             options.release = targetJavaVersion
         }
     }
-
-    processResources {
-        inputs.property("version", project.version)
-        filesMatching(listOf("fabric.mod.json")) {
-            expand("version" to project.version)
-        }
-    }
 }
 
 loom {
     splitEnvironmentSourceSets()
     mods {
-        register("packetevents") {
+        register("packetevents-mc1201") {
             sourceSet(sourceSets.main.get())
             sourceSet(sourceSets.maybeCreate("client"))
         }
