@@ -37,6 +37,17 @@ dependencies {
     compileOnly(libs.via.version)
 }
 
+subprojects {
+    afterEvaluate {
+        tasks.processResources {
+            inputs.property("version", project.version)
+            filesMatching("fabric.mod.json") {
+                expand("version" to project.version)
+            }
+        }
+    }
+}
+
 tasks {
     withType<JavaCompile> {
         val targetJavaVersion = 17
