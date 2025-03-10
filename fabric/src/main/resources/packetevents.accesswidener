@@ -1,5 +1,4 @@
-accessWidener v1 named
-
+accessWidener v2 named
 
 # fields
 accessible field net/minecraft/network/Connection channel Lio/netty/channel/Channel;
