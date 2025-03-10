@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.handler;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import io.github.retrooper.packetevents.util.FabricInjectionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -52,5 +53,19 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         if (msg.isReadable()) {
             out.add(msg.retain());
         }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        boolean kryptonReorder = false;
+        switch (evt.toString()) {
+            case "COMPRESSION_THRESHOLD_UPDATED":
+            case "COMPRESSION_ENABLED":
+                kryptonReorder = true;
+        }
+        if (evt.getClass().getName().equals("com.viaversion.fabric.common.handler.PipelineReorderEvent") || kryptonReorder) {
+            FabricInjectionUtil.reorderHandlers(ctx);
+        }
+        super.userEventTriggered(ctx, evt);
     }
 }

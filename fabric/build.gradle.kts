@@ -5,6 +5,7 @@ plugins {
 
 repositories {
     maven("https://repo.codemc.io/repository/maven-snapshots/")
+    maven("https://repo.viaversion.com/")
     maven {
         name = "ParchmentMC"
         url = uri("https://maven.parchmentmc.org")
@@ -33,6 +34,7 @@ dependencies {
     })
 
     modImplementation("net.fabricmc:fabric-loader:$loader_version")
+    compileOnly(libs.via.version)
 }
 
 tasks {

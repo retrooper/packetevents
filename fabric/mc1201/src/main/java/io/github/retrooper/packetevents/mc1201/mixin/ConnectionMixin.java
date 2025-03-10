@@ -84,8 +84,8 @@ public class ConnectionMixin {
             return;
         }
 
-        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoder(apiSide, user));
-        channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, new PacketEncoder(apiSide, user));
+        channel.pipeline().addBefore("decoder", PacketEvents.DECODER_NAME, new PacketDecoder(apiSide, user));
+        channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoder(apiSide, user));
         channel.closeFuture().addListener((ChannelFutureListener) future ->
                 PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
     }

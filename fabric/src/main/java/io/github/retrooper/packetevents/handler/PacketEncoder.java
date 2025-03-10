@@ -108,8 +108,7 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
         handlePacket(ctx, in, promise);
 
         // Check for empty packets last (matches Spigot)
-        if (!in.isReadable()) {
-            in.release();
+        if (!ByteBufHelper.isReadable(in)) {
             throw CancelPacketException.INSTANCE;
         } else {
             if (isPre1_20_5) {

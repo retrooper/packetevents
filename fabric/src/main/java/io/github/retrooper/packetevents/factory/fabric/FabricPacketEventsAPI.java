@@ -33,6 +33,7 @@ import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.LazyHolder;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
+import io.github.retrooper.packetevents.manager.InternalFabricPacketListener;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
@@ -98,7 +99,7 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
 
         // register internal packet listener (should be the first listener)
         // this listener doesn't do any modifications to the packets, just reads data
-        this.getEventManager().registerListener(new InternalPacketListener());
+        this.getEventManager().registerListener(new InternalFabricPacketListener());
         this.loaded = true;
     }
 
