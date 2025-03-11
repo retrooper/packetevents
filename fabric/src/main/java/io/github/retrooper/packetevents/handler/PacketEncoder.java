@@ -122,7 +122,7 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
     private @Nullable ProtocolPacketEvent handlePacket(ChannelHandlerContext ctx, ByteBuf buffer, ChannelPromise promise) throws Exception {
         // Process the packet using PacketEventsImplHelper (similar to Spigot)
         ProtocolPacketEvent protocolPacketEvent = PacketEventsImplHelper.handlePacket(
-            ctx.channel(), this.user, this.player, buffer, false, this.side
+            ctx.channel(), this.user, this.player, buffer, true, this.side
         );
 
         // Execute post-send tasks (required for cross-platform support)
