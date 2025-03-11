@@ -26,6 +26,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import java.util.Arrays;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -49,7 +50,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
             return;
         }
         PacketEventsImplHelper.handlePacket(ctx.channel(), this.user, this.player,
-                msg, false, this.side);
+                msg, true, this.side);
         if (msg.isReadable()) {
             out.add(msg.retain());
         }

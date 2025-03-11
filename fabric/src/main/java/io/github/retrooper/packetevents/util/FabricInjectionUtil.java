@@ -101,7 +101,6 @@ public class FabricInjectionUtil {
             }
         }
 
-        // Log the pipeline for debugging
         PacketEvents.getAPI().getLogManager().debug("Pipeline after reorder: " + pipeline.names());
     }
 }
