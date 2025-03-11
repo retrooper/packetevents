@@ -70,7 +70,7 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
         ChannelHandlerContext ctx = this.tryFixCompressorOrder(originalCtx, buffer);
         int firstReaderIndex = buffer.readerIndex();
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player,
-            buffer, false);
+            buffer, true);
         int readerIndex = buffer.readerIndex();
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> buffer.readerIndex(readerIndex));
         if (!packetSendEvent.isCancelled()) {
