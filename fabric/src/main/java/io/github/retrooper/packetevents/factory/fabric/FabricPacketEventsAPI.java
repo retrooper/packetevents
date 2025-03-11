@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
+import com.github.retrooper.packetevents.manager.registry.RegistryManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -34,6 +35,7 @@ import io.github.retrooper.packetevents.LazyHolder;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.manager.InternalFabricPacketListener;
+import io.github.retrooper.packetevents.manager.registry.FabricRegistryManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
@@ -58,6 +60,7 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
     private final ChannelInjector injector;
     private final NettyManager nettyManager = new NettyManagerImpl();
     private final LogManager logManager = new FabricLogger(LOGGER);
+    private final RegistryManager registryManager = new FabricRegistryManager();
 
     private boolean loaded;
     private boolean initialized;
@@ -184,5 +187,10 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
     @Override
     public NettyManager getNettyManager() {
         return this.nettyManager;
+    }
+
+    @Override
+    public RegistryManager getRegistryManager() {
+        return this.registryManager;
     }
 }

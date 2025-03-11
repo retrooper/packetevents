@@ -22,8 +22,11 @@ import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
+import com.github.retrooper.packetevents.manager.registry.ItemRegistry;
+import com.github.retrooper.packetevents.manager.registry.RegistryManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
+import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
@@ -32,6 +35,7 @@ import com.github.retrooper.packetevents.util.PEVersions;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 
 import java.util.logging.Logger;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class PacketEventsAPI<T> {
     private final EventManager eventManager = new EventManager();
@@ -88,4 +92,18 @@ public abstract class PacketEventsAPI<T> {
     public abstract NettyManager getNettyManager();
 
     public abstract ChannelInjector getInjector();
+
+    public RegistryManager getRegistryManager() {
+        return new RegistryManager() {
+            @Override
+            public ItemRegistry getItemRegistry() {
+                return new ItemRegistry() {
+                    @Override
+                    public @Nullable ItemType getByName(String name) {
+                        return null;
+                    }
+                };
+            }
+        };
+    }
 }
