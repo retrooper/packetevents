@@ -23,19 +23,25 @@ import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.FakeChannelUtil;
+import io.github.retrooper.packetevents.util.FabricInjectionUtil;
 import io.netty.channel.Channel;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerList.class)
-public class PlayerListMixin {
+public abstract class PlayerListMixin {
+
+    @Shadow public abstract void sendAllPlayerInfo(ServerPlayer player);
+
+    @Shadow public abstract void placeNewPlayer(Connection netManager, ServerPlayer player);
 
     /**
      * @reason Associate connection instance with player instance
@@ -66,22 +72,7 @@ public class PlayerListMixin {
         Connection connection, ServerPlayer player,
         CallbackInfo ci
     ) {
-        PacketEventsAPI<?> api = PacketEvents.getAPI();
-
-        User user = api.getPlayerManager().getUser(player);
-        if (user == null) {
-            Object channelObj = api.getPlayerManager().getChannel(player);
-
-            // Check if it's a fake connection
-            if (!FakeChannelUtil.isFakeChannel(channelObj) &&
-                (!api.isTerminated() || api.getSettings().isKickIfTerminated())) {
-                // Kick the player if they're not a fake player
-                player.connection.disconnect(Component.literal("PacketEvents 2.0 failed to inject"));
-            }
-            return;
-        }
-
-        api.getEventManager().callEvent(new UserLoginEvent(user, player));
+        FabricInjectionUtil.fireUserLoginEvent(player);
     }
 
     /**

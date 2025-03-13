@@ -11,17 +11,11 @@
   "license": "GPL-3.0",
   "environment": "*",
   "entrypoints": {
-    "pePreLaunchClient": [
-      "io.github.retrooper.packetevents.mc1201.PacketEventsClientMod"
+    "mainChainLoad": [
+      "io.github.retrooper.packetevents.mc1201.Fabric1201ChainLoadEntrypoint"
     ],
-    "pePreLaunchServer": [
-      "io.github.retrooper.packetevents.mc1201.PacketEventsServerMod"
-    ],
-    "preLaunch": [
-      "io.github.retrooper.packetevents.mc1201.PacketEventsMod"
-    ],
-    "main": [
-      "io.github.retrooper.packetevents.mc1201.PacketEventsMod"
+    "clientChainLoad": [
+      "io.github.retrooper.packetevents.mc1201.Fabric1201ClientChainLoadEntrypoint"
     ]
   },
   "mixins": [

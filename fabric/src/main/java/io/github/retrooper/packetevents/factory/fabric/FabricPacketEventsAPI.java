@@ -30,14 +30,11 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
-import io.github.retrooper.packetevents.LazyHolder;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
-import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.manager.FabricLogger;
 import io.github.retrooper.packetevents.manager.FabricProtocolManager;
 import io.github.retrooper.packetevents.manager.FabricServerManager;
 import io.github.retrooper.packetevents.manager.InternalFabricPacketListener;
-import io.github.retrooper.packetevents.manager.registry.FabricRegistryManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
@@ -48,9 +45,6 @@ import java.util.Locale;
 public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("PacketEvents");
-    // TODO, refactor if booky and retrooper approve, bad design having settable static field, exists to maintain
-    // 100% backward compatability
-    public static LazyHolder<PlayerManagerAbstract> staticLazyPlayerManagerHolder = () -> null;
 
     private final String modId;
     private final EnvType environment;
@@ -58,11 +52,9 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
 
     private final ProtocolManager protocolManager;
     private final ServerManager serverManager;
-    private final LazyHolder<PlayerManagerAbstract> playerManager;
     private final ChannelInjector injector;
     private final NettyManager nettyManager = new NettyManagerImpl();
     private final LogManager logManager = new FabricLogger(LOGGER);
-    private final RegistryManager registryManager = new FabricRegistryManager();
 
     private boolean loaded;
     private boolean initialized;
@@ -79,7 +71,6 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
 
         this.protocolManager = new FabricProtocolManager(environment);
         this.serverManager = this.constructServerManager();
-        this.playerManager = null;
         this.injector = new FabricChannelInjector(environment);
     }
 
@@ -173,7 +164,7 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
 
     @Override
     public PlayerManager getPlayerManager() {
-        return staticLazyPlayerManagerHolder.get();
+        return FabricPacketEventsAPIManagerFactory.getLazyPlayerManagerHolder().get();
     }
 
     @Override
@@ -193,6 +184,6 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
 
     @Override
     public RegistryManager getRegistryManager() {
-        return this.registryManager;
+        return FabricPacketEventsAPIManagerFactory.getLazyRegistryManagerHolder().get();
     }
 }

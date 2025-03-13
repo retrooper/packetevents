@@ -41,7 +41,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(net.minecraft.network.Connection.class)
+@Mixin(value = net.minecraft.network.Connection.class, priority = 1500) // priority to inject after Via
 public class ConnectionMixin {
 
     @Inject(

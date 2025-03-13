@@ -1,13 +1,16 @@
 package io.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
+import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.handler.PacketDecoder;
 import io.github.retrooper.packetevents.handler.PacketEncoder;
@@ -17,7 +20,9 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import net.minecraft.SharedConstants;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.server.level.ServerPlayer;
 
 public class FabricInjectionUtil {
     private static final String VIA_DECODER_NAME = "via-decoder";
@@ -102,5 +107,24 @@ public class FabricInjectionUtil {
         }
 
         PacketEvents.getAPI().getLogManager().debug("Pipeline after reorder: " + pipeline.names());
+    }
+
+    public static void fireUserLoginEvent(ServerPlayer player) {
+        PacketEventsAPI<?> api = PacketEvents.getAPI();
+
+        User user = api.getPlayerManager().getUser(player);
+        if (user == null) {
+            Object channelObj = api.getPlayerManager().getChannel(player);
+
+            // Check if it's a fake connection
+            if (!FakeChannelUtil.isFakeChannel(channelObj) &&
+                    (!api.isTerminated() || api.getSettings().isKickIfTerminated())) {
+                // Kick the player if they're not a fake player
+                player.connection.disconnect(Component.literal("PacketEvents 2.0 failed to inject"));
+            }
+            return;
+        }
+
+        api.getEventManager().callEvent(new UserLoginEvent(user, player));
     }
 }

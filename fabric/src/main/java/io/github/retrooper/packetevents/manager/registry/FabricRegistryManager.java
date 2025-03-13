@@ -1,13 +1,20 @@
 package io.github.retrooper.packetevents.manager.registry;
 
+import com.github.retrooper.packetevents.manager.registry.ItemRegistry;
 import com.github.retrooper.packetevents.manager.registry.RegistryManager;
 
 public class FabricRegistryManager implements RegistryManager {
 
-    private final FabricItemRegistry fabricItemRegistry = new FabricItemRegistry();
+    private final ItemRegistry fabricItemRegistry;
+
+    public FabricRegistryManager(
+            ItemRegistry fabricItemRegistry
+    ) {
+        this.fabricItemRegistry = fabricItemRegistry;
+    }
 
     @Override
-    public FabricItemRegistry getItemRegistry() {
+    public ItemRegistry getItemRegistry() {
         return fabricItemRegistry;
     }
 }

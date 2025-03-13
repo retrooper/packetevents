@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents;
+package io.github.retrooper.packetevents.util;
 
 import java.util.function.Supplier;
 

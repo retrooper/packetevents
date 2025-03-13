@@ -6,6 +6,7 @@ plugins {
 repositories {
     maven("https://repo.codemc.io/repository/maven-snapshots/")
     maven("https://repo.viaversion.com/")
+    maven("https://jitpack.io") // Conditional Mixin
     maven {
         name = "ParchmentMC"
         url = uri("https://maven.parchmentmc.org")
@@ -34,6 +35,7 @@ dependencies {
     })
 
     modImplementation("net.fabricmc:fabric-loader:$loader_version")
+    modImplementation("com.github.Fallen-Breath.conditional-mixin:conditional-mixin-fabric:0.6.4")
     compileOnly(libs.via.version)
 }
 
