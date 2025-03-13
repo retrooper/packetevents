@@ -20,7 +20,7 @@ public class ChainLoadData {
     }
 
     public void setPlayerManagerIfNull(LazyHolder<PlayerManagerAbstract> playerManagerAbstractLazyHolder) {
-        if (playerManagerAbstractLazyHolder == null) {
+        if (this.playerManagerAbstractLazyHolder == null) {
             this.playerManagerAbstractLazyHolder = playerManagerAbstractLazyHolder;
         }
     }

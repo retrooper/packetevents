@@ -46,7 +46,6 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
     @Override
     public void onPreLaunch() {
         FabricLoader loader = FabricLoader.getInstance();
-        ServerVersion currentVersion = ServerVersion.valueOf(SharedConstants.getCurrentVersion().getName());
 
         String peEntryPointName = null;
         String chainLoadEntryPointName = null;
