@@ -35,7 +35,6 @@ dependencies {
     })
 
     modImplementation("net.fabricmc:fabric-loader:$loader_version")
-    modImplementation("com.github.Fallen-Breath.conditional-mixin:conditional-mixin-fabric:0.6.4")
     compileOnly(libs.via.version)
 }
 
