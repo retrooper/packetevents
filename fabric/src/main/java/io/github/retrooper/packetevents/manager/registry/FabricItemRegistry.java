@@ -8,11 +8,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 public class FabricItemRegistry implements ItemRegistry {
 
     @Override
     public @Nullable ItemType getByName(String name) {
-        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(name));
-        return new FabricItemType(item);
+        Optional<Item> item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.tryParse(name));
+        return item.isPresent() ? new FabricItemType(item.get()) : null;
     }
 }
