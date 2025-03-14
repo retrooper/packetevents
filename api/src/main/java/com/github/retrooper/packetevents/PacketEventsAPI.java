@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents;
 
+import com.github.retrooper.packetevents.event.BaseEventManager;
 import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
@@ -34,7 +35,7 @@ import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 import java.util.logging.Logger;
 
 public abstract class PacketEventsAPI<T> {
-    private final EventManager eventManager = new EventManager();
+    private final EventManager eventManager = new BaseEventManager();
     private final PacketEventsSettings settings = new PacketEventsSettings();
     private final UpdateChecker updateChecker = new UpdateChecker();
     private final LogManager logManager = new LogManager();
