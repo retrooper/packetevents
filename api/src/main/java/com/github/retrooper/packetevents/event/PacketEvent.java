@@ -32,8 +32,9 @@ public abstract class PacketEvent implements CallableEvent {
     private final long timestamp;
 
     public PacketEvent() {
-        TimeStampMode timeStampMode = PacketEvents.getAPI().getSettings()
-                .getTimeStampMode();
+        TimeStampMode timeStampMode = PacketEvents.getAPI() == null
+                ? TimeStampMode.NANO
+                : PacketEvents.getAPI().getSettings().getTimeStampMode();
         switch (timeStampMode) {
             case MILLIS:
                 timestamp = System.currentTimeMillis();
