@@ -41,7 +41,7 @@ import java.util.logging.Level;
  *
  */
 
-public class BaseEventManager implements EventManager {
+public class BaseEventManager extends EventManager {
 
     //Using a ConcurrentHashMap is faster and more secure here, compared to Collections.synchronizedMap(new EnumMap<>(PacketListenerPriority.class))
     //This is mainly due to:

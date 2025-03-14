@@ -1,11 +1,54 @@
 package com.github.retrooper.packetevents.event;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class InheritableEventManager {
-    private ListenerStore selfStore;
+public class InheritableEventManager extends EventManager {
+
+    @Override
+    public void callEvent(PacketEvent event) {
+
+    }
+
+    @Override
+    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
+
+    }
+
+    @Override
+    public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority) {
+        return null;
+    }
+
+    @Override
+    public PacketListenerCommon registerListener(PacketListenerCommon listener) {
+        return null;
+    }
+
+    @Override
+    public PacketListenerCommon[] registerListeners(PacketListenerCommon... listeners) {
+        return new PacketListenerCommon[0];
+    }
+
+    @Override
+    public void unregisterListener(PacketListenerCommon listener) {
+
+    }
+
+    @Override
+    public void unregisterListeners(PacketListenerCommon... listeners) {
+
+    }
+
+    @Override
+    public void unregisterAllListeners() {
+
+    }
+
+    private ListenerStore store;
     /**
      * We store the listeners in a sorted manner aka:
      * 1) We sort by their priority
