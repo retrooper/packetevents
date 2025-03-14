@@ -18,10 +18,6 @@
 
 package com.github.retrooper.packetevents.event;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Abstract packet listener.
  *
@@ -30,13 +26,20 @@ import java.util.Map;
  */
 public abstract class PacketListenerCommon {
     private final PacketListenerPriority priority;
+    private final long creationTimeStamp;
 
     public PacketListenerCommon(PacketListenerPriority priority) {
         this.priority = priority;
+        this.creationTimeStamp = System.nanoTime();
     }
 
     public PacketListenerCommon() {
         this.priority = PacketListenerPriority.NORMAL;
+        this.creationTimeStamp = System.nanoTime();
+    }
+
+    public long getCreationTimeStamp() {
+        return this.creationTimeStamp;
     }
 
     public PacketListenerPriority getPriority() {
