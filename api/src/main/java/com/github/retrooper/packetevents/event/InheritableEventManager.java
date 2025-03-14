@@ -1,53 +1,15 @@
 package com.github.retrooper.packetevents.event;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 
 public class InheritableEventManager extends EventManager {
-
-    @Override
-    public void callEvent(PacketEvent event) {
-
-    }
-
-    @Override
-    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
-
-    }
-
-    @Override
-    public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority) {
-        return null;
-    }
-
-    @Override
-    public PacketListenerCommon registerListener(PacketListenerCommon listener) {
-        return null;
-    }
-
-    @Override
-    public PacketListenerCommon[] registerListeners(PacketListenerCommon... listeners) {
-        return new PacketListenerCommon[0];
-    }
-
-    @Override
-    public void unregisterListener(PacketListenerCommon listener) {
-
-    }
-
-    @Override
-    public void unregisterListeners(PacketListenerCommon... listeners) {
-
-    }
-
-    @Override
-    public void unregisterAllListeners() {
-
-    }
-
     private ListenerStore store;
     /**
      * We store the listeners in a sorted manner aka:
@@ -59,6 +21,71 @@ public class InheritableEventManager extends EventManager {
             .<PacketListenerCommon>comparingInt(listener -> listener.getPriority().ordinal())
             .thenComparingLong(PacketListenerCommon::getCreationTimeStamp)
             .thenComparingInt(System::identityHashCode);
+
+    @Override
+    public void callEvent(PacketEvent event) {
+        this.callEvent(event, null);
+    }
+
+    @Override
+    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
+        for (final PacketListenerCommon listener : this.store.get()) {
+            try {
+                event.call(listener);
+            } catch (Exception t) {
+                // ignore handshake exceptions
+                if (t.getClass() != InvalidHandshakeException.class) {
+                    PacketEvents.getAPI().getLogger().log(Level.WARNING, "PacketEvents caught an unhandled exception while calling your listener.", t);
+                }
+            }
+            if (postCallListenerAction != null) {
+                postCallListenerAction.run();
+            }
+        }
+
+        // For performance reasons, we don't want to re-encode the packet if it's not needed.
+        if (event instanceof ProtocolPacketEvent && !((ProtocolPacketEvent) event).needsReEncode()) {
+            ((ProtocolPacketEvent) event).setLastUsedWrapper(null);
+        }
+    }
+
+    @Override
+    public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority) {
+        final PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority);
+        return this.registerListener(packetListenerAbstract);
+    }
+
+    @Override
+    public PacketListenerCommon registerListener(PacketListenerCommon listener) {
+        this.registerListeners(listener);
+        return listener;
+    }
+
+    @Override
+    public PacketListenerCommon[] registerListeners(PacketListenerCommon... listeners) {
+        for (final PacketListenerCommon listener : listeners) {
+            this.store.add(listener);
+        }
+
+        return listeners;
+    }
+
+    @Override
+    public void unregisterListener(PacketListenerCommon listener) {
+        this.store.remove(listener);
+    }
+
+    @Override
+    public void unregisterListeners(PacketListenerCommon... listeners) {
+        for (final PacketListenerCommon listener : listeners) {
+            this.store.remove(listener);
+        }
+    }
+
+    @Override
+    public void unregisterAllListeners() {
+        this.store.clear();
+    }
 
     /**
      * This store is very speedy & thread safe.
@@ -78,7 +105,7 @@ public class InheritableEventManager extends EventManager {
             return this.stored.get();
         }
 
-        public void register(PacketListenerCommon listener) {
+        public void add(PacketListenerCommon listener) {
             PacketListenerCommon[] current;
             PacketListenerCommon[] modified;
 
@@ -128,6 +155,16 @@ public class InheritableEventManager extends EventManager {
             for (final PacketListenerCommon listener : this.stored.get()) {
                 listener.onUserConnect(event);
             }
+        }
+
+        public void clear() {
+            PacketListenerCommon[] current;
+            PacketListenerCommon[] modified;
+
+            do {
+                current = this.stored.get();
+                modified = null;
+            } while (!this.stored.compareAndSet(current, modified));
         }
     }
 }
