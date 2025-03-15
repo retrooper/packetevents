@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.EventManager;
+import com.github.retrooper.packetevents.event.RootEventManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -37,13 +39,7 @@ import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleSubtitle;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleText;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleTimes;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTitle;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -54,16 +50,15 @@ import java.util.Map;
 import java.util.UUID;
 
 public class User implements IRegistryHolder {
-
     private final Object channel;
+    private final UserProfile profile;
+    private final Map<ResourceLocation, IRegistry<?>> registries = new HashMap<>();
     private ConnectionState decoderState;
     private ConnectionState encoderState;
     private ClientVersion clientVersion;
-    private final UserProfile profile;
     private int entityId = -1;
-
+    private EventManager eventManager;
     private DimensionType dimensionType = DimensionTypes.OVERWORLD;
-    private final Map<ResourceLocation, IRegistry<?>> registries = new HashMap<>();
 
     public User(Object channel,
                 ConnectionState connectionState, ClientVersion clientVersion,
@@ -73,6 +68,11 @@ public class User implements IRegistryHolder {
         this.encoderState = connectionState;
         this.clientVersion = clientVersion;
         this.profile = profile;
+        this.eventManager = PacketEvents.getAPI().getEventManager();
+
+        if (this.eventManager instanceof RootEventManager) {
+            this.eventManager = ((RootEventManager) this.eventManager).getChildren(channel);
+        }
     }
 
     @ApiStatus.Internal
@@ -87,16 +87,16 @@ public class User implements IRegistryHolder {
     }
 
     public Object getChannel() {
-        return channel;
+        return this.channel;
     }
 
     public InetSocketAddress getAddress() {
-        return (InetSocketAddress) ChannelHelper.remoteAddress(channel);
+        return (InetSocketAddress) ChannelHelper.remoteAddress(this.channel);
     }
 
     public ConnectionState getConnectionState() {
-        ConnectionState decoderState = this.decoderState;
-        ConnectionState encoderState = this.encoderState;
+        final ConnectionState decoderState = this.decoderState;
+        final ConnectionState encoderState = this.encoderState;
         if (decoderState != encoderState) {
             throw new IllegalArgumentException("Can't get common connection state: " + decoderState + " != " + encoderState);
         }
@@ -129,7 +129,7 @@ public class User implements IRegistryHolder {
     }
 
     public ClientVersion getClientVersion() {
-        return clientVersion;
+        return this.clientVersion;
     }
 
     public void setClientVersion(ClientVersion clientVersion) {
@@ -137,19 +137,23 @@ public class User implements IRegistryHolder {
     }
 
     public UserProfile getProfile() {
-        return profile;
+        return this.profile;
     }
 
     public String getName() {
-        return profile.getName();
+        return this.profile.getName();
     }
 
     public UUID getUUID() {
-        return profile.getUUID();
+        return this.profile.getUUID();
+    }
+
+    public EventManager getEventManager() {
+        return this.eventManager;
     }
 
     public int getEntityId() {
-        return entityId;
+        return this.entityId;
     }
 
     public void setEntityId(int entityId) {
@@ -157,59 +161,59 @@ public class User implements IRegistryHolder {
     }
 
     public void sendPacket(Object buffer) {
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, buffer);
+        PacketEvents.getAPI().getProtocolManager().sendPacket(this.channel, buffer);
     }
 
     public void sendPacket(PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, wrapper);
+        PacketEvents.getAPI().getProtocolManager().sendPacket(this.channel, wrapper);
     }
 
     public void sendPacketSilently(Object buffer) {
-        PacketEvents.getAPI().getProtocolManager().sendPacketSilently(channel, buffer);
+        PacketEvents.getAPI().getProtocolManager().sendPacketSilently(this.channel, buffer);
     }
 
     public void sendPacketSilently(PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().sendPacketSilently(channel, wrapper);
+        PacketEvents.getAPI().getProtocolManager().sendPacketSilently(this.channel, wrapper);
     }
 
     public void writePacket(Object buffer) {
-        PacketEvents.getAPI().getProtocolManager().writePacket(channel, buffer);
+        PacketEvents.getAPI().getProtocolManager().writePacket(this.channel, buffer);
     }
 
     public void writePacket(PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().writePacket(channel, wrapper);
+        PacketEvents.getAPI().getProtocolManager().writePacket(this.channel, wrapper);
     }
 
     public void writePacketSilently(Object buffer) {
-        PacketEvents.getAPI().getProtocolManager().writePacketSilently(channel, buffer);
+        PacketEvents.getAPI().getProtocolManager().writePacketSilently(this.channel, buffer);
     }
 
     public void writePacketSilently(PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().writePacketSilently(channel, wrapper);
+        PacketEvents.getAPI().getProtocolManager().writePacketSilently(this.channel, wrapper);
     }
 
     public void receivePacket(Object buffer) {
-        PacketEvents.getAPI().getProtocolManager().receivePacket(channel, buffer);
+        PacketEvents.getAPI().getProtocolManager().receivePacket(this.channel, buffer);
     }
 
     public void receivePacket(PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().receivePacket(channel, wrapper);
+        PacketEvents.getAPI().getProtocolManager().receivePacket(this.channel, wrapper);
     }
 
     public void receivePacketSilently(Object buffer) {
-        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(channel, buffer);
+        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(this.channel, buffer);
     }
 
     public void receivePacketSilently(PacketWrapper<?> wrapper) {
-        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(channel, wrapper);
+        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(this.channel, wrapper);
     }
 
     public void flushPackets() {
-        ChannelHelper.flush(channel);
+        ChannelHelper.flush(this.channel);
     }
 
     public void closeConnection() {
-        ChannelHelper.close(channel);
+        ChannelHelper.close(this.channel);
     }
 
     //Might be tough with the message signing
@@ -220,27 +224,27 @@ public class User implements IRegistryHolder {
     }*/
 
     public void closeInventory() {
-        WrapperPlayServerCloseWindow closeWindow = new WrapperPlayServerCloseWindow(0);
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, closeWindow);
+        final WrapperPlayServerCloseWindow closeWindow = new WrapperPlayServerCloseWindow(0);
+        PacketEvents.getAPI().getProtocolManager().sendPacket(this.channel, closeWindow);
     }
 
     public void sendMessage(String legacyMessage) {
-        Component component = AdventureSerializer.fromLegacyFormat(legacyMessage);
-        sendMessage(component);
+        final Component component = AdventureSerializer.fromLegacyFormat(legacyMessage);
+        this.sendMessage(component);
     }
 
     public void sendMessage(Component component) {
-        sendMessage(component, ChatTypes.CHAT);
+        this.sendMessage(component, ChatTypes.CHAT);
     }
 
     public void sendMessage(Component component, ChatType type) {
-        ServerVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion().toServerVersion() :
+        final ServerVersion version = PacketEvents.getAPI().getInjector().isProxy() ? this.getClientVersion().toServerVersion() :
                 PacketEvents.getAPI().getServerManager().getVersion();
-        PacketWrapper<?> chatPacket;
+        final PacketWrapper<?> chatPacket;
         if (version.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             chatPacket = new WrapperPlayServerSystemChatMessage(false, component);
         } else {
-            ChatMessage message;
+            final ChatMessage message;
             if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
                 message = new ChatMessage_v1_16(component, type, new UUID(0L, 0L));
             } else {
@@ -248,21 +252,21 @@ public class User implements IRegistryHolder {
             }
             chatPacket = new WrapperPlayServerChatMessage(message);
         }
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, chatPacket);
+        PacketEvents.getAPI().getProtocolManager().sendPacket(this.channel, chatPacket);
     }
 
     public void sendTitle(String legacyTitle, String legacySubtitle,
                           int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        Component title = AdventureSerializer.fromLegacyFormat(legacyTitle);
-        Component subtitle = AdventureSerializer.fromLegacyFormat(legacySubtitle);
-        sendTitle(title, subtitle, fadeInTicks, stayTicks, fadeOutTicks);
+        final Component title = AdventureSerializer.fromLegacyFormat(legacyTitle);
+        final Component subtitle = AdventureSerializer.fromLegacyFormat(legacySubtitle);
+        this.sendTitle(title, subtitle, fadeInTicks, stayTicks, fadeOutTicks);
     }
 
     public void sendTitle(Component title, Component subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        ClientVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion() :
+        final ClientVersion version = PacketEvents.getAPI().getInjector().isProxy() ? this.getClientVersion() :
                 PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
-        boolean modern = version.isNewerThanOrEquals(ClientVersion.V_1_17);
-        PacketWrapper<?> animation;
+        final boolean modern = version.isNewerThanOrEquals(ClientVersion.V_1_17);
+        final PacketWrapper<?> animation;
         PacketWrapper<?> setTitle = null;
         PacketWrapper<?> setSubtitle = null;
         if (modern) {
@@ -288,12 +292,12 @@ public class User implements IRegistryHolder {
                         0, 0, 0);
             }
         }
-        sendPacket(animation);
+        this.sendPacket(animation);
         if (setTitle != null) {
-            sendPacket(setTitle);
+            this.sendPacket(setTitle);
         }
         if (setSubtitle != null) {
-            sendPacket(setSubtitle);
+            this.sendPacket(setSubtitle);
         }
     }
 
