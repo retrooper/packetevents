@@ -212,7 +212,7 @@ public class VelocityPacketEventsBuilder {
                                 return;
 
                             UserLoginEvent loginEvent = new UserLoginEvent(user, player);
-                            PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
+                            user.getEventManager().callEvent(loginEvent);
                         });
                 if (settings.shouldCheckForUpdates()) {
                     getUpdateChecker().handleUpdateCheck();

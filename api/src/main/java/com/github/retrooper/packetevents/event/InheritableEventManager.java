@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 public class InheritableEventManager extends EventManager {
-    private ListenerStore store;
+    private final ListenerStore store;
     /**
      * We store the listeners in a sorted manner aka:
      * 1) We sort by their priority

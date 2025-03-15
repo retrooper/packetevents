@@ -67,6 +67,6 @@ public class InternalBungeeProcessor implements Listener {
             return;
         }
         UserLoginEvent loginEvent = new UserLoginEvent(user, player);
-        PacketEvents.getAPI().getEventManager().callEvent(loginEvent);
+        user.getEventManager().callEvent(loginEvent);
     }
 }

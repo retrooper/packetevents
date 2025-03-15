@@ -54,7 +54,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player,
                 buffer, false);
         int readerIndex = buffer.readerIndex();
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> buffer.readerIndex(readerIndex));
+        user.getEventManager().callEvent(packetSendEvent, () -> buffer.readerIndex(readerIndex));
         if (!packetSendEvent.isCancelled()) {
             if (packetSendEvent.getLastUsedWrapper() != null) {
                 ByteBufHelper.clear(packetSendEvent.getByteBuf());

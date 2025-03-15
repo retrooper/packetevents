@@ -58,7 +58,7 @@ public final class PacketEventsImplHelper {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer, autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
+        user.getEventManager().callEvent(packetSendEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
         });
         if (!packetSendEvent.isCancelled()) {
@@ -98,7 +98,7 @@ public final class PacketEventsImplHelper {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);
-        PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
+        user.getEventManager().callEvent(packetReceiveEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
         });
         if (!packetReceiveEvent.isCancelled()) {
@@ -131,7 +131,7 @@ public final class PacketEventsImplHelper {
 
             if (user != null) {
                 UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
-                PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
+                user.getEventManager().callEvent(disconnectEvent);
                 PacketEvents.getAPI().getProtocolManager().removeUser(user.getChannel());
             }
 

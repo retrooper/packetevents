@@ -82,7 +82,7 @@ public class PlayerListMixin {
             return;
         }
 
-        api.getEventManager().callEvent(new UserLoginEvent(user, player));
+        user.getEventManager().callEvent(new UserLoginEvent(user, player));
     }
 
     /**
