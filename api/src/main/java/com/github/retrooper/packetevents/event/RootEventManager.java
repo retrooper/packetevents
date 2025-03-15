@@ -29,7 +29,7 @@ public class RootEventManager extends InheritableEventManager {
 
             return listener;
         } finally {
-            this.listenerConsistencyLock.readLock().lock();
+            this.listenerConsistencyLock.readLock().unlock();
         }
     }
 
