@@ -1,6 +1,7 @@
-package com.github.retrooper.packetevents.event;
+package com.github.retrooper.packetevents.event.inheritable;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.*;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
 import org.jetbrains.annotations.Nullable;
 

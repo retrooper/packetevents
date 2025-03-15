@@ -1,6 +1,7 @@
 package com.github.retrooper.packetevents.test.event;
 
 import com.github.retrooper.packetevents.event.*;
+import com.github.retrooper.packetevents.event.inheritable.GlobalEventManager;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class InheritableEventManagerTest {
 
     @Test
     void shouldDestroyChildrenAfterGC() throws Throwable {
-        final RootEventManager rootEventManager = new RootEventManager();
+        final GlobalEventManager rootEventManager = new GlobalEventManager();
         Object children = new Object();
 
         rootEventManager.getChildren(children);
@@ -48,7 +49,7 @@ public class InheritableEventManagerTest {
 
     @Test
     void shouldCallBothListeners() {
-        final RootEventManager rootEventManager = new RootEventManager();
+        final GlobalEventManager rootEventManager = new GlobalEventManager();
         final EventManager children = rootEventManager.getChildren(new Object());
         final List<String> calls = new ArrayList<>();
 

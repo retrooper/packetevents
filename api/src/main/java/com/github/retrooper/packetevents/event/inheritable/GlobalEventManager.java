@@ -1,4 +1,7 @@
-package com.github.retrooper.packetevents.event;
+package com.github.retrooper.packetevents.event.inheritable;
+
+import com.github.retrooper.packetevents.event.EventManager;
+import com.github.retrooper.packetevents.event.PacketListenerCommon;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -7,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class RootEventManager extends InheritableEventManager {
+public class GlobalEventManager extends InheritableEventManager {
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
     private final Map<WeakKey, EventManager> children = new ConcurrentHashMap<>();
     private final ReadWriteLock listenerConsistencyLock = new ReentrantReadWriteLock();

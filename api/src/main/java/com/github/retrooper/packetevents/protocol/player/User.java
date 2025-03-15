@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.protocol.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.EventManager;
-import com.github.retrooper.packetevents.event.RootEventManager;
+import com.github.retrooper.packetevents.event.inheritable.GlobalEventManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -70,8 +70,8 @@ public class User implements IRegistryHolder {
         this.profile = profile;
         this.eventManager = PacketEvents.getAPI().getEventManager();
 
-        if (this.eventManager instanceof RootEventManager) {
-            this.eventManager = ((RootEventManager) this.eventManager).getChildren(channel);
+        if (this.eventManager instanceof GlobalEventManager) {
+            this.eventManager = ((GlobalEventManager) this.eventManager).getChildren(channel);
         }
     }
 

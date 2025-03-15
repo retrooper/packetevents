@@ -1,6 +1,6 @@
 package com.github.retrooper.packetevents.test.event;
 
-import com.github.retrooper.packetevents.event.InheritableEventManager;
+import com.github.retrooper.packetevents.event.inheritable.InheritableEventManager;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
