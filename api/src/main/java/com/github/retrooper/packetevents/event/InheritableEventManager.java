@@ -22,6 +22,14 @@ public class InheritableEventManager extends EventManager {
             .thenComparingLong(PacketListenerCommon::getCreationTimeStamp)
             .thenComparingInt(System::identityHashCode);
 
+    public InheritableEventManager(ListenerStore store) {
+        this.store = store;
+    }
+
+    public InheritableEventManager() {
+        this(new ListenerStore());
+    }
+
     @Override
     public void callEvent(PacketEvent event) {
         this.callEvent(event, null);
@@ -38,6 +46,7 @@ public class InheritableEventManager extends EventManager {
                     PacketEvents.getAPI().getLogger().log(Level.WARNING, "PacketEvents caught an unhandled exception while calling your listener.", t);
                 }
             }
+
             if (postCallListenerAction != null) {
                 postCallListenerAction.run();
             }
@@ -57,14 +66,14 @@ public class InheritableEventManager extends EventManager {
 
     @Override
     public PacketListenerCommon registerListener(PacketListenerCommon listener) {
-        this.registerListeners(listener);
+        this.store.add(listener);
         return listener;
     }
 
     @Override
     public PacketListenerCommon[] registerListeners(PacketListenerCommon... listeners) {
         for (final PacketListenerCommon listener : listeners) {
-            this.store.add(listener);
+            this.registerListener(listener);
         }
 
         return listeners;
@@ -78,7 +87,7 @@ public class InheritableEventManager extends EventManager {
     @Override
     public void unregisterListeners(PacketListenerCommon... listeners) {
         for (final PacketListenerCommon listener : listeners) {
-            this.store.remove(listener);
+            this.unregisterListener(listener);
         }
     }
 
@@ -101,11 +110,24 @@ public class InheritableEventManager extends EventManager {
     public static class ListenerStore {
         private final AtomicReference<PacketListenerCommon[]> stored = new AtomicReference<>();
 
+        @Override
+        public ListenerStore clone() {
+            if (this.stored.get() == null) {
+                return new ListenerStore();
+            }
+
+            final ListenerStore clone = new ListenerStore();
+            final PacketListenerCommon[] copying = this.stored.get();
+            clone.stored.set(Arrays.copyOf(copying, copying.length));
+
+            return clone;
+        }
+
         public PacketListenerCommon[] get() {
             return this.stored.get();
         }
 
-        public void add(PacketListenerCommon listener) {
+        public boolean add(PacketListenerCommon listener) {
             PacketListenerCommon[] current;
             PacketListenerCommon[] modified;
 
@@ -120,18 +142,24 @@ public class InheritableEventManager extends EventManager {
 
                 // Find insertion point
                 int insertionPoint = Arrays.binarySearch(current, listener, LISTENER_COMPARATOR);
-                if (insertionPoint < 0) {
-                    insertionPoint = -insertionPoint - 1;
+
+                if (insertionPoint >= 0) {
+                    return false;
                 }
+
+                // To index
+                insertionPoint = -insertionPoint - 1;
 
                 // Copy current into modified + 1
                 System.arraycopy(current, insertionPoint, modified, insertionPoint + 1, current.length - insertionPoint);
                 modified[insertionPoint] = listener;
 
             } while (!this.stored.compareAndSet(current, modified));
+
+            return true;
         }
 
-        public void remove(PacketListenerCommon listener) {
+        public boolean remove(PacketListenerCommon listener) {
             PacketListenerCommon[] current;
             PacketListenerCommon[] modified;
 
@@ -139,16 +167,17 @@ public class InheritableEventManager extends EventManager {
                 current = this.stored.get();
 
                 final int index = Arrays.binarySearch(current, listener, LISTENER_COMPARATOR);
-                if (index != 0) {
-                    return;
+                if (index < 0 || current[index] != listener) {
+                    return false;
                 }
 
                 modified = Arrays.copyOf(current, current.length - 1);
 
                 System.arraycopy(current, 0, modified, 0, index);
                 System.arraycopy(current, index + 1, modified, index, current.length - index - 1);
-
             } while (!this.stored.compareAndSet(current, modified));
+
+            return true;
         }
 
         public void call(UserConnectEvent event) {

@@ -52,6 +52,19 @@ public class ListenerStoreTest {
     }
 
     @Test
+    void shouldNotAddDuplicateListener() {
+        final InheritableEventManager.ListenerStore listenerStore = new InheritableEventManager.ListenerStore();
+        listenerStore.add(mockListener());
+
+        final PacketListenerCommon packetListenerCommon = mockListener(() -> {});
+        listenerStore.add(packetListenerCommon);
+        listenerStore.add(mockListener());
+        listenerStore.add(packetListenerCommon);
+
+        assertEquals(3, listenerStore.get().length);
+    }
+
+    @Test
     void shouldRunInTheRightOrderByPriority() {
         final InheritableEventManager.ListenerStore listenerStore = new InheritableEventManager.ListenerStore();
         final List<PacketListenerPriority> result = new ArrayList<>();
