@@ -108,11 +108,11 @@ public class InheritableEventManager extends EventManager {
      * TODO: If needed could make this completely thread safe and so it tracks changed made to the store
      */
     public static class ListenerStore {
-        private final AtomicReference<PacketListenerCommon[]> stored = new AtomicReference<>();
+        private final AtomicReference<PacketListenerCommon[]> stored = new AtomicReference<>(new PacketListenerCommon[0]);
 
         @Override
         public ListenerStore clone() {
-            if (this.stored.get() == null) {
+            if (this.stored.get().length == 0) {
                 return new ListenerStore();
             }
 
