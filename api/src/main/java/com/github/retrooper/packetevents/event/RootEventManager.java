@@ -4,29 +4,71 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RootEventManager extends InheritableEventManager {
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
     private final Map<WeakKey, EventManager> children = new ConcurrentHashMap<>();
-    private InheritableEventManager.ListenerStore store;
+    private final ReadWriteLock listenerConsistencyLock = new ReentrantReadWriteLock();
+    private final InheritableEventManager.ListenerStore store = new ListenerStore();
 
     @Override
     public PacketListenerCommon registerListener(PacketListenerCommon listener) {
         this.cleanup();
-        return super.registerListener(listener);
+
+        this.listenerConsistencyLock.readLock().lock();
+        try {
+            if (!this.store.add(listener)) {
+                return listener;
+            }
+
+            for (final EventManager eventManager : this.children.values()) {
+                eventManager.registerListener(listener);
+            }
+
+            return listener;
+        } finally {
+            this.listenerConsistencyLock.readLock().lock();
+        }
     }
 
     @Override
     public void unregisterListener(PacketListenerCommon listener) {
         this.cleanup();
-        super.unregisterListener(listener);
+
+        this.listenerConsistencyLock.readLock().lock();
+        try {
+            if (!this.store.remove(listener)) {
+                return;
+            }
+
+            for (final EventManager eventManager : this.children.values()) {
+                eventManager.unregisterListener(listener);
+            }
+        } finally {
+            this.listenerConsistencyLock.readLock().unlock();
+        }
+    }
+
+    public int childrenCount() {
+        this.cleanup();
+
+        return this.children.size();
     }
 
     public EventManager getChildren(Object key) {
         this.cleanup();
 
         final WeakKey weakKey = new WeakKey(key, this.queue);
-        return this.children.computeIfAbsent(weakKey, ($) -> new InheritableEventManager());
+        return this.children.computeIfAbsent(weakKey, ($) -> {
+            this.listenerConsistencyLock.writeLock().lock();
+            try {
+                return new InheritableEventManager(this.store.clone());
+            } finally {
+                this.listenerConsistencyLock.writeLock().unlock();
+            }
+        });
     }
 
     private void cleanup() {
