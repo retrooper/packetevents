@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPIManagerFactory;
 import io.github.retrooper.packetevents.loader.ChainLoadData;
 import io.github.retrooper.packetevents.loader.ChainLoadEntryPoint;
@@ -46,17 +47,14 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
     public void onPreLaunch() {
         FabricLoader loader = FabricLoader.getInstance();
 
-        String peEntryPointName = null;
         String chainLoadEntryPointName = null;
         String clientChainLoadEntryPointName = null; // For client-specific entrypoints
         switch (loader.getEnvironmentType()) {
             case CLIENT -> {
-                peEntryPointName = "pePreLaunchClient";
                 chainLoadEntryPointName = "mainChainLoad";
                 clientChainLoadEntryPointName = "clientChainLoad";
             }
             case SERVER -> {
-                peEntryPointName = "pePreLaunchServer";
                 chainLoadEntryPointName = "mainChainLoad";
             }
         }
@@ -103,10 +101,8 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
         // We need to preserve the ABI of FactoryPacketEventsAPI and do this static awfulness
         FabricPacketEventsAPIManagerFactory.init(chainLoadData);
 
-        // Invoke pre-launch entrypoints
-        loader.invokeEntrypoints(peEntryPointName,
-                PreLaunchEntrypoint.class,
-                PreLaunchEntrypoint::onPreLaunch);
+        PacketEvents.setAPI(new FabricPacketEventsAPI(PacketEventsMod.MOD_ID, loader.getEnvironmentType()));
+        PacketEvents.getAPI().load();
     }
 
     /**

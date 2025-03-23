@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.factory.fabric;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.PacketEventsClientMod;
+import net.fabricmc.api.EnvType;
 
 /**
  * You should, if possible, never construct a packetevents instance on your own
@@ -54,6 +55,6 @@ public final class FabricPacketEventsBuilder {
     }
 
     public static PacketEventsAPI<?> buildNoCache(String modId, PacketEventsSettings inSettings) {
-        return PacketEventsClientMod.constructApi(modId);
+        return new FabricPacketEventsAPI(modId, EnvType.CLIENT);
     }
 }
