@@ -30,9 +30,7 @@ public class PacketEventsClientMod implements PreLaunchEntrypoint {
     }
 
     @Override
-    public void onPreLaunch() {}
-
-    public void preLaunch() {
+    public void onPreLaunch() {
         PacketEvents.setAPI(constructApi(PacketEventsMod.MOD_ID));
         PacketEvents.getAPI().load();
     }
