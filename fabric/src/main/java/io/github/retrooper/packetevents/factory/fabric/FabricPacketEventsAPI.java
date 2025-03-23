@@ -30,19 +30,20 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
+import io.github.retrooper.packetevents.PacketEventsMod;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.manager.FabricLogger;
 import io.github.retrooper.packetevents.manager.FabricProtocolManager;
 import io.github.retrooper.packetevents.manager.FabricServerManager;
 import io.github.retrooper.packetevents.manager.InternalFabricPacketListener;
 import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 
-public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
+public class FabricPacketEventsAPI extends PacketEventsAPI<ModInitializer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("PacketEvents");
 
@@ -68,7 +69,6 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
         this.modId = modId;
         this.environment = environment;
         this.settings = settings;
-
         this.protocolManager = new FabricProtocolManager(environment);
         this.serverManager = this.constructServerManager();
         this.injector = new FabricChannelInjector(environment);
@@ -142,9 +142,11 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
         return this.terminated;
     }
 
+    // Returning ModInitializer instance makes getClass().getClassLoader() return KnotClassLoader
+    // Which allows us to correctly check for existence of Via, Geyser, etc...
     @Override
-    public FabricLoader getPlugin() {
-        return FabricLoader.getInstance();
+    public ModInitializer getPlugin() {
+        return PacketEventsMod.INSTANCE;
     }
 
     @Override

@@ -41,10 +41,12 @@ import java.util.TreeMap;
 
 public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
 
+    public static PacketEventsMod INSTANCE;
     public static final String MOD_ID = "packetevents";
 
     @Override
     public void onPreLaunch() {
+        INSTANCE = this;
         FabricLoader loader = FabricLoader.getInstance();
 
         String chainLoadEntryPointName = null;
