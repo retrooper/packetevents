@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.mc1201.factory.fabric;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
 import org.jetbrains.annotations.NotNull;

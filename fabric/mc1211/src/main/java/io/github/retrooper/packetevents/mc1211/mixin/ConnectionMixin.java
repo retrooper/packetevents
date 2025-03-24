@@ -18,33 +18,24 @@
 
 package io.github.retrooper.packetevents.mc1211.mixin;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.UserConnectEvent;
-import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
-import io.github.retrooper.packetevents.handler.PacketDecoder;
-import io.github.retrooper.packetevents.handler.PacketEncoder;
-import io.github.retrooper.packetevents.util.FabricCustomPipelineUtil;
 import io.github.retrooper.packetevents.util.FabricInjectionUtil;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import net.minecraft.SharedConstants;
+import me.fallenbreath.conditionalmixin.api.annotation.Condition;
+import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
 import net.minecraft.network.BandwidthDebugMonitor;
 import net.minecraft.network.protocol.PacketFlow;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@Restriction(
+        require = {
+                @Condition(value = "minecraft", versionPredicates = {">=1.20.5"}),
+        }
+)
 @Mixin(value = net.minecraft.network.Connection.class, priority = 1500) // priority to inject after Via
 public abstract class ConnectionMixin {
 

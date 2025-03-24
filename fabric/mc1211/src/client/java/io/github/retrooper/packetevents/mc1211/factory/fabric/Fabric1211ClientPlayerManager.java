@@ -18,12 +18,13 @@
 
 package io.github.retrooper.packetevents.mc1211.factory.fabric;
 
+import io.github.retrooper.packetevents.mc1202.factory.fabric.Fabric1202ServerPlayerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
 import org.jetbrains.annotations.NotNull;
 
-public class Fabric1211ClientPlayerManager extends Fabric1211ServerPlayerManager {
+public class Fabric1211ClientPlayerManager extends Fabric1202ServerPlayerManager {
 
     @Override
     public int getPing(@NotNull Object playerObj) {
@@ -35,7 +36,6 @@ public class Fabric1211ClientPlayerManager extends Fabric1211ServerPlayerManager
             // if the server doesn't show the player info of
             // the player itself, try to fall back to potential
             // latency sampling data - which is often not present
-            // TODO fix later for 1.20.1
             return (int) Minecraft.getInstance().getDebugOverlay().getPingLogger().get(0);
         }
         return super.getPing(playerObj);

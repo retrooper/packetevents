@@ -35,6 +35,7 @@ include("velocity")
 include("sponge")
 include("fabric")
 include(":fabric:mc1201")
+include(":fabric:mc1202")
 include(":fabric:mc1211")
 include(":fabric:mc1214")
 // Patch modules

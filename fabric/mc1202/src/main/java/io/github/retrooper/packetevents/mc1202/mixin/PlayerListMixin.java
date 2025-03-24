@@ -16,17 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.mc1211.mixin;
+package io.github.retrooper.packetevents.mc1202.mixin;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.PacketEventsAPI;
-import com.github.retrooper.packetevents.event.UserLoginEvent;
-import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import io.github.retrooper.packetevents.util.FabricInjectionUtil;
-import io.netty.channel.Channel;
+import me.fallenbreath.conditionalmixin.api.annotation.Condition;
+import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.players.PlayerList;
@@ -34,8 +30,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+@Restriction(
+        require = {
+                @Condition(value = "minecraft", versionPredicates = {">=1.20.2"}),
+        }
+)
 @Mixin(PlayerList.class)
 public class PlayerListMixin {
 
@@ -43,12 +43,12 @@ public class PlayerListMixin {
      * @reason Associate connection instance with player instance
      */
     @Inject(
-        method = "placeNewPlayer",
-        at = @At("HEAD")
+            method = "placeNewPlayer",
+            at = @At("HEAD")
     )
     private void preNewPlayerPlace(
-        Connection connection, ServerPlayer player,
-        CommonListenerCookie cookie, CallbackInfo ci
+            Connection connection, ServerPlayer player,
+            CommonListenerCookie cookie, CallbackInfo ci
     ) {
         PacketEvents.getAPI().getInjector().setPlayer(connection.channel, player);
     }
@@ -57,30 +57,17 @@ public class PlayerListMixin {
      * @reason Associate connection instance with player instance and handle login event
      */
     @Inject(
-        method = "placeNewPlayer",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/server/players/PlayerList;broadcastAll(Lnet/minecraft/network/protocol/Packet;)V",
-            shift = At.Shift.AFTER
-        )
+            method = "placeNewPlayer",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/server/players/PlayerList;broadcastAll(Lnet/minecraft/network/protocol/Packet;)V",
+                    shift = At.Shift.AFTER
+            )
     )
     private void onPlayerLogin(
-        Connection connection, ServerPlayer player,
-        CommonListenerCookie cookie, CallbackInfo ci
+            Connection connection, ServerPlayer player,
+            CommonListenerCookie cookie, CallbackInfo ci
     ) {
         FabricInjectionUtil.fireUserLoginEvent(player);
-    }
-
-    /**
-     * @reason Minecraft creates a new player instance on respawn
-     */
-    @Inject(
-        method = "respawn",
-        at = @At("RETURN")
-    )
-    private void postRespawn(CallbackInfoReturnable<ServerPlayer> cir) {
-        ServerPlayer player = cir.getReturnValue();
-        Channel channel = player.connection.connection.channel;
-        PacketEvents.getAPI().getInjector().setPlayer(channel, player);
     }
 }

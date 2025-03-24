@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.factory.fabric;
 
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
-import io.github.retrooper.packetevents.PacketEventsClientMod;
 import net.fabricmc.api.EnvType;
 
 /**
@@ -28,7 +27,7 @@ import net.fabricmc.api.EnvType;
  * and preferable jar-in-jar the packetevents fabric platform.
  * <p>
  * If you still want to create your own packetevents instance, which is not
- * recommended, use {@link PacketEventsClientMod#constructApi(String)} or
+ * recommended, use {@link io.github.retrooper.packetevents.PacketEventsClientMod#constructApi(String)} or
  * {@link io.github.retrooper.packetevents.PacketEventsServerMod#constructApi(String)}.
  *
  * @deprecated flawed concept and doesn't support both client and server

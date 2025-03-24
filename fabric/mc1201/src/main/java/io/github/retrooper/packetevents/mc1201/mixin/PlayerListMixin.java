@@ -19,29 +19,26 @@
 package io.github.retrooper.packetevents.mc1201.mixin;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.PacketEventsAPI;
-import com.github.retrooper.packetevents.event.UserLoginEvent;
-import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import io.github.retrooper.packetevents.util.FabricInjectionUtil;
 import io.netty.channel.Channel;
+import me.fallenbreath.conditionalmixin.api.annotation.Condition;
+import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+@Restriction(
+        require = {
+                @Condition(value = "minecraft", versionPredicates = {"<1.20.2"}),
+        }
+)
 @Mixin(PlayerList.class)
 public abstract class PlayerListMixin {
-
-    @Shadow public abstract void sendAllPlayerInfo(ServerPlayer player);
-
-    @Shadow public abstract void placeNewPlayer(Connection netManager, ServerPlayer player);
 
     /**
      * @reason Associate connection instance with player instance

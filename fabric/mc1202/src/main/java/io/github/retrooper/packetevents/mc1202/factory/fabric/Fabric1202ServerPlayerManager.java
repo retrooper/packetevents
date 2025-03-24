@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.mc1211.factory.fabric;
+package io.github.retrooper.packetevents.mc1202.factory.fabric;
 
-import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
+import io.github.retrooper.packetevents.mc1201.factory.fabric.Fabric1201ServerPlayerManager;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
-public class Fabric1211ServerPlayerManager extends PlayerManagerAbstract {
+public class Fabric1202ServerPlayerManager extends Fabric1201ServerPlayerManager {
 
     @Override
     public int getPing(@NotNull Object player) {

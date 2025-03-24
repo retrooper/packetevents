@@ -3,8 +3,7 @@ val parchment_minecraft_version: String by project
 val parchment_mappings: String by project
 
 dependencies {
-    compileOnly(libs.bundles.adventure)
-    compileOnly(project(":fabric:mc1202", configuration = "namedElements"))
+    implementation(libs.bundles.adventure)
     compileOnly(project(":fabric:mc1201", configuration = "namedElements"))
 
     // To change the versions, see the gradle.properties file
@@ -18,7 +17,7 @@ dependencies {
 loom {
     splitEnvironmentSourceSets()
     mods {
-        register("packetevents-mc1211") {
+        register("packetevents-mc1201") {
             sourceSet(sourceSets.main.get())
             sourceSet(sourceSets.maybeCreate("client"))
         }

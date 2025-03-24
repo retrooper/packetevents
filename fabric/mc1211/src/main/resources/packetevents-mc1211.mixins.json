@@ -7,10 +7,10 @@
     "ClientPacketListenerMixin"
   ],
   "mixins": [
-    "ConnectionMixin",
-    "PlayerListMixin"
+    "ConnectionMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "plugin": "io.github.retrooper.packetevents.manager.PacketEventsMixinManager"
 }

@@ -18,6 +18,6 @@ public class Fabric1214ChainLoadEntrypoint implements ChainLoadEntryPoint {
 
     @Override
     public ServerVersion getNativeVersion() {
-        return ServerVersion.V_1_21_4;
+        return ServerVersion.V_1_21_1;
     }
 }

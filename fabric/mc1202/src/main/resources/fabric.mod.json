@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "packetevents-mc1201",
+  "id": "packetevents-mc1202",
   "version": "${version}",
-  "name": "PacketEvents for 1.20.1",
+  "name": "PacketEvents for 1.20.2",
   "description": "",
   "authors": [
     "retrooper"
@@ -12,18 +12,15 @@
   "environment": "*",
   "entrypoints": {
     "mainChainLoad": [
-      "io.github.retrooper.packetevents.mc1201.Fabric1201ChainLoadEntrypoint"
-    ],
-    "clientChainLoad": [
-      "io.github.retrooper.packetevents.mc1201.Fabric1201ClientChainLoadEntrypoint"
+      "io.github.retrooper.packetevents.mc1202.Fabric1202ChainLoadEntrypoint"
     ]
   },
   "mixins": [
-    "packetevents-mc1201.mixins.json"
+    "packetevents-mc1202.mixins.json"
   ],
   "accessWidener": "packetevents.accesswidener",
   "depends": {
     "fabricloader": ">=0.15.11",
-    "minecraft": ">=1.20"
+    "minecraft": ">=1.20.2"
   }
 }

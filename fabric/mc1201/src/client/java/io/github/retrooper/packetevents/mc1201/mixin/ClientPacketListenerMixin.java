@@ -38,7 +38,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ClientPacketListenerMixin implements TickablePacketListener,
     ClientGamePacketListener {
 
-    @Final @Shadow public Minecraft minecraft;
     @Shadow public abstract Connection getConnection();
     /**
      * @reason Associate connection instance with player instance
@@ -53,7 +52,7 @@ public abstract class ClientPacketListenerMixin implements TickablePacketListene
             )
     )
     private void postLoginPlayerConstruct(CallbackInfo ci) {
-        PacketEvents.getAPI().getInjector().setPlayer(this.getConnection().channel, this.minecraft.player);
+        PacketEvents.getAPI().getInjector().setPlayer(this.getConnection().channel, Minecraft.getInstance().player);
     }
 
     /**
