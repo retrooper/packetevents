@@ -19,6 +19,8 @@
 package io.github.retrooper.packetevents.factory.fabric;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
