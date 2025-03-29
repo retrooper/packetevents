@@ -65,7 +65,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
                 kryptonReorder = true;
         }
         if (evt.getClass().getName().equals("com.viaversion.fabric.common.handler.PipelineReorderEvent") || kryptonReorder) {
-            FabricInjectionUtil.reorderHandlers(ctx);
+            FabricInjectionUtil.reorderHandlers(ctx, side);
         }
         super.userEventTriggered(ctx, evt);
     }

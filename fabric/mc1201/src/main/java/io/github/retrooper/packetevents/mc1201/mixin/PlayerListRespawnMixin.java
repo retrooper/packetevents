@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.mc1201.mixin;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.netty.channel.Channel;
 import me.fallenbreath.conditionalmixin.api.annotation.Condition;
 import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
@@ -25,12 +26,12 @@ public class PlayerListRespawnMixin {
      * @reason Minecraft creates a new player instance on respawn
      */
     @Inject(
-            method = "respawn",
+            method = "respawn*",
             at = @At("RETURN")
     )
     private void postRespawn(CallbackInfoReturnable<ServerPlayer> cir) {
         ServerPlayer player = cir.getReturnValue();
         Channel channel = player.connection.connection.channel;
-        PacketEvents.getAPI().getInjector().setPlayer(channel, player);
+        FabricPacketEventsAPI.getServerAPI().getInjector().setPlayer(channel, player);
     }
 }

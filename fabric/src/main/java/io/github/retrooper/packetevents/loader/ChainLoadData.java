@@ -8,6 +8,7 @@ public class ChainLoadData {
 
     private LazyHolder<RegistryManager> registryManagerLazyHolder = null;
     private LazyHolder<PlayerManagerAbstract> playerManagerAbstractLazyHolder = null;
+    private LazyHolder<PlayerManagerAbstract> clientPlayerManagerAbstractLazyHolder = null;
 
     public void setRegistryManagerIfNull(LazyHolder<RegistryManager> registryManagerLazyHolder) {
         if (this.registryManagerLazyHolder == null) {
@@ -27,5 +28,15 @@ public class ChainLoadData {
 
     public LazyHolder<PlayerManagerAbstract> getPlayerManagerAbstractLazyHolder() {
         return this.playerManagerAbstractLazyHolder;
+    }
+
+    public void setClientPlayerManagerIfNull(LazyHolder<PlayerManagerAbstract> clientPlayerManagerAbstractLazyHolder) {
+        if (this.clientPlayerManagerAbstractLazyHolder == null) {
+            this.clientPlayerManagerAbstractLazyHolder = clientPlayerManagerAbstractLazyHolder;
+        }
+    }
+
+    public LazyHolder<PlayerManagerAbstract> getClientPlayerManagerAbstractLazyHolder() {
+        return this.clientPlayerManagerAbstractLazyHolder;
     }
 }

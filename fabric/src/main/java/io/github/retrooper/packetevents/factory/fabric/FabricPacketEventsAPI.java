@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.registry.RegistryManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
+import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -36,6 +37,7 @@ import io.github.retrooper.packetevents.manager.FabricLogger;
 import io.github.retrooper.packetevents.manager.FabricProtocolManager;
 import io.github.retrooper.packetevents.manager.FabricServerManager;
 import io.github.retrooper.packetevents.manager.InternalFabricPacketListener;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
@@ -44,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 
 public class FabricPacketEventsAPI extends PacketEventsAPI<ModInitializer> {
-
     private static final Logger LOGGER = LoggerFactory.getLogger("PacketEvents");
 
     private final String modId;
@@ -61,17 +62,16 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<ModInitializer> {
     private boolean initialized;
     private boolean terminated;
 
-    public FabricPacketEventsAPI(String modId, EnvType environment) {
-        this(modId, environment, new PacketEventsSettings());
-    }
+    private static FabricPacketEventsAPI serverFabricAPI;
+    private static FabricPacketEventsAPI clientFabricAPI;
 
     public FabricPacketEventsAPI(String modId, EnvType environment, PacketEventsSettings settings) {
         this.modId = modId;
         this.environment = environment;
         this.settings = settings;
-        this.protocolManager = new FabricProtocolManager(environment);
+        this.protocolManager = new FabricProtocolManager(this, environment);
         this.serverManager = this.constructServerManager();
-        this.injector = new FabricChannelInjector(environment);
+        this.injector = new FabricChannelInjector(this, environment);
     }
 
     protected ServerManager constructServerManager() {
@@ -119,7 +119,17 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<ModInitializer> {
 
         PacketType.Play.Client.load();
         PacketType.Play.Server.load();
+
+        // Let people override this, at their own risk
+        if (!"true".equalsIgnoreCase(System.getenv("PE_IGNORE_INCOMPATIBILITY"))) {
+            checkCompatibility();
+        }
+
         this.initialized = true;
+    }
+
+    private void checkCompatibility() {
+        ViaVersionUtil.checkIfViaIsPresent();
     }
 
     @Override
@@ -166,7 +176,7 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<ModInitializer> {
 
     @Override
     public PlayerManager getPlayerManager() {
-        return FabricPacketEventsAPIManagerFactory.getLazyPlayerManagerHolder().get();
+        return this.environment == EnvType.SERVER ? FabricPacketEventsAPIManagerFactory.getLazyPlayerManagerHolder().get() : FabricPacketEventsAPIManagerFactory.getClientLazyPlayerManagerHolder().get();
     }
 
     @Override
@@ -187,5 +197,29 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<ModInitializer> {
     @Override
     public RegistryManager getRegistryManager() {
         return FabricPacketEventsAPIManagerFactory.getLazyRegistryManagerHolder().get();
+    }
+
+    public static FabricPacketEventsAPI getAPI(PacketSide pipelineSide) {
+        return pipelineSide == PacketSide.CLIENT ? clientFabricAPI : serverFabricAPI;
+    }
+
+    public static void setClientAPI(FabricPacketEventsAPI fabricPacketEventsAPI) {
+        clientFabricAPI = fabricPacketEventsAPI;
+    }
+
+    public static void setServerAPI(FabricPacketEventsAPI fabricPacketEventsAPI) {
+        serverFabricAPI = fabricPacketEventsAPI;
+    }
+
+    public static FabricPacketEventsAPI getClientAPI() {
+        return clientFabricAPI;
+    }
+
+    public static FabricPacketEventsAPI getServerAPI() {
+        return serverFabricAPI;
+    }
+
+    public FabricPacketEventsAPI(String modId, EnvType environment) {
+        this(modId, environment, new PacketEventsSettings());
     }
 }

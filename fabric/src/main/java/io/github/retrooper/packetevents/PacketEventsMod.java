@@ -24,9 +24,7 @@ import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPIManagerFactory;
 import io.github.retrooper.packetevents.loader.ChainLoadData;
 import io.github.retrooper.packetevents.loader.ChainLoadEntryPoint;
-import io.github.retrooper.packetevents.manager.registry.FabricItemRegistry;
-import io.github.retrooper.packetevents.manager.registry.FabricRegistryManager;
-import io.github.retrooper.packetevents.util.LazyHolder;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
@@ -83,17 +81,24 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
             }
         }
 
-        // Set default registry manager if not already set by any entrypoint
-        chainLoadData.setRegistryManagerIfNull(LazyHolder.simple(() -> new FabricRegistryManager(
-                new FabricItemRegistry()
-        )));
-
         // Ordinarily I wouldn't be using a static here but since we need to maintain compile-time backwards compatibility
         // We need to preserve the ABI of FactoryPacketEventsAPI and do this static awfulness
         FabricPacketEventsAPIManagerFactory.init(chainLoadData);
 
-        PacketEvents.setAPI(new FabricPacketEventsAPI(PacketEventsMod.MOD_ID, loader.getEnvironmentType()));
+        FabricPacketEventsAPI fabricPacketEventsAPI = new FabricPacketEventsAPI(PacketEventsMod.MOD_ID, loader.getEnvironmentType());
+
+        PacketEvents.setAPI(fabricPacketEventsAPI);
         PacketEvents.getAPI().load();
+
+        switch (loader.getEnvironmentType()) {
+            case CLIENT -> {
+                FabricPacketEventsAPI.setClientAPI(fabricPacketEventsAPI);
+                FabricPacketEventsAPI fabricServerPacketEventsAPI = new FabricPacketEventsAPI(PacketEventsMod.MOD_ID, EnvType.SERVER);
+                FabricPacketEventsAPI.setServerAPI(fabricPacketEventsAPI);
+                fabricServerPacketEventsAPI.load();
+            }
+            case SERVER -> FabricPacketEventsAPI.setServerAPI(fabricPacketEventsAPI);
+        }
     }
 
     @Override
@@ -102,5 +107,6 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
         if (api != null) {
             api.init();
         }
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) FabricPacketEventsAPI.getClientAPI().init();
     }
 }

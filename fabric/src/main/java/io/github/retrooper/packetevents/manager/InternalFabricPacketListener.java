@@ -10,6 +10,8 @@ import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 
+import java.nio.channels.Channel;
+
 public class InternalFabricPacketListener extends com.github.retrooper.packetevents.manager.InternalPacketListener {
 
     @Override
@@ -21,7 +23,7 @@ public class InternalFabricPacketListener extends com.github.retrooper.packeteve
             ConnectionState state = packet.getNextConnectionState();
 
             String feature;
-            if (ViaVersionUtil.isAvailable()) {
+            if (ViaVersionUtil.isAvailable(user)) {
                 clientVersion = ClientVersion.getById(ViaVersionUtil.getProtocolVersion(user));
                 feature = "ViaVersion";
             } else {

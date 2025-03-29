@@ -6,20 +6,27 @@ import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerA
 import io.github.retrooper.packetevents.loader.ChainLoadData;
 
 public class FabricPacketEventsAPIManagerFactory {
-    // TODO, refactor if booky and retrooper approve, bad design having settable static field, exists to maintain
-    // 100% backward compatability
+    // TODO, refactor if booky and retrooper approve, bad design having settable static field
+    // exists to maintain 100% backward compatability
     private static LazyHolder<PlayerManagerAbstract> lazyPlayerManagerHolder = () -> null;
+    private static LazyHolder<PlayerManagerAbstract> lazyClientPlayerManagerHolder = () -> null;
     private static LazyHolder<RegistryManager> registryManagerLazyHolder = () -> null;
 
     public static LazyHolder<PlayerManagerAbstract> getLazyPlayerManagerHolder() {
         return lazyPlayerManagerHolder;
     }
+
+    public static LazyHolder<PlayerManagerAbstract> getClientLazyPlayerManagerHolder() {
+        return lazyClientPlayerManagerHolder;
+    }
+
     public static LazyHolder<RegistryManager> getLazyRegistryManagerHolder() {
         return registryManagerLazyHolder;
     }
 
     public static void init(ChainLoadData chainLoadData) {
         FabricPacketEventsAPIManagerFactory.lazyPlayerManagerHolder = chainLoadData.getPlayerManagerAbstractLazyHolder();
+        FabricPacketEventsAPIManagerFactory.lazyClientPlayerManagerHolder = chainLoadData.getClientPlayerManagerAbstractLazyHolder();
         FabricPacketEventsAPIManagerFactory.registryManagerLazyHolder = chainLoadData.getRegistryManagerLazyHolder();
     }
 }

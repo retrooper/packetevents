@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.mc1202.mixin;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.netty.channel.Channel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
@@ -25,7 +26,7 @@ public class PlayerListRespawnMixin {
     private void postRespawn(CallbackInfoReturnable<ServerPlayer> cir) {
         ServerPlayer player = cir.getReturnValue();
         Channel channel = player.connection.connection.channel;
-        PacketEvents.getAPI().getInjector().setPlayer(channel, player);
+        FabricPacketEventsAPI.getServerAPI().getInjector().setPlayer(channel, player);
     }
 }
 

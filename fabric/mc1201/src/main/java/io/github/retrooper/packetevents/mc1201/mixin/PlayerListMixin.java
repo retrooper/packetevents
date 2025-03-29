@@ -18,8 +18,8 @@
 
 package io.github.retrooper.packetevents.mc1201.mixin;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.llamalad7.mixinextras.sugar.Local;
+import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.github.retrooper.packetevents.util.FabricInjectionUtil;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,7 +36,7 @@ public abstract class PlayerListMixin {
      * @reason Associate connection instance with player instance
      */
     @Inject(
-            method = "placeNewPlayer",
+            method = "placeNewPlayer*",
             at = @At("HEAD")
     )
     private void preNewPlayerPlace(
@@ -44,14 +44,14 @@ public abstract class PlayerListMixin {
             @Local(ordinal = 0, argsOnly = true) Connection connection,
             @Local(ordinal = 0, argsOnly = true) ServerPlayer player
     ) {
-        PacketEvents.getAPI().getInjector().setPlayer(connection.channel, player);
+        FabricPacketEventsAPI.getServerAPI().getInjector().setPlayer(connection.channel, player);
     }
 
     /**
      * @reason Associate connection instance with player instance and handle login event
      */
     @Inject(
-            method = "placeNewPlayer",
+            method = "placeNewPlayer*",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/server/players/PlayerList;broadcastAll(Lnet/minecraft/network/protocol/Packet;)V",

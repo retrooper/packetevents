@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.mc1201.mixin;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.llamalad7.mixinextras.sugar.Local;
+import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
@@ -52,7 +53,7 @@ public abstract class ClientPacketListenerMixin implements TickablePacketListene
             )
     )
     private void postLoginPlayerConstruct(CallbackInfo ci) {
-        PacketEvents.getAPI().getInjector().setPlayer(this.getConnection().channel, Minecraft.getInstance().player);
+        FabricPacketEventsAPI.getClientAPI().getInjector().setPlayer(this.getConnection().channel, Minecraft.getInstance().player);
     }
 
     /**
@@ -67,6 +68,6 @@ public abstract class ClientPacketListenerMixin implements TickablePacketListene
             )
     )
     private void postRespawnPlayerConstruct(CallbackInfo ci, @Local(ordinal = 1) LocalPlayer player) {
-        PacketEvents.getAPI().getInjector().setPlayer(this.getConnection().channel, player);
+        FabricPacketEventsAPI.getClientAPI().getInjector().setPlayer(this.getConnection().channel, player);
     }
 }

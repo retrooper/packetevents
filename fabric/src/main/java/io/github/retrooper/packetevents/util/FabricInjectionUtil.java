@@ -12,6 +12,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.github.retrooper.packetevents.handler.PacketDecoder;
 import io.github.retrooper.packetevents.handler.PacketEncoder;
 import io.netty.channel.Channel;
@@ -36,33 +37,27 @@ public class FabricInjectionUtil {
             case CLIENTBOUND -> PacketSide.CLIENT;
             case SERVERBOUND -> PacketSide.SERVER;
         };
-        PacketSide apiSide = PacketEvents.getAPI().getInjector().getPacketSide();
-        if (pipelineSide != apiSide) {
-            // if pipeline side doesn't match api side, don't inject into
-            // this pipeline - it probably means this is the pipeline from
-            // integrated server to minecraft client, which is currently unsupported
-            PacketEvents.getAPI().getLogManager().debug("Skipped pipeline injection on " + pipelineSide);
-            return;
-        }
 
-        PacketEvents.getAPI().getLogManager().debug("Game connected!");
+        FabricPacketEventsAPI fabricPacketEventsAPI = FabricPacketEventsAPI.getAPI(pipelineSide);
+        fabricPacketEventsAPI.getLogManager().debug("Game connected!");
 
         Channel channel = pipeline.channel();
         User user = new User(channel, ConnectionState.HANDSHAKING,
             null, new UserProfile(null, null));
-        ProtocolManager.USERS.put(channel.pipeline(), user);
+
+        fabricPacketEventsAPI.getProtocolManager().setUser(channel, user);
 
         UserConnectEvent connectEvent = new UserConnectEvent(user);
-        PacketEvents.getAPI().getEventManager().callEvent(connectEvent);
+        fabricPacketEventsAPI.getEventManager().callEvent(connectEvent);
         if (connectEvent.isCancelled()) {
             channel.unsafe().closeForcibly();
             return;
         }
 
         String decoderName = channel.pipeline().names().contains("inbound_config") ? "inbound_config" : "decoder";
-        channel.pipeline().addBefore(decoderName, PacketEvents.DECODER_NAME, new PacketDecoder(apiSide, user));
+        channel.pipeline().addBefore(decoderName, PacketEvents.DECODER_NAME, new PacketDecoder(pipelineSide, user));
         String encoderName = channel.pipeline().names().contains("outbound_config") ? "outbound_config" : "encoder";
-        channel.pipeline().addBefore(encoderName, PacketEvents.ENCODER_NAME, new PacketEncoder(apiSide, user));
+        channel.pipeline().addBefore(encoderName, PacketEvents.ENCODER_NAME, new PacketEncoder(pipelineSide, user));
         channel.closeFuture().addListener((ChannelFutureListener) future ->
             PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
     }
@@ -75,7 +70,7 @@ public class FabricInjectionUtil {
     }
 
     // Shared method to reorder handlers after ViaVersion
-    public static void reorderHandlers(ChannelHandlerContext ctx) {
+    public static void reorderHandlers(ChannelHandlerContext ctx, PacketSide side) {
         ChannelPipeline pipeline = ctx.pipeline();
 
         // Re-inject decoder handler
@@ -106,11 +101,11 @@ public class FabricInjectionUtil {
             }
         }
 
-        PacketEvents.getAPI().getLogManager().debug("Pipeline after reorder: " + pipeline.names());
+        FabricPacketEventsAPI.getAPI(side).getLogManager().debug("Pipeline after reorder: " + pipeline.names());
     }
 
     public static void fireUserLoginEvent(ServerPlayer player) {
-        PacketEventsAPI<?> api = PacketEvents.getAPI();
+        FabricPacketEventsAPI api = FabricPacketEventsAPI.getServerAPI();
 
         User user = api.getPlayerManager().getUser(player);
         if (user == null) {

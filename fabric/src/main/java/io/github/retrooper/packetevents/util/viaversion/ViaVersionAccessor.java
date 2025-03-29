@@ -5,13 +5,5 @@ import net.minecraft.server.level.ServerPlayer;
 
 public interface ViaVersionAccessor {
 
-    int getProtocolVersion(ServerPlayer player);
-
     int getProtocolVersion(User user);
-
-    Class<?> getUserConnectionClass();
-
-    Class<?> getSpongeDecodeHandlerClass();
-
-    Class<?> getSpongeEncodeHandlerClass();
 }

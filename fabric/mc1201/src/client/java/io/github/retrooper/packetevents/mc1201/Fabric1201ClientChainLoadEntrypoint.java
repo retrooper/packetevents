@@ -8,7 +8,6 @@ public class Fabric1201ClientChainLoadEntrypoint extends Fabric1201ChainLoadEntr
 
     @Override
     public void initialize(ChainLoadData chainLoadData) {
-        super.playerManagerAbstractLazyHolder = LazyHolder.simple(Fabric1201ClientPlayerManager::new);
-        super.initialize(chainLoadData);
+        chainLoadData.setClientPlayerManagerIfNull(LazyHolder.simple(Fabric1201ClientPlayerManager::new));
     }
 }

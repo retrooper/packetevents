@@ -12,24 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class ViaVersionAccessorImpl implements ViaVersionAccessor {
 
-    private static final Class<?> ENCODE_HANDLER;
-    private static final Class<?> DECODE_HANDLER;
-
-    static {
-        try {
-            ENCODE_HANDLER = Class.forName("com.viaversion.fabric.common.handler.FabricEncodeHandler");
-            DECODE_HANDLER = Class.forName("com.viaversion.fabric.common.handler.FabricDecodeHandler");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private static Field CONNECTION_FIELD;
-
-    @Override
-    public int getProtocolVersion(ServerPlayer player) {
-        return Via.getAPI().getPlayerVersion(player);
-    }
 
     @Override
     public int getProtocolVersion(User user) {
@@ -40,25 +23,9 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
             }
             UserConnection connection = (UserConnection) CONNECTION_FIELD.get(viaEncoder);
             return connection.getProtocolInfo().getProtocolVersion();
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             PacketEvents.getAPI().getLogManager().warn("Unable to grab ViaVersion client version for player!");
             return -1;
         }
-    }
-
-    @Override
-    public Class<?> getUserConnectionClass() {
-        return UserConnection.class;
-    }
-
-    @Override
-    public Class<?> getSpongeDecodeHandlerClass() {
-        return DECODE_HANDLER;
-    }
-
-    @Override
-    public Class<?> getSpongeEncodeHandlerClass() {
-        return ENCODE_HANDLER;
     }
 }

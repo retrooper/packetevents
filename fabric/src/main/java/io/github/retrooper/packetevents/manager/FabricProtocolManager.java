@@ -18,17 +18,29 @@
 
 package io.github.retrooper.packetevents.manager;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
+import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.api.EnvType;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class FabricProtocolManager extends ProtocolManagerAbstract {
 
+    private final Map<UUID, Object> channels = new ConcurrentHashMap<>();
+    private final Map<Object, User> users = new ConcurrentHashMap<>();
     private final boolean invert;
+    private final FabricPacketEventsAPI fabricPacketEventsAPI;
 
-    public FabricProtocolManager(EnvType environment) {
+    public FabricProtocolManager(FabricPacketEventsAPI fabricPacketEventsAPI, EnvType environment) {
+        this.fabricPacketEventsAPI = fabricPacketEventsAPI;
         this.invert = environment == EnvType.CLIENT;
     }
 
@@ -88,7 +100,7 @@ public class FabricProtocolManager extends ProtocolManagerAbstract {
     @Override
     public void receivePacket(Object channel, Object byteBuf) {
         if (this.invert) {
-            // no way to specify wether to flush or not, so just don't
+            // no way to specify whether to flush or not, so just don't
             super.writePacket(channel, byteBuf);
         } else {
             this.receivePacket0(channel, byteBuf);
@@ -98,10 +110,66 @@ public class FabricProtocolManager extends ProtocolManagerAbstract {
     @Override
     public void receivePacketSilently(Object channel, Object byteBuf) {
         if (this.invert) {
-            // no way to specify wether to flush or not, so just don't
+            // no way to specify whether to flush or not, so just don't
             super.writePacketSilently(channel, byteBuf);
         } else {
             super.receivePacketSilently(channel, byteBuf);
         }
+    }
+
+    @Override
+    public Collection<User> getUsers() {
+        return users.values();
+    }
+
+    @Override
+    public Collection<Object> getChannels() {
+        return channels.values();
+    }
+
+    @Override
+    public Collection<Map.Entry<UUID, Object>> getChannelEntries() {
+        return channels.entrySet();
+    }
+
+    @Override 
+    public User getUser(Object channel) {
+        Object pipeline = ChannelHelper.getPipeline(channel);
+        return users.get(pipeline);
+    }
+
+    @Override 
+    public User removeUser(Object channel) {
+        Object pipeline = ChannelHelper.getPipeline(channel);
+        return users.remove(pipeline);
+    }
+
+    @Override
+    public void setUser(Object channel, User user) {
+        synchronized (channel) {
+            Object pipeline = ChannelHelper.getPipeline(channel);
+            users.put(pipeline, user);
+        }
+        fabricPacketEventsAPI.getInjector().updateUser(channel, user);
+    }
+
+    @Override 
+    public Object getChannel(UUID uuid) {
+        return channels.get(uuid);
+    }
+
+    @Override
+    public void setChannel(UUID uuid, Object channel) {
+        channels.put(uuid, channel);
+    }
+
+    @Override
+    public void removeChannel(UUID uuid) {
+        channels.remove(uuid);
+    }
+
+    @Override
+    public boolean hasChannel(Object channel) {
+        return channels.containsValue(channel);
     }
 }
