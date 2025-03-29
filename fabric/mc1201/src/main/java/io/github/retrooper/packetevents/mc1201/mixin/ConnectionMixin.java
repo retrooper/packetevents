@@ -18,30 +18,27 @@
 
 package io.github.retrooper.packetevents.mc1201.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import io.github.retrooper.packetevents.util.FabricInjectionUtil;
 import io.netty.channel.ChannelPipeline;
-import me.fallenbreath.conditionalmixin.api.annotation.Condition;
-import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
 import net.minecraft.network.protocol.PacketFlow;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Restriction(
-        require = {
-                @Condition(value = "minecraft", versionPredicates = {"<1.20.2"}),
-        }
-)
 @Mixin(value = net.minecraft.network.Connection.class, priority = 1500) // priority to inject after Via
 public class ConnectionMixin {
 
     @Inject(
-            method = "configureSerialization",
-            at = @At("TAIL")
+            method = "configureSerialization*",
+            at = @At("TAIL"),
+            require = 1
     )
     private static void configureSerialization(
-            ChannelPipeline pipeline, PacketFlow flow, CallbackInfo ci
+            CallbackInfo ci,
+            @Local(ordinal = 0, argsOnly = true) ChannelPipeline pipeline,
+            @Local(ordinal = 0, argsOnly = true) PacketFlow flow
     ) {
         FabricInjectionUtil.injectAtPipelineBuilder(pipeline, flow);
     }

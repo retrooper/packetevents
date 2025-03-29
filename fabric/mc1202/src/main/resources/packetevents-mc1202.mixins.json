@@ -4,8 +4,6 @@
   "package": "io.github.retrooper.packetevents.mc1202.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ConnectionMixin",
-    "PlayerListMixin",
     "PlayerListRespawnMixin"
   ],
   "injectors": {

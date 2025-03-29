@@ -58,9 +58,33 @@ allprojects {
             }
         }
 
+        remapJar {
+            archiveBaseName = "${rootProject.name}-fabric${if (project.name != "fabric") "-${project.name}" else ""}"
+            archiveVersion = rootProject.ext["versionNoHash"] as String
+        }
+
         remapSourcesJar {
             archiveVersion = rootProject.ext["versionNoHash"] as String
         }
+    }
+
+    loom {
+        mixin {
+        // Replaces strings in annotations instead of using refmap
+        // This allows us to write mixins that target methodName* and have them work across versions
+        // Even as the signature changes without having to use @Dynamic and intermeediary names
+        // This preserves some compile-time safety, reduces jar size but be careful to not inject into wrong methods
+            useLegacyMixinAp = false
+        }
+        splitEnvironmentSourceSets()
+        mods {
+            register("packetevents-${project.name}") {
+                sourceSet(sourceSets.main.get())
+                sourceSet(sourceSets.maybeCreate("client"))
+            }
+        }
+        accessWidenerPath = sourceSets.main.get().resources.srcDirs.single()
+            .resolve("${rootProject.name}.accesswidener")
     }
 
     apply(plugin = "idea")
@@ -81,12 +105,8 @@ subprojects {
         compileOnly(project(":fabric", configuration = "namedElements"))
     }
 
+    // version replacement already processed by packetevents.`library-conventions`
     tasks {
-        remapJar {
-            archiveBaseName = "${rootProject.name}-fabric-${project.name}"
-            archiveVersion = rootProject.ext["versionNoHash"] as String
-        }
-
         processResources {
             inputs.property("version", project.version)
             filesMatching("fabric.mod.json") {
@@ -94,25 +114,6 @@ subprojects {
             }
         }
     }
-}
-
-tasks {
-    remapJar {
-        archiveBaseName = "${rootProject.name}-fabric"
-        archiveVersion = rootProject.ext["versionNoHash"] as String
-    }
-}
-
-loom {
-    splitEnvironmentSourceSets()
-    mods {
-        register("packetevents") {
-            sourceSet(sourceSets.main.get())
-            sourceSet(sourceSets.maybeCreate("client"))
-        }
-    }
-    accessWidenerPath = sourceSets.main.get().resources.srcDirs.single()
-        .resolve("${rootProject.name}.accesswidener")
 }
 
 subprojects.forEach {

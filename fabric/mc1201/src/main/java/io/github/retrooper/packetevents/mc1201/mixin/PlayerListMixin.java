@@ -19,10 +19,8 @@
 package io.github.retrooper.packetevents.mc1201.mixin;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.llamalad7.mixinextras.sugar.Local;
 import io.github.retrooper.packetevents.util.FabricInjectionUtil;
-import io.netty.channel.Channel;
-import me.fallenbreath.conditionalmixin.api.annotation.Condition;
-import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
@@ -30,13 +28,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Restriction(
-        require = {
-                @Condition(value = "minecraft", versionPredicates = {"<1.20.2"}),
-        }
-)
 @Mixin(PlayerList.class)
 public abstract class PlayerListMixin {
 
@@ -48,8 +40,9 @@ public abstract class PlayerListMixin {
             at = @At("HEAD")
     )
     private void preNewPlayerPlace(
-            Connection connection, ServerPlayer player,
-            CallbackInfo ci
+            CallbackInfo ci,
+            @Local(ordinal = 0, argsOnly = true) Connection connection,
+            @Local(ordinal = 0, argsOnly = true) ServerPlayer player
     ) {
         PacketEvents.getAPI().getInjector().setPlayer(connection.channel, player);
     }
@@ -66,22 +59,9 @@ public abstract class PlayerListMixin {
             )
     )
     private void onPlayerLogin(
-        Connection connection, ServerPlayer player,
-        CallbackInfo ci
+        CallbackInfo ci,
+        @Local(ordinal = 0, argsOnly = true) ServerPlayer player
     ) {
         FabricInjectionUtil.fireUserLoginEvent(player);
-    }
-
-    /**
-     * @reason Minecraft creates a new player instance on respawn
-     */
-    @Inject(
-            method = "respawn",
-            at = @At("RETURN")
-    )
-    private void postRespawn(CallbackInfoReturnable<ServerPlayer> cir) {
-        ServerPlayer player = cir.getReturnValue();
-        Channel channel = player.connection.connection.channel;
-        PacketEvents.getAPI().getInjector().setPlayer(channel, player);
     }
 }

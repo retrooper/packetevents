@@ -7,7 +7,6 @@
     "ClientPacketListenerMixin"
   ],
   "mixins": [
-    "ConnectionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

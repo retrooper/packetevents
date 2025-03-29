@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPIManagerFactory;
 import io.github.retrooper.packetevents.loader.ChainLoadData;
@@ -28,16 +27,11 @@ import io.github.retrooper.packetevents.loader.ChainLoadEntryPoint;
 import io.github.retrooper.packetevents.manager.registry.FabricItemRegistry;
 import io.github.retrooper.packetevents.manager.registry.FabricRegistryManager;
 import io.github.retrooper.packetevents.util.LazyHolder;
-import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
 
@@ -49,40 +43,35 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
         INSTANCE = this;
         FabricLoader loader = FabricLoader.getInstance();
 
-        String chainLoadEntryPointName = null;
-        String clientChainLoadEntryPointName = null; // For client-specific entrypoints
+        String chainLoadEntryPointName = "mainChainLoad";
+        String clientChainLoadEntryPointName = "clientChainLoad"; // For client-specific entrypoints
+
+        // Collect mainChainLoad entrypoints (always present) and sort by version
+        List<ChainLoadEntryPoint> mainChainLoadEntryPoints = loader.getEntrypoints(chainLoadEntryPointName, ChainLoadEntryPoint.class);
+        mainChainLoadEntryPoints.sort((a, b) -> b.getNativeVersion().getProtocolVersion() - a.getNativeVersion().getProtocolVersion());
+
+        List<ChainLoadEntryPoint> allEntryPoints;
         switch (loader.getEnvironmentType()) {
             case CLIENT -> {
-                chainLoadEntryPointName = "mainChainLoad";
-                clientChainLoadEntryPointName = "clientChainLoad";
+                // Collect clientChainLoad entrypoints (only on client, might be empty) and sort by version then append main entry points
+                List<ChainLoadEntryPoint> clientChainLoadEntryPoints = loader.getEntrypoints(clientChainLoadEntryPointName, ChainLoadEntryPoint.class);
+                clientChainLoadEntryPoints.sort((a, b) -> b.getNativeVersion().getProtocolVersion() - a.getNativeVersion().getProtocolVersion());
+                clientChainLoadEntryPoints.addAll(mainChainLoadEntryPoints);
+
+                // 1.21.1 Client -> 1.20.1 Client -> 1.21.4 Main -> 1.21.1 Main -> 1.20.1 Main
+                allEntryPoints = clientChainLoadEntryPoints;
             }
             case SERVER -> {
-                chainLoadEntryPointName = "mainChainLoad";
+                // 1.21.4 Main -> 1.21.1 Main -> 1.20.1 Main
+                allEntryPoints = mainChainLoadEntryPoints;
             }
-        }
-
-        // Collect mainChainLoad entrypoints (always present)
-        List<ChainLoadEntryPoint> mainChainLoadEntryPoints = loader.getEntrypoints(chainLoadEntryPointName, ChainLoadEntryPoint.class);
-
-        // Collect clientChainLoad entrypoints (only on client, might be empty)
-        List<ChainLoadEntryPoint> clientChainLoadEntryPoints = loader.getEnvironmentType() == EnvType.CLIENT
-                ? loader.getEntrypoints(clientChainLoadEntryPointName, ChainLoadEntryPoint.class)
-                : Collections.emptyList();
-
-        // If on client, interleave the entrypoints; otherwise, use only mainChainLoad
-        List<ChainLoadEntryPoint> allEntryPoints;
-        if (loader.getEnvironmentType() == EnvType.SERVER) {
-            allEntryPoints = interleaveEntryPoints(mainChainLoadEntryPoints, clientChainLoadEntryPoints);
-        } else {
-            allEntryPoints = new ArrayList<>(mainChainLoadEntryPoints);
-            // Sort mainChainLoad entrypoints by version (newest first)
-            allEntryPoints.sort((a, b) -> b.getNativeVersion().getProtocolVersion() - a.getNativeVersion().getProtocolVersion());
+            default -> throw new IllegalStateException("Unexpected value: " + loader.getEnvironmentType());
         }
 
         // Initialize single chainload data instance
         ChainLoadData chainLoadData = new ChainLoadData();
 
-        // Execute all entrypoints in the sorted, interleaved order using the same ChainLoadData instance
+        // Execute all entrypoints using the same ChainLoadData instance
         for (ChainLoadEntryPoint chainLoadEntryPoint : allEntryPoints) {
             try {
                 chainLoadEntryPoint.initialize(chainLoadData);
@@ -105,43 +94,6 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
 
         PacketEvents.setAPI(new FabricPacketEventsAPI(PacketEventsMod.MOD_ID, loader.getEnvironmentType()));
         PacketEvents.getAPI().load();
-    }
-
-    /**
-     * Interleaves mainChainLoad and clientChainLoad entrypoints, sorting by version (newest first).
-     * If a clientChainLoad entrypoint is missing for a version, only the mainChainLoad entrypoint is included.
-     * @param mainEntryPoints List of mainChainLoad entrypoints
-     * @param clientEntryPoints List of clientChainLoad entrypoints
-     * @return Interleaved and sorted list of entrypoints
-     */
-    private List<ChainLoadEntryPoint> interleaveEntryPoints(
-            List<ChainLoadEntryPoint> mainEntryPoints,
-            List<ChainLoadEntryPoint> clientEntryPoints
-    ) {
-        // Use a TreeMap to group entrypoints by version, sorted newest first
-        Map<ServerVersion, List<ChainLoadEntryPoint>> versionToEntryPoints = new TreeMap<>(
-                (v1, v2) -> v2.getProtocolVersion() - v1.getProtocolVersion()
-        );
-
-        // Populate the map with mainChainLoad entrypoints
-        for (ChainLoadEntryPoint mainEntry : mainEntryPoints) {
-            versionToEntryPoints.computeIfAbsent(mainEntry.getNativeVersion(), k -> new ArrayList<>(2))
-                    .add(mainEntry);
-        }
-
-        // Add clientChainLoad entrypoints to the same version buckets
-        for (ChainLoadEntryPoint clientEntry : clientEntryPoints) {
-            versionToEntryPoints.computeIfAbsent(clientEntry.getNativeVersion(), k -> new ArrayList<>(2))
-                    .add(0, clientEntry); // Insert client entrypoint before main entrypoint
-        }
-
-        // Flatten the map into a single list, preserving version order and interleaving
-        List<ChainLoadEntryPoint> interleaved = new ArrayList<>(mainEntryPoints.size() + clientEntryPoints.size());
-        for (List<ChainLoadEntryPoint> entryPoints : versionToEntryPoints.values()) {
-            interleaved.addAll(entryPoints);
-        }
-
-        return interleaved;
     }
 
     @Override
