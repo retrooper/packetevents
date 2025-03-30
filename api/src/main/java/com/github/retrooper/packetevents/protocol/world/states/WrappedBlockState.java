@@ -1561,7 +1561,7 @@ public class WrappedBlockState {
             if (this.string == null) {
                 StringBuilder builder = new StringBuilder();
                 for (Map.Entry<StateValue, Object> entry : this.map.entrySet()) {
-                    builder.append(entry.getKey()).append('=').append(entry.getValue()).append(',');
+                    builder.append(entry.getKey().getName()).append('=').append(entry.getValue()).append(',');
                 }
                 this.string = builder.length() == 0 ? "" : '[' + builder.substring(0, builder.length() - 1) + ']';
             }
