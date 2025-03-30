@@ -1561,7 +1561,13 @@ public class WrappedBlockState {
             if (this.string == null) {
                 StringBuilder builder = new StringBuilder();
                 for (Map.Entry<StateValue, Object> entry : this.map.entrySet()) {
-                    builder.append(entry.getKey().getName()).append('=').append(entry.getValue()).append(',');
+                    builder.append(entry.getKey().getName()).append('=').append(
+                            // This is technically incorrect as NBT is case sensitive, but doesn't matter for our use case
+                            // Should replace this for future proofing (Mojang is gonna "registrize" and "componentize" everything sooner or later)
+                            // and modded support
+                            // Doing so would however break this.getInternalData()
+                            entry.getValue().toString().toLowerCase(Locale.ROOT)
+                    ).append(',');
                 }
                 this.string = builder.length() == 0 ? "" : '[' + builder.substring(0, builder.length() - 1) + ']';
             }

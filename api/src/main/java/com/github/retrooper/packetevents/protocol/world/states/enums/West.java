@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.world.states.enums;
 
+import java.util.Locale;
+
 public enum West {
     FALSE,
     LOW,
@@ -25,5 +27,10 @@ public enum West {
     SIDE,
     TALL,
     TRUE,
-    UP
+    UP;
+
+    @Override
+    public String toString() {
+        return this.name().toLowerCase(Locale.ROOT);
+    }
 }
