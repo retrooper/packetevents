@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.mc1202;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.github.retrooper.packetevents.util.LazyHolder;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.loader.ChainLoadData;
@@ -9,7 +10,7 @@ import io.github.retrooper.packetevents.mc1202.factory.fabric.Fabric1202ServerPl
 
 public class Fabric1202ChainLoadEntrypoint implements ChainLoadEntryPoint {
 
-    protected LazyHolder<PlayerManagerAbstract> playerManagerAbstractLazyHolder = LazyHolder.simple(Fabric1202ServerPlayerManager::new);
+    protected LazyHolder<PlayerManagerAbstract> playerManagerAbstractLazyHolder = LazyHolder.simple(() -> new Fabric1202ServerPlayerManager(FabricPacketEventsAPI.getServerAPI()));
 
     @Override
     public void initialize(ChainLoadData chainLoadData) {

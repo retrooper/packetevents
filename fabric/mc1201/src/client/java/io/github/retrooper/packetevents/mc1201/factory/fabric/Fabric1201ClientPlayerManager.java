@@ -18,12 +18,17 @@
 
 package io.github.retrooper.packetevents.mc1201.factory.fabric;
 
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
 import org.jetbrains.annotations.NotNull;
 
 public class Fabric1201ClientPlayerManager extends Fabric1201ServerPlayerManager {
+
+    public Fabric1201ClientPlayerManager(PacketEventsAPI<?> packetEventsAPI) {
+        super(packetEventsAPI);
+    }
 
     @Override
     public int getPing(@NotNull Object playerObj) {

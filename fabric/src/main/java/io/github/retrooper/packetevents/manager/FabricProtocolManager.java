@@ -18,11 +18,10 @@
 
 package io.github.retrooper.packetevents.manager;
 
-import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.api.EnvType;
@@ -37,10 +36,10 @@ public class FabricProtocolManager extends ProtocolManagerAbstract {
     private final Map<UUID, Object> channels = new ConcurrentHashMap<>();
     private final Map<Object, User> users = new ConcurrentHashMap<>();
     private final boolean invert;
-    private final FabricPacketEventsAPI fabricPacketEventsAPI;
+    private final PacketEventsAPI<?> packetEventsAPI;
 
-    public FabricProtocolManager(FabricPacketEventsAPI fabricPacketEventsAPI, EnvType environment) {
-        this.fabricPacketEventsAPI = fabricPacketEventsAPI;
+    public FabricProtocolManager(PacketEventsAPI<?> packetEventsAPI, EnvType environment) {
+        this.packetEventsAPI = packetEventsAPI;
         this.invert = environment == EnvType.CLIENT;
     }
 
@@ -150,7 +149,7 @@ public class FabricProtocolManager extends ProtocolManagerAbstract {
             Object pipeline = ChannelHelper.getPipeline(channel);
             users.put(pipeline, user);
         }
-        fabricPacketEventsAPI.getInjector().updateUser(channel, user);
+        packetEventsAPI.getInjector().updateUser(channel, user);
     }
 
     @Override 

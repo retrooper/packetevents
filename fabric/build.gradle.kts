@@ -1,7 +1,6 @@
 plugins {
     packetevents.`library-conventions`
     alias(libs.plugins.fabric.loom)
-    id("idea")
 }
 
 repositories {
@@ -85,14 +84,6 @@ allprojects {
         }
         accessWidenerPath = sourceSets.main.get().resources.srcDirs.single()
             .resolve("${rootProject.name}.accesswidener")
-    }
-
-    apply(plugin = "idea")
-    idea {
-        module {
-            isDownloadJavadoc = true
-            isDownloadSources = true
-        }
     }
 }
 
