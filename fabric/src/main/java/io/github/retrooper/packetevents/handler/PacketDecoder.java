@@ -26,7 +26,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import java.util.Arrays;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -65,7 +64,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
                 kryptonReorder = true;
         }
         if (evt.getClass().getName().equals("com.viaversion.fabric.common.handler.PipelineReorderEvent") || kryptonReorder) {
-            FabricInjectionUtil.reorderHandlers(ctx, side);
+            FabricInjectionUtil.reorderHandlers(ctx, side.getOpposite());
         }
         super.userEventTriggered(ctx, evt);
     }
