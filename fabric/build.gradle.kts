@@ -96,7 +96,7 @@ subprojects {
         compileOnly(project(":fabric", configuration = "namedElements"))
     }
 
-    // version replacement already processed by packetevents.`library-conventions`
+    // version replacement already processed for :fabric in packetevents.`library-conventions`
     tasks {
         processResources {
             inputs.property("version", project.version)
