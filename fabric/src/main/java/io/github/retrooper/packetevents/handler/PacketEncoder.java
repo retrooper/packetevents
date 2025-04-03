@@ -43,10 +43,11 @@ import io.netty.channel.ChannelPromise;
 import io.netty.util.ReferenceCountUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import net.minecraft.network.CompressionDecoder;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
+
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketDeflater;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +56,7 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
 
     private final PacketSide side;
     public User user;
-    public Player player;
+    public PlayerEntity player;
     private ChannelPromise promise;
     private boolean handledCompression;
     private final boolean isPre1_20_5 = PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(
@@ -161,7 +162,7 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
 
             if (PacketEvents.getAPI().getSettings().isKickOnPacketExceptionEnabled()) {
                 try {
-                    if (user != null && player instanceof ServerPlayer) {
+                    if (user != null && player instanceof ServerPlayerEntity) {
                         // Use cross-platform PacketEvents wrapper for disconnect packet
                         WrapperPlayServerDisconnect disconnectPacket = new WrapperPlayServerDisconnect(
                             net.kyori.adventure.text.Component.text("Invalid packet")
@@ -173,10 +174,11 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
                 }
                 ctx.channel().close();
 
-                if (player instanceof ServerPlayer serverPlayer) {
+                if (player instanceof ServerPlayerEntity serverPlayer) {
                     // Schedule delayed kick (Fabric-specific, using Minecraft's scheduler)
                     serverPlayer.getServer().execute(() -> {
-                        serverPlayer.connection.disconnect(Component.literal("Invalid packet"));
+//                        serverPlayer.connection.disconnect(Component.literal("Invalid packet"));
+                        serverPlayer.networkHandler.disconnect(new TextComponent("Invalid packet"));
                     });
                 }
 
@@ -230,7 +232,7 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private void decompress(ChannelPipeline pipe, ByteBuf buffer) {
-        CompressionDecoder decompressor = (CompressionDecoder) pipe.get("decompress");
+        PacketDeflater decompressor = (PacketDeflater) pipe.get("decompress");
         ChannelHandlerContext decompressorCtx = pipe.context("decompress");
 
         ByteBuf decompressed = null;

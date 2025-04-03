@@ -20,7 +20,7 @@
   ],
   "accessWidener": "packetevents.accesswidener",
   "depends": {
-    "fabricloader": ">=0.15.11",
+    "fabricloader": "*",
     "minecraft": ">=1.20.5"
   }
 }

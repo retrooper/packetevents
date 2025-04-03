@@ -3,12 +3,10 @@ package io.github.retrooper.packetevents.util.viaversion;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import io.netty.channel.Channel;
 
 import java.lang.reflect.Field;
-import net.minecraft.server.level.ServerPlayer;
 
 public class ViaVersionAccessorImpl implements ViaVersionAccessor {
 

@@ -40,14 +40,11 @@ import io.github.retrooper.packetevents.manager.InternalFabricPacketListener;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
+import java.util.logging.Logger;
 
 public class FabricPacketEventsAPI extends PacketEventsAPI<ModInitializer> {
-    private static final Logger LOGGER = LoggerFactory.getLogger("PacketEvents");
-
     private final String modId;
     private final EnvType environment;
     private final PacketEventsSettings settings;
@@ -56,7 +53,7 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<ModInitializer> {
     private final ServerManager serverManager;
     private final ChannelInjector injector;
     private final NettyManager nettyManager = new NettyManagerImpl();
-    private final LogManager logManager = new FabricLogger(LOGGER);
+    private final LogManager logManager = new FabricLogger(Logger.getLogger("PacketEvents"));
 
     private boolean loaded;
     private boolean initialized;

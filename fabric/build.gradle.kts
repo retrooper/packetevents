@@ -4,13 +4,13 @@ plugins {
 }
 
 repositories {
+    mavenCentral()
     maven("https://repo.viaversion.com/")
     maven("https://jitpack.io") // Conditional Mixin
 }
 
 val minecraft_version: String by project
-val parchment_minecraft_version: String by project
-val parchment_mappings: String by project
+val yarn_mappings: String by project
 val loader_version: String by project
 
 dependencies {
@@ -26,12 +26,17 @@ dependencies {
 
     // To change the versions, see the gradle.properties file
     minecraft("com.mojang:minecraft:$minecraft_version")
-    mappings(loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-$parchment_minecraft_version:$parchment_mappings")
-    })
+    mappings("net.fabricmc:yarn:$yarn_mappings")
 
     compileOnly(libs.via.version)
+}
+
+loom {
+    mods {
+        register("packetevents-${project.name}") {
+            sourceSet(sourceSets.main.get())
+        }
+    }
 }
 
 allprojects {
@@ -39,10 +44,6 @@ allprojects {
 
     repositories {
         maven("https://repo.codemc.io/repository/maven-snapshots/")
-        maven {
-            name = "ParchmentMC"
-            url = uri("https://maven.parchmentmc.org")
-        }
     }
 
     dependencies {
@@ -75,13 +76,7 @@ allprojects {
         // This preserves some compile-time safety, reduces jar size but be careful to not inject into wrong methods
             useLegacyMixinAp = false
         }
-        splitEnvironmentSourceSets()
-        mods {
-            register("packetevents-${project.name}") {
-                sourceSet(sourceSets.main.get())
-                sourceSet(sourceSets.maybeCreate("client"))
-            }
-        }
+
         accessWidenerPath = sourceSets.main.get().resources.srcDirs.single()
             .resolve("${rootProject.name}.accesswidener")
     }
@@ -90,10 +85,27 @@ allprojects {
 subprojects {
     version = rootProject.version
 
+    repositories {
+        maven {
+            name = "ParchmentMC"
+            url = uri("https://maven.parchmentmc.org")
+        }
+    }
+
     dependencies {
         compileOnly(project(":api", "shadow"))
         compileOnly(project(":netty-common"))
         compileOnly(project(":fabric", configuration = "namedElements"))
+    }
+
+    loom {
+        splitEnvironmentSourceSets()
+        mods {
+            register("packetevents-${project.name}") {
+                sourceSet(sourceSets.main.get())
+                sourceSet(sourceSets.maybeCreate("client"))
+            }
+        }
     }
 
     // version replacement already processed for :fabric in packetevents.`library-conventions`

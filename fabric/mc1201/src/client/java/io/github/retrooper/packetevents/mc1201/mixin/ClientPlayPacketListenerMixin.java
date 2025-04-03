@@ -18,56 +18,52 @@
 
 package io.github.retrooper.packetevents.mc1201.mixin;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.Connection;
-import net.minecraft.network.TickablePacketListener;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.listener.TickablePacketListener;
 import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientPacketListener.class)
-public abstract class ClientPacketListenerMixin implements TickablePacketListener,
-    ClientGamePacketListener {
+@Mixin(ClientPlayPacketListener.class)
+public abstract class ClientPlayPacketListenerMixin implements TickablePacketListener, ClientPlayPacketListener {
 
-    @Shadow public abstract Connection getConnection();
+    @Shadow public abstract ClientConnection getConnection();
     /**
      * @reason Associate connection instance with player instance
      */
     @Inject(
-            method = "handleLogin",
+            method = "onGameJoin",
             at = @At(
                     value = "FIELD",
                     opcode = Opcodes.PUTFIELD,
-                    target = "Lnet/minecraft/client/Minecraft;player:Lnet/minecraft/client/player/LocalPlayer;",
+                    target = "Lnet/minecraft/client/MinecraftClient;player:Lnet/minecraft/client/network/ClientPlayerEntity;",
                     shift = At.Shift.AFTER
             )
     )
     private void postLoginPlayerConstruct(CallbackInfo ci) {
-        FabricPacketEventsAPI.getClientAPI().getInjector().setPlayer(this.getConnection().channel, Minecraft.getInstance().player);
+        FabricPacketEventsAPI.getClientAPI().getInjector().setPlayer(this.getConnection().channel, MinecraftClient.getInstance().player);
     }
 
     /**
      * @reason Minecraft creates a new player instance on respawn
      */
     @Inject(
-            method = "handleRespawn",
+            method = "onPlayerRespawn",
             at = @At(
                     // inject immediately after new player instance has been created
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/player/LocalPlayer;setId(I)V"
             )
     )
-    private void postRespawnPlayerConstruct(CallbackInfo ci, @Local(ordinal = 1) LocalPlayer player) {
+    private void postRespawnPlayerConstruct(CallbackInfo ci, @Local(ordinal = 1) ClientPlayerEntity player) {
         FabricPacketEventsAPI.getClientAPI().getInjector().setPlayer(this.getConnection().channel, player);
     }
 }

@@ -19,9 +19,8 @@
 package io.github.retrooper.packetevents.mc1201.factory.fabric;
 
 import com.github.retrooper.packetevents.PacketEventsAPI;
-import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.manager.AbstractFabricPlayerManager;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 public class Fabric1201ServerPlayerManager extends AbstractFabricPlayerManager {
@@ -32,16 +31,16 @@ public class Fabric1201ServerPlayerManager extends AbstractFabricPlayerManager {
 
     @Override
     public int getPing(@NotNull Object player) {
-        if (player instanceof ServerPlayer) {
-            return ((ServerPlayer) player).latency;
+        if (player instanceof ServerPlayerEntity) {
+            return ((ServerPlayerEntity) player).pingMilliseconds; // pingMilliseconds in modern yarn
         }
         throw new UnsupportedOperationException("Unsupported player implementation: " + player);
     }
 
     @Override
     public Object getChannel(@NotNull Object player) {
-        if (player instanceof ServerPlayer) {
-            return ((ServerPlayer) player).connection.connection.channel;
+        if (player instanceof ServerPlayerEntity) {
+            return ((ServerPlayerEntity) player).networkHandler.connection.channel;
         }
         throw new UnsupportedOperationException("Unsupported player implementation: " + player);
     }

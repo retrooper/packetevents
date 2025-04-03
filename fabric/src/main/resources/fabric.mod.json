@@ -24,6 +24,6 @@
   ],
   "accessWidener": "packetevents.accesswidener",
   "depends": {
-    "fabricloader": ">=0.15.11"
+    "fabricloader": "*"
   }
 }

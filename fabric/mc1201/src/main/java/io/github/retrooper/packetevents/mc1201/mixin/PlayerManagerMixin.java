@@ -21,28 +21,28 @@ package io.github.retrooper.packetevents.mc1201.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.github.retrooper.packetevents.util.FabricInjectionUtil;
-import net.minecraft.network.Connection;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.server.PlayerManager;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(PlayerList.class)
-public abstract class PlayerListMixin {
+@Mixin(PlayerManager.class)
+public abstract class PlayerManagerMixin {
 
     /**
      * @reason Associate connection instance with player instance
      */
     @Inject(
-            method = "placeNewPlayer*",
+            method = "onPlayerConnect*",
             at = @At("HEAD")
     )
-    private void preNewPlayerPlace(
+    private void onPlayerConnect(
             CallbackInfo ci,
-            @Local(ordinal = 0, argsOnly = true) Connection connection,
-            @Local(ordinal = 0, argsOnly = true) ServerPlayer player
+            @Local(ordinal = 0, argsOnly = true) ClientConnection connection,
+            @Local(ordinal = 0, argsOnly = true) ServerPlayerEntity player
     ) {
         FabricPacketEventsAPI.getServerAPI().getInjector().setPlayer(connection.channel, player);
     }
@@ -51,16 +51,16 @@ public abstract class PlayerListMixin {
      * @reason Associate connection instance with player instance and handle login event
      */
     @Inject(
-            method = "placeNewPlayer*",
+            method = "onPlayerConnect*",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/players/PlayerList;broadcastAll(Lnet/minecraft/network/protocol/Packet;)V",
+                    target = "Lnet/minecraft/server/PlayerManager;sendToAll(Lnet/minecraft/network/packet/Packet;)V",
                     shift = At.Shift.AFTER
             )
     )
     private void onPlayerLogin(
         CallbackInfo ci,
-        @Local(ordinal = 0, argsOnly = true) ServerPlayer player
+        @Local(ordinal = 0, argsOnly = true) ServerPlayerEntity player
     ) {
         FabricInjectionUtil.fireUserLoginEvent(player);
     }

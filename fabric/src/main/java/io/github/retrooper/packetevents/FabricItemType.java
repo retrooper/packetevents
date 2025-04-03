@@ -6,8 +6,10 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import java.util.Set;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.item.Item;
+
+import net.minecraft.item.Item;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 
 public class FabricItemType implements ItemType {
@@ -20,17 +22,17 @@ public class FabricItemType implements ItemType {
 
     @Override
     public int getMaxAmount() {
-        return item.getMaxStackSize();
+        return item.getMaxAmount();
     }
 
     @Override
     public int getMaxDurability() {
-        return item.getMaxDamage();
+        return item.getDurability();
     }
 
     @Override
     public ItemType getCraftRemainder() {
-        return new FabricItemType(item.getCraftingRemainingItem());
+        return new FabricItemType(item.getRecipeRemainder());
     }
 
     @Override
@@ -45,13 +47,13 @@ public class FabricItemType implements ItemType {
 
     @Override
     public ResourceLocation getName() {
-        net.minecraft.resources.ResourceLocation resourceLocation = BuiltInRegistries.ITEM.getKey(item);
+        Identifier resourceLocation = Registry.ITEM.getId(item);
         return new ResourceLocation(resourceLocation.getNamespace(), resourceLocation.getPath());
     }
 
     @Override
     public int getId(ClientVersion version) {
-        return BuiltInRegistries.ITEM.getId(item);
+        return Registry.ITEM.getRawId(item);
     }
 
     @Override

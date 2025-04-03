@@ -21,24 +21,25 @@ package io.github.retrooper.packetevents.mc1201.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.github.retrooper.packetevents.util.FabricInjectionUtil;
 import io.netty.channel.ChannelPipeline;
-import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.network.NetworkSide;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = net.minecraft.network.Connection.class, priority = 1500) // priority to inject after Via
-public class ConnectionMixin {
+@Mixin(value = ClientConnection.class, priority = 1500) // priority to inject after Via
+public class ClientConnectionMixin {
 
     @Inject(
-            method = "configureSerialization*",
+            method = "addHandlers*",
             at = @At("TAIL"),
             require = 1
     )
-    private static void configureSerialization(
+    private static void addHandlers(
             CallbackInfo ci,
             @Local(ordinal = 0, argsOnly = true) ChannelPipeline pipeline,
-            @Local(ordinal = 0, argsOnly = true) PacketFlow flow
+            @Local(ordinal = 0, argsOnly = true) NetworkSide flow
     ) {
         FabricInjectionUtil.injectAtPipelineBuilder(pipeline, flow);
     }

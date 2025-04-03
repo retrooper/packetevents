@@ -20,9 +20,9 @@ package io.github.retrooper.packetevents.mc1211.factory.fabric;
 
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import io.github.retrooper.packetevents.mc1202.factory.fabric.Fabric1202ServerPlayerManager;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
 import org.jetbrains.annotations.NotNull;
 
 public class Fabric1211ClientPlayerManager extends Fabric1202ServerPlayerManager {
@@ -33,23 +33,23 @@ public class Fabric1211ClientPlayerManager extends Fabric1202ServerPlayerManager
 
     @Override
     public int getPing(@NotNull Object playerObj) {
-        if (playerObj instanceof LocalPlayer player) {
-            PlayerInfo info = player.connection.getPlayerInfo(player.getUUID());
+        if (playerObj instanceof ClientPlayerEntity player) {
+            PlayerListEntry info = player.networkHandler.getPlayerListEntry(player.getUuid());
             if (info != null) {
                 return info.getLatency();
             }
             // if the server doesn't show the player info of
             // the player itself, try to fall back to potential
             // latency sampling data - which is often not present
-            return (int) Minecraft.getInstance().getDebugOverlay().getPingLogger().get(0);
+            return (int) MinecraftClient.getInstance().getDebugHud().getPingLog().get(0);
         }
         return super.getPing(playerObj);
     }
 
     @Override
     public Object getChannel(@NotNull Object player) {
-        if (player instanceof LocalPlayer) {
-            return ((LocalPlayer) player).connection.getConnection().channel;
+        if (player instanceof ClientPlayerEntity) {
+            return ((ClientPlayerEntity) player).networkHandler.getConnection().channel;
         }
         return super.getChannel(player);
     }

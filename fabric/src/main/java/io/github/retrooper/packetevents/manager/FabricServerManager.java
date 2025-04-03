@@ -30,7 +30,7 @@ public class FabricServerManager extends ServerManagerAbstract {
     private ServerVersion version;
 
     private ServerVersion resolveVersion() {
-        String mcVersion = SharedConstants.getCurrentVersion().getId();
+        String mcVersion = SharedConstants.getGameVersion().getId();
         for (ServerVersion version : ServerVersion.reversedValues()) {
             if (mcVersion.contains(version.getReleaseName())) {
                 return version;

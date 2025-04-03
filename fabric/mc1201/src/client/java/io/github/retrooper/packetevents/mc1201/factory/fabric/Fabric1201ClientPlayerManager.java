@@ -19,9 +19,8 @@
 package io.github.retrooper.packetevents.mc1201.factory.fabric;
 
 import com.github.retrooper.packetevents.PacketEventsAPI;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
 import org.jetbrains.annotations.NotNull;
 
 public class Fabric1201ClientPlayerManager extends Fabric1201ServerPlayerManager {
@@ -32,8 +31,8 @@ public class Fabric1201ClientPlayerManager extends Fabric1201ServerPlayerManager
 
     @Override
     public int getPing(@NotNull Object playerObj) {
-        if (playerObj instanceof LocalPlayer player) {
-            PlayerInfo info = player.connection.getPlayerInfo(player.getUUID());
+        if (playerObj instanceof ClientPlayerEntity player) {
+            PlayerListEntry info = player.networkHandler.getPlayerListEntry(player.getUuid());
             if (info != null) {
                 return info.getLatency();
             }
@@ -48,8 +47,8 @@ public class Fabric1201ClientPlayerManager extends Fabric1201ServerPlayerManager
 
     @Override
     public Object getChannel(@NotNull Object player) {
-        if (player instanceof LocalPlayer) {
-            return ((LocalPlayer) player).connection.getConnection().channel;
+        if (player instanceof ClientPlayerEntity) {
+            return ((ClientPlayerEntity) player).networkHandler.getConnection().channel;
         }
         return super.getChannel(player);
     }

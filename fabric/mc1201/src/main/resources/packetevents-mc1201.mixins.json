@@ -7,9 +7,9 @@
     "ClientPacketListenerMixin"
   ],
   "mixins": [
-    "ConnectionMixin",
-    "PlayerListMixin",
-    "PlayerListRespawnMixin"
+    "ClientConnectionMixin",
+    "PlayerManagerMixin",
+    "PlayerManagerRespawnMixin"
   ],
   "injectors": {
     "defaultRequire": 1
