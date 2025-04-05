@@ -3,7 +3,7 @@ package io.github.retrooper.packetevents.mc1140;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.github.retrooper.packetevents.manager.registry.FabricRegistryManager;
-import io.github.retrooper.packetevents.mc1140.registry.Fabric1140ItemRegistry;
+import io.github.retrooper.packetevents.mc1140.manager.registry.Fabric1140ItemRegistry;
 import io.github.retrooper.packetevents.util.LazyHolder;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.loader.ChainLoadData;

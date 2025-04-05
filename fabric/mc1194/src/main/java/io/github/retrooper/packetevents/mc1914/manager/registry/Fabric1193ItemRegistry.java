@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents.mc1914.mixin.registry;
+package io.github.retrooper.packetevents.mc1914.manager.registry;
 
 import com.github.retrooper.packetevents.manager.registry.ItemRegistry;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;

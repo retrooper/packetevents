@@ -45,7 +45,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketDeflater;
 import net.minecraft.network.PacketInflater;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.network.ServerPlayerEntity;

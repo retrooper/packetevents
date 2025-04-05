@@ -10,6 +10,11 @@
   "contact": {},
   "license": "GPL-3.0",
   "environment": "*",
+  "entrypoints": {
+    "mainChainLoad": [
+      "io.github.retrooper.packetevents.mc1914.Fabric1913ChainLoadEntrypoint"
+    ]
+  },
   "mixins": [
     "packetevents-mc1914.mixins.json"
   ],
