@@ -25,9 +25,9 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
 import org.jetbrains.annotations.NotNull;
 
-public class Fabric1211ClientPlayerManager extends Fabric1202ServerPlayerManager {
+public class Fabric1205ClientPlayerManager extends Fabric1202ServerPlayerManager {
 
-    public Fabric1211ClientPlayerManager(PacketEventsAPI<?> packetEventsAPI) {
+    public Fabric1205ClientPlayerManager(PacketEventsAPI<?> packetEventsAPI) {
         super(packetEventsAPI);
     }
 

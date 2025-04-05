@@ -38,6 +38,6 @@ include(":fabric:mc1140")
 include(":fabric:mc1194")
 include(":fabric:mc1202")
 include(":fabric:mc1211")
-include(":fabric:mc1214")
+include(":fabric:mc1215")
 // Patch modules
 include(":patch:adventure-text-serializer-gson")

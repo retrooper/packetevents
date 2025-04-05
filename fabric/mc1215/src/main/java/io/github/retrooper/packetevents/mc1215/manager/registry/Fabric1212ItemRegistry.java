@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents.mc1214.manager.registry;
+package io.github.retrooper.packetevents.mc1215.manager.registry;
 
 import com.github.retrooper.packetevents.manager.registry.ItemRegistry;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
@@ -8,7 +8,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class Fabric1214ItemRegistry implements ItemRegistry {
+public class Fabric1212ItemRegistry implements ItemRegistry {
 
     @Override
     public @NotNull ItemType getByName(String name) {
