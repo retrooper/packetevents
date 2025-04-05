@@ -102,6 +102,11 @@ public abstract class PacketEventsAPI<T> {
                     public @Nullable ItemType getByName(String name) {
                         return null;
                     }
+
+                    @Override
+                    public @Nullable ItemType getById(int id) {
+                        return null;
+                    }
                 };
             }
         };

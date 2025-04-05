@@ -17,4 +17,9 @@ public class Fabric1193ItemRegistry implements ItemRegistry {
         Optional<Item> item = Registries.ITEM.getOrEmpty(Identifier.splitOn(name, ':'));
         return item.isPresent() ? new FabricItemType(item.get()) : null;
     }
+
+    @Override
+    public @Nullable ItemType getById(int id) {
+        return null;
+    }
 }
