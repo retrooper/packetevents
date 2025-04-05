@@ -16,23 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.mc1202.factory.fabric;
+package io.github.retrooper.packetevents.mc1140.factory.fabric;
 
 import com.github.retrooper.packetevents.PacketEventsAPI;
-import io.github.retrooper.packetevents.mc1140.factory.fabric.Fabric1140ServerPlayerManager;
+import io.github.retrooper.packetevents.manager.AbstractFabricPlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
-public class Fabric1202ServerPlayerManager extends Fabric1140ServerPlayerManager {
+public class Fabric1140ServerPlayerManager extends AbstractFabricPlayerManager {
 
-    public Fabric1202ServerPlayerManager(PacketEventsAPI<?> packetEventsAPI) {
+    public Fabric1140ServerPlayerManager(PacketEventsAPI<?> packetEventsAPI) {
         super(packetEventsAPI);
     }
 
     @Override
     public int getPing(@NotNull Object player) {
         if (player instanceof ServerPlayerEntity) {
-            return ((ServerPlayerEntity) player).networkHandler.getLatency();
+            return ((ServerPlayerEntity) player).field_13967; // pingMilliseconds in modern yarn
         }
         throw new UnsupportedOperationException("Unsupported player implementation: " + player);
     }
@@ -40,7 +40,7 @@ public class Fabric1202ServerPlayerManager extends Fabric1140ServerPlayerManager
     @Override
     public Object getChannel(@NotNull Object player) {
         if (player instanceof ServerPlayerEntity) {
-            return ((ServerPlayerEntity) player).networkHandler.connection.channel;
+            return ((ServerPlayerEntity) player).networkHandler.client.channel;
         }
         throw new UnsupportedOperationException("Unsupported player implementation: " + player);
     }

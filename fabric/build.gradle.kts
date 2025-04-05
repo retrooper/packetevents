@@ -70,20 +70,25 @@ allprojects {
 
     loom {
         mixin {
-        // Replaces strings in annotations instead of using refmap
-        // This allows us to write mixins that target methodName* and have them work across versions
-        // Even as the signature changes without having to use @Dynamic and intermeediary names
-        // This preserves some compile-time safety, reduces jar size but be careful to not inject into wrong methods
-            useLegacyMixinAp = false
+            // Replaces strings in annotations instead of using refmap
+            // This allows us to write mixins that target methodName* and have them work across versions
+            // Even as the signature changes without having to use @Dynamic and intermediary names
+            // This preserves some compile-time safety, reduces jar size but be careful to not inject into wrong methods
+            useLegacyMixinAp.set(false)
         }
 
-        accessWidenerPath = sourceSets.main.get().resources.srcDirs.single()
+        val accessWidenerFile = sourceSets["main"].resources.srcDirs.first()
             .resolve("${rootProject.name}.accesswidener")
+
+        if (accessWidenerFile.exists()) {
+            accessWidenerPath.set(accessWidenerFile)
+        }
     }
 }
 
 subprojects {
     version = rootProject.version
+    val minecraft_version: String by project
 
     repositories {
         maven {
@@ -98,22 +103,23 @@ subprojects {
         compileOnly(project(":fabric", configuration = "namedElements"))
     }
 
-    loom {
-        splitEnvironmentSourceSets()
-        mods {
-            register("packetevents-${project.name}") {
-                sourceSet(sourceSets.main.get())
-                sourceSet(sourceSets.maybeCreate("client"))
-            }
-        }
-    }
-
     // version replacement already processed for :fabric in packetevents.`library-conventions`
     tasks {
         processResources {
+            // Declare the inputs to allow Gradle to track changes
             inputs.property("version", project.version)
+            inputs.property("modName", "packetevents-${project.name}")
+            inputs.property("minecraft_version", minecraft_version) // Add if you use this
+
+            // Match and expand variables in fabric.mod.json
             filesMatching("fabric.mod.json") {
-                expand("version" to project.version)
+                expand(
+                    mapOf(
+                        "version" to project.version,
+                        "modName" to "packetevents-${project.name}",
+                        "minecraft_version" to minecraft_version // Or pull from a variable
+                    )
+                )
             }
         }
     }

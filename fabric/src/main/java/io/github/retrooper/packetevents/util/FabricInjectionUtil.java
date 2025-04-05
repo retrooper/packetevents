@@ -20,18 +20,13 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import net.minecraft.SharedConstants;
 import net.minecraft.network.NetworkSide;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class FabricInjectionUtil {
     private static final String VIA_DECODER_NAME = "via-decoder";
     private static final String VIA_ENCODER_NAME = "via-encoder";
-
-    private static final ClientVersion CLIENT_VERSION =
-        ClientVersion.getById(SharedConstants.getGameVersion().getProtocolVersion());
 
     public static void injectAtPipelineBuilder(ChannelPipeline pipeline, NetworkSide flow) {
         PacketSide pipelineSide = switch (flow) {

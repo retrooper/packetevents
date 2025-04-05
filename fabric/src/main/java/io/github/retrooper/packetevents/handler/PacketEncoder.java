@@ -46,6 +46,7 @@ import java.util.List;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketDeflater;
+import net.minecraft.network.PacketInflater;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.ApiStatus;
@@ -232,7 +233,7 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private void decompress(ChannelPipeline pipe, ByteBuf buffer) {
-        PacketDeflater decompressor = (PacketDeflater) pipe.get("decompress");
+        PacketInflater decompressor = (PacketInflater) pipe.get("decompress");
         ChannelHandlerContext decompressorCtx = pipe.context("decompress");
 
         ByteBuf decompressed = null;

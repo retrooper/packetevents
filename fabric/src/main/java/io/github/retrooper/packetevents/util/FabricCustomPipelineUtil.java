@@ -19,6 +19,7 @@ package io.github.retrooper.packetevents.util;
  */
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.lang.invoke.MethodHandle;
@@ -30,6 +31,7 @@ import java.util.List;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.MappingResolver;
 import net.minecraft.network.PacketDeflater;
+import net.minecraft.network.PacketInflater;
 
 public class FabricCustomPipelineUtil {
     private static final MethodHandle FABRIC_PACKET_DECODE_BYTEBUF;
@@ -40,7 +42,7 @@ public class FabricCustomPipelineUtil {
             MappingResolver resolver = FabricLoader.getInstance().getMappingResolver();
 
             // Get the runtime (potentially obfuscated) class for CompressionDecoder
-            Class<?> compressionDecoderClass = PacketDeflater.class;
+            Class<?> compressionDecoderClass = PacketInflater.class;
 
             // Map the method name from intermediary to runtime (obfuscated) names
             String intermediaryMethodName = "decode"; // Intermediary method name
@@ -81,8 +83,9 @@ public class FabricCustomPipelineUtil {
         }
     }
 
-    public static List<Object> callPacketDecodeByteBuf(PacketDeflater decoder, ChannelHandlerContext ctx, ByteBuf msg) throws InvocationTargetException {
+    public static List<Object> callPacketDecodeByteBuf(PacketInflater decoder, ChannelHandlerContext ctx, ByteBuf msg) throws InvocationTargetException {
         List<Object> output = new ArrayList<>(1);
+
         try {
             FABRIC_PACKET_DECODE_BYTEBUF.invokeExact(decoder, ctx, msg, output);
         } catch (Throwable e) {

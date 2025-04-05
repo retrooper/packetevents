@@ -6,6 +6,8 @@ import io.github.retrooper.packetevents.loader.ChainLoadData;
 import io.github.retrooper.packetevents.loader.ChainLoadEntryPoint;
 import io.github.retrooper.packetevents.manager.registry.FabricRegistryManager;
 import io.github.retrooper.packetevents.mc1214.manager.registry.Fabric1214ItemRegistry;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
 public class Fabric1214ChainLoadEntrypoint implements ChainLoadEntryPoint {
 
@@ -18,6 +20,6 @@ public class Fabric1214ChainLoadEntrypoint implements ChainLoadEntryPoint {
 
     @Override
     public ServerVersion getNativeVersion() {
-        return ServerVersion.V_1_21_1;
+        return ServerVersion.V_1_21_4;
     }
 }

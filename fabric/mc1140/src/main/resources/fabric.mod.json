@@ -12,15 +12,17 @@
   "environment": "*",
   "entrypoints": {
     "mainChainLoad": [
-      "io.github.retrooper.packetevents.mc1202.Fabric1202ChainLoadEntrypoint"
+      "io.github.retrooper.packetevents.mc1140.Fabric1140ChainLoadEntrypoint"
+    ],
+    "clientChainLoad": [
+      "io.github.retrooper.packetevents.mc1140.Fabric1140ClientChainLoadEntrypoint"
     ]
   },
   "mixins": [
-    "packetevents-mc1202.mixins.json"
+    "packetevents-mc1140.mixins.json"
   ],
   "accessWidener": "packetevents.accesswidener",
   "depends": {
-    "fabricloader": "*",
-    "minecraft": ">=1.20.2"
+    "fabricloader": "*"
   }
 }
