@@ -6049,7 +6049,8 @@
     "item_name": "CggACXRyYW5zbGF0ZQAVaXRlbS5taW5lY3JhZnQuc2hpZWxkAA==",
     "max_damage": "0AI=",
     "max_stack_size": "AQ==",
-    "repairable": "AB9taW5lY3JhZnQ6d29vZGVuX3Rvb2xfbWF0ZXJpYWxz"
+    "repairable": "AB9taW5lY3JhZnQ6d29vZGVuX3Rvb2xfbWF0ZXJpYWxz",
+    "use_cooldown": "QKAAAAEQbWluZWNyYWZ0OnNoaWVsZA=="
   },
   "shulker_shell": {
     "item_model": "F21pbmVjcmFmdDpzaHVsa2VyX3NoZWxs",
