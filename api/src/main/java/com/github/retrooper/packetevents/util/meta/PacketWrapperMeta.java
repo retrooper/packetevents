@@ -5,10 +5,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class PacketWrapperMeta {
     private final Map<String, Object> data = new HashMap<>();
-    private final long timestamp = System.currentTimeMillis();
+    private final long timestamp = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(10);
 
     public void put(@NotNull String key, @NotNull Object value) {
         this.data.put(key, value);
