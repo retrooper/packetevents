@@ -116,14 +116,11 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     @ApiStatus.Internal
     public final Object bufferLock = new Object();
 
-    // For use metadata packet system
     private final Map<String, Object> metadata = new HashMap<>();
 
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
-
     private final PacketTypeData packetTypeData;
-
     // For sending chunk data packets, which need this data
     @Nullable
     protected User user;
@@ -241,7 +238,6 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         } else {
             writeVarInt(packetTypeData.getNativePacketId());
         }
-
         write();
     }
 
@@ -274,7 +270,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     public void writeMeta() {
         if (this.buffer != null) {
-            this.metadata.forEach((s, o) -> PacketWrapperMetaCache.setMeta(this.buffer, s, o));
+            this.metadata.forEach((key, value) -> PacketWrapperMetaCache.setMeta(this.buffer, key, value));
         }
     }
 
@@ -294,8 +290,6 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     //Current idea change server version, but still think more
 
     public final void readEvent(ProtocolPacketEvent event) {
-
-        // Wrapped meta system
         readMeta();
 
         PacketWrapper<?> last = event.getLastUsedWrapper();
