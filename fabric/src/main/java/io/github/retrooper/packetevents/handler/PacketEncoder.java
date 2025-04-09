@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.handler;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
-import io.github.retrooper.packetevents.impl.netty.bytebuf.WrappedIdentifyByteBuf;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -50,11 +49,6 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
         if (!in.isReadable()) {
             in.release();
             return;
-        }
-
-        // Wrapped meta system
-        if (!(in instanceof WrappedIdentifyByteBuf)) {
-            in = new WrappedIdentifyByteBuf(in);
         }
 
         PacketEventsImplHelper.handlePacket(ctx.channel(),

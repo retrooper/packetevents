@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.netty.buffer;
 import java.nio.charset.Charset;
 
 public interface ByteBufOperator {
-    Object create(Object original);
 
     int capacity(Object buffer);
     Object capacity(Object buffer, int capacity);

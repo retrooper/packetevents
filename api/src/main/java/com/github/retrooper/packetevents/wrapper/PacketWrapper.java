@@ -223,9 +223,6 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
             buffer = ChannelHelper.pooledByteBuf(channel);
         }
 
-        // Rewrite buffer to a meta-system
-        this.buffer = ByteBufHelper.create(this.buffer);
-
         // Wrapped meta system
         writeMeta();
 

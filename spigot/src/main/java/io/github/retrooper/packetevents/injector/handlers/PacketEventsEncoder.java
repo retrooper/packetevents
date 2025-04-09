@@ -26,12 +26,9 @@ import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
-import io.github.retrooper.packetevents.impl.netty.bytebuf.WrappedIdentifyByteBuf;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
@@ -70,12 +67,6 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-
-        // Wrapped meta system
-        if (!(byteBuf instanceof WrappedIdentifyByteBuf)) {
-            byteBuf = new WrappedIdentifyByteBuf(byteBuf);
-        }
-
         boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
         handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
 
