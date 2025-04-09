@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
+import io.github.retrooper.packetevents.impl.netty.bytebuf.WrappedIdentifyByteBuf;
 import io.github.retrooper.packetevents.sponge.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.sponge.util.SpongeReflectionUtil;
 import io.netty.buffer.ByteBuf;
@@ -63,6 +64,12 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
         if (buffer.isReadable()) {
+
+            // Wrapped meta system
+            if (!(buffer instanceof WrappedIdentifyByteBuf)) {
+                buffer = new WrappedIdentifyByteBuf(buffer);
+            }
+
             read(ctx, buffer, out);
         }
     }

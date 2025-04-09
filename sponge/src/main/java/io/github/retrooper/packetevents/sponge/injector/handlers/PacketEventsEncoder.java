@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import io.github.retrooper.packetevents.impl.netty.bytebuf.WrappedIdentifyByteBuf;
 import io.github.retrooper.packetevents.sponge.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.sponge.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
@@ -63,6 +64,12 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
+
+        // Wrapped meta system
+        if (!(byteBuf instanceof WrappedIdentifyByteBuf)) {
+            byteBuf = new WrappedIdentifyByteBuf(byteBuf);
+        }
+
         boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
         handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
 

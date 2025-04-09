@@ -19,11 +19,18 @@
 package io.github.retrooper.packetevents.impl.netty.buffer;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufOperator;
+import io.github.retrooper.packetevents.impl.netty.bytebuf.WrappedIdentifyByteBuf;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.Charset;
 
 public class ByteBufOperatorImpl implements ByteBufOperator {
+
+    @Override
+    public Object create(Object original) {
+        return new WrappedIdentifyByteBuf((ByteBuf) original);
+    }
+
     @Override
     public int capacity(Object buffer) {
         return ((ByteBuf)buffer).capacity();

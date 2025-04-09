@@ -51,15 +51,8 @@ import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.protocol.chat.ChatType;
-import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
-import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
-import com.github.retrooper.packetevents.protocol.chat.MessageSignature;
-import com.github.retrooper.packetevents.protocol.chat.Node;
-import com.github.retrooper.packetevents.protocol.chat.Parsers;
+import com.github.retrooper.packetevents.protocol.chat.*;
 import com.github.retrooper.packetevents.protocol.chat.Parsers.Parser;
-import com.github.retrooper.packetevents.protocol.chat.RemoteChatSession;
-import com.github.retrooper.packetevents.protocol.chat.SignedCommandArgument;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
@@ -89,11 +82,7 @@ import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.Either;
-import com.github.retrooper.packetevents.util.KnownPack;
-import com.github.retrooper.packetevents.util.MathUtil;
-import com.github.retrooper.packetevents.util.StringUtil;
-import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.*;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
@@ -101,6 +90,7 @@ import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
+import com.github.retrooper.packetevents.util.meta.PacketWrapperMetaCache;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.ApiStatus;
@@ -112,31 +102,28 @@ import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
 public class PacketWrapper<T extends PacketWrapper<T>> {
+
     @Nullable
     public Object buffer;
 
     @ApiStatus.Internal
     public final Object bufferLock = new Object();
 
+    // For use metadata packet system
+    private final Map<String, Object> metadata = new HashMap<>();
+
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
-    private PacketTypeData packetTypeData;
+
+    private final PacketTypeData packetTypeData;
+
     // For sending chunk data packets, which need this data
     @Nullable
     protected User user;
@@ -236,6 +223,12 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
             buffer = ChannelHelper.pooledByteBuf(channel);
         }
 
+        // Rewrite buffer to a meta-system
+        this.buffer = ByteBufHelper.create(this.buffer);
+
+        // Wrapped meta system
+        writeMeta();
+
         //On proxies, we must rewrite the packet ID in a format compatible for the targeted client version
         if (proxy) {
             User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
@@ -251,12 +244,41 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         } else {
             writeVarInt(packetTypeData.getNativePacketId());
         }
+
         write();
     }
 
     @ApiStatus.Internal
     public final void prepareForSend(Object channel, boolean outgoing) {
         prepareForSend(channel, outgoing, PacketEvents.getAPI().getInjector().isProxy());
+    }
+
+    public void setMeta(@NotNull String key, @NotNull Object value) {
+        this.metadata.put(key, value);
+    }
+
+    public Object getMeta(@NotNull String key) {
+        return this.metadata.get(key);
+    }
+
+    public boolean hasMeta(@NotNull String key) {
+        return this.metadata.containsKey(key);
+    }
+
+    public @NotNull Map<String, Object> getMetadata() {
+        return this.metadata;
+    }
+
+    public void readMeta() {
+        if (this.buffer != null) {
+            this.metadata.putAll(PacketWrapperMetaCache.getMeta(this.buffer));
+        }
+    }
+
+    public void writeMeta() {
+        if (this.buffer != null) {
+            this.metadata.forEach((s, o) -> PacketWrapperMetaCache.setMeta(this.buffer, s, o));
+        }
     }
 
     public void read() {
@@ -275,12 +297,17 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     //Current idea change server version, but still think more
 
     public final void readEvent(ProtocolPacketEvent event) {
+
+        // Wrapped meta system
+        readMeta();
+
         PacketWrapper<?> last = event.getLastUsedWrapper();
         if (last != null) {
             copy((T) last);
         } else {
             read();
         }
+
         event.setLastUsedWrapper(this);
     }
 

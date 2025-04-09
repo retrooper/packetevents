@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.handler;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import io.github.retrooper.packetevents.impl.netty.bytebuf.WrappedIdentifyByteBuf;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -46,8 +47,15 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         if (!msg.isReadable()) {
             return;
         }
+
+        // Wrapped meta system
+        if (!(msg instanceof WrappedIdentifyByteBuf)) {
+            msg = new WrappedIdentifyByteBuf(msg);
+        }
+
         PacketEventsImplHelper.handlePacket(ctx.channel(), this.user, this.player,
                 msg, false, this.side);
+
         if (msg.isReadable()) {
             out.add(msg.retain());
         }
