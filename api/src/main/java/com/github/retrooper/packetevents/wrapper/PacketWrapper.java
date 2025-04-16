@@ -116,7 +116,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     @ApiStatus.Internal
     public final Object bufferLock = new Object();
 
-    private final Map<String, Object> metadata = new HashMap<>();
+    @Nullable
+    private Map<String, Object> metadata;
 
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
@@ -247,29 +248,31 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void setMeta(@NotNull String key, @NotNull Object value) {
+        if (this.metadata == null) {
+            this.metadata = new HashMap<>();
+        }
+
         this.metadata.put(key, value);
     }
 
     public Object getMeta(@NotNull String key) {
-        return this.metadata.get(key);
+        if (this.buffer != null) {
+            return PacketWrapperMetaCache.getMeta(this.buffer, key);
+        }
+
+        return null;
     }
 
     public boolean hasMeta(@NotNull String key) {
-        return this.metadata.containsKey(key);
-    }
-
-    public @NotNull Map<String, Object> getMetadata() {
-        return this.metadata;
-    }
-
-    public void readMeta() {
         if (this.buffer != null) {
-            this.metadata.putAll(PacketWrapperMetaCache.getMeta(this.buffer));
+            return PacketWrapperMetaCache.hasMeta(this.buffer, key);
         }
+
+        return false;
     }
 
     public void writeMeta() {
-        if (this.buffer != null) {
+        if (this.buffer != null && this.metadata != null) {
             this.metadata.forEach((key, value) -> PacketWrapperMetaCache.setMeta(this.buffer, key, value));
         }
     }
@@ -290,8 +293,6 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     //Current idea change server version, but still think more
 
     public final void readEvent(ProtocolPacketEvent event) {
-        readMeta();
-
         PacketWrapper<?> last = event.getLastUsedWrapper();
         if (last != null) {
             copy((T) last);

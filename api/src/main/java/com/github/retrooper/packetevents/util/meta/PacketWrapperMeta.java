@@ -15,12 +15,12 @@ public class PacketWrapperMeta {
         this.data.put(key, value);
     }
 
-    public @Nullable Object getMeta(@NotNull String key) {
-        return this.data.get(key);
+    public boolean has(@NotNull String key) {
+        return this.data.containsKey(key);
     }
 
-    public @NotNull Map<String, Object> get() {
-        return this.data;
+    public @Nullable Object get(@NotNull String key) {
+        return this.data.get(key);
     }
 
     public long getTimestamp() {

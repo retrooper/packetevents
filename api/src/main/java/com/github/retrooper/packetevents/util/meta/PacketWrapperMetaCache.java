@@ -18,9 +18,14 @@ public class PacketWrapperMetaCache {
                 .put(key, value);
     }
 
-    public static @NotNull Map<String, Object> getMeta(@NotNull Object buffer) {
+    public static boolean hasMeta(@NotNull Object buffer, @NotNull String key) {
         return META_CACHE.computeIfAbsent(new IdentityKey(buffer), unused -> new PacketWrapperMeta())
-                .get();
+                .has(key);
+    }
+
+    public static Object getMeta(@NotNull Object buffer, @NotNull String key) {
+        return META_CACHE.computeIfAbsent(new IdentityKey(buffer), unused -> new PacketWrapperMeta())
+                .get(key);
     }
 
     public static void clean() {
