@@ -29,6 +29,7 @@ dependencies {
     mappings("net.fabricmc:yarn:$yarn_mappings")
 
     compileOnly(libs.via.version)
+    compileOnly("org.slf4j:slf4j-simple:2.0.16")
 }
 
 loom {
