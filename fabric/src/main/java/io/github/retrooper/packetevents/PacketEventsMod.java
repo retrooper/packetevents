@@ -41,10 +41,10 @@ public class PacketEventsMod implements PreLaunchEntrypoint, ModInitializer {
         INSTANCE = this;
         FabricLoader loader = FabricLoader.getInstance();
 
-        String chainLoadEntryPointName = "mainChainLoad";
-        String clientChainLoadEntryPointName = "clientChainLoad"; // For client-specific entrypoints
+        String chainLoadEntryPointName = "peMainChainLoad";
+        String clientChainLoadEntryPointName = "peClientChainLoad"; // For client-specific entrypoints
 
-        // Collect mainChainLoad entrypoints (always present) and sort by version
+        // Collect peMainChainLoad entrypoints (always present) and sort by version
         List<ChainLoadEntryPoint> mainChainLoadEntryPoints = loader.getEntrypoints(chainLoadEntryPointName, ChainLoadEntryPoint.class);
         mainChainLoadEntryPoints.sort((a, b) -> b.getNativeVersion().getProtocolVersion() - a.getNativeVersion().getProtocolVersion());
 

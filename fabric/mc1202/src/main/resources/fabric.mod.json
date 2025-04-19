@@ -11,7 +11,7 @@
   "license": "GPL-3.0",
   "environment": "*",
   "entrypoints": {
-    "mainChainLoad": [
+    "peMainChainLoad": [
       "io.github.retrooper.packetevents.mc1202.Fabric1202ChainLoadEntrypoint"
     ]
   },
