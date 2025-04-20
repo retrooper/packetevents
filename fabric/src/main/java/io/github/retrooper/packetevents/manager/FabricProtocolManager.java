@@ -126,11 +126,6 @@ public class FabricProtocolManager extends ProtocolManagerAbstract {
         return channels.values();
     }
 
-    @Override
-    public Collection<Map.Entry<UUID, Object>> getChannelEntries() {
-        return channels.entrySet();
-    }
-
     @Override 
     public User getUser(Object channel) {
         Object pipeline = ChannelHelper.getPipeline(channel);
@@ -160,11 +155,6 @@ public class FabricProtocolManager extends ProtocolManagerAbstract {
     @Override
     public void setChannel(UUID uuid, Object channel) {
         channels.put(uuid, channel);
-    }
-
-    @Override
-    public void removeChannel(UUID uuid) {
-        channels.remove(uuid);
     }
 
     @Override
