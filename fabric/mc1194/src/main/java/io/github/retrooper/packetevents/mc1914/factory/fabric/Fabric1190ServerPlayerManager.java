@@ -16,37 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.mc1202.factory.fabric;
+package io.github.retrooper.packetevents.mc1914.factory.fabric;
 
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import io.github.retrooper.packetevents.mc1140.factory.fabric.Fabric1140ServerPlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
 
-public class Fabric1202ServerPlayerManager extends Fabric1140ServerPlayerManager {
+public class Fabric1190ServerPlayerManager extends Fabric1140ServerPlayerManager {
 
-    public Fabric1202ServerPlayerManager(PacketEventsAPI<?> packetEventsAPI) {
+    public Fabric1190ServerPlayerManager(PacketEventsAPI<?> packetEventsAPI) {
         super(packetEventsAPI);
     }
 
-    @Override
-    public int getPing(@NotNull Object player) {
-        if (player instanceof ServerPlayerEntity) {
-            return ((ServerPlayerEntity) player).networkHandler.getLatency();
-        }
-        throw new UnsupportedOperationException("Unsupported player implementation: " + player);
-    }
-
-    @Override
-    public Object getChannel(@NotNull Object player) {
-        if (player instanceof ServerPlayerEntity) {
-            return ((ServerPlayerEntity) player).networkHandler.connection.channel;
-        }
-        throw new UnsupportedOperationException("Unsupported player implementation: " + player);
-    }
-
-    // disconnect method moved from ServerPlayNetworkHandler -> ServerCommonNetworkHandler in 1.20.2
+    // new TextComponent -> Text.literal in 1.19
     @Override
     public void disconnectPlayer(ServerPlayerEntity serverPlayerEntity, String message) {
         serverPlayerEntity.networkHandler.disconnect(Text.literal(message));

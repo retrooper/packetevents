@@ -4,6 +4,8 @@ import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractFabricPlayerManager extends PlayerManagerAbstract {
@@ -77,4 +79,6 @@ public abstract class AbstractFabricPlayerManager extends PlayerManagerAbstract 
     public void receivePacketSilently(Object player, PacketWrapper<?> wrapper) {
         packetEventsAPI.getProtocolManager().receivePacketSilently(getChannel(player), wrapper);
     }
+
+    public abstract void disconnectPlayer(ServerPlayerEntity serverPlayerEntity, String message);
 }

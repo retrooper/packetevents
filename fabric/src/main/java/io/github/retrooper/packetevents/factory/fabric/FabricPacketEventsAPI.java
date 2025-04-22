@@ -33,6 +33,7 @@ import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.PacketEventsMod;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
+import io.github.retrooper.packetevents.manager.AbstractFabricPlayerManager;
 import io.github.retrooper.packetevents.manager.FabricLogger;
 import io.github.retrooper.packetevents.manager.FabricProtocolManager;
 import io.github.retrooper.packetevents.manager.FabricServerManager;
@@ -174,7 +175,7 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<ModInitializer> {
     }
 
     @Override
-    public PlayerManager getPlayerManager() {
+    public AbstractFabricPlayerManager getPlayerManager() {
         return this.environment == EnvType.SERVER ? FabricPacketEventsAPIManagerFactory.getLazyPlayerManagerHolder().get() : FabricPacketEventsAPIManagerFactory.getClientLazyPlayerManagerHolder().get();
     }
 

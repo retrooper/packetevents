@@ -112,7 +112,7 @@ public class FabricInjectionUtil {
                     (!api.isTerminated() || api.getSettings().isKickIfTerminated())) {
                 // Kick the player if they're not a fake player
                 // player.connection.disconnect(Component.literal("PacketEvents 2.0 failed to inject"));
-                player.networkHandler.disconnect(new TextComponent("PacketEvents 2.0 failed to inject"));
+                FabricPacketEventsAPI.getServerAPI().getPlayerManager().disconnectPlayer(player, "PacketEvents 2.0 failed to inject");
             }
             return;
         }

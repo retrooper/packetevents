@@ -33,6 +33,7 @@ import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
+import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
 import io.github.retrooper.packetevents.util.FabricCustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -177,8 +178,7 @@ public class PacketEncoder extends ChannelOutboundHandlerAdapter {
                 if (player instanceof ServerPlayerEntity serverPlayer) {
                     // Schedule delayed kick (Fabric-specific, using Minecraft's scheduler)
                     serverPlayer.getServer().execute(() -> {
-//                        serverPlayer.connection.disconnect(Component.literal("Invalid packet"));
-                        serverPlayer.networkHandler.disconnect(new TextComponent("Invalid packet"));
+                        FabricPacketEventsAPI.getServerAPI().getPlayerManager().disconnectPlayer(serverPlayer, "Invalid packet");
                     });
                 }
 

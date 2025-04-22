@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.mc1140.factory.fabric;
 
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import io.github.retrooper.packetevents.manager.AbstractFabricPlayerManager;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,5 +44,10 @@ public class Fabric1140ServerPlayerManager extends AbstractFabricPlayerManager {
             return ((ServerPlayerEntity) player).networkHandler.client.channel;
         }
         throw new UnsupportedOperationException("Unsupported player implementation: " + player);
+    }
+
+    @Override
+    public void disconnectPlayer(ServerPlayerEntity serverPlayerEntity, String message) {
+        serverPlayerEntity.networkHandler.disconnect(new TextComponent(message));
     }
 }

@@ -24,13 +24,13 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.SharedConstants;
 
 public class FabricServerManager extends ServerManagerAbstract {
 
-    private ServerVersion version;
+    // Its ok for this to be static, client and server version running PE will always be the same even on integrated server
+    private static ServerVersion version;
 
-    private ServerVersion resolveVersion() {
+    private static ServerVersion resolveVersion() {
         String mcVersion = FabricLoader.getInstance().getModContainer("minecraft")
                 .flatMap(mod -> mod.getMetadata().getVersion().getFriendlyString().describeConstable())
                 .orElse("unknown");
@@ -45,10 +45,14 @@ public class FabricServerManager extends ServerManagerAbstract {
 
     @Override
     public ServerVersion getVersion() {
-        if (this.version == null) {
-            this.version = this.resolveVersion();
+        return getVersionStatically();
+    }
+
+    public static ServerVersion getVersionStatically() {
+        if (version == null) {
+            version = resolveVersion();
         }
-        return this.version;
+        return version;
     }
 
     @Override
