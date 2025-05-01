@@ -5,14 +5,14 @@ import com.github.retrooper.packetevents.util.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-public abstract class FabricLogger extends LogManager {
+public abstract class AbstractFabricLogger extends LogManager {
     protected static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("§[0-9A-FK-ORa-fk-or]");
 
     protected String stripColorCodes(String message) {
         return STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
     }
 
-    public static FabricLogger createModLogger(String modId) {
+    public static AbstractFabricLogger createModLogger(String modId) {
         // Try SLF4J
         try {
             org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(modId);

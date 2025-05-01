@@ -20,16 +20,13 @@ package io.github.retrooper.packetevents.manager;
 
 import com.github.retrooper.packetevents.util.LogManager;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.jetbrains.annotations.Nullable;
 import java.util.logging.Logger;
 
-import net.kyori.adventure.text.format.NamedTextColor;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-public class FabricLogger extends LogManager {
+public class FabricLoggerManager extends LogManager {
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("§[0-9A-FK-ORa-fk-or]"); // Example pattern to strip Minecraft color codes
 
     private final Object logger;
@@ -40,7 +37,7 @@ public class FabricLogger extends LogManager {
         SLF4J, LOG4J, JDK
     }
 
-    private FabricLogger(Object logger, LoggerType loggerType) {
+    private FabricLoggerManager(Object logger, LoggerType loggerType) {
         this.logger = logger;
         this.loggerType = loggerType;
     }
@@ -142,14 +139,14 @@ public class FabricLogger extends LogManager {
     }
 
     // Factory method to create a mod-specific logger with fallback
-    public static FabricLogger createModLogger(String modId) {
+    public static FabricLoggerManager createModLogger(String modId) {
         // Try SLF4J first
         try {
             Class<?> slf4jLoggerClass = Class.forName("org.slf4j.Logger");
             Class<?> slf4jLoggerFactoryClass = Class.forName("org.slf4j.LoggerFactory");
             Method getLoggerMethod = slf4jLoggerFactoryClass.getMethod("getLogger", String.class);
             Object slf4jLogger = getLoggerMethod.invoke(null, modId);
-            return new FabricLogger(slf4jLogger, LoggerType.SLF4J);
+            return new FabricLoggerManager(slf4jLogger, LoggerType.SLF4J);
         } catch (ClassNotFoundException e) {
             // SLF4J not found, try Log4j next
         } catch (Exception e) {
@@ -161,7 +158,7 @@ public class FabricLogger extends LogManager {
             Class<?> log4jLogManagerClass = Class.forName("org.apache.logging.log4j.LogManager");
             Method getLoggerMethod = log4jLogManagerClass.getMethod("getLogger", String.class);
             Object log4jLogger = getLoggerMethod.invoke(null, modId);
-            return new FabricLogger(log4jLogger, LoggerType.LOG4J);
+            return new FabricLoggerManager(log4jLogger, LoggerType.LOG4J);
         } catch (ClassNotFoundException e) {
             // Log4j not found, fall back to JDK Logger
         } catch (Exception e) {
@@ -170,6 +167,6 @@ public class FabricLogger extends LogManager {
 
         // Fall back to JDK Logger
         Logger jdkLogger = Logger.getLogger(modId);
-        return new FabricLogger(jdkLogger, LoggerType.JDK);
+        return new FabricLoggerManager(jdkLogger, LoggerType.JDK);
     }
 }

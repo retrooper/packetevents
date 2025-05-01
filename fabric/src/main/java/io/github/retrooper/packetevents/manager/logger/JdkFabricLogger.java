@@ -5,7 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class JdkFabricLogger extends FabricLogger {
+public class JdkFabricLogger extends AbstractFabricLogger {
     private final Logger logger;
 
     public JdkFabricLogger(Logger logger) {

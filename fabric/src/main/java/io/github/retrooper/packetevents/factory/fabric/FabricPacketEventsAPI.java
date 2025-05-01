@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.factory.fabric;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.registry.RegistryManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
@@ -34,15 +33,14 @@ import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.PacketEventsMod;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.manager.AbstractFabricPlayerManager;
-import io.github.retrooper.packetevents.manager.FabricLogger;
+import io.github.retrooper.packetevents.manager.FabricLoggerManager;
 import io.github.retrooper.packetevents.manager.FabricProtocolManager;
 import io.github.retrooper.packetevents.manager.FabricServerManager;
 import io.github.retrooper.packetevents.manager.InternalFabricPacketListener;
+import io.github.retrooper.packetevents.manager.logger.jul.JULoggerFactory;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
-import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.loader.impl.game.minecraft.Slf4jLogHandler;
 
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -56,7 +54,8 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<ModInitializer> {
     private final ServerManager serverManager;
     private final ChannelInjector injector;
     private final NettyManager nettyManager = new NettyManagerImpl();
-    private final LogManager logManager = FabricLogger.createModLogger("PacketEvents");
+    private final LogManager logManager = FabricLoggerManager.createModLogger("PacketEvents");
+    private final Logger logger = JULoggerFactory.createLogger("PacketEvents");
 
     private boolean loaded;
     private boolean initialized;
@@ -172,6 +171,11 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<ModInitializer> {
     @Override
     public LogManager getLogManager() {
         return this.logManager;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return this.logger;
     }
 
     @Override
