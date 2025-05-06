@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@NullMarked
 public final class VersionedRegistry<T extends MappedEntity> implements IRegistry<T> {
 
     private final ResourceLocation registryKey;

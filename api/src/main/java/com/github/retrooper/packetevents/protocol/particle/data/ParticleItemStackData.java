@@ -45,8 +45,8 @@ public class ParticleItemStackData extends ParticleData implements LegacyConvert
             return new ParticleItemStackData(wrapper.readItemStack());
         } else {
             return new ParticleItemStackData(ItemStack.builder()
-                    .type(ItemTypes.getById(wrapper.getClientVersion(), wrapper.readVarInt()))
-                    .build());
+                    .type(ItemTypes.getRegistry().getByIdOrThrow(wrapper.getClientVersion(), wrapper.readVarInt()))
+                    .wrapper(wrapper).build());
         }
     }
 

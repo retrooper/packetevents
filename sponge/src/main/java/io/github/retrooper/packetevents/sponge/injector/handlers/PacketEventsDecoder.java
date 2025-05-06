@@ -93,7 +93,9 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
                             .execute(() -> Sponge.server().player(player).get().kick(Component.text("Invalid packet"))).build());
                 }
 
-                PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to invalid packet!");
+                if (user != null && user.getProfile().getName() != null) {
+                    PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to an invalid packet!");
+                }
             }
         }
     }

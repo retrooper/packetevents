@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
 
 public final class TrimPatterns {
 
@@ -44,7 +45,7 @@ public final class TrimPatterns {
 
     @ApiStatus.Internal
     public static TrimPattern define(
-            String name, ResourceLocation assetId, ItemType templateItem,
+            String name, ResourceLocation assetId, @Nullable ItemType templateItem,
             Component description, boolean decal
     ) {
         return REGISTRY.define(name, data ->

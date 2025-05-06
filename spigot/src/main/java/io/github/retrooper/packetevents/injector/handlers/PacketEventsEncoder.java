@@ -141,9 +141,10 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
                     FoliaScheduler.getEntityScheduler().runDelayed(player, (Plugin) PacketEvents.getAPI().getPlugin(), (o) -> player.kickPlayer("Invalid packet"), null, 1);
                 }
 
-                if (user != null) {
-                    PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to invalid packet!");
-                }}
+                if (user != null && user.getProfile().getName() != null) {
+                    PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to an invalid packet!");
+                }
+            }
         }
 
         super.exceptionCaught(ctx, cause);

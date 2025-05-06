@@ -36,7 +36,8 @@ public class PlayerManagerImpl extends PlayerManagerAbstract {
 
     @Override
     public Object getChannel(@NotNull Object player) {
-        Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(((Player) player).getUniqueId());
+        ProtocolManager protocolManager = PacketEvents.getAPI().getProtocolManager();
+        Object channel = protocolManager.getChannel(((Player) player).getUniqueId());
         if (channel == null) {
             if (CONNECTED_PLAYER == null) {
                 CONNECTED_PLAYER = Reflection
@@ -57,7 +58,7 @@ public class PlayerManagerImpl extends PlayerManagerAbstract {
             }
 
             synchronized (channel) {
-                ProtocolManager.CHANNELS.put(((Player) player).getUniqueId(), channel);
+                protocolManager.setChannel(((Player) player).getUniqueId(), channel);
             }
         }
         return channel;

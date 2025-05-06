@@ -134,6 +134,8 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         position = wrapper.position;
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
+        item = wrapper.item;
+        entityMetadata = wrapper.entityMetadata;
     }
 
     public int getEntityId() {

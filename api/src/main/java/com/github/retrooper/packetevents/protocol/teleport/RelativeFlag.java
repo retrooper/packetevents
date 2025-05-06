@@ -74,7 +74,9 @@ public final class RelativeFlag {
     }
 
     public RelativeFlag set(int flags, boolean relative) {
-        int ret = relative ? (byte) (flags | this.mask) : (byte) (flags & ~this.mask);
+        int ret = relative
+                ? (this.mask | flags)      // turn singular bit on
+                : (this.mask & ~flags);    // turn singular bit off
         return new RelativeFlag(ret);
     }
 

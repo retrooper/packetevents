@@ -78,7 +78,7 @@ public class MappedEntitySet<T> {
 
     public static <Z extends MappedEntity> void write(PacketWrapper<?> wrapper, MappedEntitySet<Z> set) {
         if (set.tagKey != null) {
-            wrapper.writeByte(0);
+            wrapper.writeVarInt(0);
             wrapper.writeIdentifier(set.tagKey);
             return;
         }
@@ -92,23 +92,34 @@ public class MappedEntitySet<T> {
 
     public static <Z extends MappedEntity> MappedEntitySet<Z> decode(
             NBT nbt, ClientVersion version, IRegistry<Z> registry) {
+        List<Z> list;
         if (nbt instanceof NBTString) {
-            String tagName = ((NBTString) nbt).getValue();
-            ResourceLocation tagKey = new ResourceLocation(tagName);
-            return new MappedEntitySet<>(tagKey);
-        }
-        NBTList<?> listTag = (NBTList<?>) nbt;
-        List<Z> list = new ArrayList<>(listTag.size());
-        for (NBT tag : listTag.getTags()) {
-            ResourceLocation tagKey = new ResourceLocation(((NBTString) tag).getValue());
-            list.add(registry.getByName(tagKey));
+            String singleEntry = ((NBTString) nbt).getValue();
+            // check whether this is a tag key or a single-entry list
+            if (!singleEntry.isEmpty() && singleEntry.charAt(0) == '#') {
+                String tagName = singleEntry.substring(1);
+                ResourceLocation tagKey = new ResourceLocation(tagName);
+                return new MappedEntitySet<>(tagKey);
+            }
+            // single entry list
+            list = new ArrayList<>(1);
+            ResourceLocation key = new ResourceLocation(singleEntry);
+            list.add(registry.getByNameOrThrow(key));
+        } else {
+            // assume it's a list
+            NBTList<?> listTag = (NBTList<?>) nbt;
+            list = new ArrayList<>(listTag.size());
+            for (NBT tag : listTag.getTags()) {
+                ResourceLocation key = new ResourceLocation(((NBTString) tag).getValue());
+                list.add(registry.getByNameOrThrow(key));
+            }
         }
         return new MappedEntitySet<>(list);
     }
 
     public static <Z extends MappedEntity> NBT encode(MappedEntitySet<Z> set, ClientVersion version) {
         if (set.tagKey != null) {
-            return new NBTString(set.tagKey.toString());
+            return new NBTString("#" + set.tagKey);
         }
 
         assert set.entities != null; // can't be null, verified in ctor

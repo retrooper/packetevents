@@ -32,13 +32,13 @@ import java.util.Objects;
 public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMaterial {
 
     private final String assetName;
-    private final ItemType ingredient;
+    private final @Nullable ItemType ingredient;
     private final float itemModelIndex;
     private final Map<ArmorMaterial, String> overrideArmorMaterials;
     private final Component description;
 
     public StaticTrimMaterial(
-            String assetName, ItemType ingredient,
+            String assetName, @Nullable ItemType ingredient,
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
         this(null, assetName, ingredient, FALLBACK_ITEM_MODEL_INDEX, overrideArmorMaterials, description);
@@ -47,14 +47,14 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
     @ApiStatus.Internal
     public StaticTrimMaterial(
             @Nullable TypesBuilderData data,
-            String assetName, ItemType ingredient,
+            String assetName, @Nullable ItemType ingredient,
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
         this(data, assetName, ingredient, FALLBACK_ITEM_MODEL_INDEX, overrideArmorMaterials, description);
     }
 
     public StaticTrimMaterial(
-            String assetName, ItemType ingredient, float itemModelIndex,
+            String assetName, @Nullable ItemType ingredient, float itemModelIndex,
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
         this(null, assetName, ingredient, itemModelIndex, overrideArmorMaterials, description);
@@ -63,7 +63,7 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
     @ApiStatus.Internal
     public StaticTrimMaterial(
             @Nullable TypesBuilderData data,
-            String assetName, ItemType ingredient, float itemModelIndex,
+            String assetName, @Nullable ItemType ingredient, float itemModelIndex,
             Map<ArmorMaterial, String> overrideArmorMaterials, Component description
     ) {
         super(data);
@@ -85,6 +85,7 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
         return this.assetName;
     }
 
+    @ApiStatus.Obsolete
     @Override
     public ItemType getIngredient() {
         return this.ingredient;
@@ -113,7 +114,7 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
         StaticTrimMaterial that = (StaticTrimMaterial) obj;
         if (Float.compare(that.itemModelIndex, this.itemModelIndex) != 0) return false;
         if (!this.assetName.equals(that.assetName)) return false;
-        if (!this.ingredient.equals(that.ingredient)) return false;
+        if (!Objects.equals(this.ingredient, that.ingredient)) return false;
         if (!this.overrideArmorMaterials.equals(that.overrideArmorMaterials)) return false;
         return this.description.equals(that.description);
     }

@@ -53,7 +53,7 @@ public class ChatMessageProcessor_v1_21_5 implements ChatMessageProcessor {
     @Override
     public void writeChatMessage(@NotNull PacketWrapper<?> wrapper, @NotNull ChatMessage data) {
         ChatMessage_v1_21_5 newData = (ChatMessage_v1_21_5) data;
-        wrapper.writeInt(newData.getGlobalIndex());
+        wrapper.writeVarInt(newData.getGlobalIndex());
         wrapper.writeUUID(newData.getSenderUUID());
         wrapper.writeVarInt(newData.getIndex());
         wrapper.writeOptional(newData.getSignature(), PacketWrapper::writeBytes);

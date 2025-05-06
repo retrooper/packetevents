@@ -37,7 +37,11 @@ public final class Reflection {
 		}
 		final Field[] declaredFields = cls.getDeclaredFields();
 		for (final Field f : declaredFields) {
-			f.setAccessible(true);
+			try {
+				f.setAccessible(true);
+			} catch (Throwable ignored) {
+				// empty catch block
+			}
 		}
 		return declaredFields;
 	}
@@ -54,6 +58,8 @@ public final class Reflection {
 			if (cls.getSuperclass() != null) {
 				return getField(cls.getSuperclass(), name);
 			}
+		} catch (Throwable ignored) {
+			// empty catch block
 		}
 		return null;
 	}

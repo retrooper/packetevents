@@ -69,7 +69,8 @@ public class PlayerManagerImpl implements PlayerManager {
     @Override
     public Object getChannel(@NotNull Object player) {
         UUID uuid = ((ServerPlayer) player).uniqueId();
-        Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(uuid);
+        ProtocolManager protocolManager = PacketEvents.getAPI().getProtocolManager();
+        Object channel = protocolManager.getChannel(uuid);
         if (channel == null) {
             channel = SpongeReflectionUtil.getChannel((ServerPlayer) player);
             // This is removed from the HashMap on channel close
@@ -77,7 +78,7 @@ public class PlayerManagerImpl implements PlayerManager {
             if (channel != null) {
                 synchronized (channel) {
                     if (ChannelHelper.isOpen(channel)) {
-                        ProtocolManager.CHANNELS.put(uuid, channel);
+                        protocolManager.setChannel(uuid, channel);
                     }
                 }
             }

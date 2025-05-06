@@ -48,6 +48,10 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
 
     String getAssetName();
 
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     ItemType getIngredient();
 
     /**
@@ -70,7 +74,8 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
 
     static TrimMaterial readDirect(PacketWrapper<?> wrapper) {
         String assetName = wrapper.readString();
-        ItemType ingredient = wrapper.readMappedEntity(ItemTypes::getById);
+        ItemType ingredient = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)
+                ? null : wrapper.readMappedEntity(ItemTypes::getById);
         float itemModelIndex = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_4)
                 ? FALLBACK_ITEM_MODEL_INDEX : wrapper.readFloat();
         Map<ArmorMaterial, String> overrideArmorMaterials = wrapper.readMap(
@@ -86,8 +91,10 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
 
     static void writeDirect(PacketWrapper<?> wrapper, TrimMaterial material) {
         wrapper.writeString(material.getAssetName());
-        wrapper.writeMappedEntity(material.getIngredient());
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_4)) {
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
+            wrapper.writeMappedEntity(material.getIngredient());
+        }
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_4)) {
             wrapper.writeFloat(material.getItemModelIndex());
         }
         wrapper.writeMap(material.getOverrideArmorMaterials(),
@@ -98,7 +105,8 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
     static TrimMaterial decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
         String assetName = compound.getStringTagValueOrThrow("asset_name");
-        ItemType ingredient = ItemTypes.getByName(compound.getStringTagValueOrThrow("ingredient"));
+        ItemType ingredient = version.isNewerThanOrEquals(ClientVersion.V_1_21_5)
+                ? null : ItemTypes.getByName(compound.getStringTagValueOrThrow("ingredient"));
         float itemModelIndex = version.isNewerThanOrEquals(ClientVersion.V_1_21_4)
                 ? FALLBACK_ITEM_MODEL_INDEX : compound.getNumberTagOrThrow("item_model_index").getAsFloat();
         NBTCompound overrideArmorMaterialsTag = compound.getCompoundTagOrNull("override_armor_materials");
@@ -132,8 +140,10 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
 
         NBTCompound compound = new NBTCompound();
         compound.setTag("asset_name", new NBTString(material.getAssetName()));
-        compound.setTag("ingredient", new NBTString(material.getIngredient().getName().toString()));
-        if (version.isNewerThanOrEquals(ClientVersion.V_1_21_4)) {
+        if (version.isOlderThan(ClientVersion.V_1_21_5)) {
+            compound.setTag("ingredient", new NBTString(material.getIngredient().getName().toString()));
+        }
+        if (version.isOlderThan(ClientVersion.V_1_21_4)) {
             compound.setTag("item_model_index", new NBTFloat(material.getItemModelIndex()));
         }
         if (overrideArmorMaterialsTag != null) {

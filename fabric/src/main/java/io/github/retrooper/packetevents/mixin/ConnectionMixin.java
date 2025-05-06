@@ -36,6 +36,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.network.BandwidthDebugMonitor;
 import net.minecraft.network.protocol.PacketFlow;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -44,6 +45,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(net.minecraft.network.Connection.class)
 public class ConnectionMixin {
 
+    @Shadow public Channel channel;
     // doesn't account for mods like ViaFabric
     @Unique
     private static final ClientVersion CLIENT_VERSION =
@@ -75,7 +77,7 @@ public class ConnectionMixin {
         Channel channel = pipeline.channel();
         User user = new User(channel, ConnectionState.HANDSHAKING,
                 CLIENT_VERSION, new UserProfile(null, null));
-        ProtocolManager.USERS.put(channel.pipeline(), user);
+        PacketEvents.getAPI().getProtocolManager().setUser(channel.pipeline(), user);
 
         UserConnectEvent connectEvent = new UserConnectEvent(user);
         PacketEvents.getAPI().getEventManager().callEvent(connectEvent);

@@ -168,7 +168,7 @@ public class SpongePacketEventsBuilder {
                 if (initialized) {
                     // Uninject the injector if needed(depends on the injector implementation)
                     injector.uninject();
-                    for (User user : ProtocolManager.USERS.values()) {
+                    for (User user : this.protocolManager.getUsers()) {
                         ServerConnectionInitializer.destroyHandlers(user.getChannel());
                     }
 

@@ -216,7 +216,7 @@ public class SpigotPacketEventsBuilder {
                 if (initialized) {
                     //Uninject the injector if needed(depends on the injector implementation)
                     injector.uninject();
-                    for (User user : ProtocolManager.USERS.values()) {
+                    for (User user : this.protocolManager.getUsers()) {
                         ServerConnectionInitializer.destroyHandlers(user.getChannel());
                     }
                     //Unregister all listeners. Because if we attempt to reload, we will end up with duplicate listeners.

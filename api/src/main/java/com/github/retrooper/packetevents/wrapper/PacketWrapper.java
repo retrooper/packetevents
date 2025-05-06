@@ -294,7 +294,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     public final void readEvent(ProtocolPacketEvent event) {
         PacketWrapper<?> last = event.getLastUsedWrapper();
-        if (last != null) {
+        if (this.getClass().isInstance(last)) {
             copy((T) last);
         } else {
             read();

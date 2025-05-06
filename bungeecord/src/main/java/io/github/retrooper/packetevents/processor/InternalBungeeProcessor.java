@@ -59,7 +59,7 @@ public class InternalBungeeProcessor implements Listener {
             throw new RuntimeException("Error looking up channel from " + player, exception);
         }
 
-        ProtocolManager.CHANNELS.put(player.getUniqueId(), channel);
+        PacketEvents.getAPI().getProtocolManager().setChannel(player.getUniqueId(), channel);
         PacketEvents.getAPI().getInjector().setPlayer(channel, player);
 
         User user = PacketEvents.getAPI().getPlayerManager().getUser(event.getPlayer());

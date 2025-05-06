@@ -1,7 +1,7 @@
 <!--suppress HtmlDeprecatedAttribute -->
 <div align="center">
-    <h2><i>packetevents</i></h2>
-    <h3><i>Precision meets performance—a powerful tool for mastering Minecraft packet manipulation with speed and finesse.</i></h3>
+    <h2><i>PacketEvents</i></h2>
+    <h3><i>A powerful networking library for Minecraft packet processing and manipulation.</i></h3>
     <a href="https://github.com/retrooper/packetevents/actions"><img src="https://img.shields.io/github/actions/workflow/status/retrooper/packetevents/gradle-publish.yml?style=for-the-badge&logo=github"></a>
     <a href="https://discord.gg/DVHxPPxHZc"><img src="https://img.shields.io/discord/721686193061888071?color=5562e9&logo=discord&logoColor=white&style=for-the-badge"></a>
     <img src="https://img.shields.io/github/license/retrooper/packetevents?style=for-the-badge&logo=github">

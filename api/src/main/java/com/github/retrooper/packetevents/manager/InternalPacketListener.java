@@ -65,7 +65,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
             //Map username with channel
             synchronized (channel) {
-                ProtocolManager.CHANNELS.put(profile.getUUID(), channel);
+                PacketEvents.getAPI().getProtocolManager().setChannel(profile.getUUID(), channel);
             }
 
             PacketEvents.getAPI().getLogManager().debug("Mapped player UUID with their channel.");

@@ -74,6 +74,115 @@ import com.github.retrooper.packetevents.protocol.packettype.serverbound.Serverb
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_9;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.VersionMapper;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.configuration.client.WrapperConfigClientConfigurationEndAck;
+import com.github.retrooper.packetevents.wrapper.configuration.client.WrapperConfigClientCookieResponse;
+import com.github.retrooper.packetevents.wrapper.configuration.client.WrapperConfigClientKeepAlive;
+import com.github.retrooper.packetevents.wrapper.configuration.client.WrapperConfigClientPluginMessage;
+import com.github.retrooper.packetevents.wrapper.configuration.client.WrapperConfigClientPong;
+import com.github.retrooper.packetevents.wrapper.configuration.client.WrapperConfigClientResourcePackStatus;
+import com.github.retrooper.packetevents.wrapper.configuration.client.WrapperConfigClientSelectKnownPacks;
+import com.github.retrooper.packetevents.wrapper.configuration.client.WrapperConfigClientSettings;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerConfigurationEnd;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerCookieRequest;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerCustomReportDetails;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerDisconnect;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerKeepAlive;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerPluginMessage;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerResetChat;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerResourcePackRemove;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerResourcePackSend;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerSelectKnownPacks;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerServerLinks;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerStoreCookie;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerTransfer;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerUpdateEnabledFeatures;
+import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
+import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientCookieResponse;
+import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
+import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginSuccessAck;
+import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientPluginResponse;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerCookieRequest;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerDisconnect;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerEncryptionRequest;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerPluginRequest;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerSetCompression;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAdvancementTab;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatAck;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatCommand;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatCommandUnsigned;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatPreview;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatSessionUpdate;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChunkBatchAck;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindowButton;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClientStatus;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClientTickEnd;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCloseWindow;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientConfigurationAck;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCookieResponse;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCraftRecipeRequest;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCreativeInventoryAction;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientDebugPing;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientDebugSampleSubscription;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientEditBook;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientEntityAction;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientGenerateStructure;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientHeldItemChange;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientKeepAlive;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientLockDifficulty;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientNameItem;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPickItem;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPickItemFromBlock;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPickItemFromEntity;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerAbilities;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerInput;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerLoaded;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerPosition;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerPositionAndRotation;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerRotation;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPong;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientQueryBlockNBT;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientQueryEntityNBT;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientResourcePackStatus;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSelectBundleItem;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSelectTrade;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetBeaconEffect;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetDifficulty;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetDisplayedRecipe;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetRecipeBookState;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetStructureBlock;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetTestBlock;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSlotStateChange;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSpectate;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerBoat;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerVehicle;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTeleportConfirm;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTestInstanceBlockAction;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateCommandBlock;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateCommandBlockMinecart;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateJigsawBlock;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUseItem;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientVehicleMove;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientWindowConfirmation;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
+import com.github.retrooper.packetevents.wrapper.status.client.WrapperStatusClientPing;
+import com.github.retrooper.packetevents.wrapper.status.client.WrapperStatusClientRequest;
+import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerPong;
+import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -201,17 +310,20 @@ public final class PacketType {
 
         public enum Client implements PacketTypeConstant, ServerBoundPacket {
 
-            HANDSHAKE(0),
+            HANDSHAKE(0, WrapperHandshakingClientHandshake.class),
             /**
              * Technically not part of the current protocol, but clients older than 1.7 will send this to initiate Server List Ping.
              * 1.8 and newer servers will handle it correctly though.
              */
-            LEGACY_SERVER_LIST_PING(0xFE);
+            LEGACY_SERVER_LIST_PING(0xFE, null),
+            ;
 
             private final int id;
+            private final Class<? extends PacketWrapper<?>> wrapperClass;
 
-            Client(int id) {
+            Client(int id, @Nullable Class<? extends PacketWrapper<?>> wrapperClass) {
                 this.id = id;
+                this.wrapperClass = wrapperClass;
             }
 
             @Nullable
@@ -230,6 +342,11 @@ public final class PacketType {
             }
 
             @Override
+            public Class<? extends PacketWrapper<?>> getWrapperClass() {
+                return wrapperClass;
+            }
+
+            @Override
             public PacketSide getSide() {
                 return PacketSide.CLIENT;
             }
@@ -237,17 +354,25 @@ public final class PacketType {
 
         public enum Server implements PacketTypeConstant, ClientBoundPacket {
 
-            LEGACY_SERVER_LIST_RESPONSE(0xFE);
+            LEGACY_SERVER_LIST_RESPONSE(0xFE, null),
+            ;
 
             private final int id;
+            private final Class<? extends PacketWrapper<?>> wrapperClass;
 
-            Server(int id) {
+            Server(int id, @Nullable Class<? extends PacketWrapper<?>> wrapperClass) {
                 this.id = id;
+                this.wrapperClass = wrapperClass;
             }
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
                 return packetID == 0xFE ? LEGACY_SERVER_LIST_RESPONSE : null;
+            }
+
+            @Override
+            public Class<? extends PacketWrapper<?>> getWrapperClass() {
+                return wrapperClass;
             }
 
             public int getId() {
@@ -265,13 +390,16 @@ public final class PacketType {
 
         public enum Client implements PacketTypeConstant, ServerBoundPacket {
 
-            REQUEST(0x00),
-            PING(0x01);
+            REQUEST(0x00, WrapperStatusClientRequest.class),
+            PING(0x01, WrapperStatusClientPing.class),
+            ;
 
             private final int id;
+            private final Class<? extends PacketWrapper<?>> wrapperClass;
 
-            Client(int id) {
+            Client(int id, @Nullable Class<? extends PacketWrapper<?>> wrapperClass) {
                 this.id = id;
+                this.wrapperClass = wrapperClass;
             }
 
             @Nullable
@@ -283,6 +411,11 @@ public final class PacketType {
                 } else {
                     return null;
                 }
+            }
+
+            @Override
+            public Class<? extends PacketWrapper<?>> getWrapperClass() {
+                return wrapperClass;
             }
 
             public int getId() {
@@ -297,13 +430,21 @@ public final class PacketType {
 
         public enum Server implements PacketTypeConstant, ClientBoundPacket {
 
-            RESPONSE(0x00),
-            PONG(0x01);
+            RESPONSE(0x00, WrapperStatusServerResponse.class),
+            PONG(0x01, WrapperStatusServerPong.class),
+            ;
 
             private final int id;
+            private final Class<? extends PacketWrapper<?>> wrapperClass;
 
-            Server(int id) {
+            Server(int id, @Nullable Class<? extends PacketWrapper<?>> wrapperClass) {
                 this.id = id;
+                this.wrapperClass = wrapperClass;
+            }
+
+            @Override
+            public Class<? extends PacketWrapper<?>> getWrapperClass() {
+                return wrapperClass;
             }
 
             @Nullable
@@ -332,22 +473,30 @@ public final class PacketType {
 
         public enum Client implements PacketTypeConstant, ServerBoundPacket {
 
-            LOGIN_START(0x00),
-            ENCRYPTION_RESPONSE(0x01),
+            LOGIN_START(0x00, WrapperLoginClientLoginStart.class),
+            ENCRYPTION_RESPONSE(0x01, WrapperLoginClientEncryptionResponse.class),
 
             // Added in 1.13
-            LOGIN_PLUGIN_RESPONSE(0x02),
+            LOGIN_PLUGIN_RESPONSE(0x02, WrapperLoginClientPluginResponse.class),
 
             // Added in 1.20.2
-            LOGIN_SUCCESS_ACK(0x03),
+            LOGIN_SUCCESS_ACK(0x03, WrapperLoginClientLoginSuccessAck.class),
 
             // Added in 1.20.5
-            COOKIE_RESPONSE(0x04);
+            COOKIE_RESPONSE(0x04, WrapperLoginClientCookieResponse.class),
+            ;
 
             private final int id;
+            private final Class<? extends PacketWrapper<?>> wrapperClass;
 
-            Client(int id) {
+            Client(int id, @Nullable Class<? extends PacketWrapper<?>> wrapperClass) {
                 this.id = id;
+                this.wrapperClass = wrapperClass;
+            }
+
+            @Override
+            public Class<? extends PacketWrapper<?>> getWrapperClass() {
+                return wrapperClass;
             }
 
             @Nullable
@@ -380,23 +529,31 @@ public final class PacketType {
 
         public enum Server implements PacketTypeConstant, ClientBoundPacket {
 
-            DISCONNECT(0x00),
-            ENCRYPTION_REQUEST(0x01),
-            LOGIN_SUCCESS(0x02),
+            DISCONNECT(0x00, WrapperLoginServerDisconnect.class),
+            ENCRYPTION_REQUEST(0x01, WrapperLoginServerEncryptionRequest.class),
+            LOGIN_SUCCESS(0x02, WrapperLoginServerLoginSuccess.class),
 
             // Added in 1.8
-            SET_COMPRESSION(0x03),
+            SET_COMPRESSION(0x03, WrapperLoginServerSetCompression.class),
 
             // Added in 1.13
-            LOGIN_PLUGIN_REQUEST(0x04),
+            LOGIN_PLUGIN_REQUEST(0x04, WrapperLoginServerPluginRequest.class),
 
             // Added in 1.20.5
-            COOKIE_REQUEST(0x05);
+            COOKIE_REQUEST(0x05, WrapperLoginServerCookieRequest.class),
+            ;
 
             private final int id;
+            private final Class<? extends PacketWrapper<?>> wrapperClass;
 
-            Server(int id) {
+            Server(int id, @Nullable Class<? extends PacketWrapper<?>> wrapperClass) {
                 this.id = id;
+                this.wrapperClass = wrapperClass;
+            }
+
+            @Override
+            public Class<? extends PacketWrapper<?>> getWrapperClass() {
+                return wrapperClass;
             }
 
             @Nullable
@@ -435,24 +592,32 @@ public final class PacketType {
 
         public enum Client implements PacketTypeCommon, ServerBoundPacket {
 
-            CLIENT_SETTINGS,
-            PLUGIN_MESSAGE,
-            CONFIGURATION_END_ACK,
-            KEEP_ALIVE,
-            PONG,
-            RESOURCE_PACK_STATUS,
+            CLIENT_SETTINGS(WrapperConfigClientSettings.class),
+            PLUGIN_MESSAGE(WrapperConfigClientPluginMessage.class),
+            CONFIGURATION_END_ACK(WrapperConfigClientConfigurationEndAck.class),
+            KEEP_ALIVE(WrapperConfigClientKeepAlive.class),
+            PONG(WrapperConfigClientPong.class),
+            RESOURCE_PACK_STATUS(WrapperConfigClientResourcePackStatus.class),
 
             // Added in 1.20.5
-            COOKIE_RESPONSE,
-            SELECT_KNOWN_PACKS;
+            COOKIE_RESPONSE(WrapperConfigClientCookieResponse.class),
+            SELECT_KNOWN_PACKS(WrapperConfigClientSelectKnownPacks.class),
+            ;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
             private final int[] ids;
+            private final Class<? extends PacketWrapper<?>> wrapper;
 
-            Client() {
+            Client(@Nullable Class<? extends PacketWrapper<?>> wrapper) {
                 this.ids = new int[SERVERBOUND_CONFIG_VERSION_MAPPER.getVersions().length];
                 Arrays.fill(this.ids, -1);
+                this.wrapper = wrapper;
+            }
+
+            @Override
+            public Class<? extends PacketWrapper<?>> getWrapperClass() {
+                return wrapper;
             }
 
             public static void load() {
@@ -509,37 +674,45 @@ public final class PacketType {
 
         public enum Server implements PacketTypeCommon, ClientBoundPacket {
 
-            PLUGIN_MESSAGE,
-            DISCONNECT,
-            CONFIGURATION_END,
-            KEEP_ALIVE,
-            PING,
-            REGISTRY_DATA,
-            RESOURCE_PACK_SEND,
-            UPDATE_ENABLED_FEATURES,
-            UPDATE_TAGS,
+            PLUGIN_MESSAGE(WrapperConfigServerPluginMessage.class),
+            DISCONNECT(WrapperConfigServerDisconnect.class),
+            CONFIGURATION_END(WrapperConfigServerConfigurationEnd.class),
+            KEEP_ALIVE(WrapperConfigServerKeepAlive.class),
+            PING(null),
+            REGISTRY_DATA(WrapperConfigServerRegistryData.class),
+            RESOURCE_PACK_SEND(WrapperConfigServerResourcePackSend.class),
+            UPDATE_ENABLED_FEATURES(WrapperConfigServerUpdateEnabledFeatures.class),
+            UPDATE_TAGS(null),
 
             // Added in 1.20.3
-            RESOURCE_PACK_REMOVE,
+            RESOURCE_PACK_REMOVE(WrapperConfigServerResourcePackRemove.class),
 
             // Added in 1.20.5
-            COOKIE_REQUEST,
-            RESET_CHAT,
-            STORE_COOKIE,
-            TRANSFER,
-            SELECT_KNOWN_PACKS,
+            COOKIE_REQUEST(WrapperConfigServerCookieRequest.class),
+            RESET_CHAT(WrapperConfigServerResetChat.class),
+            STORE_COOKIE(WrapperConfigServerStoreCookie.class),
+            TRANSFER(WrapperConfigServerTransfer.class),
+            SELECT_KNOWN_PACKS(WrapperConfigServerSelectKnownPacks.class),
 
             // added in 1.21
-            CUSTOM_REPORT_DETAILS,
-            SERVER_LINKS;
+            CUSTOM_REPORT_DETAILS(WrapperConfigServerCustomReportDetails.class),
+            SERVER_LINKS(WrapperConfigServerServerLinks.class),
+            ;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
             private final int[] ids;
+            private final Class<? extends PacketWrapper<?>> wrapper;
 
-            Server() {
+            Server(@Nullable Class<? extends PacketWrapper<?>> wrapper) {
                 this.ids = new int[CLIENTBOUND_CONFIG_VERSION_MAPPER.getVersions().length];
                 Arrays.fill(this.ids, -1);
+                this.wrapper = wrapper;
+            }
+
+            @Override
+            public Class<? extends PacketWrapper<?>> getWrapperClass() {
+                return wrapper;
             }
 
             public static void load() {
@@ -602,156 +775,163 @@ public final class PacketType {
         public enum Client implements PacketTypeCommon, ServerBoundPacket {
 
             // Packets which no longer exist on the latest version
-            CHAT_PREVIEW,
+            CHAT_PREVIEW(WrapperPlayClientChatPreview.class),
 
-            TELEPORT_CONFIRM,
-            QUERY_BLOCK_NBT,
-            SET_DIFFICULTY,
-            CHAT_MESSAGE,
-            CLIENT_STATUS,
-            CLIENT_SETTINGS,
-            TAB_COMPLETE,
-            WINDOW_CONFIRMATION,
-            CLICK_WINDOW_BUTTON,
-            CLICK_WINDOW,
-            CLOSE_WINDOW,
-            PLUGIN_MESSAGE,
-            EDIT_BOOK,
-            QUERY_ENTITY_NBT,
-            INTERACT_ENTITY,
-            GENERATE_STRUCTURE,
-            KEEP_ALIVE,
-            LOCK_DIFFICULTY,
-            PLAYER_POSITION,
-            PLAYER_POSITION_AND_ROTATION,
-            PLAYER_ROTATION,
-            PLAYER_FLYING,
-            VEHICLE_MOVE,
-            STEER_BOAT,
+            TELEPORT_CONFIRM(WrapperPlayClientTeleportConfirm.class),
+            QUERY_BLOCK_NBT(WrapperPlayClientQueryBlockNBT.class),
+            SET_DIFFICULTY(WrapperPlayClientSetDifficulty.class),
+            CHAT_MESSAGE(WrapperPlayClientChatMessage.class),
+            CLIENT_STATUS(WrapperPlayClientClientStatus.class),
+            CLIENT_SETTINGS(WrapperPlayClientSettings.class),
+            TAB_COMPLETE(WrapperPlayClientTabComplete.class),
+            WINDOW_CONFIRMATION(WrapperPlayClientWindowConfirmation.class),
+            CLICK_WINDOW_BUTTON(WrapperPlayClientClickWindowButton.class),
+            CLICK_WINDOW(WrapperPlayClientClickWindow.class),
+            CLOSE_WINDOW(WrapperPlayClientCloseWindow.class),
+            PLUGIN_MESSAGE(WrapperPlayClientPluginMessage.class),
+            EDIT_BOOK(WrapperPlayClientEditBook.class),
+            QUERY_ENTITY_NBT(WrapperPlayClientQueryEntityNBT.class),
+            INTERACT_ENTITY(WrapperPlayClientInteractEntity.class),
+            GENERATE_STRUCTURE(WrapperPlayClientGenerateStructure.class),
+            KEEP_ALIVE(WrapperPlayClientKeepAlive.class),
+            LOCK_DIFFICULTY(WrapperPlayClientLockDifficulty.class),
+            PLAYER_POSITION(WrapperPlayClientPlayerPosition.class),
+            PLAYER_POSITION_AND_ROTATION(WrapperPlayClientPlayerPositionAndRotation.class),
+            PLAYER_ROTATION(WrapperPlayClientPlayerRotation.class),
+            PLAYER_FLYING(WrapperPlayClientPlayerFlying.class),
+            VEHICLE_MOVE(WrapperPlayClientVehicleMove.class),
+            STEER_BOAT(WrapperPlayClientSteerBoat.class),
             /**
              * Removed with 1.21.4
              */
             @ApiStatus.Obsolete
-            PICK_ITEM,
-            CRAFT_RECIPE_REQUEST,
-            PLAYER_ABILITIES,
-            PLAYER_DIGGING,
-            ENTITY_ACTION,
+            PICK_ITEM(WrapperPlayClientPickItem.class),
+            CRAFT_RECIPE_REQUEST(WrapperPlayClientCraftRecipeRequest.class),
+            PLAYER_ABILITIES(WrapperPlayClientPlayerAbilities.class),
+            PLAYER_DIGGING(WrapperPlayClientPlayerDigging.class),
+            ENTITY_ACTION(WrapperPlayClientEntityAction.class),
             /**
              * Removed with 1.21.2
              */
             @ApiStatus.Obsolete
-            STEER_VEHICLE,
-            PONG,
-            RECIPE_BOOK_DATA,
-            SET_DISPLAYED_RECIPE,
-            SET_RECIPE_BOOK_STATE,
-            NAME_ITEM,
-            RESOURCE_PACK_STATUS,
-            ADVANCEMENT_TAB,
-            SELECT_TRADE,
-            SET_BEACON_EFFECT,
-            HELD_ITEM_CHANGE,
-            UPDATE_COMMAND_BLOCK,
-            UPDATE_COMMAND_BLOCK_MINECART,
-            CREATIVE_INVENTORY_ACTION,
-            UPDATE_JIGSAW_BLOCK,
-            UPDATE_STRUCTURE_BLOCK,
-            UPDATE_SIGN,
-            ANIMATION,
-            SPECTATE,
-            PLAYER_BLOCK_PLACEMENT,
-            USE_ITEM,
+            STEER_VEHICLE(WrapperPlayClientSteerVehicle.class),
+            PONG(WrapperPlayClientPong.class),
+            RECIPE_BOOK_DATA(null),
+            SET_DISPLAYED_RECIPE(WrapperPlayClientSetDisplayedRecipe.class),
+            SET_RECIPE_BOOK_STATE(WrapperPlayClientSetRecipeBookState.class),
+            NAME_ITEM(WrapperPlayClientNameItem.class),
+            RESOURCE_PACK_STATUS(WrapperPlayClientResourcePackStatus.class),
+            ADVANCEMENT_TAB(WrapperPlayClientAdvancementTab.class),
+            SELECT_TRADE(WrapperPlayClientSelectTrade.class),
+            SET_BEACON_EFFECT(WrapperPlayClientSetBeaconEffect.class),
+            HELD_ITEM_CHANGE(WrapperPlayClientHeldItemChange.class),
+            UPDATE_COMMAND_BLOCK(WrapperPlayClientUpdateCommandBlock.class),
+            UPDATE_COMMAND_BLOCK_MINECART(WrapperPlayClientUpdateCommandBlockMinecart.class),
+            CREATIVE_INVENTORY_ACTION(WrapperPlayClientCreativeInventoryAction.class),
+            UPDATE_JIGSAW_BLOCK(WrapperPlayClientUpdateJigsawBlock.class),
+            UPDATE_STRUCTURE_BLOCK(WrapperPlayClientSetStructureBlock.class),
+            UPDATE_SIGN(WrapperPlayClientUpdateSign.class),
+            ANIMATION(WrapperPlayClientAnimation.class),
+            SPECTATE(WrapperPlayClientSpectate.class),
+            PLAYER_BLOCK_PLACEMENT(WrapperPlayClientPlayerBlockPlacement.class),
+            USE_ITEM(WrapperPlayClientUseItem.class),
 
             /**
              * Added with 1.19
              */
-            CHAT_COMMAND,
+            CHAT_COMMAND(WrapperPlayClientChatCommand.class),
 
             /**
              * Added with 1.19.1
              */
-            CHAT_ACK,
+            CHAT_ACK(WrapperPlayClientChatAck.class),
 
             /**
              * Added with 1.19.3
              */
-            CHAT_SESSION_UPDATE,
+            CHAT_SESSION_UPDATE(WrapperPlayClientChatSessionUpdate.class),
 
             /**
              * Added with 1.20.2
              */
-            CHUNK_BATCH_ACK,
+            CHUNK_BATCH_ACK(WrapperPlayClientChunkBatchAck.class),
             /**
              * Added with 1.20.2
              */
-            CONFIGURATION_ACK,
+            CONFIGURATION_ACK(WrapperPlayClientConfigurationAck.class),
             /**
              * Added with 1.20.2
              */
-            DEBUG_PING,
+            DEBUG_PING(WrapperPlayClientDebugPing.class),
 
             /**
              * Added with 1.20.3
              */
-            SLOT_STATE_CHANGE,
+            SLOT_STATE_CHANGE(WrapperPlayClientSlotStateChange.class),
 
             /**
              * Added with 1.20.5
              */
-            CHAT_COMMAND_UNSIGNED,
+            CHAT_COMMAND_UNSIGNED(WrapperPlayClientChatCommandUnsigned.class),
             /**
              * Added with 1.20.5
              */
-            COOKIE_RESPONSE,
+            COOKIE_RESPONSE(WrapperPlayClientCookieResponse.class),
             /**
              * Added with 1.20.5
              */
-            DEBUG_SAMPLE_SUBSCRIPTION,
+            DEBUG_SAMPLE_SUBSCRIPTION(WrapperPlayClientDebugSampleSubscription.class),
 
             /**
              * Added with 1.21.2
              */
-            CLIENT_TICK_END,
+            CLIENT_TICK_END(WrapperPlayClientClientTickEnd.class),
             /**
              * Added with 1.21.2
              */
-            SELECT_BUNDLE_ITEM,
+            SELECT_BUNDLE_ITEM(WrapperPlayClientSelectBundleItem.class),
             /**
              * Added with 1.21.2, based on {@link #STEER_VEHICLE}
              */
-            PLAYER_INPUT,
+            PLAYER_INPUT(WrapperPlayClientPlayerInput.class),
 
             /**
              * Added with 1.21.4
              */
-            PICK_ITEM_FROM_BLOCK,
+            PICK_ITEM_FROM_BLOCK(WrapperPlayClientPickItemFromBlock.class),
             /**
              * Added with 1.21.4
              */
-            PICK_ITEM_FROM_ENTITY,
+            PICK_ITEM_FROM_ENTITY(WrapperPlayClientPickItemFromEntity.class),
             /**
              * Added with 1.21.4
              */
-            PLAYER_LOADED,
+            PLAYER_LOADED(WrapperPlayClientPlayerLoaded.class),
 
             /**
              * Added with 1.21.5
              */
-            SET_TEST_BLOCK,
+            SET_TEST_BLOCK(WrapperPlayClientSetTestBlock.class),
             /**
              * Added with 1.21.5
              */
-            TEST_INSTANCE_BLOCK_ACTION,
+            TEST_INSTANCE_BLOCK_ACTION(WrapperPlayClientTestInstanceBlockAction.class),
             ;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
             private final int[] ids;
+            private final Class<? extends PacketWrapper<?>> wrapper;
 
-            Client() {
+            Client(@Nullable Class<? extends PacketWrapper<?>> wrapper) {
                 ids = new int[SERVERBOUND_PLAY_VERSION_MAPPER.getVersions().length];
                 Arrays.fill(ids, -1);
+                this.wrapper = wrapper;
+            }
+
+            @Override
+            public Class<? extends PacketWrapper<?>> getWrapperClass() {
+                return wrapper;
             }
 
             @Nullable
@@ -820,198 +1000,209 @@ public final class PacketType {
         public enum Server implements PacketTypeCommon, ClientBoundPacket {
 
             // Packets which are no longer exist on the latest version
-            SET_COMPRESSION,
-            MAP_CHUNK_BULK,
-            UPDATE_ENTITY_NBT,
-            UPDATE_SIGN,
-            USE_BED,
-            SPAWN_WEATHER_ENTITY,
-            TITLE,
-            WORLD_BORDER,
-            COMBAT_EVENT,
-            ENTITY_MOVEMENT,
-            SPAWN_LIVING_ENTITY,
-            SPAWN_PAINTING,
-            SCULK_VIBRATION_SIGNAL,
-            ACKNOWLEDGE_PLAYER_DIGGING,
-            CHAT_PREVIEW_PACKET,
-            NAMED_SOUND_EFFECT,
-            PLAYER_CHAT_HEADER,
-            PLAYER_INFO,
-            DISPLAY_CHAT_PREVIEW,
-            UPDATE_ENABLED_FEATURES,
-            SPAWN_PLAYER,
+            SET_COMPRESSION(WrapperPlayServerSetCompression.class),
+            MAP_CHUNK_BULK(WrapperPlayServerChunkDataBulk.class),
+            UPDATE_ENTITY_NBT(WrapperPlayServerUpdateEntityNBT.class),
+            UPDATE_SIGN(null),
+            USE_BED(WrapperPlayServerUseBed.class),
+            SPAWN_WEATHER_ENTITY(WrapperPlayServerSpawnWeatherEntity.class),
+            TITLE(WrapperPlayServerSetTitleSubtitle.class),
+            WORLD_BORDER(WrapperPlayServerInitializeWorldBorder.class),
+            COMBAT_EVENT(WrapperPlayServerCombatEvent.class),
+            ENTITY_MOVEMENT(WrapperPlayServerEntityMovement.class),
+            SPAWN_LIVING_ENTITY(WrapperPlayServerSpawnLivingEntity.class),
+            SPAWN_PAINTING(WrapperPlayServerSpawnPainting.class),
+            SCULK_VIBRATION_SIGNAL(null),
+            ACKNOWLEDGE_PLAYER_DIGGING(WrapperPlayServerAcknowledgePlayerDigging.class),
+            CHAT_PREVIEW_PACKET(WrapperPlayServerChatPreview.class),
+            NAMED_SOUND_EFFECT(null),
+            PLAYER_CHAT_HEADER(WrapperPlayServerPlayerChatHeader.class),
+            PLAYER_INFO(WrapperPlayServerPlayerInfo.class),
+            DISPLAY_CHAT_PREVIEW(WrapperPlayServerSetDisplayChatPreview.class),
+            UPDATE_ENABLED_FEATURES(WrapperPlayServerUpdateEnabledFeatures.class),
+            SPAWN_PLAYER(WrapperPlayServerSpawnPlayer.class),
 
             // Still existing packets
-            WINDOW_CONFIRMATION,
-            SPAWN_ENTITY,
+            WINDOW_CONFIRMATION(WrapperPlayServerWindowConfirmation.class),
+            SPAWN_ENTITY(WrapperPlayServerSpawnEntity.class),
             /**
              * Removed with 1.21.5
              */
             @ApiStatus.Obsolete
-            SPAWN_EXPERIENCE_ORB,
-            ENTITY_ANIMATION,
-            STATISTICS,
-            BLOCK_BREAK_ANIMATION,
-            BLOCK_ENTITY_DATA,
-            BLOCK_ACTION,
-            BLOCK_CHANGE,
-            BOSS_BAR,
-            SERVER_DIFFICULTY,
-            CLEAR_TITLES,
-            TAB_COMPLETE,
-            MULTI_BLOCK_CHANGE,
-            DECLARE_COMMANDS,
-            CLOSE_WINDOW,
-            WINDOW_ITEMS,
-            WINDOW_PROPERTY,
-            SET_SLOT,
-            SET_COOLDOWN,
-            PLUGIN_MESSAGE,
-            DISCONNECT,
-            ENTITY_STATUS,
-            EXPLOSION,
-            UNLOAD_CHUNK,
-            CHANGE_GAME_STATE,
-            OPEN_HORSE_WINDOW,
-            INITIALIZE_WORLD_BORDER,
-            KEEP_ALIVE,
-            CHUNK_DATA,
-            EFFECT,
-            PARTICLE,
-            UPDATE_LIGHT,
-            JOIN_GAME,
-            MAP_DATA,
-            MERCHANT_OFFERS,
-            ENTITY_RELATIVE_MOVE,
-            ENTITY_RELATIVE_MOVE_AND_ROTATION,
-            ENTITY_ROTATION,
-            VEHICLE_MOVE,
-            OPEN_BOOK,
-            OPEN_WINDOW,
-            OPEN_SIGN_EDITOR,
-            PING,
-            CRAFT_RECIPE_RESPONSE,
-            PLAYER_ABILITIES,
-            END_COMBAT_EVENT,
-            ENTER_COMBAT_EVENT,
-            DEATH_COMBAT_EVENT,
-            FACE_PLAYER,
-            PLAYER_POSITION_AND_LOOK,
-            UNLOCK_RECIPES, // removed in 1.21.2
-            DESTROY_ENTITIES,
-            REMOVE_ENTITY_EFFECT,
-            RESOURCE_PACK_SEND,
-            RESPAWN,
-            ENTITY_HEAD_LOOK,
-            SELECT_ADVANCEMENTS_TAB,
-            ACTION_BAR,
-            WORLD_BORDER_CENTER,
-            WORLD_BORDER_LERP_SIZE,
-            WORLD_BORDER_SIZE,
-            WORLD_BORDER_WARNING_DELAY,
-            WORLD_BORDER_WARNING_REACH,
-            CAMERA,
-            HELD_ITEM_CHANGE,
-            UPDATE_VIEW_POSITION,
-            UPDATE_VIEW_DISTANCE,
-            SPAWN_POSITION,
-            DISPLAY_SCOREBOARD,
-            ENTITY_METADATA,
-            ATTACH_ENTITY,
-            ENTITY_VELOCITY,
-            ENTITY_EQUIPMENT,
-            SET_EXPERIENCE,
-            UPDATE_HEALTH,
-            SCOREBOARD_OBJECTIVE,
-            SET_PASSENGERS,
-            TEAMS,
-            UPDATE_SCORE,
-            UPDATE_SIMULATION_DISTANCE,
-            SET_TITLE_SUBTITLE,
-            TIME_UPDATE,
-            SET_TITLE_TEXT,
-            SET_TITLE_TIMES,
-            ENTITY_SOUND_EFFECT,
-            SOUND_EFFECT,
-            STOP_SOUND,
-            PLAYER_LIST_HEADER_AND_FOOTER,
-            NBT_QUERY_RESPONSE,
-            COLLECT_ITEM,
-            ENTITY_TELEPORT,
-            UPDATE_ADVANCEMENTS,
-            UPDATE_ATTRIBUTES,
-            ENTITY_EFFECT,
-            DECLARE_RECIPES,
-            TAGS,
-            CHAT_MESSAGE,
+            SPAWN_EXPERIENCE_ORB(WrapperPlayServerSpawnExperienceOrb.class),
+            ENTITY_ANIMATION(WrapperPlayServerEntityAnimation.class),
+            STATISTICS(null),
+            BLOCK_BREAK_ANIMATION(WrapperPlayServerBlockBreakAnimation.class),
+            BLOCK_ENTITY_DATA(WrapperPlayServerBlockEntityData.class),
+            BLOCK_ACTION(WrapperPlayServerBlockAction.class),
+            BLOCK_CHANGE(WrapperPlayServerBlockChange.class),
+            BOSS_BAR(WrapperPlayServerBossBar.class),
+            SERVER_DIFFICULTY(WrapperPlayServerDifficulty.class),
+            CLEAR_TITLES(WrapperPlayServerClearTitles.class),
+            TAB_COMPLETE(WrapperPlayServerTabComplete.class),
+            MULTI_BLOCK_CHANGE(WrapperPlayServerMultiBlockChange.class),
+            DECLARE_COMMANDS(WrapperPlayServerDeclareCommands.class),
+            CLOSE_WINDOW(WrapperPlayServerCloseWindow.class),
+            WINDOW_ITEMS(WrapperPlayServerWindowItems.class),
+            WINDOW_PROPERTY(WrapperPlayServerWindowProperty.class),
+            SET_SLOT(WrapperPlayServerSetSlot.class),
+            SET_COOLDOWN(WrapperPlayServerSetCooldown.class),
+            PLUGIN_MESSAGE(WrapperPlayServerPluginMessage.class),
+            DISCONNECT(WrapperPlayServerDisconnect.class),
+            ENTITY_STATUS(WrapperPlayServerEntityStatus.class),
+            EXPLOSION(WrapperPlayServerExplosion.class),
+            UNLOAD_CHUNK(WrapperPlayServerUnloadChunk.class),
+            CHANGE_GAME_STATE(WrapperPlayServerChangeGameState.class),
+            OPEN_HORSE_WINDOW(WrapperPlayServerOpenHorseWindow.class),
+            INITIALIZE_WORLD_BORDER(WrapperPlayServerInitializeWorldBorder.class),
+            KEEP_ALIVE(WrapperPlayServerKeepAlive.class),
+            CHUNK_DATA(WrapperPlayServerChunkData.class),
+            EFFECT(null),
+            PARTICLE(WrapperPlayServerParticle.class),
+            UPDATE_LIGHT(WrapperPlayServerUpdateLight.class),
+            JOIN_GAME(WrapperPlayServerJoinGame.class),
+            MAP_DATA(WrapperPlayServerMapData.class),
+            MERCHANT_OFFERS(WrapperPlayServerMerchantOffers.class),
+            ENTITY_RELATIVE_MOVE(WrapperPlayServerEntityRelativeMove.class),
+            ENTITY_RELATIVE_MOVE_AND_ROTATION(WrapperPlayServerEntityRelativeMoveAndRotation.class),
+            ENTITY_ROTATION(WrapperPlayServerEntityRotation.class),
+            VEHICLE_MOVE(WrapperPlayServerVehicleMove.class),
+            OPEN_BOOK(WrapperPlayServerOpenBook.class),
+            OPEN_WINDOW(WrapperPlayServerOpenWindow.class),
+            OPEN_SIGN_EDITOR(WrapperPlayServerOpenSignEditor.class),
+            PING(WrapperPlayServerPing.class),
+            CRAFT_RECIPE_RESPONSE(WrapperPlayServerCraftRecipeResponse.class),
+            PLAYER_ABILITIES(WrapperPlayServerPlayerAbilities.class),
+            END_COMBAT_EVENT(WrapperPlayServerEndCombatEvent.class),
+            ENTER_COMBAT_EVENT(WrapperPlayServerEnterCombatEvent.class),
+            DEATH_COMBAT_EVENT(WrapperPlayServerDeathCombatEvent.class),
+            FACE_PLAYER(WrapperPlayServerFacePlayer.class),
+            PLAYER_POSITION_AND_LOOK(WrapperPlayServerPlayerPositionAndLook.class),
+            /**
+             * Removed with 1.21.2
+             */
+            @ApiStatus.Obsolete
+            UNLOCK_RECIPES(null),
+            DESTROY_ENTITIES(WrapperPlayServerDestroyEntities.class),
+            REMOVE_ENTITY_EFFECT(WrapperPlayServerRemoveEntityEffect.class),
+            RESOURCE_PACK_SEND(WrapperPlayServerResourcePackSend.class),
+            RESPAWN(WrapperPlayServerRespawn.class),
+            ENTITY_HEAD_LOOK(WrapperPlayServerEntityHeadLook.class),
+            SELECT_ADVANCEMENTS_TAB(WrapperPlayServerSelectAdvancementsTab.class),
+            ACTION_BAR(WrapperPlayServerActionBar.class),
+            WORLD_BORDER_CENTER(WrapperPlayServerWorldBorderCenter.class),
+            WORLD_BORDER_LERP_SIZE(WrapperPlayWorldBorderLerpSize.class),
+            WORLD_BORDER_SIZE(WrapperPlayServerWorldBorderSize.class),
+            WORLD_BORDER_WARNING_DELAY(WrapperPlayWorldBorderWarningDelay.class),
+            WORLD_BORDER_WARNING_REACH(WrapperPlayServerWorldBorderWarningReach.class),
+            CAMERA(WrapperPlayServerCamera.class),
+            HELD_ITEM_CHANGE(WrapperPlayServerHeldItemChange.class),
+            UPDATE_VIEW_POSITION(WrapperPlayServerUpdateViewPosition.class),
+            UPDATE_VIEW_DISTANCE(WrapperPlayServerUpdateViewDistance.class),
+            SPAWN_POSITION(WrapperPlayServerSpawnPosition.class),
+            DISPLAY_SCOREBOARD(WrapperPlayServerDisplayScoreboard.class),
+            ENTITY_METADATA(WrapperPlayServerEntityMetadata.class),
+            ATTACH_ENTITY(WrapperPlayServerAttachEntity.class),
+            ENTITY_VELOCITY(WrapperPlayServerEntityVelocity.class),
+            ENTITY_EQUIPMENT(WrapperPlayServerEntityEquipment.class),
+            SET_EXPERIENCE(WrapperPlayServerSetExperience.class),
+            UPDATE_HEALTH(WrapperPlayServerUpdateHealth.class),
+            SCOREBOARD_OBJECTIVE(WrapperPlayServerScoreboardObjective.class),
+            SET_PASSENGERS(WrapperPlayServerSetPassengers.class),
+            TEAMS(WrapperPlayServerTeams.class),
+            UPDATE_SCORE(WrapperPlayServerUpdateScore.class),
+            UPDATE_SIMULATION_DISTANCE(WrapperPlayServerUpdateSimulationDistance.class),
+            SET_TITLE_SUBTITLE(WrapperPlayServerSetTitleSubtitle.class),
+            TIME_UPDATE(WrapperPlayServerTimeUpdate.class),
+            SET_TITLE_TEXT(WrapperPlayServerSetTitleText.class),
+            SET_TITLE_TIMES(WrapperPlayServerSetTitleTimes.class),
+            ENTITY_SOUND_EFFECT(WrapperPlayServerEntitySoundEffect.class),
+            SOUND_EFFECT(WrapperPlayServerSoundEffect.class),
+            STOP_SOUND(null),
+            PLAYER_LIST_HEADER_AND_FOOTER(WrapperPlayServerPlayerListHeaderAndFooter.class),
+            NBT_QUERY_RESPONSE(WrapperPlayServerNBTQueryResponse.class),
+            COLLECT_ITEM(WrapperPlayServerCollectItem.class),
+            ENTITY_TELEPORT(WrapperPlayServerEntityTeleport.class),
+            UPDATE_ADVANCEMENTS(null),
+            UPDATE_ATTRIBUTES(WrapperPlayServerUpdateAttributes.class),
+            ENTITY_EFFECT(WrapperPlayServerEntityEffect.class),
+            DECLARE_RECIPES(WrapperPlayServerDeclareRecipes.class),
+            TAGS(WrapperPlayServerTags.class),
+            CHAT_MESSAGE(WrapperPlayServerChatMessage.class),
 
             // Added in 1.19
-            ACKNOWLEDGE_BLOCK_CHANGES,
-            SERVER_DATA,
-            SYSTEM_CHAT_MESSAGE,
+            ACKNOWLEDGE_BLOCK_CHANGES(WrapperPlayServerAcknowledgeBlockChanges.class),
+            SERVER_DATA(WrapperPlayServerServerData.class),
+            SYSTEM_CHAT_MESSAGE(WrapperPlayServerSystemChatMessage.class),
 
             // Added in 1.19.1
-            DELETE_CHAT,
-            CUSTOM_CHAT_COMPLETIONS,
+            DELETE_CHAT(WrapperPlayServerDeleteChat.class),
+            CUSTOM_CHAT_COMPLETIONS(WrapperPlayServerCustomChatCompletions.class),
 
             // Added in 1.19.3
-            DISGUISED_CHAT,
-            PLAYER_INFO_REMOVE,
-            PLAYER_INFO_UPDATE,
+            DISGUISED_CHAT(WrapperPlayServerDisguisedChat.class),
+            PLAYER_INFO_REMOVE(WrapperPlayServerPlayerInfoRemove.class),
+            PLAYER_INFO_UPDATE(WrapperPlayServerPlayerInfoUpdate.class),
 
             // Added in 1.19.4
-            DAMAGE_EVENT,
-            HURT_ANIMATION,
-            BUNDLE,
-            CHUNK_BIOMES,
+            DAMAGE_EVENT(WrapperPlayServerDamageEvent.class),
+            HURT_ANIMATION(WrapperPlayServerHurtAnimation.class),
+            BUNDLE(WrapperPlayServerBundle.class),
+            CHUNK_BIOMES(null),
 
             // Added in 1.20.2
-            CHUNK_BATCH_END,
-            CHUNK_BATCH_BEGIN,
-            DEBUG_PONG,
-            CONFIGURATION_START,
+            CHUNK_BATCH_END(WrapperPlayServerChunkBatchEnd.class),
+            CHUNK_BATCH_BEGIN(WrapperPlayServerChunkBatchBegin.class),
+            DEBUG_PONG(WrapperPlayServerDebugPong.class),
+            CONFIGURATION_START(WrapperPlayServerConfigurationStart.class),
 
             // Added in 1.20.3
-            RESET_SCORE,
-            RESOURCE_PACK_REMOVE,
-            TICKING_STATE,
-            TICKING_STEP,
+            RESET_SCORE(WrapperPlayServerResetScore.class),
+            RESOURCE_PACK_REMOVE(WrapperPlayServerResourcePackRemove.class),
+            TICKING_STATE(WrapperPlayServerTickingState.class),
+            TICKING_STEP(WrapperPlayServerTickingStep.class),
 
             // Added in 1.20.5
-            COOKIE_REQUEST,
-            DEBUG_SAMPLE,
-            STORE_COOKIE,
-            TRANSFER,
-            PROJECTILE_POWER,
+            COOKIE_REQUEST(WrapperPlayServerCookieRequest.class),
+            DEBUG_SAMPLE(WrapperPlayServerDebugSample.class),
+            STORE_COOKIE(WrapperPlayServerStoreCookie.class),
+            TRANSFER(WrapperPlayServerTransfer.class),
+            PROJECTILE_POWER(WrapperPlayServerProjectilePower.class),
 
             // added in 1.21
-            CUSTOM_REPORT_DETAILS,
-            SERVER_LINKS,
+            CUSTOM_REPORT_DETAILS(WrapperPlayServerCustomReportDetails.class),
+            SERVER_LINKS(WrapperPlayServerServerLinks.class),
 
             // added in 1.21.2
-            MOVE_MINECART,
-            SET_CURSOR_ITEM,
-            SET_PLAYER_INVENTORY,
-            ENTITY_POSITION_SYNC,
-            PLAYER_ROTATION,
-            RECIPE_BOOK_ADD,
-            RECIPE_BOOK_REMOVE,
-            RECIPE_BOOK_SETTINGS,
+            MOVE_MINECART(WrapperPlayServerMoveMinecart.class),
+            SET_CURSOR_ITEM(WrapperPlayServerSetCursorItem.class),
+            SET_PLAYER_INVENTORY(WrapperPlayServerSetPlayerInventory.class),
+            ENTITY_POSITION_SYNC(WrapperPlayServerEntityPositionSync.class),
+            PLAYER_ROTATION(WrapperPlayServerPlayerRotation.class),
+            RECIPE_BOOK_ADD(WrapperPlayServerRecipeBookAdd.class),
+            RECIPE_BOOK_REMOVE(WrapperPlayServerRecipeBookRemove.class),
+            RECIPE_BOOK_SETTINGS(WrapperPlayServerRecipeBookSettings.class),
 
             /**
              * Added with 1.21.5
              */
-            TEST_INSTANCE_BLOCK_STATUS,
+            TEST_INSTANCE_BLOCK_STATUS(WrapperPlayServerTestInstanceBlockStatus.class),
             ;
 
             private static int INDEX = 0;
             private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
             private final int[] ids;
+            private final Class<? extends PacketWrapper<?>> wrapper;
 
-            Server() {
+            Server(@Nullable Class<? extends PacketWrapper<?>> wrapper) {
                 ids = new int[CLIENTBOUND_PLAY_VERSION_MAPPER.getVersions().length];
                 Arrays.fill(ids, -1);
+                this.wrapper = wrapper;
+            }
+
+            @Override
+            public Class<? extends PacketWrapper<?>> getWrapperClass() {
+                return wrapper;
             }
 
             public int getId(ClientVersion version) {

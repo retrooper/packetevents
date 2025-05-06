@@ -22,24 +22,52 @@ import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
 
+@NullMarked
 public interface IRegistry<T extends MappedEntity> extends BiFunction<ClientVersion, Integer, T> {
+
+    default T getByNameOrThrow(ResourceLocation name) {
+        T value = this.getByName(name);
+        if (value == null) {
+            throw new IllegalArgumentException("Can't resolve '" + name + "' in '" + this.getRegistryKey() + "'");
+        }
+        return value;
+    }
 
     default @Nullable T getByName(ResourceLocation name) {
         return this.getByName(name.toString());
     }
 
+    default T getByNameOrThrow(String name) {
+        T value = this.getByName(name);
+        if (value == null) {
+            String normedName = ResourceLocation.normString(name);
+            throw new IllegalArgumentException("Can't resolve '" + normedName + "' in '" + this.getRegistryKey() + "'");
+        }
+        return value;
+    }
+
     @Nullable
     T getByName(String name);
+
+    default T getByIdOrThrow(ClientVersion version, int id) {
+        T value = this.getById(version, id);
+        if (value == null) {
+            throw new IllegalArgumentException("Can't resolve #" + id + " (" + version
+                    + ") in '" + this.getRegistryKey() + "'");
+        }
+        return value;
+    }
 
     @Nullable
     T getById(ClientVersion version, int id);
 
     default int getId(String entityName, ClientVersion version) {
-        return this.getId(this.getByName(entityName), version);
+        return this.getId(this.getByNameOrThrow(entityName), version);
     }
 
     int getId(MappedEntity entity, ClientVersion version);
@@ -57,6 +85,6 @@ public interface IRegistry<T extends MappedEntity> extends BiFunction<ClientVers
 
     @Override
     default T apply(ClientVersion version, Integer id) {
-        return this.getById(version, id);
+        return this.getByIdOrThrow(version, id);
     }
 }

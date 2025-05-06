@@ -127,20 +127,19 @@ public final class PacketEventsImplHelper {
 
     public static void handleDisconnection(Object channel, @Nullable UUID uuid) {
         synchronized (channel) {
-            User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+            ProtocolManager protocolManager = PacketEvents.getAPI().getProtocolManager();
+            User user = protocolManager.getUser(channel);
 
             if (user != null) {
                 UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
                 PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
-                PacketEvents.getAPI().getProtocolManager().removeUser(user.getChannel());
+                protocolManager.removeUser(user.getChannel());
             }
 
             if (uuid == null) {
-                // Only way to be sure of removing a channel
-                ProtocolManager.CHANNELS.entrySet().removeIf(pair -> pair.getValue() == channel);
+                protocolManager.removeChannel(channel);
             } else {
-                // This is the efficient way that we should prefer
-                ProtocolManager.CHANNELS.remove(uuid);
+                protocolManager.removeChannelById(uuid);
             }
         }
     }

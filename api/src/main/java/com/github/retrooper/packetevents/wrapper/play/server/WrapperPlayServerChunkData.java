@@ -332,6 +332,11 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
                 int zeroBytes = ChunkReader_v1_18.getMojangZeroByteSuffixLength(chunks);
                 int newWriterIndex = ByteBufHelper.writerIndex(dataBuffer) + zeroBytes;
+                // allocate enough space for the zeros
+                if (newWriterIndex > ByteBufHelper.capacity(dataBuffer)) {
+                    ByteBufHelper.capacity(dataBuffer, newWriterIndex);
+                }
+                // create zeros by just skipping the writer index
                 ByteBufHelper.writerIndex(dataBuffer, newWriterIndex);
             }
         } else if (v1_8) {

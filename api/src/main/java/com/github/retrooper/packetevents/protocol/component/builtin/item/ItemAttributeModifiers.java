@@ -321,7 +321,12 @@ public class ItemAttributeModifiers {
         CHEST("chest"),
         HEAD("head"),
         ARMOR("armor"),
-        BODY("body");
+        BODY("body"),
+        /**
+         * Added with 1.21.5
+         */
+        SADDLE("saddle"),
+        ;
 
         public static final Index<String, EquipmentSlotGroup> ID_INDEX = Index.create(
                 EquipmentSlotGroup.class, EquipmentSlotGroup::getId);

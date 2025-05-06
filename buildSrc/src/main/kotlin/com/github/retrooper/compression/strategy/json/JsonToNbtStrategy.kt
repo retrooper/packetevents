@@ -53,9 +53,17 @@ object JsonToNbtStrategy : JsonCompressionStrategy() {
         is Double -> DoubleTag(toDouble())
         is Float -> FloatTag(toFloat())
         is Long -> LongTag(toLong())
-        is Int, is LazilyParsedNumber -> IntTag(toInt())
+        is Int -> IntTag(toInt())
         is Short -> ShortTag(toShort())
         is Byte -> ByteTag(toByte())
+        is LazilyParsedNumber -> {
+            val str = this.toString()
+            if (str.contains('.')) {
+                FloatTag(str.toFloat())
+            } else {
+                IntTag(str.toInt())
+            }
+        }
         else -> throw IllegalArgumentException("Unknown number type: $javaClass")
     }
 

@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.component.PatchableComponentMa
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,11 +66,14 @@ public final class ItemStackSerialization {
             return ItemStack.EMPTY;
         }
 
-        ItemType type = ItemTypes.getRegistry().getById(wrapper.getServerVersion().toClientVersion(), typeId);
+        ClientVersion version = wrapper.getServerVersion().toClientVersion();
+        ItemType type = ItemTypes.getRegistry().getByIdOrThrow(version, typeId);
         int amount = wrapper.readByte();
         int legacyData = v1_13_2 ? -1 : wrapper.readShort();
         NBTCompound nbt = wrapper.readNBT();
-        return ItemStack.builder().type(type).amount(amount).nbt(nbt).legacyData(legacyData).build();
+        return ItemStack.builder().type(type).amount(amount)
+                .nbt(nbt).legacyData(legacyData)
+                .wrapper(wrapper).build();
     }
 
     /**
@@ -120,7 +124,7 @@ public final class ItemStackSerialization {
         int presentCount = wrapper.readVarInt();
         int absentCount = wrapper.readVarInt();
         if (presentCount == 0 && absentCount == 0) {
-            return ItemStack.builder().type(itemType).amount(count).build();
+            return ItemStack.builder().type(itemType).amount(count).wrapper(wrapper).build();
         }
 
         PatchableComponentMap components = new PatchableComponentMap(
@@ -158,7 +162,7 @@ public final class ItemStackSerialization {
             components.unset(wrapper.readMappedEntity(ComponentTypes.getRegistry()));
         }
 
-        return ItemStack.builder().type(itemType).amount(count).components(components).build();
+        return ItemStack.builder().type(itemType).amount(count).components(components).wrapper(wrapper).build();
     }
 
     /**
