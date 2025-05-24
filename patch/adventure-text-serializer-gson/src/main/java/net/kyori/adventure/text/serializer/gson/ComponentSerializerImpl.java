@@ -187,19 +187,20 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
         if (text != null) {
             builder = Component.text().content(text);
         } else if (translate != null) {
+            // packetevents patch start
+            TranslatableComponent.Builder i18nBuilder;
+            builder = i18nBuilder = Component.translatable().key(translate);
             if (translateWith != null) {
-                // packetevents patch start
-                ComponentBuilder<?, ?> translateBuilder;
-                try {
-                    translateBuilder = Component.translatable().key(translate).fallback(translateFallback).arguments(translateWith);
-                } catch (NoSuchMethodError e) {
-                    translateBuilder = Component.translatable().key(translate).fallback(translateFallback).args(translateWith);
+                if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
+                    i18nBuilder.arguments(translateWith);
+                } else {
+                    i18nBuilder.args(translateWith);
                 }
-                builder = translateBuilder;
-                // packetevents patch end
-            } else {
-                builder = Component.translatable().key(translate).fallback(translateFallback);
             }
+            if (BackwardCompatUtil.IS_4_13_0_OR_NEWER) {
+                i18nBuilder.fallback(translateFallback);
+            }
+            // packetevents patch end
         } else if (scoreName != null && scoreObjective != null) {
             if (scoreValue == null) {
                 builder = Component.score().name(scoreName).objective(scoreObjective);
@@ -273,12 +274,14 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
             final TranslatableComponent translatable = (TranslatableComponent) value;
             out.name(TRANSLATE);
             out.value(translatable.key());
-            final @Nullable String fallback = translatable.fallback();
-            if (fallback != null) {
-                out.name(TRANSLATE_FALLBACK);
-                out.value(fallback);
-            }
             // packetevents patch start
+            if (BackwardCompatUtil.IS_4_13_0_OR_NEWER) {
+                final @Nullable String fallback = translatable.fallback();
+                if (fallback != null) {
+                    out.name(TRANSLATE_FALLBACK);
+                    out.value(fallback);
+                }
+            }
             boolean argsPresent;
             if (BackwardCompatUtil.IS_4_15_0_OR_NEWER){
                 argsPresent = !translatable.arguments().isEmpty();

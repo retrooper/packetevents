@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.util.adventure;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByteArray;
@@ -33,6 +34,8 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.UniqueIdUtil;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.BlockNBTComponent;
@@ -52,6 +55,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.DataComponentValue;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.ShadowColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -66,16 +70,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
+
 public class AdventureNBTSerializer implements ComponentSerializer<Component, Component, NBT> {
 
+    private final ClientVersion version;
     private final boolean downsampleColor;
 
-    public AdventureNBTSerializer(boolean downsampleColor) {
+    public AdventureNBTSerializer(ClientVersion version, boolean downsampleColor) {
+        this.version = version;
         this.downsampleColor = downsampleColor;
+    }
+
+    @Deprecated
+    public AdventureNBTSerializer(boolean downsampleColor) {
+        this(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), downsampleColor);
     }
 
     @Override
@@ -150,7 +163,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         String selector = reader.readUTF("selector", Function.identity());
         String keybind = reader.readUTF("keybind", Function.identity());
         String nbt = reader.readUTF("nbt", Function.identity());
-        Boolean nbtInterpret = reader.readBoolean("interpret", Function.identity());
+        boolean nbtInterpret = Optional.ofNullable(reader.readBoolean("interpret", Function.identity())).orElse(false);
         BlockNBTComponent.Pos nbtBlock = reader.readUTF("block", BlockNBTComponent.Pos::fromString);
         String nbtEntity = reader.readUTF("entity", Function.identity());
         Key nbtStorage = reader.readUTF("storage", Key::key);
@@ -163,14 +176,17 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         if (text != null) {
             builder = Component.text().content(text);
         } else if (translate != null) {
+            TranslatableComponent.Builder i18nBuilder;
+            builder = i18nBuilder = Component.translatable().key(translate);
             if (translateWith != null) {
                 if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
-                    builder = Component.translatable().key(translate).fallback(translateFallback).arguments(translateWith);
+                    i18nBuilder.arguments(translateWith);
                 } else {
-                    builder = Component.translatable().key(translate).fallback(translateFallback).args(translateWith);
+                    i18nBuilder.args(translateWith);
                 }
-            } else {
-                builder = Component.translatable().key(translate).fallback(translateFallback);
+            }
+            if (BackwardCompatUtil.IS_4_13_0_OR_NEWER) {
+                i18nBuilder.fallback(translateFallback);
             }
         } else if (score != null) {
             builder = Component.score()
@@ -230,9 +246,11 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             writer.writeUTF("translate", ((TranslatableComponent) component).key());
 
             // translation fallback
-            String fallback = ((TranslatableComponent) component).fallback();
-            if (fallback != null) {
-                writer.writeUTF("fallback", fallback);
+            if (BackwardCompatUtil.IS_4_13_0_OR_NEWER) {
+                String fallback = ((TranslatableComponent) component).fallback();
+                if (fallback != null) {
+                    writer.writeUTF("fallback", fallback);
+                }
             }
 
             // translation arguments
@@ -318,42 +336,75 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
 
         reader.useUTF("font", value -> style.font(Key.key(value)));
         reader.useUTF("color", value -> {
-            TextColor color = deserializeColor(value);
+            TextColor color = this.deserializeColor(value);
             if (color != null) style.color(color);
         });
+        if (BackwardCompatUtil.IS_4_18_0_OR_NEWER) {
+            reader.useNumber("shadow_color", num ->
+                    style.shadowColor(ShadowColor.shadowColor(num.intValue())));
+        }
 
-        for (Map.Entry<TextDecoration, String> decoration : TextDecoration.NAMES.valueToKey().entrySet()) {
-            reader.useBoolean(decoration.getValue(), value -> style.decoration(decoration.getKey(), TextDecoration.State.byBoolean(value)));
+        for (String decorationKey : TextDecoration.NAMES.keys()) {
+            reader.useBoolean(decorationKey, value -> style.decoration(
+                    indexValueOrThrow(TextDecoration.NAMES, decorationKey),
+                    TextDecoration.State.byBoolean(value)));
         }
         reader.useUTF("insertion", style::insertion);
 
-        NBTReader clickEvent = reader.child("clickEvent");
+        boolean modernEvents = this.version.isNewerThanOrEquals(ClientVersion.V_1_21_5);
+        NBTReader clickEvent = reader.child(modernEvents ? "click_event" : "clickEvent");
         if (clickEvent != null) {
-            style.clickEvent(ClickEvent.clickEvent(
-                    clickEvent.readUTF("action", ClickEvent.Action.NAMES::value),
-                    clickEvent.readUTF("value", Function.identity())
-            ));
+            ClickEvent.Action action = clickEvent.readUTF("action", ClickEvent.Action.NAMES::value);
+            String value;
+            if (!modernEvents) {
+                value = clickEvent.readUTF("value", Function.identity());
+            } else {
+                switch (action) {
+                    case OPEN_URL:
+                        value = clickEvent.readUTF("url", Function.identity());
+                        break;
+                    case OPEN_FILE:
+                        value = clickEvent.readUTF("path", Function.identity());
+                        break;
+                    case RUN_COMMAND:
+                    case SUGGEST_COMMAND:
+                        value = clickEvent.readUTF("command", Function.identity());
+                        break;
+                    case CHANGE_PAGE:
+                        value = clickEvent.readNumber("page", String::valueOf);
+                        break;
+                    case COPY_TO_CLIPBOARD:
+                    default:
+                        value = clickEvent.readUTF("value", Function.identity());
+                        break;
+                }
+            }
+            style.clickEvent(ClickEvent.clickEvent(action, value));
         }
 
-        NBTReader hoverEvent = reader.child("hoverEvent");
+        NBTReader hoverEvent = reader.child(modernEvents ? "hover_event" : "hoverEvent");
         if (hoverEvent != null) {
             HoverEvent.Action action = hoverEvent.readUTF("action", HoverEvent.Action.NAMES::value);
-            if (action.equals(HoverEvent.Action.SHOW_TEXT)) {
-                style.hoverEvent(HoverEvent.showText(hoverEvent.read("contents", this::deserialize)));
-            } else if (action.equals(HoverEvent.Action.SHOW_ITEM)) {
-                if (hoverEvent.type("contents") == NBTType.STRING) {
-                    style.hoverEvent(HoverEvent.showItem(hoverEvent.readUTF("contents", Key::key), 1));
-                } else {
-                    NBTReader child = hoverEvent.child("contents");
-                    Key itemId = child.readUTF("id", Key::key);
-                    Integer count = child.readInt("count", Function.identity());
+            switch (action.toString()) {
+                case "show_text":
+                    style.hoverEvent(HoverEvent.showText(hoverEvent.read(modernEvents ? "value" : "contents", this::deserialize)));
+                    break;
+                case "show_item":
+                    if (!modernEvents && hoverEvent.type("contents") == NBTType.STRING) {
+                        style.hoverEvent(HoverEvent.showItem(hoverEvent.readUTF("contents", Key::key), 1));
+                        break;
+                    }
+
+                    NBTReader item = modernEvents ? hoverEvent : hoverEvent.child("contents");
+                    Key itemId = item.readUTF("id", Key::key);
+                    Integer count = item.readNumber("count", Number::intValue);
                     int nonNullCount = count == null ? 1 : count;
 
-                    BinaryTagHolder tag = child.readUTF("tag", BinaryTagHolder::binaryTagHolder);
+                    BinaryTagHolder tag = item.readUTF("tag", BinaryTagHolder::binaryTagHolder);
                     if (tag != null || !BackwardCompatUtil.IS_4_17_0_OR_NEWER) {
                         style.hoverEvent(HoverEvent.showItem(itemId, nonNullCount, tag));
                     } else {
-                        Map<Key, DataComponentValue> components = child.readCompound("components", nbt -> {
+                        Map<Key, DataComponentValue> components = item.readCompound("components", nbt -> {
                             Map<Key, DataComponentValue> map = new HashMap<>(nbt.size());
                             for (Map.Entry<String, NBT> entry : nbt.getTags().entrySet()) {
                                 if (entry.getKey().startsWith("!")) { // removed component
@@ -369,14 +420,14 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                         style.hoverEvent(HoverEvent.showItem(itemId, nonNullCount,
                                 components == null ? Collections.emptyMap() : components));
                     }
-                }
-            } else if (action.equals(HoverEvent.Action.SHOW_ENTITY)) {
-                NBTReader child = hoverEvent.child("contents");
-                style.hoverEvent(HoverEvent.showEntity(
-                        child.readUTF("type", Key::key),
-                        child.readIntArray("id", this::deserializeUUID),
-                        child.read("name", this::deserialize)
-                ));
+                    break;
+                case "show_entity":
+                    NBTReader entity = modernEvents ? hoverEvent : hoverEvent.child("contents");
+                    style.hoverEvent(HoverEvent.showEntity(
+                            entity.readUTF(modernEvents ? "id" : "type", Key::key),
+                            entity.readIntArray(modernEvents ? "uuid" : "id", UniqueIdUtil::fromIntArray),
+                            entity.read("name", this::deserialize)));
+                    break;
             }
         }
 
@@ -392,12 +443,17 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         if (font != null) writer.writeUTF("font", font.asString());
 
         TextColor color = style.color();
-        if (color != null) writer.writeUTF("color", serializeColor(color));
+        if (color != null) writer.writeUTF("color", this.serializeColor(color));
 
-        for (Map.Entry<TextDecoration, String> decoration : TextDecoration.NAMES.valueToKey().entrySet()) {
-            TextDecoration.State state = style.decoration(decoration.getKey());
+        if (BackwardCompatUtil.IS_4_18_0_OR_NEWER) {
+            ShadowColor shadowColor = style.shadowColor();
+            if (shadowColor != null) writer.writeInt("shadow_color", shadowColor.value());
+        }
+
+        for (TextDecoration decoration : TextDecoration.NAMES.values()) {
+            TextDecoration.State state = style.decoration(decoration);
             if (state != TextDecoration.State.NOT_SET) {
-                writer.writeBoolean(decoration.getValue(), state == TextDecoration.State.TRUE);
+                writer.writeBoolean(decoration.toString(), state == TextDecoration.State.TRUE);
             }
         }
 
@@ -406,33 +462,59 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
 
         ClickEvent clickEvent = style.clickEvent();
         if (clickEvent != null) {
-            NBTWriter child = writer.child("clickEvent");
+            boolean modern = this.version.isNewerThanOrEquals(ClientVersion.V_1_21_5);
+            NBTWriter child = writer.child(modern ? "click_event" : "clickEvent");
             child.writeUTF("action", clickEvent.action().toString());
-            child.writeUTF("value", clickEvent.value());
+            if (!modern) {
+                child.writeUTF("value", clickEvent.value());
+            } else {
+                switch (clickEvent.action()) {
+                    case OPEN_URL:
+                        child.writeUTF("url", clickEvent.value());
+                        break;
+                    case OPEN_FILE:
+                        child.writeUTF("path", clickEvent.value());
+                        break;
+                    case RUN_COMMAND:
+                    case SUGGEST_COMMAND:
+                        child.writeUTF("command", clickEvent.value());
+                        break;
+                    case CHANGE_PAGE:
+                        child.writeInt("page", Integer.parseInt(clickEvent.value()));
+                        break;
+                    case COPY_TO_CLIPBOARD:
+                    default:
+                        child.writeUTF("value", clickEvent.value());
+                        break;
+                }
+            }
         }
 
         HoverEvent<?> hoverEvent = style.hoverEvent();
         if (hoverEvent != null) {
-            NBTWriter child = writer.child("hoverEvent");
+            boolean modern = this.version.isNewerThanOrEquals(ClientVersion.V_1_21_5);
+            NBTWriter child = writer.child(modern ? "hover_event" : "hoverEvent");
             child.writeUTF("action", hoverEvent.action().toString());
             switch (hoverEvent.action().toString()) {
-                case "show_text": {
-                    child.write("contents", this.serialize((Component) hoverEvent.value()));
+                case "show_text":
+                    child.write(modern ? "value" : "contents", this.serialize((Component) hoverEvent.value()));
                     break;
-                }
-                case "show_item": {
+                case "show_item":
                     HoverEvent.ShowItem item = (HoverEvent.ShowItem) hoverEvent.value();
                     Key itemId = item.item();
                     int count = item.count();
                     BinaryTagHolder nbt = item.nbt();
                     boolean emptyComps = !BackwardCompatUtil.IS_4_17_0_OR_NEWER || item.dataComponents().isEmpty();
 
-                    if (count == 1 && nbt == null && emptyComps) {
+                    // "modern" item stacks are no longer allowed to be inlined
+                    if (!modern && count == 1 && nbt == null && emptyComps) {
                         child.writeUTF("contents", itemId.asString());
                     } else {
-                        NBTWriter itemNBT = child.child("contents");
+                        NBTWriter itemNBT = modern ? child : child.child("contents");
                         itemNBT.writeUTF("id", itemId.asString());
-                        itemNBT.writeInt("count", count);
+                        if (!modern || count != 1) {
+                            itemNBT.writeInt("count", count);
+                        }
                         if (nbt != null) {
                             itemNBT.writeUTF("tag", nbt.string());
                         }
@@ -453,16 +535,15 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                         }
                     }
                     break;
-                }
-                case "show_entity": {
+                case "show_entity":
                     HoverEvent.ShowEntity showEntity = (HoverEvent.ShowEntity) hoverEvent.value();
-                    NBTWriter entity = child.child("contents");
-                    entity.writeUTF("type", showEntity.type().asString());
-                    entity.writeIntArray("id", this.serializeUUID(showEntity.id()));
-                    if (showEntity.name() != null) entity.write("name", this.serialize(showEntity.name()));
+                    NBTWriter entity = modern ? child : child.child("contents");
+                    entity.writeUTF(modern ? "id" : "type", showEntity.type().asString());
+                    entity.writeIntArray(modern ? "uuid" : "id", UniqueIdUtil.toIntArray(showEntity.id()));
+                    if (showEntity.name() != null) {
+                        entity.write("name", this.serialize(showEntity.name()));
+                    }
                     break;
-                }
-
             }
         }
 
@@ -493,27 +574,6 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         } else {
             return String.format(Locale.ROOT, "%c%06X", TextColor.HEX_CHARACTER, value.value());
         }
-    }
-    // -------------------------------------------------
-
-    // ---------------------- UUID ----------------------
-    private @NotNull UUID deserializeUUID(int[] value) {
-        if (value.length != 4) {
-            throw new IllegalStateException("Invalid encoded uuid length: " + value.length + " != 4");
-        }
-        return new UUID(
-                (long) value[0] << 32 | (long) value[1] & 0xFFFFFFFFL,
-                (long) value[2] << 32 | (long) value[3] & 0xFFFFFFFFL
-        );
-    }
-
-    private int @NotNull [] serializeUUID(UUID value) {
-        return new int[]{
-                (int) (value.getMostSignificantBits() >> 32),
-                (int) value.getMostSignificantBits(),
-                (int) (value.getLeastSignificantBits() >> 32),
-                (int) value.getLeastSignificantBits()
-        };
     }
     // -------------------------------------------------
 
@@ -575,59 +635,31 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         }
 
         public void useBoolean(String key, Consumer<Boolean> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.BYTE).getAsByte() != 0));
+            useNumber(key, num -> consumer.accept(num.byteValue() != 0));
         }
 
         public <R> R readBoolean(String key, Function<Boolean, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.BYTE).getAsByte() != 0));
+            return readNumber(key, num -> function.apply(num.byteValue() != 0));
         }
 
-        public void useByte(String key, Consumer<Byte> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.BYTE).getAsByte()));
+        public void useNumber(String key, Consumer<Number> consumer) {
+            useTag(key, tag -> {
+                if (tag instanceof NBTNumber) {
+                    consumer.accept(((NBTNumber) tag).getAsNumber());
+                } else {
+                    throw new IllegalArgumentException("Expected number but got " + tag.getType());
+                }
+            });
         }
 
-        public <R> R readByte(String key, Function<Byte, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.BYTE).getAsByte()));
-        }
-
-        public void useShort(String key, Consumer<Short> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.SHORT).getAsShort()));
-        }
-
-        public <R> R readShort(String key, Function<Short, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.SHORT).getAsShort()));
-        }
-
-        public void useInt(String key, Consumer<Integer> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.INT).getAsInt()));
-        }
-
-        public <R> R readInt(String key, Function<Integer, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.INT).getAsInt()));
-        }
-
-        public void useLong(String key, Consumer<Long> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.LONG).getAsLong()));
-        }
-
-        public <R> R readLong(String key, Function<Long, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.LONG).getAsLong()));
-        }
-
-        public void useFloat(String key, Consumer<Float> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.FLOAT).getAsFloat()));
-        }
-
-        public <R> R readFloat(String key, Function<Float, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.FLOAT).getAsFloat()));
-        }
-
-        public void useDouble(String key, Consumer<Double> consumer) {
-            useTag(key, tag -> consumer.accept(requireType(tag, NBTType.DOUBLE).getAsDouble()));
-        }
-
-        public <R> R readDouble(String key, Function<Double, R> function) {
-            return withTag(key, tag -> function.apply(requireType(tag, NBTType.DOUBLE).getAsDouble()));
+        public <R> R readNumber(String key, Function<Number, R> function) {
+            return withTag(key, tag -> {
+                if (tag instanceof NBTNumber) {
+                    return function.apply(((NBTNumber) tag).getAsNumber());
+                } else {
+                    throw new IllegalArgumentException("Expected number but got " + tag.getType());
+                }
+            });
         }
 
         public void useUTF(String key, Consumer<String> consumer) {

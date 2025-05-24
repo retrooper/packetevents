@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+@Deprecated
 public class NetStreamInput extends FilterInputStream {
     /**
      * Creates a new StreamNetInput instance.

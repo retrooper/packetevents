@@ -20,71 +20,317 @@ package com.github.retrooper.packetevents.protocol.sound;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
-public class Sounds {
+public final class Sounds {
 
-    private static final Map<String, Sound> SOUND_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, Sound>> SOUND_TYPE_ID_MAP = new HashMap<>();
+    private static final VersionedRegistry<Sound> REGISTRY = new VersionedRegistry<>("sound_event");
 
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("sound/sound_mappings");
-
-    public static Sound define(String key) {
-        return define(key, new ResourceLocation(key), null);
+    private Sounds() {
     }
 
-    public static Sound define(String key, ResourceLocation soundId, @Nullable Float range) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        Sound soundType = new Sound() {
-            @Override
-            public ResourceLocation getSoundId() {
-                return soundId;
-            }
+    public static VersionedRegistry<Sound> getRegistry() {
+        return REGISTRY;
+    }
 
-            @Override
-            public @Nullable Float getRange() {
-                return range;
-            }
+    @ApiStatus.Internal
+    public static Sound define(String name) {
+        return define(name, new ResourceLocation(name), null);
+    }
 
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
+    @ApiStatus.Internal
+    public static Sound define(String name, ResourceLocation soundId, @Nullable Float range) {
+        return REGISTRY.define(name, data -> new StaticSound(data, soundId, range));
+    }
 
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof Sound) {
-                    return getName().equals(((Sound) obj).getName());
-                }
-                return false;
-            }
-        };
-        MappingHelper.registerMapping(TYPES_BUILDER, SOUND_TYPE_MAP, SOUND_TYPE_ID_MAP, soundType);
-        return soundType;
+    public static Sound getByNameOrCreate(String name) {
+        Sound builtinSound = getByName(name);
+        if (builtinSound == null) {
+            return new StaticSound(new ResourceLocation(name), null);
+        }
+        return builtinSound;
     }
 
     public static @Nullable Sound getByName(String name) {
-        return SOUND_TYPE_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static @Nullable Sound getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, Sound> idMap = SOUND_TYPE_ID_MAP.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
+
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ZOMBIE_PIGMAN_HURT = define("entity.zombie_pigman.hurt");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_PARROT_IMITATE_POLAR_BEAR = define("entity.parrot.imitate.polar_bear");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_PARROT_IMITATE_PANDA = define("entity.parrot.imitate.panda");
+    @ApiStatus.Obsolete
+    public static final Sound MUSIC_NETHER = define("music.nether");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_SWEET_BERRY_BUSH_PICK_FROM_BUSH = define("block.sweet_berry_bush.pick_from_bush");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_PARROT_IMITATE_ZOMBIE_PIGMAN = define("entity.parrot.imitate.zombie_pigman");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ZOMBIE_PIGMAN_AMBIENT = define("entity.zombie_pigman.ambient");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ZOMBIE_PIGMAN_DEATH = define("entity.zombie_pigman.death");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_PARROT_IMITATE_WOLF = define("entity.parrot.imitate.wolf");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_PARROT_IMITATE_ENDERMAN = define("entity.parrot.imitate.enderman");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ZOMBIE_PIGMAN_ANGRY = define("entity.zombie_pigman.angry");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_TRIAL_SPAWNER_AMBIENT_CHARGED = define("block.trial_spawner.ambient_charged");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_TRIAL_SPAWNER_CHARGE_ACTIVATE = define("block.trial_spawner.charge_activate");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERDRAGON_FIREBALL_EXPLODE = define("entity.enderdragon_fireball.explode");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_ENDERCHEST_OPEN = define("block.enderchest.open");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERDRAGON_AMBIENT = define("entity.enderdragon.ambient");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_FIREWORK_LARGE_BLAST_FAR = define("entity.firework.large_blast_far");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERPEARL_THROW = define("entity.enderpearl.throw");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_FAR = define("record.far");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDEREYE_LAUNCH = define("entity.endereye.launch");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_CLOTH_HIT = define("block.cloth.hit");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_SNOWMAN_DEATH = define("entity.snowman.death");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ARMORSTAND_BREAK = define("entity.armorstand.break");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_STRAD = define("record.strad");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_CLOTH_BREAK = define("block.cloth.break");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_NOTE_SNARE = define("block.note.snare");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_WOOD_BUTTON_CLICK_OFF = define("block.wood_button.click_off");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_LEASHKNOT_BREAK = define("entity.leashknot.break");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_MAGMACUBE_HURT = define("entity.magmacube.hurt");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_SNOWMAN_AMBIENT = define("entity.snowman.ambient");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ARMORSTAND_HIT = define("entity.armorstand.hit");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_MAGMACUBE_JUMP = define("entity.magmacube.jump");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ZOMBIE_PIG_DEATH = define("entity.zombie_pig.death");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ZOMBIE_ATTACK_DOOR_WOOD = define("entity.zombie.attack_door_wood");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_NOTE_HARP = define("block.note.harp");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_BLOCKS = define("record.blocks");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_CLOTH_STEP = define("block.cloth.step");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_FIREWORK_SHOOT = define("entity.firework.shoot");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERDRAGON_FLAP = define("entity.enderdragon.flap");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_FIREWORK_TWINKLE_FAR = define("entity.firework.twinkle_far");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_MELLOHI = define("record.mellohi");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERMEN_SCREAM = define("entity.endermen.scream");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_SMALL_MAGMACUBE_SQUISH = define("entity.small_magmacube.squish");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_IRONGOLEM_HURT = define("entity.irongolem.hurt");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_MAGMACUBE_DEATH = define("entity.magmacube.death");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERMEN_DEATH = define("entity.endermen.death");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_FIREWORK_BLAST_FAR = define("entity.firework.blast_far");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_WOOD_BUTTON_CLICK_ON = define("block.wood_button.click_on");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERDRAGON_HURT = define("entity.enderdragon.hurt");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_LEASHKNOT_PLACE = define("entity.leashknot.place");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_SLIME_BREAK = define("block.slime.break");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_WATERLILY_PLACE = define("block.waterlily.place");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ARMORSTAND_PLACE = define("entity.armorstand.place");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERDRAGON_SHOOT = define("entity.enderdragon.shoot");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_LIGHTNING_THUNDER = define("entity.lightning.thunder");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_SMALL_MAGMACUBE_HURT = define("entity.small_magmacube.hurt");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_CLOTH_FALL = define("block.cloth.fall");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ZOMBIE_PIG_AMBIENT = define("entity.zombie_pig.ambient");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_IRONGOLEM_ATTACK = define("entity.irongolem.attack");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ZOMBIE_PIG_ANGRY = define("entity.zombie_pig.angry");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_FIREWORK_BLAST = define("entity.firework.blast");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_SNOWMAN_SHOOT = define("entity.snowman.shoot");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_CLOTH_PLACE = define("block.cloth.place");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_SLIME_PLACE = define("block.slime.place");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_SLIME_FALL = define("block.slime.fall");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ITEMFRAME_REMOVE_ITEM = define("entity.itemframe.remove_item");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_SNOWMAN_HURT = define("entity.snowman.hurt");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_STAL = define("record.stal");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_SMALL_SLIME_DEATH = define("entity.small_slime.death");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_WARD = define("record.ward");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_IRONGOLEM_STEP = define("entity.irongolem.step");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ZOMBIE_PIG_HURT = define("entity.zombie_pig.hurt");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_FIREWORK_LAUNCH = define("entity.firework.launch");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_MALL = define("record.mall");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERMEN_HURT = define("entity.endermen.hurt");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERMEN_STARE = define("entity.endermen.stare");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_SMALL_SLIME_SQUISH = define("entity.small_slime.squish");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_FIREWORK_TWINKLE = define("entity.firework.twinkle");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_LIGHTNING_IMPACT = define("entity.lightning.impact");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_IRONGOLEM_DEATH = define("entity.irongolem.death");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_STONE_PRESSUREPLATE_CLICK_ON = define("block.stone_pressureplate.click_on");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_EXPERIENCE_ORB_TOUCH = define("entity.experience_orb.touch");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_BOBBER_THROW = define("entity.bobber.throw");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERDRAGON_DEATH = define("entity.enderdragon.death");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_BOBBER_SPLASH = define("entity.bobber.splash");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERMEN_AMBIENT = define("entity.endermen.ambient");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_SLIME_STEP = define("block.slime.step");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_NOTE_PLING = define("block.note.pling");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ITEMFRAME_ROTATE_ITEM = define("entity.itemframe.rotate_item");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ITEMFRAME_BREAK = define("entity.itemframe.break");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_WOOD_PRESSUREPLATE_CLICK_OFF = define("block.wood_pressureplate.click_off");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_CAT = define("record.cat");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_WAIT = define("record.wait");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ITEMFRAME_ADD_ITEM = define("entity.itemframe.add_item");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_NOTE_HAT = define("block.note.hat");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_LINGERINGPOTION_THROW = define("entity.lingeringpotion.throw");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_VILLAGER_TRADING = define("entity.villager.trading");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_ENDERCHEST_CLOSE = define("block.enderchest.close");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ITEMFRAME_PLACE = define("entity.itemframe.place");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_FIREWORK_LARGE_BLAST = define("entity.firework.large_blast");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_MAGMACUBE_SQUISH = define("entity.magmacube.squish");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_STONE_PRESSUREPLATE_CLICK_OFF = define("block.stone_pressureplate.click_off");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_NOTE_BASS = define("block.note.bass");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_SMALL_MAGMACUBE_DEATH = define("entity.small_magmacube.death");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ARMORSTAND_FALL = define("entity.armorstand.fall");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERDRAGON_GROWL = define("entity.enderdragon.growl");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_METAL_PRESSUREPLATE_CLICK_OFF = define("block.metal_pressureplate.click_off");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_SMALL_SLIME_HURT = define("entity.small_slime.hurt");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_SMALL_SLIME_JUMP = define("entity.small_slime.jump");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ZOMBIE_BREAK_DOOR_WOOD = define("entity.zombie.break_door_wood");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_CHIRP = define("record.chirp");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_NOTE_BASEDRUM = define("block.note.basedrum");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_SLIME_HIT = define("block.slime.hit");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_13 = define("record.13");
+    @ApiStatus.Obsolete
+    public static final Sound RECORD_11 = define("record.11");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_METAL_PRESSUREPLATE_CLICK_ON = define("block.metal_pressureplate.click_on");
+    @ApiStatus.Obsolete
+    public static final Sound BLOCK_WOOD_PRESSUREPLATE_CLICK_ON = define("block.wood_pressureplate.click_on");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_ENDERMEN_TELEPORT = define("entity.endermen.teleport");
+    @ApiStatus.Obsolete
+    public static final Sound MUSIC_OVERWORLD_JUNGLE_AND_FOREST = define("music.overworld.jungle_and_forest");
+    @ApiStatus.Obsolete
+    public static final Sound ITEM_BRUSH_BRUSHING = define("item.brush.brushing");
+    @ApiStatus.Obsolete
+    public static final Sound ITEM_BRUSH_BRUSH_SAND_COMPLETED = define("item.brush.brush_sand_completed");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_GENERIC_WIND_BURST = define("entity.generic.wind_burst");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_POLAR_BEAR_BABY_AMBIENT = define("entity.polar_bear.baby_ambient");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_VINDICATION_ILLAGER_DEATH = define("entity.vindication_illager.death");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_VINDICATION_ILLAGER_AMBIENT = define("entity.vindication_illager.ambient");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_EVOCATION_ILLAGER_HURT = define("entity.evocation_illager.hurt");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_EVOCATION_ILLAGER_PREPARE_ATTACK = define("entity.evocation_illager.prepare_attack");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_EVOCATION_FANGS_ATTACK = define("entity.evocation_fangs.attack");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_EVOCATION_ILLAGER_CAST_SPELL = define("entity.evocation_illager.cast_spell");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON = define("entity.evocation_illager.prepare_summon");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_EVOCATION_ILLAGER_AMBIENT = define("entity.evocation_illager.ambient");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_EVOCATION_ILLAGER_PREPARE_WOLOLO = define("entity.evocation_illager.prepare_wololo");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_VINDICATION_ILLAGER_HURT = define("entity.vindication_illager.hurt");
+    @ApiStatus.Obsolete
+    public static final Sound ENTITY_EVOCATION_ILLAGER_DEATH = define("entity.evocation_illager.death");
 
     public static final Sound ENTITY_ALLAY_AMBIENT_WITH_ITEM = define("entity.allay.ambient_with_item");
     public static final Sound ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM = define("entity.allay.ambient_without_item");
@@ -703,6 +949,10 @@ public class Sounds {
     public static final Sound ENTITY_GOAT_PREPARE_RAM = define("entity.goat.prepare_ram");
     public static final Sound ENTITY_GOAT_RAM_IMPACT = define("entity.goat.ram_impact");
     public static final Sound ENTITY_GOAT_HORN_BREAK = define("entity.goat.horn_break");
+    /**
+     * Removed with 1.21.2
+     */
+    @ApiStatus.Obsolete
     public static final Sound ITEM_GOAT_HORN_PLAY = define("item.goat_horn.play");
     public static final Sound ENTITY_GOAT_SCREAMING_AMBIENT = define("entity.goat.screaming.ambient");
     public static final Sound ENTITY_GOAT_SCREAMING_DEATH = define("entity.goat.screaming.death");
@@ -712,6 +962,10 @@ public class Sounds {
     public static final Sound ENTITY_GOAT_SCREAMING_MILK = define("entity.goat.screaming.milk");
     public static final Sound ENTITY_GOAT_SCREAMING_PREPARE_RAM = define("entity.goat.screaming.prepare_ram");
     public static final Sound ENTITY_GOAT_SCREAMING_RAM_IMPACT = define("entity.goat.screaming.ram_impact");
+    /**
+     * Removed with 1.21.2
+     */
+    @ApiStatus.Obsolete
     public static final Sound ENTITY_GOAT_SCREAMING_HORN_BREAK = define("entity.goat.screaming.horn_break");
     public static final Sound ENTITY_GOAT_STEP = define("entity.goat.step");
     public static final Sound BLOCK_GRASS_BREAK = define("block.grass.break");
@@ -770,18 +1024,8 @@ public class Sounds {
     public static final Sound BLOCK_TRIAL_SPAWNER_SPAWN_ITEM_BEGIN = define("block.trial_spawner.spawn_item_begin");
     public static final Sound BLOCK_TRIAL_SPAWNER_DETECT_PLAYER = define("block.trial_spawner.detect_player");
     public static final Sound BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE = define("block.trial_spawner.ominous_activate");
-    /**
-     * Removed in 1.21
-     */
-    @Deprecated
-    public static final Sound BLOCK_TRIAL_SPAWNER_CHARGE_ACTIVATE = BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE;
     public static final Sound BLOCK_TRIAL_SPAWNER_AMBIENT = define("block.trial_spawner.ambient");
     public static final Sound BLOCK_TRIAL_SPAWNER_AMBIENT_OMINOUS = define("block.trial_spawner.ambient_ominous");
-    /**
-     * Removed in 1.21
-     */
-    @Deprecated
-    public static final Sound BLOCK_TRIAL_SPAWNER_AMBIENT_CHARGED = BLOCK_TRIAL_SPAWNER_AMBIENT_OMINOUS;
     public static final Sound BLOCK_TRIAL_SPAWNER_OPEN_SHUTTER = define("block.trial_spawner.open_shutter");
     public static final Sound BLOCK_TRIAL_SPAWNER_CLOSE_SHUTTER = define("block.trial_spawner.close_shutter");
     public static final Sound BLOCK_TRIAL_SPAWNER_EJECT_ITEM = define("block.trial_spawner.eject_item");
@@ -1647,6 +1891,10 @@ public class Sounds {
     public static final Sound ENTITY_WOLF_AMBIENT = define("entity.wolf.ambient");
     public static final Sound ENTITY_WOLF_DEATH = define("entity.wolf.death");
     public static final Sound ENTITY_WOLF_GROWL = define("entity.wolf.growl");
+    /**
+     * Removed with 1.21.5
+     */
+    @ApiStatus.Obsolete
     public static final Sound ENTITY_WOLF_HOWL = define("entity.wolf.howl");
     public static final Sound ENTITY_WOLF_HURT = define("entity.wolf.hurt");
     public static final Sound ENTITY_WOLF_PANT = define("entity.wolf.pant");
@@ -1710,15 +1958,271 @@ public class Sounds {
     public static final Sound MUSIC_DISC_PRECIPICE = define("music_disc.precipice");
     public static final Sound BLOCK_VAULT_REJECT_REWARDED_PLAYER = define("block.vault.reject_rewarded_player");
 
+    // added with 1.21.2
+    public static final Sound UI_HUD_BUBBLE_POP = define("ui.hud.bubble_pop");
+    public static final Sound ITEM_BUNDLE_INSERT_FAIL = define("item.bundle.insert_fail");
+    public static final Sound ENTITY_CREAKING_AMBIENT = define("entity.creaking.ambient");
+    public static final Sound ENTITY_CREAKING_ACTIVATE = define("entity.creaking.activate");
+    public static final Sound ENTITY_CREAKING_DEACTIVATE = define("entity.creaking.deactivate");
+    public static final Sound ENTITY_CREAKING_ATTACK = define("entity.creaking.attack");
+    public static final Sound ENTITY_CREAKING_DEATH = define("entity.creaking.death");
+    public static final Sound ENTITY_CREAKING_STEP = define("entity.creaking.step");
+    public static final Sound ENTITY_CREAKING_FREEZE = define("entity.creaking.freeze");
+    public static final Sound ENTITY_CREAKING_UNFREEZE = define("entity.creaking.unfreeze");
+    public static final Sound ENTITY_CREAKING_SPAWN = define("entity.creaking.spawn");
+    public static final Sound ENTITY_CREAKING_SWAY = define("entity.creaking.sway");
+    public static final Sound BLOCK_CREAKING_HEART_BREAK = define("block.creaking_heart.break");
+    public static final Sound BLOCK_CREAKING_HEART_FALL = define("block.creaking_heart.fall");
+    public static final Sound BLOCK_CREAKING_HEART_HIT = define("block.creaking_heart.hit");
+    public static final Sound BLOCK_CREAKING_HEART_HURT = define("block.creaking_heart.hurt");
+    public static final Sound BLOCK_CREAKING_HEART_PLACE = define("block.creaking_heart.place");
+    public static final Sound BLOCK_CREAKING_HEART_STEP = define("block.creaking_heart.step");
+    public static final Sound BLOCK_CREAKING_HEART_IDLE = define("block.creaking_heart.idle");
+    public static final Sound BLOCK_CREAKING_HEART_SPAWN = define("block.creaking_heart.spawn");
+    public static final Sound BLOCK_PALE_HANGING_MOSS_IDLE = define("block.pale_hanging_moss.idle");
+    public static final Sound ENTITY_PARROT_IMITATE_CREAKING = define("entity.parrot.imitate.creaking");
+    public static final Sound BLOCK_SPAWNER_BREAK = define("block.spawner.break");
+    public static final Sound BLOCK_SPAWNER_FALL = define("block.spawner.fall");
+    public static final Sound BLOCK_SPAWNER_HIT = define("block.spawner.hit");
+    public static final Sound BLOCK_SPAWNER_PLACE = define("block.spawner.place");
+    public static final Sound BLOCK_SPAWNER_STEP = define("block.spawner.step");
+
+    // added with 1.21.4
+    public static final Sound ENTITY_CREAKING_TWITCH = define("entity.creaking.twitch");
+    public static final Sound BLOCK_EYEBLOSSOM_OPEN_LONG = define("block.eyeblossom.open_long");
+    public static final Sound BLOCK_EYEBLOSSOM_OPEN = define("block.eyeblossom.open");
+    public static final Sound BLOCK_EYEBLOSSOM_CLOSE_LONG = define("block.eyeblossom.close_long");
+    public static final Sound BLOCK_EYEBLOSSOM_CLOSE = define("block.eyeblossom.close");
+    public static final Sound BLOCK_EYEBLOSSOM_IDLE = define("block.eyeblossom.idle");
+    public static final Sound BLOCK_RESIN_BREAK = define("block.resin.break");
+    public static final Sound BLOCK_RESIN_FALL = define("block.resin.fall");
+    public static final Sound BLOCK_RESIN_PLACE = define("block.resin.place");
+    public static final Sound BLOCK_RESIN_STEP = define("block.resin.step");
+    public static final Sound BLOCK_RESIN_BRICKS_BREAK = define("block.resin_bricks.break");
+    public static final Sound BLOCK_RESIN_BRICKS_FALL = define("block.resin_bricks.fall");
+    public static final Sound BLOCK_RESIN_BRICKS_HIT = define("block.resin_bricks.hit");
+    public static final Sound BLOCK_RESIN_BRICKS_PLACE = define("block.resin_bricks.place");
+    public static final Sound BLOCK_RESIN_BRICKS_STEP = define("block.resin_bricks.step");
+
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_CACTUS_FLOWER_BREAK = define("block.cactus_flower.break");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_CACTUS_FLOWER_PLACE = define("block.cactus_flower.place");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_DEADBUSH_IDLE = define("block.deadbush.idle");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_FIREFLY_BUSH_IDLE = define("block.firefly_bush.idle");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_IRON_BREAK = define("block.iron.break");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_IRON_STEP = define("block.iron.step");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_IRON_PLACE = define("block.iron.place");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_IRON_HIT = define("block.iron.hit");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_IRON_FALL = define("block.iron.fall");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_LEAF_LITTER_BREAK = define("block.leaf_litter.break");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_LEAF_LITTER_STEP = define("block.leaf_litter.step");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_LEAF_LITTER_PLACE = define("block.leaf_litter.place");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_LEAF_LITTER_HIT = define("block.leaf_litter.hit");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_LEAF_LITTER_FALL = define("block.leaf_litter.fall");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_SAND_IDLE = define("block.sand.idle");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound BLOCK_SAND_WIND = define("block.sand.wind");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_PUGLIN_AMBIENT = define("entity.wolf_puglin.ambient");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_PUGLIN_DEATH = define("entity.wolf_puglin.death");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_PUGLIN_GROWL = define("entity.wolf_puglin.growl");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_PUGLIN_HURT = define("entity.wolf_puglin.hurt");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_PUGLIN_PANT = define("entity.wolf_puglin.pant");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_PUGLIN_WHINE = define("entity.wolf_puglin.whine");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_SAD_AMBIENT = define("entity.wolf_sad.ambient");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_SAD_DEATH = define("entity.wolf_sad.death");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_SAD_GROWL = define("entity.wolf_sad.growl");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_SAD_HURT = define("entity.wolf_sad.hurt");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_SAD_PANT = define("entity.wolf_sad.pant");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_SAD_WHINE = define("entity.wolf_sad.whine");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_ANGRY_AMBIENT = define("entity.wolf_angry.ambient");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_ANGRY_DEATH = define("entity.wolf_angry.death");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_ANGRY_GROWL = define("entity.wolf_angry.growl");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_ANGRY_HURT = define("entity.wolf_angry.hurt");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_ANGRY_PANT = define("entity.wolf_angry.pant");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_ANGRY_WHINE = define("entity.wolf_angry.whine");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_GRUMPY_AMBIENT = define("entity.wolf_grumpy.ambient");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_GRUMPY_DEATH = define("entity.wolf_grumpy.death");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_GRUMPY_GROWL = define("entity.wolf_grumpy.growl");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_GRUMPY_HURT = define("entity.wolf_grumpy.hurt");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_GRUMPY_PANT = define("entity.wolf_grumpy.pant");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_GRUMPY_WHINE = define("entity.wolf_grumpy.whine");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_BIG_AMBIENT = define("entity.wolf_big.ambient");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_BIG_DEATH = define("entity.wolf_big.death");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_BIG_GROWL = define("entity.wolf_big.growl");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_BIG_HURT = define("entity.wolf_big.hurt");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_BIG_PANT = define("entity.wolf_big.pant");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_BIG_WHINE = define("entity.wolf_big.whine");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_CUTE_AMBIENT = define("entity.wolf_cute.ambient");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_CUTE_DEATH = define("entity.wolf_cute.death");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_CUTE_GROWL = define("entity.wolf_cute.growl");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_CUTE_HURT = define("entity.wolf_cute.hurt");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_CUTE_PANT = define("entity.wolf_cute.pant");
+    /**
+     * Added with 1.21.5
+     */
+    public static final Sound ENTITY_WOLF_CUTE_WHINE = define("entity.wolf_cute.whine");
+
     /**
      * Returns an immutable view of the sounds.
+     *
      * @return Sounds
      */
     public static Collection<Sound> values() {
-        return Collections.unmodifiableCollection(SOUND_TYPE_MAP.values());
+        return REGISTRY.getEntries();
     }
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
 }

@@ -18,7 +18,14 @@
 
 package com.github.retrooper.packetevents.util;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTDouble;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Objects;
 
@@ -97,6 +104,35 @@ public class Vector3d {
         } else {
             z = 0;
         }
+    }
+
+    public static Vector3d read(PacketWrapper<?> wrapper) {
+        double x = wrapper.readDouble();
+        double y = wrapper.readDouble();
+        double z = wrapper.readDouble();
+        return new Vector3d(x, y, z);
+    }
+
+    public static void write(PacketWrapper<?> wrapper, Vector3d vector) {
+        wrapper.writeDouble(vector.x);
+        wrapper.writeDouble(vector.y);
+        wrapper.writeDouble(vector.z);
+    }
+
+    public static Vector3d decode(NBT tag, ClientVersion version) {
+        NBTList<?> list = (NBTList<?>) tag;
+        double x = ((NBTNumber) list.getTag(0)).getAsDouble();
+        double y = ((NBTNumber) list.getTag(1)).getAsDouble();
+        double z = ((NBTNumber) list.getTag(2)).getAsDouble();
+        return new Vector3d(x, y, z);
+    }
+
+    public static NBT encode(Vector3d vector3d, ClientVersion version) {
+        NBTList<NBTDouble> list = new NBTList<>(NBTType.DOUBLE, 3);
+        list.addTag(new NBTDouble(vector3d.x));
+        list.addTag(new NBTDouble(vector3d.y));
+        list.addTag(new NBTDouble(vector3d.z));
+        return list;
     }
 
     public double getX() {

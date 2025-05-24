@@ -30,7 +30,6 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
-import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
@@ -45,10 +44,11 @@ import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class SpigotPacketEventsBuilder {
     private static PacketEventsAPI<Plugin> API_INSTANCE;
@@ -87,6 +87,7 @@ public class SpigotPacketEventsBuilder {
             private boolean loaded;
             private boolean initialized;
             private boolean lateBind = false;
+            private boolean terminated = false;
 
             @Override
             public void load() {
@@ -140,10 +141,9 @@ public class SpigotPacketEventsBuilder {
                         getUpdateChecker().handleUpdateCheck();
                     }
 
-                    Metrics metrics = new Metrics((JavaPlugin) plugin, 11327);
+                    Metrics metrics = new Metrics(plugin, 11327);
                     //Just to have an idea of which versions of packetevents people use
-                    metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> getVersion().toString()));
-
+                    metrics.addCustomChart(new SimplePie("packetevents_version", () -> getVersion().toStringWithoutSnapshot()));
                     Bukkit.getPluginManager().registerEvents(new InternalBukkitListener(plugin), plugin);
 
                     if (lateBind) {
@@ -216,13 +216,19 @@ public class SpigotPacketEventsBuilder {
                 if (initialized) {
                     //Uninject the injector if needed(depends on the injector implementation)
                     injector.uninject();
-                    for (User user : ProtocolManager.USERS.values()) {
+                    for (User user : this.protocolManager.getUsers()) {
                         ServerConnectionInitializer.destroyHandlers(user.getChannel());
                     }
                     //Unregister all listeners. Because if we attempt to reload, we will end up with duplicate listeners.
                     getEventManager().unregisterAllListeners();
                     initialized = false;
+                    terminated = true;
                 }
+            }
+
+            @Override
+            public boolean isTerminated() {
+                return terminated;
             }
 
             @Override

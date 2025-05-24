@@ -30,13 +30,13 @@ import java.util.List;
 
 public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlayServerEntityMetadata> {
     private int entityID;
-    private List<EntityData> entityMetadata;
+    private List<EntityData<?>> entityMetadata;
 
     public WrapperPlayServerEntityMetadata(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityMetadata(int entityID, List<EntityData> entityMetadata) {
+    public WrapperPlayServerEntityMetadata(int entityID, List<EntityData<?>> entityMetadata) {
         super(PacketType.Play.Server.ENTITY_METADATA);
         this.entityID = entityID;
         this.entityMetadata = entityMetadata;
@@ -76,11 +76,11 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
         this.entityID = entityID;
     }
 
-    public List<EntityData> getEntityMetadata() {
+    public List<EntityData<?>> getEntityMetadata() {
         return entityMetadata;
     }
 
-    public void setEntityMetadata(List<EntityData> entityMetadata) {
+    public void setEntityMetadata(List<EntityData<?>> entityMetadata) {
         this.entityMetadata = entityMetadata;
     }
 

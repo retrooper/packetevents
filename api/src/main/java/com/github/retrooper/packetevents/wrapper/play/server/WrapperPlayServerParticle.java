@@ -41,13 +41,26 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     private Vector3f offset;
     private float maxSpeed;
     private int particleCount;
+    /**
+     * Added with 1.21.4
+     */
+    private boolean alwaysShow;
 
     public WrapperPlayServerParticle(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerParticle(Particle<?> particle, boolean longDistance, Vector3d position, Vector3f offset,
-                                     float maxSpeed, int particleCount) {
+    public WrapperPlayServerParticle(
+            Particle<?> particle, boolean longDistance, Vector3d position, Vector3f offset,
+            float maxSpeed, int particleCount
+    ) {
+        this(particle, longDistance, position, offset, maxSpeed, particleCount, false);
+    }
+
+    public WrapperPlayServerParticle(
+            Particle<?> particle, boolean longDistance, Vector3d position, Vector3f offset,
+            float maxSpeed, int particleCount, boolean alwaysShow
+    ) {
         super(PacketType.Play.Server.PARTICLE);
         this.particle = particle;
         this.longDistance = longDistance;
@@ -55,6 +68,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this.offset = offset;
         this.maxSpeed = maxSpeed;
         this.particleCount = particleCount;
+        this.alwaysShow = alwaysShow;
     }
 
     @SuppressWarnings("unchecked")
@@ -71,6 +85,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             particleType = ParticleTypes.getById(serverVersion.toClientVersion(), particleTypeId);
         }
         longDistance = readBoolean();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_4)) {
+            this.alwaysShow = this.readBoolean();
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
             position = new Vector3d(readDouble(), readDouble(), readDouble());
         } else {
@@ -112,6 +129,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             }
         }
         writeBoolean(longDistance);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_4)) {
+            this.writeBoolean(this.alwaysShow);
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
             writeDouble(position.getX());
             writeDouble(position.getY());
@@ -142,12 +162,13 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
 
     @Override
     public void copy(WrapperPlayServerParticle wrapper) {
-        particle = wrapper.particle;
-        longDistance = wrapper.longDistance;
-        position = wrapper.position;
-        offset = wrapper.offset;
-        maxSpeed = wrapper.maxSpeed;
-        particleCount = wrapper.particleCount;
+        this.particle = wrapper.particle;
+        this.longDistance = wrapper.longDistance;
+        this.position = wrapper.position;
+        this.offset = wrapper.offset;
+        this.maxSpeed = wrapper.maxSpeed;
+        this.particleCount = wrapper.particleCount;
+        this.alwaysShow = wrapper.alwaysShow;
     }
 
     public Particle<?> getParticle() {
@@ -198,4 +219,17 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this.particleCount = particleCount;
     }
 
+    /**
+     * Added with 1.21.4
+     */
+    public boolean isAlwaysShow() {
+        return this.alwaysShow;
+    }
+
+    /**
+     * Added with 1.21.4
+     */
+    public void setAlwaysShow(boolean alwaysShow) {
+        this.alwaysShow = alwaysShow;
+    }
 }

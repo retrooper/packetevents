@@ -29,7 +29,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PacketSendEvent extends ProtocolPacketEvent<Object> {
+public class PacketSendEvent extends ProtocolPacketEvent {
     private List<Runnable> tasksAfterSend = null;
 
     protected PacketSendEvent(Object channel, User user, Object player, Object rawByteBuf,

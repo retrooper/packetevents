@@ -1,102 +1,55 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2024 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package io.github.retrooper.packetevents.handler;
 
-import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.ApiStatus;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
-@ChannelHandler.Sharable
+@ApiStatus.Internal
 public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
-    private static Method DECOMPRESSOR_METHOD, COMPRESSOR_METHOD;
-    public User user;
-    public LocalPlayer player;
-    public boolean checkedCompression;
 
-    public PacketDecoder(User user) {
+    private final PacketSide side;
+    public User user;
+    public Player player;
+
+    public PacketDecoder(PacketSide side, User user) {
+        this.side = side.getOpposite();
         this.user = user;
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
+        if (!msg.isReadable()) {
+            return;
+        }
+        PacketEventsImplHelper.handlePacket(ctx.channel(), this.user, this.player,
+                msg, false, this.side);
         if (msg.isReadable()) {
-            ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(msg);
-            boolean recompress = handleCompression(ctx, outputBuffer);
-            PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, outputBuffer, false);
-            //TODO hasTasksAfter
-            if (outputBuffer.isReadable()) {
-                if (recompress) {
-                    recompress(ctx, outputBuffer);
-                }
-                out.add(outputBuffer.retain());
-            }
-        }
-    }
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        super.channelInactive(ctx);
-    }
-
-
-    private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) {
-        if (checkedCompression) return false;
-        if (ctx.pipeline().names().indexOf("decompress") > ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME)) {
-            // Need to decompress this packet due to bad order
-            ChannelHandler decompressor = ctx.pipeline().get("decompress");
-            //CompressionDecoder
-            try {
-                if (DECOMPRESSOR_METHOD == null) {
-                    DECOMPRESSOR_METHOD = decompressor.getClass().getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
-                }
-                List<?> list = new ArrayList<>(1);
-                DECOMPRESSOR_METHOD.invoke(decompressor, ctx, buffer, list);
-                ByteBuf decompressed = (ByteBuf) list.get(0);
-                if (buffer != decompressed) {
-                    try {
-                        buffer.clear().writeBytes(decompressed);
-                    } finally {
-                        decompressed.release();
-                    }
-                }
-                //Relocate handlers
-                PacketDecoder decoder = (PacketDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
-                ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
-                PacketEncoder encoder = (PacketEncoder) ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
-                ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
-                checkedCompression = true;
-                return true;
-            } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
-    }
-
-    private void recompress(ChannelHandlerContext ctx, ByteBuf buffer) {
-        ByteBuf compressed = ctx.alloc().buffer();
-        try {
-            ChannelHandler compressor = ctx.pipeline().get("compress");
-            if (COMPRESSOR_METHOD == null) {
-                COMPRESSOR_METHOD = compressor.getClass().getDeclaredMethod("encode", ChannelHandlerContext.class, ByteBuf.class, ByteBuf.class);
-            }
-            COMPRESSOR_METHOD.invoke(compressor, ctx, buffer, compressed);
-        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        try {
-            buffer.clear().writeBytes(compressed);
-            PacketEvents.getAPI().getLogManager().debug("Recompressed packet!");
-        } finally {
-            compressed.release();
+            out.add(msg.retain());
         }
     }
 }

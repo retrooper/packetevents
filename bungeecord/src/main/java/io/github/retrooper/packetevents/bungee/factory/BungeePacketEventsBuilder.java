@@ -31,11 +31,12 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
-import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
@@ -45,11 +46,15 @@ import io.github.retrooper.packetevents.processor.InternalBungeeProcessor;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.protocol.ProtocolConstants;
+import org.bstats.bungeecord.Metrics;
+import org.bstats.charts.SimplePie;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -102,6 +107,22 @@ public class BungeePacketEventsBuilder {
                         }
                     }
                     return version;
+                }
+
+                @Override
+                public Object getRegistryCacheKey(User user, ClientVersion version) {
+                    ProxiedPlayer player = ProxyServer.getInstance().getPlayer(user.getUUID());
+                    if (player == null) {
+                        return null;
+                    }
+                    Server server = player.getServer();
+                    if (server == null) {
+                        // seems to be null during server switch or on join,
+                        // but only for some specific bungee forks?
+                        // BungeeCord would be a lot safer if they were to use nullability annotations...
+                        return null;
+                    }
+                    return Objects.hash(server.getInfo(), version);
                 }
             };
 
@@ -159,13 +180,14 @@ public class BungeePacketEventsBuilder {
                 protected void log(Level level, @Nullable NamedTextColor color, String message) {
                     // First we must strip away the color codes that might be in this message
                     message = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
-                    System.out.println(message);
+                    ProxyServer.getInstance().getLogger().info(message);
                     // TODO: Remove "[com.github.retrooper.packetevents.PacketEventsAPI]:" From logger
                     // PacketEvents.getAPI().getLogger().log(level, color != null ? (color.toString()) : "" + message);
                 }
             };
             private boolean loaded;
             private boolean initialized;
+            private boolean terminated;
 
             @Override
             public void load() {
@@ -178,6 +200,8 @@ public class BungeePacketEventsBuilder {
                     PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
                     PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
+
+                    WrappedBlockState.ensureLoad();
 
                     injector.inject();
                     loaded = true;
@@ -205,9 +229,7 @@ public class BungeePacketEventsBuilder {
 
                     Metrics metrics = new Metrics(plugin, 11327);
                     //Just to have an idea of which versions of packetevents people use
-                    metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
-                        return getVersion().toString();
-                    }));
+                    metrics.addCustomChart(new SimplePie("packetevents_version", () -> getVersion().toStringWithoutSnapshot()));
 
                     PacketType.Play.Client.load();
                     PacketType.Play.Server.load();
@@ -228,7 +250,13 @@ public class BungeePacketEventsBuilder {
                     // Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;
+                    terminated = true;
                 }
+            }
+
+            @Override
+            public boolean isTerminated() {
+                return terminated;
             }
 
             @Override

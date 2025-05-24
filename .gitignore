@@ -123,3 +123,6 @@ run/
 .project
 .settings/
 .classpath
+
+# Build Source Kotlin
+/buildSrc/.kotlin/

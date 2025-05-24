@@ -19,54 +19,46 @@
 package com.github.retrooper.packetevents.protocol.item.armormaterial;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ArmorMaterials {
+/**
+ * This is named "equipment asset" in vanilla since 1.21.4,
+ * before this was also called "armor material" in vanilla.
+ */
+public final class ArmorMaterials {
 
-    private static final Map<String, ArmorMaterial> MATERIAL_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, ArmorMaterial>> MATERIAL_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_armor_material_mappings");
+    // this isn't great, but it works
+    private static final Map<String, String> DFU = new HashMap<>();
 
-    public static ArmorMaterial define(String key) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        ArmorMaterial instrument = new ArmorMaterial() {
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof ArmorMaterial) {
-                    return getName().equals(((ArmorMaterial) obj).getName());
-                }
-                return false;
-            }
-        };
-        MappingHelper.registerMapping(TYPES_BUILDER, MATERIAL_MAP, MATERIAL_ID_MAP, instrument);
-        return instrument;
+    static {
+        DFU.put("turtle", "minecraft:turtle_scute");
+        DFU.put("minecraft:turtle", "minecraft:turtle_scute");
+        DFU.put("armadillo", "minecraft:armadillo_scute");
+        DFU.put("minecraft:armadillo", "minecraft:armadillo_scute");
     }
 
-    // with key
+    private static final VersionedRegistry<ArmorMaterial> REGISTRY = new VersionedRegistry<>("equipment_asset");
+
+    private ArmorMaterials() {
+    }
+
+    private static ArmorMaterial define(String name) {
+        return REGISTRY.define(name, StaticArmorMaterial::new);
+    }
+
+    public static VersionedRegistry<ArmorMaterial> getRegistry() {
+        return REGISTRY;
+    }
+
     public static ArmorMaterial getByName(String name) {
-        return MATERIAL_MAP.get(name);
+        return REGISTRY.getByName(DFU.getOrDefault(name, name));
     }
 
     public static ArmorMaterial getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, ArmorMaterial> idMap = MATERIAL_ID_MAP.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
 
     public static final ArmorMaterial LEATHER = define("leather");
@@ -75,16 +67,105 @@ public class ArmorMaterials {
     public static final ArmorMaterial GOLD = define("gold");
     public static final ArmorMaterial DIAMOND = define("diamond");
 
-    // Added with 1.13
-    public static final ArmorMaterial TURTLE = define("turtle");
+    /**
+     * Renamed from {@link #TURTLE} in 1.21.4
+     */
+    public static final ArmorMaterial TURTLE_SCUTE = define("turtle_scute");
+    /**
+     * Added with 1.13, renamed to {@link #TURTLE_SCUTE} in 1.21.4
+     */
+    @Deprecated
+    public static final ArmorMaterial TURTLE = TURTLE_SCUTE;
 
-    // Added with 1.16
+    /**
+     * Added with 1.16
+     */
     public static final ArmorMaterial NETHERITE = define("netherite");
 
-    // Added with 1.20.5
-    public static final ArmorMaterial ARMADILLO = define("armadillo");
+    /**
+     * Renamed from {@link #ARMADILLO} in 1.21.4
+     */
+    public static final ArmorMaterial ARMADILLO_SCUTE = define("armadillo_scute");
+    /**
+     * Added with 1.20.5, renamed to {@link #ARMADILLO_SCUTE} in 1.21.4
+     */
+    @Deprecated
+    public static final ArmorMaterial ARMADILLO = ARMADILLO_SCUTE;
+
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial ELYTRA = define("elytra");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial WHITE_CARPET = define("white_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial ORANGE_CARPET = define("orange_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial MAGENTA_CARPET = define("magenta_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial LIGHT_BLUE_CARPET = define("light_blue_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial YELLOW_CARPET = define("yellow_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial LIME_CARPET = define("lime_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial PINK_CARPET = define("pink_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial GRAY_CARPET = define("gray_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial LIGHT_GRAY_CARPET = define("light_gray_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial CYAN_CARPET = define("cyan_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial PURPLE_CARPET = define("purple_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial BLUE_CARPET = define("blue_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial BROWN_CARPET = define("brown_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial GREEN_CARPET = define("green_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial RED_CARPET = define("red_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial BLACK_CARPET = define("black_carpet");
+    /**
+     * Added with 1.21.4
+     */
+    public static final ArmorMaterial TRADER_LLAMA = define("trader_llama");
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
 }

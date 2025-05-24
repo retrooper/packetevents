@@ -18,7 +18,6 @@
 
 package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.event.simple.*;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
@@ -26,7 +25,7 @@ import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 
-public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
+public class PacketReceiveEvent extends ProtocolPacketEvent {
     protected PacketReceiveEvent(Object channel, User user, Object player, Object rawByteBuf,
                                  boolean autoProtocolTranslation) throws PacketProcessException {
         super(PacketSide.CLIENT, channel, user, player, rawByteBuf, autoProtocolTranslation);

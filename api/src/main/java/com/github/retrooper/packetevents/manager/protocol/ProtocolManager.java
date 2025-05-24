@@ -33,8 +33,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface ProtocolManager {
+    @ApiStatus.Internal
     Map<UUID, Object> CHANNELS = new ConcurrentHashMap<>();
     // Use SocketAddress because ProtocolLib wraps Channels with NettyChannelProxy class
+    @ApiStatus.Internal
     Map<Object, User> USERS = new ConcurrentHashMap<>();
 
     default Collection<User> getUsers() {
@@ -104,10 +106,13 @@ public interface ProtocolManager {
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
         Object[] buffers = new Object[wrappers.length];
         for (int i = 0; i < wrappers.length; i++) {
-            wrappers[i].prepareForSend(channel, outgoing);
-            buffers[i] = wrappers[i].buffer;
-            // Fix race condition when sending packets to multiple people (due to when the buffer is freed)
-            wrappers[i].buffer = null;
+            PacketWrapper<?> wrappper = wrappers[i];
+            synchronized (wrappper.bufferLock) {
+                wrappper.prepareForSend(channel, outgoing);
+                buffers[i] = wrappper.buffer;
+                // Fix race condition when sending packets to multiple people (due to when the buffer is freed)
+                wrappper.buffer = null;
+            }
         }
         return buffers;
     }
@@ -147,11 +152,13 @@ public interface ProtocolManager {
         return USERS.get(pipeline);
     }
 
+    @ApiStatus.Internal
     default User removeUser(Object channel) {
         Object pipeline = ChannelHelper.getPipeline(channel);
         return USERS.remove(pipeline);
     }
 
+    @ApiStatus.Internal
     default void setUser(Object channel, User user) {
         synchronized (channel) {
             Object pipeline = ChannelHelper.getPipeline(channel);
@@ -162,5 +169,24 @@ public interface ProtocolManager {
 
     default Object getChannel(UUID uuid) {
         return CHANNELS.get(uuid);
+    }
+
+    @ApiStatus.Internal
+    default void setChannel(UUID uuid, Object channel) {
+        CHANNELS.put(uuid, channel);
+    }
+
+    @ApiStatus.Internal
+    default void removeChannel(Object channel) {
+        CHANNELS.values().remove(channel);
+    }
+
+    @ApiStatus.Internal
+    default void removeChannelById(UUID uuid) {
+        CHANNELS.remove(uuid);
+    }
+
+    default boolean hasChannel(Object channel) {
+        return CHANNELS.containsValue(channel);
     }
 }

@@ -30,7 +30,10 @@ import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -38,7 +41,10 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageEncoder;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -78,9 +84,9 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
         list.add(byteBuf.retain());
     }
 
-    private PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
+    private @Nullable PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
         PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, true);
-        if (packetSendEvent.hasTasksAfterSend()) {
+        if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
             promise.addListener((p) -> {
                 for (Runnable task : packetSendEvent.getTasksAfterSend()) {
                     task.run();
@@ -114,15 +120,33 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
         }
 
         boolean didWeCauseThis = ExceptionUtil.isException(cause, PacketProcessException.class);
-
-        if (didWeCauseThis && user != null && user.getEncoderState() != ConnectionState.HANDSHAKING) {
-            // Ignore handshaking exceptions
-            if (PacketEvents.getAPI().getSettings().isFullStackTraceEnabled()) {
-                cause.printStackTrace();
-            } else {
-                PacketEvents.getAPI().getLogManager().warn(cause.getMessage());
+        if (didWeCauseThis
+                && (user == null || user.getEncoderState() != ConnectionState.HANDSHAKING)) {
+            if (!SpigotReflectionUtil.isMinecraftServerInstanceDebugging()) {
+                if (PacketEvents.getAPI().getSettings().isFullStackTraceEnabled()) {
+                    cause.printStackTrace();
+                } else {
+                    PacketEvents.getAPI().getLogManager().warn(cause.getMessage());
+                }
             }
-            return;
+
+            if (PacketEvents.getAPI().getSettings().isKickOnPacketExceptionEnabled()) {
+                try {
+                    if (user != null) {
+                        user.sendPacket(new WrapperPlayServerDisconnect(Component.text("Invalid packet")));
+                    }
+                } catch (Exception ignored) { // There may (?) be an exception if the player is in the wrong state...
+                    // Do nothing.
+                }
+                ctx.channel().close();
+                if (player != null) {
+                    FoliaScheduler.getEntityScheduler().runDelayed(player, (Plugin) PacketEvents.getAPI().getPlugin(), (o) -> player.kickPlayer("Invalid packet"), null, 1);
+                }
+
+                if (user != null && user.getProfile().getName() != null) {
+                    PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to an invalid packet!");
+                }
+            }
         }
 
         super.exceptionCaught(ctx, cause);

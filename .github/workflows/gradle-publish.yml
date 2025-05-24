@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: 'adopt'
+          distribution: 'temurin'
           cache: 'gradle'
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
@@ -62,3 +62,9 @@ jobs:
         with:
           name: fabric-build
           path: fabric/build/libs
+
+      - name: Upload build artifacts sponge
+        uses: actions/upload-artifact@v4
+        with:
+          name: sponge-build
+          path: sponge/build/libs

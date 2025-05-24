@@ -42,7 +42,7 @@ public class WrapperPlayServerKeepAlive extends PacketWrapper<WrapperPlayServerK
 
     @Override
     public void read() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12_2)) {
             this.id = readLong();
         } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             this.id = readVarInt();

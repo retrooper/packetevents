@@ -21,7 +21,10 @@ package io.github.retrooper.packetevents.manager.server;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PEVersion;
+import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -41,8 +44,8 @@ public class ServerManagerImpl implements ServerManager {
         PEVersion latestVersion = PEVersion.fromString(ServerVersion.getLatest().getReleaseName());
         if (version.isNewerThan(latestVersion)) {
             //We do not support this version yet, so let us warn the user
-            plugin.getLogger().warning("[packetevents] We currently do not support the minecraft version "
-                    + version + ", so things might break. PacketEvents will behave as if the minecraft version were "
+            plugin.getLogger().warning("[packetevents] We currently do not support the Minecraft version "
+                    + version + ", so things might break. PacketEvents will behave as if the Minecraft version were "
                     + latestVersion + "!");
             return ServerVersion.getLatest();
         }
@@ -53,7 +56,7 @@ public class ServerManagerImpl implements ServerManager {
             }
         }
 
-        plugin.getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the server version is " + fallbackVersion.name() + "...");
+        plugin.getLogger().warning("[packetevents] Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the Server version is " + fallbackVersion.name() + "...");
         return fallbackVersion;
     }
 
@@ -63,5 +66,10 @@ public class ServerManagerImpl implements ServerManager {
             serverVersion = resolveVersionNoCache();
         }
         return serverVersion;
+    }
+
+    @Override
+    public Object getRegistryCacheKey(User user, ClientVersion version) {
+        return GlobalRegistryHolder.getGlobalRegistryCacheKey(user, version);
     }
 }

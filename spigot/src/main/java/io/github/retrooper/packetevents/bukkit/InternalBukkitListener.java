@@ -29,6 +29,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
+import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 public class InternalBukkitListener implements Listener {
 
@@ -38,26 +39,53 @@ public class InternalBukkitListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onJoin(PlayerJoinEvent e) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onSpawnInGame(PlayerSpawnLocationEvent e) {
         Player player = e.getPlayer();
         SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-
         User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
         if (user == null) {
             //We did not inject this user
             Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+            if (channel == null) {
+                return;
+            }
             //Check if it is a fake connection...
-            if (!FakeChannelUtil.isFakeChannel(channel)) {
+            if (!FakeChannelUtil.isFakeChannel(channel) && (!PacketEvents.getAPI().isTerminated() || PacketEvents.getAPI().getSettings().isKickIfTerminated())) {
                 //Kick them, if they are not a fake player.
-                FoliaScheduler.getRegionScheduler().runDelayed(plugin, player.getLocation(), (o) -> {
+                FoliaScheduler.getEntityScheduler().runDelayed(player, plugin, (o) -> {
                     player.kickPlayer("PacketEvents 2.0 failed to inject");
-                }, 0);
+                }, null, 0);
             }
             return;
         }
 
         // Set bukkit player object in the injectors
         injector.updatePlayer(user, player);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onJoin(PlayerJoinEvent e) {
+        Player player = e.getPlayer();
+        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+        if (user == null) {
+            //We did not inject this user
+            //Check if it is a fake connection...
+            if (channel == null || !FakeChannelUtil.isFakeChannel(channel) && (!PacketEvents.getAPI().isTerminated() || PacketEvents.getAPI().getSettings().isKickIfTerminated())) {
+                //Kick them, if they are not a fake player.
+                FoliaScheduler.getEntityScheduler().runDelayed(player, plugin, (o) -> {
+                    player.kickPlayer("PacketEvents 2.0 failed to inject");
+                }, null, 0);
+            }
+            // Set bukkit player object in the injectors
+            return;
+        }
+
+        // It's possible that the player reference was set in the prior event.
+        if (!injector.isPlayerSet(channel)) {
+            injector.updatePlayer(user, player);
+        }
     }
 }

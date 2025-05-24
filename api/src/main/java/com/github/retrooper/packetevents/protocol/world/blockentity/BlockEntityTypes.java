@@ -19,65 +19,32 @@
 package com.github.retrooper.packetevents.protocol.world.blockentity;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
-public class BlockEntityTypes {
+public final class BlockEntityTypes {
 
-    private static final Map<String, BlockEntityType> BLOCK_ENTITY_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, BlockEntityType>> BLOCK_ENTITY_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("block/block_entity_type_mappings");
+    private static final VersionedRegistry<BlockEntityType> REGISTRY = new VersionedRegistry<>("block_entity_type");
 
-    public static BlockEntityType define(String key) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        BlockEntityType blockEntityType = new BlockEntityType() {
-            private final int[] ids = data.getData();
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                int index = TYPES_BUILDER.getDataIndex(version);
-                return this.ids[index];
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof BlockEntityType) {
-                    return this.getName().equals(((BlockEntityType) obj).getName());
-                }
-                return false;
-            }
-        };
-
-        BLOCK_ENTITY_TYPE_MAP.put(blockEntityType.getName().toString(), blockEntityType);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, BlockEntityType> idMap = BLOCK_ENTITY_TYPE_ID_MAP.computeIfAbsent(
-                    (byte) index, k -> new HashMap<>());
-            idMap.put(blockEntityType.getId(version), blockEntityType);
-        }
-        return blockEntityType;
+    private BlockEntityTypes() {
     }
 
-    // with minecraft:key
+    private static BlockEntityType define(String key) {
+        return REGISTRY.define(key, StaticBlockEntityType::new);
+    }
+
+    public static VersionedRegistry<BlockEntityType> getRegistry() {
+        return REGISTRY;
+    }
+
     public static BlockEntityType getByName(String name) {
-        return BLOCK_ENTITY_TYPE_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static BlockEntityType getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, BlockEntityType> idMap = BLOCK_ENTITY_TYPE_ID_MAP.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
 
     public static final BlockEntityType FURNACE = define("furnace");
@@ -119,6 +86,8 @@ public class BlockEntityTypes {
     public static final BlockEntityType SCULK_CATALYST = define("sculk_catalyst");
     public static final BlockEntityType SCULK_SHRIEKER = define("sculk_shrieker");
     public static final BlockEntityType CHISELED_BOOKSHELF = define("chiseled_bookshelf");
+    @ApiStatus.Obsolete
+    public static final BlockEntityType SUSPICIOUS_SAND = define("suspicious_sand");
     public static final BlockEntityType BRUSHABLE_BLOCK = define("brushable_block");
     public static final BlockEntityType DECORATED_POT = define("decorated_pot");
     public static final BlockEntityType CRAFTER = define("crafter");
@@ -126,14 +95,29 @@ public class BlockEntityTypes {
     public static final BlockEntityType VAULT = define("vault");
 
     /**
+     * Added with 1.21.2
+     */
+    public static final BlockEntityType CREAKING_HEART = define("creaking_heart");
+
+    /**
+     * Added with 1.21.5
+     */
+    public static final BlockEntityType TEST_BLOCK = define("test_block");
+    /**
+     * Added with 1.21.5
+     */
+    public static final BlockEntityType TEST_INSTANCE_BLOCK = define("test_instance_block");
+
+    /**
      * Returns an immutable view of the block entity types.
+     *
      * @return Block Entity Types
      */
     public static Collection<BlockEntityType> values() {
-        return Collections.unmodifiableCollection(BLOCK_ENTITY_TYPE_MAP.values());
+        return REGISTRY.getEntries();
     }
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
 }

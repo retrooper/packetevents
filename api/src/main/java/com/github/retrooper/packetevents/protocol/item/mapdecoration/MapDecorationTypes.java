@@ -20,29 +20,27 @@ package com.github.retrooper.packetevents.protocol.item.mapdecoration;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.github.retrooper.packetevents.resources.ResourceLocation.minecraft;
 
-public class MapDecorationTypes {
+public final class MapDecorationTypes {
 
-    private static final Map<String, MapDecorationType> DECORATION_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, MapDecorationType>> DECORATION_TYPE_ID_MAP = new HashMap<>();
+    private static final VersionedRegistry<MapDecorationType> REGISTRY = new VersionedRegistry<>("map_decoration_type");
 
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_map_decoration_type_mappings");
+    private MapDecorationTypes() {
+    }
 
+    @ApiStatus.Internal
     public static MapDecorationType define(String key, boolean showOnItemFrame, boolean trackCount) {
         return define(key, minecraft(key), showOnItemFrame, trackCount);
     }
 
+    @ApiStatus.Internal
     public static MapDecorationType define(
             String key, ResourceLocation assetId,
             boolean showOnItemFrame, boolean trackCount
@@ -51,6 +49,7 @@ public class MapDecorationTypes {
                 -1, false, trackCount);
     }
 
+    @ApiStatus.Internal
     public static MapDecorationType define(
             String key,
             boolean showOnItemFrame, int mapColor,
@@ -60,72 +59,30 @@ public class MapDecorationTypes {
                 showOnItemFrame, mapColor, explorationMapElement, trackCount);
     }
 
+    @ApiStatus.Internal
     public static MapDecorationType define(
             String key, ResourceLocation assetId,
             boolean showOnItemFrame, int mapColor,
             boolean explorationMapElement, boolean trackCount
     ) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        MapDecorationType potionType = new MapDecorationType() {
-            @Override
-            public ResourceLocation getAssetId() {
-                return assetId;
-            }
+        return REGISTRY.define(key, data -> new StaticMapDecorationType(data,
+                assetId, showOnItemFrame, mapColor, explorationMapElement, trackCount));
+    }
 
-            @Override
-            public boolean isShowOnItemFrame() {
-                return showOnItemFrame;
-            }
-
-            @Override
-            public int getMapColor() {
-                return mapColor;
-            }
-
-            @Override
-            public boolean isExplorationMapElement() {
-                return explorationMapElement;
-            }
-
-            @Override
-            public boolean isTrackCount() {
-                return trackCount;
-            }
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof MapDecorationType) {
-                    return this.getName().equals(((MapDecorationType) obj).getName());
-                }
-                return false;
-            }
-        };
-        MappingHelper.registerMapping(TYPES_BUILDER, DECORATION_TYPE_MAP, DECORATION_TYPE_ID_MAP, potionType);
-        return potionType;
+    public static VersionedRegistry<MapDecorationType> getRegistry() {
+        return REGISTRY;
     }
 
     public static @Nullable MapDecorationType getByName(String name) {
-        return DECORATION_TYPE_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static @Nullable MapDecorationType getById(int id, ClientVersion version) {
-        return getById(version, id);
+        return REGISTRY.getById(version, id);
     }
 
     public static @Nullable MapDecorationType getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, MapDecorationType> idMap = DECORATION_TYPE_ID_MAP.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
 
     // color constants used by vanilla
@@ -209,13 +166,14 @@ public class MapDecorationTypes {
 
     /**
      * Returns an immutable view of the map decoration types.
+     *
      * @return Map Decoration Types
      */
     public static Collection<MapDecorationType> values() {
-        return Collections.unmodifiableCollection(DECORATION_TYPE_MAP.values());
+        return REGISTRY.getEntries();
     }
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
 }

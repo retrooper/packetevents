@@ -6,40 +6,41 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 
-import java.net.InetSocketAddress;
-
 public class InternalBukkitPacketListener extends com.github.retrooper.packetevents.manager.InternalPacketListener {
+
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
-        User user = event.getUser();
-        //Only handle Handshake uniquely on Bukkit
         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
-            InetSocketAddress address = event.getSocketAddress();
-            WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
-            ConnectionState nextState = handshake.getNextConnectionState();
-            ClientVersion clientVersion = handshake.getClientVersion();
+            User user = event.getUser();
+            WrapperHandshakingClientHandshake packet = new WrapperHandshakingClientHandshake(event);
+            ClientVersion clientVersion = packet.getClientVersion();
+            ConnectionState state = packet.getNextConnectionState();
 
-            PacketEvents.getAPI().getLogManager().debug("Read handshake version for " + address.getHostString() + ":" + address.getPort() + " as " + clientVersion);
-
+            String feature;
             if (ViaVersionUtil.isAvailable()) {
                 clientVersion = ClientVersion.getById(ViaVersionUtil.getProtocolVersion(user));
-                PacketEvents.getAPI().getLogManager().debug("Read ViaVersion version for " + address.getHostString() + ":" + address.getPort() + " as " + clientVersion + " with UUID=" + user.getUUID());
+                feature = "ViaVersion";
             } else if (ProtocolSupportUtil.isAvailable()) {
                 clientVersion = ClientVersion.getById(ProtocolSupportUtil.getProtocolVersion(user.getAddress()));
-                PacketEvents.getAPI().getLogManager().debug("Read ProtocolSupport version for " + address.getHostString() + ":" + address.getPort() + " as " + clientVersion);
+                feature = "ProtocolSupport";
+            } else {
+                feature = null;
             }
-            if (clientVersion == ClientVersion.UNKNOWN) {
-                PacketEvents.getAPI().getLogManager().debug("Client version for " + address.getHostString() + ":" + address.getPort() + " is unknown!");
+
+            LogManager logger = PacketEvents.getAPI().getLogManager();
+            if (logger.isDebug()) {
+                logger.debug("Processed handshake for " + event.getAddress() + ": "
+                        + state.name() + " / " + packet.getClientVersion().getReleaseName()
+                        + (feature != null ? " (using " + feature + ")" : ""));
             }
-            //Update client version for this event call(and user)
+
             user.setClientVersion(clientVersion);
-            PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());
-            //Transition into LOGIN or STATUS connection state immediately, to remain in sync with vanilla
-            user.setConnectionState(nextState);
+            user.setConnectionState(state);
         } else {
             super.onPacketReceive(event);
         }

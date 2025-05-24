@@ -22,7 +22,6 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
-import com.github.retrooper.packetevents.protocol.score.ScoreFormatTypes;
 import com.github.retrooper.packetevents.util.LegacyFormat;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -72,13 +71,13 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
             }
         } else {
             if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-                displayName = AdventureSerializer.fromLegacyFormat(readString(32));
+                displayName = this.getSerializers().fromLegacy(this.readString(32));
                 renderType = RenderType.getByName(readString());
             } else {
                 displayName = readComponent();
                 renderType = RenderType.getById(readVarInt());
                 if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-                    scoreFormat = readOptional(ScoreFormatTypes::read);
+                    scoreFormat = readOptional(ScoreFormat::readTyped);
                 }
             }
         }
@@ -94,7 +93,8 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
         writeByte((byte) mode.ordinal());
         if (this.mode == ObjectiveMode.CREATE || this.mode == ObjectiveMode.UPDATE) {
             if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-                writeString(LegacyFormat.trimLegacyFormat(AdventureSerializer.asVanilla(displayName), 32));
+                String legacyText = this.getSerializers().asLegacy(this.displayName);
+                writeString(LegacyFormat.trimLegacyFormat(legacyText, 32));
                 if (renderType != null) {
                     writeString(renderType.name().toLowerCase());
                 } else {
@@ -108,7 +108,7 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
                     writeVarInt(RenderType.INTEGER.ordinal());
                 }
                 if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-                    writeOptional(scoreFormat, ScoreFormatTypes::write);
+                    writeOptional(scoreFormat, ScoreFormat::writeTyped);
                 }
             }
         }

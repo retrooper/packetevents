@@ -18,78 +18,65 @@
 
 package com.github.retrooper.packetevents.protocol.world.positionsource;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.positionsource.builtin.BlockPositionSource;
 import com.github.retrooper.packetevents.protocol.world.positionsource.builtin.EntityPositionSource;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper.Reader;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper.Writer;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
+public final class PositionSourceTypes {
 
-public class PositionSourceTypes {
+    private static final VersionedRegistry<PositionSourceType<?>> REGISTRY = new VersionedRegistry<>("position_source_type");
 
-    private static final Map<String, PositionSourceType<?>> POS_SOURCE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, PositionSourceType<?>>> POS_SOURCE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("world/world_position_source_mappings");
-
-    public static <T extends PositionSource> PositionSourceType<T> define(
-            String key, PacketWrapper.Reader<T> reader, PacketWrapper.Writer<T> writer
-    ) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        PositionSourceType<T> sourceType = new PositionSourceType<T>() {
-            @Override
-            public T read(PacketWrapper<?> wrapper) {
-                return reader.apply(wrapper);
-            }
-
-            @Override
-            public void write(PacketWrapper<?> wrapper, T source) {
-                writer.accept(wrapper, source);
-            }
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof PositionSourceType<?>) {
-                    return this.getName().equals(((PositionSourceType<?>) obj).getName());
-                }
-                return false;
-            }
-        };
-        MappingHelper.registerMapping(TYPES_BUILDER, POS_SOURCE_MAP, POS_SOURCE_ID_MAP, sourceType);
-        return sourceType;
+    private PositionSourceTypes() {
     }
 
-    // with minecraft:key
-    public static PositionSourceType<?> getByName(String name) {
-        return POS_SOURCE_MAP.get(name);
+    public static VersionedRegistry<PositionSourceType<?>> getRegistry() {
+        return REGISTRY;
+    }
+
+    @ApiStatus.Internal
+    public static <T extends PositionSource> PositionSourceType<T> define(
+            String name,
+            Reader<T> reader, Writer<T> writer,
+            Decoder<T> decoder, Encoder<T> encoder
+    ) {
+        return REGISTRY.define(name, data -> new StaticPositionSourceType<>(
+                data, reader, writer, decoder, encoder));
+    }
+
+    public static @Nullable PositionSourceType<?> getByName(String name) {
+        return REGISTRY.getByName(name);
     }
 
     public static PositionSourceType<?> getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, PositionSourceType<?>> idMap = POS_SOURCE_ID_MAP.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
 
     public static final PositionSourceType<BlockPositionSource> BLOCK = define("block",
-            BlockPositionSource::read, BlockPositionSource::write);
+            BlockPositionSource::read, BlockPositionSource::write,
+            BlockPositionSource::decodeSource, BlockPositionSource::encodeSource);
     public static final PositionSourceType<EntityPositionSource> ENTITY = define("entity",
-            EntityPositionSource::read, EntityPositionSource::write);
+            EntityPositionSource::read, EntityPositionSource::write,
+            EntityPositionSource::decodeSource, EntityPositionSource::encodeSource);
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
+    }
+
+    @FunctionalInterface
+    public interface Decoder<T> {
+
+        T decode(NBTCompound compound, ClientVersion version);
+    }
+
+    @FunctionalInterface
+    public interface Encoder<T> {
+
+        void encode(T value, ClientVersion version, NBTCompound compound);
     }
 }

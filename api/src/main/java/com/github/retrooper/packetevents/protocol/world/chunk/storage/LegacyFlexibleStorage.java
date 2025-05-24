@@ -36,7 +36,7 @@ public class LegacyFlexibleStorage extends BaseStorage {
         }
 
         this.bitsPerEntry = bitsPerEntry;
-        this.data = Arrays.copyOf(data, data.length);
+        this.data = data;
 
         this.size = this.data.length * 64 / this.bitsPerEntry;
         this.maxEntryValue = (1L << this.bitsPerEntry) - 1;

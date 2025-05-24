@@ -21,23 +21,39 @@ package com.github.retrooper.packetevents.util;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
+import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class PacketEventsImplHelper {
-    
-    public static PacketSendEvent handleClientBoundPacket(Object channel, 
-                                                              User user, 
-                                                              Object player, 
-                                                              Object buffer, 
-                                                             boolean autoProtocolTranslation) throws Exception {
-        if (!ByteBufHelper.isReadable(buffer)) return null;
+public final class PacketEventsImplHelper {
+
+    private PacketEventsImplHelper() {
+    }
+
+    public static @Nullable ProtocolPacketEvent handlePacket(
+            Object channel, User user, Object player, Object buffer,
+            boolean autoProtocolTranslation, PacketSide side
+    ) throws Exception {
+        if (side == PacketSide.SERVER) {
+            return handleClientBoundPacket(channel, user, player, buffer, autoProtocolTranslation);
+        } else {
+            return handleServerBoundPacket(channel, user, player, buffer, autoProtocolTranslation);
+        }
+    }
+
+    public static @Nullable PacketSendEvent handleClientBoundPacket(
+            Object channel, User user, Object player, Object buffer,
+            boolean autoProtocolTranslation
+    ) throws Exception {
+        if (!ByteBufHelper.isReadable(buffer)) {
+            return null;
+        }
 
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer, autoProtocolTranslation);
@@ -71,26 +87,25 @@ public class PacketEventsImplHelper {
         return packetSendEvent;
     }
 
-    public static Object handleServerBoundPacket(Object channel, User user,
-                                                             Object player,
-                                                             Object buffer,
-                                                             boolean autoProtocolTranslation) throws Exception {
-        if (!ByteBufHelper.isReadable(buffer)) return null;
+    public static @Nullable PacketReceiveEvent handleServerBoundPacket(
+            Object channel, User user, Object player, Object buffer,
+            boolean autoProtocolTranslation
+    ) throws Exception {
+        if (!ByteBufHelper.isReadable(buffer)) {
+            return null;
+        }
 
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);
-        Object finalBuffer = buffer;
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
-            ByteBufHelper.readerIndex(finalBuffer, processIndex);
+            ByteBufHelper.readerIndex(buffer, processIndex);
         });
         if (!packetReceiveEvent.isCancelled()) {
             //Did they ever use a wrapper?
             if (packetReceiveEvent.getLastUsedWrapper() != null) {
                 //Rewrite the buffer
                 ByteBufHelper.clear(buffer);
-                buffer = UnpooledByteBufAllocationHelper.buffer();
-                packetReceiveEvent.getLastUsedWrapper().setBuffer(buffer);
                 packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
                 packetReceiveEvent.getLastUsedWrapper().write();
             } else {
@@ -107,25 +122,24 @@ public class PacketEventsImplHelper {
                 task.run();
             }
         }
-        return buffer;
+        return packetReceiveEvent;
     }
 
     public static void handleDisconnection(Object channel, @Nullable UUID uuid) {
         synchronized (channel) {
-            User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+            ProtocolManager protocolManager = PacketEvents.getAPI().getProtocolManager();
+            User user = protocolManager.getUser(channel);
 
             if (user != null) {
                 UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
                 PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
-                PacketEvents.getAPI().getProtocolManager().removeUser(user.getChannel());
+                protocolManager.removeUser(user.getChannel());
             }
 
             if (uuid == null) {
-                // Only way to be sure of removing a channel
-                ProtocolManager.CHANNELS.entrySet().removeIf(pair -> pair.getValue() == channel);
+                protocolManager.removeChannel(channel);
             } else {
-                // This is the efficient way that we should prefer
-                ProtocolManager.CHANNELS.remove(uuid);
+                protocolManager.removeChannelById(uuid);
             }
         }
     }

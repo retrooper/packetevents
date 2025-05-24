@@ -47,13 +47,13 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     private float pitch;
     private float headPitch;
     private Vector3d velocity;
-    private List<EntityData> entityMetadata;
+    private List<EntityData<?>> entityMetadata;
 
     public WrapperPlayServerSpawnLivingEntity(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerSpawnLivingEntity(int entityID, UUID entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity, List<EntityData> entityMetadata) {
+    public WrapperPlayServerSpawnLivingEntity(int entityID, UUID entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity, List<EntityData<?>> entityMetadata) {
         super(PacketType.Play.Server.SPAWN_LIVING_ENTITY);
         this.entityID = entityID;
         this.entityUUID = entityUUID;
@@ -73,7 +73,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     public WrapperPlayServerSpawnLivingEntity(int entityId, UUID entityUUID,
                                               EntityType entityType, Location location, float headPitch,
                                               Vector3d velocity,
-                                              List<EntityData> entityMetadata) {
+                                              List<EntityData<?>> entityMetadata) {
         this(entityId, entityUUID, entityType, location.getPosition(), location.getYaw(), location.getPitch(),
                 headPitch, velocity, entityMetadata);
     }
@@ -227,11 +227,11 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.velocity = velocity;
     }
 
-    public List<EntityData> getEntityMetadata() {
+    public List<EntityData<?>> getEntityMetadata() {
         return entityMetadata;
     }
 
-    public void setEntityMetadata(List<EntityData> entityMetadata) {
+    public void setEntityMetadata(List<EntityData<?>> entityMetadata) {
         this.entityMetadata = entityMetadata;
     }
 

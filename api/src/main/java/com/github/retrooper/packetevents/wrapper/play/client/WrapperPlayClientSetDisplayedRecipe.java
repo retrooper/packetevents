@@ -19,42 +19,86 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.recipe.RecipeDisplayId;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 public class WrapperPlayClientSetDisplayedRecipe extends PacketWrapper<WrapperPlayClientSetDisplayedRecipe> {
+
+    /**
+     * Replaced in 1.21.2 with {@link #recipeId}
+     */
+    @ApiStatus.Obsolete
     private ResourceLocation recipe;
+
+    private RecipeDisplayId recipeId;
 
     public WrapperPlayClientSetDisplayedRecipe(PacketReceiveEvent event) {
         super(event);
     }
 
+    /**
+     * Replaced in 1.21.2 with {@link #WrapperPlayClientSetDisplayedRecipe(RecipeDisplayId)}
+     */
+    @ApiStatus.Obsolete
     public WrapperPlayClientSetDisplayedRecipe(ResourceLocation recipe) {
         super(PacketType.Play.Client.SET_DISPLAYED_RECIPE);
         this.recipe = recipe;
     }
 
+    public WrapperPlayClientSetDisplayedRecipe(RecipeDisplayId recipeId) {
+        super(PacketType.Play.Client.SET_DISPLAYED_RECIPE);
+        this.recipeId = recipeId;
+    }
+
     @Override
     public void read() {
-        this.recipe = readIdentifier();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            this.recipeId = RecipeDisplayId.read(this);
+        } else {
+            this.recipe = this.readIdentifier();
+        }
     }
 
     @Override
     public void write() {
-        writeIdentifier(this.recipe);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            RecipeDisplayId.write(this, this.recipeId);
+        } else {
+            this.writeIdentifier(this.recipe);
+        }
     }
 
     @Override
     public void copy(WrapperPlayClientSetDisplayedRecipe packet) {
         this.recipe = packet.recipe;
+        this.recipeId = packet.recipeId;
     }
 
+    /**
+     * Replaced in 1.21.2 with {@link #getRecipeId()}
+     */
+    @ApiStatus.Obsolete
     public ResourceLocation getRecipe() {
-        return recipe;
+        return this.recipe;
     }
 
+    /**
+     * Replaced in 1.21.2 with {@link #setRecipeId(RecipeDisplayId)}
+     */
+    @ApiStatus.Obsolete
     public void setRecipe(ResourceLocation recipe) {
         this.recipe = recipe;
+    }
+
+    public RecipeDisplayId getRecipeId() {
+        return this.recipeId;
+    }
+
+    public void setRecipeId(RecipeDisplayId recipeId) {
+        this.recipeId = recipeId;
     }
 }

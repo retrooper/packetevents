@@ -19,6 +19,30 @@
 package com.github.retrooper.packetevents.protocol.component;
 
 import com.github.retrooper.packetevents.protocol.color.DyeColor;
+import com.github.retrooper.packetevents.protocol.component.builtin.AxolotlVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.CatCollarComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.CatVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.ChickenVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.CowVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.FoxVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.FrogVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.HorseVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.LlamaVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.MooshroomVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.PaintingVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.ParrotVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.PigVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.RabbitVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.SalmonSizeComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.SheepColorComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.ShulkerColorComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.TropicalFishBaseColorComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.TropicalFishPatternColorComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.TropicalFishPatternComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.VillagerVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.WolfCollarComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.WolfSoundVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.WolfVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ArmorTrim;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BannerLayers;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BundleContents;
@@ -31,110 +55,96 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAdv
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAttributeModifiers;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBees;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBlockStateProperties;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBlocksAttacks;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBreakSound;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemConsumable;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemContainerContents;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemContainerLoot;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemCustomModelData;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDamageResistant;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDeathProtection;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDyeColor;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantable;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEquippable;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemFireworks;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemInstrument;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemJukeboxPlayable;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLock;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMapDecorations;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMapPostProcessingState;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemModel;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPotionContents;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPotionDurationScale;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemProfile;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemProvidesBannerPatterns;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemProvidesTrimMaterial;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemRarity;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemRecipes;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemRepairable;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemTool;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemTooltipDisplay;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemTooltipStyle;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemUnbreakable;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemUseCooldown;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemUseRemainder;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemWeapon;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.LodestoneTracker;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.PotDecorations;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.SuspiciousStewEffects;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.WritableBookContent;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.WrittenBookContent;
 import com.github.retrooper.packetevents.protocol.item.instrument.Instrument;
+import com.github.retrooper.packetevents.protocol.mapper.MaybeMappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Dummy;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper.Reader;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper.Writer;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
-public class ComponentTypes {
+/**
+ * Contains all item data component types.
+ *
+ * @see EnchantEffectComponentTypes
+ */
+public final class ComponentTypes {
 
-    private static final Map<String, ComponentType<?>> COMPONENT_TYPE_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, ComponentType<?>>> COMPONENT_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("item/item_component_mappings");
+    private static final VersionedRegistry<ComponentType<?>> REGISTRY = new VersionedRegistry<>("data_component_type");
 
+    private ComponentTypes() {
+    }
+
+    @ApiStatus.Internal
     public static <T> ComponentType<T> define(String key) {
         return define(key, null, null);
     }
 
+    @ApiStatus.Internal
     public static <T> ComponentType<T> define(String key, @Nullable Reader<T> reader, @Nullable Writer<T> writer) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        ComponentType<T> type = new ComponentType<T>() {
-            @Override
-            public T read(PacketWrapper<?> wrapper) {
-                return reader == null ? null : reader.apply(wrapper);
-            }
-
-            @Override
-            public void write(PacketWrapper<?> wrapper, T content) {
-                if (writer != null) {
-                    writer.accept(wrapper, content);
-                }
-            }
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                return MappingHelper.getId(version, TYPES_BUILDER, data);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof ComponentType<?>) {
-                    return this.getName().equals(((ComponentType<?>) obj).getName());
-                }
-                return false;
-            }
-
-            @Override
-            public String toString() {
-                return "Component[" + this.getName() + "]";
-            }
-        };
-
-        MappingHelper.registerMapping(TYPES_BUILDER, COMPONENT_TYPE_MAP, COMPONENT_TYPE_ID_MAP, type);
-        return type;
+        return REGISTRY.define(key, data -> new StaticComponentType<>(data, reader, writer));
     }
 
-    // with key
+    public static VersionedRegistry<ComponentType<?>> getRegistry() {
+        return REGISTRY;
+    }
+
     public static ComponentType<?> getByName(String name) {
-        return COMPONENT_TYPE_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static ComponentType<?> getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, ComponentType<?>> idMap = COMPONENT_TYPE_ID_MAP.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
 
-    // item component types
     public static final ComponentType<NBTCompound> CUSTOM_DATA = define("custom_data",
             // mojang wraps their "persistent" codec as a stream codec just here,
             // so packetevents has to handle nbt strings
@@ -145,8 +155,14 @@ public class ComponentTypes {
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
     public static final ComponentType<Integer> DAMAGE = define("damage",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
-    public static final ComponentType<Boolean> UNBREAKABLE = define("unbreakable",
-            PacketWrapper::readBoolean, PacketWrapper::writeBoolean);
+    public static final ComponentType<ItemUnbreakable> UNBREAKABLE_MODERN = define("unbreakable",
+            ItemUnbreakable::read, ItemUnbreakable::write);
+    /**
+     * Changed in 1.21.5
+     */
+    @Deprecated
+    public static final ComponentType<Boolean> UNBREAKABLE = UNBREAKABLE_MODERN.legacyMap(
+            ItemUnbreakable::isShowInTooltip, ItemUnbreakable::new);
     public static final ComponentType<Component> CUSTOM_NAME = define("custom_name",
             PacketWrapper::readComponent, PacketWrapper::writeComponent);
     public static final ComponentType<Component> ITEM_NAME = define("item_name",
@@ -163,10 +179,24 @@ public class ComponentTypes {
             ItemAdventurePredicate::read, ItemAdventurePredicate::write);
     public static final ComponentType<ItemAttributeModifiers> ATTRIBUTE_MODIFIERS = define("attribute_modifiers",
             ItemAttributeModifiers::read, ItemAttributeModifiers::write);
-    public static final ComponentType<Integer> CUSTOM_MODEL_DATA = define("custom_model_data",
-            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
+    public static final ComponentType<ItemCustomModelData> CUSTOM_MODEL_DATA_LISTS = define("custom_model_data",
+            ItemCustomModelData::read, ItemCustomModelData::write);
+    /**
+     * Rewritten in 1.21.4
+     */
+    @Deprecated
+    public static final ComponentType<Integer> CUSTOM_MODEL_DATA = CUSTOM_MODEL_DATA_LISTS.legacyMap(
+            ItemCustomModelData::getLegacyId, ItemCustomModelData::new);
+    /**
+     * Removed with 1.21.5
+     */
+    @ApiStatus.Obsolete
     public static final ComponentType<Dummy> HIDE_ADDITIONAL_TOOLTIP = define("hide_additional_tooltip",
             Dummy::dummyRead, Dummy::dummyWrite);
+    /**
+     * Removed with 1.21.5
+     */
+    @ApiStatus.Obsolete
     public static final ComponentType<Dummy> HIDE_TOOLTIP = define("hide_tooltip",
             Dummy::dummyRead, Dummy::dummyWrite);
     public static final ComponentType<Integer> REPAIR_COST = define("repair_cost",
@@ -179,6 +209,10 @@ public class ComponentTypes {
             Dummy::dummyReadNbt, Dummy::dummyWriteNbt);
     public static final ComponentType<FoodProperties> FOOD = define("food",
             FoodProperties::read, FoodProperties::write);
+    /**
+     * Has been migrated to #DAMAGE_RESISTANT with 1.21.2.
+     */
+    @ApiStatus.Obsolete
     public static final ComponentType<Dummy> FIRE_RESISTANT = define("fire_resistant",
             Dummy::dummyRead, Dummy::dummyWrite);
     public static final ComponentType<ItemTool> TOOL = define("tool",
@@ -217,8 +251,12 @@ public class ComponentTypes {
             PacketWrapper::readNBT, PacketWrapper::writeNBT);
     public static final ComponentType<NBTCompound> BLOCK_ENTITY_DATA = define("block_entity_data",
             PacketWrapper::readNBT, PacketWrapper::writeNBT);
-    public static final ComponentType<Instrument> INSTRUMENT = define("instrument",
-            Instrument::read, Instrument::write);
+    public static final ComponentType<ItemInstrument> ITEM_INSTRUMENT = define("instrument",
+            ItemInstrument::read, ItemInstrument::write);
+    @Deprecated
+    public static final ComponentType<Instrument> INSTRUMENT = ITEM_INSTRUMENT.legacyMap(
+            inst -> inst.getInstrument().getValue(),
+            inst -> new ItemInstrument(new MaybeMappedEntity<>(inst)));
     public static final ComponentType<Integer> OMINOUS_BOTTLE_AMPLIFIER = define("ominous_bottle_amplifier",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
     public static final ComponentType<ItemRecipes> RECIPES = define("recipes",
@@ -254,22 +292,196 @@ public class ComponentTypes {
     public static final ComponentType<ItemJukeboxPlayable> JUKEBOX_PLAYABLE = define("jukebox_playable",
             ItemJukeboxPlayable::read, ItemJukeboxPlayable::write);
 
+    // added in 1.21.2
+    public static final ComponentType<ItemConsumable> CONSUMABLE = define("consumable",
+            ItemConsumable::read, ItemConsumable::write);
+    public static final ComponentType<ItemUseRemainder> USE_REMAINDER = define("use_remainder",
+            ItemUseRemainder::read, ItemUseRemainder::write);
+    public static final ComponentType<ItemUseCooldown> USE_COOLDOWN = define("use_cooldown",
+            ItemUseCooldown::read, ItemUseCooldown::write);
+    public static final ComponentType<ItemEnchantable> ENCHANTABLE = define("enchantable",
+            ItemEnchantable::read, ItemEnchantable::write);
+    public static final ComponentType<ItemRepairable> REPAIRABLE = define("repairable",
+            ItemRepairable::read, ItemRepairable::write);
+    public static final ComponentType<ItemModel> ITEM_MODEL = define("item_model",
+            ItemModel::read, ItemModel::write);
+    public static final ComponentType<ItemDamageResistant> DAMAGE_RESISTANT = define("damage_resistant",
+            ItemDamageResistant::read, ItemDamageResistant::write);
+    public static final ComponentType<ItemEquippable> EQUIPPABLE = define("equippable",
+            ItemEquippable::read, ItemEquippable::write);
+    public static final ComponentType<Dummy> GLIDER = define("glider",
+            Dummy::dummyRead, Dummy::dummyWrite);
+    public static final ComponentType<ItemDeathProtection> DEATH_PROTECTION = define("death_protection",
+            ItemDeathProtection::read, ItemDeathProtection::write);
+    public static final ComponentType<ItemTooltipStyle> TOOLTIP_STYLE = define("tooltip_style",
+            ItemTooltipStyle::read, ItemTooltipStyle::write);
+
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<ItemTooltipDisplay> TOOLTIP_DISPLAY = define("tooltip_display",
+            ItemTooltipDisplay::read, ItemTooltipDisplay::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<ItemWeapon> WEAPON = define("weapon",
+            ItemWeapon::read, ItemWeapon::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<ItemBlocksAttacks> BLOCKS_ATTACKS = define("blocks_attacks",
+            ItemBlocksAttacks::read, ItemBlocksAttacks::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<ItemPotionDurationScale> POTION_DURATION_SCALE = define("potion_duration_scale",
+            ItemPotionDurationScale::read, ItemPotionDurationScale::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<ItemProvidesTrimMaterial> PROVIDES_TRIM_MATERIAL = define("provides_trim_material",
+            ItemProvidesTrimMaterial::read, ItemProvidesTrimMaterial::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<ItemProvidesBannerPatterns> PROVIDES_BANNER_PATTERNS = define("provides_banner_patterns",
+            ItemProvidesBannerPatterns::read, ItemProvidesBannerPatterns::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<ItemBreakSound> BREAK_SOUND = define("break_sound",
+            ItemBreakSound::read, ItemBreakSound::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<VillagerVariantComponent> VILLAGER_VARIANT = define("villager/variant",
+            VillagerVariantComponent::read, VillagerVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<WolfVariantComponent> WOLF_VARIANT = define("wolf/variant",
+            WolfVariantComponent::read, WolfVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<WolfSoundVariantComponent> WOLF_SOUND_VARIANT = define("wolf/sound_variant",
+            WolfSoundVariantComponent::read, WolfSoundVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<WolfCollarComponent> WOLF_COLLAR = define("wolf/collar",
+            WolfCollarComponent::read, WolfCollarComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<FoxVariantComponent> FOX_VARIANT = define("fox/variant",
+            FoxVariantComponent::read, FoxVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<SalmonSizeComponent> SALMON_SIZE = define("salmon/size",
+            SalmonSizeComponent::read, SalmonSizeComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<ParrotVariantComponent> PARROT_VARIANT = define("parrot/variant",
+            ParrotVariantComponent::read, ParrotVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<TropicalFishPatternComponent> TROPICAL_FISH_PATTERN = define("tropical_fish/pattern",
+            TropicalFishPatternComponent::read, TropicalFishPatternComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<TropicalFishBaseColorComponent> TROPICAL_FISH_BASE_COLOR = define("tropical_fish/base_color",
+            TropicalFishBaseColorComponent::read, TropicalFishBaseColorComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<TropicalFishPatternColorComponent> TROPICAL_FISH_PATTERN_COLOR = define("tropical_fish/pattern_color",
+            TropicalFishPatternColorComponent::read, TropicalFishPatternColorComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<MooshroomVariantComponent> MOOSHROOM_VARIANT = define("mooshroom/variant",
+            MooshroomVariantComponent::read, MooshroomVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<RabbitVariantComponent> RABBIT_VARIANT = define("rabbit/variant",
+            RabbitVariantComponent::read, RabbitVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<PigVariantComponent> PIG_VARIANT = define("pig/variant",
+            PigVariantComponent::read, PigVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<CowVariantComponent> COW_VARIANT = define("cow/variant",
+            CowVariantComponent::read, CowVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<ChickenVariantComponent> CHICKEN_VARIANT = define("chicken/variant",
+            ChickenVariantComponent::read, ChickenVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<FrogVariantComponent> FROG_VARIANT = define("frog/variant",
+            FrogVariantComponent::read, FrogVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<HorseVariantComponent> HORSE_VARIANT = define("horse/variant",
+            HorseVariantComponent::read, HorseVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<PaintingVariantComponent> PAINTING_VARIANT = define("painting/variant",
+            PaintingVariantComponent::read, PaintingVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<LlamaVariantComponent> LLAMA_VARIANT = define("llama/variant",
+            LlamaVariantComponent::read, LlamaVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<AxolotlVariantComponent> AXOLOTL_VARIANT = define("axolotl/variant",
+            AxolotlVariantComponent::read, AxolotlVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<CatVariantComponent> CAT_VARIANT = define("cat/variant",
+            CatVariantComponent::read, CatVariantComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<CatCollarComponent> CAT_COLLAR = define("cat/collar",
+            CatCollarComponent::read, CatCollarComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<SheepColorComponent> SHEEP_COLOR = define("sheep/color",
+            SheepColorComponent::read, SheepColorComponent::write);
+    /**
+     * Added with 1.21.5
+     */
+    public static final ComponentType<ShulkerColorComponent> SHULKER_COLOR = define("shulker/color",
+            ShulkerColorComponent::read, ShulkerColorComponent::write);
+
     /**
      * Returns an immutable view of the component types.
      *
      * @return Component Types
      */
     public static Collection<ComponentType<?>> values() {
-        return Collections.unmodifiableCollection(COMPONENT_TYPE_MAP.values());
+        return REGISTRY.getEntries();
     }
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
     }
-
-    @FunctionalInterface
-    public interface Reader<T> extends Function<PacketWrapper<?>, T> {}
-
-    @FunctionalInterface
-    public interface Writer<T> extends BiConsumer<PacketWrapper<?>, T> {}
 }

@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
@@ -74,16 +73,17 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void read() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-            this.containerId = readUnsignedByte();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)
+                || this.serverVersion.isOlderThan(ServerVersion.V_1_14)) {
+            this.containerId = this.readContainerId();
         } else {
-            this.containerId = readVarInt();
+            this.containerId = this.readVarInt();
         }
 
         // 1.7 has a very different packet format
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             this.type = readUnsignedByte();
-            this.title = AdventureSerializer.fromLegacyFormat(readString(32));
+            this.title = this.getSerializers().fromLegacy(this.readString(32));
             this.legacySlots = readUnsignedByte();
             this.useProvidedWindowTitle = readBoolean();
 
@@ -110,16 +110,17 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void write() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-            writeByte(this.containerId);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)
+                || this.serverVersion.isOlderThan(ServerVersion.V_1_14)) {
+            this.writeContainerId(this.containerId);
         } else {
-            writeVarInt(this.containerId);
+            this.writeVarInt(this.containerId);
         }
 
         // 1.7 has a very different packet format
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             writeByte(this.type);
-            writeString(AdventureSerializer.toLegacyFormat(this.title));
+            writeString(this.getSerializers().asLegacy(this.title));
             writeByte(this.legacySlots);
             writeBoolean(this.useProvidedWindowTitle);
 

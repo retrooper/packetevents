@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes.PropertyModifier;
+import net.kyori.adventure.util.Index;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collections;
@@ -37,14 +38,31 @@ public class ItemAttributeModifiers {
     public static final ItemAttributeModifiers EMPTY = new ItemAttributeModifiers(
             Collections.emptyList(), true) {
         @Override
+        public void setModifiers(List<ModifierEntry> modifiers) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public void setShowInTooltip(boolean showInTooltip) {
             throw new UnsupportedOperationException();
         }
     };
 
     private List<ModifierEntry> modifiers;
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     private boolean showInTooltip;
 
+    public ItemAttributeModifiers(List<ModifierEntry> modifiers) {
+        this(modifiers, true);
+    }
+
+    /**
+     * {@link #showInTooltip} has been removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public ItemAttributeModifiers(List<ModifierEntry> modifiers, boolean showInTooltip) {
         this.modifiers = modifiers;
         this.showInTooltip = showInTooltip;
@@ -52,13 +70,15 @@ public class ItemAttributeModifiers {
 
     public static ItemAttributeModifiers read(PacketWrapper<?> wrapper) {
         List<ModifierEntry> modifiers = wrapper.readList(ModifierEntry::read);
-        boolean showInTooltip = wrapper.readBoolean();
+        boolean showInTooltip = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5) || wrapper.readBoolean();
         return new ItemAttributeModifiers(modifiers, showInTooltip);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemAttributeModifiers modifiers) {
         wrapper.writeList(modifiers.modifiers, ModifierEntry::write);
-        wrapper.writeBoolean(modifiers.showInTooltip);
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
+            wrapper.writeBoolean(modifiers.showInTooltip);
+        }
     }
 
     public void addModifier(ModifierEntry modifier) {
@@ -73,10 +93,18 @@ public class ItemAttributeModifiers {
         this.modifiers = modifiers;
     }
 
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public boolean isShowInTooltip() {
         return this.showInTooltip;
     }
 
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public void setShowInTooltip(boolean showInTooltip) {
         this.showInTooltip = showInTooltip;
     }
@@ -283,15 +311,34 @@ public class ItemAttributeModifiers {
     }
 
     public enum EquipmentSlotGroup {
-        ANY,
-        MAINHAND,
-        OFFHAND,
-        HAND,
-        FEET,
-        LEGS,
-        CHEST,
-        HEAD,
-        ARMOR,
-        BODY,
+
+        ANY("any"),
+        MAINHAND("mainhand"),
+        OFFHAND("offhand"),
+        HAND("hand"),
+        FEET("feet"),
+        LEGS("legs"),
+        CHEST("chest"),
+        HEAD("head"),
+        ARMOR("armor"),
+        BODY("body"),
+        /**
+         * Added with 1.21.5
+         */
+        SADDLE("saddle"),
+        ;
+
+        public static final Index<String, EquipmentSlotGroup> ID_INDEX = Index.create(
+                EquipmentSlotGroup.class, EquipmentSlotGroup::getId);
+
+        private final String id;
+
+        EquipmentSlotGroup(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return this.id;
+        }
     }
 }

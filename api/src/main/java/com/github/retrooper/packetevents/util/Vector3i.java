@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.util;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Objects;
 
@@ -56,6 +57,7 @@ public class Vector3i {
         this.z = 0;
     }
 
+    @Deprecated
     public Vector3i(long val) {
         this(val, PacketEvents.getAPI().getServerManager().getVersion());
     }
@@ -125,6 +127,19 @@ public class Vector3i {
         }
     }
 
+    public static Vector3i read(PacketWrapper<?> wrapper) {
+        int x = wrapper.readVarInt();
+        int y = wrapper.readVarInt();
+        int z = wrapper.readVarInt();
+        return new Vector3i(x, y, z);
+    }
+
+    public static void write(PacketWrapper<?> wrapper, Vector3i vector) {
+        wrapper.writeVarInt(vector.x);
+        wrapper.writeVarInt(vector.y);
+        wrapper.writeVarInt(vector.z);
+    }
+
     public long getSerializedPosition(ServerVersion serverVersion) {
         // 1.17 adds support for negative values
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
@@ -142,6 +157,7 @@ public class Vector3i {
         return ((long) (getX() & 0x3FFFFFF) << 38) | ((long) (getY() & 0xFFF) << 26) | (getZ() & 0x3FFFFFF);
     }
 
+    @Deprecated
     public long getSerializedPosition() {
         return getSerializedPosition(PacketEvents.getAPI().getServerManager().getVersion());
     }

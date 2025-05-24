@@ -18,38 +18,39 @@
 
 package com.github.retrooper.packetevents.protocol.entity.data;
 
-public class EntityData {
-    private int index;
-    private EntityDataType<?> type;
-    private Object value;
+public class EntityData<T> {
 
-    public EntityData(int index, EntityDataType<?> type, Object value) {
+    private int index;
+    private EntityDataType<T> type;
+    private T value;
+
+    public EntityData(int index, EntityDataType<T> type, T value) {
         this.index = index;
         this.type = type;
         this.value = value;
     }
 
     public int getIndex() {
-        return index;
+        return this.index;
     }
 
     public void setIndex(int index) {
         this.index = index;
     }
 
-    public EntityDataType<?> getType() {
-        return type;
+    public EntityDataType<T> getType() {
+        return this.type;
     }
 
-    public void setType(EntityDataType<?> type) {
+    public void setType(EntityDataType<T> type) {
         this.type = type;
     }
 
-    public Object getValue() {
-        return value;
+    public T getValue() {
+        return this.value;
     }
 
-    public void setValue(Object value) {
+    public void setValue(T value) {
         this.value = value;
     }
 }

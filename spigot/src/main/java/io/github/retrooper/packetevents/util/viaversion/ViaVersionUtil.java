@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.util.viaversion;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -31,12 +32,13 @@ public class ViaVersionUtil {
 
     private static void load() {
         if (viaVersionAccessor == null) {
+            ClassLoader classLoader = PacketEvents.getAPI().getPlugin().getClass().getClassLoader();
             try {
-                Class.forName("com.viaversion.viaversion.api.Via");
+                classLoader.loadClass("com.viaversion.viaversion.api.Via");
                 viaVersionAccessor = new ViaVersionAccessorImpl();
             } catch (Exception e) {
                 try {
-                    Class.forName("us.myles.ViaVersion.api.Via");
+                    classLoader.loadClass("us.myles.ViaVersion.api.Via");
                     viaVersionAccessor = new ViaVersionAccessorImplLegacy();
                 } catch (ClassNotFoundException ex) {
                     viaVersionAccessor = null;

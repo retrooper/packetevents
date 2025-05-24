@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.color;
 
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.util.RGBLike;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,6 +55,8 @@ public enum DyeColor implements RGBLike {
 
     BLACK(new Color(0x1d1d21), new Color(0x0), new Color(0x1e1b1b), 29);
 
+    private static final DyeColor[] COLORS = values();
+
     private final Color textureDiffuseColor;
 
     private final Color textColor;
@@ -68,6 +71,14 @@ public enum DyeColor implements RGBLike {
         this.textColor = textColor;
         this.fireworkColor = fireworkColor;
         this.mapColorId = mapColorId;
+    }
+
+    public static DyeColor read(PacketWrapper<?> wrapper) {
+        return wrapper.readEnum(COLORS);
+    }
+
+    public static void write(PacketWrapper<?> wrapper, DyeColor color) {
+        wrapper.writeEnum(color);
     }
 
     public @NotNull Color color() {

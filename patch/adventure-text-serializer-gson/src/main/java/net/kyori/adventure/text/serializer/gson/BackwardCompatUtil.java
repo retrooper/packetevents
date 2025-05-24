@@ -21,6 +21,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.util.Codec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,10 +32,31 @@ import java.util.UUID;
 
 public final class BackwardCompatUtil {
 
+    public static final boolean IS_4_10_0_OR_NEWER;
+    public static final boolean IS_4_13_0_OR_NEWER;
     public static final boolean IS_4_15_0_OR_NEWER;
     public static final boolean IS_4_17_0_OR_NEWER;
+    public static final boolean IS_4_18_0_OR_NEWER;
 
     static {
+        boolean is4_10_0OrNewer = false;
+        try {
+            // some methods were renamed in 4.10.0
+            BinaryTagHolder.binaryTagHolder("");
+            is4_10_0OrNewer = true;
+        } catch (Throwable ignored) {
+        }
+        IS_4_10_0_OR_NEWER = is4_10_0OrNewer;
+
+        boolean is4_13_0OrNewer = false;
+        try {
+            // translatable fallback support was added in 4.13.0
+            Component.translatable().fallback("");
+            is4_13_0OrNewer = true;
+        } catch (Throwable ignored) {
+        }
+        IS_4_13_0_OR_NEWER = is4_13_0OrNewer;
+
         boolean is4_15_0OrNewer = false;
         try {
             Component.translatable().arguments(Component.empty()); // TranslatableComponent#arguments method was added in 4.15.0
@@ -51,6 +73,15 @@ public final class BackwardCompatUtil {
         } catch (Throwable ignored) {
         }
         IS_4_17_0_OR_NEWER = is4_17_0OrNewer;
+
+        boolean is4_18_0OrNewer = false;
+        try {
+            // shadow color support was added in 4.18.0
+            Style.empty().shadowColor();
+            is4_18_0OrNewer = true;
+        } catch (Throwable ignored) {
+        }
+        IS_4_18_0_OR_NEWER = is4_18_0OrNewer;
     }
 
     private BackwardCompatUtil() {

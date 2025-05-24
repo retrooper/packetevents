@@ -30,6 +30,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
     private DiggingAction action;
     private Vector3i blockPosition;
     private BlockFace blockFace;
+    private int blockFaceId;
     private int sequence;
 
     public WrapperPlayClientPlayerDigging(PacketReceiveEvent event) {
@@ -41,6 +42,16 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         this.action = action;
         this.blockPosition = blockPosition;
         this.blockFace = blockFace;
+        this.blockFaceId = blockFace.getFaceValue();
+        this.sequence = sequence;
+    }
+
+    public WrapperPlayClientPlayerDigging(DiggingAction action, Vector3i blockPosition, int blockFace, int sequence) {
+        super(PacketType.Play.Client.PLAYER_DIGGING);
+        this.action = action;
+        this.blockPosition = blockPosition;
+        this.blockFace = BlockFace.getBlockFaceByValue(blockFace);
+        this.blockFaceId = blockFace;
         this.sequence = sequence;
     }
 
@@ -60,9 +71,9 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
             int z = readInt();
             blockPosition = new Vector3i(x, y, z);
         }
-        short face = readUnsignedByte();
-        // Vanilla 1.8 doesn't seem to care about BlockFace of OTHER in this packet... just leave it as 1.9+
-        blockFace = BlockFace.getBlockFaceByValue(face);
+
+        blockFaceId = readUnsignedByte();
+        blockFace = BlockFace.getBlockFaceByValue(blockFaceId);
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             sequence = readVarInt();
@@ -80,7 +91,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
             writeByte(blockPosition.y);
             writeInt(blockPosition.z);
         }
-        writeByte(blockFace.getFaceValue());
+        writeByte(blockFaceId);
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeVarInt(sequence);
@@ -92,6 +103,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         action = wrapper.action;
         blockPosition = wrapper.blockPosition;
         blockFace = wrapper.blockFace;
+        blockFaceId = wrapper.blockFaceId;
         sequence = wrapper.sequence;
     }
 
@@ -117,6 +129,16 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
 
     public void setBlockFace(BlockFace blockFace) {
         this.blockFace = blockFace;
+        this.blockFaceId = blockFace.getFaceValue();
+    }
+
+    public int getBlockFaceId() {
+        return blockFaceId;
+    }
+
+    public void setBlockFaceId(int faceId) {
+        this.blockFace = BlockFace.getBlockFaceByValue(faceId);
+        this.blockFaceId = faceId;
     }
 
     public int getSequence() {

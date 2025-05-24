@@ -52,7 +52,7 @@ public class WrapperPlayServerMerchantOffers extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void read() {
-        containerId = readVarInt();
+        containerId = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2) ? this.readContainerId() : this.readVarInt();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             merchantOffers = readList(PacketWrapper::readMerchantOffer);
         } else {
@@ -70,7 +70,11 @@ public class WrapperPlayServerMerchantOffers extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void write() {
-        writeVarInt(containerId);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)){
+            this.writeContainerId(this.containerId);
+        } else {
+            this.writeVarInt(this.containerId);
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeList(merchantOffers, PacketWrapper::writeMerchantOffer);
         }

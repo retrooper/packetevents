@@ -21,10 +21,12 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.ItemStackSerialization;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientCreativeInventoryAction extends PacketWrapper<WrapperPlayClientCreativeInventoryAction> {
+
     private int slot;
     private ItemStack itemStack;
 
@@ -42,13 +44,18 @@ public class WrapperPlayClientCreativeInventoryAction extends PacketWrapper<Wrap
     public void read() {
         this.slot = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)
                 ? this.readUnsignedShort() : this.readShort();
-        this.itemStack = readItemStack();
+        this.itemStack = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_5)
+                ? ItemStackSerialization.readUntrusted(this) : ItemStackSerialization.read(this);
     }
 
     @Override
     public void write() {
-        writeShort(slot);
-        writeItemStack(itemStack);
+        this.writeShort(this.slot);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+            ItemStackSerialization.writeUntrusted(this, this.itemStack);
+        } else {
+            ItemStackSerialization.write(this, this.itemStack);
+        }
     }
 
     @Override

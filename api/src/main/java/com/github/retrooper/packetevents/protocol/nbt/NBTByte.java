@@ -30,6 +30,10 @@ public class NBTByte extends NBTNumber {
         this((byte) (value ? 1 : 0));
     }
 
+    public boolean getAsBool() {
+        return this.value != 0;
+    }
+
     @Override
     public NBTType<NBTByte> getType() {
         return NBTType.BYTE;

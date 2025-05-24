@@ -18,84 +18,118 @@
 
 package com.github.retrooper.packetevents.protocol.particle.data;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.color.Color;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class ParticleDustData extends ParticleData {
     //0.01 - 4
     private float scale;
-
-    //0-1
-    private float red;
-    private float green;
-    private float blue;
+    private Color color;
 
     public ParticleDustData(float scale, float red, float green, float blue) {
-        this.scale = scale;
-        this.red = red;
-        this.green = green;
-        this.blue = blue;
+        this(scale, new Color(red, green, blue));
+    }
+
+    public ParticleDustData(float scale, float[] rgb) {
+        this(scale, rgb[0], rgb[1], rgb[2]);
     }
 
     public ParticleDustData(float scale, Vector3f rgb) {
         this(scale, rgb.getX(), rgb.getY(), rgb.getZ());
     }
 
+    public ParticleDustData(float scale, int red, int green, int blue) {
+        this(scale, new Color(red, green, blue));
+    }
+
     public ParticleDustData(float scale, Color color) {
-        this(scale, color.red() / 255f, color.green() / 255f, color.blue() / 255f);
+        this.scale = scale;
+        this.color = color;
+    }
+
+    public static ParticleDustData read(PacketWrapper<?> wrapper) {
+        Color color;
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            color = new Color(wrapper.readInt());
+        } else {
+            float red = wrapper.readFloat();
+            float green = wrapper.readFloat();
+            float blue = wrapper.readFloat();
+            color = new Color(red, green, blue);
+        }
+        float scale = wrapper.readFloat();
+        return new ParticleDustData(scale, color);
+    }
+
+    public static void write(PacketWrapper<?> wrapper, ParticleDustData data) {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            wrapper.writeInt(data.color.asRGB());
+        } else {
+            wrapper.writeFloat(data.getRed());
+            wrapper.writeFloat(data.getGreen());
+            wrapper.writeFloat(data.getBlue());
+        }
+        wrapper.writeFloat(data.scale);
+    }
+
+    public static ParticleDustData decode(NBTCompound compound, ClientVersion version) {
+        Color color = Color.decode(compound.getTagOrThrow("color"), version);
+        float scale = compound.getNumberTagOrThrow("scale").getAsFloat();
+        return new ParticleDustData(scale, color);
+    }
+
+    public static void encode(ParticleDustData data, ClientVersion version, NBTCompound compound) {
+        compound.setTag("color", Color.encode(data.color, version));
+        compound.setTag("scale", new NBTFloat(data.scale));
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
     }
 
     public float getRed() {
-        return red;
+        return this.color.red() / 255f;
     }
 
     public void setRed(float red) {
-        this.red = red;
+        this.color = new Color(red, this.getGreen(), this.getBlue());
     }
 
     public float getGreen() {
-        return green;
+        return this.color.green() / 255f;
     }
 
     public void setGreen(float green) {
-        this.green = green;
+        this.color = new Color(this.getRed(), green, this.getBlue());
     }
 
     public float getBlue() {
-        return blue;
+        return this.color.blue() / 255f;
     }
 
     public void setBlue(float blue) {
-        this.blue = blue;
+        this.color = new Color(this.getRed(), this.getGreen(), blue);
     }
 
     public float getScale() {
-        return scale;
+        return this.scale;
     }
 
     public void setScale(float scale) {
         this.scale = scale;
     }
 
-    public static ParticleDustData read(PacketWrapper<?> wrapper) {
-        float red = wrapper.readFloat();
-        float green = wrapper.readFloat();
-        float blue = wrapper.readFloat();
-        float scale = wrapper.readFloat();
-        return new ParticleDustData(scale, red, green, blue);
+    public Color getColor() {
+        return this.color;
     }
 
-    public static void write(PacketWrapper<?> wrapper, ParticleDustData data) {
-        wrapper.writeFloat(data.getRed());
-        wrapper.writeFloat(data.getGreen());
-        wrapper.writeFloat(data.getBlue());
-        wrapper.writeFloat(data.getScale());
-    }
-
-
-    @Override
-    public boolean isEmpty() {
-        return false;
+    public void setColor(Color color) {
+        this.color = color;
     }
 }

@@ -25,8 +25,10 @@
 package com.github.retrooper.packetevents.protocol.world.chunk;
 
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class NibbleArray3d {
+
     private final byte[] data;
 
     public NibbleArray3d(byte[] data) {
@@ -37,8 +39,13 @@ public class NibbleArray3d {
         this(new byte[size >> 1]);
     }
 
+    @Deprecated
     public NibbleArray3d(NetStreamInput in, int size) {
         this(in.readBytes(size));
+    }
+
+    public NibbleArray3d(PacketWrapper<?> wrapper, int size) {
+        this(wrapper.readBytes(size));
     }
 
     public byte[] getData() {

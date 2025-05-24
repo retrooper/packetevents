@@ -18,23 +18,37 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.component.predicates.ComponentMatchers;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-// why do I have to implement this mess, I just want to deserialize items
 public class ItemAdventurePredicate {
 
     private List<BlockPredicate> predicates;
+    /**
+     * Removed with 1.21.5
+     */
+    @ApiStatus.Obsolete
     private boolean showInTooltip;
 
+    public ItemAdventurePredicate(List<BlockPredicate> predicates) {
+        this(predicates, true);
+    }
+
+    /**
+     * {@link #showInTooltip} has been removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public ItemAdventurePredicate(List<BlockPredicate> predicates, boolean showInTooltip) {
         this.predicates = predicates;
         this.showInTooltip = showInTooltip;
@@ -42,13 +56,15 @@ public class ItemAdventurePredicate {
 
     public static ItemAdventurePredicate read(PacketWrapper<?> wrapper) {
         List<BlockPredicate> predicates = wrapper.readList(BlockPredicate::read);
-        boolean showInTooltip = wrapper.readBoolean();
+        boolean showInTooltip = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5) || wrapper.readBoolean();
         return new ItemAdventurePredicate(predicates, showInTooltip);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemAdventurePredicate predicate) {
         wrapper.writeList(predicate.predicates, BlockPredicate::write);
-        wrapper.writeBoolean(predicate.showInTooltip);
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
+            wrapper.writeBoolean(predicate.showInTooltip);
+        }
     }
 
     public void addPredicate(BlockPredicate predicate) {
@@ -63,10 +79,18 @@ public class ItemAdventurePredicate {
         this.predicates = predicates;
     }
 
+    /**
+     * Removed with 1.21.5
+     */
+    @ApiStatus.Obsolete
     public boolean isShowInTooltip() {
         return this.showInTooltip;
     }
 
+    /**
+     * Removed with 1.21.5
+     */
+    @ApiStatus.Obsolete
     public void setShowInTooltip(boolean showInTooltip) {
         this.showInTooltip = showInTooltip;
     }
@@ -90,23 +114,40 @@ public class ItemAdventurePredicate {
         private @Nullable MappedEntitySet<StateType.Mapped> blocks;
         private @Nullable List<PropertyMatcher> properties;
         private @Nullable NBTCompound nbt;
+        /**
+         * Added with 1.21.5
+         */
+        private ComponentMatchers matchers;
 
         public BlockPredicate(
                 @Nullable MappedEntitySet<StateType.Mapped> blocks,
                 @Nullable List<PropertyMatcher> properties,
                 @Nullable NBTCompound nbt
         ) {
+            this(blocks, properties, nbt, new ComponentMatchers());
+        }
+
+        public BlockPredicate(
+                @Nullable MappedEntitySet<StateType.Mapped> blocks,
+                @Nullable List<PropertyMatcher> properties,
+                @Nullable NBTCompound nbt,
+                ComponentMatchers matchers
+        ) {
             this.blocks = blocks;
             this.properties = properties;
             this.nbt = nbt;
+            this.matchers = matchers;
         }
 
         public static BlockPredicate read(PacketWrapper<?> wrapper) {
             MappedEntitySet<StateType.Mapped> blocks = wrapper.readOptional(
                     ew -> MappedEntitySet.read(ew, StateTypes::getMappedById));
-            List<PropertyMatcher> properties = wrapper.readList(PropertyMatcher::read);
-            NBTCompound nbt = wrapper.readNBT();
-            return new BlockPredicate(blocks, properties, nbt);
+            List<PropertyMatcher> properties = wrapper.readOptional(
+                    ew -> wrapper.readList(PropertyMatcher::read));
+            NBTCompound nbt = wrapper.readOptional(PacketWrapper::readNBT);
+            ComponentMatchers matchers = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)
+                    ? ComponentMatchers.read(wrapper) : new ComponentMatchers();
+            return new BlockPredicate(blocks, properties, nbt, matchers);
         }
 
         public static void write(PacketWrapper<?> wrapper, BlockPredicate predicate) {
@@ -114,6 +155,9 @@ public class ItemAdventurePredicate {
             wrapper.writeOptional(predicate.properties,
                     (ew, val) -> ew.writeList(val, PropertyMatcher::write));
             wrapper.writeOptional(predicate.nbt, PacketWrapper::writeNBT);
+            if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+                ComponentMatchers.write(wrapper, predicate.matchers);
+            }
         }
 
         public @Nullable MappedEntitySet<StateType.Mapped> getBlocks() {
@@ -147,6 +191,20 @@ public class ItemAdventurePredicate {
             this.nbt = nbt;
         }
 
+        /**
+         * Added with 1.21.5
+         */
+        public ComponentMatchers getMatchers() {
+            return this.matchers;
+        }
+
+        /**
+         * Added with 1.21.5
+         */
+        public void setMatchers(ComponentMatchers matchers) {
+            this.matchers = matchers;
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
@@ -154,12 +212,13 @@ public class ItemAdventurePredicate {
             BlockPredicate that = (BlockPredicate) obj;
             if (!Objects.equals(this.blocks, that.blocks)) return false;
             if (!Objects.equals(this.properties, that.properties)) return false;
-            return Objects.equals(this.nbt, that.nbt);
+            if (!Objects.equals(this.nbt, that.nbt)) return false;
+            return this.matchers.equals(that.matchers);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(this.blocks, this.properties, this.nbt);
+            return Objects.hash(this.blocks, this.properties, this.nbt, this.matchers);
         }
     }
 

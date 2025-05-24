@@ -75,6 +75,8 @@ public abstract class PacketEventsAPI<T> {
 
     public abstract void terminate();
 
+    public abstract boolean isTerminated();
+
     public abstract T getPlugin();
 
     public abstract ServerManager getServerManager();

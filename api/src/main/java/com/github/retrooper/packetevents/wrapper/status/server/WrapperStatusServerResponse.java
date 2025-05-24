@@ -56,11 +56,11 @@ public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServ
     }
 
     public JsonObject getComponent() {
-        return AdventureSerializer.getGsonSerializer().serializer().fromJson(componentJson, JsonObject.class);
+        return this.getSerializers().gson().serializer().fromJson(componentJson, JsonObject.class);
     }
 
     public void setComponent(JsonObject component) {
-        this.componentJson = AdventureSerializer.getGsonSerializer().serializer().toJson(component);
+        this.componentJson = this.getSerializers().gson().serializer().toJson(component);
     }
 
     public String getComponentJson() {

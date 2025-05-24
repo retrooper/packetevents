@@ -18,9 +18,11 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterial;
 import com.github.retrooper.packetevents.protocol.item.trimpattern.TrimPattern;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
 
@@ -28,8 +30,20 @@ public class ArmorTrim {
 
     private TrimMaterial material;
     private TrimPattern pattern;
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     private boolean showInTooltip;
 
+    public ArmorTrim(TrimMaterial material, TrimPattern pattern) {
+        this(material, pattern, true);
+    }
+
+    /**
+     * {@link #showInTooltip} has been removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public ArmorTrim(TrimMaterial material, TrimPattern pattern, boolean showInTooltip) {
         this.material = material;
         this.pattern = pattern;
@@ -39,14 +53,16 @@ public class ArmorTrim {
     public static ArmorTrim read(PacketWrapper<?> wrapper) {
         TrimMaterial material = TrimMaterial.read(wrapper);
         TrimPattern pattern = TrimPattern.read(wrapper);
-        boolean showInTooltip = wrapper.readBoolean();
+        boolean showInTooltip = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5) || wrapper.readBoolean();
         return new ArmorTrim(material, pattern, showInTooltip);
     }
 
     public static void write(PacketWrapper<?> wrapper, ArmorTrim trim) {
         TrimMaterial.write(wrapper, trim.material);
         TrimPattern.write(wrapper, trim.pattern);
-        wrapper.writeBoolean(trim.showInTooltip);
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
+            wrapper.writeBoolean(trim.showInTooltip);
+        }
     }
 
     public TrimMaterial getMaterial() {
@@ -65,10 +81,18 @@ public class ArmorTrim {
         this.pattern = pattern;
     }
 
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public boolean isShowInTooltip() {
         return this.showInTooltip;
     }
 
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public void setShowInTooltip(boolean showInTooltip) {
         this.showInTooltip = showInTooltip;
     }

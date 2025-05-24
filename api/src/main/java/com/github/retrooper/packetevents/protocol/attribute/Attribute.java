@@ -18,7 +18,35 @@
 
 package com.github.retrooper.packetevents.protocol.attribute;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.MathUtil;
 
 public interface Attribute extends MappedEntity {
+
+    @Override
+    default ResourceLocation getName() {
+        return this.getName(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+    }
+
+    ResourceLocation getName(ClientVersion version);
+
+    default double sanitizeValue(double value) {
+        return this.sanitizeValue(value, PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+    }
+
+    default double sanitizeValue(double value, ClientVersion version) {
+        if (!Double.isNaN(value)) {
+            return MathUtil.clamp(value, this.getMinValue(), this.getMaxValue());
+        }
+        return this.getMinValue();
+    }
+
+    double getDefaultValue();
+
+    double getMinValue();
+
+    double getMaxValue();
 }

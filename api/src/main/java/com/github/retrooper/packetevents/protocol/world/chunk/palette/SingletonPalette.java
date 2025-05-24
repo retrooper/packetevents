@@ -19,19 +19,29 @@
 package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
-import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
-
-import java.io.IOException;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
+ * Added with 1.18
+ * <p>
  * A palette containing one state.
  * Credit to MCProtocolLib
  */
 public class SingletonPalette implements Palette {
+
     private final int state;
 
+    @Deprecated
     public SingletonPalette(NetStreamInput in) {
-        this.state = in.readVarInt();
+        this(in.readVarInt());
+    }
+
+    public SingletonPalette(PacketWrapper<?> wrapper) {
+        this(wrapper.readVarInt());
+    }
+
+    public SingletonPalette(int state) {
+        this.state = state;
     }
 
     @Override
@@ -52,6 +62,11 @@ public class SingletonPalette implements Palette {
         if (id == 0) {
             return this.state;
         }
+        return 0;
+    }
+
+    @Override
+    public int getBits() {
         return 0;
     }
 }

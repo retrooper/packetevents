@@ -23,10 +23,10 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.ColorUtil;
 import com.github.retrooper.packetevents.util.LegacyFormat;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -41,7 +41,10 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     private Optional<ScoreBoardTeamInfo> teamInfo;
 
     public enum OptionData {
-        NONE((byte) 0x00), FRIENDLY_FIRE((byte) 0x01), FRIENDLY_CAN_SEE_INVISIBLE((byte) 0x02), ALL((byte) 0x03);
+        NONE((byte) 0x00),
+        FRIENDLY_FIRE((byte) 0x01),
+        FRIENDLY_CAN_SEE_INVISIBLE((byte) 0x02),
+        ALL((byte) 0x03);
 
         private static final OptionData[] VALUES = values();
         private final byte byteValue;
@@ -66,7 +69,10 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     }
 
     public enum NameTagVisibility {
-        ALWAYS("always"), NEVER("never"), HIDE_FOR_OTHER_TEAMS("hideForOtherTeams"), HIDE_FOR_OWN_TEAM("hideForOwnTeam");
+        ALWAYS("always"),
+        NEVER("never"),
+        HIDE_FOR_OTHER_TEAMS("hideForOtherTeams"),
+        HIDE_FOR_OWN_TEAM("hideForOwnTeam");
 
         private final String id;
 
@@ -90,7 +96,10 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     }
 
     public enum CollisionRule {
-        ALWAYS("always"), NEVER("never"), PUSH_OTHER_TEAMS("pushOtherTeams"), PUSH_OWN_TEAM("pushOwnTeam");
+        ALWAYS("always"),
+        NEVER("never"),
+        PUSH_OTHER_TEAMS("pushOtherTeams"),
+        PUSH_OWN_TEAM("pushOwnTeam");
 
         private final String id;
 
@@ -115,7 +124,11 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     }
 
     public enum TeamMode {
-        CREATE, REMOVE, UPDATE, ADD_ENTITIES, REMOVE_ENTITIES;
+        CREATE,
+        REMOVE,
+        UPDATE,
+        ADD_ENTITIES,
+        REMOVE_ENTITIES;
     }
 
     public WrapperPlayServerTeams(PacketSendEvent event) {
@@ -161,17 +174,19 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
             CollisionRule collisionRule = null;
             NamedTextColor color;
             if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-                displayName = AdventureSerializer.fromLegacyFormat(readString(32));
-                prefix = AdventureSerializer.fromLegacyFormat(readString(16));
-                suffix = AdventureSerializer.fromLegacyFormat(readString(16));
+                LegacyComponentSerializer serializer = this.getSerializers().legacy();
+                displayName = serializer.deserialize(this.readString(32));
+                prefix = serializer.deserialize(this.readString(16));
+                suffix = serializer.deserialize(this.readString(16));
                 optionData = OptionData.values()[readByte()];
                 if (serverVersion == ServerVersion.V_1_7_10) {
                     nameTagVisibility = NameTagVisibility.ALWAYS;
                     color = NamedTextColor.WHITE;
                 } else {
                     nameTagVisibility = NameTagVisibility.fromID(readString(32));
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9))
+                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
                         collisionRule = CollisionRule.fromID(readString(32));
+                    }
                     if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
                         // starting from 1.17, the color is sent with ColorFormatting enum ordinal
                         int colorId = readVarInt();
@@ -185,8 +200,13 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
             } else {
                 displayName = readComponent();
                 optionData = OptionData.fromValue(readByte());
-                nameTagVisibility = NameTagVisibility.fromID(readString(40));
-                collisionRule = CollisionRule.fromID(readString(40));
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+                    nameTagVisibility = this.readEnum(NameTagVisibility.class);
+                    collisionRule = this.readEnum(CollisionRule.class);
+                } else {
+                    nameTagVisibility = NameTagVisibility.fromID(this.readString(40));
+                    collisionRule = CollisionRule.fromID(this.readString(40));
+                }
                 color = ColorUtil.fromId(readByte());
                 prefix = readComponent();
                 suffix = readComponent();
@@ -216,9 +236,10 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
             ScoreBoardTeamInfo info = teamInfo.orElse(new ScoreBoardTeamInfo(Component.empty(), Component.empty(), Component.empty(), NameTagVisibility.ALWAYS, CollisionRule.ALWAYS, NamedTextColor.WHITE, OptionData.NONE));
             if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-                writeString(LegacyFormat.trimLegacyFormat(AdventureSerializer.asVanilla(info.displayName), 32));
-                writeString(LegacyFormat.trimLegacyFormat(AdventureSerializer.asVanilla(info.prefix), 16));
-                writeString(LegacyFormat.trimLegacyFormat(AdventureSerializer.asVanilla(info.suffix), 16));
+                LegacyComponentSerializer serializer = this.getSerializers().legacy();
+                writeString(LegacyFormat.trimLegacyFormat(serializer.serialize(info.displayName), 32));
+                writeString(LegacyFormat.trimLegacyFormat(serializer.serialize(info.prefix), 16));
+                writeString(LegacyFormat.trimLegacyFormat(serializer.serialize(info.suffix), 16));
                 writeByte(info.optionData.ordinal());
                 if (serverVersion == ServerVersion.V_1_7_10) {
                     writeString(NameTagVisibility.ALWAYS.getId(), 32);
@@ -232,8 +253,13 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
             } else {
                 writeComponent(info.displayName);
                 writeByte(info.optionData.getByteValue());
-                writeString(info.tagVisibility.id);
-                writeString(info.collisionRule.getId());
+                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+                    writeEnum(info.tagVisibility);
+                    writeEnum(info.collisionRule);
+                } else {
+                    writeString(info.tagVisibility.id);
+                    writeString(info.collisionRule.getId());
+                }
                 if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
                     int colorId = ColorUtil.getId(info.color);
                     if (colorId < 0)
@@ -270,7 +296,6 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
     public String getTeamName() {
         return teamName;
     }
-
 
     public void setTeamName(String teamName) {
         this.teamName = teamName;
@@ -381,7 +406,5 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         public void setOptionData(OptionData optionData) {
             this.optionData = optionData;
         }
-
     }
-
 }

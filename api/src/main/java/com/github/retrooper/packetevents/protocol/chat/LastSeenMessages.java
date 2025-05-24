@@ -1,5 +1,6 @@
 package com.github.retrooper.packetevents.protocol.chat;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.DataOutput;
@@ -86,12 +87,23 @@ public class LastSeenMessages {
     }
 
     public static class Update {
+
         private final int offset;
         private final BitSet acknowledged;
+        private final byte checksum;
 
+        /**
+         * Checksum has been added with 1.21.5
+         */
+        @ApiStatus.Obsolete
         public Update(int offset, BitSet acknowledged) {
+            this(offset, acknowledged, (byte) 0);
+        }
+
+        public Update(int offset, BitSet acknowledged, byte checksum) {
             this.offset = offset;
             this.acknowledged = acknowledged;
+            this.checksum = checksum;
         }
 
         public int getOffset() {
@@ -100,6 +112,13 @@ public class LastSeenMessages {
 
         public BitSet getAcknowledged() {
             return acknowledged;
+        }
+
+        /**
+         * Added with 1.21.5
+         */
+        public byte getChecksum() {
+            return this.checksum;
         }
     }
 }

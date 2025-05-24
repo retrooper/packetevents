@@ -1,33 +1,42 @@
-# packetevents
+<!--suppress HtmlDeprecatedAttribute -->
+<div align="center">
+    <h2><i>PacketEvents</i></h2>
+    <h3><i>A powerful networking library for Minecraft packet processing and manipulation.</i></h3>
+    <a href="https://github.com/retrooper/packetevents/actions"><img src="https://img.shields.io/github/actions/workflow/status/retrooper/packetevents/gradle-publish.yml?style=for-the-badge&logo=github"></a>
+    <a href="https://discord.gg/DVHxPPxHZc"><img src="https://img.shields.io/discord/721686193061888071?color=5562e9&logo=discord&logoColor=white&style=for-the-badge"></a>
+    <img src="https://img.shields.io/github/license/retrooper/packetevents?style=for-the-badge&logo=github">
+    <a href="https://bstats.org/plugin/bukkit/packetevents/11327"><img src="https://img.shields.io/bstats/servers/11327?style=for-the-badge"></a>
+    <a href="https://github.com/retrooper/packetevents/releases"><img src="https://img.shields.io/github/downloads/retrooper/packetevents/total.svg?style=for-the-badge&logo=github"></a>
+</div>
+<h3>Resources</h3>
 
-[![](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://github.com/retrooper/packetevents/blob/2.0/LICENSE) [![](https://github.com/retrooper/packetevents/actions/workflows/build.yml/badge.svg)](https://github.com/retrooper/packetevents/actions) [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/prqzNg9tRU)
+- [Read documentation](https://docs.packetevents.com/)
+    - [Getting Started](https://docs.packetevents.com/getting-started)
+    - [JavaDocs](https://javadocs.packetevents.com)
+- [Releases](https://github.com/retrooper/packetevents/releases/)
+    - [Modrinth](https://modrinth.com/plugin/packetevents)
+    - [GitHub](https://github.com/retrooper/packetevents/releases/)
+    - [SpigotMC](https://www.spigotmc.org/resources/packetevents-api.80279/)
+- [Development Builds](https://ci.codemc.io/job/retrooper/job/packetevents)
+- [Statistics](https://bstats.org/plugin/bukkit/packetevents/11327)
 
-PacketEvents is a fast and efficient multi-platform packet processing library. Our packet wrappers are easy to use with multi-version support. With our API you can write code that runs on Spigot, BungeeCord, Velocity, and Fabric! Switch to PacketEvents today by joining \
-our [Discord Server](https://discord.me/packetevents) for help.
+<h3>Sponsors</h3>
 
-### Links
-* [Find release builds on Modrinth](https://modrinth.com/plugin/packetevents)
-* [Find development builds on Jenkins](https://ci.codemc.io/job/retrooper/job/packetevents)
-* [View the JavaDocs Page](https://packetevents.github.io)
+<i>Thanks to the following sponsors for supporting this project:</i>
 
-### Setup
-[How to Setup PacketEvents](https://github.com/retrooper/packetevents/wiki/Depending-on-pre%E2%80%90built-PacketEvents)
+<a href="https://pebblehost.com"><img src="https://pebblehost.com/src/img/logos/main-old.png" width=150><br>
 
-### Examples / How to use PacketEvents
-[Example repository](https://github.com/retrooper/packetevents-example)
+<a href="https://www.ej-technologies.com"><img src="https://www.ej-technologies.com/images/product_banners/jprofiler_small.png"><br>
 
-### Sponsorships
-[![](https://www.ej-technologies.com/images/product_banners/jprofiler_small.png)](https://www.ej-technologies.com/products/jprofiler/overview.html)
+<a href="https://github.com/radstevee"><img src="https://github.com/radstevee.png" width="50px" alt="radstevee"/></a><br>
 
-### Statistics
-PacketEvents optionally collects statistics using [bStats](https://bstats.org/)\
-Check out our [bStats page](https://bstats.org/plugin/bukkit/packetevents/11327)
+<h3>Credits</h3>
 
-### Credit to these projects
-[wiki.vg/Protocol](https://wiki.vg/Protocol)\
-[netty](https://github.com/netty/netty)\
-[gson](https://github.com/google/gson)\
-[adventure](https://github.com/KyoriPowered/adventure)\
+<i>Here are some projects that we are heavily inspired by, thus we have integrated</i>\
+<i>small portions of their code into our work.</i>
+
+[Protocol Documentation for the Minecraft Java Edition](https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol)\
 [ViaVersion](https://github.com/ViaVersion/ViaVersion)\
 [ProtocolSupport](https://github.com/ProtocolSupport/ProtocolSupport)\
+[adventure](https://github.com/KyoriPowered/adventure)\
 [MCProtocolLib](https://github.com/GeyserMC/MCProtocolLib/)  

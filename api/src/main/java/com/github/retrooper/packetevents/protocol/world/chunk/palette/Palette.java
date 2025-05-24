@@ -28,6 +28,7 @@ package com.github.retrooper.packetevents.protocol.world.chunk.palette;
  * A palette for mapping block states to storage IDs.
  */
 public interface Palette {
+
     /**
      * Gets the number of block states known by this palette.
      *
@@ -52,4 +53,6 @@ public interface Palette {
      * @return The resulting block state.
      */
     int idToState(int id);
+
+    int getBits();
 }

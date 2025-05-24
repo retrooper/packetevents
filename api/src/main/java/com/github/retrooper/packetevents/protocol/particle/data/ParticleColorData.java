@@ -19,13 +19,21 @@
 package com.github.retrooper.packetevents.protocol.particle.data;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.color.AlphaColor;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class ParticleColorData extends ParticleData {
 
-    private int color;
+    private AlphaColor color;
 
     public ParticleColorData(int color) {
+        this(new AlphaColor(color));
+    }
+
+    public ParticleColorData(AlphaColor color) {
         this.color = color;
     }
 
@@ -36,15 +44,37 @@ public class ParticleColorData extends ParticleData {
 
     public static void write(PacketWrapper<?> wrapper, ParticleColorData data) {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            wrapper.writeInt(data.color);
+            wrapper.writeInt(data.color.asRGB());
+        }
+    }
+
+    public static ParticleColorData decode(NBTCompound compound, ClientVersion version) {
+        AlphaColor argb;
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            NBT colorTag = compound.getTagOrThrow("color");
+            argb = AlphaColor.decode(colorTag, version);
+        } else {
+            // no data to decode for <1.20.5
+            argb = AlphaColor.WHITE;
+        }
+        return new ParticleColorData(argb);
+    }
+
+    public static void encode(ParticleColorData data, ClientVersion version, NBTCompound compound) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            compound.setTag("color", AlphaColor.encode(data.color, version));
         }
     }
 
     public int getColor() {
-        return this.color;
+        return this.color.asRGB();
     }
 
     public void setColor(int color) {
+        this.color = new AlphaColor(color);
+    }
+
+    public void setAlphaColor(AlphaColor color) {
         this.color = color;
     }
 

@@ -19,10 +19,47 @@
 package com.github.retrooper.packetevents.protocol.world.states.enums;
 
 public enum Mode {
-    CORNER,
+
+    /**
+     * Only applies to comparators
+     */
     COMPARE,
-    DATA,
-    LOAD,
+    /**
+     * Only applies to comparators
+     */
+    SUBTRACT,
+
+    /**
+     * Only applies to structure blocks
+     */
     SAVE,
-    SUBTRACT
+    /**
+     * Only applies to structure blocks
+     */
+    LOAD,
+    /**
+     * Only applies to structure blocks
+     */
+    CORNER,
+    /**
+     * Only applies to structure blocks
+     */
+    DATA,
+
+    /**
+     * Added with 1.21.5, only applies to test blocks
+     */
+    START,
+    /**
+     * Added with 1.21.5, only applies to test blocks
+     */
+    LOG,
+    /**
+     * Added with 1.21.5, only applies to test blocks
+     */
+    FAIL,
+    /**
+     * Added with 1.21.5, only applies to test blocks
+     */
+    ACCEPT,
 }

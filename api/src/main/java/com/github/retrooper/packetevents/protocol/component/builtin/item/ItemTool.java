@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
@@ -32,24 +33,37 @@ public class ItemTool {
     private List<Rule> rules;
     private float defaultMiningSpeed;
     private int damagePerBlock;
+    /**
+     * Added with 1.21.5
+     */
+    private boolean canDestroyBlocksInCreative;
 
     public ItemTool(List<Rule> rules, float defaultMiningSpeed, int damagePerBlock) {
+        this(rules, defaultMiningSpeed, damagePerBlock, true);
+    }
+
+    public ItemTool(List<Rule> rules, float defaultMiningSpeed, int damagePerBlock, boolean canDestroyBlocksInCreative) {
         this.rules = rules;
         this.defaultMiningSpeed = defaultMiningSpeed;
         this.damagePerBlock = damagePerBlock;
+        this.canDestroyBlocksInCreative = canDestroyBlocksInCreative;
     }
 
     public static ItemTool read(PacketWrapper<?> wrapper) {
         List<Rule> rules = wrapper.readList(Rule::read);
         float defaultMiningSpeed = wrapper.readFloat();
         int damagePerBlock = wrapper.readVarInt();
-        return new ItemTool(rules, defaultMiningSpeed, damagePerBlock);
+        boolean canDestroyBlocksInCreative = wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5) || wrapper.readBoolean();
+        return new ItemTool(rules, defaultMiningSpeed, damagePerBlock, canDestroyBlocksInCreative);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemTool tool) {
         wrapper.writeList(tool.rules, Rule::write);
         wrapper.writeFloat(tool.defaultMiningSpeed);
         wrapper.writeVarInt(tool.damagePerBlock);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+            wrapper.writeBoolean(tool.canDestroyBlocksInCreative);
+        }
     }
 
     public void addRule(Rule rule) {
@@ -80,6 +94,20 @@ public class ItemTool {
         this.damagePerBlock = damagePerBlock;
     }
 
+    /**
+     * Added with 1.21.5
+     */
+    public boolean isCanDestroyBlocksInCreative() {
+        return this.canDestroyBlocksInCreative;
+    }
+
+    /**
+     * Added with 1.21.5
+     */
+    public void setCanDestroyBlocksInCreative(boolean canDestroyBlocksInCreative) {
+        this.canDestroyBlocksInCreative = canDestroyBlocksInCreative;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -87,12 +115,13 @@ public class ItemTool {
         ItemTool itemTool = (ItemTool) obj;
         if (Float.compare(itemTool.defaultMiningSpeed, this.defaultMiningSpeed) != 0) return false;
         if (this.damagePerBlock != itemTool.damagePerBlock) return false;
-        return this.rules.equals(itemTool.rules);
+        if (!this.rules.equals(itemTool.rules)) return false;
+        return this.canDestroyBlocksInCreative == itemTool.canDestroyBlocksInCreative;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.rules, this.defaultMiningSpeed, this.damagePerBlock);
+        return Objects.hash(this.rules, this.defaultMiningSpeed, this.damagePerBlock, this.canDestroyBlocksInCreative);
     }
 
     public static class Rule {

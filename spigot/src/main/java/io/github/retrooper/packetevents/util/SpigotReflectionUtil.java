@@ -97,7 +97,7 @@ public final class SpigotReflectionUtil {
     public static Class<?> MINECRAFT_SERVER_CLASS, NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS,
             NMS_IMATERIAL_CLASS, NMS_ENTITY_CLASS, ENTITY_PLAYER_CLASS, BOUNDING_BOX_CLASS, NMS_MINECRAFT_KEY_CLASS,
             ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS, NMS_ENUM_PARTICLE_CLASS,
-            MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, NMS_WORLD_CLASS, WORLD_SERVER_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
+            MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, LEVEL_CLASS, SERVER_LEVEL_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
             GAME_PROFILE_CLASS, CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS, CRAFT_PARTICLE_CLASS,
             LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
             BLOCK_CLASS, CRAFT_BLOCK_DATA_CLASS, PROPERTY_MAP_CLASS, DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, MOJANG_ENCODER_CLASS, DATA_RESULT_CLASS,
@@ -138,7 +138,7 @@ public final class SpigotReflectionUtil {
     private static Object DIMENSION_TYPE_REGISTRY_KEY;
 
     private static boolean PAPER_ENTITY_LOOKUP_EXISTS = false;
-    private static boolean PAPER_ENTITY_LOOKUP_LEGACY = false;
+    private static boolean PAPER_ENTITY_LOOKUP_LEGACY = true;
 
     private static boolean IS_OBFUSCATED;
 
@@ -184,18 +184,18 @@ public final class SpigotReflectionUtil {
         if (DIMENSION_MANAGER_CLASS != null) {
             if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16
                     || PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16_1) {
-                GET_DIMENSION_KEY = Reflection.getMethod(NMS_WORLD_CLASS, "getTypeKey", 0);
+                GET_DIMENSION_KEY = Reflection.getMethod(LEVEL_CLASS, "getTypeKey", 0);
             }
-            GET_DIMENSION_MANAGER = Reflection.getMethod(NMS_WORLD_CLASS, DIMENSION_MANAGER_CLASS, 0);
+            GET_DIMENSION_MANAGER = Reflection.getMethod(LEVEL_CLASS, DIMENSION_MANAGER_CLASS, 0);
             GET_DIMENSION_ID = Reflection.getMethod(DIMENSION_MANAGER_CLASS, int.class, 0);
         }
         CODEC_ENCODE_METHOD = Reflection.getMethod(MOJANG_ENCODER_CLASS, "encodeStart", 0);
         DATA_RESULT_GET_METHOD = Reflection.getMethod(DATA_RESULT_CLASS, "result", 0);
         String entityIdMethodName = VERSION.isOlderThan(ServerVersion.V_1_9) ? "a" :
                 VERSION.isOlderThan(ServerVersion.V_1_17) ? "getEntity" : "b";
-        GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(WORLD_SERVER_CLASS, entityIdMethodName, NMS_ENTITY_CLASS, int.class);
+        GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(SERVER_LEVEL_CLASS, entityIdMethodName, NMS_ENTITY_CLASS, int.class);
         if (GET_ENTITY_BY_ID_METHOD == null) {
-            GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(WORLD_SERVER_CLASS, "getEntity", NMS_ENTITY_CLASS, int.class);
+            GET_ENTITY_BY_ID_METHOD = Reflection.getMethodExact(SERVER_LEVEL_CLASS, "getEntity", NMS_ENTITY_CLASS, int.class);
         }
 
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
@@ -293,15 +293,15 @@ public final class SpigotReflectionUtil {
         }
         DIMENSION_CODEC_FIELD = Reflection.getField(DIMENSION_MANAGER_CLASS, MOJANG_CODEC_CLASS, 0);
         DYNAMIC_OPS_NBT_INSTANCE_FIELD = Reflection.getField(DYNAMIC_OPS_NBT_CLASS, DYNAMIC_OPS_NBT_CLASS, 0);
-        CHUNK_PROVIDER_SERVER_FIELD = Reflection.getField(WORLD_SERVER_CLASS, CHUNK_PROVIDER_SERVER_CLASS, 0);
+        CHUNK_PROVIDER_SERVER_FIELD = Reflection.getField(SERVER_LEVEL_CLASS, CHUNK_PROVIDER_SERVER_CLASS, 0);
         if (CHUNK_PROVIDER_SERVER_FIELD == null) {
-            CHUNK_PROVIDER_SERVER_FIELD = Reflection.getField(WORLD_SERVER_CLASS, ICHUNKPROVIDER_CLASS, 0);
+            CHUNK_PROVIDER_SERVER_FIELD = Reflection.getField(SERVER_LEVEL_CLASS, ICHUNKPROVIDER_CLASS, 0);
         }
 
-        PAPER_ENTITY_LOOKUP_EXISTS = Reflection.getField(WORLD_SERVER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) != null;
+        PAPER_ENTITY_LOOKUP_EXISTS = Reflection.getField(SERVER_LEVEL_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) != null;
         if (PAPER_ENTITY_LOOKUP_EXISTS) {
             //It's not inside the Level class (NMS World) class, which is how it was on < 1.21 Paper
-            PAPER_ENTITY_LOOKUP_LEGACY = Reflection.getField(NMS_WORLD_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) == null;
+            PAPER_ENTITY_LOOKUP_LEGACY = Reflection.getField(LEVEL_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) == null;
         }
     }
 
@@ -328,8 +328,8 @@ public final class SpigotReflectionUtil {
         MOB_EFFECT_LIST_CLASS = getServerClass(IS_OBFUSCATED ? "world.effect.MobEffectList" : "world.effect.MobEffect", "MobEffectList");
         NMS_ITEM_CLASS = getServerClass("world.item.Item", "Item");
         DEDICATED_SERVER_CLASS = getServerClass("server.dedicated.DedicatedServer", "DedicatedServer");
-        NMS_WORLD_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.World" : "world.level.Level", "World");
-        WORLD_SERVER_CLASS = getServerClass(IS_OBFUSCATED ? "server.level.WorldServer" : "server.level.ServerLevel", "WorldServer");
+        LEVEL_CLASS = getServerClass(IS_OBFUSCATED ? "world.level.World" : "world.level.Level", "World");
+        SERVER_LEVEL_CLASS = getServerClass(IS_OBFUSCATED ? "server.level.WorldServer" : "server.level.ServerLevel", "WorldServer");
         ENUM_PROTOCOL_DIRECTION_CLASS = getServerClass(IS_OBFUSCATED ? "network.protocol.EnumProtocolDirection" : "network.protocol.PacketFlow", "EnumProtocolDirection");
         if (V_1_17_OR_HIGHER) {
             LEVEL_ENTITY_GETTER_CLASS = getServerClass("world.level.entity.LevelEntityGetter", "");
@@ -800,27 +800,33 @@ public final class SpigotReflectionUtil {
 
     public static com.github.retrooper.packetevents.protocol.item.ItemStack decodeBukkitItemStack(ItemStack in) {
         Object buffer = PooledByteBufAllocator.DEFAULT.buffer();
-        //3 reflection calls
-        Object packetDataSerializer = createPacketDataSerializer(buffer);
-        Object nmsItemStack = toNMSItemStack(in);
-        writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
-        //No more reflection from here on.
-        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
-        com.github.retrooper.packetevents.protocol.item.ItemStack stack = wrapper.readItemStack();
-        ByteBufHelper.release(buffer);
-        return stack;
+        try {
+            // 3 reflection calls
+            Object packetDataSerializer = createPacketDataSerializer(buffer);
+            Object nmsItemStack = toNMSItemStack(in);
+            writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
+            // No more reflection from here on.
+            PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
+            com.github.retrooper.packetevents.protocol.item.ItemStack stack = wrapper.readItemStack();
+            return stack;
+        } finally {
+            ByteBufHelper.release(buffer);
+        }
     }
 
     public static ItemStack encodeBukkitItemStack(com.github.retrooper.packetevents.protocol.item.ItemStack in) {
         Object buffer = PooledByteBufAllocator.DEFAULT.buffer();
-        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
-        wrapper.writeItemStack(in);
-        //3 reflection calls
-        Object packetDataSerializer = createPacketDataSerializer(wrapper.getBuffer());
-        Object nmsItemStack = readNMSItemStackPacketDataSerializer(packetDataSerializer);
-        ItemStack stack = toBukkitItemStack(nmsItemStack);
-        ByteBufHelper.release(buffer);
-        return stack;
+        try {
+            PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
+            wrapper.writeItemStack(in);
+            // 3 reflection calls
+            Object packetDataSerializer = createPacketDataSerializer(wrapper.getBuffer());
+            Object nmsItemStack = readNMSItemStackPacketDataSerializer(packetDataSerializer);
+            ItemStack stack = toBukkitItemStack(nmsItemStack);
+            return stack;
+        } finally {
+            ByteBufHelper.release(buffer);
+        }
     }
 
     public static int getBlockDataCombinedId(MaterialData materialData) {
@@ -1020,55 +1026,51 @@ public final class SpigotReflectionUtil {
         return null;
     }
 
-    private static Entity getEntityByIdWithWorldUnsafe(World world, int id) {
+    private static @Nullable Entity getEntityByIdWithWorldUnsafe(World world, int id) {
         if (world == null) {
             return null;
         }
-        Entity e = ENTITY_ID_CACHE.getOrDefault(id, null);
-        if (e != null) {
-            return e;
+        Entity cachedEntity = ENTITY_ID_CACHE.getOrDefault(id, null);
+        if (cachedEntity != null) {
+            return cachedEntity;
         }
         try {
-            Object worldServer = GET_CRAFT_WORLD_HANDLE_METHOD.invoke(world);
+            Object serverLevel = GET_CRAFT_WORLD_HANDLE_METHOD.invoke(world);
             Object nmsEntity;
             //On 1.17 we need this to bypass
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
-                ReflectionObject reflectWorldServer = new ReflectionObject(worldServer);
+                ReflectionObject reflectObj = PAPER_ENTITY_LOOKUP_LEGACY
+                        ? new ReflectionObject(serverLevel, SERVER_LEVEL_CLASS)
+                        : new ReflectionObject(serverLevel, LEVEL_CLASS);
                 Object levelEntityGetter;
                 if (PAPER_ENTITY_LOOKUP_EXISTS) {
-                    if (!PAPER_ENTITY_LOOKUP_LEGACY) {
-                        //Check in the correct class!
-                        reflectWorldServer = new ReflectionObject(worldServer, NMS_WORLD_CLASS);
-                    }
-                    levelEntityGetter = reflectWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
+                    levelEntityGetter = reflectObj.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
                 } else {
-                    Object entitySectionManager = reflectWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
+                    Object entitySectionManager = reflectObj.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
                     ReflectionObject reflectEntitySectionManager = new ReflectionObject(entitySectionManager);
                     levelEntityGetter = reflectEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
                 }
                 nmsEntity = GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD.invoke(levelEntityGetter, id);
             } else {
-                nmsEntity = GET_ENTITY_BY_ID_METHOD.invoke(worldServer, id);
+                nmsEntity = GET_ENTITY_BY_ID_METHOD.invoke(serverLevel, id);
             }
             if (nmsEntity == null) {
                 return null;
             }
-            e = getBukkitEntity(nmsEntity);
-            ENTITY_ID_CACHE.put(id, e);
-            return e;
-        } catch (IllegalAccessException | InvocationTargetException ex) {
-            ex.printStackTrace();
+            Entity entity = getBukkitEntity(nmsEntity);
+            ENTITY_ID_CACHE.put(id, entity);
+            return entity;
+        } catch (IllegalAccessException | InvocationTargetException exception) {
+            throw new RuntimeException("Error while looking up entity by id " + id + " in " + world, exception);
         }
-        return null;
     }
 
-    @Nullable
-    @ApiStatus.Internal
     /**
      * Get the entity by the id.
      * @deprecated Please resort to {@link SpigotConversionUtil#getEntityById(World, int)} since the reflection util is not API.
      */
-    public static Entity getEntityById(@Nullable World origin, int id) {
+    @Deprecated
+    public static @Nullable Entity getEntityById(@Nullable World origin, int id) {
         if (origin != null) {
             Entity e = getEntityByIdWithWorldUnsafe(origin, id);
             if (e != null) {
@@ -1085,13 +1087,12 @@ public final class SpigotReflectionUtil {
         return null;
     }
 
-    @Nullable
-    @Deprecated
     /**
      * Get the entity by the id.
      * @deprecated Please resort to {@link SpigotConversionUtil#getEntityById(World, int)} since the reflection util is not API.
      */
-    public static Entity getEntityById(int entityID) {
+    @Deprecated
+    public static @Nullable Entity getEntityById(int entityID) {
         return getEntityById(null, entityID);
     }
 
@@ -1103,7 +1104,7 @@ public final class SpigotReflectionUtil {
             if (PAPER_ENTITY_LOOKUP_EXISTS) {
                 if (!PAPER_ENTITY_LOOKUP_LEGACY) {
                     //Check in the correct class!
-                    wrappedWorldServer = new ReflectionObject(worldServer, NMS_WORLD_CLASS);
+                    wrappedWorldServer = new ReflectionObject(worldServer, LEVEL_CLASS);
                 }
                 levelEntityGetter = wrappedWorldServer.readObject(0, PAPER_ENTITY_LOOKUP_CLASS);
             } else {

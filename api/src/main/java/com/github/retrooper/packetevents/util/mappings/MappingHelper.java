@@ -26,21 +26,27 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import java.util.zip.GZIPInputStream;
 
+@ApiStatus.Internal
 public class MappingHelper {
 
     public static SequentialNBTReader.Compound decompress(final String path) {
         try {
             final DataInputStream dataInput = new DataInputStream(new GZIPInputStream(new BufferedInputStream(
-                    PacketEvents.getAPI().getSettings().getResourceProvider().apply( "assets/" + path + ".nbt"))));
+                    PacketEvents.getAPI().getSettings().getResourceProvider().apply("assets/" + path + ".nbt"))));
             return (SequentialNBTReader.Compound) SequentialNBTReader.INSTANCE.deserializeTag(NBTLimiter.noop(), dataInput);
         } catch (IOException e) {
             throw new RuntimeException("Cannot find resource file " + path + ".nbt", e);
@@ -103,12 +109,18 @@ public class MappingHelper {
         return diffs;
     }
 
-    public static  <T extends MappedEntity> void registerMapping(TypesBuilder builder, Map<String, T> typeMap, Map<Byte, Map<Integer, T>> typeIdMap, T type) {
-        typeMap.put(type.getName().toString(), type);
+    public static <T extends MappedEntity> void registerMapping(
+            TypesBuilder builder,
+            Map<String, T> typeMap,
+            Map<Byte, Map<Integer, T>> typeIdMap,
+            TypesBuilderData typeData,
+            T type
+    ) {
+        typeMap.put(typeData.getName().toString(), type);
         for (ClientVersion version : builder.getVersions()) {
             int index = builder.getDataIndex(version);
             Map<Integer, T> idMap = typeIdMap.computeIfAbsent((byte) index, k -> new HashMap<>());
-            idMap.put(type.getId(version), type);
+            idMap.put(typeData.getId(version), type);
         }
     }
 

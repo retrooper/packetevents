@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Not to be confused with {@link WrapperPlayClientSteerBoat}
@@ -28,8 +29,12 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
  * This packet is for sending player inputs to the server
  * <p>
  * On 1.8 and older, vehicle control is server sided.  This packet includes inputs for movement.
- * On 1.9 and newer, plugins may use this packet to create vehicles out of ordinary entities.
+ * On 1.9 to 1.21.2, plugins may use this packet to create vehicles out of ordinary entities.
+ * <p>
+ * Starting with 1.21.2, the server sends all movement inputs
+ * using the {@link WrapperPlayClientPlayerInput} packet instead.
  */
+@ApiStatus.Obsolete
 public class WrapperPlayClientSteerVehicle extends PacketWrapper<WrapperPlayClientSteerVehicle> {
     private float sideways;
     private float forward;

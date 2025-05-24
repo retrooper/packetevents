@@ -18,13 +18,18 @@
 
 package com.github.retrooper.packetevents.protocol.mapper;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 /**
@@ -54,6 +59,10 @@ public class MappedEntitySet<T> {
         this.entities = entities;
     }
 
+    public static <Z extends MappedEntity> MappedEntitySet<Z> createEmpty() {
+        return new MappedEntitySet<>(new ArrayList<>(0));
+    }
+
     public static <Z extends MappedEntity> MappedEntitySet<Z> read(
             PacketWrapper<?> wrapper, BiFunction<ClientVersion, Integer, Z> getter) {
         int count = wrapper.readVarInt() - 1;
@@ -69,7 +78,7 @@ public class MappedEntitySet<T> {
 
     public static <Z extends MappedEntity> void write(PacketWrapper<?> wrapper, MappedEntitySet<Z> set) {
         if (set.tagKey != null) {
-            wrapper.writeByte(0);
+            wrapper.writeVarInt(0);
             wrapper.writeIdentifier(set.tagKey);
             return;
         }
@@ -79,5 +88,76 @@ public class MappedEntitySet<T> {
         for (Z entity : set.entities) {
             wrapper.writeMappedEntity(entity);
         }
+    }
+
+    public static <Z extends MappedEntity> MappedEntitySet<Z> decode(
+            NBT nbt, ClientVersion version, IRegistry<Z> registry) {
+        List<Z> list;
+        if (nbt instanceof NBTString) {
+            String singleEntry = ((NBTString) nbt).getValue();
+            // check whether this is a tag key or a single-entry list
+            if (!singleEntry.isEmpty() && singleEntry.charAt(0) == '#') {
+                String tagName = singleEntry.substring(1);
+                ResourceLocation tagKey = new ResourceLocation(tagName);
+                return new MappedEntitySet<>(tagKey);
+            }
+            // single entry list
+            list = new ArrayList<>(1);
+            ResourceLocation key = new ResourceLocation(singleEntry);
+            list.add(registry.getByNameOrThrow(key));
+        } else {
+            // assume it's a list
+            NBTList<?> listTag = (NBTList<?>) nbt;
+            list = new ArrayList<>(listTag.size());
+            for (NBT tag : listTag.getTags()) {
+                ResourceLocation key = new ResourceLocation(((NBTString) tag).getValue());
+                list.add(registry.getByNameOrThrow(key));
+            }
+        }
+        return new MappedEntitySet<>(list);
+    }
+
+    public static <Z extends MappedEntity> NBT encode(MappedEntitySet<Z> set, ClientVersion version) {
+        if (set.tagKey != null) {
+            return new NBTString("#" + set.tagKey);
+        }
+
+        assert set.entities != null; // can't be null, verified in ctor
+        NBTList<NBTString> listTag = NBTList.createStringList();
+        for (Z entity : set.entities) {
+            listTag.addTag(new NBTString(entity.getName().toString()));
+        }
+        return listTag;
+    }
+
+    public boolean isEmpty() {
+        return this.entities != null && this.entities.isEmpty();
+    }
+
+    public @Nullable ResourceLocation getTagKey() {
+        return this.tagKey;
+    }
+
+    public @Nullable List<T> getEntities() {
+        return this.entities;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof MappedEntitySet)) return false;
+        MappedEntitySet<?> that = (MappedEntitySet<?>) obj;
+        if (!Objects.equals(this.tagKey, that.tagKey)) return false;
+        return Objects.equals(this.entities, that.entities);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.tagKey, this.entities);
+    }
+
+    @Override
+    public String toString() {
+        return "MappedEntitySet{tagKey=" + this.tagKey + ", entities=" + this.entities + '}';
     }
 }

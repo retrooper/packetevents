@@ -35,8 +35,10 @@ public class WrapperPlayServerSetTitleSubtitle extends PacketWrapper<WrapperPlay
         super(event);
     }
 
+    @Deprecated
     public WrapperPlayServerSetTitleSubtitle(String subtitleJson) {
-        this(AdventureSerializer.parseComponent(subtitleJson));
+        super(PacketType.Play.Server.SET_TITLE_SUBTITLE);
+        this.subtitle = this.getSerializers().fromJson(subtitleJson);
     }
 
     public WrapperPlayServerSetTitleSubtitle(Component subtitle) {
@@ -69,11 +71,11 @@ public class WrapperPlayServerSetTitleSubtitle extends PacketWrapper<WrapperPlay
 
     @Deprecated
     public String getSubtitleJson() {
-        return AdventureSerializer.toJson(this.getSubtitle());
+        return this.getSerializers().asJson(this.getSubtitle());
     }
 
     @Deprecated
     public void setSubtitleJson(String subtitleJson) {
-        this.setSubtitle(AdventureSerializer.parseComponent(subtitleJson));
+        this.setSubtitle(this.getSerializers().fromJson(subtitleJson));
     }
 }

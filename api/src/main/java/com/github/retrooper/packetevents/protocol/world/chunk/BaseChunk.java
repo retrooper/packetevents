@@ -64,13 +64,14 @@ public interface BaseChunk {
     boolean isEmpty();
 
     static BaseChunk create() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_18)) {
             return new Chunk_v1_18();
-        } else if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            return new Chunk_v1_9(0, DataPalette.createForChunk());
-        } else if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+        } else if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+            return new Chunk_v1_9(0, PaletteType.CHUNK.create());
+        } else if (version.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             return new Chunk_v1_9(0, new DataPalette(new ListPalette(4), new LegacyFlexibleStorage(4, 4096), PaletteType.CHUNK));
-        } else if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8)) {
+        } else if (version.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             return new Chunk_v1_8(new ShortArray3d(4096), null, null);
         }
         return new Chunk_v1_7(false, true);

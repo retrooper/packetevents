@@ -19,11 +19,13 @@
 package com.github.retrooper.packetevents.protocol.particle.data;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class ParticleBlockStateData extends ParticleData implements LegacyConvertible {
+
     private WrappedBlockState blockState;
 
     public ParticleBlockStateData(WrappedBlockState blockState) {
@@ -42,11 +44,9 @@ public class ParticleBlockStateData extends ParticleData implements LegacyConver
         int blockID;
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
             blockID = wrapper.readVarInt();
-        }
-        else if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+        } else if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
             blockID = wrapper.readInt();
-        }
-        else {
+        } else {
             blockID = wrapper.readVarInt();
         }
         return new ParticleBlockStateData(WrappedBlockState.getByGlobalId(wrapper.getServerVersion()
@@ -56,10 +56,20 @@ public class ParticleBlockStateData extends ParticleData implements LegacyConver
     public static void write(PacketWrapper<?> wrapper, ParticleBlockStateData data) {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
             wrapper.writeVarInt(data.getBlockState().getGlobalId());
-        }
-        else {
+        } else {
             wrapper.writeInt(data.getBlockState().getGlobalId());
         }
+    }
+
+    public static ParticleBlockStateData decode(NBTCompound compound, ClientVersion version) {
+        String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "block_state" : "value";
+        WrappedBlockState state = WrappedBlockState.decode(compound.getTagOrThrow(key), version);
+        return new ParticleBlockStateData(state);
+    }
+
+    public static void encode(ParticleBlockStateData data, ClientVersion version, NBTCompound compound) {
+        String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "block_state" : "value";
+        compound.setTag(key, WrappedBlockState.encode(data.blockState, version));
     }
 
     @Override

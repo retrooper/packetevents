@@ -20,9 +20,9 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<WrapperPlayServerPlayerListHeaderAndFooter> {
 
@@ -38,7 +38,10 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
 
     @Deprecated
     public WrapperPlayServerPlayerListHeaderAndFooter(String headerJson, String footerJson) {
-        this(AdventureSerializer.parseComponent(headerJson), AdventureSerializer.parseComponent(footerJson));
+        super(PacketType.Play.Server.PLAYER_LIST_HEADER_AND_FOOTER);
+        GsonComponentSerializer gson = this.getSerializers().gson();
+        this.header = gson.deserializeOrNull(headerJson);
+        this.footer = gson.deserializeOrNull(footerJson);
     }
 
     public WrapperPlayServerPlayerListHeaderAndFooter(Component header, Component footer) {
@@ -83,22 +86,22 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
 
     @Deprecated
     public String getHeaderJson() {
-        return AdventureSerializer.toJson(this.getHeader());
+        return this.getSerializers().asJson(this.getHeader());
     }
 
     @Deprecated
     public void setHeaderJson(String headerJson) {
-        this.setHeader(AdventureSerializer.parseComponent(headerJson));
+        this.setHeader(this.getSerializers().fromJson(headerJson));
     }
 
     @Deprecated
     public String getFooterJson() {
-        return AdventureSerializer.toJson(this.getFooter());
+        return this.getSerializers().asJson(this.getFooter());
     }
 
     @Deprecated
     public void setFooterJson(String footerJson) {
-        this.setFooter(AdventureSerializer.parseComponent(footerJson));
+        this.setFooter(this.getSerializers().fromJson(footerJson));
     }
 
     @Deprecated

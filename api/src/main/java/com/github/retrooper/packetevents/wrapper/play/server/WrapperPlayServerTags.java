@@ -53,7 +53,9 @@ public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> 
             this.tags.put(ResourceLocation.minecraft("block"), this.readList(Tag::read));
             this.tags.put(ResourceLocation.minecraft("item"), this.readList(Tag::read));
             this.tags.put(ResourceLocation.minecraft("fluid"), this.readList(Tag::read));
-            this.tags.put(ResourceLocation.minecraft("entity_type"), this.readList(Tag::read));
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+                this.tags.put(ResourceLocation.minecraft("entity_type"), this.readList(Tag::read));
+            }
         }
     }
 
@@ -67,7 +69,9 @@ public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> 
             this.writeList(this.tags.get(ResourceLocation.minecraft("block")), Tag::write);
             this.writeList(this.tags.get(ResourceLocation.minecraft("item")), Tag::write);
             this.writeList(this.tags.get(ResourceLocation.minecraft("fluid")), Tag::write);
-            this.writeList(this.tags.get(ResourceLocation.minecraft("entity_type")), Tag::write);
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+                this.writeList(this.tags.get(ResourceLocation.minecraft("entity_type")), Tag::write);
+            }
         }
     }
 

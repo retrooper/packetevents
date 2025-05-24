@@ -21,9 +21,9 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -64,8 +64,15 @@ public class WrapperPlayServerTitle extends PacketWrapper<WrapperPlayServerTitle
     @Deprecated
     public WrapperPlayServerTitle(TitleAction action, @Nullable String titleJson, @Nullable String subtitleJson,
                                   @Nullable String actionBarJson, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        this(action, AdventureSerializer.parseComponent(titleJson), AdventureSerializer.parseComponent(subtitleJson),
-                AdventureSerializer.parseComponent(actionBarJson), fadeInTicks, stayTicks, fadeOutTicks);
+        super(PacketType.Play.Server.TITLE);
+        this.action = action;
+        GsonComponentSerializer gson = this.getSerializers().gson();
+        this.title = gson.deserializeOrNull(titleJson);
+        this.subtitle = gson.deserializeOrNull(subtitleJson);
+        this.actionBar = gson.deserializeOrNull(actionBarJson);
+        this.fadeInTicks = fadeInTicks;
+        this.stayTicks = stayTicks;
+        this.fadeOutTicks = fadeOutTicks;
     }
 
     @Override
@@ -147,12 +154,12 @@ public class WrapperPlayServerTitle extends PacketWrapper<WrapperPlayServerTitle
 
     @Deprecated
     public @Nullable String getTitleJson() {
-        return AdventureSerializer.toJson(this.getTitle());
+        return this.getSerializers().asJson(this.getTitle());
     }
 
     @Deprecated
     public void setTitleJson(@Nullable String titleJson) {
-        this.setTitle(AdventureSerializer.parseComponent(titleJson));
+        this.setTitle(this.getSerializers().fromJson(titleJson));
     }
 
     public @Nullable Component getSubtitle() {
@@ -165,12 +172,12 @@ public class WrapperPlayServerTitle extends PacketWrapper<WrapperPlayServerTitle
 
     @Deprecated
     public @Nullable String getSubtitleJson() {
-        return AdventureSerializer.toJson(this.getSubtitle());
+        return this.getSerializers().asJson(this.getSubtitle());
     }
 
     @Deprecated
     public void setSubtitleJson(@Nullable String subtitleJson) {
-        this.setSubtitle(AdventureSerializer.parseComponent(subtitleJson));
+        this.setSubtitle(this.getSerializers().fromJson(subtitleJson));
     }
 
     public @Nullable Component getActionBar() {
@@ -183,12 +190,12 @@ public class WrapperPlayServerTitle extends PacketWrapper<WrapperPlayServerTitle
 
     @Deprecated
     public @Nullable String getActionBarJson() {
-        return AdventureSerializer.toJson(this.getActionBar());
+        return this.getSerializers().asJson(this.getActionBar());
     }
 
     @Deprecated
     public void setActionBarJson(@Nullable String actionBarJson) {
-        this.setActionBar(AdventureSerializer.parseComponent(actionBarJson));
+        this.setActionBar(this.getSerializers().fromJson(actionBarJson));
     }
 
     public int getFadeInTicks() {

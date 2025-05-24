@@ -18,31 +18,34 @@
 
 package com.github.retrooper.packetevents.protocol.world.states.type;
 
+import com.github.retrooper.packetevents.annotations.RuntimeObsolete;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.MaterialType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.mappings.MappingHelper;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilder;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
-public class StateTypes {
+public final class StateTypes {
 
-    private static final List<StateType> ALL_STATE_TYPES = new ArrayList<>();
-    private static final Map<String, StateType.Mapped> BY_NAME = new HashMap<>();
-    private static final Map<Byte, Map<Integer, StateType.Mapped>> BY_ID = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("block/block_type_mappings");
+    private static final VersionedRegistry<StateType.Mapped> REGISTRY = new VersionedRegistry<>("block");
+    private static final List<StateType> STATE_TYPE_VALUES;
+
+    private StateTypes() {
+    }
+
+    public static VersionedRegistry<StateType.Mapped> getRegistry() {
+        return REGISTRY;
+    }
 
     public static Collection<StateType> values() {
-        return Collections.unmodifiableCollection(ALL_STATE_TYPES);
+        return STATE_TYPE_VALUES;
     }
 
     public static @Nullable StateType getByName(String blockString) {
@@ -51,7 +54,7 @@ public class StateTypes {
     }
 
     public static StateType.@Nullable Mapped getMappedByName(String blockString) {
-        return getMappedByName(new ResourceLocation(blockString));
+        return REGISTRY.getByName(blockString);
     }
 
     public static @Nullable StateType getByName(ResourceLocation blockKey) {
@@ -60,7 +63,7 @@ public class StateTypes {
     }
 
     public static StateType.@Nullable Mapped getMappedByName(ResourceLocation blockKey) {
-        return BY_NAME.get(blockKey.toString());
+        return REGISTRY.getByName(blockKey);
     }
 
     public static StateType getById(ClientVersion version, int id) {
@@ -68,11 +71,10 @@ public class StateTypes {
     }
 
     public static StateType.Mapped getMappedById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        Map<Integer, StateType.Mapped> idMap = BY_ID.get((byte) index);
-        return idMap.get(id);
+        return REGISTRY.getById(version, id);
     }
 
+    // <editor-fold desc="state type definitions" defaultstate="collapsed">
     public static StateType AIR = StateTypes.builder().name("AIR").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).isAir(true).setMaterial(MaterialType.AIR).build();
     public static StateType STONE = StateTypes.builder().name("STONE").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType GRANITE = StateTypes.builder().name("GRANITE").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
@@ -120,7 +122,7 @@ public class StateTypes {
     public static StateType SAND = StateTypes.builder().name("SAND").blastResistance(0.5f).hardness(0.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.SAND).build();
     public static StateType SUSPICIOUS_SAND = StateTypes.builder().name("SUSPICIOUS_SAND").blastResistance(0.25f).hardness(0.25f)
             .isBlocking(true)
-            .requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SAND).build();
+            .requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.SAND).build();
     public static StateType RED_SAND = StateTypes.builder().name("RED_SAND").blastResistance(0.5f).hardness(0.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.SAND).build();
     public static StateType GRAVEL = StateTypes.builder().name("GRAVEL").blastResistance(0.6f).hardness(0.6f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.SAND).build();
     public static StateType COAL_ORE = StateTypes.builder().name("COAL_ORE").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
@@ -524,6 +526,8 @@ public class StateTypes {
     public static StateType BLACK_CARPET = StateTypes.builder().name("BLACK_CARPET").blastResistance(0.1f).hardness(0.1f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.CLOTH_DECORATION).build();
     public static StateType TERRACOTTA = StateTypes.builder().name("TERRACOTTA").blastResistance(4.2f).hardness(1.25f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType PACKED_ICE = StateTypes.builder().name("PACKED_ICE").blastResistance(0.5f).hardness(0.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.ICE_SOLID).build();
+    @ApiStatus.Obsolete @RuntimeObsolete
+    public static StateType GRASS_PATH = StateTypes.builder().name("GRASS_PATH").blastResistance(0.65f).hardness(0.65f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DIRT).build();
     public static StateType DIRT_PATH = StateTypes.builder().name("DIRT_PATH").blastResistance(0.65f).hardness(0.65f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DIRT).build();
     public static StateType SUNFLOWER = StateTypes.builder().name("SUNFLOWER").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
     public static StateType LILAC = StateTypes.builder().name("LILAC").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
@@ -1084,7 +1088,7 @@ public class StateTypes {
     public static StateType POTTED_FLOWERING_AZALEA_BUSH = StateTypes.builder().name("POTTED_FLOWERING_AZALEA_BUSH").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DECORATION).build();
     //1.20 added types
     public static StateType SUSPICIOUS_GRAVEL = StateTypes.builder().name("SUSPICIOUS_GRAVEL").blastResistance(0.25f)
-            .hardness(0.25f).isBlocking(true).requiresCorrectTool(true)
+            .hardness(0.25f).isBlocking(true).requiresCorrectTool(false)
             .isSolid(true).setMaterial(MaterialType.SAND).build();
     public static StateType PITCHER_CROP = StateTypes.builder().name("PITCHER_CROP").blastResistance(0.0f).hardness(0.0f)
             .isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
@@ -1100,16 +1104,16 @@ public class StateTypes {
     //1.20.3 added types
     public static StateType TUFF_SLAB = StateTypes.builder().name("TUFF_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType TUFF_STAIRS = StateTypes.builder().name("TUFF_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
-    public static StateType TUFF_WALL = StateTypes.builder().name("TUFF_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType TUFF_WALL = StateTypes.builder().name("TUFF_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
     public static StateType POLISHED_TUFF = StateTypes.builder().name("POLISHED_TUFF").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType POLISHED_TUFF_SLAB = StateTypes.builder().name("POLISHED_TUFF_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType POLISHED_TUFF_STAIRS = StateTypes.builder().name("POLISHED_TUFF_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
-    public static StateType POLISHED_TUFF_WALL = StateTypes.builder().name("POLISHED_TUFF_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType POLISHED_TUFF_WALL = StateTypes.builder().name("POLISHED_TUFF_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
     public static StateType CHISELED_TUFF = StateTypes.builder().name("CHISELED_TUFF").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType TUFF_BRICKS = StateTypes.builder().name("TUFF_BRICKS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType TUFF_BRICK_SLAB = StateTypes.builder().name("TUFF_BRICK_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType TUFF_BRICK_STAIRS = StateTypes.builder().name("TUFF_BRICK_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
-    public static StateType TUFF_BRICK_WALL = StateTypes.builder().name("TUFF_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType TUFF_BRICK_WALL = StateTypes.builder().name("TUFF_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
     public static StateType CHISELED_TUFF_BRICKS = StateTypes.builder().name("CHISELED_TUFF_BRICKS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType OXIDIZED_CHISELED_COPPER = StateTypes.builder().name("OXIDIZED_CHISELED_COPPER").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
     public static StateType WEATHERED_CHISELED_COPPER = StateTypes.builder().name("WEATHERED_CHISELED_COPPER").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
@@ -1152,14 +1156,71 @@ public class StateTypes {
     public static StateType WAXED_WEATHERED_COPPER_BULB = StateTypes.builder().name("WAXED_WEATHERED_COPPER_BULB").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
     public static StateType WAXED_OXIDIZED_COPPER_BULB = StateTypes.builder().name("WAXED_OXIDIZED_COPPER_BULB").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
     public static StateType CRAFTER = StateTypes.builder().name("CRAFTER").blastResistance(3.5f).hardness(1.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.STONE).build();
-    public static StateType TRIAL_SPAWNER = StateTypes.builder().name("TRIAL_SPAWNER").blastResistance(50.0f).hardness(50.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType TRIAL_SPAWNER = StateTypes.builder().name("TRIAL_SPAWNER").blastResistance(50.0f).hardness(50.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.STONE).build();
 
     // 1.20.5 added types
-    public static StateType VAULT = StateTypes.builder().name("vault").blastResistance(50.0f).hardness(50.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
-    public static StateType HEAVY_CORE = StateTypes.builder().name("heavy_core").blastResistance(1200.0f).hardness(10.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.METAL).build();
+    public static StateType VAULT = StateTypes.builder().name("VAULT").blastResistance(50.0f).hardness(50.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
+    public static StateType HEAVY_CORE = StateTypes.builder().name("HEAVY_CORE").blastResistance(1200.0f).hardness(10.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.METAL).build();
+
+    // 1.21.2 added types
+    public static StateType PALE_OAK_WOOD = StateTypes.builder().name("PALE_OAK_WOOD").blastResistance(2.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_PLANKS = StateTypes.builder().name("PALE_OAK_PLANKS").blastResistance(3.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_SAPLING = StateTypes.builder().name("PALE_OAK_SAPLING").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
+    public static StateType PALE_OAK_LOG = StateTypes.builder().name("PALE_OAK_LOG").blastResistance(2.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType STRIPPED_PALE_OAK_LOG = StateTypes.builder().name("STRIPPED_PALE_OAK_LOG").blastResistance(2.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType STRIPPED_PALE_OAK_WOOD = StateTypes.builder().name("STRIPPED_PALE_OAK_WOOD").blastResistance(2.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_LEAVES = StateTypes.builder().name("PALE_OAK_LEAVES").blastResistance(0.2f).hardness(0.2f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.LEAVES).build();
+    public static StateType CREAKING_HEART = StateTypes.builder().name("CREAKING_HEART").blastResistance(5.0f).hardness(5.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_SIGN = StateTypes.builder().name("PALE_OAK_SIGN").blastResistance(1.0f).hardness(1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_WALL_SIGN = StateTypes.builder().name("PALE_OAK_WALL_SIGN").blastResistance(1.0f).hardness(1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_HANGING_SIGN = StateTypes.builder().name("PALE_OAK_HANGING_SIGN").blastResistance(1.0f).hardness(1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_WALL_HANGING_SIGN = StateTypes.builder().name("PALE_OAK_WALL_HANGING_SIGN").blastResistance(1.0f).hardness(1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_PRESSURE_PLATE = StateTypes.builder().name("PALE_OAK_PRESSURE_PLATE").blastResistance(0.5f).hardness(0.5f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_TRAPDOOR = StateTypes.builder().name("PALE_OAK_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType POTTED_PALE_OAK_SAPLING = StateTypes.builder().name("POTTED_PALE_OAK_SAPLING").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DECORATION).build();
+    public static StateType PALE_OAK_BUTTON = StateTypes.builder().name("PALE_OAK_BUTTON").blastResistance(0.5f).hardness(0.5f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.DECORATION).build();
+    public static StateType PALE_OAK_STAIRS = StateTypes.builder().name("PALE_OAK_STAIRS").blastResistance(3.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_SLAB = StateTypes.builder().name("PALE_OAK_SLAB").blastResistance(3.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_FENCE_GATE = StateTypes.builder().name("PALE_OAK_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_FENCE = StateTypes.builder().name("PALE_OAK_FENCE").blastResistance(3.0f).hardness(2.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_OAK_DOOR = StateTypes.builder().name("PALE_OAK_DOOR").blastResistance(3.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType PALE_MOSS_BLOCK = StateTypes.builder().name("PALE_MOSS_BLOCK").blastResistance(0.1f).hardness(0.1f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.MOSS).build();
+    public static StateType PALE_MOSS_CARPET = StateTypes.builder().name("PALE_MOSS_CARPET").blastResistance(0.1f).hardness(0.1f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.PLANT).build();
+    public static StateType PALE_HANGING_MOSS = StateTypes.builder().name("PALE_HANGING_MOSS").blastResistance(0.1f).hardness(0.1f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
+
+    // 1.21.4 added types
+    public static StateType RESIN_CLUMP = StateTypes.builder().name("RESIN_CLUMP").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.RESIN).build();
+    public static StateType RESIN_BLOCK = StateTypes.builder().name("RESIN_BLOCK").blastResistance(0.0f).hardness(0.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.RESIN).build();
+    public static StateType RESIN_BRICKS = StateTypes.builder().name("RESIN_BRICKS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.RESIN).build();
+    public static StateType RESIN_BRICK_STAIRS = StateTypes.builder().name("RESIN_BRICK_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.RESIN).build();
+    public static StateType RESIN_BRICK_SLAB = StateTypes.builder().name("RESIN_BRICK_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.RESIN).build();
+    public static StateType RESIN_BRICK_WALL = StateTypes.builder().name("RESIN_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).isShapeExceedsCube(true).setMaterial(MaterialType.RESIN).build();
+    public static StateType CHISELED_RESIN_BRICKS = StateTypes.builder().name("CHISELED_RESIN_BRICKS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.RESIN).build();
+    public static StateType OPEN_EYEBLOSSOM = StateTypes.builder().name("OPEN_EYEBLOSSOM").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
+    public static StateType CLOSED_EYEBLOSSOM = StateTypes.builder().name("CLOSED_EYEBLOSSOM").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
+    public static StateType POTTED_OPEN_EYEBLOSSOM = StateTypes.builder().name("POTTED_OPEN_EYEBLOSSOM").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DECORATION).build();
+    public static StateType POTTED_CLOSED_EYEBLOSSOM = StateTypes.builder().name("POTTED_CLOSED_EYEBLOSSOM").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DECORATION).build();
+
+    // 1.21.5 added types
+    public static StateType BUSH = StateTypes.builder().name("BUSH").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
+    public static StateType SHORT_DRY_GRASS = StateTypes.builder().name("SHORT_DRY_GRASS").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
+    public static StateType TALL_DRY_GRASS = StateTypes.builder().name("TALL_DRY_GRASS").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
+    public static StateType CACTUS_FLOWER = StateTypes.builder().name("CACTUS_FLOWER").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
+    public static StateType TEST_BLOCK = StateTypes.builder().name("TEST_BLOCK").blastResistance(3600000.0f).hardness(-1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType TEST_INSTANCE_BLOCK = StateTypes.builder().name("TEST_INSTANCE_BLOCK").blastResistance(3600000.0f).hardness(-1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.METAL).build();
+    public static StateType WILDFLOWERS = StateTypes.builder().name("WILDFLOWERS").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
+    public static StateType LEAF_LITTER = StateTypes.builder().name("LEAF_LITTER").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
+    public static StateType FIREFLY_BUSH = StateTypes.builder().name("FIREFLY_BUSH").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
+    // </editor-fold>
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
+
+        List<StateType> stateTypes = new ArrayList<>(REGISTRY.size());
+        for (StateType.Mapped type : REGISTRY.getEntries()) {
+            stateTypes.add(type.getStateType());
+        }
+        STATE_TYPE_VALUES = Collections.unmodifiableList(stateTypes);
     }
 
     public static Builder builder() {
@@ -1223,13 +1284,11 @@ public class StateTypes {
         }
 
         public StateType build() {
-            TypesBuilderData data = TYPES_BUILDER.define(this.name.getKey().toLowerCase(Locale.ROOT));
-            StateType type = new StateType(
-                    TYPES_BUILDER, data, blastResistance, hardness, isSolid,
-                    isBlocking, isAir, requiresCorrectTool, isShapeExceedsCube, materialType);
-            ALL_STATE_TYPES.add(type);
-            MappingHelper.registerMapping(TYPES_BUILDER, BY_NAME, BY_ID, type.getMapped());
-            return type;
+            String definedName = this.name.getKey().toLowerCase(Locale.ROOT);
+            return REGISTRY.define(definedName, data -> new StateType(
+                    data, this.blastResistance, this.hardness, this.isSolid, this.isBlocking, this.isAir,
+                    this.requiresCorrectTool, this.isShapeExceedsCube, this.materialType
+            ).getMapped()).getStateType();
         }
     }
 }

@@ -63,7 +63,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
     @Deprecated
     public WrapperPlayServerSystemChatMessage(@NotNull ChatType type, String messageJson) {
         super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
-        this.message = AdventureSerializer.parseComponent(messageJson);
+        this.message = this.getSerializers().fromJson(messageJson);
         this.type = type;
         if (type == ChatTypes.GAME_INFO) {
             this.overlay = true;
@@ -80,7 +80,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
     @Deprecated
     public WrapperPlayServerSystemChatMessage(boolean overlay, String messageJson) {
         super(PacketType.Play.Server.SYSTEM_CHAT_MESSAGE);
-        this.message = AdventureSerializer.parseComponent(messageJson);
+        this.message = this.getSerializers().fromJson(messageJson);
         this.overlay = overlay;
         this.type = overlay ? ChatTypes.GAME_INFO : ChatTypes.SYSTEM;
     }
@@ -91,7 +91,7 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
             overlay = readBoolean();
         } else {
-            type = ChatTypes.getById(serverVersion.toClientVersion(), readVarInt());
+            this.type = this.readMappedEntity(ChatTypes.getRegistry());
         }
     }
 
@@ -103,12 +103,12 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
         } else {
             if (type == null) {
                 if (overlay) {
-                    writeVarInt(ChatTypes.GAME_INFO.getId(serverVersion.toClientVersion()));
+                    this.writeMappedEntity(ChatTypes.GAME_INFO);
                 } else {
-                    writeVarInt(ChatTypes.SYSTEM.getId(serverVersion.toClientVersion()));
+                    this.writeMappedEntity(ChatTypes.SYSTEM);
                 }
             } else {
-                writeVarInt(type.getId(serverVersion.toClientVersion()));
+                this.writeMappedEntity(this.type);
             }
         }
     }
@@ -132,12 +132,12 @@ public class WrapperPlayServerSystemChatMessage extends PacketWrapper<WrapperPla
 
     @Deprecated
     public String getMessageJson() {
-        return AdventureSerializer.toJson(this.getMessage());
+        return this.getSerializers().asJson(this.getMessage());
     }
 
     @Deprecated
     public void setMessageJson(String messageJson) {
-        this.setMessage(AdventureSerializer.parseComponent(messageJson));
+        this.setMessage(this.getSerializers().fromJson(messageJson));
     }
 
     public Component getMessage() {

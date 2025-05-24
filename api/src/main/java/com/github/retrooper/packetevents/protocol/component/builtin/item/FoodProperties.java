@@ -22,8 +22,10 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.potion.PotionEffect;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,12 +39,28 @@ public class FoodProperties {
     private @Nullable ItemStack usingConvertsTo;
 
     public FoodProperties(
+            int nutrition, float saturation, boolean canAlwaysEat
+    ) {
+        this(nutrition, saturation, canAlwaysEat, 1.6f, Collections.emptyList());
+    }
+
+    /**
+     * <code>eatSeconds</code> and <code>effects</code>
+     * have been moved to {@link ItemConsumable} in 1.21.2
+     */
+    @ApiStatus.Obsolete
+    public FoodProperties(
             int nutrition, float saturation, boolean canAlwaysEat,
             float eatSeconds, List<PossibleEffect> effects
     ) {
         this(nutrition, saturation, canAlwaysEat, eatSeconds, effects, null);
     }
 
+    /**
+     * <code>eatSeconds</code>, <code>effects</code> and <code>usingConvertsTo</code>
+     * have been moved to {@link ItemConsumable} in 1.21.2
+     */
+    @ApiStatus.Obsolete
     public FoodProperties(
             int nutrition, float saturation, boolean canAlwaysEat, float eatSeconds,
             List<PossibleEffect> effects, @Nullable ItemStack usingConvertsTo
@@ -59,10 +77,13 @@ public class FoodProperties {
         int nutrition = wrapper.readVarInt();
         float saturation = wrapper.readFloat();
         boolean canAlwaysEat = wrapper.readBoolean();
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            return new FoodProperties(nutrition, saturation, canAlwaysEat);
+        }
         float eatSeconds = wrapper.readFloat();
-        List<PossibleEffect> effects = wrapper.readList(PossibleEffect::read);
         ItemStack usingConvertsTo = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21)
                 ? wrapper.readOptional(PacketWrapper::readItemStack) : null;
+        List<PossibleEffect> effects = wrapper.readList(PossibleEffect::read);
         return new FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, effects, usingConvertsTo);
     }
 
@@ -70,10 +91,12 @@ public class FoodProperties {
         wrapper.writeVarInt(props.nutrition);
         wrapper.writeFloat(props.saturation);
         wrapper.writeBoolean(props.canAlwaysEat);
-        wrapper.writeFloat(props.eatSeconds);
-        wrapper.writeList(props.effects, PossibleEffect::write);
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21)) {
-            wrapper.writeOptional(props.usingConvertsTo, PacketWrapper::writeItemStack);
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_2)) {
+            wrapper.writeFloat(props.eatSeconds);
+            if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21)) {
+                wrapper.writeOptional(props.usingConvertsTo, PacketWrapper::writeItemStack);
+            }
+            wrapper.writeList(props.effects, PossibleEffect::write);
         }
     }
 
@@ -101,30 +124,58 @@ public class FoodProperties {
         this.canAlwaysEat = canAlwaysEat;
     }
 
+    /**
+     * Has been moved to {@link ItemConsumable} in 1.21.2
+     */
+    @ApiStatus.Obsolete
     public float getEatSeconds() {
         return this.eatSeconds;
     }
 
+    /**
+     * Has been moved to {@link ItemConsumable} in 1.21.2
+     */
+    @ApiStatus.Obsolete
     public void setEatSeconds(float eatSeconds) {
         this.eatSeconds = eatSeconds;
     }
 
+    /**
+     * Has been moved to {@link ItemConsumable} in 1.21.2
+     */
+    @ApiStatus.Obsolete
     public void addEffect(PossibleEffect effect) {
         this.effects.add(effect);
     }
 
+    /**
+     * Has been moved to {@link ItemConsumable} in 1.21.2
+     */
+    @ApiStatus.Obsolete
     public List<PossibleEffect> getEffects() {
         return this.effects;
     }
 
+    /**
+     * Has been moved to {@link ItemConsumable} in 1.21.2
+     */
+    @ApiStatus.Obsolete
     public void setEffects(List<PossibleEffect> effects) {
         this.effects = effects;
     }
 
+    /**
+     * Has been moved to {@link ItemConsumable} in 1.21.2
+     */
+    @ApiStatus.Obsolete
     public @Nullable ItemStack getUsingConvertsTo() {
         return this.usingConvertsTo;
     }
 
+    /**
+     * Has been moved to {@link ItemConsumable} in 1.21.2
+     */
+    @ApiStatus.Obsolete
     public void setUsingConvertsTo(@Nullable ItemStack usingConvertsTo) {
         this.usingConvertsTo = usingConvertsTo;
     }
@@ -147,6 +198,10 @@ public class FoodProperties {
         return Objects.hash(this.nutrition, this.saturation, this.canAlwaysEat, this.eatSeconds, this.effects, this.usingConvertsTo);
     }
 
+    /**
+     * Has been moved to {@link ItemConsumable} in 1.21.2
+     */
+    @ApiStatus.Obsolete
     public static class PossibleEffect {
 
         private PotionEffect effect;

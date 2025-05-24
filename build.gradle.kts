@@ -1,7 +1,7 @@
 import java.io.ByteArrayOutputStream
 
 // TODO UPDATE
-val fullVersion = "2.4.1"
+val fullVersion = "2.8.1"
 val snapshot = true
 
 group = "com.github.retrooper"
@@ -27,7 +27,7 @@ ext["versionNoHash"] = "$fullVersion${getVersionMeta(false)}"
 
 tasks {
     wrapper {
-        gradleVersion = "8.8"
+        gradleVersion = "8.13"
         distributionType = Wrapper.DistributionType.ALL
     }
 
@@ -69,12 +69,6 @@ allprojects {
     tasks {
         withType<Jar> {
             archiveVersion = rootProject.ext["versionNoHash"] as String
-        }
-
-        withType<Javadoc> {
-            title = "packetevents-${project.name} v${rootProject.version}"
-            options.encoding = Charsets.UTF_8.name()
-            options.overview = rootProject.file("buildSrc/src/main/resources/javadoc-overview.html").toString()
         }
     }
 }

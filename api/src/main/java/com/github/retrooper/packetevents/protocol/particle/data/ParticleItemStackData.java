@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.particle.data;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -42,16 +43,26 @@ public class ParticleItemStackData extends ParticleData implements LegacyConvert
     public static ParticleItemStackData read(PacketWrapper<?> wrapper) {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
             return new ParticleItemStackData(wrapper.readItemStack());
-        }
-        else {
+        } else {
             return new ParticleItemStackData(ItemStack.builder()
-                    .type(ItemTypes.getById(wrapper.getClientVersion(), wrapper.readVarInt()))
-                    .build());
+                    .type(ItemTypes.getRegistry().getByIdOrThrow(wrapper.getClientVersion(), wrapper.readVarInt()))
+                    .wrapper(wrapper).build());
         }
     }
 
     public static void write(PacketWrapper<?> wrapper, ParticleItemStackData data) {
         wrapper.writeItemStack(data.getItemStack());
+    }
+
+    public static ParticleItemStackData decode(NBTCompound compound, ClientVersion version) {
+        String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "item" : "value";
+        ItemStack stack = ItemStack.decode(compound.getTagOrThrow(key), version);
+        return new ParticleItemStackData(stack);
+    }
+
+    public static void encode(ParticleItemStackData data, ClientVersion version, NBTCompound compound) {
+        String key = version.isNewerThanOrEquals(ClientVersion.V_1_20_5) ? "item" : "value";
+        compound.setTag(key, ItemStack.encodeForParticle(data.itemStack, version));
     }
 
     @Override

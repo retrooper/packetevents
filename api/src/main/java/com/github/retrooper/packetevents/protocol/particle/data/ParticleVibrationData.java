@@ -21,6 +21,9 @@ package com.github.retrooper.packetevents.protocol.particle.data;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.nbt.NBTIntArray;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSource;
 import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSourceType;
@@ -150,6 +153,26 @@ public class ParticleVibrationData extends ParticleData {
         sourceType.write(wrapper, data.getSource());
 
         wrapper.writeVarInt(data.getTicks());
+    }
+
+    public static ParticleVibrationData decode(NBTCompound compound, ClientVersion version) {
+        Vector3i origin = version.isNewerThanOrEquals(ClientVersion.V_1_19) ? null :
+                new Vector3i(compound.getTagOfTypeOrThrow("origin", NBTIntArray.class).getValue());
+        PositionSource destination = PositionSource.decode(compound.getCompoundTagOrThrow("destination"), version);
+        int arrivalInTicks = compound.getNumberTagOrThrow("arrival_in_ticks").getAsInt();
+        return new ParticleVibrationData(origin, destination, arrivalInTicks);
+    }
+
+    public static void encode(ParticleVibrationData data, ClientVersion version, NBTCompound compound) {
+        if (version.isOlderThan(ClientVersion.V_1_19)) {
+            Vector3i startPos = data.getStartingPosition();
+            if (startPos != null) {
+                compound.setTag("origin", new NBTIntArray(
+                        new int[]{startPos.x, startPos.y, startPos.z}));
+            }
+        }
+        compound.setTag("destination", PositionSource.encode(data.source, version));
+        compound.setTag("arrival_in_ticks", new NBTInt(data.ticks));
     }
 
     @ApiStatus.Obsolete

@@ -18,46 +18,82 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.impl.v_1_18;
 
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
+import com.github.retrooper.packetevents.protocol.stream.NetStreamInputWrapper;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
+import com.github.retrooper.packetevents.protocol.stream.NetStreamOutputWrapper;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.DataPalette;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.PaletteType;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
-import org.jetbrains.annotations.NotNull;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class Chunk_v1_18 implements BaseChunk {
+
     private static final int AIR = 0;
 
     private int blockCount;
-    private @NotNull
-    final DataPalette chunkData;
-    private @NotNull
-    final DataPalette biomeData;
+    private final DataPalette chunkData;
+    private final DataPalette biomeData;
 
     public Chunk_v1_18() {
-        this(0, DataPalette.createForChunk(), DataPalette.createForBiome());
+        this.chunkData = PaletteType.CHUNK.create();
+        this.biomeData = PaletteType.BIOME.create();
     }
 
-    public Chunk_v1_18(final int blockCount, final @NotNull DataPalette chunkData, final @NotNull DataPalette biomeData) {
+    public Chunk_v1_18(int blockCount, DataPalette chunkData, DataPalette biomeData) {
         this.blockCount = blockCount;
         this.chunkData = chunkData;
         this.biomeData = biomeData;
     }
 
-    public static Chunk_v1_18 read(NetStreamInput in)  {
-        int blockCount = in.readShort();
+    public static Chunk_v1_18 read(PacketWrapper<?> wrapper) {
+        boolean paletteLengthPrefix = wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5);
+        return read(new NetStreamInputWrapper(wrapper), paletteLengthPrefix);
+    }
 
-        DataPalette chunkPalette = DataPalette.read(in, PaletteType.CHUNK);
-        DataPalette biomePalette = DataPalette.read(in, PaletteType.BIOME);
+    /**
+     * @deprecated use {@link #read(PacketWrapper)} instead
+     */
+    @Deprecated
+    public static Chunk_v1_18 read(NetStreamInput in) {
+        return read(in, true);
+    }
+
+    /**
+     * @deprecated use {@link #read(PacketWrapper)} instead
+     */
+    @Deprecated
+    public static Chunk_v1_18 read(NetStreamInput in, boolean paletteLengthPrefix) {
+        int blockCount = in.readShort();
+        DataPalette chunkPalette = DataPalette.read(in, PaletteType.CHUNK,
+                true, paletteLengthPrefix);
+        DataPalette biomePalette = DataPalette.read(in, PaletteType.BIOME,
+                true, paletteLengthPrefix);
         return new Chunk_v1_18(blockCount, chunkPalette, biomePalette);
     }
 
-    public static void write(NetStreamOutput out, Chunk_v1_18 section)  {
+    public static void write(PacketWrapper<?> wrapper, Chunk_v1_18 section) {
+        boolean paletteLengthPrefix = wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5);
+        write(new NetStreamOutputWrapper(wrapper), section, paletteLengthPrefix);
+    }
+
+    /**
+     * @deprecated use {@link #write(PacketWrapper, Chunk_v1_18)} instead
+     */
+    @Deprecated
+    public static void write(NetStreamOutput out, Chunk_v1_18 section) {
+        write(out, section, true);
+    }
+
+    /**
+     * @deprecated use {@link #write(PacketWrapper, Chunk_v1_18)} instead
+     */
+    @Deprecated
+    public static void write(NetStreamOutput out, Chunk_v1_18 section, boolean paletteLengthPrefix) {
         out.writeShort(section.blockCount);
-        DataPalette.write(out, section.chunkData);
-        DataPalette.write(out, section.biomeData);
+        DataPalette.write(out, section.chunkData, paletteLengthPrefix);
+        DataPalette.write(out, section.biomeData, paletteLengthPrefix);
     }
 
     @Override
@@ -88,11 +124,11 @@ public class Chunk_v1_18 implements BaseChunk {
         this.blockCount = blockCount;
     }
 
-    public @NotNull DataPalette getChunkData() {
+    public DataPalette getChunkData() {
         return chunkData;
     }
 
-    public @NotNull DataPalette getBiomeData() {
+    public DataPalette getBiomeData() {
         return biomeData;
     }
 }

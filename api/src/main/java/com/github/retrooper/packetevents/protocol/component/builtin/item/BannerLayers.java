@@ -80,14 +80,14 @@ public class BannerLayers {
 
         public static Layer read(PacketWrapper<?> wrapper) {
             BannerPattern pattern = wrapper.readMappedEntityOrDirect(
-                    BannerPatterns::getById, BannerPattern::readDirect);
-            DyeColor color = wrapper.readEnum(DyeColor.values());
+                    BannerPatterns.getRegistry(), BannerPattern::readDirect);
+            DyeColor color = DyeColor.read(wrapper);
             return new Layer(pattern, color);
         }
 
         public static void write(PacketWrapper<?> wrapper, Layer layer) {
             wrapper.writeMappedEntityOrDirect(layer.pattern, BannerPattern::writeDirect);
-            wrapper.writeEnum(layer.color);
+            DyeColor.write(wrapper, layer.color);
         }
 
         public BannerPattern getPattern() {

@@ -28,11 +28,15 @@ import java.security.*;
 import java.util.UUID;
 
 //TODO Fix MessageVerifier.
+/**
+ * @deprecated has never worked in the past and is unused
+ */
+@Deprecated
 class MessageVerifierHelper {
 
     public static boolean verify(UUID uuid, MessageSignData signData, PublicKey publicKey, Component component)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        return verify(uuid, signData, publicKey, AdventureSerializer.toJson(component));
+        return verify(uuid, signData, publicKey, AdventureSerializer.serializer().asJson(component));
     }
 
     public static boolean verify(UUID uuid, MessageSignData signData, PublicKey publicKey, String jsonMessage)

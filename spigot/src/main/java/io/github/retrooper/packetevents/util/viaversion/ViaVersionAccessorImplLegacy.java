@@ -42,11 +42,12 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     private void load() {
         if (viaClass == null) {
             try {
-                viaClass = Class.forName("us.myles.ViaVersion.api.Via");
+                ClassLoader classLoader = PacketEvents.getAPI().getPlugin().getClass().getClassLoader();
+                viaClass = classLoader.loadClass("us.myles.ViaVersion.api.Via");
                 viaManagerField = viaClass.getDeclaredField("manager");
-                bukkitDecodeHandlerClass = Class.forName("us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler");
-                bukkitEncodeHandlerClass = Class.forName("us.myles.ViaVersion.bukkit.handlers.BukkitEncodeHandler");
-                Class<?> viaAPIClass = Class.forName("us.myles.ViaVersion.api.ViaAPI");
+                bukkitDecodeHandlerClass = classLoader.loadClass("us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler");
+                bukkitEncodeHandlerClass = classLoader.loadClass("us.myles.ViaVersion.bukkit.handlers.BukkitEncodeHandler");
+                Class<?> viaAPIClass = classLoader.loadClass("us.myles.ViaVersion.api.ViaAPI");
                 apiAccessor = viaClass.getMethod("getAPI");
                 getPlayerVersionMethod = viaAPIClass.getMethod("getPlayerVersion", Object.class);
             } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException e) {
@@ -56,7 +57,8 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
 
         if (userConnectionClass == null) {
             try {
-                userConnectionClass = Class.forName("us.myles.ViaVersion.api.data.UserConnection");
+                ClassLoader classLoader = PacketEvents.getAPI().getPlugin().getClass().getClassLoader();
+                userConnectionClass = classLoader.loadClass("us.myles.ViaVersion.api.data.UserConnection");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }

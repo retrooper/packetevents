@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.potion.Potion;
 import com.github.retrooper.packetevents.protocol.potion.PotionEffect;
 import com.github.retrooper.packetevents.protocol.potion.Potions;
@@ -32,28 +33,44 @@ public class ItemPotionContents {
     private @Nullable Potion potion;
     private @Nullable Integer customColor;
     private List<PotionEffect> customEffects;
+    private @Nullable String customName;
 
     public ItemPotionContents(
             @Nullable Potion potion,
             @Nullable Integer customColor,
             List<PotionEffect> customEffects
     ) {
+        this(potion, customColor, customEffects, null);
+    }
+
+    public ItemPotionContents(
+            @Nullable Potion potion,
+            @Nullable Integer customColor,
+            List<PotionEffect> customEffects,
+            @Nullable String customName
+    ) {
         this.potion = potion;
         this.customColor = customColor;
         this.customEffects = customEffects;
+        this.customName = customName;
     }
 
     public static ItemPotionContents read(PacketWrapper<?> wrapper) {
         Potion potionId = wrapper.readOptional(ew -> ew.readMappedEntity(Potions::getById));
         Integer customColor = wrapper.readOptional(PacketWrapper::readInt);
         List<PotionEffect> customEffects = wrapper.readList(PotionEffect::read);
-        return new ItemPotionContents(potionId, customColor, customEffects);
+        String customName = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_2)
+                ? wrapper.readOptional(PacketWrapper::readString) : null;
+        return new ItemPotionContents(potionId, customColor, customEffects, customName);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemPotionContents contents) {
         wrapper.writeOptional(contents.potion, PacketWrapper::writeMappedEntity);
         wrapper.writeOptional(contents.customColor, PacketWrapper::writeInt);
         wrapper.writeList(contents.customEffects, PotionEffect::write);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            wrapper.writeOptional(contents.customName, PacketWrapper::writeString);
+        }
     }
 
     public @Nullable Potion getPotion() {
@@ -84,6 +101,14 @@ public class ItemPotionContents {
         this.customEffects = customEffects;
     }
 
+    public @Nullable String getCustomName() {
+        return this.customName;
+    }
+
+    public void setCustomName(@Nullable String customName) {
+        this.customName = customName;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -91,11 +116,12 @@ public class ItemPotionContents {
         ItemPotionContents that = (ItemPotionContents) obj;
         if (!Objects.equals(this.potion, that.potion)) return false;
         if (!Objects.equals(this.customColor, that.customColor)) return false;
-        return this.customEffects.equals(that.customEffects);
+        if (!this.customEffects.equals(that.customEffects)) return false;
+        return Objects.equals(this.customName, that.customName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.potion, this.customColor, this.customEffects);
+        return Objects.hash(this.potion, this.customColor, this.customEffects, this.customName);
     }
 }

@@ -18,7 +18,7 @@ public class EnsureCorrectTagsTest extends BaseDummyAPITest {
     @Test
     @DisplayName("Test block tags order")
     public void testBlockTagsOrder() {
-        assertDoesNotThrow(BlockTags.DRIPSTONE_REPLACEABLE::getName); // init the class
+        assertDoesNotThrow(BlockTags.DRIPSTONE_REPLACEABLE_BLOCKS::getName); // init the class
     }
 
     @Test

@@ -38,13 +38,24 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
     private Vector3f cursorPosition;
     private Optional<ItemStack> itemStack;
     private Optional<Boolean> insideBlock;
+    private Optional<Boolean> worldBorderHit;
     private int sequence;
 
     public WrapperPlayClientPlayerBlockPlacement(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPlayerBlockPlacement(InteractionHand interactionHand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition, ItemStack itemStack, Boolean insideBlock, int sequence) {
+    public WrapperPlayClientPlayerBlockPlacement(
+            InteractionHand interactionHand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition,
+            ItemStack itemStack, Boolean insideBlock, int sequence
+    ) {
+        this(interactionHand, blockPosition, face, cursorPosition, itemStack, insideBlock, null, sequence);
+    }
+
+    public WrapperPlayClientPlayerBlockPlacement(
+            InteractionHand interactionHand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition,
+            ItemStack itemStack, Boolean insideBlock, Boolean worldBorderHit, int sequence
+    ) {
         super(PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT);
         this.interactionHand = interactionHand;
         this.blockPosition = blockPosition;
@@ -53,6 +64,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
         this.cursorPosition = cursorPosition;
         this.itemStack = Optional.ofNullable(itemStack);
         this.insideBlock = Optional.ofNullable(insideBlock);
+        this.worldBorderHit = Optional.ofNullable(worldBorderHit);
         this.sequence = sequence;
     }
 
@@ -68,6 +80,9 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
             cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
             insideBlock = Optional.of(readBoolean());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+                    this.worldBorderHit = Optional.of(this.readBoolean());
+                }
                 sequence = readVarInt();
             }
         } else {
@@ -106,6 +121,9 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
             writeFloat(cursorPosition.z);
             writeBoolean(insideBlock.orElse(false));
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+                    this.writeBoolean(this.worldBorderHit.orElse(false));
+                }
                 writeVarInt(sequence);
             }
         } else {
@@ -145,6 +163,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
         cursorPosition = wrapper.cursorPosition;
         itemStack = wrapper.itemStack;
         insideBlock = wrapper.insideBlock;
+        worldBorderHit = wrapper.worldBorderHit;
         sequence = wrapper.sequence;
     }
 
@@ -201,11 +220,19 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
     }
 
     public Optional<Boolean> getInsideBlock() {
-        return insideBlock;
+        return this.insideBlock != null ? this.insideBlock : Optional.empty();
     }
 
     public void setInsideBlock(Optional<Boolean> insideBlock) {
         this.insideBlock = insideBlock;
+    }
+
+    public Optional<Boolean> getWorldBorderHit() {
+        return this.worldBorderHit != null ? this.worldBorderHit : Optional.empty();
+    }
+
+    public void setWorldBorderHit(Optional<Boolean> worldBorderHit) {
+        this.worldBorderHit = worldBorderHit;
     }
 
     public int getSequence() {

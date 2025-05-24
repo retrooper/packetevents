@@ -36,7 +36,8 @@ public class WrapperPlayServerSetTitleText extends PacketWrapper<WrapperPlayServ
     }
 
     public WrapperPlayServerSetTitleText(String titleJson) {
-        this(AdventureSerializer.parseComponent(titleJson));
+        super(PacketType.Play.Server.SET_TITLE_TEXT);
+        this.title = this.getSerializers().fromJson(titleJson);
     }
 
     public WrapperPlayServerSetTitleText(Component title) {
@@ -69,11 +70,11 @@ public class WrapperPlayServerSetTitleText extends PacketWrapper<WrapperPlayServ
 
     @Deprecated
     public String getTitleJson() {
-        return AdventureSerializer.toJson(this.getTitle());
+        return this.getSerializers().asJson(this.getTitle());
     }
 
     @Deprecated
     public void setTitleJson(String titleJson) {
-        this.setTitle(AdventureSerializer.parseComponent(titleJson));
+        this.setTitle(this.getSerializers().fromJson(titleJson));
     }
 }

@@ -18,9 +18,16 @@
 
 package com.github.retrooper.packetevents.resources;
 
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Objects;
 
 public class ResourceLocation {
+
+    public static final String VANILLA_NAMESPACE = "minecraft";
+
     protected final String namespace;
     protected final String key;
 
@@ -30,7 +37,7 @@ public class ResourceLocation {
     }
 
     public ResourceLocation(String location) {
-        String[] array = new String[]{"minecraft", location};
+        String[] array = new String[]{VANILLA_NAMESPACE, location};
         int index = location.indexOf(":");
         if (index != -1) {
             array[1] = location.substring(index + 1);
@@ -40,6 +47,31 @@ public class ResourceLocation {
         }
         this.namespace = array[0];
         this.key = array[1];
+    }
+
+    public static ResourceLocation read(PacketWrapper<?> wrapper) {
+        return wrapper.readIdentifier();
+    }
+
+    public static void write(PacketWrapper<?> wrapper, ResourceLocation resourceLocation) {
+        wrapper.writeIdentifier(resourceLocation);
+    }
+
+    @Contract("null -> null; !null -> !null")
+    public static @Nullable String normString(@Nullable String location) {
+        if (location == null) {
+            return null;
+        }
+        int index = location.indexOf(':');
+        if (index > 0) {
+            return location; // namespace already set
+        } else if (index == -1) {
+            // prepend namespace and delimiter
+            return VANILLA_NAMESPACE + ":" + location;
+        } else { // index == 0
+            // treat prepending delimiter as no namespace
+            return VANILLA_NAMESPACE + location;
+        }
     }
 
     public String getNamespace() {
@@ -70,6 +102,6 @@ public class ResourceLocation {
     }
 
     public static ResourceLocation minecraft(String key) {
-        return new ResourceLocation("minecraft", key);
+        return new ResourceLocation(VANILLA_NAMESPACE, key);
     }
 }

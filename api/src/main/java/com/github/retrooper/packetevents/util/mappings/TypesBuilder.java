@@ -18,22 +18,35 @@
 
 package com.github.retrooper.packetevents.util.mappings;
 
-import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.VersionMapper;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@ApiStatus.Internal
 public class TypesBuilder {
     private final String mapPath;
     private Map<ClientVersion, Map<String, Integer>> entries = new HashMap<>();
     private VersionMapper versionMapper;
+
+    @Nullable
+    VersionedRegistry<?> registry;
 
     public TypesBuilder(String mapPath, boolean lazy) {
         this.mapPath = mapPath;
@@ -47,8 +60,13 @@ public class TypesBuilder {
     }
 
     public void load() {
-        try (final SequentialNBTReader.Compound compound = MappingHelper.decompress("mappings/" + mapPath)) {
-            compound.skipOne(); // skip version tag for now
+        if (this.entries == null) {
+            this.entries = new HashMap<>();
+        }
+        try (final SequentialNBTReader.Compound rootCompound = MappingHelper.decompress("mappings/" + this.mapPath)) {
+            rootCompound.skipOne(); // skip version tag for now
+            SequentialNBTReader.Compound compound = (SequentialNBTReader.Compound) rootCompound.next().getValue();
+
             int length = ((NBTNumber) compound.next().getValue()).getAsInt(); // Second tag is the length
             final SequentialNBTReader.Compound entries = (SequentialNBTReader.Compound) compound.next().getValue(); // Third tag are the entries
 
@@ -129,6 +147,10 @@ public class TypesBuilder {
         }
     }
 
+    public @Nullable VersionedRegistry<?> getRegistry() {
+        return this.registry;
+    }
+
     public ClientVersion[] getVersions() {
         return versionMapper.getVersions();
     }
@@ -139,6 +161,11 @@ public class TypesBuilder {
 
     public int getDataIndex(ClientVersion rawVersion) {
         return versionMapper.getIndex(rawVersion);
+    }
+
+    @VisibleForTesting
+    public boolean isMappingDataLoaded() {
+        return this.entries != null;
     }
 
     public void unloadFileMappings() {
@@ -160,6 +187,10 @@ public class TypesBuilder {
             }
             index++;
         }
-        return new TypesBuilderData(name, ids);
+        return new TypesBuilderData(this, name, ids);
+    }
+
+    public @Nullable Map<ClientVersion, Map<String, Integer>> getEntries() {
+        return this.entries;
     }
 }

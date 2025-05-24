@@ -23,7 +23,12 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * Removed with 1.21.5
+ */
+@ApiStatus.Obsolete
 public class WrapperPlayServerSpawnExperienceOrb extends PacketWrapper<WrapperPlayServerSpawnExperienceOrb> {
     private int entityId;
     private double x;

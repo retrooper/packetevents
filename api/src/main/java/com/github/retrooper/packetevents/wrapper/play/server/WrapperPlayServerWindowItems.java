@@ -49,7 +49,7 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        windowID = readUnsignedByte();
+        windowID = this.readContainerId();
         boolean v1_17_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1);
         if (v1_17_1) {
             stateID = readVarInt();
@@ -70,7 +70,7 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
-        writeByte(windowID);
+        this.writeContainerId(this.windowID);
         boolean v1_17_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1);
         if (v1_17_1) {
             writeVarInt(stateID);

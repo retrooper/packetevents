@@ -18,10 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -33,26 +35,42 @@ public class ItemEnchantments implements Iterable<Map.Entry<EnchantmentType, Int
     public static final ItemEnchantments EMPTY = new ItemEnchantments(
             Collections.emptyMap(), true) {
         @Override
+        public void setEnchantments(Map<EnchantmentType, Integer> enchantments) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public void setShowInTooltip(boolean showInTooltip) {
             throw new UnsupportedOperationException();
         }
     };
 
     private Map<EnchantmentType, Integer> enchantments;
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     private boolean showInTooltip;
 
+    public ItemEnchantments(Map<EnchantmentType, Integer> enchantments) {
+        this(enchantments, true);
+    }
+
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public ItemEnchantments(Map<EnchantmentType, Integer> enchantments, boolean showInTooltip) {
         this.enchantments = Collections.unmodifiableMap(enchantments);
         this.showInTooltip = showInTooltip;
     }
 
     public static ItemEnchantments read(PacketWrapper<?> wrapper) {
-        ClientVersion version = wrapper.getServerVersion().toClientVersion();
         Map<EnchantmentType, Integer> enchantments = wrapper.readMap(
-                ew -> EnchantmentTypes.getById(version, ew.readVarInt()),
+                ew -> wrapper.readMappedEntity(EnchantmentTypes.getRegistry()),
                 PacketWrapper::readVarInt
         );
-        boolean showInTooltip = wrapper.readBoolean();
+        boolean showInTooltip = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5) || wrapper.readBoolean();
         return new ItemEnchantments(enchantments, showInTooltip);
     }
 
@@ -62,7 +80,9 @@ public class ItemEnchantments implements Iterable<Map.Entry<EnchantmentType, Int
                 (ew, enchantment) -> ew.writeVarInt(enchantment.getId(version)),
                 PacketWrapper::writeVarInt
         );
-        wrapper.writeBoolean(enchantments.isShowInTooltip());
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
+            wrapper.writeBoolean(enchantments.isShowInTooltip());
+        }
     }
 
     public int getEnchantmentLevel(EnchantmentType enchantment) {
@@ -93,10 +113,18 @@ public class ItemEnchantments implements Iterable<Map.Entry<EnchantmentType, Int
         this.enchantments = enchantments;
     }
 
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public boolean isShowInTooltip() {
         return this.showInTooltip;
     }
 
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public void setShowInTooltip(boolean showInTooltip) {
         this.showInTooltip = showInTooltip;
     }

@@ -40,6 +40,7 @@ public class NPC {
     private NamedTextColor nameColor;
     private Component prefixName;
     private Component suffixName;
+    private String teamName;
     private int displayPing = 0;
     private Location location = new Location(0.0, 0.0, 0.0, 0.0f, 0.0f);
     private ItemStack mainHand = null;
@@ -60,6 +61,7 @@ public class NPC {
         this.nameColor = nameColor;
         this.prefixName = prefixName;
         this.suffixName = suffixName;
+        this.teamName = "npc-" + id;
     }
 
     public NPC(UserProfile profile, int entityId, @Nullable Component tabName) {
@@ -273,7 +275,7 @@ public class NPC {
         for (Object channel : channels) {
             //Destroy team
             WrapperPlayServerTeams removeTeam =
-                    new WrapperPlayServerTeams("custom_name_team",
+                    new WrapperPlayServerTeams(teamName,
                             WrapperPlayServerTeams.TeamMode.REMOVE,
                             Optional.empty());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, removeTeam);
@@ -410,6 +412,16 @@ public class NPC {
         this.suffixName = nameSuffix;
     }
 
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_18)) {
+            this.teamName = teamName.substring(0, 16);
+        } else this.teamName = teamName;
+    }
+
     @Nullable
     public Component getTabName() {
         return tabName;
@@ -436,11 +448,11 @@ public class NPC {
     }
 
     private WrapperPlayServerTeams generateTeamsData() {
-        return new WrapperPlayServerTeams("custom_name_team",
+        return new WrapperPlayServerTeams(teamName,
                 WrapperPlayServerTeams.TeamMode.CREATE,
                 Optional.of(
                         new WrapperPlayServerTeams.ScoreBoardTeamInfo(
-                                Component.text("custom_name_team"),
+                                Component.text(teamName),
                                 prefixName,
                                 suffixName,
                                 WrapperPlayServerTeams.NameTagVisibility.ALWAYS,

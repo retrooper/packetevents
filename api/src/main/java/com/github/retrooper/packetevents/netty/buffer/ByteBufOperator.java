@@ -74,6 +74,8 @@ public interface ByteBufOperator {
     Object markWriterIndex(Object buffer);
     Object resetWriterIndex(Object buffer);
 
+    Object allocateNewBuffer(Object buffer);
+
     default float readFloat(Object buffer) {
         return Float.intBitsToFloat(readInt(buffer));
     }

@@ -19,10 +19,12 @@
 package com.github.retrooper.packetevents.manager.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 public interface PlayerManager {
@@ -34,7 +36,17 @@ public interface PlayerManager {
 
     User getUser(@NotNull Object player);
 
-    default ConnectionState getConnectionState(@NotNull Object player) {
+    /**
+     * <strong>WARNING</strong>: Usage of this method should be avoided. Please use either
+     * {@link User#getDecoderState()} or {@link User#getEncoderState()}.<br>
+     * To access the specific state a packet event was sent/received in, use {@link ProtocolPacketEvent#getConnectionState()}.
+     * <p>
+     * Since 1.20.2, the Minecraft protocol allows the decoder/encoder connection states to de-sync.
+     *
+     * @throws IllegalStateException if encoder/decoder connection states do not match
+     */
+    @ApiStatus.Obsolete
+    default ConnectionState getConnectionState(@NotNull Object player) throws IllegalStateException {
         return getUser(player).getConnectionState();
     }
 

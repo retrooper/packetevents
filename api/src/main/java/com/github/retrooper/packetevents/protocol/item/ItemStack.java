@@ -18,10 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.item;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.component.ComponentType;
-import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
-import com.github.retrooper.packetevents.protocol.component.StaticComponentMap;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments;
 import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
@@ -32,11 +31,20 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import org.jetbrains.annotations.Nullable;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.MathUtil;
+import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
+import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,46 +54,112 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.DAMAGE;
+import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.ENCHANTABLE;
 import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.ENCHANTMENTS;
 import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.MAX_DAMAGE;
 import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.MAX_STACK_SIZE;
 import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.STORED_ENCHANTMENTS;
+import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.UNBREAKABLE_MODERN;
 
+@NullMarked
 public class ItemStack {
-    public static final ItemStack EMPTY = new ItemStack(ItemTypes.AIR, 0, new NBTCompound(), 0);
+
+    public static final ItemStack EMPTY = ItemStack.builder().nbt(new NBTCompound()).build();
+
+    private final ClientVersion version;
+    private final IRegistryHolder registryHolder;
+
     private final ItemType type;
     private int amount;
+
+    /**
+     * Removed with 1.20.5
+     */
+    @ApiStatus.Obsolete
     @Nullable
     private NBTCompound nbt;
+    /**
+     * Added with 1.20.5
+     */
     @Nullable // lazy loaded
-    private PatchableComponentMap components; // Added in 1.20.5
-    private int legacyData = -1;
-
-    private boolean cachedIsEmpty = false;
-
-    private ItemStack(ItemType type, int amount, @Nullable NBTCompound nbt, int legacyData) {
-        this(type, amount, nbt, null, legacyData);
-    }
+    private PatchableComponentMap components;
+    /**
+     * Removed with 1.13
+     */
+    @ApiStatus.Obsolete
+    private int legacyData;
 
     private ItemStack(
             ItemType type,
             int amount,
             @Nullable NBTCompound nbt,
             @Nullable PatchableComponentMap components,
-            int legacyData
+            int legacyData,
+            ClientVersion version,
+            IRegistryHolder registryHolder
     ) {
         this.type = type;
         this.amount = amount;
         this.nbt = nbt;
         this.components = components;
         this.legacyData = legacyData;
-        updateCachedEmptyStatus();
+        this.version = version;
+        this.registryHolder = registryHolder;
+    }
+
+    public static ItemStack decode(NBT nbt, ClientVersion version) {
+        if (nbt instanceof NBTString) {
+            ResourceLocation itemName = new ResourceLocation(((NBTString) nbt).getValue());
+            return ItemStack.builder().type(ItemTypes.getByName(itemName.toString())).build();
+        }
+        NBTCompound compound = (NBTCompound) nbt;
+        ItemStack.Builder builder = ItemStack.builder();
+
+        ResourceLocation itemName = Optional.ofNullable(compound.getStringTagValueOrNull("id")).map(Optional::of)
+                .orElseGet(() -> Optional.ofNullable(compound.getStringTagValueOrNull("item")))
+                .map(ResourceLocation::new).orElseThrow(() -> new IllegalArgumentException(
+                        "No item type specified: " + compound.getTags().keySet()));
+        builder.type(ItemTypes.getByName(itemName.toString()));
+        builder.nbt(compound.getCompoundTagOrNull("tag"));
+
+        Optional.ofNullable(compound.getNumberTagOrNull("Count")).map(Optional::of)
+                .orElseGet(() -> Optional.ofNullable(compound.getNumberTagOrNull("count")))
+                .map(NBTNumber::getAsInt).ifPresent(builder::amount);
+
+        // TODO components
+
+        return builder.build();
+    }
+
+    public static NBT encodeForParticle(ItemStack itemStack, ClientVersion version) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            boolean simple = itemStack.isEmpty()
+                    || itemStack.components == null
+                    || itemStack.components.getPatches().isEmpty();
+            if (simple) {
+                return new NBTString(itemStack.type.getName().toString());
+            }
+        }
+
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("id", new NBTString(itemStack.type.getName().toString()));
+        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
+            compound.setTag("Count", new NBTInt(itemStack.getAmount()));
+            if (itemStack.nbt != null) {
+                compound.setTag("tag", itemStack.nbt);
+            }
+        }
+
+        // TODO components
+
+        return compound;
     }
 
     public int getMaxStackSize() {
-        return this.getComponentOr(MAX_STACK_SIZE,
-                // fallback to legacy specified max stack size
-                this.getType().getMaxAmount());
+        if (this.version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            return this.getComponentOr(MAX_STACK_SIZE, 1);
+        }
+        return this.getType().getMaxAmount();
     }
 
     public boolean isStackable() {
@@ -93,9 +167,13 @@ public class ItemStack {
     }
 
     public boolean isDamageableItem() {
-        return !this.cachedIsEmpty && this.getMaxDamage() > 0
-                && (this.nbt == null || !this.nbt.getBoolean("Unbreakable"))
-                && !this.getComponentOr(ComponentTypes.UNBREAKABLE, false);
+        if (this.version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            return this.hasComponent(MAX_DAMAGE)
+                    && !this.hasComponent(UNBREAKABLE_MODERN)
+                    && this.hasComponent(DAMAGE);
+        }
+        return !this.isEmpty() && this.getMaxDamage() > 0
+                && (this.nbt == null || !this.nbt.getBoolean("Unbreakable"));
     }
 
     public boolean isDamaged() {
@@ -103,60 +181,68 @@ public class ItemStack {
     }
 
     public int getDamageValue() {
-        if (this.nbt != null) {
-            NBTInt damage = this.nbt.getTagOfTypeOrNull("Damage", NBTInt.class);
-            if (damage != null) {
-                return damage.getAsInt();
-            }
+        if (this.version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            int value = this.getComponentOr(DAMAGE, 0);
+            return MathUtil.clamp(value, 0, this.getMaxDamage());
+        } else if (this.version.isNewerThanOrEquals(ClientVersion.V_1_13)) {
+            NBTNumber damage = this.nbt != null ? this.nbt.getNumberTagOrNull("Damage") : null;
+            return damage == null ? 0 : damage.getAsInt();
+        } else {
+            return Math.max(0, this.legacyData);
         }
-        return this.getComponentOr(DAMAGE, 0);
     }
 
     public void setDamageValue(int damage) {
-        int cappedDamage = Math.max(0, damage);
-        // set in legacy nbt
-        this.getOrCreateTag().setTag("Damage", new NBTInt(cappedDamage));
-        // set in components
-        this.setComponent(DAMAGE, cappedDamage);
+        if (this.version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            this.setComponent(DAMAGE, MathUtil.clamp(damage, 0, this.getMaxDamage()));
+        } else if (this.version.isNewerThanOrEquals(ClientVersion.V_1_13)) {
+            this.getOrCreateTag().setTag("Damage", new NBTInt(Math.max(0, damage)));
+        } else {
+            this.legacyData = Math.max(0, damage);
+        }
     }
 
     public int getMaxDamage() {
-        return this.getComponentOr(MAX_DAMAGE,
-                // fallback to legacy specified max durability
-                this.getType().getMaxDurability());
+        if (this.version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            return this.getComponentOr(MAX_DAMAGE, 0);
+        } else {
+            return this.getType().getMaxDurability();
+        }
     }
 
     public NBTCompound getOrCreateTag() {
         if (this.nbt == null) {
             this.nbt = new NBTCompound();
         }
-
         return this.nbt;
     }
 
-    private void updateCachedEmptyStatus() {
-        cachedIsEmpty = isEmpty();
-    }
-
     public ItemType getType() {
-        return cachedIsEmpty ? ItemTypes.AIR : type;
+        if (this.version.isNewerThanOrEquals(ClientVersion.V_1_11)) {
+            // vanilla prevents negative-stacked items starting with 1.11
+            return this.isEmpty() ? ItemTypes.AIR : this.type;
+        }
+        return this.type;
     }
 
     public int getAmount() {
-        return cachedIsEmpty ? 0 : amount;
+        if (this.version.isNewerThanOrEquals(ClientVersion.V_1_11)) {
+            // vanilla prevents negative-stacked items starting with 1.11
+            return this.isEmpty() ? 0 : this.amount;
+        }
+        return this.amount;
     }
 
     public void shrink(int amount) {
-        this.setAmount(this.getAmount() - amount);
+        this.amount -= amount;
     }
 
     public void grow(int amount) {
-        this.setAmount(this.getAmount() + amount);
+        this.amount += amount;
     }
 
     public void setAmount(int amount) {
         this.amount = amount;
-        updateCachedEmptyStatus();
     }
 
     public ItemStack split(int toTake) {
@@ -168,11 +254,14 @@ public class ItemStack {
     }
 
     public ItemStack copy() {
-        return cachedIsEmpty ? EMPTY : new ItemStack(
-                type, amount,
-                nbt == null ? null : nbt.copy(),
-                components == null ? null : components.copy(),
-                legacyData
+        if (this.isEmpty()) {
+            return EMPTY;
+        }
+        return new ItemStack(
+                this.type, this.amount,
+                this.nbt == null ? null : this.nbt.copy(),
+                this.components == null ? null : this.components.copy(),
+                this.legacyData, this.version, this.registryHolder
         );
     }
 
@@ -245,22 +334,43 @@ public class ItemStack {
         this.legacyData = legacyData;
     }
 
-    public boolean isEnchantable(ClientVersion version) {
-        if (getType() == ItemTypes.BOOK) return getAmount() == 1;
-        if (getType() == ItemTypes.ENCHANTED_BOOK) return false;
-        return getMaxStackSize() == 1 && canBeDepleted() && !isEnchanted(version);
+    public boolean isEnchantable() {
+        return this.isEnchantable(this.version);
     }
 
-    public boolean isEnchanted(ClientVersion version) {
-        if (this.isEmpty()) {
+    /**
+     * @deprecated use {@link #isEnchantable()} instead
+     */
+    @Deprecated
+    public boolean isEnchantable(ClientVersion version) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            // component logic
+            return this.hasComponent(ENCHANTABLE) && !this.isEnchanted(version);
+        }
+        // legacy nbt logic
+        if (this.type == ItemTypes.BOOK) {
+            return this.getAmount() == 1;
+        } else if (this.type == ItemTypes.ENCHANTED_BOOK) {
             return false;
         }
-        // check for components
-        if (!this.getComponentOr(ENCHANTMENTS, ItemEnchantments.EMPTY).isEmpty()
-                || !this.getComponentOr(STORED_ENCHANTMENTS, ItemEnchantments.EMPTY).isEmpty()) {
-            return true;
+        return this.getMaxStackSize() == 1 && this.canBeDepleted() && !this.isEnchanted(version);
+    }
+
+    public boolean isEnchanted() {
+        return this.isEnchanted(this.version);
+    }
+
+    /**
+     * @deprecated use {@link #isEnchanted()} instead
+     */
+    @Deprecated
+    public boolean isEnchanted(ClientVersion version) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            // component logic
+            return !this.getComponentOr(ENCHANTMENTS, ItemEnchantments.EMPTY).isEmpty()
+                    || !this.getComponentOr(STORED_ENCHANTMENTS, ItemEnchantments.EMPTY).isEmpty();
         }
-        // check for legacy nbt
+        // legacy nbt logic
         if (this.nbt != null) {
             String tagName = this.getEnchantmentsTagName(version);
             NBTList<NBTCompound> enchantments = this.nbt.getCompoundListTagOrNull(tagName);
@@ -269,17 +379,22 @@ public class ItemStack {
         return false;
     }
 
-    public List<Enchantment> getEnchantments(ClientVersion version) {
-        if (this.isEmpty()) {
-            return new ArrayList<>(0);
-        }
+    public List<Enchantment> getEnchantments() {
+        return this.getEnchantments(this.version);
+    }
 
-        // check for components
-        ItemEnchantments enchantmentsComp = this.getComponentOr(ENCHANTMENTS, ItemEnchantments.EMPTY);
-        ItemEnchantments storedEnchantmentsComp = this.getComponentOr(STORED_ENCHANTMENTS, ItemEnchantments.EMPTY);
-        if (!enchantmentsComp.isEmpty() || !storedEnchantmentsComp.isEmpty()) {
+    /**
+     * @deprecated use {@link #getEnchantments()} instead
+     */
+    @Deprecated
+    public List<Enchantment> getEnchantments(ClientVersion version) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            // component logic
+            ItemEnchantments enchantmentsComp = this.getComponentOr(ENCHANTMENTS, ItemEnchantments.EMPTY);
+            ItemEnchantments storedEnchantmentsComp = this.getComponentOr(STORED_ENCHANTMENTS, ItemEnchantments.EMPTY);
             List<Enchantment> enchantmentsList = new ArrayList<>(
-                    enchantmentsComp.getEnchantmentCount() + storedEnchantmentsComp.getEnchantmentCount());
+                    enchantmentsComp.getEnchantmentCount()
+                            + storedEnchantmentsComp.getEnchantmentCount());
             for (Map.Entry<EnchantmentType, Integer> enchantment : enchantmentsComp) {
                 enchantmentsList.add(new Enchantment(enchantment.getKey(), enchantment.getValue()));
             }
@@ -288,8 +403,7 @@ public class ItemStack {
             }
             return enchantmentsList;
         }
-
-        // check for legacy nbt
+        // legacy nbt logic
         if (this.nbt != null) {
             String tagName = this.getEnchantmentsTagName(version);
             NBTList<NBTCompound> nbtList = this.nbt.getCompoundListTagOrNull(tagName);
@@ -301,10 +415,12 @@ public class ItemStack {
                     EnchantmentType type = getEnchantmentTypeFromTag(compound, version);
 
                     if (type != null) {
-                        NBTShort levelTag = compound.getTagOfTypeOrNull("lvl", NBTShort.class);
-                        int level = levelTag.getAsInt();
-                        Enchantment enchantment = Enchantment.builder().type(type).level(level).build();
-                        enchantments.add(enchantment);
+                        NBTNumber levelTag = compound.getNumberTagOrNull("lvl");
+                        if (levelTag != null) {
+                            int level = levelTag.getAsInt();
+                            Enchantment enchantment = Enchantment.builder().type(type).level(level).build();
+                            enchantments.add(enchantment);
+                        }
                     }
                 }
                 return enchantments;
@@ -314,36 +430,41 @@ public class ItemStack {
         return new ArrayList<>(0);
     }
 
+    public int getEnchantmentLevel(EnchantmentType enchantment) {
+        return this.getEnchantmentLevel(enchantment, this.version);
+    }
+
+    /**
+     * @deprecated use {@link #getEnchantmentLevel(EnchantmentType)} instead
+     */
+    @Deprecated
     public int getEnchantmentLevel(EnchantmentType enchantment, ClientVersion version) {
-        if (this.isEmpty()) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            // component logic
+            ItemEnchantments enchantmentsComp = this.getComponentOr(ENCHANTMENTS, ItemEnchantments.EMPTY);
+            if (!enchantmentsComp.isEmpty()) {
+                int level = enchantmentsComp.getEnchantmentLevel(enchantment);
+                if (level > 0) {
+                    return level;
+                }
+            }
+            ItemEnchantments storedEnchantmentsComp = this.getComponentOr(STORED_ENCHANTMENTS, ItemEnchantments.EMPTY);
+            if (!storedEnchantmentsComp.isEmpty()) {
+                return storedEnchantmentsComp.getEnchantmentLevel(enchantment);
+            }
             return 0;
         }
 
-        // check for components
-        ItemEnchantments enchantmentsComp = this.getComponentOr(ENCHANTMENTS, ItemEnchantments.EMPTY);
-        if (!enchantmentsComp.isEmpty()) {
-            int level = enchantmentsComp.getEnchantmentLevel(enchantment);
-            if (level > 0) {
-                return level;
-            }
-        }
-        ItemEnchantments storedEnchantmentsComp = this.getComponentOr(STORED_ENCHANTMENTS, ItemEnchantments.EMPTY);
-        if (!storedEnchantmentsComp.isEmpty()) {
-            int level = storedEnchantmentsComp.getEnchantmentLevel(enchantment);
-            if (level > 0) {
-                return level;
-            }
-        }
-
+        // legacy nbt logic
         if (this.nbt != null) {
             String tagName = this.getEnchantmentsTagName(version);
             NBTList<NBTCompound> nbtList = this.nbt.getCompoundListTagOrNull(tagName);
             if (nbtList != null) {
                 for (NBTCompound base : nbtList.getTags()) {
                     EnchantmentType type = getEnchantmentTypeFromTag(base, version);
-                    if (enchantment == type) {
-                        NBTShort nbtShort = base.getTagOfTypeOrNull("lvl", NBTShort.class);
-                        return nbtShort != null ? nbtShort.getAsInt() : 0;
+                    if (Objects.equals(type, enchantment)) {
+                        NBTNumber nbtLevel = base.getNumberTagOrNull("lvl");
+                        return nbtLevel != null ? nbtLevel.getAsInt() : 0;
                     }
                 }
             }
@@ -358,59 +479,66 @@ public class ItemStack {
             return EnchantmentTypes.getByName(id);
         } else {
             NBTShort idTag = tag.getTagOfTypeOrNull("id", NBTShort.class);
-            return EnchantmentTypes.getById(version, idTag.getAsInt());
+            return idTag != null ? EnchantmentTypes.getById(version, idTag.getAsInt()) : null;
         }
     }
 
+    public void setEnchantments(List<Enchantment> enchantments) {
+        this.setEnchantments(enchantments, this.version);
+    }
+
+    /**
+     * @deprecated use {@link #setEnchantments(List)} instead
+     */
+    @Deprecated
     public void setEnchantments(List<Enchantment> enchantments, ClientVersion version) {
-        // set in legacy nbt
-        nbt = getOrCreateTag(); // Create tag if null
-        String tagName = getEnchantmentsTagName(version);
-        if (enchantments.isEmpty()) {
-            //Let us clear the enchantments
-            if (nbt.getTagOrNull(tagName) != null) {
-                nbt.removeTag(tagName);
-            }
-        } else {
-            List<NBTCompound> list = new ArrayList<>();
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            // component logic
+            Map<EnchantmentType, Integer> enchantmentsMap = new HashMap<>(enchantments.size());
             for (Enchantment enchantment : enchantments) {
-                NBTCompound compound = new NBTCompound();
-                if (version.isNewerThanOrEquals(ClientVersion.V_1_13)) {
-                    compound.setTag("id", new NBTString(enchantment.getType().getName().toString()));
-                } else {
-                    compound.setTag("id", new NBTShort((short) enchantment.getType().getId(version)));
-                }
-
-                compound.setTag("lvl", new NBTShort((short) enchantment.getLevel()));
-                list.add(compound);
+                enchantmentsMap.put(enchantment.getType(), enchantment.getLevel());
             }
-            assert nbt != null; // NBT was created in getOrCreateTag()
-            nbt.setTag(tagName, new NBTList<>(NBTType.COMPOUND, list));
+            ComponentType<ItemEnchantments> componentType =
+                    this.hasComponent(STORED_ENCHANTMENTS) ? STORED_ENCHANTMENTS : ENCHANTMENTS;
+            Optional<ItemEnchantments> prevEnchantments = this.getComponent(componentType);
+            boolean showInTooltip = prevEnchantments.map(ItemEnchantments::isShowInTooltip).orElse(true);
+            this.setComponent(componentType, new ItemEnchantments(enchantmentsMap, showInTooltip));
+        } else {
+            // legacy nbt logic
+            String tagName = this.getEnchantmentsTagName(version);
+            if (enchantments.isEmpty()) {
+                // just remove enchantment tag
+                if (this.nbt != null && this.nbt.getTagOrNull(tagName) != null) {
+                    this.nbt.removeTag(tagName);
+                }
+            } else {
+                List<NBTCompound> list = new ArrayList<>();
+                for (Enchantment enchantment : enchantments) {
+                    NBTCompound compound = new NBTCompound();
+                    if (version.isNewerThanOrEquals(ClientVersion.V_1_13)) {
+                        compound.setTag("id", new NBTString(enchantment.getType().getName().toString()));
+                    } else {
+                        compound.setTag("id", new NBTShort((short) enchantment.getType().getId(version)));
+                    }
+                    compound.setTag("lvl", new NBTShort((short) enchantment.getLevel()));
+                    list.add(compound);
+                }
+                this.getOrCreateTag().setTag(tagName, new NBTList<>(NBTType.COMPOUND, list));
+            }
         }
-
-        // set in components
-        Map<EnchantmentType, Integer> enchantmentsMap = new HashMap<>(enchantments.size());
-        for (Enchantment enchantment : enchantments) {
-            enchantmentsMap.put(enchantment.getType(), enchantment.getLevel());
-        }
-        ComponentType<ItemEnchantments> componentType = this.type == ItemTypes.ENCHANTED_BOOK
-                ? STORED_ENCHANTMENTS : ENCHANTMENTS;
-        Optional<ItemEnchantments> prevEnchantments = this.getComponent(componentType);
-        boolean showInTooltip = prevEnchantments.map(ItemEnchantments::isShowInTooltip).orElse(true);
-        this.setComponent(componentType, new ItemEnchantments(enchantmentsMap, showInTooltip));
     }
 
     @Deprecated
     public String getEnchantmentsTagName(ClientVersion version) {
         String tagName = version.isNewerThanOrEquals(ClientVersion.V_1_13) ? "Enchantments" : "ench";
-        if (type == ItemTypes.ENCHANTED_BOOK) {
+        if (this.type == ItemTypes.ENCHANTED_BOOK) {
             tagName = "StoredEnchantments";
         }
         return tagName;
     }
 
     public boolean canBeDepleted() {
-        return this.getType().getMaxDurability() > 0;
+        return this.getMaxDamage() > 0;
     }
 
     public boolean is(ItemType type) {
@@ -418,24 +546,57 @@ public class ItemStack {
     }
 
     public static boolean isSameItemSameTags(ItemStack stack, ItemStack otherStack) {
-        return stack.is(otherStack.getType())
-                && (stack.isEmpty() && otherStack.isEmpty()
-                || (ItemStack.tagMatches(stack, otherStack)
-                && Objects.equals(stack.components, otherStack.components)));
+        return isSameItemSameComponents(stack, otherStack);
     }
 
-    public static boolean tagMatches(ItemStack left, ItemStack right) {
-        if (left == right) {
+    public static boolean isSameItemSameComponents(ItemStack stack, ItemStack otherStack) {
+        if (stack.version != otherStack.version) {
+            throw new IllegalArgumentException("Can't compare two ItemStacks across versions: "
+                    + stack.version + " != " + otherStack.version);
+        } else if (stack.version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            // compare components
+            return stack.is(otherStack.getType())
+                    && (stack.isEmpty() && otherStack.isEmpty()
+                    || stack.getComponents().equals(otherStack.getComponents()));
+        }
+        // component nbt
+        return stack.is(otherStack.getType())
+                && (stack.isEmpty() && otherStack.isEmpty()
+                || (Objects.equals(stack.nbt, otherStack.nbt)));
+    }
+
+    public static boolean tagMatches(@Nullable ItemStack stack, @Nullable ItemStack otherStack) {
+        if (stack == otherStack) {
             return true;
+        } else if (stack == null) {
+            return otherStack.isEmpty();
+        } else if (otherStack == null) {
+            return stack.isEmpty();
         }
-        if (left == null) {
-            return right.isEmpty();
+        if (stack.version != otherStack.version) {
+            throw new IllegalArgumentException("Can't compare two ItemStacks across versions: "
+                    + stack.version + " != " + otherStack.version);
+        } else if (stack.version.isNewerThanOrEquals(ClientVersion.V_1_20_5)) {
+            return stack.getComponents().equals(otherStack.getComponents());
         }
-        if (right == null) {
-            return left.isEmpty();
+        return Objects.equals(stack.nbt, otherStack.nbt);
+    }
+
+    public boolean isEmpty() {
+        boolean baseEmpty = this.type == ItemTypes.AIR || this.amount <= 0;
+        if (this.version.isOlderThanOrEquals(ClientVersion.V_1_12_2)) {
+            return baseEmpty || this.legacyData < Short.MIN_VALUE || this.legacyData > (1 << 16);
+        } else {
+            return baseEmpty;
         }
-        return Objects.equals(left.nbt, right.nbt)
-                && Objects.equals(left.components, right.components);
+    }
+
+    public ClientVersion getVersion() {
+        return this.version;
+    }
+
+    public IRegistryHolder getRegistryHolder() {
+        return this.registryHolder;
     }
 
     @Override
@@ -444,30 +605,26 @@ public class ItemStack {
             return true;
         if (obj instanceof ItemStack) {
             ItemStack itemStack = (ItemStack) obj;
-            return getType().equals(itemStack.getType())
-                    && amount == itemStack.amount
-                    && Objects.equals(nbt, itemStack.nbt)
-                    && Objects.equals(components, itemStack.components)
-                    && legacyData == itemStack.legacyData;
+            return this.type.equals(itemStack.type)
+                    && this.amount == itemStack.amount
+                    && Objects.equals(this.nbt, itemStack.nbt)
+                    && Objects.equals(this.components, itemStack.components)
+                    && this.legacyData == itemStack.legacyData;
         }
         return false;
     }
 
     @Override
     public String toString() {
-        if (cachedIsEmpty) {
-            return "ItemStack[null]";
-        } else {
-            String identifier = type == null ? "null" : type.getName().toString();
-            int maxAmount = getType().getMaxAmount();
-            return "ItemStack[type=" + identifier + ", amount=" + amount + "/" + maxAmount
-                    + ", nbt tag names: " + (nbt != null ? nbt.getTagNames() : "[null]")
-                    + ", legacyData=" + legacyData + ", components=" + components + "]";
+        if (this.isEmpty()) {
+            return "ItemStack[EMPTY]";
         }
-    }
-
-    public boolean isEmpty() {
-        return type == null || type == ItemTypes.AIR || amount <= 0;
+        return "ItemStack["
+                + this.getAmount() + "x/" + this.getMaxStackSize() + "x " + this.type.getName()
+                + (this.nbt != null ? ", nbt tag names=" + this.nbt.getTagNames() : "")
+                + (this.legacyData != -1 ? ", legacy data=" + this.legacyData : "")
+                + (this.components != null ? ", components=" + this.components.getPatches() : "")
+                + "]";
     }
 
     public static Builder builder() {
@@ -475,10 +632,14 @@ public class ItemStack {
     }
 
     public static class Builder {
-        private ItemType type;
+
+        private ClientVersion version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        private IRegistryHolder registryHolder = GlobalRegistryHolder.INSTANCE;
+
+        private ItemType type = ItemTypes.AIR;
         private int amount = 1;
-        private NBTCompound nbt = null;
-        private PatchableComponentMap components = null;
+        private @Nullable NBTCompound nbt = null;
+        private @Nullable PatchableComponentMap components = null;
         private int legacyData = -1;
 
         public Builder type(ItemType type) {
@@ -511,8 +672,7 @@ public class ItemStack {
 
         public <T> Builder component(ComponentType<T> type, @Nullable T value) {
             if (this.components == null) {
-                this.components = new PatchableComponentMap(this.type == null
-                        ? StaticComponentMap.SHARED_ITEM_COMPONENTS : this.type.getComponents());
+                this.components = new PatchableComponentMap(this.type.getComponents(this.version));
             }
             this.components.set(type, value);
             return this;
@@ -523,9 +683,28 @@ public class ItemStack {
             return this;
         }
 
-        public ItemStack build() {
-            return new ItemStack(type, amount, nbt, components, legacyData);
+        public Builder user(User user) {
+            return this.version(user.getPacketVersion()).registryHolder(user);
         }
 
+        public Builder wrapper(PacketWrapper<?> wrapper) {
+            ClientVersion version = wrapper.getServerVersion().toClientVersion();
+            return this.version(version).registryHolder(wrapper.getRegistryHolder());
+        }
+
+        public Builder version(ClientVersion version) {
+            this.version = version;
+            return this;
+        }
+
+        public Builder registryHolder(IRegistryHolder registryHolder) {
+            this.registryHolder = registryHolder;
+            return this;
+        }
+
+        public ItemStack build() {
+            return new ItemStack(this.type, this.amount, this.nbt, this.components,
+                    this.legacyData, this.version, this.registryHolder);
+        }
     }
 }

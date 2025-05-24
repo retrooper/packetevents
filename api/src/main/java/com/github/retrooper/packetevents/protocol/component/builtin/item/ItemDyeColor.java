@@ -18,15 +18,29 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
 
 public class ItemDyeColor {
 
     private int rgb;
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     private boolean showInTooltip;
 
+    public ItemDyeColor(int rgb) {
+        this(rgb, true);
+    }
+
+    /**
+     * {@link #showInTooltip} has been removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public ItemDyeColor(int rgb, boolean showInTooltip) {
         this.rgb = rgb;
         this.showInTooltip = showInTooltip;
@@ -34,13 +48,15 @@ public class ItemDyeColor {
 
     public static ItemDyeColor read(PacketWrapper<?> wrapper) {
         int rgb = wrapper.readInt();
-        boolean showInTooltip = wrapper.readBoolean();
+        boolean showInTooltip = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5) || wrapper.readBoolean();
         return new ItemDyeColor(rgb, showInTooltip);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemDyeColor color) {
         wrapper.writeInt(color.rgb);
-        wrapper.writeBoolean(color.showInTooltip);
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
+            wrapper.writeBoolean(color.showInTooltip);
+        }
     }
 
     public int getRgb() {
@@ -51,10 +67,18 @@ public class ItemDyeColor {
         this.rgb = rgb;
     }
 
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public boolean isShowInTooltip() {
         return this.showInTooltip;
     }
 
+    /**
+     * Removed in 1.21.5
+     */
+    @ApiStatus.Obsolete
     public void setShowInTooltip(boolean showInTooltip) {
         this.showInTooltip = showInTooltip;
     }

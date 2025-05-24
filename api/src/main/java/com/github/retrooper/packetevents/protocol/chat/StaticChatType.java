@@ -18,41 +18,106 @@
 
 package com.github.retrooper.packetevents.protocol.chat;
 
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
-public class StaticChatType implements ChatType {
+import java.util.Objects;
 
-    private final ChatTypeDecoration chatDecoration;
-    private final ChatTypeDecoration narrationDecoration;
+public class StaticChatType extends AbstractMappedEntity implements ChatType {
 
-    public StaticChatType(ChatTypeDecoration chatDecoration, ChatTypeDecoration narrationDecoration) {
+    private final @UnknownNullability("only nullable for 1.19") ChatTypeDecoration chatDecoration;
+    private final @Nullable ChatTypeDecoration overlayDecoration;
+    private final @UnknownNullability("only nullable for 1.19") ChatTypeDecoration narrationDecoration;
+    private final @Nullable NarrationPriority narrationPriority;
+
+    public StaticChatType(
+            ChatTypeDecoration chatDecoration,
+            ChatTypeDecoration narrationDecoration
+    ) {
+        this(null, chatDecoration, null, narrationDecoration, null);
+    }
+
+    @ApiStatus.Internal
+    public StaticChatType(
+            @Nullable TypesBuilderData data,
+            ChatTypeDecoration chatDecoration,
+            ChatTypeDecoration narrationDecoration
+    ) {
+        this(data, chatDecoration, null, narrationDecoration, null);
+    }
+
+    public StaticChatType(
+            @UnknownNullability("only nullable for 1.19") ChatTypeDecoration chatDecoration,
+            @Nullable ChatTypeDecoration overlayDecoration,
+            @UnknownNullability("only nullable for 1.19") ChatTypeDecoration narrationDecoration,
+            @Nullable NarrationPriority narrationPriority
+    ) {
+        this(null, chatDecoration, overlayDecoration, narrationDecoration, narrationPriority);
+    }
+
+    @ApiStatus.Internal
+    public StaticChatType(
+            @Nullable TypesBuilderData data,
+            @UnknownNullability("only nullable for 1.19") ChatTypeDecoration chatDecoration,
+            @Nullable ChatTypeDecoration overlayDecoration,
+            @UnknownNullability("only nullable for 1.19") ChatTypeDecoration narrationDecoration,
+            @Nullable NarrationPriority narrationPriority
+    ) {
+        super(data);
         this.chatDecoration = chatDecoration;
+        this.overlayDecoration = overlayDecoration;
         this.narrationDecoration = narrationDecoration;
+        this.narrationPriority = narrationPriority;
     }
 
     @Override
-    public ChatTypeDecoration getChatDecoration() {
+    public ChatType copy(@Nullable TypesBuilderData newData) {
+        return new StaticChatType(newData, this.chatDecoration,
+                this.overlayDecoration, this.narrationDecoration, this.narrationPriority);
+    }
+
+    @Override
+    public @UnknownNullability("only nullable for 1.19") ChatTypeDecoration getChatDecoration() {
         return this.chatDecoration;
     }
 
     @Override
-    public ChatTypeDecoration getNarrationDecoration() {
+    public @Nullable ChatTypeDecoration getOverlayDecoration() {
+        return this.overlayDecoration;
+    }
+
+    @Override
+    public @UnknownNullability("only nullable for 1.19") ChatTypeDecoration getNarrationDecoration() {
         return this.narrationDecoration;
     }
 
     @Override
-    public ResourceLocation getName() {
-        throw new UnsupportedOperationException();
+    public @Nullable NarrationPriority getNarrationPriority() {
+        return this.narrationPriority;
     }
 
     @Override
-    public int getId(ClientVersion version) {
-        throw new UnsupportedOperationException();
+    public boolean deepEquals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StaticChatType)) return false;
+        if (!super.equals(obj)) return false;
+        StaticChatType that = (StaticChatType) obj;
+        if (!Objects.equals(this.chatDecoration, that.chatDecoration)) return false;
+        if (!Objects.equals(this.overlayDecoration, that.overlayDecoration)) return false;
+        if (!Objects.equals(this.narrationDecoration, that.narrationDecoration)) return false;
+        return this.narrationPriority == that.narrationPriority;
     }
 
     @Override
-    public boolean isRegistered() {
-        return false;
+    public int deepHashCode() {
+        return Objects.hash(super.hashCode(), this.chatDecoration, this.overlayDecoration, this.narrationDecoration, this.narrationPriority);
+    }
+
+    @Override
+    public String toString() {
+        return "StaticChatType{chatDecoration=" + this.chatDecoration + ", overlayDecoration=" + this.overlayDecoration + ", narrationDecoration=" + this.narrationDecoration + ", narrationPriority=" + this.narrationPriority + '}';
     }
 }

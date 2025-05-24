@@ -29,6 +29,12 @@ package com.github.retrooper.packetevents.protocol.world.chunk.palette;
  */
 //TODO Equals & hashcode
 public class GlobalPalette implements Palette {
+
+    // this is the amount of bits required to store the biggest state id number
+    public static final int BITS_PER_ENTRY = 15;
+
+    public static final GlobalPalette INSTANCE = new GlobalPalette();
+
     @Override
     public int size() {
         return Integer.MAX_VALUE;
@@ -42,5 +48,10 @@ public class GlobalPalette implements Palette {
     @Override
     public int idToState(int id) {
         return id;
+    }
+
+    @Override
+    public int getBits() {
+        return BITS_PER_ENTRY;
     }
 }

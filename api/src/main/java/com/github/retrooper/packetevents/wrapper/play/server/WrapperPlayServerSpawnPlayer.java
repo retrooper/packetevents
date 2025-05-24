@@ -30,7 +30,6 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +46,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
 
     @Deprecated
     private ItemType item;
-    private List<EntityData> entityMetadata;
+    private List<EntityData<?>> entityMetadata;
 
     public WrapperPlayServerSpawnPlayer(PacketSendEvent event) {
         super(event);
@@ -57,15 +56,15 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), metadata.entityData(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
     }
 
-    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, List<EntityData> entityMetadata) {
+    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, List<EntityData<?>> entityMetadata) {
         this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), entityMetadata);
     }
 
-    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, EntityData... entityMetadata) {
+    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, EntityData<?>... entityMetadata) {
         this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), Arrays.asList(entityMetadata));
     }
 
-    public WrapperPlayServerSpawnPlayer(int entityID, UUID uuid, Vector3d position, float yaw, float pitch, List<EntityData> entityMetadata) {
+    public WrapperPlayServerSpawnPlayer(int entityID, UUID uuid, Vector3d position, float yaw, float pitch, List<EntityData<?>> entityMetadata) {
         super(PacketType.Play.Server.SPAWN_PLAYER);
         this.entityID = entityID;
         this.uuid = uuid;
@@ -135,6 +134,8 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         position = wrapper.position;
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
+        item = wrapper.item;
+        entityMetadata = wrapper.entityMetadata;
     }
 
     public int getEntityId() {
@@ -178,12 +179,12 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
     }
 
     @Deprecated
-    public List<EntityData> getEntityMetadata() {
+    public List<EntityData<?>> getEntityMetadata() {
         return entityMetadata;
     }
 
     @Deprecated
-    public void setEntityMetadata(List<EntityData> entityMetadata) {
+    public void setEntityMetadata(List<EntityData<?>> entityMetadata) {
         this.entityMetadata = entityMetadata;
     }
 

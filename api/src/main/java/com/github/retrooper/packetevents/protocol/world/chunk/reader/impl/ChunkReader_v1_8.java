@@ -18,14 +18,15 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.reader.impl;
 
-import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
-import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.NetworkChunkData;
 import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.ShortArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8.Chunk_v1_8;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -35,7 +36,12 @@ import java.util.BitSet;
 public class ChunkReader_v1_8 implements ChunkReader {
 
     @Override
-    public BaseChunk[] read(Dimension dimension, BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn) {
+    public BaseChunk[] read(
+            DimensionType dimensionType, BitSet chunkMask, BitSet secondaryChunkMask, boolean fullChunk,
+            boolean hasBlockLight, boolean hasSkyLight, int chunkSize, int arrayLength, PacketWrapper<?> wrapper
+    ) {
+        byte[] data = wrapper.readByteArrayOfSize(arrayLength);
+
         Chunk_v1_8[] chunks = new Chunk_v1_8[16];
         int pos = 0;
         int expected = fullChunk ? 256 : 0; // 256 if full chunk for the biome data, always sent if full chunk
@@ -49,14 +55,14 @@ public class ChunkReader_v1_8 implements ChunkReader {
         // 3 = Get sky light.
         for (int pass = 0; pass < 4; pass++) {
             for (int ind = 0; ind < 16; ind++) {
-                if (set.get(ind)) {
+                if (chunkMask.get(ind)) {
                     if (pass == 0) {
                         // Block length + Blocklight length
                         expected += (4096 * 2) + 2048;
                     }
 
                     if (pass == 1) {
-                        chunks[ind] = new Chunk_v1_8(sky || hasSkyLight);
+                        chunks[ind] = new Chunk_v1_8(sky || hasBlockLight);
                         ShortArray3d blocks = chunks[ind].getBlocks();
                         buf.position(pos / 2);
                         buf.get(blocks.getData(), 0, blocks.getData().length);
@@ -69,7 +75,7 @@ public class ChunkReader_v1_8 implements ChunkReader {
                         pos += blocklight.getData().length;
                     }
 
-                    if (pass == 3 && (sky || hasSkyLight)) {
+                    if (pass == 3 && (sky || hasBlockLight)) {
                         NibbleArray3d skylight = chunks[ind].getSkyLight();
                         System.arraycopy(data, pos, skylight.getData(), 0, skylight.getData().length);
                         pos += skylight.getData().length;
@@ -79,9 +85,13 @@ public class ChunkReader_v1_8 implements ChunkReader {
 
             if (pass == 0 && data.length > expected) {
                 // If we have more data than blocks and blocklight combined, there must be skylight data as well.
-                sky = checkForSky;
+                sky = hasSkyLight;
             }
         }
+
+        // reset reader index of buffer to end of data, we still need to read biome data
+        int ri = ByteBufHelper.readerIndex(wrapper.buffer);
+        ByteBufHelper.readerIndex(wrapper.buffer, ri - (arrayLength - pos));
 
         return chunks;
     }

@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.protocol.world.positionsource;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public interface PositionSourceType<T extends PositionSource> extends MappedEntity {
@@ -26,4 +28,8 @@ public interface PositionSourceType<T extends PositionSource> extends MappedEnti
     T read(PacketWrapper<?> wrapper);
 
     void write(PacketWrapper<?> wrapper, T source);
+
+    T decode(NBTCompound compound, ClientVersion version);
+
+    void encode(T source, ClientVersion version, NBTCompound compound);
 }

@@ -32,6 +32,7 @@ include("netty-common")
 include("spigot")
 include("bungeecord")
 include("velocity")
+include("sponge")
 include("fabric")
 // Patch modules
 include(":patch:adventure-text-serializer-gson")

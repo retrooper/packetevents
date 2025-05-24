@@ -207,7 +207,7 @@ public class NBTCompound extends NBT {
     }
 
     public boolean getBoolean(String string) {
-        NBTByte nbtByte = this.getTagOfTypeOrNull(string, NBTByte.class);
+        NBTNumber nbtByte = this.getTagOfTypeOrNull(string, NBTNumber.class);
         // Empty byte tags are considered 0
         return nbtByte != null && nbtByte.getAsByte() != 0;
     }

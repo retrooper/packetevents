@@ -35,31 +35,32 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlayServerUpdateAttributes> {
 
     private static final List<Map.Entry<String, Attribute>> PRE_1_16_ATTRIBUTES = Collections.unmodifiableList(Arrays.asList(
-            new SimpleEntry<>("generic.maxHealth", Attributes.GENERIC_MAX_HEALTH),
-            new SimpleEntry<>("Max Health", Attributes.GENERIC_MAX_HEALTH),
-            new SimpleEntry<>("zombie.spawnReinforcements", Attributes.ZOMBIE_SPAWN_REINFORCEMENTS),
-            new SimpleEntry<>("Spawn Reinforcements Chance", Attributes.ZOMBIE_SPAWN_REINFORCEMENTS),
+            new SimpleEntry<>("generic.maxHealth", Attributes.MAX_HEALTH),
+            new SimpleEntry<>("Max Health", Attributes.MAX_HEALTH),
+            new SimpleEntry<>("zombie.spawnReinforcements", Attributes.SPAWN_REINFORCEMENTS),
+            new SimpleEntry<>("Spawn Reinforcements Chance", Attributes.SPAWN_REINFORCEMENTS),
             new SimpleEntry<>("horse.jumpStrength", Attributes.HORSE_JUMP_STRENGTH),
             new SimpleEntry<>("Jump Strength", Attributes.HORSE_JUMP_STRENGTH),
-            new SimpleEntry<>("generic.followRange", Attributes.GENERIC_FOLLOW_RANGE),
-            new SimpleEntry<>("Follow Range", Attributes.GENERIC_FOLLOW_RANGE),
-            new SimpleEntry<>("generic.knockbackResistance", Attributes.GENERIC_KNOCKBACK_RESISTANCE),
-            new SimpleEntry<>("Knockback Resistance", Attributes.GENERIC_KNOCKBACK_RESISTANCE),
-            new SimpleEntry<>("generic.movementSpeed", Attributes.GENERIC_MOVEMENT_SPEED),
-            new SimpleEntry<>("Movement Speed", Attributes.GENERIC_MOVEMENT_SPEED),
-            new SimpleEntry<>("generic.flyingSpeed", Attributes.GENERIC_FLYING_SPEED),
-            new SimpleEntry<>("Flying Speed", Attributes.GENERIC_FLYING_SPEED),
-            new SimpleEntry<>("generic.attackDamage", Attributes.GENERIC_ATTACK_DAMAGE),
-            new SimpleEntry<>("generic.attackKnockback", Attributes.GENERIC_ATTACK_KNOCKBACK),
-            new SimpleEntry<>("generic.attackSpeed", Attributes.GENERIC_ATTACK_SPEED),
-            new SimpleEntry<>("generic.armorToughness", Attributes.GENERIC_ARMOR_TOUGHNESS),
-            new SimpleEntry<>("generic.armor", Attributes.GENERIC_ARMOR),
-            new SimpleEntry<>("generic.luck", Attributes.GENERIC_LUCK)
+            new SimpleEntry<>("generic.followRange", Attributes.FOLLOW_RANGE),
+            new SimpleEntry<>("Follow Range", Attributes.FOLLOW_RANGE),
+            new SimpleEntry<>("generic.knockbackResistance", Attributes.KNOCKBACK_RESISTANCE),
+            new SimpleEntry<>("Knockback Resistance", Attributes.KNOCKBACK_RESISTANCE),
+            new SimpleEntry<>("generic.movementSpeed", Attributes.MOVEMENT_SPEED),
+            new SimpleEntry<>("Movement Speed", Attributes.MOVEMENT_SPEED),
+            new SimpleEntry<>("generic.flyingSpeed", Attributes.FLYING_SPEED),
+            new SimpleEntry<>("Flying Speed", Attributes.FLYING_SPEED),
+            new SimpleEntry<>("generic.attackDamage", Attributes.ATTACK_DAMAGE),
+            new SimpleEntry<>("generic.attackKnockback", Attributes.ATTACK_KNOCKBACK),
+            new SimpleEntry<>("generic.attackSpeed", Attributes.ATTACK_SPEED),
+            new SimpleEntry<>("generic.armorToughness", Attributes.ARMOR_TOUGHNESS),
+            new SimpleEntry<>("generic.armor", Attributes.ARMOR),
+            new SimpleEntry<>("generic.luck", Attributes.LUCK)
     ));
     private static final Map<String, Attribute> PRE_1_16_ATTRIBUTES_MAP = PRE_1_16_ATTRIBUTES.stream()
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -104,6 +105,9 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
             } else {
                 String attributeName = this.readString(64);
                 attribute = PRE_1_16_ATTRIBUTES_MAP.get(attributeName);
+                if (attribute == null) {
+                    attribute = Attributes.getByName(attributeName);
+                }
                 if (attribute == null) {
                     throw new IllegalStateException("Can't find attribute for name " + attributeName
                             + " (version: " + this.serverVersion.name() + ")");
@@ -155,9 +159,11 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
             if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
                 this.writeVarInt(property.getAttribute().getId(this.serverVersion.toClientVersion()));
             } else if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-                this.writeIdentifier(property.getAttribute().getName());
+                this.writeIdentifier(property.getAttribute().getName(this.serverVersion.toClientVersion()));
             } else {
-                this.writeString(PRE_1_16_ATTRIBUTES_RMAP.get(property.getAttribute()));
+                // just write the "modern" name if the legacy name can't be found
+                String str = PRE_1_16_ATTRIBUTES_RMAP.get(property.getAttribute());
+                this.writeString(str != null ? str : property.getAttribute().getName().toString());
             }
 
             writeDouble(property.value);
@@ -284,6 +290,7 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
         private Attribute attribute;
         private double value;
         private List<PropertyModifier> modifiers;
+        private transient Double calculatedValue = null;
 
         @Deprecated
         public Property(String key, double value, List<PropertyModifier> modifiers) {
@@ -294,6 +301,34 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
             this.attribute = attribute;
             this.value = value;
             this.modifiers = modifiers;
+        }
+
+        public double calcValue() {
+            if (this.calculatedValue == null) {
+                this.calculatedValue = this.calcValue0();
+            }
+            return this.calculatedValue;
+        }
+
+        public double calcValue0() {
+            double base = this.getValue();
+            for (PropertyModifier modifier : this.modifiers) {
+                if (modifier.getOperation() == PropertyModifier.Operation.ADDITION) {
+                    base += modifier.getAmount();
+                }
+            }
+            double value = base;
+            for (PropertyModifier modifier : this.modifiers) {
+                if (modifier.getOperation() == PropertyModifier.Operation.MULTIPLY_BASE) {
+                    value += base * modifier.getAmount();
+                }
+            }
+            for (PropertyModifier modifier : this.modifiers) {
+                if (modifier.getOperation() == PropertyModifier.Operation.MULTIPLY_TOTAL) {
+                    value *= 1d + modifier.getAmount();
+                }
+            }
+            return this.attribute.sanitizeValue(value);
         }
 
         public Attribute getAttribute() {
@@ -320,6 +355,33 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
 
         public void setValue(double value) {
             this.value = value;
+            this.setDirty();
+        }
+
+        public void addModifier(PropertyModifier modifier) {
+            this.modifiers.add(modifier);
+            this.setDirty();
+        }
+
+        public boolean removeModifier(ResourceLocation modifierId) {
+            return this.removeModifierIf(modifier -> modifierId.equals(modifier.getName()));
+        }
+
+        @ApiStatus.Obsolete
+        public boolean removeModifier(UUID modifierId) {
+            return this.removeModifierIf(modifier -> modifierId.equals(modifier.getUUID()));
+        }
+
+        @ApiStatus.Obsolete
+        public boolean removeModifier(ResourceLocation modifierId, UUID modifierUId) {
+            return this.removeModifierIf(modifier -> modifierUId.equals(modifier.getUUID())
+                    || modifierId.equals(modifier.getName()));
+        }
+
+        public boolean removeModifierIf(Predicate<PropertyModifier> predicate) {
+            boolean ret = this.modifiers.removeIf(predicate);
+            if (ret) this.setDirty();
+            return ret;
         }
 
         public List<PropertyModifier> getModifiers() {
@@ -328,6 +390,11 @@ public class WrapperPlayServerUpdateAttributes extends PacketWrapper<WrapperPlay
 
         public void setModifiers(List<PropertyModifier> modifiers) {
             this.modifiers = modifiers;
+            this.setDirty();
+        }
+
+        public void setDirty() {
+            this.calculatedValue = null;
         }
     }
 }

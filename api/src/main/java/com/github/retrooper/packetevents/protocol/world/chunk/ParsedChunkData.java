@@ -18,6 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk;
 
+/**
+ * @deprecated unused
+ */
+@Deprecated
 public class ParsedChunkData {
     BaseChunk[] chunks;
 

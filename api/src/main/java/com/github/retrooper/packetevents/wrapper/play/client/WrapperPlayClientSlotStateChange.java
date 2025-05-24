@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -42,14 +43,19 @@ public class WrapperPlayClientSlotStateChange extends PacketWrapper<WrapperPlayC
     @Override
     public void read() {
         this.slot = this.readVarInt();
-        this.windowId = this.readVarInt();
+        this.windowId = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)
+                ? this.readContainerId() : this.readVarInt();
         this.state = this.readBoolean();
     }
 
     @Override
     public void write() {
         this.writeVarInt(this.slot);
-        this.writeVarInt(this.windowId);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+            this.writeContainerId(this.windowId);
+        } else {
+            this.writeVarInt(this.windowId);
+        }
         this.writeBoolean(this.state);
     }
 

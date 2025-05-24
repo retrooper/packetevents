@@ -137,4 +137,8 @@ public class WrapperPlayServerResourcePackSend extends PacketWrapper<WrapperPlay
     public Component getPrompt() {
         return prompt;
     }
+
+    public void setPrompt(Component prompt) {
+        this.prompt = prompt;
+    }
 }

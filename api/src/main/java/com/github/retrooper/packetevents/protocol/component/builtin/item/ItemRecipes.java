@@ -18,9 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,12 +36,21 @@ public class ItemRecipes {
     }
 
     public static ItemRecipes read(PacketWrapper<?> wrapper) {
-        List<ResourceLocation> recipes = wrapper.readList(PacketWrapper::readIdentifier);
-        return new ItemRecipes(recipes);
+        NBTList<?> recipes = (NBTList<?>) wrapper.readNBTRaw();
+        List<ResourceLocation> recipeKeys = new ArrayList<>(recipes.size());
+        for (int i = 0; i < recipes.size(); i++) {
+            NBTString tag = (NBTString) recipes.getTag(i);
+            recipeKeys.add(new ResourceLocation(tag.getValue()));
+        }
+        return new ItemRecipes(recipeKeys);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemRecipes recipes) {
-        wrapper.writeList(recipes.recipes, PacketWrapper::writeIdentifier);
+        NBTList<NBTString> recipesTag = NBTList.createStringList();
+        for (ResourceLocation recipeKey : recipes.recipes) {
+            recipesTag.addTag(new NBTString(recipeKey.toString()));
+        }
+        wrapper.writeNBTRaw(recipesTag);
     }
 
     public void addRecipe(ResourceLocation recipeKey) {

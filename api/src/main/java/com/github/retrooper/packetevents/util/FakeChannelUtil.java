@@ -21,7 +21,8 @@ package com.github.retrooper.packetevents.util;
 public class FakeChannelUtil {
     public static boolean isFakeChannel(Object channel) {
         if (channel.getClass().getSimpleName().equals("FakeChannel")
-                || channel.getClass().getSimpleName().equals("SpoofedChannel")) {
+                || channel.getClass().getSimpleName().equals("SpoofedChannel")
+                || channel.getClass().getSimpleName().equals("EmbeddedChannel")) {
             return true;
         }
         return false;

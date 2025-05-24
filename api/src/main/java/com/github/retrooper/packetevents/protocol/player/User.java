@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2022 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
+import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -30,7 +32,12 @@ import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
+import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
@@ -40,23 +47,26 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTitle;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-public class User {
+public class User implements IRegistryHolder {
+
     private final Object channel;
     private ConnectionState decoderState;
     private ConnectionState encoderState;
     private ClientVersion clientVersion;
     private final UserProfile profile;
     private int entityId = -1;
-    private int minWorldHeight = 0;
-    private int totalWorldHeight = 256;
-    private List<NBTCompound> worldNBT;
-    private Dimension dimension = new Dimension(0);
+
+    private DimensionType dimensionType = DimensionTypes.OVERWORLD;
+    private final Map<ResourceLocation, IRegistry<?>> registries = new HashMap<>();
 
     public User(Object channel,
                 ConnectionState connectionState, ClientVersion clientVersion,
@@ -68,6 +78,17 @@ public class User {
         this.profile = profile;
     }
 
+    @ApiStatus.Internal
+    @Override
+    public @Nullable IRegistry<?> getRegistry(ResourceLocation registryKey, ClientVersion version) {
+        return this.registries.get(registryKey);
+    }
+
+    @ApiStatus.Internal
+    public void putRegistry(IRegistry<?> registry) {
+        this.registries.put(registry.getRegistryKey(), registry);
+    }
+
     public Object getChannel() {
         return channel;
     }
@@ -76,15 +97,26 @@ public class User {
         return (InetSocketAddress) ChannelHelper.remoteAddress(channel);
     }
 
-    public ConnectionState getConnectionState() {
+    /**
+     * <strong>WARNING</strong>: Usage of this method should be avoided. Please use either
+     * {@link User#getDecoderState()} or {@link User#getEncoderState()}.<br>
+     * To access the specific state a packet event was sent/received in, use {@link ProtocolPacketEvent#getConnectionState()}.
+     * <p>
+     * Since 1.20.2, the Minecraft protocol allows the decoder/encoder connection states to de-sync.
+     *
+     * @throws IllegalStateException if encoder/decoder connection states do not match
+     */
+    @ApiStatus.Obsolete
+    public ConnectionState getConnectionState() throws IllegalStateException {
         ConnectionState decoderState = this.decoderState;
         ConnectionState encoderState = this.encoderState;
         if (decoderState != encoderState) {
-            throw new IllegalArgumentException("Can't get common connection state: " + decoderState + " != " + encoderState);
+            throw new IllegalStateException("Can't get common connection state: " + decoderState + " != " + encoderState);
         }
         return decoderState;
     }
 
+    @ApiStatus.Internal
     public void setConnectionState(ConnectionState connectionState) {
         this.setDecoderState(connectionState);
         this.setEncoderState(connectionState);
@@ -94,6 +126,7 @@ public class User {
         return this.decoderState;
     }
 
+    @ApiStatus.Internal
     public void setDecoderState(ConnectionState decoderState) {
         this.decoderState = decoderState;
         PacketEvents.getAPI().getLogManager().debug(
@@ -104,6 +137,7 @@ public class User {
         return this.encoderState;
     }
 
+    @ApiStatus.Internal
     public void setEncoderState(ConnectionState encoderState) {
         this.encoderState = encoderState;
         PacketEvents.getAPI().getLogManager().debug(
@@ -146,12 +180,44 @@ public class User {
         PacketEvents.getAPI().getProtocolManager().sendPacket(channel, wrapper);
     }
 
+    public void sendPacketSilently(Object buffer) {
+        PacketEvents.getAPI().getProtocolManager().sendPacketSilently(channel, buffer);
+    }
+
     public void sendPacketSilently(PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().sendPacketSilently(channel, wrapper);
     }
 
+    public void writePacket(Object buffer) {
+        PacketEvents.getAPI().getProtocolManager().writePacket(channel, buffer);
+    }
+
     public void writePacket(PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getProtocolManager().writePacket(channel, wrapper);
+    }
+
+    public void writePacketSilently(Object buffer) {
+        PacketEvents.getAPI().getProtocolManager().writePacketSilently(channel, buffer);
+    }
+
+    public void writePacketSilently(PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getProtocolManager().writePacketSilently(channel, wrapper);
+    }
+
+    public void receivePacket(Object buffer) {
+        PacketEvents.getAPI().getProtocolManager().receivePacket(channel, buffer);
+    }
+
+    public void receivePacket(PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getProtocolManager().receivePacket(channel, wrapper);
+    }
+
+    public void receivePacketSilently(Object buffer) {
+        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(channel, buffer);
+    }
+
+    public void receivePacketSilently(PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(channel, wrapper);
     }
 
     public void flushPackets() {
@@ -175,8 +241,7 @@ public class User {
     }
 
     public void sendMessage(String legacyMessage) {
-        Component component = AdventureSerializer.fromLegacyFormat(legacyMessage);
-        sendMessage(component);
+        this.sendMessage(this.getSerializers().fromLegacy(legacyMessage));
     }
 
     public void sendMessage(Component component) {
@@ -184,14 +249,13 @@ public class User {
     }
 
     public void sendMessage(Component component, ChatType type) {
-        ServerVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion().toServerVersion() :
-                PacketEvents.getAPI().getServerManager().getVersion();
+        ClientVersion version = this.getPacketVersion();
         PacketWrapper<?> chatPacket;
-        if (version.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_19)) {
             chatPacket = new WrapperPlayServerSystemChatMessage(false, component);
         } else {
             ChatMessage message;
-            if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+            if (version.isNewerThanOrEquals(ClientVersion.V_1_16)) {
                 message = new ChatMessage_v1_16(component, type, new UUID(0L, 0L));
             } else {
                 message = new ChatMessageLegacy(component, type);
@@ -203,15 +267,14 @@ public class User {
 
     public void sendTitle(String legacyTitle, String legacySubtitle,
                           int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        Component title = AdventureSerializer.fromLegacyFormat(legacyTitle);
-        Component subtitle = AdventureSerializer.fromLegacyFormat(legacySubtitle);
+        LegacyComponentSerializer serializer = this.getSerializers().legacy();
+        Component title = serializer.deserialize(legacyTitle);
+        Component subtitle = serializer.deserialize(legacySubtitle);
         sendTitle(title, subtitle, fadeInTicks, stayTicks, fadeOutTicks);
     }
 
     public void sendTitle(Component title, Component subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        ClientVersion version = PacketEvents.getAPI().getInjector().isProxy() ? getClientVersion() :
-                PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
-        boolean modern = version.isNewerThanOrEquals(ClientVersion.V_1_17);
+        boolean modern = this.getPacketVersion().isNewerThanOrEquals(ClientVersion.V_1_17);
         PacketWrapper<?> animation;
         PacketWrapper<?> setTitle = null;
         PacketWrapper<?> setSubtitle = null;
@@ -247,118 +310,119 @@ public class User {
         }
     }
 
-    //TODO sendTitle that is cross-version
-
-    public int getMinWorldHeight() {
-        return minWorldHeight;
+    public ClientVersion getPacketVersion() {
+        PacketEventsAPI<?> api = PacketEvents.getAPI();
+        if (api.getInjector().isProxy()) {
+            return this.getClientVersion();
+        }
+        return api.getServerManager().getVersion().toClientVersion();
     }
 
-    public void setMinWorldHeight(int minWorldHeight) {
-        this.minWorldHeight = minWorldHeight;
+    public AdventureSerializer getSerializers() {
+        return AdventureSerializer.serializer(this.getPacketVersion());
+    }
+
+    //TODO sendTitle that is cross-version
+
+    // dimension type related methods
+
+    public int getMinWorldHeight() {
+        return this.getMinWorldHeight(null);
+    }
+
+    public int getMinWorldHeight(@Nullable ClientVersion version) {
+        if (version == null) {
+            version = PacketEvents.getAPI().getInjector().isProxy() ? this.getClientVersion() :
+                    PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        }
+        return this.dimensionType.getMinY(version);
     }
 
     public int getTotalWorldHeight() {
-        return totalWorldHeight;
+        return this.getTotalWorldHeight(null);
     }
 
+    public int getTotalWorldHeight(@Nullable ClientVersion version) {
+        if (version == null) {
+            version = PacketEvents.getAPI().getInjector().isProxy() ? this.getClientVersion() :
+                    PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        }
+        return this.dimensionType.getHeight(version);
+    }
+
+    public DimensionType getDimensionType() {
+        return this.dimensionType;
+    }
+
+    @ApiStatus.Internal
+    public void setDimensionType(DimensionType dimensionType) {
+        this.dimensionType = dimensionType;
+    }
+
+    // legacy dimension type related methods
+
+    @Deprecated
+    public void setMinWorldHeight(int minWorldHeight) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Deprecated
     public void setTotalWorldHeight(int totalWorldHeight) {
-        this.totalWorldHeight = totalWorldHeight;
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public void switchDimensionType(ServerVersion version, Dimension dimension) {
-        NBTCompound dimensionData = this.getWorldNBT(dimension);
-        if (dimensionData != null) {
-            NBTCompound worldNBT = dimensionData.getCompoundTagOrNull("element");
-            if (worldNBT != null) {
-                this.setMinWorldHeight(worldNBT.getNumberTagOrNull("min_y").getAsInt());
-                this.setTotalWorldHeight(worldNBT.getNumberTagOrNull("height").getAsInt());
-                return;
-            } else {
-                this.setDefaultWorldHeights(version, dimension);
-            }
-        }
-        if (version.isOlderThan(ServerVersion.V_1_20_5)
-                || this.clientVersion.isOlderThan(ClientVersion.V_1_20_5)) {
-            // hide this warning on 1.20.5, as the server does no longer send
-            // vanilla datapack dimension type contents
-            //
-            // this 1.20.5 feature can be fully worked around with by clearing the
-            // known packs sent by the client to the server durings config phase
-            PacketEvents.getAPI().getLogger().warning(
-                    "No data was sent for dimension " + dimensionData + " to " + this.getName());
-        }
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public void setDefaultWorldHeights(ServerVersion version, Dimension dimension) {
-        boolean extended = version.isNewerThanOrEquals(ServerVersion.V_1_18)
-                && "minecraft:overworld".equals(this.getWorldName(dimension));
-        this.setDefaultWorldHeights(extended);
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public void setDefaultWorldHeights(boolean extended) {
-        this.minWorldHeight = extended ? -64 : 0;
-        this.totalWorldHeight = extended ? 256 + 128 : 256;
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public void setWorldNBT(NBTList<NBTCompound> worldNBT) {
-        this.worldNBT = worldNBT.getTags();
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public Dimension getDimension() {
-        return dimension;
+        return Dimension.fromDimensionType(this.dimensionType, this, null);
     }
 
+    @Deprecated
     public void setDimension(Dimension dimension) {
-        this.dimension = dimension;
+        this.dimensionType = dimension.asDimensionType(this, null);
     }
 
-    @Nullable
-    public NBTCompound getWorldNBT(String worldName) {
-        if (worldNBT == null) {
-            return null;
-        }
-        for (NBTCompound compound : worldNBT) {
-            if (compound.getStringTagOrNull("name").getValue().equals(worldName)) {
-                return compound;
-            }
-        }
-        return null;
+    @Deprecated
+    public @Nullable NBTCompound getWorldNBT(String worldName) {
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public @Nullable NBTCompound getWorldNBT(int worldId) {
-        if (this.worldNBT == null) {
-            return null;
-        }
-        for (NBTCompound element : this.worldNBT) {
-            if (element.getNumberTagOrNull("id").getAsInt() == worldId) {
-                return element;
-            }
-        }
-        return null;
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public @Nullable NBTCompound getWorldNBT(Dimension dimension) {
-        String dimensionName = dimension.getDimensionName();
-        if (!dimensionName.isEmpty()) {
-            return this.getWorldNBT(dimensionName);
-        }
-        return this.getWorldNBT(dimension.getId());
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public @Nullable String getWorldName(int worldId) {
-        if (this.worldNBT == null) {
-            return null;
-        }
-        for (NBTCompound element : this.worldNBT) {
-            if (element.getNumberTagOrNull("id").getAsInt() == worldId) {
-                return element.getStringTagValueOrNull("name");
-            }
-        }
-        return null;
+        throw new UnsupportedOperationException();
     }
 
-    public @Nullable String getWorldName(Dimension dimension) {
-        String dimensionName = dimension.getDimensionName();
-        return dimensionName.isEmpty() ? this.getWorldName(dimension.getId()) : dimensionName;
+    @Deprecated
+    public String getWorldName(Dimension dimension) {
+        throw new UnsupportedOperationException();
     }
 }

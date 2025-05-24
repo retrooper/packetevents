@@ -21,143 +21,101 @@ package com.github.retrooper.packetevents.wrapper.configuration.client;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.common.client.WrapperCommonClientSettings;
+import net.kyori.adventure.util.Index;
 
-public class WrapperConfigClientSettings extends PacketWrapper<WrapperConfigClientSettings> {
-
-    private String locale;
-    private int viewDistance;
-    private ChatVisibility visibility;
-    private boolean chatColorable;
-    private byte visibleSkinSectionMask;
-    private HumanoidArm hand;
-    private boolean textFilteringEnabled;
-    private boolean allowServerListings;
+public class WrapperConfigClientSettings extends WrapperCommonClientSettings<WrapperConfigClientSettings> {
 
     public WrapperConfigClientSettings(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperConfigClientSettings(String locale, int viewDistance, ChatVisibility visibility,
-                                       boolean chatColorable, byte visibleSkinSectionMask, HumanoidArm hand,
-                                       boolean textFilteringEnabled, boolean allowServerListings) {
-        super(PacketType.Configuration.Client.CLIENT_SETTINGS);
-        this.locale = locale;
-        this.viewDistance = viewDistance;
-        this.visibility = visibility;
-        this.chatColorable = chatColorable;
-        this.visibleSkinSectionMask = visibleSkinSectionMask;
-        this.hand = hand;
-        this.textFilteringEnabled = textFilteringEnabled;
-        this.allowServerListings = allowServerListings;
+    public WrapperConfigClientSettings(
+            String locale, int viewDistance, WrapperCommonClientSettings.ChatVisibility chatVisibility,
+            boolean chatColors, byte skinMask, HumanoidArm mainHand, boolean textFilteringEnabled,
+            boolean allowServerListings, ParticleStatus particleStatus
+    ) {
+        super(PacketType.Configuration.Client.CLIENT_SETTINGS, locale, viewDistance,
+                chatVisibility, chatColors, skinMask, mainHand, textFilteringEnabled,
+                allowServerListings, particleStatus, (byte) 0);
     }
 
-    @Override
-    public void read() {
-        this.locale = this.readString(16);
-        this.viewDistance = this.readByte();
-        this.visibility = ChatVisibility.VALUES[this.readVarInt()];
-        this.chatColorable = this.readBoolean();
-        this.visibleSkinSectionMask = (byte) this.readUnsignedByte();
-        this.hand = HumanoidArm.VALUES[this.readVarInt()];
-        this.textFilteringEnabled = this.readBoolean();
-        this.allowServerListings = this.readBoolean();
+    @Deprecated
+    public WrapperConfigClientSettings(
+            String locale, int viewDistance, ChatVisibility visibility,
+            boolean chatColorable, byte visibleSkinSectionMask, HumanoidArm hand,
+            boolean textFilteringEnabled, boolean allowServerListings
+    ) {
+        this(locale, viewDistance, visibility.modern, chatColorable,
+                visibleSkinSectionMask, hand, textFilteringEnabled,
+                allowServerListings, ParticleStatus.ALL);
     }
 
-    @Override
-    public void write() {
-        this.writeString(this.locale, 16);
-        this.writeByte(this.viewDistance);
-        this.writeVarInt(this.visibility.ordinal());
-        this.writeBoolean(this.chatColorable);
-        this.writeByte(this.visibleSkinSectionMask);
-        this.writeVarInt(this.hand.ordinal());
-        this.writeBoolean(this.textFilteringEnabled);
-        this.writeBoolean(this.allowServerListings);
-    }
-
-    @Override
-    public void copy(WrapperConfigClientSettings wrapper) {
-        this.locale = wrapper.locale;
-        this.viewDistance = wrapper.viewDistance;
-        this.visibility = wrapper.visibility;
-        this.chatColorable = wrapper.chatColorable;
-        this.visibleSkinSectionMask = wrapper.visibleSkinSectionMask;
-        this.hand = wrapper.hand;
-        this.textFilteringEnabled = wrapper.textFilteringEnabled;
-        this.allowServerListings = wrapper.allowServerListings;
-    }
-
-    public String getLocale() {
-        return this.locale;
-    }
-
-    public void setLocale(String locale) {
-        this.locale = locale;
-    }
-
-    public int getViewDistance() {
-        return this.viewDistance;
-    }
-
-    public void setViewDistance(int viewDistance) {
-        this.viewDistance = viewDistance;
-    }
-
+    @Deprecated
     public ChatVisibility getVisibility() {
-        return this.visibility;
+        return ChatVisibility.MODERN_INDEX.valueOrThrow(this.getChatVisibility());
     }
 
+    @Deprecated
     public void setVisibility(ChatVisibility visibility) {
-        this.visibility = visibility;
+        this.setChatVisibility(visibility.modern);
     }
 
+    @Deprecated
     public boolean isChatColorable() {
-        return this.chatColorable;
+        return this.isChatColors();
     }
 
+    @Deprecated
     public void setChatColorable(boolean chatColorable) {
-        this.chatColorable = chatColorable;
+        this.setChatColors(chatColorable);
     }
 
+    @Deprecated
     public byte getVisibleSkinSectionMask() {
-        return this.visibleSkinSectionMask;
+        return this.getSkinMask();
     }
 
+    @Deprecated
     public void setVisibleSkinSectionMask(byte visibleSkinSectionMask) {
-        this.visibleSkinSectionMask = visibleSkinSectionMask;
+        this.setSkinMask(visibleSkinSectionMask);
     }
 
+    @Deprecated
     public HumanoidArm getHand() {
-        return this.hand;
+        return this.getMainHand();
     }
 
+    @Deprecated
     public void setHand(HumanoidArm hand) {
-        this.hand = hand;
+        this.setMainHand(hand);
     }
 
-    public boolean isTextFilteringEnabled() {
-        return this.textFilteringEnabled;
-    }
-
-    public void setTextFilteringEnabled(boolean textFilteringEnabled) {
-        this.textFilteringEnabled = textFilteringEnabled;
-    }
-
+    @Deprecated
     public boolean isAllowServerListings() {
-        return this.allowServerListings;
+        return this.isServerListingAllowed();
     }
 
+    @Deprecated
     public void setAllowServerListings(boolean allowServerListings) {
-        this.allowServerListings = allowServerListings;
+        this.setServerListingAllowed(allowServerListings);
     }
 
+    @Deprecated
     public enum ChatVisibility {
 
-        FULL,
-        SYSTEM,
-        HIDDEN;
+        FULL(WrapperCommonClientSettings.ChatVisibility.FULL),
+        SYSTEM(WrapperCommonClientSettings.ChatVisibility.SYSTEM),
+        HIDDEN(WrapperCommonClientSettings.ChatVisibility.HIDDEN);
 
         public static final ChatVisibility[] VALUES = values();
+        private static final Index<WrapperCommonClientSettings.ChatVisibility, ChatVisibility> MODERN_INDEX =
+                Index.create(ChatVisibility.class, visibility -> visibility.modern);
+
+        private final WrapperCommonClientSettings.ChatVisibility modern;
+
+        ChatVisibility(WrapperCommonClientSettings.ChatVisibility modern) {
+            this.modern = modern;
+        }
     }
 }

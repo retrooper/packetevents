@@ -93,6 +93,17 @@ public class VelocityPipelineInjector implements ChannelInjector {
     }
 
     @Override
+    public boolean isPlayerSet(Object ch) {
+        if (ch == null) return false;
+        Channel channel = (Channel) ch;
+        PacketEventsEncoder encoder = (PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
+        if (encoder.player != null) return true;
+
+        PacketEventsDecoder decoder = (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+        return decoder.player != null;
+    }
+
+    @Override
     public void setPlayer(Object ch, Object p) {
         Channel channel = (Channel) ch;
         Player player = (Player) p;

@@ -243,4 +243,9 @@ public class ByteBufOperatorImpl implements ByteBufOperator {
     public Object resetWriterIndex(Object buffer) {
         return ((ByteBuf)buffer).resetWriterIndex();
     }
+
+    @Override
+    public Object allocateNewBuffer(Object buffer) {
+        return ((ByteBuf) buffer).alloc().buffer();
+    }
 }

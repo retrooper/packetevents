@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+@Deprecated
 public class NetStreamOutput extends FilterOutputStream {
     public NetStreamOutput(OutputStream out) {
         super(out);
