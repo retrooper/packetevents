@@ -43,6 +43,7 @@
 package com.github.retrooper.packetevents.wrapper;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.binary.BinaryBuffer;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
@@ -130,6 +131,8 @@ import java.util.function.IntFunction;
 public class PacketWrapper<T extends PacketWrapper<T>> {
     @Nullable
     public Object buffer;
+    @Nullable
+    public BinaryBuffer binaryBuffer;
 
     @ApiStatus.Internal
     public final Object bufferLock = new Object();

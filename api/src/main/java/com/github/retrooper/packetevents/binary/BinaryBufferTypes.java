@@ -4,6 +4,8 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
+import java.nio.charset.StandardCharsets;
+
 final class BinaryBufferTypes {
 
     private BinaryBufferTypes() {}
@@ -11,83 +13,96 @@ final class BinaryBufferTypes {
     static final class Float implements BinaryBufferType<java.lang.Float> {
         @Override
         public java.lang.Float read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
-            return ByteBufHelper.readFloat(buffer);
+            return ByteBufHelper.readFloat(buffer.getBuffer());
         }
 
         @Override
         public void write(BinaryBuffer buffer, java.lang.Float value, ServerVersion serverVersion, ClientVersion clientVersion) {
-            ByteBufHelper.writeFloat(buffer, value);
+            ByteBufHelper.writeFloat(buffer.getBuffer(), value);
         }
     }
     static final class Double implements BinaryBufferType<java.lang.Double> {
             @Override
             public java.lang.Double read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
-                return ByteBufHelper.readDouble(buffer);
+                return ByteBufHelper.readDouble(buffer.getBuffer());
             }
 
             @Override
             public void write(BinaryBuffer buffer, java.lang.Double value, ServerVersion serverVersion, ClientVersion clientVersion) {
-                ByteBufHelper.writeDouble(buffer, value);
+                ByteBufHelper.writeDouble(buffer.getBuffer(), value);
             }
     }
     static final class Bool implements BinaryBufferType<Boolean> {
 
         @Override
         public Boolean read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
-            return ByteBufHelper.readBoolean(buffer);
+            return ByteBufHelper.readBoolean(buffer.getBuffer());
         }
 
         @Override
         public void write(BinaryBuffer buffer, Boolean value, ServerVersion serverVersion, ClientVersion clientVersion) {
-            ByteBufHelper.writeBoolean(buffer, value);
+            ByteBufHelper.writeBoolean(buffer.getBuffer(), value);
         }
     }
     static final class Byte implements BinaryBufferType<java.lang.Byte> {
 
         @Override
         public java.lang.Byte read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
-            return ByteBufHelper.readByte(buffer);
+            return ByteBufHelper.readByte(buffer.getBuffer());
         }
 
         @Override
         public void write(BinaryBuffer buffer, java.lang.Byte value, ServerVersion serverVersion, ClientVersion clientVersion) {
-            ByteBufHelper.writeByte(buffer, value);
+            ByteBufHelper.writeByte(buffer.getBuffer(), value);
+        }
+    }
+    static final class UByte implements BinaryBufferType<java.lang.Short> {
+
+        @Override
+        public java.lang.Short read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return ByteBufHelper.readUnsignedByte(buffer.getBuffer());
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, java.lang.Short value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            int s = value & 0xFF;
+            ByteBufHelper.writeByte(buffer.getBuffer(), s);
         }
     }
     static final class Int implements BinaryBufferType<Integer> {
 
         @Override
         public Integer read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
-            return ByteBufHelper.readInt(buffer);
+            return ByteBufHelper.readInt(buffer.getBuffer());
         }
 
         @Override
         public void write(BinaryBuffer buffer, Integer value, ServerVersion serverVersion, ClientVersion clientVersion) {
-            ByteBufHelper.writeInt(buffer, value);
+            ByteBufHelper.writeInt(buffer.getBuffer(), value);
         }
     }
     static final class Long implements BinaryBufferType<java.lang.Long> {
 
         @Override
         public java.lang.Long read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
-            return ByteBufHelper.readLong(buffer);
+            return ByteBufHelper.readLong(buffer.getBuffer());
         }
 
         @Override
         public void write(BinaryBuffer buffer, java.lang.Long value, ServerVersion serverVersion, ClientVersion clientVersion) {
-            ByteBufHelper.writeLong(buffer, value);
+            ByteBufHelper.writeLong(buffer.getBuffer(), value);
         }
     }
     static final class Short implements BinaryBufferType<java.lang.Short> {
 
         @Override
         public java.lang.Short read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
-            return ByteBufHelper.readShort(buffer);
+            return ByteBufHelper.readShort(buffer.getBuffer());
         }
 
         @Override
         public void write(BinaryBuffer buffer, java.lang.Short value, ServerVersion serverVersion, ClientVersion clientVersion) {
-            ByteBufHelper.writeShort(buffer, value);
+            ByteBufHelper.writeShort(buffer.getBuffer(), value);
         }
     }
     static final class VarInt implements BinaryBufferType<Integer> {
@@ -98,7 +113,7 @@ final class BinaryBufferTypes {
             int length = 0;
             byte currentByte;
             do {
-                currentByte = ByteBufHelper.readByte(buffer);
+                currentByte = ByteBufHelper.readByte(buffer.getBuffer());
                 value |= (currentByte & 0x7F) << (length * 7);
                 length++;
                 if (length > 5) {
@@ -110,14 +125,40 @@ final class BinaryBufferTypes {
 
         @Override
         public void write(BinaryBuffer buffer, Integer value, ServerVersion serverVersion, ClientVersion clientVersion) {
-            while (true) {
-                if ((value & ~0x7F) == 0) {
-                    ByteBufHelper.writeByte(buffer, value);
-                    break;
-                }
-                ByteBufHelper.writeByte(buffer, (value & 0x7F) | 0x80);
-                value >>>= 7;
+            /* Got this code/optimization from https://steinborn.me/posts/performance/how-fast-can-you-write-a-varint/
+             * Copyright and permission notice above (above the class).
+             * Steinborn's post says that the code is under the MIT, last accessed 29.06.2024.
+             */
+            if ((value & (0xFFFFFFFF << 7)) == 0) {
+                ByteBufHelper.writeByte(buffer.getBuffer(), value);
+            } else if ((value & (0xFFFFFFFF << 14)) == 0) {
+                int w = (value & 0x7F | 0x80) << 8 | (value >>> 7);
+                ByteBufHelper.writeShort(buffer.getBuffer(), w);
+            } else if ((value & (0xFFFFFFFF << 21)) == 0) {
+                int w = (value & 0x7F | 0x80) << 16 | ((value >>> 7) & 0x7F | 0x80) << 8 | (value >>> 14);
+                ByteBufHelper.writeMedium(buffer.getBuffer(), w);
+            } else if ((value & (0xFFFFFFFF << 28)) == 0) {
+                int w = (value & 0x7F | 0x80) << 24 | (((value >>> 7) & 0x7F | 0x80) << 16)
+                        | ((value >>> 14) & 0x7F | 0x80) << 8 | (value >>> 21);
+                ByteBufHelper.writeInt(buffer.getBuffer(), w);
+            } else {
+                int w = (value & 0x7F | 0x80) << 24 | ((value >>> 7) & 0x7F | 0x80) << 16
+                        | ((value >>> 14) & 0x7F | 0x80) << 8 | ((value >>> 21) & 0x7F | 0x80);
+                ByteBufHelper.writeInt(buffer.getBuffer(), w);
+                ByteBufHelper.writeByte(buffer.getBuffer(), value >>> 28);
             }
+        }
+    }
+    static final class Medium implements BinaryBufferType<Integer> {
+
+        @Override
+        public Integer read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return ByteBufHelper.readMedium(buffer.getBuffer());
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, Integer value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            ByteBufHelper.writeMedium(buffer.getBuffer(), value);
         }
     }
     static final class VarLong implements BinaryBufferType<java.lang.Long> {
@@ -127,7 +168,7 @@ final class BinaryBufferTypes {
             long value = 0;
             int size = 0;
             int b;
-            while (((b = ByteBufHelper.readByte(buffer)) & 0x80) == 0x80) {
+            while (((b = ByteBufHelper.readByte(buffer.getBuffer())) & 0x80) == 0x80) {
                 value |= (long) (b & 0x7F) << (size++ * 7);
             }
             return value | ((long) (b & 0x7F) << (size * 7));        }
@@ -135,11 +176,52 @@ final class BinaryBufferTypes {
         @Override
         public void write(BinaryBuffer buffer, java.lang.Long value, ServerVersion serverVersion, ClientVersion clientVersion) {
             while ((value & ~0x7F) != 0) {
-                ByteBufHelper.writeByte(buffer, (int) (value & 0x7F) | 0x80);
+                ByteBufHelper.writeByte(buffer.getBuffer(), (int) (value & 0x7F) | 0x80);
                 value >>>= 7;
             }
 
-            ByteBufHelper.writeByte(buffer, value.intValue());
+            ByteBufHelper.writeByte(buffer.getBuffer(), value.intValue());
+        }
+    }
+
+    static final class String implements BinaryBufferType<java.lang.String> {
+
+        static final int MAX_LENGTH = java.lang.Short.MAX_VALUE;
+
+        private int maxLength = MAX_LENGTH;
+
+        String(int length) {
+            if (length < 0 || length > MAX_LENGTH) {
+                throw new IllegalArgumentException("String length must be between 0 and " + MAX_LENGTH + ", but was " + length);
+            }
+            this.maxLength = length;
+        }
+
+        String() {}
+
+        @Override
+        public java.lang.String read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            int j = buffer.read(BinaryBuffer.VAR_INT);
+            // TODO: Don't throw an exception if the string is too long (but still cut it off and probably kick the player)
+            if (j > maxLength * 4) {
+                throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + maxLength * 4 + ")");
+            } else if (j < 0) {
+                throw new RuntimeException("The received encoded string buffer length is less than zero! Weird string!");
+            } else {
+                java.lang.String s = ByteBufHelper.toString(buffer, ByteBufHelper.readerIndex(buffer), j, StandardCharsets.UTF_8);
+                ByteBufHelper.readerIndex(buffer, ByteBufHelper.readerIndex(buffer) + j);
+                if (s.length() > maxLength) {
+                    throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + maxLength + ")");
+                } else {
+                    return s;
+                }
+            }
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, java.lang.String value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.VAR_INT, value.length());
+            ByteBufHelper.writeBytes(buffer.getBuffer(), value.getBytes(StandardCharsets.UTF_8));
         }
     }
 }

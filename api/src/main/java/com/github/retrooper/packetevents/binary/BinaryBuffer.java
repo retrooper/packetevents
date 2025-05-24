@@ -11,13 +11,24 @@ import java.util.*;
 public final class BinaryBuffer {
 
     public static final BinaryBufferType<Byte> BYTE = new BinaryBufferTypes.Byte();
+    public static final BinaryBufferType<Short> UBYTE = new BinaryBufferTypes.UByte();
     public static final BinaryBufferType<Boolean> BOOLEAN = new BinaryBufferTypes.Bool();
-    public static final BinaryBufferType<Integer> INT = new BinaryBufferTypes.Int();
+
     public static final BinaryBufferType<Float> FLOAT = new BinaryBufferTypes.Float();
     public static final BinaryBufferType<Double> DOUBLE = new BinaryBufferTypes.Double();
-    public static final BinaryBufferType<Long> LONG = new BinaryBufferTypes.Long();
+
     public static final BinaryBufferType<Short> SHORT = new BinaryBufferTypes.Short();
+    public static final BinaryBufferType<Integer> INT = new BinaryBufferTypes.Int();
+    public static final BinaryBufferType<Long> LONG = new BinaryBufferTypes.Long();
+    public static final BinaryBufferType<Integer> MEDIUM = new BinaryBufferTypes.Medium();
+
     public static final BinaryBufferType<Integer> VAR_INT = new BinaryBufferTypes.VarInt();
+    public static final BinaryBufferType<Long> VAR_LONG = new BinaryBufferTypes.VarLong();
+
+    public static final BinaryBufferType<String> STRING = new BinaryBufferTypes.String();
+    public static BinaryBufferType<String> SizedString(int maxSize) {
+        return new BinaryBufferTypes.String(maxSize);
+    }
 
     private Object buffer;
 
@@ -158,5 +169,9 @@ public final class BinaryBuffer {
     }
     public <T extends Enum<T>> void writeEnum(T value) {
         write(VAR_INT, value.ordinal());
+    }
+
+    public Object getBuffer() {
+        return buffer;
     }
 }
