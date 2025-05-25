@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.item.type;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.component.ComponentType;
@@ -1638,11 +1639,19 @@ public final class ItemTypes {
     }
 
     public static @Nullable ItemType getByName(String name) {
-        return REGISTRY.getByName(name);
+        ItemType itemType = REGISTRY.getByName(name);
+        if (itemType == null) {
+            return PacketEvents.getAPI().getRegistryManager().getItemRegistry().getByName(name);
+        }
+        return itemType;
     }
 
     public static @Nullable ItemType getById(ClientVersion version, int id) {
-        return REGISTRY.getById(version, id);
+        ItemType itemType =  REGISTRY.getById(version, id);
+        if (itemType == null) {
+            return PacketEvents.getAPI().getRegistryManager().getItemRegistry().getById(id);
+        }
+        return itemType;
     }
 
     public static ItemType getTypePlacingState(StateType type) {

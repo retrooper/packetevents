@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "${modName}",
+  "version": "${version}",
+  "name": "PacketEvents dependency for 1.20.5+, built against 1.21.1",
+  "description": "",
+  "authors": [
+    "retrooper"
+  ],
+  "contact": {},
+  "license": "GPL-3.0",
+  "environment": "*",
+  "entrypoints": {
+    "peClientChainLoad": [
+      "io.github.retrooper.packetevents.mc1211.Fabric1205ClientChainLoadEntrypoint"
+    ]
+  },
+  "accessWidener": "packetevents.accesswidener",
+  "depends": {
+    "fabricloader": "*",
+    "minecraft": ">=1.20.5"
+  }
+}

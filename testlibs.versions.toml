@@ -1,5 +1,5 @@
 [versions]
-mockbukkit = "3.131.0"
+mockbukkit = "3.133.2"
 slf4j = "2.0.16"
 junit = "5.11.2"
 

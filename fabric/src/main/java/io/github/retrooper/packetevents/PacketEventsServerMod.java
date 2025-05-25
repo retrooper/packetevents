@@ -20,18 +20,15 @@ package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
+import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
+import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 
-public class PacketEventsServerMod implements PreLaunchEntrypoint {
+public class PacketEventsServerMod {
 
+    // Exists solely for backwards compatability for mods that may have used this internal method
     public static FabricPacketEventsAPI constructApi(String modid) {
         return new FabricPacketEventsAPI(modid, EnvType.SERVER);
-    }
-
-    @Override
-    public void onPreLaunch() {
-        PacketEvents.setAPI(constructApi(PacketEventsMod.MOD_ID));
-        PacketEvents.getAPI().load();
     }
 }

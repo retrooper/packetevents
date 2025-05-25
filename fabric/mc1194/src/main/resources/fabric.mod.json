@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "${modName}",
+  "version": "${version}",
+  "name": "PacketEvents dependency for 1.19+ compiled against ${minecraft_version}",
+  "description": "",
+  "authors": [
+    "retrooper"
+  ],
+  "contact": {},
+  "license": "GPL-3.0",
+  "environment": "*",
+  "entrypoints": {
+    "peMainChainLoad": [
+      "io.github.retrooper.packetevents.mc1914.Fabric1913ChainLoadEntrypoint"
+    ]
+  },
+  "mixins": [
+    "packetevents-mc1914.mixins.json"
+  ],
+  "accessWidener": "packetevents.accesswidener",
+  "depends": {
+    "fabricloader": "*",
+    "minecraft": ">=1.19"
+  }
+}

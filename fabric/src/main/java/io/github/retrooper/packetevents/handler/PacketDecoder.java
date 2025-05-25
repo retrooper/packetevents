@@ -21,20 +21,22 @@ package io.github.retrooper.packetevents.handler;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import io.github.retrooper.packetevents.util.FabricInjectionUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 
-@ApiStatus.Internal
+@ApiStatus.Internal @ChannelHandler.Sharable
 public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     private final PacketSide side;
     public User user;
-    public Player player;
+    public PlayerEntity player;
 
     public PacketDecoder(PacketSide side, User user) {
         this.side = side.getOpposite();
@@ -47,9 +49,23 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
             return;
         }
         PacketEventsImplHelper.handlePacket(ctx.channel(), this.user, this.player,
-                msg, false, this.side);
+                msg, true, this.side);
         if (msg.isReadable()) {
             out.add(msg.retain());
         }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        boolean kryptonReorder = false;
+        switch (evt.toString()) {
+            case "COMPRESSION_THRESHOLD_UPDATED":
+            case "COMPRESSION_ENABLED":
+                kryptonReorder = true;
+        }
+        if (evt.getClass().getName().equals("com.viaversion.fabric.common.handler.PipelineReorderEvent") || kryptonReorder) {
+            FabricInjectionUtil.reorderHandlers(ctx, side.getOpposite());
+        }
+        super.userEventTriggered(ctx, evt);
     }
 }

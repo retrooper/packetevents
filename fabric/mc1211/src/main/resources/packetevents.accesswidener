@@ -1,0 +1,9 @@
+accessWidener v2 named
+
+
+# fields
+accessible field net/minecraft/network/ClientConnection channel Lio/netty/channel/Channel;
+
+# methods
+
+# classes

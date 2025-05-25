@@ -1,0 +1,10 @@
+accessWidener v2 named
+
+
+# fields
+accessible field net/minecraft/network/ClientConnection channel Lio/netty/channel/Channel;
+accessible field net/minecraft/client/network/ClientPlayNetworkHandler connection Lnet/minecraft/network/ClientConnection;
+accessible field net/minecraft/server/network/ServerPlayNetworkHandler client Lnet/minecraft/network/ClientConnection; # Private in newer versions
+# methods
+
+# classes

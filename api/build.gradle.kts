@@ -40,6 +40,9 @@ dependencies {
     testImplementation(testlibs.bundles.junit)
     testImplementation(libs.netty)
     testImplementation(libs.classgraph)
+    testImplementation(project(":spigot"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.11.2")
 }
 
 mappingCompression {
