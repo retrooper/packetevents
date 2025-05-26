@@ -183,7 +183,6 @@ final class BinaryBufferTypes {
             ByteBufHelper.writeByte(buffer.getBuffer(), value.intValue());
         }
     }
-
     static final class String implements BinaryBufferType<java.lang.String> {
 
         static final int MAX_LENGTH = java.lang.Short.MAX_VALUE;
@@ -222,6 +221,21 @@ final class BinaryBufferTypes {
         public void write(BinaryBuffer buffer, java.lang.String value, ServerVersion serverVersion, ClientVersion clientVersion) {
             buffer.write(BinaryBuffer.VAR_INT, value.length());
             ByteBufHelper.writeBytes(buffer.getBuffer(), value.getBytes(StandardCharsets.UTF_8));
+        }
+    }
+    static final class Uuid implements BinaryBufferType<java.util.UUID> {
+
+        @Override
+        public java.util.UUID read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            long mostSigBits = ByteBufHelper.readLong(buffer.getBuffer());
+            long leastSigBits = ByteBufHelper.readLong(buffer.getBuffer());
+            return new java.util.UUID(mostSigBits, leastSigBits);
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, java.util.UUID value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            ByteBufHelper.writeLong(buffer.getBuffer(), value.getMostSignificantBits());
+            ByteBufHelper.writeLong(buffer.getBuffer(), value.getLeastSignificantBits());
         }
     }
 }

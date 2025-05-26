@@ -44,6 +44,7 @@ package com.github.retrooper.packetevents.wrapper;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.binary.BinaryBuffer;
+import com.github.retrooper.packetevents.binary.BinaryBufferType;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
@@ -154,6 +155,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         this.clientVersion = clientVersion;
         this.serverVersion = serverVersion;
         this.buffer = null;
+        this.binaryBuffer = null;
         this.packetTypeData = new PacketTypeData(null, packetID);
     }
 
@@ -166,6 +168,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         this.serverVersion = event.getServerVersion();
         this.user = event.getUser();
         this.buffer = event.getByteBuf();
+        this.binaryBuffer = new BinaryBuffer(this.buffer);
         this.packetTypeData = new PacketTypeData(event.getPacketType(), event.getPacketId());
         if (readData) {
             readEvent(event);
@@ -180,6 +183,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         this.clientVersion = event.getUser().getClientVersion();
         this.serverVersion = event.getServerVersion();
         this.buffer = event.getByteBuf();
+        this.binaryBuffer = new BinaryBuffer(this.buffer);
         this.packetTypeData = new PacketTypeData(event.getPacketType(), event.getPacketId());
         this.user = event.getUser();
         if (readData) {
@@ -309,6 +313,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     public void setBuffer(Object buffer) {
         this.buffer = buffer;
+        this.binaryBuffer = new BinaryBuffer(buffer);
     }
 
     /**
@@ -356,45 +361,80 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     public void resetBuffer() {
         ByteBufHelper.clear(buffer);
+        // TODO: Potentially use {@link BinaryBuffer#reset()} instead?
     }
 
     public byte readByte() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.BYTE);
+        }
         return ByteBufHelper.readByte(buffer);
     }
 
     public void writeByte(int value) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.BYTE, (byte) value);
+            return;
+        }
         ByteBufHelper.writeByte(buffer, value);
     }
 
     public short readUnsignedByte() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.UBYTE);
+        }
         return ByteBufHelper.readUnsignedByte(buffer);
     }
 
     public boolean readBoolean() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.BOOLEAN);
+        }
         return readByte() != 0;
     }
 
     public void writeBoolean(boolean value) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.BOOLEAN, value);
+            return;
+        }
         writeByte(value ? 1 : 0);
     }
 
     public int readInt() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.INT);
+        }
         return ByteBufHelper.readInt(buffer);
     }
 
     public void writeInt(int value) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.INT, value);
+            return;
+        }
         ByteBufHelper.writeInt(buffer, value);
     }
 
     public int readMedium() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.MEDIUM);
+        }
         return ByteBufHelper.readMedium(buffer);
     }
 
     public void writeMedium(int value) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.MEDIUM, value);
+            return;
+        }
         ByteBufHelper.writeMedium(buffer, value);
     }
 
     public int readVarInt() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.VAR_INT);
+        }
         int value = 0;
         int length = 0;
         byte currentByte;
@@ -410,6 +450,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeVarInt(int value) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.VAR_INT, value);
+            return;
+        }
         /* Got this code/optimization from https://steinborn.me/posts/performance/how-fast-can-you-write-a-varint/
          * Copyright and permission notice above (above the class).
          * Steinborn's post says that the code is under the MIT, last accessed 29.06.2024.
@@ -434,10 +478,13 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         }
     }
 
+
+    // TODO: Map types need to be checked further if Reader instances are required for serialization
     public <K, V> Map<K, V> readMap(Reader<K> keyFunction, Reader<V> valueFunction) {
         return this.readMap(keyFunction, valueFunction, Integer.MAX_VALUE);
     }
 
+    // TODO: Map types need to be checked further if Reader instances are required for serialization
     public <K, V> Map<K, V> readMap(Reader<K> keyFunction, Reader<V> valueFunction, int maxSize) {
         int size = this.readVarInt();
         if (size > maxSize) {
@@ -453,6 +500,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         return map;
     }
 
+    // TODO: Map types need to be checked further if Writer instances are required for serialization
     public <K, V> void writeMap(Map<K, V> map, Writer<K> keyConsumer, Writer<V> valueConsumer) {
         writeVarInt(map.size());
         for (Map.Entry<K, V> entry : map.entrySet()) {
@@ -689,6 +737,9 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public long readVarLong() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.VAR_LONG);
+        }
         long value = 0;
         int size = 0;
         int b;
@@ -699,6 +750,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeVarLong(long l) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.VAR_LONG, l);
+            return;
+        }
         while ((l & ~0x7F) != 0) {
             this.writeByte((int) (l & 0x7F) | 0x80);
             l >>>= 7;
@@ -708,18 +763,32 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public float readFloat() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.FLOAT);
+        }
         return ByteBufHelper.readFloat(buffer);
     }
 
     public void writeFloat(float value) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.FLOAT, value);
+            return;
+        }
         ByteBufHelper.writeFloat(buffer, value);
     }
 
     public double readDouble() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.DOUBLE);
+        }
         return ByteBufHelper.readDouble(buffer);
     }
 
     public void writeDouble(double value) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.DOUBLE, value);
+            return;
+        }
         ByteBufHelper.writeDouble(buffer, value);
     }
 
@@ -830,12 +899,19 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public UUID readUUID() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.UUID);
+        }
         long mostSigBits = readLong();
         long leastSigBits = readLong();
         return new UUID(mostSigBits, leastSigBits);
     }
 
     public void writeUUID(UUID uuid) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.UUID, uuid);
+            return;
+        }
         writeLong(uuid.getMostSignificantBits());
         writeLong(uuid.getLeastSignificantBits());
     }

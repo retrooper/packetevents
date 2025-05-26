@@ -25,6 +25,8 @@ public final class BinaryBuffer {
     public static final BinaryBufferType<Integer> VAR_INT = new BinaryBufferTypes.VarInt();
     public static final BinaryBufferType<Long> VAR_LONG = new BinaryBufferTypes.VarLong();
 
+    public static final BinaryBufferType<UUID> UUID = new BinaryBufferTypes.Uuid();
+
     public static final BinaryBufferType<String> STRING = new BinaryBufferTypes.String();
     public static BinaryBufferType<String> SizedString(int maxSize) {
         return new BinaryBufferTypes.String(maxSize);
