@@ -1045,6 +1045,9 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public SaltSignature readSaltSignature() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.SALT_SIGNATURE);
+        }
         long salt = readLong();
         byte[] signature;
         //1.19.3+
@@ -1062,6 +1065,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeSaltSignature(SaltSignature signature) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.SALT_SIGNATURE, signature);
+            return;
+        }
         writeLong(signature.getSalt());
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
             boolean present = signature.getSignature().length != 0;

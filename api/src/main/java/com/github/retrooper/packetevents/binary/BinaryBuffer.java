@@ -10,6 +10,7 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.*;
@@ -35,15 +36,16 @@ public final class BinaryBuffer {
     public static final BinaryBufferType<Vector3i> BLOCK_POSITION = new BinaryBufferTypes.BlockPos();
     public static final BinaryBufferType<GameMode> GAME_MODE = new BinaryBufferTypes.GameMode();
     public static final BinaryBufferType<ResourceLocation> IDENTIFIER = new BinaryBufferTypes.Identifier();
+    public static final BinaryBufferType<SaltSignature> SALT_SIGNATURE = new BinaryBufferTypes.Salt();
 
     public static final BinaryBufferType<NBT> NBT_RAW = new BinaryBufferTypes.NbtRaw();
     public static final BinaryBufferType<NBTCompound> NBT = new BinaryBufferTypes.Nbt();
-
     public static final BinaryBufferType<NBT> NBT_RAW_UNLIMITED = new BinaryBufferTypes.NbtRawUnlimited();
     public static final BinaryBufferType<NBTCompound> NBT_UNLIMITED = new BinaryBufferTypes.NbtUnlimited();
 
     @Deprecated()
     /** Use {@link BinaryBuffer#DIMENSION_TYPE} instead */
+    // TODO: Make DIMENSION_TYPE
     public static final BinaryBufferType<Dimension> DIMENSION = new BinaryBufferTypes.Dimension();
 
     public static final BinaryBufferType<String> STRING = new BinaryBufferTypes.String();
@@ -53,10 +55,19 @@ public final class BinaryBuffer {
 
     private Object buffer;
 
+    /**
+     * Creates a new BinaryBuffer instance with the specified buffer object. This object is specified by the platform's netty ByteBuf
+     * @param buffer the underlying buffer object, typically a ByteBuf or similar.
+     */
     public BinaryBuffer(Object buffer) {
         this.buffer = buffer;
     }
 
+    /**
+     * Creates a new BinaryBuffer instance with the specified capacity and whether it should be IO or direct.
+     * @param capacity the initial capacity of the buffer
+     * @param io whether the buffer should be an IO buffer (true) or a direct buffer (false)
+     */
     public BinaryBuffer(int capacity, boolean io) {
         if (io) {
             this.buffer = PacketEvents.getAPI().getNettyManager().getByteBufAllocationOperator().buffer(capacity);
@@ -66,47 +77,137 @@ public final class BinaryBuffer {
         }
     }
 
+    /**
+     * Creates a new BinaryBuffer instance with the specified capacity, using an IO buffer by default.
+     * @param capacity the initial capacity of the buffer
+     */
     public BinaryBuffer(int capacity) {
         this(capacity, true);
     }
 
+    /**
+     * Creates a new BinaryBuffer instance that wraps the provided byte array.
+     * @param wrappedData the byte array to wrap in the buffer
+     */
     public BinaryBuffer(byte[] wrappedData) {
         this.buffer = PacketEvents.getAPI().getNettyManager().getByteBufAllocationOperator().wrappedBuffer(wrappedData);
     }
 
-    /** Buffer Operations **/
+    /**
+     * Resets the reader index of the underlying buffer.
+     */
     public void resetReaderIndex() {
         ByteBufHelper.resetReaderIndex(buffer);
     }
+
+    /**
+     * Resets the writer index of the underlying buffer.
+     */
     public void resetWriterIndex() {
         ByteBufHelper.resetWriterIndex(buffer);
     }
+
+    /**
+     * Clears the underlying buffer, resetting both reader and writer indices.
+     */
     public void reset() {
         ByteBufHelper.clear(buffer);
     }
 
+    /**
+     * Reads a raw byte array from the underlying buffer.
+     * @param length the length of the byte array to read
+     * @return the byte array read from the buffer, or an empty array if a read is unsuccessful.
+     */
+    public byte[] readBytes(int length) {
+        byte[] bytes = new byte[length];
+        ByteBufHelper.readBytes(buffer, bytes);
+        return bytes;
+    }
 
-    /** Primitive Read/Write Methods **/
+    /**
+     * Writes a raw byte array to the underlying buffer.
+     * @param array the byte array to write to the buffer
+     */
+    public void writeBytes(byte[] array) {
+        ByteBufHelper.writeBytes(buffer, array);
+    }
+
+    /**
+     * Reads a {@link BinaryBufferType}
+     * @param type the type to read
+     * @param serverVersion the server version to read the type for, these are important in specific cases.
+     * @param clientVersion the client version to read the type for, these are important in specific cases.
+     * @return The value read from the buffer. Will always return an instance of the type specified's generic, or throw an exception if the read fails.
+     * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T> T read(BinaryBufferType<T> type, ServerVersion serverVersion, ClientVersion clientVersion) {
         return type.read(this, serverVersion, clientVersion);
     }
+
+    /**
+     * Reads a {@link BinaryBufferType} while automatically determining the server version based on the current server manager.
+     * @param type the type to read
+     * @param clientVersion the client version to read the type for, these are important in specific cases.
+     * @return The value read from the buffer. Will always return an instance of the type specified's generic, or throw an exception if the read fails.
+     * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T> T read(BinaryBufferType<T> type, ClientVersion clientVersion) {
         return type.read(this, clientVersion);
     }
+
+    /**
+     * Reads a {@link BinaryBufferType} while automatically determining the server and client versions based on the current server manager.
+     * @param type the type to read
+     * @return The value read from the buffer. Will always return an instance of the type specified's generic, or throw an exception if the read fails.
+     * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T> T read(BinaryBufferType<T> type) {
         return type.read(this);
     }
+
+    /**
+     * Writes a value to the underlying buffer using the specified {@link BinaryBufferType}.
+     * @param type the type to write
+     * @param value the value to write to the buffer
+     * @param serverVersion the server version to write the type for, these are important in specific cases.
+     * @param clientVersion the client version to write the type for, these are important in specific cases.
+     * @param <T> the type to write, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T> void write(BinaryBufferType<T> type, T value, ServerVersion serverVersion, ClientVersion clientVersion) {
         type.write(this, value, serverVersion, clientVersion);
     }
+
+    /**
+     * Writes a value to the underlying buffer using the specified {@link BinaryBufferType} while automatically determining the server version based on the current server manager.
+     * @param type the type to write
+     * @param value the value to write to the buffer
+     * @param clientVersion the client version to write the type for, these are important in specific cases.
+     * @param <T> the type to write, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T> void write(BinaryBufferType<T> type, T value, ClientVersion clientVersion) {
         type.write(this, value, clientVersion);
     }
+
+    /**
+     * Writes a value to the underlying buffer using the specified {@link BinaryBufferType} while automatically determining the server and client versions based on the current server manager.
+     * @param type the type to write
+     * @param value the value to write to the buffer
+     * @param <T> the type to write, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T> void write(BinaryBufferType<T> type, T value) {
         type.write(this, value);
     }
 
-    /** Collection Read/Write Methods **/
+    /**
+     * Reads a collection using {@link BinaryBuffer#VAR_INT} for the size specification.
+     * @param maxSize the maximum size of the collection to read, if the size exceeds this value an {@link IllegalArgumentException} will be thrown.
+     * @param type the type to read from the buffer
+     * @param serverVersion the server version to read the type for, these are important in specific cases These get passed into the type.
+     * @param clientVersion the client version to read the type for, these are important in specific cases These get passed into the type.
+     * @return a collection of the specified type read from the buffer, or an empty collection if the read is unsuccessful.
+     * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T>Collection<T> readCollection(int maxSize, BinaryBufferType<T> type, ServerVersion serverVersion, ClientVersion clientVersion) {
         int size = read(VAR_INT, serverVersion, clientVersion);
         if (size > maxSize) {
@@ -118,36 +219,111 @@ public final class BinaryBuffer {
         }
         return list;
     }
+
+
+    /**
+     * Reads a collection using {@link BinaryBuffer#VAR_INT} for the size specification while automatically determining the server version based on the current server manager.
+     * @param maxSize the maximum size of the collection to read, if the size exceeds this value an {@link IllegalArgumentException} will be thrown.
+     * @param type the type to read from the buffer
+     * @param clientVersion the client version to read the type for, these are important in specific cases These get passed into the type.
+     * @return a collection of the specified type read from the buffer, or an empty collection if the read is unsuccessful.
+     * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T>Collection<T> readCollection(int maxSize, BinaryBufferType<T> type, ClientVersion clientVersion) {
         return readCollection(maxSize, type, PacketEvents.getAPI().getServerManager().getVersion(), clientVersion);
     }
+
+    /**
+     * Reads a collection using {@link BinaryBuffer#VAR_INT} for the size specification while automatically determining the server and client versions based on the current server manager.
+     * @param maxSize the maximum size of the collection to read, if the size exceeds this value an {@link IllegalArgumentException} will be thrown.
+     * @param type the type to read from the buffer
+     * @return a collection of the specified type read from the buffer, or an empty collection if the read is unsuccessful.
+     * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T>Collection<T> readCollection(int maxSize, BinaryBufferType<T> type) {
         return readCollection(maxSize, type, PacketEvents.getAPI().getServerManager().getVersion(), PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
     }
+
+    /**
+     * Reads a collection using {@link BinaryBuffer#VAR_INT} for the size specification with a maximum size of {@link Short#MAX_VALUE}.
+     * @param type the type to read from the buffer
+     * @param serverVersion the server version to read the type for, these are important in specific cases These get passed into the type.
+     * @param clientVersion the client version to read the type for, these are important in specific cases These get passed into the type.
+     * @return a collection of the specified type read from the buffer, or an empty collection if the read is unsuccessful.
+     * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T>Collection<T> readCollection(BinaryBufferType<T> type, ServerVersion serverVersion, ClientVersion clientVersion) {
         return readCollection(Short.MAX_VALUE, type, serverVersion, clientVersion);
     }
+
+    /**
+     * Reads a collection using {@link BinaryBuffer#VAR_INT} for the size specification with a maximum size of {@link Short#MAX_VALUE} while automatically determining the server version based on the current server manager.
+     * @param type the type to read from the buffer
+     * @param clientVersion the client version to read the type for, these are important in specific cases These get passed into the type.
+     * @return a collection of the specified type read from the buffer, or an empty collection if the read is unsuccessful.
+     * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T>Collection<T> readCollection(BinaryBufferType<T> type, ClientVersion clientVersion) {
         return readCollection(Short.MAX_VALUE, type, PacketEvents.getAPI().getServerManager().getVersion(), clientVersion);
     }
+
+    /**
+     * Reads a collection using {@link BinaryBuffer#VAR_INT} for the size specification with a maximum size of {@link Short#MAX_VALUE} while automatically determining the server and client versions based on the current server manager.
+     * @param type the type to read from the buffer
+     * @return a collection of the specified type read from the buffer, or an empty collection if the read is unsuccessful.
+     * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T>Collection<T> readCollection(BinaryBufferType<T> type) {
         return readCollection(Short.MAX_VALUE, type, PacketEvents.getAPI().getServerManager().getVersion(), PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
     }
 
+    /**
+     * Writes a collection using {@link BinaryBuffer#VAR_INT} for the size specification.
+     * @param collection the collection to write to the buffer
+     * @param type the type to write to the buffer
+     * @param serverVersion the server version to write the type for, these are important in specific cases These get passed into the type.
+     * @param clientVersion the client version to write the type for, these are important in specific cases These get passed into the type.
+     * @param <T> the type to write, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T> void writeCollection(Collection<T> collection, BinaryBufferType<T> type, ServerVersion serverVersion, ClientVersion clientVersion) {
         write(VAR_INT, collection.size(), serverVersion, clientVersion);
         for (T t : collection) {
             write(type, t, serverVersion, clientVersion);
         }
     }
+
+    /**
+     * Writes a collection using {@link BinaryBuffer#VAR_INT} for the size specification while automatically determining the server version based on the current server manager.
+     * @param collection the collection to write to the buffer
+     * @param type the type to write to the buffer
+     * @param clientVersion the client version to write the type for, these are important in specific cases These get passed into the type.
+     * @param <T> the type to write, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T> void writeCollection(Collection<T> collection, BinaryBufferType<T> type, ClientVersion clientVersion) {
         writeCollection(collection, type, PacketEvents.getAPI().getServerManager().getVersion(), clientVersion);
     }
+
+    /**
+     * Writes a collection using {@link BinaryBuffer#VAR_INT} for the size specification while automatically determining the server and client versions based on the current server manager.
+     * @param collection the collection to write to the buffer
+     * @param type the type to write to the buffer
+     * @param <T> the type to write, this is the generic of the {@link BinaryBufferType} specified.
+     */
     public <T> void writeCollection(Collection<T> collection, BinaryBufferType<T> type) {
         writeCollection(collection, type, PacketEvents.getAPI().getServerManager().getVersion(), PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
     }
 
-    /** Map Read/Write Methods **/
+
+    /**
+     * Writes a map to the underlying buffer using {@link BinaryBuffer#VAR_INT} for the size specification. Every iteration it reads the keyType, and then the valueType
+     * @param keyType the type to read the keys from the buffer
+     * @param valueType the type to read the values from the buffer
+     * @param serverVersion the server version to read the type for, these are important in specific cases These get passed into the type.
+     * @param clientVersion the client version to read the type for, these are important in specific cases These get passed into the type.
+     * @return a map of the specified types read from the buffer, or an empty map if the read is unsuccessful. {@link Map}
+     * @param <K> the type to read the keys, this is the generic of the {@link BinaryBufferType} specified for keys.
+     * @param <V> the type to read the values, this is the generic of the {@link BinaryBufferType} specified for values.
+     */
     public <K, V> Map<K, V> readMap(BinaryBufferType<K> keyType, BinaryBufferType<V> valueType, ServerVersion serverVersion, ClientVersion clientVersion) {
         int size = read(VAR_INT, serverVersion, clientVersion);
         Map<K, V> map = new HashMap<>(size);
@@ -158,13 +334,42 @@ public final class BinaryBuffer {
         }
         return map;
     }
+
+    /**
+     * Reads a map from the underlying buffer using {@link BinaryBuffer#VAR_INT} for the size specification while automatically determining the server version based on the current server manager.
+     * @param keyType the type to read the keys from the buffer
+     * @param valueType the type to read the values from the buffer
+     * @param clientVersion the client version to read the type for, these are important in specific cases These get passed into the type.
+     * @return a map of the specified types read from the buffer, or an empty map if the read is unsuccessful. {@link Map}
+     * @param <K> the type to read the keys, this is the generic of the {@link BinaryBufferType} specified for keys.
+     * @param <V> the type to read the values, this is the generic of the {@link BinaryBufferType} specified for values.
+     */
     public <K, V> Map<K, V> readMap(BinaryBufferType<K> keyType, BinaryBufferType<V> valueType, ClientVersion clientVersion) {
         return readMap(keyType, valueType, PacketEvents.getAPI().getServerManager().getVersion(), clientVersion);
     }
+
+    /**
+     * Reads a map from the underlying buffer using {@link BinaryBuffer#VAR_INT} for the size specification while automatically determining the server and client versions based on the current server manager.
+     * @param keyType the type to read the keys from the buffer
+     * @param valueType the type to read the values from the buffer
+     * @return a map of the specified types read from the buffer, or an empty map if the read is unsuccessful. {@link Map}
+     * @param <K> the type to read the keys, this is the generic of the {@link BinaryBufferType} specified for keys.
+     * @param <V> the type to read the values, this is the generic of the {@link BinaryBufferType} specified for values.
+     */
     public <K, V> Map<K, V> readMap(BinaryBufferType<K> keyType, BinaryBufferType<V> valueType) {
         return readMap(keyType, valueType, PacketEvents.getAPI().getServerManager().getVersion(), PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
     }
 
+    /**
+     * Writes a map to the underlying buffer using {@link BinaryBuffer#VAR_INT} for the size specification. Every iteration it writes the keyType, and then the valueType
+     * @param map the map to write to the buffer
+     * @param keyType the type to write the keys to the buffer
+     * @param valueType the type to write the values to the buffer
+     * @param serverVersion the server version to write the type for, these are important in specific cases These get passed into the type.
+     * @param clientVersion the client version to write the type for, these are important in specific cases These get passed into the type.
+     * @param <K> the type to write the keys, this is the generic of the {@link BinaryBufferType} specified for keys.
+     * @param <V> the type to write the values, this is the generic of the {@link BinaryBufferType} specified for values.
+     */
     public <K, V> void writeMap(Map<K, V> map, BinaryBufferType<K> keyType, BinaryBufferType<V> valueType, ServerVersion serverVersion, ClientVersion clientVersion) {
         write(VAR_INT, map.size(), serverVersion, clientVersion);
         for (Map.Entry<K, V> entry : map.entrySet()) {
@@ -172,14 +377,39 @@ public final class BinaryBuffer {
             write(valueType, entry.getValue(), serverVersion, clientVersion);
         }
     }
+
+    /**
+     * Writes a map to the underlying buffer using {@link BinaryBuffer#VAR_INT} for the size specification while automatically determining the server version based on the current server manager.
+     * @param map the map to write to the buffer
+     * @param keyType the type to write the keys to the buffer
+     * @param valueType the type to write the values to the buffer
+     * @param clientVersion the client version to write the type for, these are important in specific cases These get passed into the type.
+     * @param <K> the type to write the keys, this is the generic of the {@link BinaryBufferType} specified for keys.
+     * @param <V> the type to write the values, this is the generic of the {@link BinaryBufferType} specified for values.
+     */
     public <K, V> void writeMap(Map<K, V> map, BinaryBufferType<K> keyType, BinaryBufferType<V> valueType, ClientVersion clientVersion) {
         writeMap(map, keyType, valueType, PacketEvents.getAPI().getServerManager().getVersion(), clientVersion);
     }
+
+    /**
+     * Writes a map to the underlying buffer using {@link BinaryBuffer#VAR_INT} for the size specification while automatically determining the server and client versions based on the current server manager.
+     * @param map the map to write to the buffer
+     * @param keyType the type to write the keys to the buffer
+     * @param valueType the type to write the values to the buffer
+     * @param <K> the type to write the keys, this is the generic of the {@link BinaryBufferType} specified for keys.
+     * @param <V> the type to write the values, this is the generic of the {@link BinaryBufferType} specified for values.
+     */
     public <K, V> void writeMap(Map<K, V> map, BinaryBufferType<K> keyType, BinaryBufferType<V> valueType) {
         writeMap(map, keyType, valueType, PacketEvents.getAPI().getServerManager().getVersion(), PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
     }
 
-    /** Enums Read/Write Methods **/
+
+    /**
+     * Reads an enum value from the underlying buffer using its ordinal. The ordinal is read using {@link BinaryBuffer#VAR_INT}.
+     * @param enumClass the class of the enum to read
+     * @return the enum value read from the buffer, or throws an {@link IllegalArgumentException} if the ordinal is invalid.
+     * @param <T> the type of the enum to read, this is the generic of the enum class specified.
+     */
     public <T extends Enum<T>> T readEnum(Class<T> enumClass) {
         T[] constants = enumClass.getEnumConstants();
         int ordinal = read(VAR_INT);
@@ -188,10 +418,20 @@ public final class BinaryBuffer {
         }
         return constants[ordinal];
     }
+
+    /**
+     * Writes an enum value to the underlying buffer using its ordinal. The ordinal is written using {@link BinaryBuffer#VAR_INT}.
+     * @param value the enum value to write to the buffer
+     * @param <T> the type of the enum to write, this is the generic of the enum class specified.
+     */
     public <T extends Enum<T>> void writeEnum(T value) {
         write(VAR_INT, value.ordinal());
     }
 
+    /**
+     * Returns the underlying buffer object. These should rarely be used outside packetevents internals.
+     * @return the underlying buffer object, typically a ByteBuf or similar.
+     */
     public Object getBuffer() {
         return buffer;
     }

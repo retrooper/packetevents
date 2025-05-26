@@ -11,6 +11,7 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 
 import java.nio.charset.StandardCharsets;
 
@@ -368,6 +369,41 @@ final class BinaryBufferTypes {
         }
     }
 
+    static final class Salt implements BinaryBufferType<SaltSignature> {
+
+        @Override
+        public SaltSignature read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            long salt = buffer.read(BinaryBuffer.LONG);
+            byte[] signature;
+            //1.19.3+
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+                //Read optional signature
+                if (buffer.read(BinaryBuffer.BOOLEAN)) {
+                    signature = buffer.readBytes(256);
+                } else {
+                    signature = new byte[0];
+                }
+            } else {
+                signature = readByteArray(256);
+            }
+            return new SaltSignature(salt, signature);        }
+
+        @Override
+        public void write(BinaryBuffer buffer, SaltSignature signature, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.LONG, signature.getSalt());
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+                boolean present = signature.getSignature().length != 0;
+                buffer.write(BinaryBuffer.BOOLEAN, present);
+                if (present) {
+
+                    writeBytes(signature.getSignature());
+                }
+
+            } else {
+                writeByteArray(signature.getSignature());
+            }
+        }
+    }
 
 
 }
