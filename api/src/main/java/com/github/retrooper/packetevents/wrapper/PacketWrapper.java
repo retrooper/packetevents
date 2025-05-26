@@ -365,14 +365,16 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public byte readByte() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.BYTE);
         }
         return ByteBufHelper.readByte(buffer);
     }
 
     public void writeByte(int value) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.BYTE, (byte) value);
             return;
         }
@@ -380,21 +382,24 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public short readUnsignedByte() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.UBYTE);
         }
         return ByteBufHelper.readUnsignedByte(buffer);
     }
 
     public boolean readBoolean() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.BOOLEAN);
         }
         return readByte() != 0;
     }
 
     public void writeBoolean(boolean value) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.BOOLEAN, value);
             return;
         }
@@ -402,14 +407,16 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public int readInt() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.INT);
         }
         return ByteBufHelper.readInt(buffer);
     }
 
     public void writeInt(int value) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.INT, value);
             return;
         }
@@ -417,14 +424,16 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public int readMedium() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.MEDIUM);
         }
         return ByteBufHelper.readMedium(buffer);
     }
 
     public void writeMedium(int value) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.MEDIUM, value);
             return;
         }
@@ -432,7 +441,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public int readVarInt() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.VAR_INT);
         }
         int value = 0;
@@ -450,7 +460,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeVarInt(int value) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.VAR_INT, value);
             return;
         }
@@ -737,7 +748,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public long readVarLong() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.VAR_LONG);
         }
         long value = 0;
@@ -750,7 +762,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeVarLong(long l) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.VAR_LONG, l);
             return;
         }
@@ -763,14 +776,16 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public float readFloat() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.FLOAT);
         }
         return ByteBufHelper.readFloat(buffer);
     }
 
     public void writeFloat(float value) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.FLOAT, value);
             return;
         }
@@ -778,14 +793,16 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public double readDouble() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.DOUBLE);
         }
         return ByteBufHelper.readDouble(buffer);
     }
 
     public void writeDouble(double value) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.DOUBLE, value);
             return;
         }
@@ -899,7 +916,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public UUID readUUID() {
-        if (true) {
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.UUID);
         }
         long mostSigBits = readLong();
@@ -908,7 +925,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeUUID(UUID uuid) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.UUID, uuid);
             return;
         }
@@ -917,7 +935,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public Vector3i readBlockPosition() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.BLOCK_POSITION);
         }
         long val = readLong();
@@ -925,7 +944,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeBlockPosition(Vector3i pos) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.BLOCK_POSITION, pos);
             return;
         }
@@ -934,14 +954,16 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public GameMode readGameMode() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.GAME_MODE);
         }
         return GameMode.getById(readByte());
     }
 
     public void writeGameMode(@Nullable GameMode mode) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.GAME_MODE, mode);
             return;
         }
@@ -1010,7 +1032,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     @Deprecated
     public Dimension readDimension() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.DIMENSION);
         }
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
@@ -1028,7 +1051,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     @Deprecated
     public void writeDimension(Dimension dimension) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.DIMENSION, dimension);
             return;
         }
@@ -1045,7 +1069,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public SaltSignature readSaltSignature() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.SALT_SIGNATURE);
         }
         long salt = readLong();
@@ -1065,7 +1090,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeSaltSignature(SaltSignature signature) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.SALT_SIGNATURE, signature);
             return;
         }
@@ -1083,14 +1109,16 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public PublicKey readPublicKey() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.PUBLIC_KEY);
         }
         return MinecraftEncryptionUtil.publicKey(readByteArray(512));
     }
 
     public void writePublicKey(PublicKey publicKey) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.PUBLIC_KEY, publicKey);
             return;
         }
@@ -1098,7 +1126,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public PublicProfileKey readPublicProfileKey() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.PUBLIC_PROFILE_KEY);
         }
         Instant expiresAt = readTimestamp();
@@ -1108,7 +1137,8 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writePublicProfileKey(PublicProfileKey key) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.PUBLIC_PROFILE_KEY, key);
             return;
         }
@@ -1127,14 +1157,16 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public Instant readTimestamp() {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             return binaryBuffer.read(BinaryBuffer.TIMESTAMP);
         }
         return Instant.ofEpochMilli(readLong());
     }
 
     public void writeTimestamp(Instant timestamp) {
-        if (true) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
             binaryBuffer.write(BinaryBuffer.TIMESTAMP, timestamp);
             return;
         }
@@ -1142,10 +1174,18 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public SignatureData readSignatureData() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.SIGNATURE_DATA);
+        }
         return new SignatureData(readTimestamp(), readPublicKey(), readByteArray(4096));
     }
 
     public void writeSignatureData(SignatureData signatureData) {
+
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
+            binaryBuffer.write(BinaryBuffer.SIGNATURE_DATA, signatureData);
+            return;
+        }
         writeTimestamp(signatureData.getTimestamp());
         writePublicKey(signatureData.getPublicKey());
         writeByteArray(signatureData.getSignature());

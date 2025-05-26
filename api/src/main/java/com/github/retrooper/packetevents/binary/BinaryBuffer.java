@@ -3,6 +3,7 @@ package com.github.retrooper.packetevents.binary;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -10,8 +11,11 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.PublicProfileKey;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.Either;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
+import com.github.retrooper.packetevents.util.crypto.SignatureData;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.security.PublicKey;
@@ -70,7 +74,7 @@ import java.util.*;
 public final class BinaryBuffer {
 
     public static final BinaryBufferType<byte[]> BYTE_ARRAY = new BinaryBufferTypes.ByteArray();
-    public static BinaryBufferType<byte[]> SizedByteArray(int maxSize) {
+    public static BinaryBufferType<byte[]> BYTE_ARRAY(int maxSize) {
         return new BinaryBufferTypes.ByteArray(maxSize);
     }
 
@@ -97,6 +101,11 @@ public final class BinaryBuffer {
     public static final BinaryBufferType<PublicKey> PUBLIC_KEY = new BinaryBufferTypes.Publickey();
     public static final BinaryBufferType<Instant> TIMESTAMP = new BinaryBufferTypes.Timestamp();
     public static final BinaryBufferType<PublicProfileKey> PUBLIC_PROFILE_KEY = new BinaryBufferTypes.ProfileKey();
+    public static final BinaryBufferType<SignatureData> SIGNATURE_DATA = new BinaryBufferTypes.SignatureData();
+
+    public static <T extends MappedEntity> BinaryBufferType<T> MAPPED_ENTITY(IRegistry<T> registry) {
+        return new BinaryBufferTypes.MappedEntity<>(registry);
+    }
 
     /**
      * Use {@link BinaryBuffer#DIMENSION_TYPE} instead
@@ -110,7 +119,7 @@ public final class BinaryBuffer {
     public static final BinaryBufferType<NBTCompound> NBT_UNLIMITED = new BinaryBufferTypes.NbtUnlimited();
 
     public static final BinaryBufferType<String> STRING = new BinaryBufferTypes.String();
-    public static BinaryBufferType<String> SizedString(int maxSize) {
+    public static BinaryBufferType<String> STRING(int maxSize) {
         return new BinaryBufferTypes.String(maxSize);
     }
 
@@ -227,6 +236,53 @@ public final class BinaryBuffer {
         return type.read(this);
     }
 
+
+    /** Reads an {@link Either} from the underlying buffer, where the first value is read as a boolean to determine if it is a left or right value.
+     * If the boolean is true, the left value is read using the specified leftType, otherwise the right value is read using the specified rightType.
+     * @param leftType the type to read the left value from the buffer
+     * @param rightType the type to read the right value from the buffer
+     * @param serverVersion the server version to read the type for, these are important in specific cases.
+     * @param clientVersion the client version to read the type for, these are important in specific cases.
+     * @return an Either containing a left or right value based on the boolean read from the buffer.
+     * @param <L> the type of the left value, this is the generic of the {@link BinaryBufferType} specified for left values.
+     * @param <R> the type of the right value, this is the generic of the {@link BinaryBufferType} specified for right values.
+     */
+    public <L, R> Either<L, R> readEither(BinaryBufferType<L> leftType, BinaryBufferType<R> rightType, ServerVersion serverVersion, ClientVersion clientVersion) {
+        boolean isLeft = read(BOOLEAN, serverVersion, clientVersion);
+        if (isLeft) {
+            return Either.createLeft(read(leftType, serverVersion, clientVersion));
+        } else {
+            return Either.createRight(read(rightType, serverVersion, clientVersion));
+        }
+    }
+
+    /** Reads an {@link Either} from the underlying buffer, where the first value is read as a boolean to determine if it is a left or right value.
+     * If the boolean is true, the left value is read using the specified leftType, otherwise the right value is read using the specified rightType.
+     * while automatically determining the server version based on the current server manager.
+     * @param leftType the type to read the left value from the buffer
+     * @param rightType the type to read the right value from the buffer
+     * @param clientVersion the client version to read the type for, these are important in specific cases.
+     * @return an Either containing a left or right value based on the boolean read from the buffer.
+     * @param <L> the type of the left value, this is the generic of the {@link BinaryBufferType} specified for left values.
+     * @param <R> the type of the right value, this is the generic of the {@link BinaryBufferType} specified for right values.
+     */
+    public <L, R> Either<L, R> readEither(BinaryBufferType<L> leftType, BinaryBufferType<R> rightType, ClientVersion clientVersion) {
+        return readEither(leftType, rightType, PacketEvents.getAPI().getServerManager().getVersion(), clientVersion);
+    }
+
+    /** Reads an {@link Either} from the underlying buffer, where the first value is read as a boolean to determine if it is a left or right value.
+     * If the boolean is true, the left value is read using the specified leftType, otherwise the right value is read using the specified rightType.
+     * while automatically determining the server and client versions based on the current server manager.
+     * @param leftType the type to read the left value from the buffer
+     * @param rightType the type to read the right value from the buffer
+     * @return an Either containing a left or right value based on the boolean read from the buffer.
+     * @param <L> the type of the left value, this is the generic of the {@link BinaryBufferType} specified for left values.
+     * @param <R> the type of the right value, this is the generic of the {@link BinaryBufferType} specified for right values.
+     */
+    public <L, R> Either<L, R> readEither(BinaryBufferType<L> leftType, BinaryBufferType<R> rightType) {
+        return readEither(leftType, rightType, PacketEvents.getAPI().getServerManager().getVersion(), PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+    }
+
     /**
      * Writes a value to the underlying buffer using the specified {@link BinaryBufferType}.
      * @param type the type to write
@@ -259,6 +315,54 @@ public final class BinaryBuffer {
     public <T> void write(BinaryBufferType<T> type, T value) {
         type.write(this, value);
     }
+
+    /** Writes an {@link Either} to the underlying buffer, where the first value is written as a boolean to determine if it is a left or right value.
+     * If the boolean is true, the left value is written using the specified leftType, otherwise the right value is written using the specified rightType.
+     * @param either the Either to write to the buffer
+     * @param leftType the type to write the left value to the buffer
+     * @param rightType the type to write the right value to the buffer
+     * @param serverVersion the server version to write the type for, these are important in specific cases.
+     * @param clientVersion the client version to write the type for, these are important in specific cases.
+     * @param <L> the type of the left value, this is the generic of the {@link BinaryBufferType} specified for left values.
+     * @param <R> the type of the right value, this is the generic of the {@link BinaryBufferType} specified for right values.
+     */
+    public <L, R> void writeEither(Either<L, R> either, BinaryBufferType<L> leftType, BinaryBufferType<R> rightType, ServerVersion serverVersion, ClientVersion clientVersion) {
+        if (either.isLeft()) {
+            write(BOOLEAN, true, serverVersion, clientVersion);
+            write(leftType, either.getLeft(), serverVersion, clientVersion);
+        } else {
+            write(BOOLEAN, false, serverVersion, clientVersion);
+            write(rightType, either.getRight(), serverVersion, clientVersion);
+        }
+    }
+
+    /** Writes an {@link Either} to the underlying buffer, where the first value is written as a boolean to determine if it is a left or right value.
+     * If the boolean is true, the left value is written using the specified leftType, otherwise the right value is written using the specified rightType.
+     * while automatically determining the server version based on the current server manager.
+     * @param either the Either to write to the buffer
+     * @param leftType the type to write the left value to the buffer
+     * @param rightType the type to write the right value to the buffer
+     * @param clientVersion the client version to write the type for, these are important in specific cases.
+     * @param <L> the type of the left value, this is the generic of the {@link BinaryBufferType} specified for left values.
+     * @param <R> the type of the right value, this is the generic of the {@link BinaryBufferType} specified for right values.
+     */
+    public <L, R> void writeEither(Either<L, R> either, BinaryBufferType<L> leftType, BinaryBufferType<R> rightType, ClientVersion clientVersion) {
+        writeEither(either, leftType, rightType, PacketEvents.getAPI().getServerManager().getVersion(), clientVersion);
+    }
+
+    /** Writes an {@link Either} to the underlying buffer, where the first value is written as a boolean to determine if it is a left or right value.
+     * If the boolean is true, the left value is written using the specified leftType, otherwise the right value is written using the specified rightType.
+     * while automatically determining the server and client versions based on the current server manager.
+     * @param either the Either to write to the buffer
+     * @param leftType the type to write the left value to the buffer
+     * @param rightType the type to write the right value to the buffer
+     * @param <L> the type of the left value, this is the generic of the {@link BinaryBufferType} specified for left values.
+     * @param <R> the type of the right value, this is the generic of the {@link BinaryBufferType} specified for right values.
+     */
+    public <L, R> void writeEither(Either<L, R> either, BinaryBufferType<L> leftType, BinaryBufferType<R> rightType) {
+        writeEither(either, leftType, rightType, PacketEvents.getAPI().getServerManager().getVersion(), PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+    }
+
 
     /**
      * Reads a collection using {@link BinaryBuffer#VAR_INT} for the size specification.
@@ -313,7 +417,7 @@ public final class BinaryBuffer {
      * @return a collection of the specified type read from the buffer, or an empty collection if the read is unsuccessful.
      * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
      */
-    public <T>Collection<T> readCollection(BinaryBufferType<T> type, ServerVersion serverVersion, ClientVersion clientVersion) {
+    public <T> Collection<T> readCollection(BinaryBufferType<T> type, ServerVersion serverVersion, ClientVersion clientVersion) {
         return readCollection(Short.MAX_VALUE, type, serverVersion, clientVersion);
     }
 
@@ -324,7 +428,7 @@ public final class BinaryBuffer {
      * @return a collection of the specified type read from the buffer, or an empty collection if the read is unsuccessful.
      * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
      */
-    public <T>Collection<T> readCollection(BinaryBufferType<T> type, ClientVersion clientVersion) {
+    public <T> Collection<T> readCollection(BinaryBufferType<T> type, ClientVersion clientVersion) {
         return readCollection(Short.MAX_VALUE, type, PacketEvents.getAPI().getServerManager().getVersion(), clientVersion);
     }
 
@@ -334,7 +438,7 @@ public final class BinaryBuffer {
      * @return a collection of the specified type read from the buffer, or an empty collection if the read is unsuccessful.
      * @param <T> the type to read, this is the generic of the {@link BinaryBufferType} specified.
      */
-    public <T>Collection<T> readCollection(BinaryBufferType<T> type) {
+    public <T> Collection<T> readCollection(BinaryBufferType<T> type) {
         return readCollection(Short.MAX_VALUE, type, PacketEvents.getAPI().getServerManager().getVersion(), PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
     }
 

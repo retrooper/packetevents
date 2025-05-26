@@ -2,6 +2,8 @@ package com.github.retrooper.packetevents.binary;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter;
@@ -14,6 +16,9 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
+import com.github.retrooper.packetevents.util.crypto.SignatureData;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
+import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
 
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
@@ -486,4 +491,60 @@ final class BinaryBufferTypes {
             buffer.write(BYTE_ARRAY, value.getKeySignature(), serverVersion, clientVersion);
         }
     }
+    static final class SignatureData implements BinaryBufferType<com.github.retrooper.packetevents.util.crypto.SignatureData> {
+        private static final BinaryBufferType<byte[]> BYTE_ARRAY = new ByteArray(4096);
+
+        @Override
+        public com.github.retrooper.packetevents.util.crypto.SignatureData read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return new com.github.retrooper.packetevents.util.crypto.SignatureData(
+                    buffer.read(BinaryBuffer.TIMESTAMP, serverVersion, clientVersion),
+                    buffer.read(BinaryBuffer.PUBLIC_KEY, serverVersion, clientVersion),
+                    buffer.read(BYTE_ARRAY, serverVersion, clientVersion)
+            );
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, com.github.retrooper.packetevents.util.crypto.SignatureData value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.TIMESTAMP, value.getTimestamp(), serverVersion, clientVersion);
+            buffer.write(BinaryBuffer.PUBLIC_KEY, value.getPublicKey(), serverVersion, clientVersion);
+            buffer.write(BYTE_ARRAY, value.getSignature(), serverVersion, clientVersion);
+        }
+    }
+
+    static final class MappedEntityDirect<T extends com.github.retrooper.packetevents.protocol.mapper.MappedEntity> implements BinaryBufferType<T> {
+
+        @Override
+        public T read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return null;
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, T value, ServerVersion serverVersion, ClientVersion clientVersion) {
+
+        }
+    }
+    static final class MappedEntity<T extends com.github.retrooper.packetevents.protocol.mapper.MappedEntity> implements BinaryBufferType<T> {
+
+        private final IRegistry<T> registry;
+        private final IRegistryHolder registryHolder;
+
+        MappedEntity(IRegistry<T> registry, IRegistryHolder registryHolder) {
+            this.registry = registry;
+            this.registryHolder = registryHolder;
+        }
+
+        @Override
+        public T read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            IRegistry<T> replacedRegistry = registryHolder.getRegistryOr(
+                    registry, serverVersion.toClientVersion()
+            );
+
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, T value, ServerVersion serverVersion, ClientVersion clientVersion) {
+
+        }
+    }
+
 }
