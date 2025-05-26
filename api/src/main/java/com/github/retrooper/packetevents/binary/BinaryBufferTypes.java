@@ -12,7 +12,10 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.PublicProfileKey;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.KnownPack;
+import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
@@ -510,7 +513,6 @@ final class BinaryBufferTypes {
             buffer.write(BYTE_ARRAY, value.getSignature(), serverVersion, clientVersion);
         }
     }
-
     static final class MappedEntityDirect<T extends com.github.retrooper.packetevents.protocol.mapper.MappedEntity> implements BinaryBufferType<T> {
 
         @Override
@@ -538,12 +540,58 @@ final class BinaryBufferTypes {
             IRegistry<T> replacedRegistry = registryHolder.getRegistryOr(
                     registry, serverVersion.toClientVersion()
             );
-
+            return null; // TODO:
         }
 
         @Override
         public void write(BinaryBuffer buffer, T value, ServerVersion serverVersion, ClientVersion clientVersion) {
 
+        }
+    }
+    static final class Rotation implements BinaryBufferType<java.lang.Float> {
+
+        @Override
+        public java.lang.Float read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return (float) (buffer.read(BinaryBuffer.BYTE) * 360) / 256f;
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, java.lang.Float value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.BYTE, (byte) MathUtil.floor(value * 256f / 360f));
+        }
+    }
+    static final class KnownPack implements BinaryBufferType<com.github.retrooper.packetevents.util.KnownPack> {
+
+        @Override
+        public com.github.retrooper.packetevents.util.KnownPack read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return new com.github.retrooper.packetevents.util.KnownPack(
+                    buffer.read(BinaryBuffer.STRING, serverVersion, clientVersion),
+                    buffer.read(BinaryBuffer.STRING, serverVersion, clientVersion),
+                    buffer.read(BinaryBuffer.STRING, serverVersion, clientVersion)
+            );
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, com.github.retrooper.packetevents.util.KnownPack value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.STRING, value.getNamespace(), serverVersion, clientVersion);
+            buffer.write(BinaryBuffer.STRING, value.getId(), serverVersion, clientVersion);
+            buffer.write(BinaryBuffer.STRING, value.getVersion(), serverVersion, clientVersion);
+        }
+    }
+    static final class WorldBlockPos implements BinaryBufferType<WorldBlockPosition> {
+
+        @Override
+        public WorldBlockPosition read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return new WorldBlockPosition(
+                    buffer.read(BinaryBuffer.IDENTIFIER, serverVersion, clientVersion),
+                    buffer.read(BinaryBuffer.BLOCK_POSITION, serverVersion, clientVersion)
+            );
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, WorldBlockPosition value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.IDENTIFIER, value.getWorld(), serverVersion, clientVersion);
+            buffer.write(BinaryBuffer.BLOCK_POSITION, value.getBlockPosition(), serverVersion, clientVersion);
         }
     }
 

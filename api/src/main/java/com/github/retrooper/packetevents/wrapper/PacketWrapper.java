@@ -1201,10 +1201,17 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public WorldBlockPosition readWorldBlockPosition() {
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
+            return binaryBuffer.read(BinaryBuffer.WORLD_BLOCK_POSITION);
+        }
         return new WorldBlockPosition(readIdentifier(), readBlockPosition());
     }
 
     public void writeWorldBlockPosition(WorldBlockPosition pos) {
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
+            binaryBuffer.write(BinaryBuffer.WORLD_BLOCK_POSITION, pos);
+            return;
+        }
         writeIdentifier(pos.getWorld());
         writeBlockPosition(pos.getBlockPosition());
     }
@@ -1437,6 +1444,9 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public KnownPack readKnownPack() {
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
+            return binaryBuffer.read(BinaryBuffer.KNOWN_PACK);
+        }
         String namespace = this.readString();
         String id = this.readString();
         String version = this.readString();
@@ -1444,6 +1454,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeKnownPack(KnownPack knownPack) {
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
+            binaryBuffer.write(BinaryBuffer.KNOWN_PACK, knownPack);
+            return;
+        }
         this.writeString(knownPack.getNamespace());
         this.writeString(knownPack.getId());
         this.writeString(knownPack.getVersion());
@@ -1567,6 +1581,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public <Z extends Enum<?>> Z readEnum(Z[] values) {
+
         return values[this.readVarInt()];
     }
 
@@ -1663,10 +1678,17 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeRotation(float rotation) {
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
+            this.binaryBuffer.write(BinaryBuffer.ROTATION, rotation);
+            return;
+        }
         this.writeByte((byte) MathUtil.floor(rotation * 256f / 360f));
     }
 
     public float readRotation() {
+        if (PacketEvents.getAPI().getSettings().shouldUseBinaryBuffer()) {
+            return this.binaryBuffer.read(BinaryBuffer.ROTATION);
+        }
         return (float) (this.readByte() * 360) / 256f;
     }
 

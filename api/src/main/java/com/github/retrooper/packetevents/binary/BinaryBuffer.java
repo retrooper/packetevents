@@ -10,8 +10,10 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.PublicProfileKey;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Either;
+import com.github.retrooper.packetevents.util.KnownPack;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.util.crypto.SignatureData;
@@ -95,6 +97,7 @@ public final class BinaryBuffer {
 
     public static final BinaryBufferType<UUID> UUID = new BinaryBufferTypes.Uuid();
     public static final BinaryBufferType<Vector3i> BLOCK_POSITION = new BinaryBufferTypes.BlockPos();
+    public static final BinaryBufferType<WorldBlockPosition> WORLD_BLOCK_POSITION = new BinaryBufferTypes.WorldBlockPos();
     public static final BinaryBufferType<GameMode> GAME_MODE = new BinaryBufferTypes.GameMode();
     public static final BinaryBufferType<ResourceLocation> IDENTIFIER = new BinaryBufferTypes.Identifier();
     public static final BinaryBufferType<SaltSignature> SALT_SIGNATURE = new BinaryBufferTypes.Salt();
@@ -102,10 +105,8 @@ public final class BinaryBuffer {
     public static final BinaryBufferType<Instant> TIMESTAMP = new BinaryBufferTypes.Timestamp();
     public static final BinaryBufferType<PublicProfileKey> PUBLIC_PROFILE_KEY = new BinaryBufferTypes.ProfileKey();
     public static final BinaryBufferType<SignatureData> SIGNATURE_DATA = new BinaryBufferTypes.SignatureData();
-
-    public static <T extends MappedEntity> BinaryBufferType<T> MAPPED_ENTITY(IRegistry<T> registry) {
-        return new BinaryBufferTypes.MappedEntity<>(registry);
-    }
+    public static final BinaryBufferType<Float> ROTATION = new BinaryBufferTypes.Rotation();
+    public static final BinaryBufferType<KnownPack> KNOWN_PACK = new BinaryBufferTypes.KnownPack();
 
     /**
      * Use {@link BinaryBuffer#DIMENSION_TYPE} instead
