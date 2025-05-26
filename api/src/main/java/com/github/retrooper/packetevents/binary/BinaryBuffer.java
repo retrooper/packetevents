@@ -4,6 +4,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.*;
@@ -26,6 +28,8 @@ public final class BinaryBuffer {
     public static final BinaryBufferType<Long> VAR_LONG = new BinaryBufferTypes.VarLong();
 
     public static final BinaryBufferType<UUID> UUID = new BinaryBufferTypes.Uuid();
+    public static final BinaryBufferType<Vector3i> BLOCK_POSITION = new BinaryBufferTypes.BlockPos();
+    public static final BinaryBufferType<GameMode> GAME_MODE = new BinaryBufferTypes.GameMode();
 
     public static final BinaryBufferType<String> STRING = new BinaryBufferTypes.String();
     public static BinaryBufferType<String> SizedString(int maxSize) {

@@ -3,6 +3,8 @@ package com.github.retrooper.packetevents.binary;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.util.Vector3i;
 
 import java.nio.charset.StandardCharsets;
 
@@ -236,6 +238,34 @@ final class BinaryBufferTypes {
         public void write(BinaryBuffer buffer, java.util.UUID value, ServerVersion serverVersion, ClientVersion clientVersion) {
             ByteBufHelper.writeLong(buffer.getBuffer(), value.getMostSignificantBits());
             ByteBufHelper.writeLong(buffer.getBuffer(), value.getLeastSignificantBits());
+        }
+    }
+    static final class BlockPos implements BinaryBufferType<Vector3i> {
+
+        @Override
+        public Vector3i read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            long l = ByteBufHelper.readLong(buffer.getBuffer());
+            return new Vector3i(l, serverVersion);
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, Vector3i value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            long val = value.getSerializedPosition(serverVersion);
+            ByteBufHelper.writeLong(buffer.getBuffer(), val);
+        }
+    }
+    static final class GameMode implements BinaryBufferType<com.github.retrooper.packetevents.protocol.player.GameMode> {
+
+        @Override
+        public com.github.retrooper.packetevents.protocol.player.GameMode read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            byte b = ByteBufHelper.readByte(buffer.getBuffer());
+            return com.github.retrooper.packetevents.protocol.player.GameMode.getById(b);
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, com.github.retrooper.packetevents.protocol.player.GameMode value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            int id = value == null ? -1 : value.getId();
+            ByteBufHelper.writeByte(buffer.getBuffer(), id);
         }
     }
 }

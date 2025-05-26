@@ -917,20 +917,34 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public Vector3i readBlockPosition() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.BLOCK_POSITION);
+        }
         long val = readLong();
         return new Vector3i(val, serverVersion);
     }
 
     public void writeBlockPosition(Vector3i pos) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.BLOCK_POSITION, pos);
+            return;
+        }
         long val = pos.getSerializedPosition(serverVersion);
         writeLong(val);
     }
 
     public GameMode readGameMode() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.GAME_MODE);
+        }
         return GameMode.getById(readByte());
     }
 
     public void writeGameMode(@Nullable GameMode mode) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.GAME_MODE, mode);
+            return;
+        }
         int id = mode == null ? -1 : mode.getId();
         writeByte(id);
     }
