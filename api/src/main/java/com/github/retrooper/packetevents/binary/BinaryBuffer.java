@@ -3,8 +3,12 @@ package com.github.retrooper.packetevents.binary;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -30,6 +34,17 @@ public final class BinaryBuffer {
     public static final BinaryBufferType<UUID> UUID = new BinaryBufferTypes.Uuid();
     public static final BinaryBufferType<Vector3i> BLOCK_POSITION = new BinaryBufferTypes.BlockPos();
     public static final BinaryBufferType<GameMode> GAME_MODE = new BinaryBufferTypes.GameMode();
+    public static final BinaryBufferType<ResourceLocation> IDENTIFIER = new BinaryBufferTypes.Identifier();
+
+    public static final BinaryBufferType<NBT> NBT_RAW = new BinaryBufferTypes.NbtRaw();
+    public static final BinaryBufferType<NBTCompound> NBT = new BinaryBufferTypes.Nbt();
+
+    public static final BinaryBufferType<NBT> NBT_RAW_UNLIMITED = new BinaryBufferTypes.NbtRawUnlimited();
+    public static final BinaryBufferType<NBTCompound> NBT_UNLIMITED = new BinaryBufferTypes.NbtUnlimited();
+
+    @Deprecated()
+    /** Use {@link BinaryBuffer#DIMENSION_TYPE} instead */
+    public static final BinaryBufferType<Dimension> DIMENSION = new BinaryBufferTypes.Dimension();
 
     public static final BinaryBufferType<String> STRING = new BinaryBufferTypes.String();
     public static BinaryBufferType<String> SizedString(int maxSize) {

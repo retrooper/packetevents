@@ -2,8 +2,14 @@ package com.github.retrooper.packetevents.binary;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter;
+import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
 
 import java.nio.charset.StandardCharsets;
@@ -254,6 +260,66 @@ final class BinaryBufferTypes {
             ByteBufHelper.writeLong(buffer.getBuffer(), val);
         }
     }
+    static final class Identifier implements BinaryBufferType<ResourceLocation> {
+
+        @Override
+        public ResourceLocation read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return new ResourceLocation(buffer.read(BinaryBuffer.STRING));
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, ResourceLocation value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.STRING, value.toString());
+        }
+    }
+    static final class Nbt implements BinaryBufferType<NBTCompound> {
+
+        @Override
+        public NBTCompound read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return (NBTCompound) buffer.read(BinaryBuffer.NBT_RAW);
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, NBTCompound value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.NBT_RAW, value, serverVersion, clientVersion);
+        }
+    }
+    static final class NbtRaw implements BinaryBufferType<NBT> {
+
+        @Override
+        public NBT read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return NBTCodec.readNBTFromBuffer(buffer.getBuffer(), serverVersion);
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, NBT value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            NBTCodec.writeNBTToBuffer(buffer.getBuffer(), serverVersion, value);
+        }
+    }
+    static final class NbtUnlimited implements BinaryBufferType<NBTCompound> {
+
+        @Override
+        public NBTCompound read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return (NBTCompound) buffer.read(BinaryBuffer.NBT_RAW_UNLIMITED);
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, NBTCompound value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.NBT_RAW, value, serverVersion, clientVersion);
+        }
+    }
+    static final class NbtRawUnlimited implements BinaryBufferType<NBT> {
+
+        @Override
+        public NBT read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return NBTCodec.readNBTFromBuffer(buffer.getBuffer(), serverVersion, NBTLimiter.noop());
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, NBT value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            NBTCodec.writeNBTToBuffer(buffer.getBuffer(), serverVersion, value);
+        }
+    }
     static final class GameMode implements BinaryBufferType<com.github.retrooper.packetevents.protocol.player.GameMode> {
 
         @Override
@@ -268,4 +334,40 @@ final class BinaryBufferTypes {
             ByteBufHelper.writeByte(buffer.getBuffer(), id);
         }
     }
+    static final class Dimension implements BinaryBufferType<com.github.retrooper.packetevents.protocol.world.Dimension> {
+
+        @Override
+        public com.github.retrooper.packetevents.protocol.world.Dimension read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                return new com.github.retrooper.packetevents.protocol.world.Dimension(
+                        buffer.read(BinaryBuffer.VAR_INT));
+            }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                    || serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
+                com.github.retrooper.packetevents.protocol.world.Dimension dimension = new com.github.retrooper.packetevents.protocol.world.Dimension(new NBTCompound());
+                dimension.setDimensionName(buffer.read(BinaryBuffer.IDENTIFIER).toString());
+                return dimension;
+            } else {
+                NBTCompound attrib = buffer.read(BinaryBuffer.NBT);
+                return new com.github.retrooper.packetevents.protocol.world.Dimension(attrib);
+            }
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, com.github.retrooper.packetevents.protocol.world.Dimension value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                buffer.write(BinaryBuffer.VAR_INT, value.getId());
+                return;
+            }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                    || serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
+                buffer.write(BinaryBuffer.STRING, value.getDimensionName());
+            } else {
+                buffer.write(BinaryBuffer.NBT, value.getAttributes());
+            }
+        }
+    }
+
+
+
 }

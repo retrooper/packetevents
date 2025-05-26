@@ -1010,6 +1010,9 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     @Deprecated
     public Dimension readDimension() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.DIMENSION);
+        }
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             return new Dimension(this.readVarInt());
         }
@@ -1025,6 +1028,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     @Deprecated
     public void writeDimension(Dimension dimension) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.DIMENSION, dimension);
+            return;
+        }
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             this.writeVarInt(dimension.getId());
             return;
