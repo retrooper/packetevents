@@ -8,12 +8,16 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.PublicProfileKey;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 
 import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
+import java.time.Instant;
 
 final class BinaryBufferTypes {
 
@@ -368,8 +372,39 @@ final class BinaryBufferTypes {
             }
         }
     }
+    static final class ByteArray implements BinaryBufferType<byte[]> {
+        private static final int MAX_LENGTH = 32767; // 2^15 - 1
+        private final int maxLength;
 
+        public ByteArray(int maxLength) {
+            if (maxLength < 0 || maxLength > MAX_LENGTH) {
+                throw new IllegalArgumentException("ByteArray length must be between 0 and " + MAX_LENGTH + ", but was " + maxLength);
+            }
+            this.maxLength = maxLength;
+        }
+
+        public ByteArray() {
+            this(MAX_LENGTH);
+        }
+
+        @Override
+        public byte[] read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            int len = buffer.read(BinaryBuffer.VAR_INT, serverVersion, clientVersion);
+            if (len < 0 || len > maxLength) {
+                throw new RuntimeException("The received byte array length is invalid (" + len + " > " + maxLength + ")");
+            }
+            return buffer.readBytes(len);
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, byte[] value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.VAR_INT, value.length, serverVersion, clientVersion);
+            buffer.writeBytes(value);
+        }
+    }
     static final class Salt implements BinaryBufferType<SaltSignature> {
+
+        private static final BinaryBufferType<byte[]> BYTE_ARRAY = new ByteArray(256);
 
         @Override
         public SaltSignature read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
@@ -384,7 +419,7 @@ final class BinaryBufferTypes {
                     signature = new byte[0];
                 }
             } else {
-                signature = readByteArray(256);
+                signature = buffer.read(BYTE_ARRAY);
             }
             return new SaltSignature(salt, signature);        }
 
@@ -396,14 +431,59 @@ final class BinaryBufferTypes {
                 buffer.write(BinaryBuffer.BOOLEAN, present);
                 if (present) {
 
-                    writeBytes(signature.getSignature());
+                    buffer.writeBytes(signature.getSignature());
                 }
 
             } else {
-                writeByteArray(signature.getSignature());
+                buffer.write(BYTE_ARRAY, signature.getSignature(), serverVersion, clientVersion);
             }
         }
     }
+    static final class Publickey implements BinaryBufferType<PublicKey> {
 
+        private static final BinaryBufferType<byte[]> BYTE_ARRAY = new ByteArray(512);
 
+        @Override
+        public PublicKey read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return MinecraftEncryptionUtil.publicKey(
+                    buffer.read(BinaryBuffer.BYTE_ARRAY, serverVersion, clientVersion)
+            );
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, PublicKey value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BYTE_ARRAY, value.getEncoded());
+        }
+    }
+    static final class Timestamp implements BinaryBufferType<Instant> {
+
+        @Override
+        public Instant read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            return Instant.ofEpochMilli(buffer.read(BinaryBuffer.LONG, serverVersion, clientVersion));
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, Instant value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.LONG, value.toEpochMilli(), serverVersion, clientVersion);
+        }
+    }
+    static final class ProfileKey implements BinaryBufferType<PublicProfileKey> {
+
+        private static final BinaryBufferType<byte[]> BYTE_ARRAY = new ByteArray(4096);
+
+        @Override
+        public PublicProfileKey read(BinaryBuffer buffer, ServerVersion serverVersion, ClientVersion clientVersion) {
+            Instant expiresAt = buffer.read(BinaryBuffer.TIMESTAMP, serverVersion, clientVersion);
+            PublicKey publicKey = buffer.read(BinaryBuffer.PUBLIC_KEY, serverVersion, clientVersion);
+            byte[] signature = buffer.read(BYTE_ARRAY, serverVersion, clientVersion);
+            return new PublicProfileKey(expiresAt, publicKey, signature);
+        }
+
+        @Override
+        public void write(BinaryBuffer buffer, PublicProfileKey value, ServerVersion serverVersion, ClientVersion clientVersion) {
+            buffer.write(BinaryBuffer.TIMESTAMP, value.getExpiresAt(), serverVersion, clientVersion);
+            buffer.write(BinaryBuffer.PUBLIC_KEY, value.getKey(), serverVersion, clientVersion);
+            buffer.write(BYTE_ARRAY, value.getKeySignature(), serverVersion, clientVersion);
+        }
+    }
 }

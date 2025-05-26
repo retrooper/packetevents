@@ -1083,14 +1083,24 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public PublicKey readPublicKey() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.PUBLIC_KEY);
+        }
         return MinecraftEncryptionUtil.publicKey(readByteArray(512));
     }
 
     public void writePublicKey(PublicKey publicKey) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.PUBLIC_KEY, publicKey);
+            return;
+        }
         writeByteArray(publicKey.getEncoded());
     }
 
     public PublicProfileKey readPublicProfileKey() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.PUBLIC_PROFILE_KEY);
+        }
         Instant expiresAt = readTimestamp();
         PublicKey key = readPublicKey();
         byte[] keySignature = readByteArray(4096);
@@ -1098,6 +1108,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writePublicProfileKey(PublicProfileKey key) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.PUBLIC_PROFILE_KEY, key);
+            return;
+        }
         writeTimestamp(key.getExpiresAt());
         writePublicKey(key.getKey());
         writeByteArray(key.getKeySignature());
@@ -1113,10 +1127,17 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public Instant readTimestamp() {
+        if (true) {
+            return binaryBuffer.read(BinaryBuffer.TIMESTAMP);
+        }
         return Instant.ofEpochMilli(readLong());
     }
 
     public void writeTimestamp(Instant timestamp) {
+        if (true) {
+            binaryBuffer.write(BinaryBuffer.TIMESTAMP, timestamp);
+            return;
+        }
         writeLong(timestamp.toEpochMilli());
     }
 

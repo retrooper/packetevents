@@ -7,15 +7,72 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.PublicProfileKey;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.security.PublicKey;
+import java.time.Instant;
 import java.util.*;
 
+/**
+ * BinaryBuffer is a utility class for reading and writing protocol data from the underlying buffer
+ * This class was created to replace heavy usage of {@link PacketWrapper} for reading and writing data.
+ * {@link BinaryBufferType} is the format used to read and write data from the buffer.
+ * It provides methods to read and write various data types, including primitive types, collections, maps, and custom types.
+ * Custom classes that are not defined in the {@link BinaryBufferTypes} class can be added by creating a new class that extends {@link BinaryBufferType}.
+ * This is the encouraged way to add new types to the buffer.
+ * Example usage:
+ * <pre>
+ *     class Person {
+ *         public static final BinaryBufferType<Person> TYPE = new Serializer();
+ *
+ *          public static Person read({@link BinaryBuffer} buffer, {@link ServerVersion} serverVersion, {@link ClientVersion} clientVersion) {
+ *              return buffer.read(TYPE, serverVersion, clientVersion);
+ *          }
+ *
+ *        private int id;
+ *         private String name;
+ *
+ *         public Person(int id, String name) {
+ *              this.id = id;
+ *              this.name = name;
+ *         }
+ *
+ *
+ *
+ *         class Serializer implements {@link BinaryBufferType<Person>} {
+ *
+ *           {@literal @}Override
+ *           public Person read({@link BinaryBuffer} buffer, {@link ServerVersion} serverVersion, {@link ClientVersion} clientVersion) {
+ *              int id = buffer.read(BinaryBuffer.INT, serverVersion, clientVersion);
+ *              String name = buffer.read(BinaryBuffer.STRING, serverVersion, clientVersion);
+ *              return new Person(id, name);
+ *         }
+ *
+ *         {@literal @}Override
+ *         public void write({@link BinaryBuffer} buffer, Person value, {@link ServerVersion} serverVersion, {@link ClientVersion} clientVersion) {
+ *              buffer.write(BinaryBuffer.INT, value.getId(), serverVersion, clientVersion);
+ *              buffer.write(BinaryBuffer.STRING, value.getName(), serverVersion, clientVersion);
+ *         }
+ *
+ *     }
+ *
+ * </pre>
+ *
+ * TODO's:
+ *   - Add more types to the {@link BinaryBufferTypes} class.
+ *   - Convert the types like BYTE_ARRAY, INT_ARRAY, etc to a more reusable method, same with collections
+ */
 public final class BinaryBuffer {
+
+    public static final BinaryBufferType<byte[]> BYTE_ARRAY = new BinaryBufferTypes.ByteArray();
+    public static BinaryBufferType<byte[]> SizedByteArray(int maxSize) {
+        return new BinaryBufferTypes.ByteArray(maxSize);
+    }
 
     public static final BinaryBufferType<Byte> BYTE = new BinaryBufferTypes.Byte();
     public static final BinaryBufferType<Short> UBYTE = new BinaryBufferTypes.UByte();
@@ -37,16 +94,20 @@ public final class BinaryBuffer {
     public static final BinaryBufferType<GameMode> GAME_MODE = new BinaryBufferTypes.GameMode();
     public static final BinaryBufferType<ResourceLocation> IDENTIFIER = new BinaryBufferTypes.Identifier();
     public static final BinaryBufferType<SaltSignature> SALT_SIGNATURE = new BinaryBufferTypes.Salt();
+    public static final BinaryBufferType<PublicKey> PUBLIC_KEY = new BinaryBufferTypes.Publickey();
+    public static final BinaryBufferType<Instant> TIMESTAMP = new BinaryBufferTypes.Timestamp();
+    public static final BinaryBufferType<PublicProfileKey> PUBLIC_PROFILE_KEY = new BinaryBufferTypes.ProfileKey();
+
+    /**
+     * Use {@link BinaryBuffer#DIMENSION_TYPE} instead
+     */
+    @Deprecated()
+    public static final BinaryBufferType<Dimension> DIMENSION = new BinaryBufferTypes.Dimension();
 
     public static final BinaryBufferType<NBT> NBT_RAW = new BinaryBufferTypes.NbtRaw();
     public static final BinaryBufferType<NBTCompound> NBT = new BinaryBufferTypes.Nbt();
     public static final BinaryBufferType<NBT> NBT_RAW_UNLIMITED = new BinaryBufferTypes.NbtRawUnlimited();
     public static final BinaryBufferType<NBTCompound> NBT_UNLIMITED = new BinaryBufferTypes.NbtUnlimited();
-
-    @Deprecated()
-    /** Use {@link BinaryBuffer#DIMENSION_TYPE} instead */
-    // TODO: Make DIMENSION_TYPE
-    public static final BinaryBufferType<Dimension> DIMENSION = new BinaryBufferTypes.Dimension();
 
     public static final BinaryBufferType<String> STRING = new BinaryBufferTypes.String();
     public static BinaryBufferType<String> SizedString(int maxSize) {
