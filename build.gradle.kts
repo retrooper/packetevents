@@ -4,26 +4,26 @@ import java.io.ByteArrayOutputStream
 val fullVersion = "2.9.0"
 val snapshot = true
 
-group = "com.github.retrooper"
+group = "ac.grim.packetevents"
 description = rootProject.name
 
 fun getVersionMeta(includeHash: Boolean): String {
-    if (!snapshot) {
-        return ""
-    }
+    if (!snapshot) return ""
     var commitHash = ""
-    if (includeHash && file(".git").isDirectory) {
+    if (includeHash) {
         val stdout = ByteArrayOutputStream()
-        exec {
-            commandLine("git", "rev-parse", "--short", "HEAD")
-            standardOutput = stdout
-        }
-        commitHash = "+${stdout.toString().trim()}"
+        ProcessBuilder("git", "rev-parse", "--short", "HEAD")
+            .redirectErrorStream(true)
+            .start()
+            .apply { waitFor() }
+            .inputStream.use { stdout.writeBytes(it.readAllBytes()) }
+        commitHash = "+${stdout.toString().trim()}-SNAPSHOT"
     }
-    return "$commitHash-SNAPSHOT"
+    return commitHash
 }
+
 version = "$fullVersion${getVersionMeta(true)}"
-ext["versionNoHash"] = "$fullVersion${getVersionMeta(false)}"
+ext["versionNoHash"] = version
 
 tasks {
     wrapper {
@@ -67,6 +67,14 @@ tasks {
 
 allprojects {
     tasks {
+        // compileJava
+        withType<JavaCompile> {
+            options.isFork = true
+        }
+        // compileTestJava
+        withType<Test> {
+            maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+        }
         withType<Jar> {
             archiveVersion = rootProject.ext["versionNoHash"] as String
         }

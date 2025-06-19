@@ -22,14 +22,18 @@ public class InternalBukkitPacketListener extends com.github.retrooper.packeteve
             ConnectionState state = packet.getNextConnectionState();
 
             String feature;
-            if (ViaVersionUtil.isAvailable()) {
-                clientVersion = ClientVersion.getById(ViaVersionUtil.getProtocolVersion(user));
-                feature = "ViaVersion";
-            } else if (ProtocolSupportUtil.isAvailable()) {
-                clientVersion = ClientVersion.getById(ProtocolSupportUtil.getProtocolVersion(user.getAddress()));
-                feature = "ProtocolSupport";
+            if (!isPreVia()) {
+                if (ViaVersionUtil.isAvailable()) {
+                    clientVersion = ClientVersion.getById(ViaVersionUtil.getProtocolVersion(user));
+                    feature = "ViaVersion";
+                } else if (ProtocolSupportUtil.isAvailable()) {
+                    clientVersion = ClientVersion.getById(ProtocolSupportUtil.getProtocolVersion(user.getAddress()));
+                    feature = "ProtocolSupport";
+                } else {
+                    feature = null;
+                }
             } else {
-                feature = null;
+                feature = "Client Version Handshake";
             }
 
             LogManager logger = PacketEvents.getAPI().getLogManager();

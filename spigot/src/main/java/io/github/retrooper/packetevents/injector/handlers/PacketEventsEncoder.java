@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
@@ -33,6 +34,7 @@ import io.github.retrooper.packetevents.injector.connection.ServerConnectionInit
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -68,9 +70,11 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     private boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
     private ChannelPromise promise;
     public static final Object COMPRESSION_ENABLED_EVENT = paperCompressionEnabledEvent();
+    private boolean preVia;
 
-    public PacketEventsEncoder(User user) {
+    public PacketEventsEncoder(User user, boolean preVia) {
         this.user = user;
+        this.preVia = preVia;
     }
 
     public PacketEventsEncoder(ChannelHandler encoder) {
@@ -78,12 +82,17 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
         player = ((PacketEventsEncoder) encoder).player;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
         promise = ((PacketEventsEncoder) encoder).promise;
+        preVia = ((PacketEventsEncoder) encoder).preVia;
     }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
         boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
-        handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
+        handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise, preVia);
+
+        // We still call preVia listeners if ViaVersion is not available
+        if (!preVia && PacketEvents.getAPI().getSettings().isPreViaInjection() && !ViaVersionUtil.isAvailable())
+            handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise, !preVia);
 
         if (needsRecompression) {
             compress(ctx, byteBuf);
@@ -97,8 +106,8 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
         list.add(byteBuf.retain());
     }
 
-    private @Nullable PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
-        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, true);
+    private @Nullable PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise, boolean preVia) throws Exception {
+        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, !preVia);
         if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
             promise.addListener((p) -> {
                 for (Runnable task : packetSendEvent.getTasksAfterSend()) {
@@ -209,17 +218,25 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
         int compressIndex = ctx.pipeline().names().indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = ctx.pipeline().names().indexOf((preVia ? "pre-" : "") + PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
-        if (compressIndex > peEncoderIndex) {
-            //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
-            //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
+
+        if (compressIndex <= peEncoderIndex) return false; // We are fine, no need to relocate
+
+        //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
+        //But first we need to compress the data and re-compress it after we do all our processing to avoid issues
+
+        boolean decompress = false;
+
+        // We don't need to handle decompression if the client is 1.7 or older
+        if (!preVia ||
+            !user.getClientVersion().isOlderThanOrEquals(ClientVersion.V_1_7_10)) {
             decompress(ctx, buffer, buffer);
-            //Let us relocate and no longer deal with compression.
-            PacketEventsDecoder decoder = (PacketEventsDecoder) ctx.pipeline().get(PacketEvents.DECODER_NAME);
-            ServerConnectionInitializer.relocateHandlers(ctx.channel(), decoder, user);
-            return true;
+            decompress = true;
         }
-        return false;
+
+        //Let us relocate and no longer deal with compression.
+        ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, preVia, false);
+        return decompress;
     }
 }

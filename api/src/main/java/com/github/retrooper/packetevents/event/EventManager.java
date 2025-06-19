@@ -78,10 +78,11 @@ public class EventManager {
      * @param event                  {@link PacketEvent}
      * @param postCallListenerAction The action to be ran after all the listeners have finished processing
      */
-    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
+    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction, boolean preVia) {
         for (PacketListenerCommon listener : listeners) {
             try {
-                event.call(listener);
+                if (listener.isPreVia() == preVia)
+                    event.call(listener);
             } catch (Exception t) {
                 // ignore handshake exceptions
                 if (t.getClass() != InvalidHandshakeException.class) {
@@ -96,6 +97,10 @@ public class EventManager {
         if (event instanceof ProtocolPacketEvent && !((ProtocolPacketEvent) event).needsReEncode()) {
             ((ProtocolPacketEvent) event).setLastUsedWrapper(null);
         }
+    }
+
+    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
+        callEvent(event, postCallListenerAction, false);
     }
 
     /**

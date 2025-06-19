@@ -61,4 +61,8 @@ public abstract class PacketListenerCommon {
     public void onPacketEventExternal(PacketEvent event) {
     }
 
+    public boolean isPreVia() {
+        return false;
+    }
+
 }

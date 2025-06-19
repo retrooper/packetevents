@@ -40,6 +40,12 @@ public class PacketEventsSettings {
     private boolean fullStackTraceEnabled = false;
     private boolean kickOnPacketExceptionEnabled = true;
     private boolean kickIfTerminated = true;
+    /*
+     * By default, in spigot module, we decode packets based on server version if ViaVersion is present,
+     * setting this to true will force PacketEvents to use the client version translation in order to decoder packets
+     * before they reach ViaVersion
+     */
+    private boolean preViaInjection = false;
     private Function<String, InputStream> resourceProvider = path -> PacketEventsSettings.class
             .getClassLoader()
             .getResourceAsStream(path);
@@ -153,6 +159,18 @@ public class PacketEventsSettings {
     }
 
     /**
+     * This decides if PacketEvents should force the client version translation.
+     *
+     * @param preViaInjection Value
+     * @return Settings instance.
+     */
+    @ApiStatus.Internal
+    public PacketEventsSettings preViaInjection(boolean preViaInjection) {
+        this.preViaInjection = preViaInjection;
+        return this;
+    }
+
+    /**
      * Some projects may want to implement a CDN with resources like asset mappings
      * By default, all resources are retrieved from the ClassLoader
      *
@@ -239,6 +257,15 @@ public class PacketEventsSettings {
      */
     public boolean isKickIfTerminated() {
         return kickIfTerminated;
+    }
+
+    /**
+     * Should PacketEvents force the client version translation?
+     *
+     * @return Getter for {@link #preViaInjection}
+     */
+    public boolean isPreViaInjection() {
+        return preViaInjection;
     }
 
     /**

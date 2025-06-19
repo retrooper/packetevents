@@ -60,7 +60,7 @@ public final class PacketEventsImplHelper {
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
-        });
+        }, !autoProtocolTranslation);
         if (!packetSendEvent.isCancelled()) {
             //Did they ever use a wrapper?
             if (packetSendEvent.getLastUsedWrapper() != null) {
@@ -100,7 +100,7 @@ public final class PacketEventsImplHelper {
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
-        });
+        }, !autoProtocolTranslation);
         if (!packetReceiveEvent.isCancelled()) {
             //Did they ever use a wrapper?
             if (packetReceiveEvent.getLastUsedWrapper() != null) {

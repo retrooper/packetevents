@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
@@ -70,7 +71,8 @@ public class ServerConnectionInitializer {
                 return;
             }
 
-            relocateHandlers(channel, null, user);
+            relocateHandlers(channel, user, false, false);
+            if (PacketEvents.getAPI().getSettings().isPreViaInjection() && ViaVersionUtil.isAvailable()) relocateHandlers(channel, user, true, false);
 
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
             PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
@@ -92,31 +94,53 @@ public class ServerConnectionInitializer {
         }
     }
 
-    public static void relocateHandlers(Channel ctx, PacketEventsDecoder decoder, User user) {
-        // Decoder == null means we haven't made handlers for the user yet
+    public static void relocateHandlers(Channel ctx, User user, boolean preVia, boolean force) {
         try {
+            if (PacketEvents.getAPI().getSettings().isDebugEnabled())
+                PacketEvents.getAPI().getLogManager().debug("Pre relocate, preVia: " + preVia + ", " + ChannelHelper.pipelineHandlerNamesAsString(ctx));
+
+            String encoderName = preVia ? "pre-" + PacketEvents.ENCODER_NAME : PacketEvents.ENCODER_NAME;
+            String decoderName = preVia ? "pre-" + PacketEvents.DECODER_NAME : PacketEvents.DECODER_NAME;
+
+            PacketEventsDecoder existingDecoder = (PacketEventsDecoder) ctx.pipeline().get(decoderName);
             ChannelHandler encoder;
-            if (decoder != null) {
-                // This patches a bug where PE 2.0 handlers keep jumping behind one another causing a stackoverflow
-                if (decoder.hasBeenRelocated) return;
-                // Make sure we only relocate because of compression once
-                decoder.hasBeenRelocated = true;
-                decoder = (PacketEventsDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
-                encoder = ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
-                decoder = new PacketEventsDecoder(decoder);
-                encoder = new PacketEventsEncoder(encoder);
-            } else {
-                encoder = new PacketEventsEncoder(user);
-                decoder = new PacketEventsDecoder(user);
+            PacketEventsDecoder decoder;
+
+            if (existingDecoder != null) {
+                if (existingDecoder.hasBeenRelocated && !force) return;
+                existingDecoder.hasBeenRelocated = true;
+
+                decoder = new PacketEventsDecoder((PacketEventsDecoder) ctx.pipeline().remove(decoderName));
+                encoder = new PacketEventsEncoder(ctx.pipeline().remove(encoderName));
+            } else { // Decoder == null means we haven't made handlers for the user yet
+                encoder = new PacketEventsEncoder(user, preVia);
+                decoder = new PacketEventsDecoder(user, preVia);
             }
-            // We are targeting the encoder and decoder since we don't want to target specific plugins
-            // (ProtocolSupport has changed its handler name in the past)
-            // I don't like the hacks required for compression but that's on vanilla, we can't fix it.
-            // TODO: i think this will only work for server-side packetevents?
-            String decoderName = ctx.pipeline().names().contains("inbound_config") ? "inbound_config" : "decoder";
-            ctx.pipeline().addBefore(decoderName, PacketEvents.DECODER_NAME, decoder);
-            String encoderName = ctx.pipeline().names().contains("outbound_config") ? "outbound_config" : "encoder";
-            ctx.pipeline().addBefore(encoderName, PacketEvents.ENCODER_NAME, encoder);
+
+            if (PacketEvents.getAPI().getSettings().isDebugEnabled())
+                PacketEvents.getAPI().getLogManager().debug("After remove, preVia: " + preVia + ", " + ChannelHelper.pipelineHandlerNamesAsString(ctx));
+
+            if (preVia) {
+                ctx.pipeline()
+                        .addBefore("via-encoder", encoderName, encoder)
+                        .addBefore("via-decoder", decoderName, decoder);
+            } else {
+                // We are targeting the encoder and decoder since we don't want to target specific plugins
+                // (ProtocolSupport has changed its handler name in the past)
+                // I don't like the hacks required for compression but that's on vanilla, we can't fix it.
+                // TODO: i think this will only work for server-side packetevents?
+                String decoderTarget = ctx.pipeline().names().contains("inbound_config")
+                        ? "inbound_config" : "decoder";
+                String encoderTarget = ctx.pipeline().names().contains("outbound_config")
+                        ? "outbound_config" : "encoder";
+
+                ctx.pipeline()
+                        .addBefore(decoderTarget, decoderName, decoder)
+                        .addBefore(encoderTarget, encoderName, encoder);
+            }
+
+            if (PacketEvents.getAPI().getSettings().isDebugEnabled())
+                PacketEvents.getAPI().getLogManager().debug("After add, preVia: " + preVia + ", " + ChannelHelper.pipelineHandlerNamesAsString(ctx));
         } catch (NoSuchElementException ex) {
             String handlers = ChannelHelper.pipelineHandlerNamesAsString(ctx);
             throw new IllegalStateException("PacketEvents failed to add a decoder to the netty pipeline. Pipeline handlers: " + handlers, ex);

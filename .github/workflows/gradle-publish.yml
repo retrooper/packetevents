@@ -1,6 +1,6 @@
 name: Gradle Package
 
-on: [ push, pull_request ]
+on: [ push ]
 
 jobs:
   build:
@@ -68,3 +68,11 @@ jobs:
         with:
           name: sponge-build
           path: sponge/build/libs
+
+      - name: Publish with Gradle
+        run: ./gradlew publish
+        env:
+          MAVEN_SNAPSHOT_URL: ${{ secrets.MAVEN_SNAPSHOT_URL }}
+          MAVEN_RELEASE_URL: ${{ secrets.MAVEN_RELEASE_URL }}
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}

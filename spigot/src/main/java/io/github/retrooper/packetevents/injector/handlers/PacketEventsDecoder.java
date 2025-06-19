@@ -29,6 +29,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDi
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -43,20 +44,28 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public User user;
     public Player player;
     public boolean hasBeenRelocated;
+    public boolean preViaVersion;
 
-    public PacketEventsDecoder(User user) {
+    public PacketEventsDecoder(User user, boolean preViaVersion) {
         this.user = user;
+        this.preViaVersion = preViaVersion;
     }
 
     public PacketEventsDecoder(PacketEventsDecoder decoder) {
         user = decoder.user;
         player = decoder.player;
         hasBeenRelocated = decoder.hasBeenRelocated;
+        preViaVersion = decoder.preViaVersion;
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
         try {
-            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, true);
+            // We still call preVia listeners if ViaVersion is not available
+            if (!preViaVersion && PacketEvents.getAPI().getSettings().isPreViaInjection() && !ViaVersionUtil.isAvailable()) {
+                PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, preViaVersion);
+            }
+
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, !preViaVersion);
             out.add(ByteBufHelper.retain(input));
         } catch (Throwable e) {
             // We must be sure all the exceptions caused by our handlers are PacketProcessExceptions
@@ -96,7 +105,8 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
                         "An error occurred while processing a packet from " + user.getProfile().getName() +
                         " (state: " + state +
                         ", clientVersion: " + clientVersion +
-                        ", serverVersion: " + PacketEvents.getAPI().getServerManager().getVersion().getReleaseName() + ")");
+                        ", serverVersion: " + PacketEvents.getAPI().getServerManager().getVersion().getReleaseName() + ")" +
+                        ", preVia: " + preViaVersion);
             } else {
                 PacketEvents.getAPI().getLogManager().warn(cause.getMessage());
             }
@@ -129,7 +139,12 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         }
 
         // Via changes the order of handlers in this event, so we must respond to Via changing their stuff
-        ServerConnectionInitializer.relocateHandlers(ctx.channel(), this, user);
+        if (!preViaVersion) {
+            // 1.20.4 has a bug where userEventTriggered is called twice, so Via relocates twice uselessly and we must do so
+            ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, false, true);
+            if (PacketEvents.getAPI().getSettings().isPreViaInjection() && ViaVersionUtil.isAvailable())
+                ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, true, true);
+        }
         super.userEventTriggered(ctx, event);
     }
 
