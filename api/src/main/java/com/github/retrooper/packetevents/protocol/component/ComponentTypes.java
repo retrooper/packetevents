@@ -97,10 +97,14 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.Writabl
 import com.github.retrooper.packetevents.protocol.component.builtin.item.WrittenBookContent;
 import com.github.retrooper.packetevents.protocol.item.instrument.Instrument;
 import com.github.retrooper.packetevents.protocol.mapper.MaybeMappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtDecoder;
+import com.github.retrooper.packetevents.protocol.util.NbtEncoder;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Dummy;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper.Reader;
@@ -110,6 +114,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.function.Function;
 
 /**
  * Contains all item data component types.
@@ -131,6 +136,22 @@ public final class ComponentTypes {
     @ApiStatus.Internal
     public static <T> ComponentType<T> define(String key, @Nullable Reader<T> reader, @Nullable Writer<T> writer) {
         return REGISTRY.define(key, data -> new StaticComponentType<>(data, reader, writer));
+    }
+
+    @ApiStatus.Internal
+    public static <T> ComponentType<T> define(String key, @Nullable Reader<T> reader, @Nullable Writer<T> writer, @Nullable ComponentType.Decoder<T> decoder, @Nullable ComponentType.Encoder<T> encoder) {
+        return REGISTRY.define(key, data -> new StaticComponentType<>(data, reader, writer, decoder, encoder));
+    }
+
+    @ApiStatus.Internal
+    public static <T> ComponentType<T> define(String key, @Nullable Reader<T> reader, @Nullable Writer<T> writer, @Nullable Function<ClientVersion, NbtDecoder<T>> decoder, @Nullable Function<ClientVersion, NbtEncoder<T>> encoder) {
+        return define(
+                key,
+                reader,
+                writer,
+                decoder == null ? null : (NBT nbt, ClientVersion version) -> decoder.apply(version).decode(nbt, PacketWrapper.createDummyWrapper(version)),
+                encoder == null ? null : (T value, ClientVersion version) -> encoder.apply(version).encode(PacketWrapper.createDummyWrapper(version), value)
+        );
     }
 
     public static VersionedRegistry<ComponentType<?>> getRegistry() {
@@ -164,11 +185,11 @@ public final class ComponentTypes {
     public static final ComponentType<Boolean> UNBREAKABLE = UNBREAKABLE_MODERN.legacyMap(
             ItemUnbreakable::isShowInTooltip, ItemUnbreakable::new);
     public static final ComponentType<Component> CUSTOM_NAME = define("custom_name",
-            PacketWrapper::readComponent, PacketWrapper::writeComponent);
+            PacketWrapper::readComponent, PacketWrapper::writeComponent, AdventureSerializer::serializer, AdventureSerializer::serializer);
     public static final ComponentType<Component> ITEM_NAME = define("item_name",
-            PacketWrapper::readComponent, PacketWrapper::writeComponent);
+            PacketWrapper::readComponent, PacketWrapper::writeComponent, AdventureSerializer::serializer, AdventureSerializer::serializer);
     public static final ComponentType<ItemLore> LORE = define("lore",
-            ItemLore::read, ItemLore::write);
+            ItemLore::read, ItemLore::write, ItemLore::decode, ItemLore::encode);
     public static final ComponentType<ItemRarity> RARITY = define("rarity",
             wrapper -> wrapper.readEnum(ItemRarity.values()), PacketWrapper::writeEnum);
     public static final ComponentType<ItemEnchantments> ENCHANTMENTS = define("enchantments",

@@ -18,9 +18,14 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -42,6 +47,29 @@ public class ItemLore {
 
     public static void write(PacketWrapper<?> wrapper, ItemLore lore) {
         wrapper.writeList(lore.lines, PacketWrapper::writeComponent);
+    }
+
+    public static ItemLore decode(NBT nbt, ClientVersion version) {
+        List<Component> lines = new ArrayList<>();
+        if (nbt instanceof NBTList<?>) {
+            NBTList<? extends NBT> list = (NBTList<? extends NBT>) nbt;
+            for (NBT tag : list.getTags()) {
+                Component line = AdventureSerializer.serializer(version).nbt().deserialize(tag);
+                lines.add(line);
+            }
+            return new ItemLore(lines);
+        } else {
+            throw new IllegalArgumentException("Expected NBTList for ItemLore, got " + nbt.getType());
+        }
+    }
+
+    public static NBT encode(ItemLore lore, ClientVersion version) {
+        NBTList<? extends NBT> list = NBTList.createCompoundList();
+        for (Component line : lore.lines) {
+            NBT nbt = AdventureSerializer.serializer(version).nbt().serialize(line);
+            list.addTagUnsafe(nbt);
+        }
+        return list;
     }
 
     public void addLine(Component line) {
