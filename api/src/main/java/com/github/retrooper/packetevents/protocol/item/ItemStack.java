@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.item;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.component.ComponentType;
+import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments;
 import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
@@ -27,14 +28,7 @@ import com.github.retrooper.packetevents.protocol.item.enchantment.type.Enchantm
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
-import com.github.retrooper.packetevents.protocol.nbt.NBTList;
-import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
-import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
-import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -46,20 +40,10 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.logging.Level;
 
-import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.DAMAGE;
-import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.ENCHANTABLE;
-import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.ENCHANTMENTS;
-import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.MAX_DAMAGE;
-import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.MAX_STACK_SIZE;
-import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.STORED_ENCHANTMENTS;
-import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.UNBREAKABLE_MODERN;
+import static com.github.retrooper.packetevents.protocol.component.ComponentTypes.*;
 
 @NullMarked
 public class ItemStack {
@@ -111,6 +95,7 @@ public class ItemStack {
         return decode(nbt, wrapper.getServerVersion().toClientVersion());
     }
 
+    @SuppressWarnings("unchecked")
     @Deprecated
     public static ItemStack decode(NBT nbt, ClientVersion version) {
         if (nbt instanceof NBTString) {
@@ -125,13 +110,34 @@ public class ItemStack {
                 .map(ResourceLocation::new).orElseThrow(() -> new IllegalArgumentException(
                         "No item type specified: " + compound.getTags().keySet()));
         builder.type(ItemTypes.getByName(itemName.toString()));
-        builder.nbt(compound.getCompoundTagOrNull("tag"));
 
         Optional.ofNullable(compound.getNumberTagOrNull("Count")).map(Optional::of)
                 .orElseGet(() -> Optional.ofNullable(compound.getNumberTagOrNull("count")))
                 .map(NBTNumber::getAsInt).ifPresent(builder::amount);
 
-        // TODO components
+        if (version.isOlderThan(ClientVersion.V_1_20_5)) {
+            builder.nbt(compound.getCompoundTagOrNull("tag"));
+        } else {
+            NBTCompound components = compound.getCompoundTagOrNull("components");
+            if (components != null) {
+                PatchableComponentMap componentMap = new PatchableComponentMap(
+                        ItemTypes.getByName(itemName.toString()).getComponents(version),
+                        new HashMap<>(4));
+                components.getTags().forEach((key, value) -> {
+                    ComponentType<?> componentType = ComponentTypes.getByName(key);
+                    if (componentType != null) {
+                        try {
+                            Object valueObj = componentType.decode(value, version);
+                            componentMap.set((ComponentType<Object>) componentType, valueObj);
+                        } catch (UnsupportedOperationException e) {
+                            // TODO: Remove this catch block when all components are supported
+                            PacketEvents.getAPI().getLogger().log(Level.FINEST, "Unsupported component type when decoding: " + key, e);
+                        }
+                    }
+                });
+                builder.components(componentMap);
+            }
+        }
 
         return builder.build();
     }
@@ -158,9 +164,28 @@ public class ItemStack {
             if (itemStack.nbt != null) {
                 compound.setTag("tag", itemStack.nbt);
             }
+        } else {
+            compound.setTag("count", new NBTInt(itemStack.getAmount()));
+            if (itemStack.components != null) {
+                NBTCompound components = new NBTCompound();
+                for (Map.Entry<ComponentType<?>, Optional<?>> entry : itemStack.components.getPatches().entrySet()) {
+                    ComponentType<?> type = entry.getKey();
+                    Object value = entry.getValue().orElse(null);
+                    if (value != null) {
+                        try {
+                            NBT encodedValue = ((ComponentType<Object>) type).encode(value, version);
+                            components.setTag(type.getName().toString(), encodedValue);
+                        } catch (UnsupportedOperationException e) {
+                            // TODO: Remove this catch block when all components are supported
+                            PacketEvents.getAPI().getLogger().log(Level.FINEST, "Unsupported component type when encoding: " + type.getName(), e);
+                        }
+                    }
+                }
+                if (!components.getTags().isEmpty()) {
+                    compound.setTag("components", components);
+                }
+            }
         }
-
-        // TODO components
 
         return compound;
     }
