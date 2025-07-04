@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.PacketTransformer;
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
@@ -49,11 +50,13 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTi
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class User implements IRegistryHolder {
@@ -61,6 +64,7 @@ public class User implements IRegistryHolder {
     private final Object channel;
     private ConnectionState decoderState;
     private ConnectionState encoderState;
+    private PacketTransformer transformer = new PacketTransformer(this); // personal packet transformer
     private ClientVersion clientVersion;
     private final UserProfile profile;
     private int entityId = -1;
@@ -76,6 +80,14 @@ public class User implements IRegistryHolder {
         this.encoderState = connectionState;
         this.clientVersion = clientVersion;
         this.profile = profile;
+    }
+
+    public void setTransformer(@NotNull PacketTransformer transformer) {
+        this.transformer = Objects.requireNonNull(transformer);
+    }
+
+    public @NotNull PacketTransformer getTransformer() {
+        return transformer;
     }
 
     @ApiStatus.Internal

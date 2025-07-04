@@ -43,7 +43,15 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer,
                 false);
         int readerIndex = buffer.readerIndex();
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> buffer.readerIndex(readerIndex));
+        user.getTransformer().onPreSend(packetSendEvent);
+        ByteBufHelper.readerIndex(buffer, readerIndex);
+        if(!packetSendEvent.isCancelled()) {
+            PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> buffer.readerIndex(readerIndex));
+        }
+        if(!packetSendEvent.isCancelled()) {
+            user.getTransformer().onPostSend(packetSendEvent);
+            ByteBufHelper.readerIndex(buffer, readerIndex);
+        }
         if (!packetSendEvent.isCancelled()) {
             if (packetSendEvent.getLastUsedWrapper() != null) {
                 ByteBufHelper.clear(packetSendEvent.getByteBuf());

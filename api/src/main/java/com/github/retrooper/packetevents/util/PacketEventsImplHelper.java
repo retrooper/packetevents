@@ -58,9 +58,17 @@ public final class PacketEventsImplHelper {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer, autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
+        user.getTransformer().onPreSend(packetSendEvent);
+        ByteBufHelper.readerIndex(buffer, processIndex);
+        if(!packetSendEvent.isCancelled()) {
+            PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
+                ByteBufHelper.readerIndex(buffer, processIndex);
+            });
+        }
+        if(!packetSendEvent.isCancelled()) {
+            user.getTransformer().onPostSend(packetSendEvent);
             ByteBufHelper.readerIndex(buffer, processIndex);
-        });
+        }
         if (!packetSendEvent.isCancelled()) {
             //Did they ever use a wrapper?
             if (packetSendEvent.getLastUsedWrapper() != null) {
@@ -98,9 +106,17 @@ public final class PacketEventsImplHelper {
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
         PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);
-        PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
+        user.getTransformer().onPreReceive(packetReceiveEvent);
+        ByteBufHelper.readerIndex(buffer, processIndex);
+        if(!packetReceiveEvent.isCancelled()) {
+            PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
+                ByteBufHelper.readerIndex(buffer, processIndex);
+            });
+        }
+        if(!packetReceiveEvent.isCancelled()) {
+            user.getTransformer().onPostReceive(packetReceiveEvent);
             ByteBufHelper.readerIndex(buffer, processIndex);
-        });
+        }
         if (!packetReceiveEvent.isCancelled()) {
             //Did they ever use a wrapper?
             if (packetReceiveEvent.getLastUsedWrapper() != null) {
