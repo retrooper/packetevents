@@ -21,14 +21,12 @@ package com.github.retrooper.packetevents.protocol.component.builtin.item;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
+import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class ItemEnchantments implements Iterable<Map.Entry<EnchantmentType, Integer>> {
 
@@ -82,6 +80,49 @@ public class ItemEnchantments implements Iterable<Map.Entry<EnchantmentType, Int
         );
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
             wrapper.writeBoolean(enchantments.isShowInTooltip());
+        }
+    }
+
+    public static ItemEnchantments decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+
+        NBTCompound levelsCompound;
+        boolean showInTooltip;
+        if (version.isOlderThan(ClientVersion.V_1_21_5)) {
+            levelsCompound = compound.getCompoundTagOrNull("levels");
+            showInTooltip = compound.getBoolean("show_in_tooltip");
+        } else {
+            levelsCompound = compound;
+            showInTooltip = false;
+        }
+
+        Map<EnchantmentType, Integer> enchantments = new HashMap<>();
+        if (levelsCompound != null) {
+            for (Map.Entry<String, NBT> entry : levelsCompound.getTags().entrySet()) {
+                EnchantmentType enchantment = EnchantmentTypes.getByName(entry.getKey());
+                if (enchantment != null && entry.getValue() instanceof NBTNumber) {
+                    enchantments.put(enchantment, ((NBTNumber) entry.getValue()).getAsInt());
+                }
+            }
+        }
+
+        return new ItemEnchantments(enchantments, showInTooltip);
+    }
+
+    public static NBT encode(ItemEnchantments enchantments, ClientVersion version) {
+        NBTCompound levelsCompound = new NBTCompound();
+
+        for (Map.Entry<EnchantmentType, Integer> entry : enchantments.getEnchantments().entrySet()) {
+            levelsCompound.setTag(entry.getKey().getName().toString(), new NBTInt(entry.getValue()));
+        }
+
+        if (version.isOlderThan(ClientVersion.V_1_21_5)) {
+            NBTCompound compound = new NBTCompound();
+            compound.setTag("levels", levelsCompound);
+            compound.setTag("show_in_tooltip", new NBTByte(enchantments.isShowInTooltip()));
+            return compound;
+        } else {
+            return levelsCompound;
         }
     }
 

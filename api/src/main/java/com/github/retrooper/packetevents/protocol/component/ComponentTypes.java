@@ -193,7 +193,7 @@ public final class ComponentTypes {
     public static final ComponentType<ItemRarity> RARITY = define("rarity",
             wrapper -> wrapper.readEnum(ItemRarity.values()), PacketWrapper::writeEnum);
     public static final ComponentType<ItemEnchantments> ENCHANTMENTS = define("enchantments",
-            ItemEnchantments::read, ItemEnchantments::write);
+            ItemEnchantments::read, ItemEnchantments::write, ItemEnchantments::decode, ItemEnchantments::encode);
     public static final ComponentType<ItemAdventurePredicate> CAN_PLACE_ON = define("can_place_on",
             ItemAdventurePredicate::read, ItemAdventurePredicate::write);
     public static final ComponentType<ItemAdventurePredicate> CAN_BREAK = define("can_break",
@@ -239,7 +239,7 @@ public final class ComponentTypes {
     public static final ComponentType<ItemTool> TOOL = define("tool",
             ItemTool::read, ItemTool::write);
     public static final ComponentType<ItemEnchantments> STORED_ENCHANTMENTS = define("stored_enchantments",
-            ItemEnchantments::read, ItemEnchantments::write);
+            ItemEnchantments::read, ItemEnchantments::write, ItemEnchantments::decode, ItemEnchantments::encode);
     public static final ComponentType<ItemDyeColor> DYED_COLOR = define("dyed_color",
             ItemDyeColor::read, ItemDyeColor::write);
     public static final ComponentType<Integer> MAP_COLOR = define("map_color",
