@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.protocol.component.ComponentType;
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
+import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.LinkedHashSet;
@@ -46,6 +48,35 @@ public class ItemTooltipDisplay {
     public static void write(PacketWrapper<?> wrapper, ItemTooltipDisplay tooltipDisplay) {
         wrapper.writeBoolean(tooltipDisplay.hideTooltip);
         wrapper.writeCollection(tooltipDisplay.hiddenComponents, PacketWrapper::writeMappedEntity);
+    }
+
+    public static ItemTooltipDisplay decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+        boolean hideTooltip = compound.getBooleanOr("hide_tooltip", false);
+        NBTList<NBTString> hiddenComponentsList = compound.getStringListTagOrNull("hidden_components");
+        Set<ComponentType<?>> hiddenComponents = new LinkedHashSet<>();
+        if (hiddenComponentsList != null) {
+            for (NBTString component : hiddenComponentsList.getTags()) {
+                ComponentType<?> type = ComponentTypes.getRegistry().getByName(component.getValue());
+                if (type != null) {
+                    hiddenComponents.add(type);
+                }
+            }
+        }
+        return new ItemTooltipDisplay(hideTooltip, hiddenComponents);
+    }
+
+    public static NBT encode(ItemTooltipDisplay tooltipDisplay, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("hide_tooltip", new NBTByte(tooltipDisplay.hideTooltip ? (byte) 1 : (byte) 0));
+        if (!tooltipDisplay.hiddenComponents.isEmpty()) {
+            NBTList<NBTString> hiddenComponentsList = new NBTList<>(NBTType.STRING);
+            for (ComponentType<?> component : tooltipDisplay.hiddenComponents) {
+                hiddenComponentsList.addTag(new NBTString(component.getName().toString()));
+            }
+            compound.setTag("hidden_components", hiddenComponentsList);
+        }
+        return compound;
     }
 
     public boolean isHideTooltip() {

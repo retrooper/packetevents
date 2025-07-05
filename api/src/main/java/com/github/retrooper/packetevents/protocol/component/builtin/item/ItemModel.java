@@ -18,6 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -37,6 +40,14 @@ public class ItemModel {
 
     public static void write(PacketWrapper<?> wrapper, ItemModel model) {
         wrapper.writeIdentifier(model.modelLocation);
+    }
+
+    public static ItemModel decode(NBT nbt, ClientVersion version) {
+        return new ItemModel(new ResourceLocation(((NBTString) nbt).getValue()));
+    }
+
+    public static NBT encode(ItemModel model, ClientVersion version) {
+        return new NBTString(model.modelLocation.toString());
     }
 
     public ResourceLocation getModelLocation() {

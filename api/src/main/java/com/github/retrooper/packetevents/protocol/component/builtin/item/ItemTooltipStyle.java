@@ -18,6 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -37,6 +40,14 @@ public class ItemTooltipStyle {
 
     public static void write(PacketWrapper<?> wrapper, ItemTooltipStyle style) {
         wrapper.writeIdentifier(style.tooltipLoc);
+    }
+
+    public static ItemTooltipStyle decode(NBT nbt, ClientVersion version) {
+        return new ItemTooltipStyle(new ResourceLocation(((NBTString) nbt).getValue()));
+    }
+
+    public static NBT encode(ItemTooltipStyle style, ClientVersion version) {
+        return new NBTString(style.tooltipLoc.toString());
     }
 
     public ResourceLocation getTooltipLoc() {

@@ -48,4 +48,24 @@ public interface ComponentType<T> extends MappedEntity {
 
         NBT encode(T value, ClientVersion version);
     }
+
+    interface SimpleDecoder<T> extends Decoder<T> {
+
+        T decode(NBT nbt);
+
+        @Override
+        default T decode(NBT nbt, ClientVersion version) {
+            return decode(nbt);
+        }
+    }
+
+    interface SimpleEncoder<T> extends Encoder<T> {
+
+        NBT encode(T value);
+
+        @Override
+        default NBT encode(T value, ClientVersion version) {
+            return encode(value);
+        }
+    }
 }

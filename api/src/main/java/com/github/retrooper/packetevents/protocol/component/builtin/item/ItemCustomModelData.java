@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.color.Color;
+import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -80,6 +82,34 @@ public class ItemCustomModelData {
             wrapper.writeList(data.colors, Color::write);
         } else {
             wrapper.writeVarInt(data.getLegacyId());
+        }
+    }
+
+    public static ItemCustomModelData decode(NBT nbt, ClientVersion version) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_21_4)) {
+            NBTCompound compound = (NBTCompound) nbt;
+            PacketWrapper<?> wrapper = PacketWrapper.createDummyWrapper(version);
+            List<Float> floats = compound.getListOrEmpty("floats", (subNbt, subWrapper) -> ((NBTNumber) subNbt).getAsFloat(), wrapper);
+            List<Boolean> flags = compound.getListOrEmpty("flags", (subNbt, subWrapper) -> ((NBTByte) subNbt).getAsBool(), wrapper);
+            List<String> strings = compound.getListOrEmpty("strings", (subNbt, subWrapper) -> ((NBTString) subNbt).getValue(), wrapper);
+            List<Color> colors = compound.getListOrEmpty("colors", (subNbt, subWrapper) -> Color.decode(subNbt, version), wrapper);
+            return new ItemCustomModelData(floats, flags, strings, colors);
+        } else {
+            return new ItemCustomModelData(((NBTNumber) nbt).getAsInt());
+        }
+    }
+
+    public static NBT encode(ItemCustomModelData data, ClientVersion version) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_21_4)) {
+            NBTCompound compound = new NBTCompound();
+            PacketWrapper<?> wrapper = PacketWrapper.createDummyWrapper(version);
+            compound.setList("floats", data.floats, (subWrapper, value) -> new NBTFloat(value), wrapper);
+            compound.setList("flags", data.flags, (subWrapper, value) -> new NBTByte(value), wrapper);
+            compound.setList("strings", data.strings, (subWrapper, value) -> new NBTString(value), wrapper);
+            compound.setList("colors", data.colors, (subWrapper, value) -> Color.encode(value, version), wrapper);
+            return compound;
+        } else {
+            return new NBTInt(data.getLegacyId());
         }
     }
 

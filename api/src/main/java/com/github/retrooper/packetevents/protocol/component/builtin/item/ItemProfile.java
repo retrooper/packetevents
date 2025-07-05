@@ -18,9 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -52,6 +55,39 @@ public class ItemProfile {
         wrapper.writeOptional(profile.name, (ew, name) -> ew.writeString(name, 16));
         wrapper.writeOptional(profile.id, PacketWrapper::writeUUID);
         wrapper.writeList(profile.properties, Property::write);
+    }
+
+    public static ItemProfile decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+        String name = compound.getStringTagValueOrNull("name");
+        String id = compound.getStringTagValueOrNull("id");
+        UUID uuid = id != null ? UUID.fromString(id) : null;
+        NBTList<NBTCompound> propertiesList = compound.getCompoundListTagOrNull("properties");
+        List<Property> properties = new ArrayList<>();
+        if (propertiesList != null) {
+            for (NBTCompound propertyNbt : propertiesList.getTags()) {
+                properties.add(Property.decode(propertyNbt));
+            }
+        }
+        return new ItemProfile(name, uuid, properties);
+    }
+
+    public static NBT encode(ItemProfile profile, ClientVersion version) {
+        NBTCompound nbt = new NBTCompound();
+        if (profile.name != null) {
+            nbt.setTag("name", new NBTString(profile.name));
+        }
+        if (profile.id != null) {
+            nbt.setTag("id", new NBTString(profile.id.toString()));
+        }
+        if (!profile.properties.isEmpty()) {
+            NBTList<NBTCompound> propertiesList = new NBTList<>(NBTType.COMPOUND);
+            for (Property property : profile.properties) {
+                propertiesList.addTag(Property.encode(property));
+            }
+            nbt.setTag("properties", propertiesList);
+        }
+        return nbt;
     }
 
     public @Nullable String getName() {
@@ -121,6 +157,23 @@ public class ItemProfile {
             wrapper.writeString(property.value, 32767);
             wrapper.writeOptional(property.signature,
                     (ew, signature) -> ew.writeString(signature, 1024));
+        }
+
+        public static Property decode(NBTCompound nbt) {
+            String name = nbt.getStringTagValueOrThrow("name");
+            String value = nbt.getStringTagValueOrThrow("value");
+            String signature = nbt.getStringTagValueOrNull("signature");
+            return new Property(name, value, signature);
+        }
+
+        public static NBTCompound encode(Property property) {
+            NBTCompound nbt = new NBTCompound();
+            nbt.setTag("name", new NBTString(property.name));
+            nbt.setTag("value", new NBTString(property.value));
+            if (property.signature != null) {
+                nbt.setTag("signature", new NBTString(property.signature));
+            }
+            return nbt;
         }
 
         public String getName() {

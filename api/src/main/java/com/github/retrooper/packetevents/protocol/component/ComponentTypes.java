@@ -201,7 +201,7 @@ public final class ComponentTypes {
     public static final ComponentType<ItemAttributeModifiers> ATTRIBUTE_MODIFIERS = define("attribute_modifiers",
             ItemAttributeModifiers::read, ItemAttributeModifiers::write);
     public static final ComponentType<ItemCustomModelData> CUSTOM_MODEL_DATA_LISTS = define("custom_model_data",
-            ItemCustomModelData::read, ItemCustomModelData::write);
+            ItemCustomModelData::read, ItemCustomModelData::write, ItemCustomModelData::decode, ItemCustomModelData::encode);
     /**
      * Rewritten in 1.21.4
      */
@@ -289,7 +289,7 @@ public final class ComponentTypes {
     public static final ComponentType<ItemFireworks> FIREWORKS = define("fireworks",
             ItemFireworks::read, ItemFireworks::write);
     public static final ComponentType<ItemProfile> PROFILE = define("profile",
-            ItemProfile::read, ItemProfile::write);
+            ItemProfile::read, ItemProfile::write, ItemProfile::decode, ItemProfile::encode);
     public static final ComponentType<ResourceLocation> NOTE_BLOCK_SOUND = define("note_block_sound",
             PacketWrapper::readIdentifier, PacketWrapper::writeIdentifier);
     public static final ComponentType<BannerLayers> BANNER_PATTERNS = define("banner_patterns",
@@ -325,7 +325,7 @@ public final class ComponentTypes {
     public static final ComponentType<ItemRepairable> REPAIRABLE = define("repairable",
             ItemRepairable::read, ItemRepairable::write);
     public static final ComponentType<ItemModel> ITEM_MODEL = define("item_model",
-            ItemModel::read, ItemModel::write);
+            ItemModel::read, ItemModel::write, ItemModel::decode, ItemModel::encode);
     public static final ComponentType<ItemDamageResistant> DAMAGE_RESISTANT = define("damage_resistant",
             ItemDamageResistant::read, ItemDamageResistant::write);
     public static final ComponentType<ItemEquippable> EQUIPPABLE = define("equippable",
@@ -335,13 +335,13 @@ public final class ComponentTypes {
     public static final ComponentType<ItemDeathProtection> DEATH_PROTECTION = define("death_protection",
             ItemDeathProtection::read, ItemDeathProtection::write);
     public static final ComponentType<ItemTooltipStyle> TOOLTIP_STYLE = define("tooltip_style",
-            ItemTooltipStyle::read, ItemTooltipStyle::write);
+            ItemTooltipStyle::read, ItemTooltipStyle::write, ItemTooltipStyle::decode, ItemTooltipStyle::encode);
 
     /**
      * Added with 1.21.5
      */
     public static final ComponentType<ItemTooltipDisplay> TOOLTIP_DISPLAY = define("tooltip_display",
-            ItemTooltipDisplay::read, ItemTooltipDisplay::write);
+            ItemTooltipDisplay::read, ItemTooltipDisplay::write, ItemTooltipDisplay::decode, ItemTooltipDisplay::encode);
     /**
      * Added with 1.21.5
      */
