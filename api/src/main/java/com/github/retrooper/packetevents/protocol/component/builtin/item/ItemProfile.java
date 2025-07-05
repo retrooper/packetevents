@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.UniqueIdUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,8 +61,15 @@ public class ItemProfile {
     public static ItemProfile decode(NBT nbt, ClientVersion version) {
         NBTCompound compound = (NBTCompound) nbt;
         String name = compound.getStringTagValueOrNull("name");
-        String id = compound.getStringTagValueOrNull("id");
-        UUID uuid = id != null ? UUID.fromString(id) : null;
+        NBTList<NBTNumber> idList = compound.getNumberListTagOrNull("id");
+        UUID uuid = null;
+        if (idList != null && idList.size() == 4) {
+            int i1 = idList.getTag(0).getAsInt();
+            int i2 = idList.getTag(1).getAsInt();
+            int i3 = idList.getTag(2).getAsInt();
+            int i4 = idList.getTag(3).getAsInt();
+            uuid = UniqueIdUtil.fromIntArray(new int[]{i1, i2, i3, i4});
+        }
         NBTList<NBTCompound> propertiesList = compound.getCompoundListTagOrNull("properties");
         List<Property> properties = new ArrayList<>();
         if (propertiesList != null) {
@@ -78,7 +86,13 @@ public class ItemProfile {
             nbt.setTag("name", new NBTString(profile.name));
         }
         if (profile.id != null) {
-            nbt.setTag("id", new NBTString(profile.id.toString()));
+            int[] idArray = UniqueIdUtil.toIntArray(profile.id);
+            NBTList<NBTInt> idList = new NBTList<>(NBTType.INT);
+            idList.addTag(new NBTInt(idArray[0]));
+            idList.addTag(new NBTInt(idArray[1]));
+            idList.addTag(new NBTInt(idArray[2]));
+            idList.addTag(new NBTInt(idArray[3]));
+            nbt.setTag("id", idList);
         }
         if (!profile.properties.isEmpty()) {
             NBTList<NBTCompound> propertiesList = new NBTList<>(NBTType.COMPOUND);
