@@ -19,21 +19,17 @@
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.attribute.Attribute;
-import com.github.retrooper.packetevents.protocol.attribute.AttributeDisplay;
-import com.github.retrooper.packetevents.protocol.attribute.AttributeOperation;
-import com.github.retrooper.packetevents.protocol.attribute.Attributes;
-import com.github.retrooper.packetevents.protocol.attribute.DefaultAttributeDisplay;
+import com.github.retrooper.packetevents.protocol.attribute.*;
+import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.UniqueIdUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes.PropertyModifier;
 import net.kyori.adventure.util.Index;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class ItemAttributeModifiers {
 
@@ -80,6 +76,44 @@ public class ItemAttributeModifiers {
         wrapper.writeList(modifiers.modifiers, ModifierEntry::write);
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
             wrapper.writeBoolean(modifiers.showInTooltip);
+        }
+    }
+
+    public static ItemAttributeModifiers decode(NBT nbt, ClientVersion version) {
+        NBTList<NBTCompound> modifierList;
+        boolean showInTooltip;
+        if (version.isOlderThan(ClientVersion.V_1_21_5)) {
+            NBTCompound compound = (NBTCompound) nbt;
+            modifierList = compound.getCompoundListTagOrNull("modifiers");
+            showInTooltip = compound.getBoolean("show_in_tooltip");
+        } else {
+            modifierList = (NBTList<NBTCompound>) nbt;
+            showInTooltip = false;
+        }
+
+        List<ModifierEntry> modifiers = new ArrayList<>();
+        if (modifierList != null) {
+            for (NBTCompound compound : modifierList.getTags()) {
+                modifiers.add(ModifierEntry.decode(compound, version));
+            }
+        }
+
+        return new ItemAttributeModifiers(modifiers, showInTooltip);
+    }
+
+    public static NBT encode(ItemAttributeModifiers modifiers, ClientVersion version) {
+        NBTList<NBTCompound> modifierList = new NBTList<>(NBTType.COMPOUND);
+        for (ModifierEntry entry : modifiers.modifiers) {
+            modifierList.addTag(ModifierEntry.encode(entry, version));
+        }
+
+        if (version.isOlderThan(ClientVersion.V_1_21_5)) {
+            NBTCompound compound = new NBTCompound();
+            compound.setTag("modifiers", modifierList);
+            compound.setTag("show_in_tooltip", new NBTByte(modifiers.showInTooltip));
+            return compound;
+        } else {
+            return modifierList;
         }
     }
 
@@ -168,6 +202,34 @@ public class ItemAttributeModifiers {
             if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
                 AttributeDisplay.write(wrapper, entry.display);
             }
+        }
+
+        public static ModifierEntry decode(NBTCompound compound, ClientVersion version) {
+            Attribute attribute = Attributes.getByName(compound.getStringTagValueOrThrow("type"));
+            EquipmentSlotGroup slot = EquipmentSlotGroup.ID_INDEX.valueOrThrow(compound.getStringTagValueOrDefault("slot", "any").toUpperCase(Locale.ROOT));
+            Modifier modifier = Modifier.decode(compound, version);
+
+            AttributeDisplay display = DefaultAttributeDisplay.INSTANCE;
+            NBTCompound displayCompound = compound.getCompoundTagOrNull("display");
+            if (displayCompound != null) {
+                AttributeDisplayType<?> displayType = AttributeDisplayTypes.getRegistry().getByName(displayCompound.getStringTagValueOrThrow("type"));
+                display = displayType.decode(displayCompound, version);
+            }
+
+            return new ModifierEntry(attribute, modifier, slot, display);
+        }
+
+        public static NBTCompound encode(ModifierEntry entry, ClientVersion version) {
+            NBTCompound compound = new NBTCompound();
+            compound.setTag("type", new NBTString(entry.attribute.getName().toString()));
+            compound.setTag("slot", new NBTString(entry.slotGroup.getId()));
+            compound.setTag("modifier", Modifier.encode(entry.modifier, version));
+            if (entry.display != null && !entry.display.equals(DefaultAttributeDisplay.INSTANCE)) {
+                NBTCompound displayCompound = (NBTCompound) ((AttributeDisplayType<AttributeDisplay>) entry.display.getType()).encode(entry.display, version);
+                displayCompound.setTag("type", new NBTString(entry.display.getType().getName().toString()));
+                compound.setTag("display", displayCompound);
+            }
+            return compound;
         }
 
         public Attribute getAttribute() {
@@ -259,6 +321,33 @@ public class ItemAttributeModifiers {
             }
             wrapper.writeDouble(modifier.value);
             wrapper.writeEnum(modifier.operation);
+        }
+
+        public static Modifier decode(NBTCompound compound, ClientVersion version) {
+            double value = compound.getNumberTagValueOrThrow("amount").doubleValue();
+            AttributeOperation operation = AttributeOperation.valueOf(compound.getStringTagValueOrThrow("operation").toUpperCase(Locale.ROOT));
+
+            if (version.isNewerThanOrEquals(ClientVersion.V_1_21)) {
+                ResourceLocation id = new ResourceLocation(compound.getStringTagValueOrThrow("id"));
+                return new Modifier(id, value, operation);
+            } else {
+                UUID id = UniqueIdUtil.fromIntArray(compound.getTagOfTypeOrThrow("uuid", NBTIntArray.class).getValue());
+                String name = compound.getStringTagValueOrThrow("name");
+                return new Modifier(id, name, value, operation);
+            }
+        }
+
+        public static NBTCompound encode(Modifier modifier, ClientVersion version) {
+            NBTCompound compound = new NBTCompound();
+            if (version.isNewerThanOrEquals(ClientVersion.V_1_21)) {
+                compound.setTag("id", new NBTString(modifier.name));
+            } else {
+                compound.setTag("uuid", new NBTIntArray(UniqueIdUtil.toIntArray(modifier.id)));
+                compound.setTag("name", new NBTString(modifier.name));
+            }
+            compound.setTag("amount", new NBTDouble(modifier.value));
+            compound.setTag("operation", new NBTString(modifier.operation.name().toLowerCase(Locale.ROOT)));
+            return compound;
         }
 
         public ResourceLocation getNameKey() {

@@ -18,6 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.attribute;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NullMarked;
@@ -39,6 +43,22 @@ public class OverrideAttributeDisplay implements AttributeDisplay {
 
     public static void write(PacketWrapper<?> wrapper, OverrideAttributeDisplay display) {
         wrapper.writeComponent(display.component);
+    }
+
+    public static OverrideAttributeDisplay decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+        NBT valueNbt = compound.getTagOrNull("value");
+        Component component = valueNbt != null
+                ? AdventureSerializer.serializer(version).fromNbtTag(valueNbt)
+                : Component.empty();
+        return new OverrideAttributeDisplay(component);
+    }
+
+    public static NBT encode(OverrideAttributeDisplay display, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        NBT valueNbt = AdventureSerializer.serializer(version).asNbtTag(display.component);
+        compound.setTag("value", valueNbt);
+        return compound;
     }
 
     @Override

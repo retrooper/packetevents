@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.protocol.attribute;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
 
@@ -28,4 +30,18 @@ public interface AttributeDisplayType<T extends AttributeDisplay> extends Mapped
     T read(PacketWrapper<?> wrapper);
 
     void write(PacketWrapper<?> wrapper, T display);
+
+    T decode(NBT nbt, ClientVersion version);
+
+    NBT encode(T display, ClientVersion version);
+
+    interface Decoder<T> {
+
+        T decode(NBT nbt, ClientVersion version);
+    }
+
+    interface Encoder<T> {
+
+        NBT encode(T value, ClientVersion version);
+    }
 }

@@ -33,10 +33,10 @@ public final class AttributeDisplayTypes {
 
     @ApiStatus.Internal
     public static <T extends AttributeDisplay> AttributeDisplayType<T> define(
-            String name, PacketWrapper.Reader<T> reader, PacketWrapper.Writer<T> writer
+            String name, PacketWrapper.Reader<T> reader, PacketWrapper.Writer<T> writer, AttributeDisplayType.Decoder<T> decoder, AttributeDisplayType.Encoder<T> encoder
     ) {
         return REGISTRY.define(name, data ->
-                new StaticAttributeDisplayType<>(data, reader, writer));
+                new StaticAttributeDisplayType<>(data, reader, writer, decoder, encoder));
     }
 
     public static VersionedRegistry<AttributeDisplayType<?>> getRegistry() {
@@ -44,11 +44,11 @@ public final class AttributeDisplayTypes {
     }
 
     public static final AttributeDisplayType<DefaultAttributeDisplay> DEFAULT = define("default",
-            DefaultAttributeDisplay::read, DefaultAttributeDisplay::write);
+            DefaultAttributeDisplay::read, DefaultAttributeDisplay::write, DefaultAttributeDisplay::decode, DefaultAttributeDisplay::encode);
     public static final AttributeDisplayType<HiddenAttributeDisplay> HIDDEN = define("hidden",
-            HiddenAttributeDisplay::read, HiddenAttributeDisplay::write);
+            HiddenAttributeDisplay::read, HiddenAttributeDisplay::write, HiddenAttributeDisplay::decode, HiddenAttributeDisplay::encode);
     public static final AttributeDisplayType<OverrideAttributeDisplay> OVERRIDE = define("override",
-            OverrideAttributeDisplay::read, OverrideAttributeDisplay::write);
+            OverrideAttributeDisplay::read, OverrideAttributeDisplay::write, OverrideAttributeDisplay::decode, OverrideAttributeDisplay::encode);
 
     static {
         REGISTRY.unloadMappings();

@@ -199,7 +199,7 @@ public final class ComponentTypes {
     public static final ComponentType<ItemAdventurePredicate> CAN_BREAK = define("can_break",
             ItemAdventurePredicate::read, ItemAdventurePredicate::write);
     public static final ComponentType<ItemAttributeModifiers> ATTRIBUTE_MODIFIERS = define("attribute_modifiers",
-            ItemAttributeModifiers::read, ItemAttributeModifiers::write);
+            ItemAttributeModifiers::read, ItemAttributeModifiers::write, ItemAttributeModifiers::decode, ItemAttributeModifiers::encode);
     public static final ComponentType<ItemCustomModelData> CUSTOM_MODEL_DATA_LISTS = define("custom_model_data",
             ItemCustomModelData::read, ItemCustomModelData::write, ItemCustomModelData::decode, ItemCustomModelData::encode);
     /**

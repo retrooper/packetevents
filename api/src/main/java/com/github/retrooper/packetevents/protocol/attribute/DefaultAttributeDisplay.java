@@ -18,6 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.attribute;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
 
@@ -35,6 +38,14 @@ public class DefaultAttributeDisplay implements AttributeDisplay {
 
     public static void write(PacketWrapper<?> wrapper, DefaultAttributeDisplay display) {
         // NO-OP
+    }
+
+    public static DefaultAttributeDisplay decode(NBT nbt, ClientVersion version) {
+        return INSTANCE;
+    }
+
+    public static NBT encode(DefaultAttributeDisplay display, ClientVersion version) {
+        return new NBTCompound();
     }
 
     @Override

@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.protocol.attribute;
 
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper.Reader;
@@ -32,12 +34,16 @@ public class StaticAttributeDisplayType<T extends AttributeDisplay> extends Abst
 
     private final Reader<T> reader;
     private final Writer<T> writer;
+    private final Decoder<T> decoder;
+    private final Encoder<T> encoder;
 
     @ApiStatus.Internal
-    public StaticAttributeDisplayType(@Nullable TypesBuilderData data, Reader<T> reader, Writer<T> writer) {
+    public StaticAttributeDisplayType(@Nullable TypesBuilderData data, Reader<T> reader, Writer<T> writer, Decoder<T> decoder, Encoder<T> encoder) {
         super(data);
         this.reader = reader;
         this.writer = writer;
+        this.decoder = decoder;
+        this.encoder = encoder;
     }
 
     @Override
@@ -48,5 +54,15 @@ public class StaticAttributeDisplayType<T extends AttributeDisplay> extends Abst
     @Override
     public void write(PacketWrapper<?> wrapper, T display) {
         this.writer.accept(wrapper, display);
+    }
+
+    @Override
+    public T decode(NBT nbt, ClientVersion version) {
+        return this.decoder.decode(nbt, version);
+    }
+
+    @Override
+    public NBT encode(T display, ClientVersion version) {
+        return this.encoder.encode(display, version);
     }
 }
