@@ -265,7 +265,7 @@ public final class ComponentTypes {
     public static final ComponentType<WrittenBookContent> WRITTEN_BOOK_CONTENT = define("written_book_content",
             WrittenBookContent::read, WrittenBookContent::write);
     public static final ComponentType<ArmorTrim> TRIM = define("trim",
-            ArmorTrim::read, ArmorTrim::write);
+            ArmorTrim::read, ArmorTrim::write, ArmorTrim::decode, ArmorTrim::encode);
     public static final ComponentType<DebugStickState> DEBUG_STICK_STATE = define("debug_stick_state",
             DebugStickState::read, DebugStickState::write);
     public static final ComponentType<NBTCompound> ENTITY_DATA = define("entity_data",

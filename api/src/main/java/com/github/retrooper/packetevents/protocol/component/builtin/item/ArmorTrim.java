@@ -20,7 +20,14 @@ package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterial;
+import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterials;
 import com.github.retrooper.packetevents.protocol.item.trimpattern.TrimPattern;
+import com.github.retrooper.packetevents.protocol.item.trimpattern.TrimPatterns;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -63,6 +70,24 @@ public class ArmorTrim {
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
             wrapper.writeBoolean(trim.showInTooltip);
         }
+    }
+
+    public static ArmorTrim decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+        TrimMaterial material = TrimMaterials.getByName(compound.getStringTagValueOrThrow("material"));
+        TrimPattern pattern = TrimPatterns.getByName(compound.getStringTagValueOrThrow("pattern"));
+        boolean showInTooltip = version.isNewerThanOrEquals(ClientVersion.V_1_21_5) || compound.getBoolean("show_in_tooltip");
+        return new ArmorTrim(material, pattern, showInTooltip);
+    }
+
+    public static NBT encode(ArmorTrim trim, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("material", new NBTString(trim.material.getName().toString()));
+        compound.setTag("pattern", new NBTString(trim.pattern.getName().toString()));
+        if (version.isOlderThan(ClientVersion.V_1_21_5)) {
+            compound.setTag("show_in_tooltip", new NBTByte(trim.showInTooltip));
+        }
+        return compound;
     }
 
     public TrimMaterial getMaterial() {
