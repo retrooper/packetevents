@@ -99,6 +99,7 @@ import com.github.retrooper.packetevents.protocol.item.instrument.Instrument;
 import com.github.retrooper.packetevents.protocol.mapper.MaybeMappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.util.NbtDecoder;
 import com.github.retrooper.packetevents.protocol.util.NbtEncoder;
@@ -114,6 +115,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.function.Function;
 
 /**
@@ -295,7 +297,9 @@ public final class ComponentTypes {
     public static final ComponentType<BannerLayers> BANNER_PATTERNS = define("banner_patterns",
             BannerLayers::read, BannerLayers::write, BannerLayers::decode, BannerLayers::encode);
     public static final ComponentType<DyeColor> BASE_COLOR = define("base_color",
-            wrapper -> wrapper.readEnum(DyeColor.values()), PacketWrapper::writeEnum);
+            wrapper -> wrapper.readEnum(DyeColor.values()), PacketWrapper::writeEnum,
+            (nbt, version) -> DyeColor.valueOf(((NBTString) nbt).getValue().toUpperCase(Locale.ROOT)),
+            (color, version) -> new NBTString(color.name().toLowerCase(Locale.ROOT)));
     public static final ComponentType<PotDecorations> POT_DECORATIONS = define("pot_decorations",
             PotDecorations::read, PotDecorations::write);
     public static final ComponentType<ItemContainerContents> CONTAINER = define("container",
