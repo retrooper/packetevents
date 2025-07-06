@@ -21,9 +21,13 @@ package com.github.retrooper.packetevents.protocol.component.builtin.item;
 import com.github.retrooper.packetevents.protocol.color.DyeColor;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPattern;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
+import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class BannerLayers {
@@ -41,6 +45,23 @@ public class BannerLayers {
 
     public static void write(PacketWrapper<?> wrapper, BannerLayers patterns) {
         wrapper.writeList(patterns.layers, Layer::write);
+    }
+
+    public static BannerLayers decode(NBT nbt, ClientVersion version) {
+        NBTList<NBTCompound> list = (NBTList<NBTCompound>) nbt;
+        List<Layer> layers = new ArrayList<>();
+        for (NBTCompound compound : list.getTags()) {
+            layers.add(Layer.decode(compound, version));
+        }
+        return new BannerLayers(layers);
+    }
+
+    public static NBT encode(BannerLayers layers, ClientVersion version) {
+        NBTList<NBTCompound> list = new NBTList<>(NBTType.COMPOUND);
+        for (Layer layer : layers.layers) {
+            list.addTag(Layer.encode(layer, version));
+        }
+        return list;
     }
 
     public void addLayer(Layer layer) {
@@ -88,6 +109,31 @@ public class BannerLayers {
         public static void write(PacketWrapper<?> wrapper, Layer layer) {
             wrapper.writeMappedEntityOrDirect(layer.pattern, BannerPattern::writeDirect);
             DyeColor.write(wrapper, layer.color);
+        }
+
+        public static Layer decode(NBTCompound compound, ClientVersion version) {
+            DyeColor color = DyeColor.valueOf(compound.getStringTagValueOrThrow("color").toUpperCase(Locale.ROOT));
+            BannerPattern pattern;
+            NBT patternNbt = compound.getTagOrThrow("pattern");
+            if (patternNbt instanceof NBTCompound) {
+                pattern = BannerPattern.decode(patternNbt, version, null);
+            } else {
+                pattern = BannerPatterns.getByName(((NBTString) patternNbt).getValue());
+            }
+            return new Layer(pattern, color);
+        }
+
+        public static NBTCompound encode(Layer layer, ClientVersion version) {
+            NBTCompound compound = new NBTCompound();
+            compound.setTag("color", new NBTString(layer.color.name().toLowerCase(Locale.ROOT)));
+            NBT patternNbt;
+            if (layer.pattern.isRegistered()) {
+                patternNbt = new NBTString(layer.pattern.getName().toString());
+            } else {
+                patternNbt = BannerPattern.encode(layer.pattern, version);
+            }
+            compound.setTag("pattern", patternNbt);
+            return compound;
         }
 
         public BannerPattern getPattern() {

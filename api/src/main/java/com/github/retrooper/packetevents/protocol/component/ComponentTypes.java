@@ -293,7 +293,7 @@ public final class ComponentTypes {
     public static final ComponentType<ResourceLocation> NOTE_BLOCK_SOUND = define("note_block_sound",
             PacketWrapper::readIdentifier, PacketWrapper::writeIdentifier);
     public static final ComponentType<BannerLayers> BANNER_PATTERNS = define("banner_patterns",
-            BannerLayers::read, BannerLayers::write);
+            BannerLayers::read, BannerLayers::write, BannerLayers::decode, BannerLayers::encode);
     public static final ComponentType<DyeColor> BASE_COLOR = define("base_color",
             wrapper -> wrapper.readEnum(DyeColor.values()), PacketWrapper::writeEnum);
     public static final ComponentType<PotDecorations> POT_DECORATIONS = define("pot_decorations",
