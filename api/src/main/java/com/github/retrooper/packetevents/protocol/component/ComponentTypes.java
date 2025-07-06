@@ -365,7 +365,7 @@ public final class ComponentTypes {
      * Added with 1.21.5
      */
     public static final ComponentType<ItemProvidesTrimMaterial> PROVIDES_TRIM_MATERIAL = define("provides_trim_material",
-            ItemProvidesTrimMaterial::read, ItemProvidesTrimMaterial::write);
+            ItemProvidesTrimMaterial::read, ItemProvidesTrimMaterial::write, ItemProvidesTrimMaterial::decode, ItemProvidesTrimMaterial::encode);
     /**
      * Added with 1.21.5
      */

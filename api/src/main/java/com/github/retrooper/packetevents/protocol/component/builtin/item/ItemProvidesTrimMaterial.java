@@ -21,6 +21,10 @@ package com.github.retrooper.packetevents.protocol.component.builtin.item;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterial;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterials;
 import com.github.retrooper.packetevents.protocol.mapper.MaybeMappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Objects;
@@ -40,6 +44,18 @@ public class ItemProvidesTrimMaterial {
 
     public static void write(PacketWrapper<?> wrapper, ItemProvidesTrimMaterial material) {
         MaybeMappedEntity.write(wrapper, material.material, TrimMaterial::write);
+    }
+
+    public static ItemProvidesTrimMaterial decode(NBT nbt, ClientVersion version) {
+        MaybeMappedEntity<TrimMaterial> material = new MaybeMappedEntity<>(
+                new ResourceLocation(((NBTString) nbt).getValue()),
+                TrimMaterials.getRegistry()
+        );
+        return new ItemProvidesTrimMaterial(material);
+    }
+
+    public static NBT encode(ItemProvidesTrimMaterial material, ClientVersion version) {
+        return new NBTString(material.material.getName().toString());
     }
 
     public MaybeMappedEntity<TrimMaterial> getMaterial() {
