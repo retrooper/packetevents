@@ -243,7 +243,7 @@ public final class ComponentTypes {
     public static final ComponentType<ItemEnchantments> STORED_ENCHANTMENTS = define("stored_enchantments",
             ItemEnchantments::read, ItemEnchantments::write, ItemEnchantments::decode, ItemEnchantments::encode);
     public static final ComponentType<ItemDyeColor> DYED_COLOR = define("dyed_color",
-            ItemDyeColor::read, ItemDyeColor::write);
+            ItemDyeColor::read, ItemDyeColor::write, ItemDyeColor::decode, ItemDyeColor::encode);
     public static final ComponentType<Integer> MAP_COLOR = define("map_color",
             PacketWrapper::readInt, PacketWrapper::writeInt);
     public static final ComponentType<Integer> MAP_ID = define("map_id",

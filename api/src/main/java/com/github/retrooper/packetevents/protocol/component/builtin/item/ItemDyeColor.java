@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -56,6 +58,31 @@ public class ItemDyeColor {
         wrapper.writeInt(color.rgb);
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
             wrapper.writeBoolean(color.showInTooltip);
+        }
+    }
+
+    public static ItemDyeColor decode(NBT nbt, ClientVersion version) {
+        int rgb;
+        boolean showInTooltip;
+        if (version.isOlderThan(ClientVersion.V_1_21_5)) {
+            NBTCompound compound = (NBTCompound) nbt;
+            rgb = compound.getNumberTagValueOrThrow("rgb").intValue();
+            showInTooltip = compound.getBoolean("show_in_tooltip");
+        } else {
+            rgb = ((NBTNumber) nbt).getAsInt();
+            showInTooltip = false;
+        }
+        return new ItemDyeColor(rgb, showInTooltip);
+    }
+
+    public static NBT encode(ItemDyeColor color, ClientVersion version) {
+        if (version.isOlderThan(ClientVersion.V_1_21_5)) {
+            NBTCompound compound = new NBTCompound();
+            compound.setTag("rgb", new NBTInt(color.rgb));
+            compound.setTag("show_in_tooltip", new NBTByte(color.showInTooltip));
+            return compound;
+        } else {
+            return new NBTInt(color.rgb);
         }
     }
 
