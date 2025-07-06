@@ -61,14 +61,10 @@ public class ItemProfile {
     public static ItemProfile decode(NBT nbt, ClientVersion version) {
         NBTCompound compound = (NBTCompound) nbt;
         String name = compound.getStringTagValueOrNull("name");
-        NBTList<NBTNumber> idList = compound.getNumberListTagOrNull("id");
+        NBTIntArray idArray = compound.getTagOfTypeOrNull("id", NBTIntArray.class);
         UUID uuid = null;
-        if (idList != null && idList.size() == 4) {
-            int i1 = idList.getTag(0).getAsInt();
-            int i2 = idList.getTag(1).getAsInt();
-            int i3 = idList.getTag(2).getAsInt();
-            int i4 = idList.getTag(3).getAsInt();
-            uuid = UniqueIdUtil.fromIntArray(new int[]{i1, i2, i3, i4});
+        if (idArray != null) {
+            uuid = UniqueIdUtil.fromIntArray(idArray.getValue());
         }
         NBTList<NBTCompound> propertiesList = compound.getCompoundListTagOrNull("properties");
         List<Property> properties = new ArrayList<>();
@@ -86,13 +82,7 @@ public class ItemProfile {
             nbt.setTag("name", new NBTString(profile.name));
         }
         if (profile.id != null) {
-            int[] idArray = UniqueIdUtil.toIntArray(profile.id);
-            NBTList<NBTInt> idList = new NBTList<>(NBTType.INT);
-            idList.addTag(new NBTInt(idArray[0]));
-            idList.addTag(new NBTInt(idArray[1]));
-            idList.addTag(new NBTInt(idArray[2]));
-            idList.addTag(new NBTInt(idArray[3]));
-            nbt.setTag("id", idList);
+            nbt.setTag("id", new NBTIntArray(UniqueIdUtil.toIntArray(profile.id)));
         }
         if (!profile.properties.isEmpty()) {
             NBTList<NBTCompound> propertiesList = new NBTList<>(NBTType.COMPOUND);
