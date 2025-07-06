@@ -366,7 +366,7 @@ public final class ComponentTypes {
      * Added with 1.21.5
      */
     public static final ComponentType<ItemProvidesBannerPatterns> PROVIDES_BANNER_PATTERNS = define("provides_banner_patterns",
-            ItemProvidesBannerPatterns::read, ItemProvidesBannerPatterns::write);
+            ItemProvidesBannerPatterns::read, ItemProvidesBannerPatterns::write, ItemProvidesBannerPatterns::decode, ItemProvidesBannerPatterns::encode);
     /**
      * Added with 1.21.5
      */

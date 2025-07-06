@@ -18,6 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -38,6 +41,16 @@ public class ItemProvidesBannerPatterns {
 
     public static void write(PacketWrapper<?> wrapper, ItemProvidesBannerPatterns patterns) {
         wrapper.writeIdentifier(patterns.tagKey);
+    }
+
+    public static ItemProvidesBannerPatterns decode(NBT nbt, ClientVersion version) {
+        NBTString tagKeyTag = (NBTString) nbt;
+        ResourceLocation tagKey = new ResourceLocation(tagKeyTag.getValue());
+        return new ItemProvidesBannerPatterns(tagKey);
+    }
+
+    public static NBT encode(ItemProvidesBannerPatterns patterns, ClientVersion version) {
+        return new NBTString(patterns.tagKey.toString());
     }
 
     public ResourceLocation getTagKey() {
