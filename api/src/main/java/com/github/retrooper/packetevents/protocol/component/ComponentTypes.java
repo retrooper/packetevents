@@ -123,6 +123,7 @@ import java.util.function.Function;
  *
  * @see EnchantEffectComponentTypes
  */
+// TODO: Add NBT encoders/decoders for all components
 public final class ComponentTypes {
 
     private static final VersionedRegistry<ComponentType<?>> REGISTRY = new VersionedRegistry<>("data_component_type");
