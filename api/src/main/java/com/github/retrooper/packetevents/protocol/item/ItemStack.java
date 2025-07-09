@@ -130,7 +130,6 @@ public class ItemStack {
                             Object valueObj = componentType.decode(value, version);
                             componentMap.set((ComponentType<Object>) componentType, valueObj);
                         } catch (UnsupportedOperationException e) {
-                            // TODO: Remove this catch block when all components are supported
                             PacketEvents.getAPI().getLogger().log(Level.FINEST, "Unsupported component type when decoding: " + key, e);
                         }
                     }
@@ -176,7 +175,6 @@ public class ItemStack {
                             NBT encodedValue = ((ComponentType<Object>) type).encode(value, version);
                             components.setTag(type.getName().toString(), encodedValue);
                         } catch (UnsupportedOperationException e) {
-                            // TODO: Remove this catch block when all components are supported
                             PacketEvents.getAPI().getLogger().log(Level.FINEST, "Unsupported component type when encoding: " + type.getName(), e);
                         }
                     }
