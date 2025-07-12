@@ -97,9 +97,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.Writabl
 import com.github.retrooper.packetevents.protocol.component.builtin.item.WrittenBookContent;
 import com.github.retrooper.packetevents.protocol.item.instrument.Instrument;
 import com.github.retrooper.packetevents.protocol.mapper.MaybeMappedEntity;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.util.NbtDecoder;
 import com.github.retrooper.packetevents.protocol.util.NbtEncoder;
@@ -157,6 +155,38 @@ public final class ComponentTypes {
         );
     }
 
+    @ApiStatus.Internal
+    public static <T, N extends NBT> ComponentType<T> define(String key, @Nullable Reader<T> reader, @Nullable Writer<T> writer, NBTType<N> nbtType, Function<N, T> decoder, Function<T, N> encoder) {
+        return define(
+                key,
+                reader,
+                writer,
+                (nbt, version) -> {
+                    N casted = nbtType.getNBTClass().cast(nbt);
+                    return decoder.apply(casted);
+                },
+                (value, version) -> encoder.apply(value)
+        );
+    }
+
+    @ApiStatus.Internal
+    public static <T extends Enum<T>> ComponentType<T> define(String key, Class<T> enumClass) {
+        return define(
+                key,
+                wrapper -> wrapper.readEnum(enumClass),
+                PacketWrapper::writeEnum,
+                (nbt, version) -> {
+                    NBTString string = (NBTString) nbt;
+                    String value = string.getValue();
+                    return Enum.valueOf(enumClass, value.toUpperCase(Locale.ROOT));
+                },
+                (value, version) -> {
+                    String name = value.name().toLowerCase(Locale.ROOT);
+                    return new NBTString(name);
+                }
+        );
+    }
+
     public static VersionedRegistry<ComponentType<?>> getRegistry() {
         return REGISTRY;
     }
@@ -169,21 +199,16 @@ public final class ComponentTypes {
         return REGISTRY.getById(version, id);
     }
 
-    // TODO
     public static final ComponentType<NBTCompound> CUSTOM_DATA = define("custom_data",
             // mojang wraps their "persistent" codec as a stream codec just here,
             // so packetevents has to handle nbt strings
-            CustomData::read, CustomData::write);
-    // TODO
+            CustomData::read, CustomData::write, CustomData::decode, CustomData::encode);
     public static final ComponentType<Integer> MAX_STACK_SIZE = define("max_stack_size",
-            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
-    // TODO
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt, NBTType.INT, NBTInt::getAsInt, NBTInt::new);
     public static final ComponentType<Integer> MAX_DAMAGE = define("max_damage",
-            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
-    // TODO
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt, NBTType.INT, NBTInt::getAsInt, NBTInt::new);
     public static final ComponentType<Integer> DAMAGE = define("damage",
-            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
-    // TODO
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt, NBTType.INT, NBTInt::getAsInt, NBTInt::new);
     public static final ComponentType<ItemUnbreakable> UNBREAKABLE_MODERN = define("unbreakable",
             ItemUnbreakable::read, ItemUnbreakable::write);
     /**
@@ -198,9 +223,7 @@ public final class ComponentTypes {
             PacketWrapper::readComponent, PacketWrapper::writeComponent, AdventureSerializer::serializer, AdventureSerializer::serializer);
     public static final ComponentType<ItemLore> LORE = define("lore",
             ItemLore::read, ItemLore::write, ItemLore::decode, ItemLore::encode);
-    // TODO
-    public static final ComponentType<ItemRarity> RARITY = define("rarity",
-            wrapper -> wrapper.readEnum(ItemRarity.values()), PacketWrapper::writeEnum);
+    public static final ComponentType<ItemRarity> RARITY = define("rarity", ItemRarity.class);
     public static final ComponentType<ItemEnchantments> ENCHANTMENTS = define("enchantments",
             ItemEnchantments::read, ItemEnchantments::write, ItemEnchantments::decode, ItemEnchantments::encode);
     // TODO
@@ -231,17 +254,14 @@ public final class ComponentTypes {
     @ApiStatus.Obsolete
     public static final ComponentType<Dummy> HIDE_TOOLTIP = define("hide_tooltip",
             Dummy::dummyRead, Dummy::dummyWrite);
-    // TODO
     public static final ComponentType<Integer> REPAIR_COST = define("repair_cost",
-            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt, NBTType.INT, NBTInt::getAsInt, NBTInt::new);
     public static final ComponentType<Dummy> CREATIVE_SLOT_LOCK = define("creative_slot_lock",
-            Dummy::dummyRead, Dummy::dummyWrite);
-    // TODO
+            Dummy::dummyRead, Dummy::dummyWrite, Dummy::dummyDecode, Dummy::dummyEncode);
     public static final ComponentType<Boolean> ENCHANTMENT_GLINT_OVERRIDE = define("enchantment_glint_override",
-            PacketWrapper::readBoolean, PacketWrapper::writeBoolean);
-    // TODO
+            PacketWrapper::readBoolean, PacketWrapper::writeBoolean, NBTType.BYTE, NBTByte::getAsBool, NBTByte::new);
     public static final ComponentType<Dummy> INTANGIBLE_PROJECTILE = define("intangible_projectile",
-            Dummy::dummyReadNbt, Dummy::dummyWriteNbt);
+            Dummy::dummyReadNbt, Dummy::dummyWriteNbt, Dummy::dummyDecode, Dummy::dummyEncode);
     // TODO
     public static final ComponentType<FoodProperties> FOOD = define("food",
             FoodProperties::read, FoodProperties::write);
@@ -258,17 +278,15 @@ public final class ComponentTypes {
             ItemEnchantments::read, ItemEnchantments::write, ItemEnchantments::decode, ItemEnchantments::encode);
     public static final ComponentType<ItemDyeColor> DYED_COLOR = define("dyed_color",
             ItemDyeColor::read, ItemDyeColor::write, ItemDyeColor::decode, ItemDyeColor::encode);
-    // TODO
     public static final ComponentType<Integer> MAP_COLOR = define("map_color",
-            PacketWrapper::readInt, PacketWrapper::writeInt);
-    // TODO
+            PacketWrapper::readInt, PacketWrapper::writeInt, NBTType.INT, NBTInt::getAsInt, NBTInt::new);
     public static final ComponentType<Integer> MAP_ID = define("map_id",
-            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt, NBTType.INT, NBTInt::getAsInt, NBTInt::new);
     // TODO
     public static final ComponentType<ItemMapDecorations> MAP_DECORATIONS = define("map_decorations",
             ItemMapDecorations::read, ItemMapDecorations::write);
     public static final ComponentType<ItemMapPostProcessingState> MAP_POST_PROCESSING = define("map_post_processing",
-            wrapper -> wrapper.readEnum(ItemMapPostProcessingState.values()), PacketWrapper::writeEnum);
+            ItemMapPostProcessingState.class);
     // TODO
     public static final ComponentType<ChargedProjectiles> CHARGED_PROJECTILES = define("charged_projectiles",
             ChargedProjectiles::read, ChargedProjectiles::write);
@@ -292,15 +310,12 @@ public final class ComponentTypes {
     // TODO
     public static final ComponentType<DebugStickState> DEBUG_STICK_STATE = define("debug_stick_state",
             DebugStickState::read, DebugStickState::write);
-    // TODO
     public static final ComponentType<NBTCompound> ENTITY_DATA = define("entity_data",
-            PacketWrapper::readNBT, PacketWrapper::writeNBT);
-    // TODO
+            PacketWrapper::readNBT, PacketWrapper::writeNBT, NBTType.COMPOUND, Function.identity(), Function.identity());
     public static final ComponentType<NBTCompound> BUCKET_ENTITY_DATA = define("bucket_entity_data",
-            PacketWrapper::readNBT, PacketWrapper::writeNBT);
-    // TODO
+            PacketWrapper::readNBT, PacketWrapper::writeNBT, NBTType.COMPOUND, Function.identity(), Function.identity());
     public static final ComponentType<NBTCompound> BLOCK_ENTITY_DATA = define("block_entity_data",
-            PacketWrapper::readNBT, PacketWrapper::writeNBT);
+            PacketWrapper::readNBT, PacketWrapper::writeNBT, NBTType.COMPOUND, Function.identity(), Function.identity());
     // TODO
     public static final ComponentType<ItemInstrument> ITEM_INSTRUMENT = define("instrument",
             ItemInstrument::read, ItemInstrument::write);
@@ -308,9 +323,8 @@ public final class ComponentTypes {
     public static final ComponentType<Instrument> INSTRUMENT = ITEM_INSTRUMENT.legacyMap(
             inst -> inst.getInstrument().getValue(),
             inst -> new ItemInstrument(new MaybeMappedEntity<>(inst)));
-    // TODO
     public static final ComponentType<Integer> OMINOUS_BOTTLE_AMPLIFIER = define("ominous_bottle_amplifier",
-            PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
+            PacketWrapper::readVarInt, PacketWrapper::writeVarInt, NBTType.INT, NBTInt::getAsInt, NBTInt::new);
     // TODO
     public static final ComponentType<ItemRecipes> RECIPES = define("recipes",
             ItemRecipes::read, ItemRecipes::write);
@@ -325,15 +339,11 @@ public final class ComponentTypes {
             ItemFireworks::read, ItemFireworks::write);
     public static final ComponentType<ItemProfile> PROFILE = define("profile",
             ItemProfile::read, ItemProfile::write, ItemProfile::decode, ItemProfile::encode);
-    // TODO
     public static final ComponentType<ResourceLocation> NOTE_BLOCK_SOUND = define("note_block_sound",
-            PacketWrapper::readIdentifier, PacketWrapper::writeIdentifier);
+            PacketWrapper::readIdentifier, PacketWrapper::writeIdentifier, ResourceLocation::decode, ResourceLocation::encode);
     public static final ComponentType<BannerLayers> BANNER_PATTERNS = define("banner_patterns",
             BannerLayers::read, BannerLayers::write, BannerLayers::decode, BannerLayers::encode);
-    public static final ComponentType<DyeColor> BASE_COLOR = define("base_color",
-            wrapper -> wrapper.readEnum(DyeColor.values()), PacketWrapper::writeEnum,
-            (nbt, version) -> DyeColor.valueOf(((NBTString) nbt).getValue().toUpperCase(Locale.ROOT)),
-            (color, version) -> new NBTString(color.name().toLowerCase(Locale.ROOT)));
+    public static final ComponentType<DyeColor> BASE_COLOR = define("base_color", DyeColor.class);
     // TODO
     public static final ComponentType<PotDecorations> POT_DECORATIONS = define("pot_decorations",
             PotDecorations::read, PotDecorations::write);
@@ -382,9 +392,8 @@ public final class ComponentTypes {
     // TODO
     public static final ComponentType<ItemEquippable> EQUIPPABLE = define("equippable",
             ItemEquippable::read, ItemEquippable::write);
-    // TODO
     public static final ComponentType<Dummy> GLIDER = define("glider",
-            Dummy::dummyRead, Dummy::dummyWrite);
+            Dummy::dummyRead, Dummy::dummyWrite, Dummy::dummyDecode, Dummy::dummyEncode);
     // TODO
     public static final ComponentType<ItemDeathProtection> DEATH_PROTECTION = define("death_protection",
             ItemDeathProtection::read, ItemDeathProtection::write);

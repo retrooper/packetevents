@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.resources;
 
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
@@ -73,6 +74,14 @@ public class ResourceLocation implements Keyed {
     }
 
     public static NBT encode(PacketWrapper<?> wrapper, ResourceLocation resourceLocation) {
+        return new NBTString(resourceLocation.toString());
+    }
+
+    public static ResourceLocation decode(NBT nbt, ClientVersion version) {
+        return new ResourceLocation(((NBTString) nbt).getValue());
+    }
+
+    public static NBT encode(ResourceLocation resourceLocation, ClientVersion version) {
         return new NBTString(resourceLocation.toString());
     }
 

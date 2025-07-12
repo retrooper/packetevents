@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.component.builtin.item;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class CustomData {
@@ -41,5 +42,19 @@ public class CustomData {
 
     public static void write(PacketWrapper<?> wrapper, NBTCompound compound) {
         wrapper.writeNBT(compound);
+    }
+
+    public static NBTCompound decode(NBT nbt, ClientVersion version) {
+        if (nbt instanceof NBTCompound) {
+            return (NBTCompound) nbt;
+        } else if (nbt instanceof NBTString) {
+            // TODO: parse nbt string
+            return new NBTCompound();
+        }
+        throw new UnsupportedOperationException("Unsupported custom data nbt type: " + nbt.getType());
+    }
+
+    public static NBT encode(NBTCompound compound, ClientVersion version) {
+        return compound;
     }
 }

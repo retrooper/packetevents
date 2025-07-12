@@ -18,6 +18,9 @@
 
 package com.github.retrooper.packetevents.util;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public final class Dummy {
@@ -43,6 +46,14 @@ public final class Dummy {
     public static void dummyWriteNbt(PacketWrapper<?> wrapper, Dummy dummy) {
         wrapper.writeByte(0x0A); // compound start
         wrapper.writeByte(0x00); // compound end
+    }
+
+    public static Dummy dummyDecode(NBT nbt, ClientVersion version) {
+        return DUMMY;
+    }
+
+    public static NBT dummyEncode(Dummy dummy, ClientVersion version) {
+        return new NBTCompound();
     }
 
     public static Dummy dummy() {
