@@ -173,10 +173,10 @@ public class SpigotConversionUtil {
             Object nbt = SpigotReflectionUtil.convertWorldServerDimensionToNMSNbt(serverLevel);
 
             NBTCompound peNbt = SpigotReflectionUtil.fromMinecraftNBT(nbt);
-            ResourceLocation dimensionName = new ResourceLocation(SpigotReflectionUtil.getDimensionKey(serverLevel));
-            int dimensionId = SpigotReflectionUtil.getDimensionId(serverLevel);
+            ResourceLocation dimensionTypeName = new ResourceLocation(SpigotReflectionUtil.getDimensionKey(serverLevel));
+            int dimensionTypeId = SpigotReflectionUtil.getDimensionId(serverLevel);
             return DimensionType.decode(peNbt, version.toClientVersion(),
-                    new SimpleTypesBuilderData(dimensionName, dimensionId));
+                    new SimpleTypesBuilderData(dimensionTypeName, dimensionTypeId));
         }
     }
 

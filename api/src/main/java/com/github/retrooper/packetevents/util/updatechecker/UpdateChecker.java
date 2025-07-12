@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.util.PEVersion;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.gson.JsonObject;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -90,16 +91,18 @@ public class UpdateChecker {
         }
     }
 
-    public void handleUpdateCheck() {
+    public void handleUpdateCheck(@Nullable Runnable updateCheckCallback) {
         Thread thread = new Thread(() -> {
             PacketEvents.getAPI().getLogManager().info("Checking for updates, please wait...");
             UpdateChecker.UpdateCheckerStatus status = checkForUpdate();
-            //if (status == UpdateChecker.UpdateCheckerStatus.FAILED) {
-                //PacketEvents.getAPI().getLogManager().severe("Failed to check for updates!");
-                //A warning message is already printed when we fail to check for updates, no need to spam.
-            //}
+            if (updateCheckCallback != null)
+                updateCheckCallback.run();
         }, "packetevents-update-check-thread");
         thread.start();
+    }
+
+    public void handleUpdateCheck() {
+       handleUpdateCheck(null);
     }
 
     /**

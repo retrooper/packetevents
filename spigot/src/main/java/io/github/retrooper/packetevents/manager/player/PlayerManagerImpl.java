@@ -29,11 +29,29 @@ import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.ref.WeakReference;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManagerImpl implements PlayerManager {
+
+    // we associate the user object with a UUID upon receiving the ClientboundGameProfilePacket;
+    // but, as packets are send asynchronously, this causes a race condition between the packet being sent
+    // and the main thread login logic; if the packet gets processed by packetevents before the main thread login
+    // logic reaches the event where we process things, everything is fine; if not, the event won't know what
+    // to do with the player and will kick them
+    //
+    // this map gets used early on in the login/join process, were we can't extract
+    // a reference to the player's connection from the player;
+    // this player reference may then get used by the packet handler to associate the user with a player
+    // from inside the packet handler, ensuring consistent results regardless of which thread is faster
+    @ApiStatus.Internal
+    public final Map<UUID, WeakReference<Player>> joiningPlayers = new ConcurrentHashMap<>();
+
     @Override
     public int getPing(@NotNull Object player) {
         //Yay, we contributed this to Spigot and now we can use it on 1.17+ servers.

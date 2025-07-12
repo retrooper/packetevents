@@ -44,7 +44,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
@@ -96,7 +95,7 @@ public final class SpigotReflectionUtil {
     //Minecraft classes
     public static Class<?> MINECRAFT_SERVER_CLASS, NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS,
             NMS_IMATERIAL_CLASS, NMS_ENTITY_CLASS, ENTITY_PLAYER_CLASS, BOUNDING_BOX_CLASS, NMS_MINECRAFT_KEY_CLASS,
-            ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS, NMS_ENUM_PARTICLE_CLASS,
+            ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, TRANSFER_COOKIE_CONNECTION_CLASS, SERVER_LOGIN_PACKET_LISTENER_IMPL_CLASS, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS, NMS_ENUM_PARTICLE_CLASS,
             MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, LEVEL_CLASS, SERVER_LEVEL_CLASS, ENUM_PROTOCOL_DIRECTION_CLASS,
             GAME_PROFILE_CLASS, CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS, CRAFT_PARTICLE_CLASS,
             LEVEL_ENTITY_GETTER_CLASS, ENTITY_ACCESS_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS, PAPER_ENTITY_LOOKUP_CLASS, CRAFT_MAGIC_NUMBERS_CLASS, IBLOCK_DATA_CLASS,
@@ -104,14 +103,15 @@ public final class SpigotReflectionUtil {
             DYNAMIC_OPS_NBT_CLASS, NMS_NBT_COMPOUND_CLASS, NMS_NBT_BASE_CLASS, NBT_COMPRESSION_STREAM_TOOLS_CLASS,
             STREAM_CODEC, STREAM_DECODER, STREAM_ENCODER, REGISTRY_FRIENDLY_BYTE_BUF, REGISTRY_ACCESS, REGISTRY_ACCESS_FROZEN,
             RESOURCE_KEY, REGISTRY, WRITABLE_REGISTRY, NBT_ACCOUNTER, CHUNK_PROVIDER_SERVER_CLASS, ICHUNKPROVIDER_CLASS, CHUNK_STATUS_CLASS,
-            BLOCK_POSITION_CLASS, PLAYER_CHUNK_MAP_CLASS, PLAYER_CHUNK_CLASS, CHUNK_CLASS, IBLOCKACCESS_CLASS, ICHUNKACCESS_CLASS;
+            BLOCK_POSITION_CLASS, PLAYER_CHUNK_MAP_CLASS, PLAYER_CHUNK_CLASS, CHUNK_CLASS, IBLOCKACCESS_CLASS, ICHUNKACCESS_CLASS, REMOTE_CHAT_SESSION_CLASS;
 
     //Netty classes
     public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS, BYTE_TO_MESSAGE_DECODER, MESSAGE_TO_BYTE_ENCODER;
 
     //Fields
     public static Field ENTITY_PLAYER_PING_FIELD, ENTITY_BOUNDING_BOX_FIELD, BYTE_BUF_IN_PACKET_DATA_SERIALIZER, DIMENSION_CODEC_FIELD,
-            DYNAMIC_OPS_NBT_INSTANCE_FIELD, CHUNK_PROVIDER_SERVER_FIELD, CRAFT_PARTICLE_PARTICLES_FIELD, NMS_MK_KEY_FIELD, LEGACY_NMS_PARTICLE_KEY_FIELD, LEGACY_NMS_KEY_TO_NMS_PARTICLE;
+            DYNAMIC_OPS_NBT_INSTANCE_FIELD, CHUNK_PROVIDER_SERVER_FIELD, CRAFT_PARTICLE_PARTICLES_FIELD, NMS_MK_KEY_FIELD, LEGACY_NMS_PARTICLE_KEY_FIELD, LEGACY_NMS_KEY_TO_NMS_PARTICLE,
+            REMOTE_CHAT_SESSION_FIELD, REGISTRY_KEY_LOCATION_FIELD;
 
     //Methods
     public static Method IS_DEBUGGING, GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
@@ -124,7 +124,7 @@ public final class SpigotReflectionUtil {
             GET_DIMENSION_MANAGER, GET_DIMENSION_ID, GET_DIMENSION_KEY, CODEC_ENCODE_METHOD, DATA_RESULT_GET_METHOD,
             READ_NBT_FROM_STREAM_METHOD, WRITE_NBT_TO_STREAM_METHOD, STREAM_DECODER_DECODE, STREAM_ENCODER_ENCODE,
             CREATE_REGISTRY_RESOURCE_KEY, GET_REGISTRY_OR_THROW, GET_DIMENSION_TYPES, GET_REGISTRY_ID,
-            NBT_ACCOUNTER_UNLIMITED_HEAP, GET_REGISTRY_KEY_LOCATION, CHUNK_CACHE_GET_IBLOCKACCESS, CHUNK_CACHE_GET_ICHUNKACCESS,
+            NBT_ACCOUNTER_UNLIMITED_HEAP, CHUNK_CACHE_GET_IBLOCKACCESS, CHUNK_CACHE_GET_ICHUNKACCESS,
             IBLOCKACCESS_GET_BLOCK_DATA, CHUNK_GET_BLOCK_DATA, PLAYER_CHUNK_MAP_GET_PLAYER_CHUNK, PLAYER_CHUNK_GET_CHUNK;
 
     //Constructors
@@ -182,10 +182,7 @@ public final class SpigotReflectionUtil {
             GET_ENTITY_BY_ID_LEVEL_ENTITY_GETTER_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, ENTITY_ACCESS_CLASS, 0, int.class);
         }
         if (DIMENSION_MANAGER_CLASS != null) {
-            if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16
-                    || PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_16_1) {
-                GET_DIMENSION_KEY = Reflection.getMethod(LEVEL_CLASS, "getTypeKey", 0);
-            }
+            GET_DIMENSION_KEY = Reflection.getMethod(LEVEL_CLASS, "getTypeKey", 0);
             GET_DIMENSION_MANAGER = Reflection.getMethod(LEVEL_CLASS, DIMENSION_MANAGER_CLASS, 0);
             GET_DIMENSION_ID = Reflection.getMethod(DIMENSION_MANAGER_CLASS, int.class, 0);
         }
@@ -259,7 +256,6 @@ public final class SpigotReflectionUtil {
                 0, RESOURCE_KEY);
         GET_DIMENSION_TYPES = Reflection.getMethod(REGISTRY_ACCESS_FROZEN, REGISTRY, 0);
         GET_REGISTRY_ID = Reflection.getMethod(REGISTRY, int.class, 0, Object.class);
-        GET_REGISTRY_KEY_LOCATION = Reflection.getMethod(RESOURCE_KEY, NMS_MINECRAFT_KEY_CLASS, 0);
         //Only need to check if the arguments are null. The lookup class being null is handled in the method.
         //Not checking if the arguments passed are null could lead to unintended behavior.
         if (IBLOCKACCESS_CLASS != null) {
@@ -303,6 +299,9 @@ public final class SpigotReflectionUtil {
             //It's not inside the Level class (NMS World) class, which is how it was on < 1.21 Paper
             PAPER_ENTITY_LOOKUP_LEGACY = Reflection.getField(LEVEL_CLASS, PAPER_ENTITY_LOOKUP_CLASS, 0) == null;
         }
+
+        REMOTE_CHAT_SESSION_FIELD = Reflection.getField(ENTITY_PLAYER_CLASS, REMOTE_CHAT_SESSION_CLASS, 0);
+        REGISTRY_KEY_LOCATION_FIELD = Reflection.getField(RESOURCE_KEY, NMS_MINECRAFT_KEY_CLASS, 1);
     }
 
     private static void initClasses() {
@@ -319,9 +318,12 @@ public final class SpigotReflectionUtil {
         NMS_MINECRAFT_KEY_CLASS = getServerClass(IS_OBFUSCATED ? "resources.MinecraftKey" : "resources.ResourceLocation", "MinecraftKey");
         ENTITY_HUMAN_CLASS = getServerClass(IS_OBFUSCATED ? "world.entity.player.EntityHuman" : "world.entity.player.Player", "EntityHuman");
         PLAYER_CONNECTION_CLASS = getServerClass(IS_OBFUSCATED ? "server.network.PlayerConnection" : "server.network.ServerGamePacketListenerImpl", "PlayerConnection");
+        SERVER_LOGIN_PACKET_LISTENER_IMPL_CLASS = getServerClass(IS_OBFUSCATED ? "server.network.LoginListener" : "server.network.ServerLoginPacketListenerImpl", "LoginListener");
 
-        //Only on 1.20.2
+        // 1.20.2+
         SERVER_COMMON_PACKETLISTENER_IMPL_CLASS = getServerClass("server.network.ServerCommonPacketListenerImpl", "ServerCommonPacketListenerImpl");
+        // 1.20.5+
+        TRANSFER_COOKIE_CONNECTION_CLASS = getOBCClass("entity.CraftPlayer$TransferCookieConnection");
 
         SERVER_CONNECTION_CLASS = getServerClass(IS_OBFUSCATED ? "server.network.ServerConnection" : "server.network.ServerConnectionListener", "ServerConnection");
         NETWORK_MANAGER_CLASS = getServerClass(IS_OBFUSCATED ? "network.NetworkManager" : "network.Connection", "NetworkManager");
@@ -398,6 +400,8 @@ public final class SpigotReflectionUtil {
         RESOURCE_KEY = getServerClass("resources.ResourceKey", "ResourceKey");
         REGISTRY = getServerClass(IS_OBFUSCATED ? "core.IRegistry" : "core.Registry", "IRegistry");
         WRITABLE_REGISTRY = getServerClass(IS_OBFUSCATED ? "core.IRegistryWritable" : "core.WritableRegistry", "IRegistryWritable");
+
+        REMOTE_CHAT_SESSION_CLASS = Reflection.getClassByNameWithoutException("net.minecraft.network.chat.RemoteChatSession");
     }
 
     private static void initObjects() {
@@ -542,6 +546,9 @@ public final class SpigotReflectionUtil {
             return null;
         }
         ReflectionObject wrappedEntityPlayer = new ReflectionObject(entityPlayer, ENTITY_PLAYER_CLASS);
+        if (TRANSFER_COOKIE_CONNECTION_CLASS != null) {
+            return wrappedEntityPlayer.readObject(0, TRANSFER_COOKIE_CONNECTION_CLASS);
+        }
         return wrappedEntityPlayer.readObject(0, SpigotReflectionUtil.PLAYER_CONNECTION_CLASS);
     }
 
@@ -591,8 +598,13 @@ public final class SpigotReflectionUtil {
         if (playerConnection == null) {
             return null;
         }
-        Class<?> playerConnectionClass = SERVER_COMMON_PACKETLISTENER_IMPL_CLASS != null ?
-                SERVER_COMMON_PACKETLISTENER_IMPL_CLASS : PLAYER_CONNECTION_CLASS;
+        Class<?> playerConnectionClass;
+        if (SERVER_COMMON_PACKETLISTENER_IMPL_CLASS != null) {
+            playerConnectionClass = playerConnection.getClass() == SERVER_LOGIN_PACKET_LISTENER_IMPL_CLASS
+                    ? SERVER_LOGIN_PACKET_LISTENER_IMPL_CLASS : SERVER_COMMON_PACKETLISTENER_IMPL_CLASS;
+        } else {
+            playerConnectionClass = PLAYER_CONNECTION_CLASS;
+        }
         ReflectionObject wrapper = new ReflectionObject(playerConnection, playerConnectionClass);
         try {
             return wrapper.readObject(0, NETWORK_MANAGER_CLASS);
@@ -719,7 +731,7 @@ public final class SpigotReflectionUtil {
     public static String getDimensionKey(Object worldServer) {
         try {
             Object resourceKey = GET_DIMENSION_KEY.invoke(worldServer);
-            return GET_REGISTRY_KEY_LOCATION.invoke(resourceKey).toString();
+            return REGISTRY_KEY_LOCATION_FIELD.get(resourceKey).toString();
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -1068,6 +1080,7 @@ public final class SpigotReflectionUtil {
 
     /**
      * Get the entity by the id.
+     *
      * @deprecated Please resort to {@link SpigotConversionUtil#getEntityById(World, int)} since the reflection util is not API.
      */
     @Deprecated
@@ -1090,6 +1103,7 @@ public final class SpigotReflectionUtil {
 
     /**
      * Get the entity by the id.
+     *
      * @deprecated Please resort to {@link SpigotConversionUtil#getEntityById(World, int)} since the reflection util is not API.
      */
     @Deprecated
@@ -1184,4 +1198,13 @@ public final class SpigotReflectionUtil {
         return null;
     }
 
+    public static Object getRemoteChatSession(Player player) {
+        Object entityPlayer = getEntityPlayer(player);
+        try {
+            return REMOTE_CHAT_SESSION_FIELD.get(entityPlayer);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -28,8 +28,6 @@
 
 <a href="https://www.ej-technologies.com"><img src="https://www.ej-technologies.com/images/product_banners/jprofiler_small.png"><br>
 
-<a href="https://github.com/radstevee"><img src="https://github.com/radstevee.png" width="50px" alt="radstevee"/></a><br>
-
 <h3>Credits</h3>
 
 <i>Here are some projects that we are heavily inspired by, thus we have integrated</i>\

@@ -43,7 +43,7 @@ public class InternalSpongeListener {
             // Check if it is a fake connection...
             if (!FakeChannelUtil.isFakeChannel(channel)) {
                 // Kick them, if they are not a fake player.
-                player.kick(Component.text("PacketEvents 2.0 failed to inject"));
+                player.kick(Component.text("PacketEvents failed to inject into a channel."));
             }
             return;
         }

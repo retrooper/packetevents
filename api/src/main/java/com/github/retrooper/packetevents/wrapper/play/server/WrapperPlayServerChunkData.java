@@ -329,7 +329,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             this.buffer = originalBuffer;
 
             // write the same amount of zero bytes mojang also writes
-            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+            if (this.serverVersion.isOlderThan(ServerVersion.V_1_21_6)
+                    && this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
                 int zeroBytes = ChunkReader_v1_18.getMojangZeroByteSuffixLength(chunks);
                 int newWriterIndex = ByteBufHelper.writerIndex(dataBuffer) + zeroBytes;
                 // allocate enough space for the zeros

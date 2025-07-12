@@ -35,20 +35,14 @@ public class ServerManagerImpl implements ServerManager {
         Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
         String bukkitVersion = Bukkit.getBukkitVersion();
         ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
+
+        String failureToDetectVersionMsg = "Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the Server version is " + fallbackVersion.name() + "...\n If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc";
+
         if (bukkitVersion.contains("Unknown")) {
+            plugin.getLogger().warning(failureToDetectVersionMsg);
             return fallbackVersion;
         }
-        //Our PEVersion class can parse this version and detect if it is a newer version than what is currently supported
-        //and account for that properly
-        PEVersion version = PEVersion.fromString(bukkitVersion.substring(0, bukkitVersion.indexOf("-")));
-        PEVersion latestVersion = PEVersion.fromString(ServerVersion.getLatest().getReleaseName());
-        if (version.isNewerThan(latestVersion)) {
-            //We do not support this version yet, so let us warn the user
-            plugin.getLogger().warning("[packetevents] We currently do not support the Minecraft version "
-                    + version + ", so things might break. PacketEvents will behave as if the Minecraft version were "
-                    + latestVersion + "!");
-            return ServerVersion.getLatest();
-        }
+
         for (final ServerVersion val : ServerVersion.reversedValues()) {
             //For example "V_1_18" -> "1.18"
             if (bukkitVersion.contains(val.getReleaseName())) {
@@ -56,7 +50,7 @@ public class ServerManagerImpl implements ServerManager {
             }
         }
 
-        plugin.getLogger().warning("[packetevents] Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the Server version is " + fallbackVersion.name() + "...");
+        plugin.getLogger().warning(failureToDetectVersionMsg);
         return fallbackVersion;
     }
 

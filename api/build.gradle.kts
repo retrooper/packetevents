@@ -22,13 +22,15 @@ java {
 dependencies {
     compileOnlyApi(libs.bundles.adventure)
     compileOnlyApi(libs.bundles.adventure.serializers)
+
     implementation(libs.adventure.api)
-    api(project(":patch:adventure-text-serializer-gson", "shadow")) {
-        excludeAdventure()
+    project(":patch:adventure-text-serializer-gson", "shadow").apply {
+        // I am not sure why, but to override the real adventure serializer our
+        // dependency has to be in the "api" configuration...
+        api(this) { excludeAdventure() }
+        shadowAndPublish(this) { excludeAdventure() }
     }
-    api(libs.adventure.text.serializer.legacy) {
-        excludeAdventure()
-    }
+    shadowAndPublish(libs.adventure.text.serializer.legacy) { excludeAdventure() }
     compileOnly(libs.gson)
 
     testImplementation(libs.bundles.adventure)
@@ -85,15 +87,6 @@ tasks {
 
     test {
         useJUnitPlatform()
-    }
-
-    shadowJar {
-        exclude {
-            val path = it.path
-            path.startsWith("net/kyori") && !path.startsWith("net/kyori/adventure/text/serializer") && !path.startsWith(
-                "net/kyori/option"
-            )
-        }
     }
 }
 

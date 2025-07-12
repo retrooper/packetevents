@@ -19,10 +19,11 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-// Thanks MCProtocolLib, this is taken entirely from them
 public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServerWorldBorder> {
     private WorldBorderAction action;
 
@@ -92,7 +93,9 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        this.action = WorldBorderAction.values()[this.readVarInt()];
+        int actionId = readVarInt();
+        action = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12) ? WorldBorderAction.fromId(actionId)
+                : WorldBorderAction.fromLegacyId(actionId);
         if (this.action == WorldBorderAction.SET_SIZE) {
             this.radius = readDouble();
         } else if (this.action == WorldBorderAction.LERP_SIZE) {
@@ -120,7 +123,8 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
-        writeVarInt(this.action.ordinal());
+        int actionId = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12) ? action.getId() : action.getLegacyId();
+        writeVarInt(actionId);
         if (this.action == WorldBorderAction.SET_SIZE) {
             writeDouble(this.radius);
         } else if (this.action == WorldBorderAction.LERP_SIZE) {
@@ -200,12 +204,79 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
         return this.warningBlocks;
     }
 
+    public void setAction(WorldBorderAction action) {
+        this.action = action;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    public void setOldRadius(double oldRadius) {
+        this.oldRadius = oldRadius;
+    }
+
+    public void setNewRadius(double newRadius) {
+        this.newRadius = newRadius;
+    }
+
+    public void setSpeed(long speed) {
+        this.speed = speed;
+    }
+
+    public void setCenterX(double centerX) {
+        this.centerX = centerX;
+    }
+
+    public void setCenterZ(double centerZ) {
+        this.centerZ = centerZ;
+    }
+
+    public void setPortalTeleportBoundary(int portalTeleportBoundary) {
+        this.portalTeleportBoundary = portalTeleportBoundary;
+    }
+
+    public void setWarningTime(int warningTime) {
+        this.warningTime = warningTime;
+    }
+
+    public void setWarningBlocks(int warningBlocks) {
+        this.warningBlocks = warningBlocks;
+    }
+
     public enum WorldBorderAction {
-        SET_SIZE,
-        LERP_SIZE,
-        SET_CENTER,
-        INITIALIZE,
-        SET_WARNING_TIME,
-        SET_WARNING_BLOCKS;
+        SET_SIZE(1),
+        LERP_SIZE(2),
+        SET_CENTER(3),
+        INITIALIZE(6),
+        SET_WARNING_TIME(5),
+        SET_WARNING_BLOCKS(4);
+
+        private final int legacyId;
+
+        WorldBorderAction(int legacyId) {
+            this.legacyId = legacyId;
+        }
+
+        public int getId() {
+            return ordinal();
+        }
+
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        public static WorldBorderAction fromId(int id) {
+            return WorldBorderAction.values()[id];
+        }
+
+        public static WorldBorderAction fromLegacyId(int legacyId) {
+            for (WorldBorderAction action : WorldBorderAction.values()) {
+                if (action.legacyId == legacyId) {
+                    return action;
+                }
+            }
+            return null;
+        }
     }
 }

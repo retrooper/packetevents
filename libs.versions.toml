@@ -10,7 +10,7 @@ paper = "1.20.6-R0.1-SNAPSHOT"
 bungeecord = "1.21-R0.1-SNAPSHOT"
 velocity = "3.4.0-SNAPSHOT"
 run-paper = "2.3.1"
-fabric-loom = "1.10.5"
+fabric-loom = "1.11.4"
 spongeGradle = "2.2.0"
 classgraph = "4.8.179"
 
@@ -38,8 +38,8 @@ velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref =
 classgraph = { group = "io.github.classgraph", name = "classgraph", version.ref = "classgraph" }
 
 [bundles]
-adventure = [ "adventure-api", "adventure-nbt", "adventure-key", "adventure-examination-api", "adventure-examination-string" ]
-adventure-serializers = [ "adventure-text-serializer-gson", "adventure-text-serializer-json-legacy", "adventure-text-serializer-legacy" ]
+adventure = ["adventure-api", "adventure-nbt", "adventure-key", "adventure-examination-api", "adventure-examination-string"]
+adventure-serializers = ["adventure-text-serializer-gson", "adventure-text-serializer-json-legacy", "adventure-text-serializer-legacy"]
 
 [plugins]
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }

@@ -37,7 +37,9 @@ import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHands
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Internal
 public class InternalPacketListener extends PacketListenerAbstract {
 
     public InternalPacketListener() {
@@ -68,7 +70,9 @@ public class InternalPacketListener extends PacketListenerAbstract {
                 PacketEvents.getAPI().getProtocolManager().setChannel(profile.getUUID(), channel);
             }
 
-            PacketEvents.getAPI().getLogManager().debug("Mapped player UUID with their channel.");
+            if (PacketEvents.getAPI().getLogManager().isDebug()) {
+                PacketEvents.getAPI().getLogManager().debug("Mapped player UUID with their channel " + profile.getUUID() + " " + channel);
+            }
 
             // Switch the user's connection state to new state, but the variable event.getConnectionState() remains LOGIN
             // We switch user state immediately to remain in sync with vanilla, allowing you to encode packets immediately

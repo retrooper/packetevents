@@ -5,6 +5,7 @@ via-nbt = "4.1.0"
 fast-util = "8.5.6"
 gson = "2.8.9"
 java-diff-utils = "4.12"
+mod-publish = "0.8.4"
 
 [libraries]
 shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version.ref = "shadow" }
@@ -13,3 +14,4 @@ via-nbt = { group = "com.viaversion", name = "nbt", version.ref = "via-nbt" }
 fast-util = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fast-util" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 java-diff-utils = { group = "io.github.java-diff-utils", name = "java-diff-utils", version.ref = "java-diff-utils" }
+mod-publish = { group = "me.modmuss50", name = "mod-publish-plugin", version.ref = "mod-publish" }

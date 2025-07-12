@@ -19,19 +19,34 @@
 package io.github.retrooper.packetevents.bukkit;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
+import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
-import org.spigotmc.event.player.PlayerSpawnLocationEvent;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
 
+import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * Used on Paper/Spigot before 1.20.5
+ */
+@NullMarked
+@ApiStatus.Internal
 public class InternalBukkitListener implements Listener {
+
+    static final String KICK_MESSAGE = "PacketEvents failed to inject into a channel";
 
     private final Plugin plugin;
 
@@ -39,53 +54,58 @@ public class InternalBukkitListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onSpawnInGame(PlayerSpawnLocationEvent e) {
-        Player player = e.getPlayer();
-        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
-        if (user == null) {
-            //We did not inject this user
-            Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-            if (channel == null) {
-                return;
-            }
-            //Check if it is a fake connection...
-            if (!FakeChannelUtil.isFakeChannel(channel) && (!PacketEvents.getAPI().isTerminated() || PacketEvents.getAPI().getSettings().isKickIfTerminated())) {
-                //Kick them, if they are not a fake player.
-                FoliaScheduler.getEntityScheduler().runDelayed(player, plugin, (o) -> {
-                    player.kickPlayer("PacketEvents 2.0 failed to inject");
-                }, null, 0);
-            }
-            return;
+    // this is the first event which is called after the player object has been created;
+    // note that we can't extract the reference to the player's connection yet
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onLogin(PlayerLoginEvent event) {
+        if (event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
+            this.onPreJoin(event.getPlayer());
         }
-
-        // Set bukkit player object in the injectors
-        injector.updatePlayer(user, player);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onJoin(PlayerJoinEvent e) {
-        Player player = e.getPlayer();
-        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
-        if (user == null) {
-            //We did not inject this user
-            //Check if it is a fake connection...
-            if (channel == null || !FakeChannelUtil.isFakeChannel(channel) && (!PacketEvents.getAPI().isTerminated() || PacketEvents.getAPI().getSettings().isKickIfTerminated())) {
-                //Kick them, if they are not a fake player.
-                FoliaScheduler.getEntityScheduler().runDelayed(player, plugin, (o) -> {
-                    player.kickPlayer("PacketEvents 2.0 failed to inject");
-                }, null, 0);
-            }
-            // Set bukkit player object in the injectors
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onJoin(PlayerJoinEvent event) {
+        this.onPostJoin(event.getPlayer());
+    }
+
+    void onPreJoin(Player player) {
+        // save player in map for packet handler to consume
+        PacketEventsAPI<?> api = PacketEvents.getAPI();
+        Map<UUID, WeakReference<Player>> map = ((PlayerManagerImpl) api.getPlayerManager()).joiningPlayers;
+        map.put(player.getUniqueId(), new WeakReference<>(player));
+    }
+
+    void onPostJoin(Player player) {
+        PacketEventsAPI<?> api = PacketEvents.getAPI();
+        User user = api.getPlayerManager().getUser(player);
+        if (user != null) {
+            // update player reference in encoder/decoder (doesn't matter if this was already done)
+            SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+            injector.setPlayer(user.getChannel(), player);
+            // remove from map; this is probably already removed anyway, but just make sure
+            ((PlayerManagerImpl) api.getPlayerManager()).joiningPlayers.remove(player.getUniqueId());
             return;
         }
 
-        // It's possible that the player reference was set in the prior event.
-        if (!injector.isPlayerSet(channel)) {
-            injector.updatePlayer(user, player);
+        // if this case occurs, we can't extract the connection from a fully joined player
+        // or have internal connection for this player; this should not occur, kick them
+
+        // remove from map just to be sure
+        ((PlayerManagerImpl) api.getPlayerManager()).joiningPlayers.remove(player.getUniqueId());
+
+        Object channel = api.getPlayerManager().getChannel(player);
+        if (channel != null && FakeChannelUtil.isFakeChannel(channel)
+                || (api.isTerminated() && !api.getSettings().isKickIfTerminated())) {
+            // either fake channel or api terminated (and we don't kick)
+            return;
         }
+
+        // delay by a tick
+        FoliaScheduler.getEntityScheduler().runDelayed(player, this.plugin, __ -> {
+            // only kick if the player is actually still connected
+            if (player.isConnected()) {
+                player.kickPlayer(KICK_MESSAGE);
+            }
+        }, null, 0);
     }
 }

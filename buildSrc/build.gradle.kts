@@ -21,4 +21,5 @@ dependencies {
     implementation(libs.fast.util)
     implementation(libs.gson)
     implementation(libs.java.diff.utils)
+    implementation(libs.mod.publish)
 }

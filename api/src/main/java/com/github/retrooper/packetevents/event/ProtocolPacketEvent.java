@@ -32,6 +32,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +45,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     private final Object channel;
     private final ConnectionState connectionState;
     private final User user;
-    private final Object player;
+    private Object player;
     private Object byteBuf;
     private final int packetID;
     private final PacketTypeCommon packetType;
@@ -143,6 +144,12 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     @Override
     public <T> T getPlayer() {
         return (T) player;
+    }
+
+    @Deprecated
+    @ApiStatus.Internal
+    public void setPlayer(Object player) {
+        this.player = player;
     }
 
     /**

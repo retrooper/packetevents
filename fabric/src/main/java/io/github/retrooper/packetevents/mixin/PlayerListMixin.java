@@ -77,7 +77,7 @@ public class PlayerListMixin {
             if (!FakeChannelUtil.isFakeChannel(channelObj) &&
                 (!api.isTerminated() || api.getSettings().isKickIfTerminated())) {
                 // Kick the player if they're not a fake player
-                player.connection.disconnect(Component.literal("PacketEvents 2.0 failed to inject"));
+                player.connection.disconnect(Component.literal("PacketEvents failed to inject into a channel."));
             }
             return;
         }

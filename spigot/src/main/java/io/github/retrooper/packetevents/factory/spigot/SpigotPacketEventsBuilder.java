@@ -24,13 +24,17 @@ import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
+import com.github.retrooper.packetevents.util.PEVersion;
 import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
+import io.github.retrooper.packetevents.bukkit.InternalBukkitLoginListener;
+import io.github.retrooper.packetevents.bukkit.InternalPaperListener;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.manager.InternalBukkitPacketListener;
@@ -39,8 +43,8 @@ import io.github.retrooper.packetevents.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.util.BukkitLogManager;
-import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
@@ -137,6 +141,19 @@ public class SpigotPacketEventsBuilder {
                 //Load if we haven't loaded already
                 load();
                 if (!initialized) {
+                    Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
+                    String bukkitVersion = Bukkit.getBukkitVersion();
+                    // Our PEVersion class can parse this version and detect if it is a newer version than what is currently supported
+                    PEVersion bukkitServerVersion = PEVersion.fromString(bukkitVersion.substring(0, bukkitVersion.indexOf("-")));
+                    PEVersion latestSupportedVersion = PEVersion.fromString(ServerVersion.getLatest().getReleaseName());
+                    if (bukkitServerVersion.isNewerThan(latestSupportedVersion)) {
+                        //We do not support this version yet, so let us warn the user
+                        plugin.getLogger().warning("Your build of PacketEvents does not support the Minecraft version "
+                                + bukkitServerVersion + "! The latest Minecraft version supported by your build of PacketEvents is " + latestSupportedVersion
+                                + ". Please test the development builds, as they may already have support for your Minecraft version (hint: select the build that contains 'spigot'): https://ci.codemc.io/job/retrooper/job/packetevents/ If you're in need of any help, join our Discord server: https://discord.gg/DVHxPPxHZc");
+                        Bukkit.getPluginManager().disablePlugin(plugin);
+                        return;
+                    }
                     if (settings.shouldCheckForUpdates()) {
                         getUpdateChecker().handleUpdateCheck();
                     }
@@ -144,7 +161,19 @@ public class SpigotPacketEventsBuilder {
                     Metrics metrics = new Metrics(plugin, 11327);
                     //Just to have an idea of which versions of packetevents people use
                     metrics.addCustomChart(new SimplePie("packetevents_version", () -> getVersion().toStringWithoutSnapshot()));
-                    Bukkit.getPluginManager().registerEvents(new InternalBukkitListener(plugin), plugin);
+
+                    try {
+                        // register paper listener to support 1.21.7+ configuration api
+                        Class.forName("io.papermc.paper.connection.PlayerConnection");
+                        Bukkit.getPluginManager().registerEvents(new InternalPaperListener(plugin), plugin);
+                    } catch (ClassNotFoundException ignored) {
+                        if (this.serverManager.getVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+                            // register instant-login listener for 1.20.5+
+                            Bukkit.getPluginManager().registerEvents(new InternalBukkitLoginListener(), plugin);
+                        } else {
+                            Bukkit.getPluginManager().registerEvents(new InternalBukkitListener(plugin), plugin);
+                        }
+                    }
 
                     if (lateBind) {
                         //If late-bind is enabled, we still need to inject (after all plugins enabled).

@@ -118,7 +118,7 @@ public class SpongeChannelInjector implements ChannelInjector {
                     try {
                         ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
                     } catch (Exception e) {
-                        PacketEvents.getAPI().getLogManager().severe("Sponge injector failed to inject into an existing channel.");
+                        PacketEvents.getAPI().getLogManager().severe("PacketEvents Sponge injector failed to inject into an existing channel. If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc");
                         e.printStackTrace();
                     }
                 }
