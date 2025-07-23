@@ -18,6 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Objects;
@@ -37,6 +41,18 @@ public class ItemEnchantable {
 
     public static void write(PacketWrapper<?> wrapper, ItemEnchantable enchantable) {
         wrapper.writeVarInt(enchantable.value);
+    }
+
+    public static ItemEnchantable decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+        int value = compound.getNumberTagValueOrThrow("value").intValue();
+        return new ItemEnchantable(value);
+    }
+
+    public static NBT encode(ItemEnchantable enchantable, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("value", new NBTInt(enchantable.value));
+        return compound;
     }
 
     public int getValue() {

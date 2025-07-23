@@ -18,8 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -51,6 +53,24 @@ public class ItemRecipes {
             recipesTag.addTag(new NBTString(recipeKey.toString()));
         }
         wrapper.writeNBTRaw(recipesTag);
+    }
+
+    public static ItemRecipes decode(NBT nbt, ClientVersion clientVersion) {
+        NBTList<?> recipes = (NBTList<?>) nbt;
+        List<ResourceLocation> recipeKeys = new ArrayList<>(recipes.size());
+        for (int i = 0; i < recipes.size(); i++) {
+            NBTString tag = (NBTString) recipes.getTag(i);
+            recipeKeys.add(new ResourceLocation(tag.getValue()));
+        }
+        return new ItemRecipes(recipeKeys);
+    }
+
+    public NBT encode(ClientVersion clientVersion) {
+        NBTList<NBTString> recipesTag = NBTList.createStringList();
+        for (ResourceLocation recipeKey : this.recipes) {
+            recipesTag.addTag(new NBTString(recipeKey.toString()));
+        }
+        return recipesTag;
     }
 
     public void addRecipe(ResourceLocation recipeKey) {

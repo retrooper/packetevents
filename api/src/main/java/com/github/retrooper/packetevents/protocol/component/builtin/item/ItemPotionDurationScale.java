@@ -18,6 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Objects;
@@ -37,6 +41,15 @@ public class ItemPotionDurationScale {
 
     public static void write(PacketWrapper<?> wrapper, ItemPotionDurationScale scale) {
         wrapper.writeFloat(scale.scale);
+    }
+
+    public static ItemPotionDurationScale decode(NBT nbt, ClientVersion version) {
+        NBTNumber nbtNumber = (NBTNumber) nbt;
+        return new ItemPotionDurationScale(nbtNumber.getAsFloat());
+    }
+
+    public static NBT encode(ItemPotionDurationScale scale, ClientVersion version) {
+        return new NBTFloat(scale.scale);
     }
 
     public float getScale() {

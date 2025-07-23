@@ -18,10 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTLong;
-import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.*;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -52,6 +50,23 @@ public class ItemContainerLoot {
             compound.setTag("seed", new NBTLong(loot.seed));
         }
         wrapper.writeNBT(compound);
+    }
+
+    public static ItemContainerLoot decode(NBT nbt, ClientVersion clientVersion) {
+        NBTCompound compound = (NBTCompound) nbt;
+        ResourceLocation lootTable = new ResourceLocation(compound.getStringTagValueOrThrow("loot_table"));
+        NBTNumber seedTag = compound.getNumberTagOrNull("seed");
+        long seed = seedTag == null ? 0L : seedTag.getAsLong();
+        return new ItemContainerLoot(lootTable, seed);
+    }
+
+    public static NBT encode(ItemContainerLoot loot, ClientVersion clientVersion) {
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("loot_table", new NBTString(loot.lootTable.toString()));
+        if (loot.seed != 0L) {
+            compound.setTag("seed", new NBTLong(loot.seed));
+        }
+        return compound;
     }
 
     public ResourceLocation getLootTable() {

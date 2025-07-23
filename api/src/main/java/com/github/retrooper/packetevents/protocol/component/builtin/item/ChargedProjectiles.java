@@ -19,8 +19,14 @@
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,6 +45,24 @@ public class ChargedProjectiles {
 
     public static void write(PacketWrapper<?> wrapper, ChargedProjectiles projectiles) {
         wrapper.writeList(projectiles.items, PacketWrapper::writePresentItemStack);
+    }
+
+    public static ChargedProjectiles decode(NBT nbt, ClientVersion version) {
+        NBTList<NBT> list = (NBTList<NBT>) nbt;
+        List<ItemStack> items = new ArrayList<>();
+        for (NBT itemNBT : list.getTags()) {
+            ItemStack itemStack = ItemStack.decode(itemNBT, version);
+            items.add(itemStack);
+        }
+        return new ChargedProjectiles(items);
+    }
+
+    public static NBT encode(ChargedProjectiles chargedProjectiles, ClientVersion version) {
+        NBTList<NBTCompound> list = new NBTList<>(NBTType.COMPOUND);
+        for (ItemStack itemStack : chargedProjectiles.items) {
+            list.addTagUnsafe(ItemStack.encodeForParticle(itemStack, version));
+        }
+        return list;
     }
 
     public void addItem(ItemStack itemStack) {

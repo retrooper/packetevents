@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Objects;
@@ -38,6 +40,15 @@ public class ItemUseRemainder {
 
     public static void write(PacketWrapper<?> wrapper, ItemUseRemainder remainder) {
         wrapper.writeItemStack(remainder.target);
+    }
+
+    public static ItemUseRemainder decode(NBT nbt, ClientVersion version) {
+        ItemStack target = ItemStack.decode(nbt, version);
+        return new ItemUseRemainder(target);
+    }
+
+    public static NBT encode(ItemUseRemainder remainder, ClientVersion version) {
+        return ItemStack.encodeForParticle(remainder.target, version);
     }
 
     public ItemStack getTarget() {

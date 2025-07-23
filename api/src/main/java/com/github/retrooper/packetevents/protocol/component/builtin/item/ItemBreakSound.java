@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -38,6 +40,15 @@ public class ItemBreakSound {
 
     public static void write(PacketWrapper<?> wrapper, ItemBreakSound sound) {
         Sound.write(wrapper, sound.sound);
+    }
+
+    public static ItemBreakSound decode(NBT nbt, ClientVersion version) {
+        Sound sound = Sound.decode(nbt, version);
+        return new ItemBreakSound(sound);
+    }
+
+    public static NBT encode(ItemBreakSound sound, ClientVersion version) {
+        return Sound.encode(sound.sound, version);
     }
 
     public Sound getSound() {

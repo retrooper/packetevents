@@ -18,6 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -37,6 +40,18 @@ public class ItemDamageResistant {
 
     public static void write(PacketWrapper<?> wrapper, ItemDamageResistant resistant) {
         wrapper.writeIdentifier(resistant.typesTagKey);
+    }
+
+    public static ItemDamageResistant decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+        ResourceLocation typesTagKey = ResourceLocation.decode(compound.getTagOrThrow("types"), version);
+        return new ItemDamageResistant(typesTagKey);
+    }
+
+    public static NBT encode(ItemDamageResistant resistant, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("types", ResourceLocation.encode(resistant.typesTagKey, version));
+        return compound;
     }
 
     public ResourceLocation getTypesTagKey() {

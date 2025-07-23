@@ -18,10 +18,15 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateValue;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -43,6 +48,27 @@ public class ItemBlockStateProperties {
         wrapper.writeMap(props.properties,
                 PacketWrapper::writeString,
                 PacketWrapper::writeString);
+    }
+
+    public static ItemBlockStateProperties decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+        Map<String, String> properties = new HashMap<>();
+        compound.getTags().forEach((key, value) -> {
+            if (value instanceof NBTString) {
+                properties.put(key, ((NBTString) value).getValue());
+            }
+        });
+        return new ItemBlockStateProperties(properties);
+    }
+
+    public static NBT encode(ItemBlockStateProperties properties, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        properties.getProperties().forEach((key, value) -> {
+            if (value != null) {
+                compound.setTag(key, new NBTString(value));
+            }
+        });
+        return compound;
     }
 
     public @Nullable Object getProperty(StateValue stateValue) {

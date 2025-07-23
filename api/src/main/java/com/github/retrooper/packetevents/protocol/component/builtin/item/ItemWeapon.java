@@ -18,6 +18,11 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Objects;
@@ -41,6 +46,20 @@ public class ItemWeapon {
     public static void write(PacketWrapper<?> wrapper, ItemWeapon weapon) {
         wrapper.writeVarInt(weapon.itemDamagePerAttack);
         wrapper.writeFloat(weapon.disableBlockingForSeconds);
+    }
+
+    public static ItemWeapon decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+        int itemDamagePerAttack = compound.getNumberTagValueOrDefault("item_damage_per_attack", 1).intValue();
+        float disableBlockingForSeconds = compound.getNumberTagValueOrDefault("disable_blocking_for_seconds", 0).floatValue();
+        return new ItemWeapon(itemDamagePerAttack, disableBlockingForSeconds);
+    }
+
+    public static NBT encode(ItemWeapon weapon, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("item_damage_per_attack", new NBTInt(weapon.itemDamagePerAttack));
+        compound.setTag("disable_blocking_for_seconds", new NBTFloat(weapon.disableBlockingForSeconds));
+        return compound;
     }
 
     public int getItemDamagePerAttack() {

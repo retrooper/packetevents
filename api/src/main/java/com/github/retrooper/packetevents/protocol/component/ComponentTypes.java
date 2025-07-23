@@ -121,7 +121,6 @@ import java.util.function.Function;
  *
  * @see EnchantEffectComponentTypes
  */
-// TODO: Add NBT encoders/decoders for all components
 public final class ComponentTypes {
 
     private static final VersionedRegistry<ComponentType<?>> REGISTRY = new VersionedRegistry<>("data_component_type");
@@ -226,10 +225,8 @@ public final class ComponentTypes {
     public static final ComponentType<ItemRarity> RARITY = define("rarity", ItemRarity.class);
     public static final ComponentType<ItemEnchantments> ENCHANTMENTS = define("enchantments",
             ItemEnchantments::read, ItemEnchantments::write, ItemEnchantments::decode, ItemEnchantments::encode);
-    // TODO
     public static final ComponentType<ItemAdventurePredicate> CAN_PLACE_ON = define("can_place_on",
             ItemAdventurePredicate::read, ItemAdventurePredicate::write);
-    // TODO
     public static final ComponentType<ItemAdventurePredicate> CAN_BREAK = define("can_break",
             ItemAdventurePredicate::read, ItemAdventurePredicate::write);
     public static final ComponentType<ItemAttributeModifiers> ATTRIBUTE_MODIFIERS = define("attribute_modifiers",
@@ -262,7 +259,6 @@ public final class ComponentTypes {
             PacketWrapper::readBoolean, PacketWrapper::writeBoolean, NBTType.BYTE, NBTByte::getAsBool, NBTByte::new);
     public static final ComponentType<Dummy> INTANGIBLE_PROJECTILE = define("intangible_projectile",
             Dummy::dummyReadNbt, Dummy::dummyWriteNbt, Dummy::dummyDecode, Dummy::dummyEncode);
-    // TODO
     public static final ComponentType<FoodProperties> FOOD = define("food",
             FoodProperties::read, FoodProperties::write);
     /**
@@ -271,7 +267,6 @@ public final class ComponentTypes {
     @ApiStatus.Obsolete
     public static final ComponentType<Dummy> FIRE_RESISTANT = define("fire_resistant",
             Dummy::dummyRead, Dummy::dummyWrite);
-    // TODO
     public static final ComponentType<ItemTool> TOOL = define("tool",
             ItemTool::read, ItemTool::write);
     public static final ComponentType<ItemEnchantments> STORED_ENCHANTMENTS = define("stored_enchantments",
@@ -282,32 +277,24 @@ public final class ComponentTypes {
             PacketWrapper::readInt, PacketWrapper::writeInt, NBTType.INT, NBTInt::getAsInt, NBTInt::new);
     public static final ComponentType<Integer> MAP_ID = define("map_id",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt, NBTType.INT, NBTInt::getAsInt, NBTInt::new);
-    // TODO
     public static final ComponentType<ItemMapDecorations> MAP_DECORATIONS = define("map_decorations",
             ItemMapDecorations::read, ItemMapDecorations::write);
     public static final ComponentType<ItemMapPostProcessingState> MAP_POST_PROCESSING = define("map_post_processing",
             ItemMapPostProcessingState.class);
-    // TODO
     public static final ComponentType<ChargedProjectiles> CHARGED_PROJECTILES = define("charged_projectiles",
-            ChargedProjectiles::read, ChargedProjectiles::write);
-    // TODO
+            ChargedProjectiles::read, ChargedProjectiles::write, ChargedProjectiles::decode, ChargedProjectiles::encode);
     public static final ComponentType<BundleContents> BUNDLE_CONTENTS = define("bundle_contents",
-            BundleContents::read, BundleContents::write);
-    // TODO
+            BundleContents::read, BundleContents::write, BundleContents::decode, BundleContents::encode);
     public static final ComponentType<ItemPotionContents> POTION_CONTENTS = define("potion_contents",
             ItemPotionContents::read, ItemPotionContents::write);
-    // TODO
     public static final ComponentType<SuspiciousStewEffects> SUSPICIOUS_STEW_EFFECTS = define("suspicious_stew_effects",
             SuspiciousStewEffects::read, SuspiciousStewEffects::write);
-    // TODO
     public static final ComponentType<WritableBookContent> WRITABLE_BOOK_CONTENT = define("writable_book_content",
             WritableBookContent::read, WritableBookContent::write);
-    // TODO
     public static final ComponentType<WrittenBookContent> WRITTEN_BOOK_CONTENT = define("written_book_content",
             WrittenBookContent::read, WrittenBookContent::write);
     public static final ComponentType<ArmorTrim> TRIM = define("trim",
             ArmorTrim::read, ArmorTrim::write, ArmorTrim::decode, ArmorTrim::encode);
-    // TODO
     public static final ComponentType<DebugStickState> DEBUG_STICK_STATE = define("debug_stick_state",
             DebugStickState::read, DebugStickState::write);
     public static final ComponentType<NBTCompound> ENTITY_DATA = define("entity_data",
@@ -316,7 +303,6 @@ public final class ComponentTypes {
             PacketWrapper::readNBT, PacketWrapper::writeNBT, NBTType.COMPOUND, Function.identity(), Function.identity());
     public static final ComponentType<NBTCompound> BLOCK_ENTITY_DATA = define("block_entity_data",
             PacketWrapper::readNBT, PacketWrapper::writeNBT, NBTType.COMPOUND, Function.identity(), Function.identity());
-    // TODO
     public static final ComponentType<ItemInstrument> ITEM_INSTRUMENT = define("instrument",
             ItemInstrument::read, ItemInstrument::write);
     @Deprecated
@@ -325,16 +311,12 @@ public final class ComponentTypes {
             inst -> new ItemInstrument(new MaybeMappedEntity<>(inst)));
     public static final ComponentType<Integer> OMINOUS_BOTTLE_AMPLIFIER = define("ominous_bottle_amplifier",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt, NBTType.INT, NBTInt::getAsInt, NBTInt::new);
-    // TODO
     public static final ComponentType<ItemRecipes> RECIPES = define("recipes",
-            ItemRecipes::read, ItemRecipes::write);
-    // TODO
+            ItemRecipes::read, ItemRecipes::write, ItemRecipes::decode, ItemRecipes::encode);
     public static final ComponentType<LodestoneTracker> LODESTONE_TRACKER = define("lodestone_tracker",
             LodestoneTracker::read, LodestoneTracker::write);
-    // TODO
     public static final ComponentType<FireworkExplosion> FIREWORK_EXPLOSION = define("firework_explosion",
             FireworkExplosion::read, FireworkExplosion::write);
-    // TODO
     public static final ComponentType<ItemFireworks> FIREWORKS = define("fireworks",
             ItemFireworks::read, ItemFireworks::write);
     public static final ComponentType<ItemProfile> PROFILE = define("profile",
@@ -344,57 +326,42 @@ public final class ComponentTypes {
     public static final ComponentType<BannerLayers> BANNER_PATTERNS = define("banner_patterns",
             BannerLayers::read, BannerLayers::write, BannerLayers::decode, BannerLayers::encode);
     public static final ComponentType<DyeColor> BASE_COLOR = define("base_color", DyeColor.class);
-    // TODO
     public static final ComponentType<PotDecorations> POT_DECORATIONS = define("pot_decorations",
             PotDecorations::read, PotDecorations::write);
-    // TODO
     public static final ComponentType<ItemContainerContents> CONTAINER = define("container",
             ItemContainerContents::read, ItemContainerContents::write);
-    // TODO
     public static final ComponentType<ItemBlockStateProperties> BLOCK_STATE = define("block_state",
-            ItemBlockStateProperties::read, ItemBlockStateProperties::write);
-    // TODO
+            ItemBlockStateProperties::read, ItemBlockStateProperties::write, ItemBlockStateProperties::decode, ItemBlockStateProperties::encode);
     public static final ComponentType<ItemBees> BEES = define("bees",
             ItemBees::read, ItemBees::write);
-    // TODO
     public static final ComponentType<ItemLock> LOCK = define("lock",
             ItemLock::read, ItemLock::write);
-    // TODO
     public static final ComponentType<ItemContainerLoot> CONTAINER_LOOT = define("container_loot",
-            ItemContainerLoot::read, ItemContainerLoot::write);
+            ItemContainerLoot::read, ItemContainerLoot::write, ItemContainerLoot::decode, ItemContainerLoot::encode);
 
     // added in 1.21
-    // TODO
     public static final ComponentType<ItemJukeboxPlayable> JUKEBOX_PLAYABLE = define("jukebox_playable",
             ItemJukeboxPlayable::read, ItemJukeboxPlayable::write);
 
     // added in 1.21.2
-    // TODO
     public static final ComponentType<ItemConsumable> CONSUMABLE = define("consumable",
             ItemConsumable::read, ItemConsumable::write);
-    // TODO
     public static final ComponentType<ItemUseRemainder> USE_REMAINDER = define("use_remainder",
-            ItemUseRemainder::read, ItemUseRemainder::write);
-    // TODO
+            ItemUseRemainder::read, ItemUseRemainder::write, ItemUseRemainder::decode, ItemUseRemainder::encode);
     public static final ComponentType<ItemUseCooldown> USE_COOLDOWN = define("use_cooldown",
-            ItemUseCooldown::read, ItemUseCooldown::write);
-    // TODO
+            ItemUseCooldown::read, ItemUseCooldown::write, ItemUseCooldown::decode, ItemUseCooldown::encode);
     public static final ComponentType<ItemEnchantable> ENCHANTABLE = define("enchantable",
-            ItemEnchantable::read, ItemEnchantable::write);
-    // TODO
+            ItemEnchantable::read, ItemEnchantable::write, ItemEnchantable::decode, ItemEnchantable::encode);
     public static final ComponentType<ItemRepairable> REPAIRABLE = define("repairable",
-            ItemRepairable::read, ItemRepairable::write);
+            ItemRepairable::read, ItemRepairable::write, ItemRepairable::decode, ItemRepairable::encode);
     public static final ComponentType<ItemModel> ITEM_MODEL = define("item_model",
             ItemModel::read, ItemModel::write, ItemModel::decode, ItemModel::encode);
-    // TODO
     public static final ComponentType<ItemDamageResistant> DAMAGE_RESISTANT = define("damage_resistant",
-            ItemDamageResistant::read, ItemDamageResistant::write);
-    // TODO
+            ItemDamageResistant::read, ItemDamageResistant::write, ItemDamageResistant::decode, ItemDamageResistant::encode);
     public static final ComponentType<ItemEquippable> EQUIPPABLE = define("equippable",
             ItemEquippable::read, ItemEquippable::write);
     public static final ComponentType<Dummy> GLIDER = define("glider",
             Dummy::dummyRead, Dummy::dummyWrite, Dummy::dummyDecode, Dummy::dummyEncode);
-    // TODO
     public static final ComponentType<ItemDeathProtection> DEATH_PROTECTION = define("death_protection",
             ItemDeathProtection::read, ItemDeathProtection::write);
     public static final ComponentType<ItemTooltipStyle> TOOLTIP_STYLE = define("tooltip_style",
@@ -408,21 +375,18 @@ public final class ComponentTypes {
     /**
      * Added with 1.21.5
      */
-    // TODO
     public static final ComponentType<ItemWeapon> WEAPON = define("weapon",
-            ItemWeapon::read, ItemWeapon::write);
+            ItemWeapon::read, ItemWeapon::write, ItemWeapon::decode, ItemWeapon::encode);
     /**
      * Added with 1.21.5
      */
-    // TODO
     public static final ComponentType<ItemBlocksAttacks> BLOCKS_ATTACKS = define("blocks_attacks",
             ItemBlocksAttacks::read, ItemBlocksAttacks::write);
     /**
      * Added with 1.21.5
      */
-    // TODO
     public static final ComponentType<ItemPotionDurationScale> POTION_DURATION_SCALE = define("potion_duration_scale",
-            ItemPotionDurationScale::read, ItemPotionDurationScale::write);
+            ItemPotionDurationScale::read, ItemPotionDurationScale::write, ItemPotionDurationScale::decode, ItemPotionDurationScale::encode);
     /**
      * Added with 1.21.5
      */
@@ -436,9 +400,8 @@ public final class ComponentTypes {
     /**
      * Added with 1.21.5
      */
-    // TODO
     public static final ComponentType<ItemBreakSound> BREAK_SOUND = define("break_sound",
-            ItemBreakSound::read, ItemBreakSound::write);
+            ItemBreakSound::read, ItemBreakSound::write, ItemBreakSound::decode, ItemBreakSound::encode);
     /**
      * Added with 1.21.5
      */

@@ -20,6 +20,10 @@ package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetCooldown;
@@ -51,6 +55,21 @@ public class ItemUseCooldown {
     public static void write(PacketWrapper<?> wrapper, ItemUseCooldown cooldown) {
         wrapper.writeFloat(cooldown.seconds);
         wrapper.writeOptional(cooldown.cooldownGroup.orElse(null), PacketWrapper::writeIdentifier);
+    }
+
+    public static ItemUseCooldown decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+        float seconds = compound.getNumberTagValueOrThrow("seconds").floatValue();
+        Optional<ResourceLocation> cooldownGroup = Optional.ofNullable(compound.getStringTagOrNull("cooldown_group"))
+                .map(n -> ResourceLocation.decode(n, version));
+        return new ItemUseCooldown(seconds, cooldownGroup);
+    }
+
+    public static NBT encode(ItemUseCooldown cooldown, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("seconds", new NBTFloat(cooldown.seconds));
+        cooldown.cooldownGroup.ifPresent(resourceLocation -> compound.setTag("cooldown_group", ResourceLocation.encode(resourceLocation, version)));
+        return compound;
     }
 
     public WrapperPlayServerSetCooldown buildWrapper(ItemStack fallbackStack) {

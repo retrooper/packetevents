@@ -21,6 +21,9 @@ package com.github.retrooper.packetevents.protocol.component.builtin.item;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Objects;
@@ -40,6 +43,18 @@ public class ItemRepairable {
 
     public static void write(PacketWrapper<?> wrapper, ItemRepairable repairable) {
         MappedEntitySet.write(wrapper, repairable.items);
+    }
+
+    public static ItemRepairable decode(NBT nbt, ClientVersion version) {
+        NBTCompound compound = (NBTCompound) nbt;
+        MappedEntitySet<ItemType> items = MappedEntitySet.decode(compound.getTagOrThrow("items"), version, ItemTypes.getRegistry());
+        return new ItemRepairable(items);
+    }
+
+    public static NBT encode(ItemRepairable repairable, ClientVersion version) {
+        NBTCompound compound = new NBTCompound();
+        compound.setTag("items", MappedEntitySet.encode(repairable.items, version));
+        return compound;
     }
 
     public MappedEntitySet<ItemType> getItems() {
