@@ -229,7 +229,8 @@ public final class AdventureSerializer implements NbtEncoder<Component>, NbtDeco
                         builder
                                 .values(JSONOptions.byDataVersion().at(0))
                                 .value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.BOTH)
-                                .value(JSONOptions.SHOW_ITEM_HOVER_DATA_MODE, JSONOptions.ShowItemHoverDataMode.EMIT_EITHER);
+                                .value(JSONOptions.SHOW_ITEM_HOVER_DATA_MODE, JSONOptions.ShowItemHoverDataMode.EMIT_EITHER)
+                                .value(JSONOptions.EMIT_COMPACT_TEXT_COMPONENT, false);
                         if (this.version.isNewerThanOrEquals(ClientVersion.V_1_16)
                                 && !PacketEvents.getAPI().getSettings().shouldDownsampleColors()) {
                             builder.value(JSONOptions.EMIT_RGB, true);

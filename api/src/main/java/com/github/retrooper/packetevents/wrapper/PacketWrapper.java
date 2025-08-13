@@ -103,7 +103,6 @@ import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.ApiStatus.Experimental;
@@ -626,10 +625,6 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public void writeComponentAsJSON(Component component) {
-        // Plain component fix for 1.9-1.11.2 clients
-        if (clientVersion.isOlderThan(ClientVersion.V_1_12) && clientVersion.isNewerThanOrEquals(ClientVersion.V_1_9)) {
-            component = component.colorIfAbsent(NamedTextColor.WHITE);
-        }
         String jsonString = this.getSerializers().asJson(component);
         this.writeString(jsonString, this.getMaxMessageLength());
     }
