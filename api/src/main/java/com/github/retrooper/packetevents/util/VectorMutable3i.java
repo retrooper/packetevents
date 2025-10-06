@@ -21,8 +21,6 @@ package com.github.retrooper.packetevents.util;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,37 +31,36 @@ import org.jetbrains.annotations.NotNull;
  * PacketEvents usually uses this for block positions as they don't need any decimals.
  *
  * @author retrooper
- * @since 1.7
+ * @since 2.7.1
  */
-public class Vector3i implements VectorInterface3i {
+public class VectorMutable3i implements VectorInterface3i {
     /**
      * X (coordinate/angle/whatever you wish)
      */
-    public final int x;
+    public int x;
     /**
      * Y (coordinate/angle/whatever you wish)
      */
-    public final int y;
+    public int y;
     /**
      * Z (coordinate/angle/whatever you wish)
      */
-    public final int z;
+    public int z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).
      */
-    public Vector3i() {
+    public VectorMutable3i() {
         this.x = 0;
         this.y = 0;
         this.z = 0;
     }
 
-    @Deprecated
-    public Vector3i(long val) {
+    public VectorMutable3i(long val) {
         this(val, PacketEvents.getAPI().getServerManager().getVersion());
     }
 
-    public Vector3i(long val, ServerVersion serverVersion) {
+    public VectorMutable3i(long val, ServerVersion serverVersion) {
         int x = (int) (val >> 38);
         int y;
         int z;
@@ -91,7 +88,7 @@ public class Vector3i implements VectorInterface3i {
      * @param y Y
      * @param z Z
      */
-    public Vector3i(int x, int y, int z) {
+    public VectorMutable3i(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -105,7 +102,7 @@ public class Vector3i implements VectorInterface3i {
      *
      * @param array Array.
      */
-    public Vector3i(int[] array) {
+    public VectorMutable3i(int[] array) {
         if (array.length > 0) {
             x = array[0];
         } else {
@@ -128,19 +125,6 @@ public class Vector3i implements VectorInterface3i {
         }
     }
 
-    public static Vector3i read(PacketWrapper<?> wrapper) {
-        int x = wrapper.readVarInt();
-        int y = wrapper.readVarInt();
-        int z = wrapper.readVarInt();
-        return new Vector3i(x, y, z);
-    }
-
-    public static void write(PacketWrapper<?> wrapper, Vector3i vector) {
-        wrapper.writeVarInt(vector.x);
-        wrapper.writeVarInt(vector.y);
-        wrapper.writeVarInt(vector.z);
-    }
-
     public long getSerializedPosition(ServerVersion serverVersion) {
         // 1.17 adds support for negative values
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
@@ -158,7 +142,6 @@ public class Vector3i implements VectorInterface3i {
         return ((long) (getX() & 0x3FFFFFF) << 38) | ((long) (getY() & 0xFFF) << 26) | (getZ() & 0x3FFFFFF);
     }
 
-    @Deprecated
     public long getSerializedPosition() {
         return getSerializedPosition(PacketEvents.getAPI().getServerManager().getVersion());
     }
@@ -175,7 +158,7 @@ public class Vector3i implements VectorInterface3i {
         return z;
     }
 
-    public boolean equals(Vector3i other) {
+    public boolean equals(VectorMutable3i other) {
         return this.x == other.x && this.y == other.y && this.z == other.z;
     }
 
@@ -211,63 +194,92 @@ public class Vector3i implements VectorInterface3i {
         return new Vector3d(x, y, z);
     }
 
-    public Vector3i add(int x, int y, int z) {
-        return new Vector3i(this.x + x, this.y + y, this.z + z);
+    public VectorMutable3i add(int x, int y, int z) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
+        return this;
     }
 
-    public Vector3i add(Vector3i other) {
+    public VectorMutable3i add(VectorMutable3i other) {
         return add(other.x, other.y, other.z);
     }
 
-    public Vector3i offset(BlockFace face) {
+    public VectorMutable3i offset(BlockFace face) {
         return add(face.getModX(), face.getModY(), face.getModZ());
     }
 
-    public Vector3i subtract(int x, int y, int z) {
-        return new Vector3i(this.x - x, this.y - y, this.z - z);
+    public VectorMutable3i subtract(int x, int y, int z) {
+        this.x -= x;
+        this.y -= y;
+        this.z -= z;
+        return this;
     }
 
-    public Vector3i subtract(Vector3i other) {
+    public VectorMutable3i subtract(VectorMutable3i other) {
         return subtract(other.x, other.y, other.z);
     }
 
-    public Vector3i multiply(int x, int y, int z) {
-        return new Vector3i(this.x * x, this.y * y, this.z * z);
+    public VectorMutable3i multiply(int x, int y, int z) {
+        this.x *= x;
+        this.y *= y;
+        this.z *= z;
+        return this;
     }
 
-    public Vector3i multiply(Vector3i other) {
+    public VectorMutable3i multiply(VectorMutable3i other) {
         return multiply(other.x, other.y, other.z);
     }
 
-    public Vector3i multiply(int value) {
+    public VectorMutable3i multiply(int value) {
         return multiply(value, value, value);
     }
 
-    public Vector3i crossProduct(Vector3i other) {
-        int newX = this.y * other.z - other.y * this.z;
-        int newY = this.z * other.x - other.z * this.x;
-        int newZ = this.x * other.y - other.x * this.y;
-        return new Vector3i(newX, newY, newZ);
+    public VectorMutable3i crossProduct(VectorMutable3i other) {
+        int oldX = this.x;
+        int oldY = this.y;
+        this.x = this.y * other.z - other.y * this.z;
+        this.y = this.z * other.x - other.z * oldX;
+        this.z = oldX * other.y - this.x * oldY;
+        return this;
     }
 
-    public int dot(Vector3i other) {
+    public int dot(VectorMutable3i other) {
         return this.x * other.x + this.y * other.y + this.z * other.z;
     }
 
-    public Vector3i with(Integer x, Integer y, Integer z) {
-        return new Vector3i(x == null ? this.x : x, y == null ? this.y : y, z == null ? this.z : z);
+    public VectorMutable3i with(Integer x, Integer y, Integer z) {
+        return new VectorMutable3i(x == null ? this.x : x, y == null ? this.y : y, z == null ? this.z : z);
     }
 
-    public Vector3i withX(int x) {
-        return new Vector3i(x, this.y, this.z);
+    public VectorMutable3i withX(int x) {
+        return new VectorMutable3i(x, this.y, this.z);
     }
 
-    public Vector3i withY(int y) {
-        return new Vector3i(this.x, y, this.z);
+    public VectorMutable3i withY(int y) {
+        return new VectorMutable3i(this.x, y, this.z);
     }
 
-    public Vector3i withZ(int z) {
-        return new Vector3i(this.x, this.y, z);
+    public VectorMutable3i withZ(int z) {
+        return new VectorMutable3i(this.x, this.y, z);
+    }
+
+    @NotNull
+    public VectorMutable3i setX(int x) {
+        this.x = x;
+        return this;
+    }
+
+    @NotNull
+    public VectorMutable3i setY(int y) {
+        this.y = y;
+        return this;
+    }
+
+    @NotNull
+    public VectorMutable3i setZ(int z) {
+        this.z = z;
+        return this;
     }
 
     @Override
@@ -275,14 +287,14 @@ public class Vector3i implements VectorInterface3i {
         return "X: " + x + ", Y: " + y + ", Z: " + z;
     }
 
-    public static Vector3i zero() {
-        return new Vector3i();
+    public static VectorMutable3i zero() {
+        return new VectorMutable3i();
     }
 
     @NotNull
-    public Vector3i clone() {
+    public VectorMutable3i clone() {
         try {
-            return (Vector3i) super.clone();
+            return (VectorMutable3i) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new Error(e);
         }
