@@ -25,8 +25,7 @@ public enum DiggingAction {
     DROP_ITEM_STACK,
     DROP_ITEM,
     RELEASE_USE_ITEM,
-    SWAP_ITEM_WITH_OFFHAND,
-    UNKNOWN;
+    SWAP_ITEM_WITH_OFFHAND;
 
     private static final DiggingAction[] VALUES = values();
 
@@ -35,10 +34,6 @@ public enum DiggingAction {
     }
 
     public static DiggingAction getById(int id) {
-        if (id < 0 || id >= (VALUES.length - 1)) {
-            return UNKNOWN;
-        }
-
         return VALUES[id];
     }
 }
