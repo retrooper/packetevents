@@ -21,6 +21,8 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.DiggingAction;
+import com.github.retrooper.packetevents.protocol.player.InteractAction;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -57,14 +59,14 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
         if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             this.entityID = readInt();
             byte typeIndex = readByte();
-            this.interactAction = InteractAction.VALUES[typeIndex];
+            this.interactAction = InteractAction.getById(typeIndex);
             this.target = Optional.empty();
             this.interactionHand = InteractionHand.MAIN_HAND;
             this.sneaking = Optional.empty();
         } else {
             this.entityID = readVarInt();
             int typeIndex = readVarInt();
-            this.interactAction = InteractAction.VALUES[typeIndex];
+            this.interactAction = InteractAction.getById(typeIndex);
             if (interactAction == InteractAction.INTERACT_AT) {
                 float x = readFloat();
                 float y = readFloat();
@@ -164,7 +166,15 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
     }
 
     public enum InteractAction {
-        INTERACT, ATTACK, INTERACT_AT;
+        INTERACT, ATTACK, INTERACT_AT, UNKNOWN;
+
         public static final InteractAction[] VALUES = values();
+
+        public static InteractAction getById(int id) {
+            if (id < 0 || id >= (VALUES.length - 1)) {
+                return UNKNOWN;
+            }
+            return VALUES[id];
+        }
     }
 }

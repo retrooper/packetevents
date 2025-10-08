@@ -78,11 +78,14 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
     }
 
     public enum Action {
-        OPENED_TAB, CLOSED_SCREEN;
+        OPENED_TAB, CLOSED_SCREEN, UNKNOWN;
 
         private static final Action[] VALUES = values();
 
         public static Action getById(int id) {
+            if (id < 0 || id >= (VALUES.length - 1)) {
+                return UNKNOWN;
+            }
             return VALUES[id];
         }
     }

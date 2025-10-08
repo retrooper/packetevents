@@ -18,24 +18,19 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
-/**
- * The {@code InteractionHand} enum represents what hand was used in an interaction.
- *
- * @author retrooper
- * @since 2.0
- */
-public enum InteractionHand {
-    MAIN_HAND,
-    OFF_HAND,
+public enum InteractAction {
+    INTERACT,
+    ATTACK,
+    INTERACT_AT,
     UNKNOWN;
 
-    private static final InteractionHand[] VALUES = values();
+    public static final InteractAction[] VALUES = values();
 
     public int getId() {
         return ordinal();
     }
 
-    public static InteractionHand getById(int id) {
+    public static InteractAction getById(int id) {
         if (id < 0 || id >= (VALUES.length - 1)) {
             return UNKNOWN;
         }

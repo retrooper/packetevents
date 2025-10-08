@@ -70,11 +70,15 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
         REQUEST_STATS,
 
         // This only exists on 1.7.10 -> 1.15.2
-        OPEN_INVENTORY_ACHIEVEMENT;
+        OPEN_INVENTORY_ACHIEVEMENT,
+        UNKNOWN;
 
         private static final Action[] VALUES = values();
 
         public static Action getById(int index) {
+            if (index < 0 || index >= (VALUES.length - 1)) {
+                return UNKNOWN;
+            }
             return VALUES[index];
         }
     }
