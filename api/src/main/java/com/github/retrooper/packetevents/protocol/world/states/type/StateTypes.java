@@ -1412,35 +1412,35 @@ public final class StateTypes {
     /**
      * @versions 1.21.9+
      */
-    public static StateType COPPER_GOLEM_STATUE = StateTypes.builder().name("COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.METAL).build();
+    public static StateType COPPER_GOLEM_STATUE = StateTypes.builder().name("COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.METAL).build();
     /**
      * @versions 1.21.9+
      */
-    public static StateType EXPOSED_COPPER_GOLEM_STATUE = StateTypes.builder().name("EXPOSED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.METAL).build();
+    public static StateType EXPOSED_COPPER_GOLEM_STATUE = StateTypes.builder().name("EXPOSED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.METAL).build();
     /**
      * @versions 1.21.9+
      */
-    public static StateType WEATHERED_COPPER_GOLEM_STATUE = StateTypes.builder().name("WEATHERED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.METAL).build();
+    public static StateType WEATHERED_COPPER_GOLEM_STATUE = StateTypes.builder().name("WEATHERED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.METAL).build();
     /**
      * @versions 1.21.9+
      */
-    public static StateType OXIDIZED_COPPER_GOLEM_STATUE = StateTypes.builder().name("OXIDIZED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.METAL).build();
+    public static StateType OXIDIZED_COPPER_GOLEM_STATUE = StateTypes.builder().name("OXIDIZED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.METAL).build();
     /**
      * @versions 1.21.9+
      */
-    public static StateType WAXED_COPPER_GOLEM_STATUE = StateTypes.builder().name("WAXED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_COPPER_GOLEM_STATUE = StateTypes.builder().name("WAXED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.METAL).build();
     /**
      * @versions 1.21.9+
      */
-    public static StateType WAXED_EXPOSED_COPPER_GOLEM_STATUE = StateTypes.builder().name("WAXED_EXPOSED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_EXPOSED_COPPER_GOLEM_STATUE = StateTypes.builder().name("WAXED_EXPOSED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.METAL).build();
     /**
      * @versions 1.21.9+
      */
-    public static StateType WAXED_WEATHERED_COPPER_GOLEM_STATUE = StateTypes.builder().name("WAXED_WEATHERED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_WEATHERED_COPPER_GOLEM_STATUE = StateTypes.builder().name("WAXED_WEATHERED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.METAL).build();
     /**
      * @versions 1.21.9+
      */
-    public static StateType WAXED_OXIDIZED_COPPER_GOLEM_STATUE = StateTypes.builder().name("WAXED_OXIDIZED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.METAL).build();
+    public static StateType WAXED_OXIDIZED_COPPER_GOLEM_STATUE = StateTypes.builder().name("WAXED_OXIDIZED_COPPER_GOLEM_STATUE").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.METAL).build();
     /**
      * @versions 1.21.9+
      */
