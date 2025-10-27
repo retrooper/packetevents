@@ -1432,7 +1432,7 @@ public final class PacketType {
             /**
              * Added with 1.19.4
              */
-            CHUNK_BIOMES(null),
+            CHUNK_BIOMES(WrapperPlayServerChunkBiomes.class),
 
             /**
              * Added with 1.20.2
