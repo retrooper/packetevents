@@ -212,6 +212,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCh
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkBatchBegin;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkBatchEnd;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkBiomes;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkDataBulk;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerClearDialog;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerClearTitles;
