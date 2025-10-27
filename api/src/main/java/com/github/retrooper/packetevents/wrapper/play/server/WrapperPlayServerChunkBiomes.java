@@ -52,7 +52,7 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
         this.chunkPalettesMap = chunkPalettesMap;
     }
 
-    public WrapperPlayServerChunkBiomes(Long[] chunkKeys, DataPalette biomePalette) {
+    public WrapperPlayServerChunkBiomes(long[] chunkKeys, DataPalette biomePalette) {
         super(PacketType.Play.Server.CHUNK_BIOMES);
         this.chunkPalettesMap = new HashMap<>();
         for (long chunkKey : chunkKeys) {
@@ -60,7 +60,7 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
         }
     }
 
-    public WrapperPlayServerChunkBiomes(Long[] chunkKeys, int biomeID) {
+    public WrapperPlayServerChunkBiomes(long[] chunkKeys, int biomeID) {
         super(PacketType.Play.Server.CHUNK_BIOMES);
         this.chunkPalettesMap = new HashMap<>();
         for (long chunkKey : chunkKeys) {
