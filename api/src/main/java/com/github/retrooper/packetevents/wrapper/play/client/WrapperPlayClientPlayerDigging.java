@@ -75,8 +75,6 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
             blockPosition = new Vector3i(x, y, z);
         }
 
-        // TODO: read the byte buf and check for remaining bytes and ignore reading the unsignedByte if none are left
-        //  as this will currently error the console if a malformed packet is sent (without the face).
         blockFaceId = readUnsignedByte();
         blockFace = BlockFace.getBlockFaceByValue(blockFaceId);
 
