@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,12 @@ import java.time.Instant;
 public class MessageSignData {
     private final SaltSignature saltSignature;
     private final Instant timestamp;
-    private final boolean signedPreview;
+    private boolean signedPreview;
+
+    public MessageSignData(SaltSignature saltSignature, Instant timestamp) {
+        this.saltSignature = saltSignature;
+        this.timestamp = timestamp;
+    }
 
     public MessageSignData(SaltSignature saltSignature, Instant timestamp, boolean signedPreview) {
         this.saltSignature = saltSignature;
@@ -40,5 +45,9 @@ public class MessageSignData {
 
     public boolean isSignedPreview() {
         return signedPreview;
+    }
+
+    public void setSignedPreview(boolean signedPreview) {
+        this.signedPreview = signedPreview;
     }
 }

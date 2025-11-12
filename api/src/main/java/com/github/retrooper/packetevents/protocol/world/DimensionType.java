@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,8 @@ import org.jetbrains.annotations.Nullable;
 public enum DimensionType {
     NETHER(-1, "minecraft:the_nether"),
     OVERWORLD(0, "minecraft:overworld"),
-    END(1, "minecraft:the_end");
+    END(1, "minecraft:the_end"),
+    CUSTOM(-999, "minecraft:custom");
 
     private static final DimensionType[] VALUES = values();
 

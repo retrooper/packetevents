@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
         if (serverVersion == ServerVersion.V_1_17) {
             entityIDs = new int[]{readVarInt()};
         } else {
-            if (serverVersion == ServerVersion.V_1_7_10) {
+            if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
                 int entityIDCount = readUnsignedByte();
                 entityIDs = new int[entityIDCount];
                 for (int i = 0; i < entityIDCount; i++) {
@@ -66,7 +66,7 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
         if (serverVersion == ServerVersion.V_1_17) {
             writeVarInt(entityIDs[0]);
         } else {
-            if (serverVersion == ServerVersion.V_1_7_10) {
+            if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
                 writeByte(entityIDs.length);
                 for (int entityID : entityIDs) {
                     writeInt(entityID);

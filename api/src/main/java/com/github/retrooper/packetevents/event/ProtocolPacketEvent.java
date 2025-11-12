@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
@@ -31,18 +32,20 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ProtocolPacketEvent<T> extends PacketEvent implements PlayerEvent<T>, CancellableEvent, UserEvent {
+public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerEvent, CancellableEvent, UserEvent {
     private final Object channel;
     private final ConnectionState connectionState;
     private final User user;
-    private final T player;
+    private Object player;
     private Object byteBuf;
     private final int packetID;
     private final PacketTypeCommon packetType;
@@ -51,9 +54,10 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private PacketWrapper<?> lastUsedWrapper;
     private List<Runnable> postTasks = null;
     private boolean cloned;
+    private boolean needsReEncode = PacketEvents.getAPI().getSettings().reEncodeByDefault();
 
     public ProtocolPacketEvent(PacketSide packetSide, Object channel,
-                               User user, T player, Object byteBuf,
+                               User user, Object player, Object byteBuf,
                                boolean autoProtocolTranslation) throws PacketProcessException {
         this.channel = channel;
         this.user = user;
@@ -76,16 +80,21 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
             throw new PacketProcessException("Failed to read the Packet ID of a packet. (Size: " + size + ")");
         }
         ClientVersion version = serverVersion.toClientVersion();
-        this.packetType = PacketType.getById(packetSide, user.getConnectionState(),
+        ConnectionState state = packetSide == PacketSide.CLIENT ? user.getDecoderState() : user.getEncoderState();
+        this.packetType = PacketType.getById(packetSide, state,
                 version, packetID);
         if (this.packetType == null) {
-            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Bound: " + packetSide.getOpposite() + ", Connection state: " + user.getConnectionState() + ", Server version: " + serverVersion.getReleaseName());
+            // mojang messed up and keeps sending disconnect packets in the wrong protocol state
+            if (PacketType.getById(packetSide, ConnectionState.PLAY, version, packetID) == PacketType.Play.Server.DISCONNECT) {
+                throw new InvalidDisconnectPacketSend();
+            }
+            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Bound: " + packetSide.getOpposite() + ", Connection state: " + user.getDecoderState() + ", Server version: " + serverVersion.getReleaseName());
         }
-        this.connectionState = user.getConnectionState();
+        this.connectionState = state;
     }
 
     public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, Object channel,
-                               User user, T player, Object byteBuf) {
+                               User user, Object player, Object byteBuf) {
         this.channel = channel;
         this.user = user;
         this.player = player;
@@ -93,9 +102,20 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.byteBuf = byteBuf;
         this.packetID = packetID;
         this.packetType = packetType;
-        this.connectionState = user.getConnectionState();
+
+        this.connectionState = (packetType != null && packetType.getSide() == PacketSide.SERVER)
+                ? user.getEncoderState() : user.getDecoderState();
         cloned = true;
     }
+
+    public void markForReEncode(boolean needsReEncode) {
+        this.needsReEncode = needsReEncode;
+    }
+
+    public boolean needsReEncode() {
+        return needsReEncode;
+    }
+
 
     public boolean isClone() {
         return cloned;
@@ -105,8 +125,15 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         return channel;
     }
 
+    public SocketAddress getAddress() {
+        return ChannelHelper.remoteAddress(this.channel);
+    }
+
+    /**
+     * <strong>WARNING:</strong> This doesn't support local addresses or unix sockets.
+     */
     public InetSocketAddress getSocketAddress() {
-        return (InetSocketAddress) ChannelHelper.remoteAddress(channel);
+        return (InetSocketAddress) this.getAddress();
     }
 
     @Override
@@ -115,10 +142,19 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     @Override
-    public T getPlayer() {
-        return player;
+    public <T> T getPlayer() {
+        return (T) player;
     }
 
+    @Deprecated
+    @ApiStatus.Internal
+    public void setPlayer(Object player) {
+        this.player = player;
+    }
+
+    /**
+     * Gets the connection state this packet has been sent/received in.
+     */
     public ConnectionState getConnectionState() {
         return connectionState;
     }
@@ -151,7 +187,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.byteBuf = byteBuf;
     }
 
-    @Deprecated
     public int getPacketId() {
         return packetID;
     }
@@ -196,7 +231,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     @Override
-    public ProtocolPacketEvent<?> clone() {
+    public ProtocolPacketEvent clone() {
         return this instanceof PacketReceiveEvent ? ((PacketReceiveEvent) this).clone()
                 : ((PacketSendEvent) this).clone();
     }

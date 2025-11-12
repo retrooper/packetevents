@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,7 +88,9 @@ public class WrapperPlayServerChangeGameState extends PacketWrapper<WrapperPlayS
         THUNDER_LEVEL_CHANGE,
         PLAY_PUFFER_FISH_STING_SOUND,
         PLAY_ELDER_GUARDIAN_MOB_APPEARANCE,
-        ENABLE_RESPAWN_SCREEN;
+        ENABLE_RESPAWN_SCREEN,
+        LIMITED_CRAFTING,
+        START_LOADING_CHUNKS;
 
         private static final Reason[] VALUES = values();
 

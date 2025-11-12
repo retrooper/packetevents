@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ public enum ClientboundPacketType_1_15 {
     UPDATE_LIGHT,
     JOIN_GAME,
     MAP_DATA,
-    TRADE_LIST,
+    MERCHANT_OFFERS,
     ENTITY_RELATIVE_MOVE,
     ENTITY_RELATIVE_MOVE_AND_ROTATION,
     ENTITY_ROTATION,
@@ -108,7 +108,7 @@ public enum ClientboundPacketType_1_15 {
     COLLECT_ITEM,
     ENTITY_TELEPORT,
     UPDATE_ADVANCEMENTS,
-    ENTITY_PROPERTIES,
+    UPDATE_ATTRIBUTES,
     ENTITY_EFFECT,
     DECLARE_RECIPES,
     TAGS

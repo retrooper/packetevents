@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,17 +20,24 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
 public class WrapperPlayServerSetTitleText extends PacketWrapper<WrapperPlayServerSetTitleText> {
+
+    @Deprecated
     public static boolean HANDLE_JSON = true;
-    private String titleJson;
+
     private Component title;
 
     public WrapperPlayServerSetTitleText(PacketSendEvent event) {
         super(event);
+    }
+
+    public WrapperPlayServerSetTitleText(String titleJson) {
+        super(PacketType.Play.Server.SET_TITLE_TEXT);
+        this.title = this.getSerializers().fromJson(titleJson);
     }
 
     public WrapperPlayServerSetTitleText(Component title) {
@@ -38,31 +45,19 @@ public class WrapperPlayServerSetTitleText extends PacketWrapper<WrapperPlayServ
         this.title = title;
     }
 
-    public WrapperPlayServerSetTitleText(String titleJson) {
-        super(PacketType.Play.Server.SET_TITLE_TEXT);
-        this.titleJson = titleJson;
-    }
-
     @Override
     public void read() {
-        titleJson = readComponentJSON();
-        if (HANDLE_JSON) {
-            title = AdventureSerializer.parseComponent(titleJson);
-        }
+        this.title = this.readComponent();
     }
 
     @Override
     public void write() {
-        if (HANDLE_JSON && title != null) {
-            titleJson = AdventureSerializer.toJson(title);
-        }
-        writeComponentJSON(titleJson);
+        this.writeComponent(this.title);
     }
 
     @Override
     public void copy(WrapperPlayServerSetTitleText wrapper) {
-        titleJson = wrapper.titleJson;
-        title = wrapper.title;
+        this.title = wrapper.title;
     }
 
     public Component getTitle() {
@@ -73,11 +68,13 @@ public class WrapperPlayServerSetTitleText extends PacketWrapper<WrapperPlayServ
         this.title = title;
     }
 
+    @Deprecated
     public String getTitleJson() {
-        return titleJson;
+        return this.getSerializers().asJson(this.getTitle());
     }
 
+    @Deprecated
     public void setTitleJson(String titleJson) {
-        this.titleJson = titleJson;
+        this.setTitle(this.getSerializers().fromJson(titleJson));
     }
 }

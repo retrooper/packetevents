@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,6 +80,7 @@ public class NettyPacketEventsBuilder {
             private final NettyManager nettyManager = new NettyManagerImpl();
             private boolean loaded;
             private boolean initialized;
+            private boolean terminated;
 
             @Override
             public void load() {
@@ -115,9 +116,7 @@ public class NettyPacketEventsBuilder {
                         getUpdateChecker().handleUpdateCheck();
                     }
 
-                    if (settings.isbStatsEnabled()) {
-                        //TODO Cross-platform metrics?
-                    }
+                    //TODO Cross-platform metrics?
 
                     PacketType.Play.Client.load();
                     PacketType.Play.Server.load();
@@ -138,7 +137,13 @@ public class NettyPacketEventsBuilder {
                     //Unregister all our listeners
                     getEventManager().unregisterAllListeners();
                     initialized = false;
+                    terminated = true;
                 }
+            }
+
+            @Override
+            public boolean isTerminated() {
+                return terminated;
             }
 
             @Override

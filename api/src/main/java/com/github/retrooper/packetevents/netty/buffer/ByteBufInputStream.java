@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
  */
 
 package com.github.retrooper.packetevents.netty.buffer;
+
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 
 import java.io.*;
 //TODO give netty credit
@@ -40,27 +42,27 @@ public class ByteBufInputStream extends InputStream implements DataInput {
         this(buffer, ByteBufHelper.readableBytes(buffer), releaseOnClose);
     }
 
-    public ByteBufInputStream(Object buffer, int length, boolean releaseOnClose) {
+    public ByteBufInputStream(Object buffer, int maxLength, boolean releaseOnClose) {
         this.lineBuf = new StringBuilder();
         if (buffer == null) {
             throw new NullPointerException("buffer");
-        } else if (length < 0) {
+        } else if (maxLength < 0) {
             if (releaseOnClose) {
                 ByteBufHelper.release(buffer);
             }
 
-            throw new IllegalArgumentException("length: " + length);
-        } else if (length > ByteBufHelper.readableBytes(buffer)) {
+            throw new IllegalArgumentException("maxLength: " + maxLength);
+        } else if (ByteBufHelper.readableBytes(buffer) > maxLength) {
             if (releaseOnClose) {
                 ByteBufHelper.release(buffer);
             }
 
-            throw new IndexOutOfBoundsException("Too many bytes to be read - Needs " + length + ", maximum is " + ByteBufHelper.readableBytes(buffer));
+            throw new IndexOutOfBoundsException("Too many bytes to be read - Found " + ByteBufHelper.readableBytes(buffer) + ", maximum is " + maxLength);
         } else {
             this.releaseOnClose = releaseOnClose;
             this.buffer = buffer;
             this.startIndex = ByteBufHelper.readerIndex(buffer);
-            this.endIndex = this.startIndex + length;
+            this.endIndex = this.startIndex + ByteBufHelper.readableBytes(buffer);
             ByteBufHelper.markReaderIndex(buffer);
         }
     }
@@ -204,7 +206,8 @@ public class ByteBufInputStream extends InputStream implements DataInput {
     }
 
     public String readUTF() throws IOException {
-        return DataInputStream.readUTF(this);
+        String text = DataInputStream.readUTF(this);
+        return text;
     }
 
     public int readUnsignedByte() throws IOException {
@@ -225,7 +228,14 @@ public class ByteBufInputStream extends InputStream implements DataInput {
         if (fieldSize < 0) {
             throw new IndexOutOfBoundsException("fieldSize cannot be a negative number");
         } else if (fieldSize > this.available()) {
-            throw new EOFException("fieldSize is too long! Length is " + fieldSize + ", but maximum is " + this.available());
+            int value = this.available();
+            String msg = "fieldSize is too long! Length is " + fieldSize + ", but maximum is " + value;
+            if (value == 0) {
+                throw new PacketProcessException(msg);
+            }
+            else {
+                throw new EOFException(msg);
+            }
         }
     }
 }

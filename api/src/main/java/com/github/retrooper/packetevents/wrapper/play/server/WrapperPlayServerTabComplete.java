@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -68,14 +67,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             commandMatches = new ArrayList<>(matchLength);
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
-                Component tooltip;
-                boolean hasTooltip = readBoolean();
-                if (hasTooltip) {
-                    String tooltipJson = readComponentJSON();
-                    tooltip = AdventureSerializer.parseComponent(tooltipJson);
-                } else {
-                    tooltip = null;
-                }
+                Component tooltip = readOptional(PacketWrapper::readComponent);
                 CommandMatch commandMatch = new CommandMatch(text, tooltip);
                 commandMatches.add(commandMatch);
             }
@@ -84,7 +76,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             commandMatches = new ArrayList<>(matchLength);
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
-                CommandMatch commandMatch = new CommandMatch(text, (Component) null);
+                CommandMatch commandMatch = new CommandMatch(text, null);
                 commandMatches.add(commandMatch);
             }
         }
@@ -103,8 +95,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
                 boolean hasTooltip = match.getTooltip().isPresent();
                 writeBoolean(hasTooltip);
                 if (hasTooltip) {
-                    String tooltipJson = AdventureSerializer.toJson(match.getTooltip().get());
-                    writeComponentJSON(tooltipJson);
+                    writeComponent(match.getTooltip().get());
                 }
             }
         } else {
@@ -126,12 +117,8 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
         return transactionID;
     }
 
-    public void setTransactionId(Integer transactionID) {
-        if (transactionID != null) {
-            this.transactionID = Optional.of(transactionID);
-        } else {
-            this.transactionID = Optional.empty();
-        }
+    public void setTransactionId(@Nullable Integer transactionID) {
+        this.transactionID = Optional.ofNullable(transactionID);
     }
 
     public Optional<CommandRange> getCommandRange() {
@@ -139,11 +126,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
     }
 
     public void setCommandRange(@Nullable CommandRange commandRange) {
-        if (commandRange != null) {
-            this.commandRange = Optional.of(commandRange);
-        } else {
-            this.commandRange = Optional.empty();
-        }
+        this.commandRange = Optional.ofNullable(commandRange);
     }
 
     public List<CommandMatch> getCommandMatches() {

@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.protocol.chat.message;
 
 import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import net.kyori.adventure.text.Component;
 
 public class ChatMessage {
@@ -34,12 +36,20 @@ public class ChatMessage {
         return chatContent;
     }
 
-    public ChatType getType() {
-        return type;
+    public String getChatContentJson(ClientVersion version) {
+        return AdventureSerializer.serializer(version).asJson(this.getChatContent());
     }
 
     public void setChatContent(Component chatContent) {
         this.chatContent = chatContent;
+    }
+
+    public void setChatContentJson(ClientVersion version, String json) {
+        this.setChatContent(AdventureSerializer.serializer(version).fromJson(json));
+    }
+
+    public ChatType getType() {
+        return type;
     }
 
     public void setType(ChatType type) {

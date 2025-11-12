@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 
 package com.github.retrooper.packetevents.wrapper.status.client;
 
-import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperStatusClientRequest extends PacketWrapper<WrapperStatusClientRequest> {
-    public WrapperStatusClientRequest(PacketSendEvent event) {
+    public WrapperStatusClientRequest(PacketReceiveEvent event) {
         super(event);
     }
 

@@ -1,4 +1,0 @@
-dependencies {
-    compileOnly "io.netty:netty-all:${nettyVersion}"
-    api project(':api')
-}

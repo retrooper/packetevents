@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.UUID;
-
-public class ChatMessage_v1_19_1 extends ChatMessage {
+//We'll extend ChatMessage_v1_16 for now, hopefully no breaking changes in the future
+public class ChatMessage_v1_19_1 extends ChatMessage_v1_16 {
     private String plainContent;
     private @Nullable Component unsignedChatContent;
-    private UUID senderUUID;
-    private ChatTypeBoundNetwork chatType;
+    private ChatType.Bound chatFormatting;
     private byte @Nullable [] previousSignature;
     private byte[] signature;
     private Instant timestamp;
@@ -41,16 +40,15 @@ public class ChatMessage_v1_19_1 extends ChatMessage {
 
     public ChatMessage_v1_19_1(String plainContent, Component decoratedChatContent,
                                @Nullable Component unsignedChatContent,
-                               UUID senderUUID, ChatTypeBoundNetwork chatType,
+                               UUID senderUUID, ChatType.Bound chatFormatting,
                                byte @Nullable [] previousSignature, byte[] signature,
                                Instant timestamp, long salt,
                                LastSeenMessages lastSeenMessages,
                                FilterMask filterMask) {
-        super(decoratedChatContent, chatType.getType());
+        super(decoratedChatContent, chatFormatting.getType(), senderUUID);
         this.plainContent = plainContent;
         this.unsignedChatContent = unsignedChatContent;
-        this.senderUUID = senderUUID;
-        this.chatType = chatType;
+        this.chatFormatting = chatFormatting;
         this.previousSignature = previousSignature;
         this.signature = signature;
         this.timestamp = timestamp;
@@ -79,30 +77,40 @@ public class ChatMessage_v1_19_1 extends ChatMessage {
         this.unsignedChatContent = unsignedChatContent;
     }
 
-    public UUID getSenderUUID() {
-        return senderUUID;
-    }
-
-    public void setSenderUUID(UUID senderUUID) {
-        this.senderUUID = senderUUID;
-    }
-
     @Override
     public ChatType getType() {
-        return chatType.getType();
+        return chatFormatting.getType();
     }
 
     @Override
     public void setType(ChatType type) {
-        chatType.setType(type);
+        chatFormatting.setType(type);
     }
 
-    public ChatTypeBoundNetwork getChatType() {
-        return chatType;
+    public ChatType.Bound getChatFormatting() {
+        return chatFormatting;
     }
 
-    public void setChatType(ChatTypeBoundNetwork type) {
-        this.chatType = type;
+    public void setChatFormatting(ChatType.Bound chatFormatting) {
+        this.chatFormatting = chatFormatting;
+    }
+
+    /**
+     * Retrieves the chat formatting. Please refer to {@link ChatMessage_v1_19_1#getChatFormatting}
+     * @return chat formatting which contains the actual chat type.
+     */
+    @Deprecated
+    public ChatType.Bound getChatType() {
+        return chatFormatting;
+    }
+
+    /**
+     * Sets the chat formatting. Please refer to {@link ChatMessage_v1_19_1#setChatFormatting}
+     * @param chatFormatting formatting which contains the actual chat type.
+     */
+    @Deprecated
+    public void setChatType(ChatType.Bound chatFormatting) {
+        this.chatFormatting = chatFormatting;
     }
 
     public byte @Nullable [] getPreviousSignature() {
@@ -153,6 +161,10 @@ public class ChatMessage_v1_19_1 extends ChatMessage {
         this.filterMask = filterMask;
     }
 
+    /**
+     * Please refer to {@link com.github.retrooper.packetevents.protocol.chat.ChatType.Bound}
+     */
+    @Deprecated
     public static class ChatTypeBoundNetwork {
         private ChatType type;
         private Component name;

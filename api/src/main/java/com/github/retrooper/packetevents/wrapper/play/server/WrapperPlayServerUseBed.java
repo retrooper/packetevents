@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ public class WrapperPlayServerUseBed extends PacketWrapper<WrapperPlayServerUseB
 
     @Override
     public void read() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             entityId = readVarInt();
             position = readBlockPosition();
         } else {
@@ -61,7 +61,7 @@ public class WrapperPlayServerUseBed extends PacketWrapper<WrapperPlayServerUseB
 
     @Override
     public void write() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             writeVarInt(entityId);
             writeBlockPosition(position);
         } else {

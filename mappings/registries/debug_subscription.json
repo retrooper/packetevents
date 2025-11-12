@@ -1,0 +1,20 @@
+{
+  "V_1_21_9": [
+    "dedicated_server_tick_time",
+    "bees",
+    "brains",
+    "breezes",
+    "goal_selectors",
+    "entity_paths",
+    "entity_block_intersections",
+    "bee_hives",
+    "pois",
+    "redstone_wire_orientations",
+    "village_sections",
+    "raids",
+    "structures",
+    "game_event_listeners",
+    "neighbor_updates",
+    "game_events"
+  ]
+}

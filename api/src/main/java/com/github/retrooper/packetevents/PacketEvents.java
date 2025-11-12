@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,13 @@
 
 package com.github.retrooper.packetevents;
 
+import org.jetbrains.annotations.ApiStatus;
+
 public final class PacketEvents {
     private static PacketEventsAPI<?> API;
 
     //Put these variable names anywhere else, they are really only for the injectors
+    @ApiStatus.Internal
     public static String IDENTIFIER, ENCODER_NAME, DECODER_NAME, CONNECTION_HANDLER_NAME, SERVER_CHANNEL_HANDLER_NAME,
     TIMEOUT_HANDLER_NAME;
 

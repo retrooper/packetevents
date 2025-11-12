@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
  */
 
 package com.github.retrooper.packetevents.protocol.player;
-
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Representation of a player's game mode.
@@ -38,11 +36,15 @@ public enum GameMode {
         return ordinal();
     }
 
-    @Nullable
     public static GameMode getById(int id) {
-        if (id == -1) {
-            return null;
+        // Minecraft defaults to a survival gamemode if invalid
+        if (id < 0 || id >= VALUES.length) {
+            return GameMode.SURVIVAL;
         }
         return VALUES[id];
+    }
+
+    public static GameMode defaultGameMode() {
+        return SURVIVAL;
     }
 }

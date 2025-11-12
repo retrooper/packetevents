@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -38,7 +39,7 @@ public class MojangAPIUtil {
         String uuidStr = UUIDUtil.toStringWithoutDashes(uuid);
         try {
             List<TextureProperty> textureProperties = new ArrayList<>();
-            URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr);
+            URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr + "?unsigned=false");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             //Bad request, this UUID is not valid
@@ -55,7 +56,7 @@ public class MojangAPIUtil {
                 sb.append(inputLine);
             }
             in.close();
-            JsonObject responseObject = AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
+            JsonObject responseObject = AdventureSerializer.serializer().gson().serializer().fromJson(sb.toString(), JsonObject.class);
             JsonArray jsonProperties = responseObject.get("properties").getAsJsonArray();
             for (JsonElement element : jsonProperties) {
                 JsonObject property = element.getAsJsonObject();
@@ -97,7 +98,7 @@ public class MojangAPIUtil {
                 sb.append(inputLine);
             }
             in.close();
-            JsonObject responseObject = AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
+            JsonObject responseObject = AdventureSerializer.serializer().gson().serializer().fromJson(sb.toString(), JsonObject.class);
             return responseObject.get("name").getAsString();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -124,7 +125,7 @@ public class MojangAPIUtil {
                 sb.append(inputLine);
             }
             in.close();
-            JsonObject responseObject = AdventureSerializer.getGsonSerializer().serializer().fromJson(sb.toString(), JsonObject.class);
+            JsonObject responseObject = AdventureSerializer.serializer().gson().serializer().fromJson(sb.toString(), JsonObject.class);
             String uuidStr = responseObject.get("id").getAsString();
             //Now we must add the "-"s to the UUID
             return UUIDUtil.fromStringWithoutDashes(uuidStr);

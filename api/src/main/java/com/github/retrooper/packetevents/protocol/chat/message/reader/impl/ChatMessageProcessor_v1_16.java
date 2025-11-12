@@ -33,8 +33,7 @@ public class ChatMessageProcessor_v1_16 implements ChatMessageProcessor {
     @Override
     public ChatMessage readChatMessage(@NotNull PacketWrapper<?> wrapper) {
         Component chatContent = wrapper.readComponent();
-        int id = wrapper.readByte();
-        ChatType type = ChatTypes.getById(wrapper.getServerVersion().toClientVersion(), id);
+        ChatType type = wrapper.readMappedEntity(ChatTypes.getRegistry());
         UUID senderUUID = wrapper.readUUID();
         return new ChatMessage_v1_16(chatContent, type, senderUUID);
     }
@@ -42,7 +41,7 @@ public class ChatMessageProcessor_v1_16 implements ChatMessageProcessor {
     @Override
     public void writeChatMessage(@NotNull PacketWrapper<?> wrapper, @NotNull ChatMessage data) {
         wrapper.writeComponent(data.getChatContent());
-        wrapper.writeByte(data.getType().getId(wrapper.getServerVersion().toClientVersion()));
+        wrapper.writeMappedEntity(data.getType());
         wrapper.writeUUID(((ChatMessage_v1_16) data).getSenderUUID());
     }
 }

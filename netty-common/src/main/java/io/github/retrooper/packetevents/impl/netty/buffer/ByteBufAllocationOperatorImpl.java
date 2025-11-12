@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.impl.netty.buffer;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocationOperator;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 
 public class ByteBufAllocationOperatorImpl implements ByteBufAllocationOperator {
@@ -38,12 +39,32 @@ public class ByteBufAllocationOperatorImpl implements ByteBufAllocationOperator 
     }
 
     @Override
+    public Object buffer(int initialCapacity) {
+        return Unpooled.buffer(initialCapacity);
+    }
+
+    @Override
     public Object directBuffer() {
         return Unpooled.directBuffer();
     }
 
     @Override
+    public Object directBuffer(int initialCapacity) {
+        return Unpooled.directBuffer(initialCapacity);
+    }
+
+    @Override
     public Object compositeBuffer() {
         return Unpooled.compositeBuffer();
+    }
+
+    @Override
+    public Object compositeBuffer(int maxNumComponents) {
+        return Unpooled.compositeBuffer(maxNumComponents);
+    }
+
+    @Override
+    public Object emptyBuffer() {
+        return Unpooled.EMPTY_BUFFER;
     }
 }

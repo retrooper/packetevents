@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,11 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityMetadataProvider;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -44,21 +46,25 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
 
     @Deprecated
     private ItemType item;
-    private List<EntityData> entityMetadata;
+    private List<EntityData<?>> entityMetadata;
 
     public WrapperPlayServerSpawnPlayer(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, List<EntityData> entityMetadata) {
+    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, EntityMetadataProvider metadata) {
+        this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), metadata.entityData(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
+    }
+
+    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, List<EntityData<?>> entityMetadata) {
         this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), entityMetadata);
     }
 
-    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, EntityData... entityMetadata) {
+    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, EntityData<?>... entityMetadata) {
         this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), Arrays.asList(entityMetadata));
     }
 
-    public WrapperPlayServerSpawnPlayer(int entityID, UUID uuid, Vector3d position, float yaw, float pitch, List<EntityData> entityMetadata) {
+    public WrapperPlayServerSpawnPlayer(int entityID, UUID uuid, Vector3d position, float yaw, float pitch, List<EntityData<?>> entityMetadata) {
         super(PacketType.Play.Server.SPAWN_PLAYER);
         this.entityID = entityID;
         this.uuid = uuid;
@@ -67,6 +73,10 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         this.pitch = pitch;
         this.entityMetadata = entityMetadata;
         this.item = ItemTypes.AIR;
+    }
+
+    public WrapperPlayServerSpawnPlayer(int entityID, UUID uuid, Vector3d position, float yaw, float pitch, EntityMetadataProvider metadata) {
+        this(entityID, uuid, position, yaw, pitch, metadata.entityData(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
     }
 
     @Override
@@ -124,6 +134,8 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         position = wrapper.position;
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
+        item = wrapper.item;
+        entityMetadata = wrapper.entityMetadata;
     }
 
     public int getEntityId() {
@@ -167,13 +179,18 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
     }
 
     @Deprecated
-    public List<EntityData> getEntityMetadata() {
+    public List<EntityData<?>> getEntityMetadata() {
         return entityMetadata;
     }
 
     @Deprecated
-    public void setEntityMetadata(List<EntityData> entityMetadata) {
+    public void setEntityMetadata(List<EntityData<?>> entityMetadata) {
         this.entityMetadata = entityMetadata;
+    }
+
+    @Deprecated
+    public void setEntityMetadata(EntityMetadataProvider metadata) {
+        this.entityMetadata = metadata.entityData(serverVersion.toClientVersion());
     }
 
     @Deprecated

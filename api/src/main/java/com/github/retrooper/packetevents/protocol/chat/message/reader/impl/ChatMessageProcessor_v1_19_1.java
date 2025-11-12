@@ -40,7 +40,9 @@ public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
         byte[] signature = wrapper.readByteArray();
         String plainContent = wrapper.readString(256);
         Component chatContent = wrapper.readOptional(PacketWrapper::readComponent);
-        if (chatContent == null) {
+        if (chatContent == null && plainContent.isEmpty()) {
+            chatContent = Component.empty();
+        } else if (chatContent == null) {
             chatContent = Component.text(plainContent);
         }
         Instant timestamp = wrapper.readTimestamp();
@@ -48,14 +50,8 @@ public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
         LastSeenMessages lastSeenMessages = wrapper.readLastSeenMessages();
         Component unsignedChatContent = wrapper.readOptional(PacketWrapper::readComponent);
         FilterMask filterMask = wrapper.readFilterMask();
-
-        int id = wrapper.readVarInt();
-        ChatType type = ChatTypes.getById(wrapper.getServerVersion().toClientVersion(), id);
-        Component name = wrapper.readComponent();
-        Component targetName = wrapper.readOptional(PacketWrapper::readComponent);
-        ChatMessage_v1_19_1.ChatTypeBoundNetwork chatType = new ChatMessage_v1_19_1.ChatTypeBoundNetwork(type, name, targetName);
-
-        return new ChatMessage_v1_19_1(plainContent, chatContent, unsignedChatContent, senderUUID, chatType,
+        ChatType.Bound chatFormatting = wrapper.readChatTypeBoundNetwork();
+        return new ChatMessage_v1_19_1(plainContent, chatContent, unsignedChatContent, senderUUID, chatFormatting,
                 previousSignature, signature, timestamp, salt, lastSeenMessages, filterMask);
     }
 
@@ -72,8 +68,6 @@ public class ChatMessageProcessor_v1_19_1 implements ChatMessageProcessor {
         wrapper.writeLastSeenMessages(newData.getLastSeenMessages());
         wrapper.writeOptional(newData.getUnsignedChatContent(), PacketWrapper::writeComponent);
         wrapper.writeFilterMask(newData.getFilterMask());
-        wrapper.writeVarInt(newData.getChatType().getType().getId(wrapper.getServerVersion().toClientVersion()));
-        wrapper.writeComponent(newData.getChatType().getName());
-        wrapper.writeOptional(newData.getChatType().getTargetName(), PacketWrapper::writeComponent);
+        wrapper.writeChatTypeBoundNetwork(newData.getChatFormatting());
     }
 }

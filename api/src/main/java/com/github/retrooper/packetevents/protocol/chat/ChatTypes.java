@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,68 +19,67 @@
 package com.github.retrooper.packetevents.protocol.chat;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import org.jetbrains.annotations.ApiStatus;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
 
-public class ChatTypes {
-    private static final Map<String, ChatType> CHAT_TYPE_MAP = new HashMap<>();
-    //Key - mappings version, value - map with chat type ids and chat types
-    private static final Map<Byte, Map<Integer, ChatType>> CHAT_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("chat/chat_type_mappings",
-            ClientVersion.V_1_18_2,
-            ClientVersion.V_1_19,
-            ClientVersion.V_1_19_1);
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.incomingDirectMessage;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.outgoingDirectMessage;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.teamMessage;
+import static com.github.retrooper.packetevents.protocol.chat.ChatTypeDecoration.withSender;
 
-    static {
-        TYPES_BUILDER.unloadFileMappings();
+public final class ChatTypes {
+
+    private static final VersionedRegistry<ChatType> REGISTRY = new VersionedRegistry<>("chat_type");
+
+    private ChatTypes() {
     }
 
+    @ApiStatus.Internal
     public static ChatType define(String key) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        ChatType chatType = new ChatType() {
-            private final int[] ids = data.getData();
-
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
-
-            @Override
-            public int getId(ClientVersion version) {
-                int index = TYPES_BUILDER.getDataIndex(version);
-                return ids[index];
-            }
-        };
-        CHAT_TYPE_MAP.put(chatType.getName().toString(), chatType);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, ChatType> typeIdMap = CHAT_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
-            typeIdMap.put(chatType.getId(version), chatType);
-        }
-        return chatType;
+        return define(key, withSender("chat.type.text"));
     }
 
-    //with minecraft:key
+    @ApiStatus.Internal
+    public static ChatType define(String key, ChatTypeDecoration chatDeco) {
+        return define(key, chatDeco, withSender("chat.type.text.narrate"));
+    }
+
+    @ApiStatus.Internal
+    public static ChatType define(String key, ChatTypeDecoration chatDeco, ChatTypeDecoration narrationDeco) {
+        return REGISTRY.define(key, data ->
+                new StaticChatType(data, chatDeco, narrationDeco));
+    }
+
+    public static VersionedRegistry<ChatType> getRegistry() {
+        return REGISTRY;
+    }
+
     public static ChatType getByName(String name) {
-        return CHAT_TYPE_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static ChatType getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        return CHAT_TYPE_ID_MAP.get((byte) index).get(id);
+        return REGISTRY.getById(version, id);
     }
 
     public static final ChatType CHAT = define("chat");
-    public static final ChatType SAY_COMMAND = define("say_command");
-    public static final ChatType MSG_COMMAND_INCOMING = define("msg_command_incoming");
-    public static final ChatType MSG_COMMAND_OUTGOING = define("msg_command_outgoing");
-    public static final ChatType TEAM_MSG_COMMAND_INCOMING = define("team_msg_command_incoming");
-    public static final ChatType TEAM_MSG_COMMAND_OUTGOING = define("team_msg_command_outgoing");
-    public static final ChatType EMOTE_COMMAND = define("emote_command");
+    public static final ChatType SAY_COMMAND = define("say_command",
+            withSender("chat.type.announcement"));
+    public static final ChatType MSG_COMMAND_INCOMING = define("msg_command_incoming",
+            incomingDirectMessage("commands.message.display.incoming"));
+    public static final ChatType MSG_COMMAND_OUTGOING = define("msg_command_outgoing",
+            outgoingDirectMessage("commands.message.display.outgoing"));
+    public static final ChatType TEAM_MSG_COMMAND_INCOMING = define("team_msg_command_incoming",
+            teamMessage("chat.type.team.text"));
+    public static final ChatType TEAM_MSG_COMMAND_OUTGOING = define("team_msg_command_outgoing",
+            teamMessage("chat.type.team.sent"));
+    public static final ChatType EMOTE_COMMAND = define("emote_command",
+            withSender("chat.type.emote"),
+            withSender("chat.type.emote"));
+
+    // added by CraftBukkit for a few versions
     public static final ChatType RAW = define("raw");
 
     @Deprecated
@@ -91,4 +90,17 @@ public class ChatTypes {
     public static final ChatType MSG_COMMAND = define("msg_command");
     @Deprecated
     public static final ChatType TEAM_MSG_COMMAND = define("team_msg_command");
+
+    /**
+     * Returns an immutable view of the chat types.
+     *
+     * @return Chat Types
+     */
+    public static Collection<ChatType> values() {
+        return REGISTRY.getEntries();
+    }
+
+    static {
+        REGISTRY.unloadMappings();
+    }
 }

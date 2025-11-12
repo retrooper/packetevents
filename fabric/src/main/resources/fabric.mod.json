@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "packetevents",
+  "version": "${version}",
+  "name": "PacketEvents",
+  "description": "",
+  "authors": [
+    "retrooper"
+  ],
+  "contact": {},
+  "license": "GPL-3.0",
+  "icon": "assets/packetevents/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "pePreLaunchClient": [
+      "io.github.retrooper.packetevents.PacketEventsClientMod"
+    ],
+    "pePreLaunchServer": [
+      "io.github.retrooper.packetevents.PacketEventsServerMod"
+    ],
+    "preLaunch": [
+      "io.github.retrooper.packetevents.PacketEventsMod"
+    ],
+    "main": [
+      "io.github.retrooper.packetevents.PacketEventsMod"
+    ]
+  },
+  "mixins": [
+    "packetevents.mixins.json"
+  ],
+  "accessWidener": "packetevents.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.15.11"
+  }
+}

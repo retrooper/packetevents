@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,11 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-// Thanks MCProtocolLib, this is taken entirely from them
 public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServerWorldBorder> {
     private WorldBorderAction action;
 
@@ -92,7 +93,7 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        this.action = WorldBorderAction.values()[this.readVarInt()];
+        action = readEnum(WorldBorderAction.class);
         if (this.action == WorldBorderAction.SET_SIZE) {
             this.radius = readDouble();
         } else if (this.action == WorldBorderAction.LERP_SIZE) {
@@ -120,7 +121,7 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
-        writeVarInt(this.action.ordinal());
+        writeEnum(action);
         if (this.action == WorldBorderAction.SET_SIZE) {
             writeDouble(this.radius);
         } else if (this.action == WorldBorderAction.LERP_SIZE) {
@@ -200,6 +201,46 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
         return this.warningBlocks;
     }
 
+    public void setAction(WorldBorderAction action) {
+        this.action = action;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    public void setOldRadius(double oldRadius) {
+        this.oldRadius = oldRadius;
+    }
+
+    public void setNewRadius(double newRadius) {
+        this.newRadius = newRadius;
+    }
+
+    public void setSpeed(long speed) {
+        this.speed = speed;
+    }
+
+    public void setCenterX(double centerX) {
+        this.centerX = centerX;
+    }
+
+    public void setCenterZ(double centerZ) {
+        this.centerZ = centerZ;
+    }
+
+    public void setPortalTeleportBoundary(int portalTeleportBoundary) {
+        this.portalTeleportBoundary = portalTeleportBoundary;
+    }
+
+    public void setWarningTime(int warningTime) {
+        this.warningTime = warningTime;
+    }
+
+    public void setWarningBlocks(int warningBlocks) {
+        this.warningBlocks = warningBlocks;
+    }
+
     public enum WorldBorderAction {
         SET_SIZE,
         LERP_SIZE,
@@ -207,5 +248,14 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
         INITIALIZE,
         SET_WARNING_TIME,
         SET_WARNING_BLOCKS;
+
+
+        public int getId() {
+            return ordinal();
+        }
+
+        public static WorldBorderAction fromId(int id) {
+            return WorldBorderAction.values()[id];
+        }
     }
 }

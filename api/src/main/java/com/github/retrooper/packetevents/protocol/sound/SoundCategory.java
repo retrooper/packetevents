@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.sound;
 
 public enum SoundCategory {
+
     MASTER,
     MUSIC,
     RECORD,
@@ -28,7 +29,12 @@ public enum SoundCategory {
     NEUTRAL,
     PLAYER,
     AMBIENT,
-    VOICE;
+    VOICE,
+    /**
+     * Added with 1.21.6
+     */
+    UI,
+    ;
 
     private static final SoundCategory[] VALUES = values();
 

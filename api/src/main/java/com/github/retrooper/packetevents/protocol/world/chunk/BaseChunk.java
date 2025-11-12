@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,20 +32,46 @@ import com.github.retrooper.packetevents.protocol.world.chunk.storage.LegacyFlex
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
 public interface BaseChunk {
-    WrappedBlockState get(ClientVersion version, int x, int y, int z);
+    int getBlockId(int x, int y, int z);
 
-    void set(ClientVersion version, int x, int y, int z, int combinedID);
+    default WrappedBlockState get(ClientVersion version, int x, int y, int z) {
+        return get(version, x, y, z, true);
+    }
+
+    default WrappedBlockState get(ClientVersion version, int x, int y, int z, boolean clone) {
+        return WrappedBlockState.getByGlobalId(version, getBlockId(x, y, z), clone);
+    }
+
+    default WrappedBlockState get(int x, int y, int z) {
+        return get(x, y, z, true);
+    }
+
+    default WrappedBlockState get(int x, int y, int z, boolean clone) {
+        return get(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), x, y, z, clone);
+    }
+
+    default void set(int x, int y, int z, WrappedBlockState state) {
+        set(x, y, z, state.getGlobalId());
+    }
+
+    void set(int x, int y, int z, int combinedID);
+
+    // We don't use ClientVersion, but it's here to maintain backwards compatibility.
+    default void set(ClientVersion version, int x, int y, int z, int combinedID) {
+        set(x, y, z, combinedID);
+    }
 
     boolean isEmpty();
 
     static BaseChunk create() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_18)) {
             return new Chunk_v1_18();
-        } else if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            return new Chunk_v1_9(0, DataPalette.createForChunk());
-        } else if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+        } else if (version.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+            return new Chunk_v1_9(0, PaletteType.CHUNK.create());
+        } else if (version.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             return new Chunk_v1_9(0, new DataPalette(new ListPalette(4), new LegacyFlexibleStorage(4, 4096), PaletteType.CHUNK));
-        } else if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8)) {
+        } else if (version.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             return new Chunk_v1_8(new ShortArray3d(4096), null, null);
         }
         return new Chunk_v1_7(false, true);

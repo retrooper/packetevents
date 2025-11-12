@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@ public class PlayerManagerImpl extends PlayerManagerAbstract {
 
     @Override
     public Object getChannel(@NotNull Object player) {
-        Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(((Player) player).getUniqueId());
+        ProtocolManager protocolManager = PacketEvents.getAPI().getProtocolManager();
+        Object channel = protocolManager.getChannel(((Player) player).getUniqueId());
         if (channel == null) {
             if (CONNECTED_PLAYER == null) {
                 CONNECTED_PLAYER = Reflection
@@ -49,10 +50,15 @@ public class PlayerManagerImpl extends PlayerManagerAbstract {
             ReflectionObject reflectConnectedPlayer = new ReflectionObject(connectedPlayer);
             Object minecraftConnection = reflectConnectedPlayer.readObject(0, MINECRAFT_CONNECTION_CLASS);
             ReflectionObject reflectConnection = new ReflectionObject(minecraftConnection);
-            channel = reflectConnection.readObject(0, Channel.class);
+            // In cases where the player has a custom connection, for example, Fake Players, this will not find the channel.
+            try {
+              channel = reflectConnection.readObject(0, Channel.class);
+            } catch (IllegalStateException ignored) {
+              return null;
+            }
 
             synchronized (channel) {
-                ProtocolManager.CHANNELS.put(((Player) player).getUniqueId(), channel);
+                protocolManager.setChannel(((Player) player).getUniqueId(), channel);
             }
         }
         return channel;

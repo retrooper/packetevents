@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,6 +80,11 @@ public class ByteBufOperatorImpl implements ByteBufOperator {
     }
 
     @Override
+    public int readMedium(Object buffer) {
+        return ((ByteBuf)buffer).readMedium();
+    }
+
+    @Override
     public int readInt(Object buffer) {
         return ((ByteBuf)buffer).readInt();
     }
@@ -102,6 +107,16 @@ public class ByteBufOperatorImpl implements ByteBufOperator {
     @Override
     public void writeShort(Object buffer, int value) {
         ((ByteBuf)buffer).writeShort(value);
+    }
+
+    @Override
+    public void writeShortLE(Object buffer, int value) {
+        ((ByteBuf) buffer).writeShortLE(value);
+    }
+
+    @Override
+    public void writeMedium(Object buffer, int value) {
+        ((ByteBuf)buffer).writeMedium(value);
     }
 
     @Override
@@ -232,5 +247,10 @@ public class ByteBufOperatorImpl implements ByteBufOperator {
     @Override
     public Object resetWriterIndex(Object buffer) {
         return ((ByteBuf)buffer).resetWriterIndex();
+    }
+
+    @Override
+    public Object allocateNewBuffer(Object buffer) {
+        return ((ByteBuf) buffer).alloc().buffer();
     }
 }

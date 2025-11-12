@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.util.crypto;
 
-import com.github.retrooper.packetevents.util.AdventureSerializer;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import net.kyori.adventure.text.Component;
 
 import java.nio.ByteBuffer;
@@ -28,11 +28,15 @@ import java.security.*;
 import java.util.UUID;
 
 //TODO Fix MessageVerifier.
+/**
+ * @deprecated has never worked in the past and is unused
+ */
+@Deprecated
 class MessageVerifierHelper {
 
     public static boolean verify(UUID uuid, MessageSignData signData, PublicKey publicKey, Component component)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        return verify(uuid, signData, publicKey, AdventureSerializer.toJson(component));
+        return verify(uuid, signData, publicKey, AdventureSerializer.serializer().asJson(component));
     }
 
     public static boolean verify(UUID uuid, MessageSignData signData, PublicKey publicKey, String jsonMessage)

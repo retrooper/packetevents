@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,14 +38,24 @@ public class WrapperPlayServerUnloadChunk extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        this.chunkX = readInt();
-        this.chunkZ = readInt();
+        if (this.serverVersion.isNewerThanOrEquals(com.github.retrooper.packetevents.manager.server.ServerVersion.V_1_20_2)) {
+            long chunkKey = readLong();
+            this.chunkX = getChunkX(chunkKey);
+            this.chunkZ = getChunkZ(chunkKey);
+        } else {
+            this.chunkX = readInt();
+            this.chunkZ = readInt();
+        }
     }
 
     @Override
     public void write() {
-        writeInt(chunkX);
-        writeInt(chunkZ);
+        if (this.serverVersion.isNewerThanOrEquals(com.github.retrooper.packetevents.manager.server.ServerVersion.V_1_20_2)) {
+            writeLong(getChunkKey(this.chunkX, this.chunkZ));
+        } else {
+            writeInt(this.chunkX);
+            writeInt(this.chunkZ);
+        }
     }
 
     @Override

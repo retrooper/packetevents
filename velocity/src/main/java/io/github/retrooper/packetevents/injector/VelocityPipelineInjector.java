@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
@@ -30,7 +29,6 @@ import io.github.retrooper.packetevents.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.handlers.PacketEventsEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -86,23 +84,23 @@ public class VelocityPipelineInjector implements ChannelInjector {
     }
 
     @Override
-    public User getUser(Object channel) {
-        PacketEventsDecoder decoder = (PacketEventsDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME);
-        return decoder.user;
-    }
-
-    @Override
-    public void changeConnectionState(Object channel, @Nullable ConnectionState connectionState) {
-        getUser(channel).setConnectionState(connectionState);
-    }
-
-    @Override
     public void updateUser(Object channel, User user) {
         PacketEventsDecoder decoder = (PacketEventsDecoder) ((Channel) channel).pipeline().get(PacketEvents.DECODER_NAME);
         decoder.user = user;
 
         PacketEventsEncoder encoder = (PacketEventsEncoder) ((Channel) channel).pipeline().get(PacketEvents.ENCODER_NAME);
         encoder.user = user;
+    }
+
+    @Override
+    public boolean isPlayerSet(Object ch) {
+        if (ch == null) return false;
+        Channel channel = (Channel) ch;
+        PacketEventsEncoder encoder = (PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
+        if (encoder.player != null) return true;
+
+        PacketEventsDecoder decoder = (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+        return decoder.player != null;
     }
 
     @Override
@@ -118,10 +116,7 @@ public class VelocityPipelineInjector implements ChannelInjector {
     }
 
     @Override
-    public boolean hasPlayer(Object player) {
-        Channel channel = (Channel) PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        PacketEventsDecoder decoder = (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-        return decoder != null
-                && decoder.player != null;
+    public boolean isProxy() {
+        return true;
     }
 }

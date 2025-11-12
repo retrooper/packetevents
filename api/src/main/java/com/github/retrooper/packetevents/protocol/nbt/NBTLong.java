@@ -32,6 +32,11 @@ public class NBTLong extends NBTNumber {
     }
 
     @Override
+    public Number getAsNumber() {
+        return value;
+    }
+
+    @Override
     public byte getAsByte() {
         return (byte) value;
     }
@@ -84,5 +89,10 @@ public class NBTLong extends NBTNumber {
     @Override
     public NBTLong copy() {
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Long(" + value + ")";
     }
 }

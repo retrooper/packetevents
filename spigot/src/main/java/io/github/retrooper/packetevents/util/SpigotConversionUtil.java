@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,15 +20,34 @@ package io.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.mappings.SimpleTypesBuilderData;
+import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Pose;
+import org.bukkit.inventory.MainHand;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class SpigotConversionUtil {
     public static Location fromBukkitLocation(org.bukkit.Location location) {
@@ -40,11 +59,21 @@ public class SpigotConversionUtil {
     }
 
     public static PotionType fromBukkitPotionEffectType(org.bukkit.potion.PotionEffectType potionEffectType) {
-        return PotionTypes.getById(potionEffectType.getId());
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        int id = potionEffectType.getId();
+        if (version.isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+            id--;
+        }
+        return PotionTypes.getById(id, version);
     }
 
     public static org.bukkit.potion.PotionEffectType toBukkitPotionEffectType(PotionType potionType) {
-        return org.bukkit.potion.PotionEffectType.getById(potionType.getId());
+        ClientVersion version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        int id = potionType.getId(version);
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_2)) {
+            id++;
+        }
+        return org.bukkit.potion.PotionEffectType.getById(id);
     }
 
     public static GameMode fromBukkitGameMode(org.bukkit.GameMode gameMode) {
@@ -53,6 +82,15 @@ public class SpigotConversionUtil {
 
     public static org.bukkit.GameMode toBukkitGameMode(GameMode gameMode) {
         return org.bukkit.GameMode.getByValue(gameMode.getId());
+    }
+
+    public static WrappedBlockState fromBukkitBlockData(BlockData blockData) {
+        String string = blockData.getAsString(false);
+        return WrappedBlockState.getByString(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), string);
+    }
+
+    public static BlockData toBukkitBlockData(WrappedBlockState blockState) {
+        return org.bukkit.Bukkit.createBlockData(blockState.toString());
     }
 
     public static EntityType fromBukkitEntityType(org.bukkit.entity.EntityType entityType) {
@@ -92,13 +130,28 @@ public class SpigotConversionUtil {
         return bukkitStack.getType();
     }
 
-    public static WrappedBlockState fromBukkitBlockData(org.bukkit.material.MaterialData materialData) {
+    /**
+     * Converts a Bukkit {@link org.bukkit.material.MaterialData} object to a {@link WrappedBlockState} object.
+     * <p>
+     * This method is compatible with Minecraft versions from 1.8.8 to 1.12.2.
+     * </p>
+     *
+     * @param materialData The Bukkit {@link org.bukkit.material.MaterialData} object to convert.
+     * @return The corresponding {@link WrappedBlockState} object.
+     */
+    public static WrappedBlockState fromBukkitMaterialData(org.bukkit.material.MaterialData materialData) {
         int combinedID = SpigotReflectionUtil.getBlockDataCombinedId(materialData);
         ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
         return WrappedBlockState.getByGlobalId(serverVersion.toClientVersion(), combinedID);
     }
 
-    public static org.bukkit.material.MaterialData toBukkitBlockData(WrappedBlockState state) {
+    /**
+     * Converts a {@link WrappedBlockState} object to a Bukkit {@link org.bukkit.material.MaterialData} object.
+     *
+     * @param state The {@link WrappedBlockState} object to convert.
+     * @return The corresponding Bukkit {@link org.bukkit.material.MaterialData} object.
+     */
+    public static org.bukkit.material.MaterialData toBukkitMaterialData(WrappedBlockState state) {
         return SpigotReflectionUtil.getBlockDataByCombinedId(state.getGlobalId());
     }
 
@@ -108,5 +161,92 @@ public class SpigotConversionUtil {
 
     public static org.bukkit.inventory.ItemStack toBukkitItemStack(ItemStack itemStack) {
         return SpigotReflectionUtil.encodeBukkitItemStack(itemStack);
+    }
+
+    public static DimensionType typeFromBukkitWorld(World world) {
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        if (version.isOlderThan(ServerVersion.V_1_14)) {
+            int environmentId = world.getEnvironment().getId();
+            return DimensionTypes.getRegistry().getById(version.toClientVersion(), environmentId);
+        } else if (version.isOlderThan(ServerVersion.V_1_16)) {
+            Object worldServer = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
+            int dimensionTypeId = SpigotReflectionUtil.getDimensionId(worldServer);
+            return DimensionTypes.getRegistry().getById(version.toClientVersion(), dimensionTypeId);
+        } else {
+            Object serverLevel = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
+            Object nbt = SpigotReflectionUtil.convertWorldServerDimensionToNMSNbt(serverLevel);
+
+            NBTCompound peNbt = SpigotReflectionUtil.fromMinecraftNBT(nbt);
+            ResourceLocation dimensionTypeName = new ResourceLocation(SpigotReflectionUtil.getDimensionKey(serverLevel));
+            int dimensionTypeId = SpigotReflectionUtil.getDimensionId(serverLevel);
+            return DimensionType.decode(peNbt, version.toClientVersion(),
+                    new SimpleTypesBuilderData(dimensionTypeName, dimensionTypeId));
+        }
+    }
+
+    @Deprecated
+    public static Dimension fromBukkitWorld(World world) {
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        if (version.isOlderThan(ServerVersion.V_1_14)) {
+            return new Dimension(world.getEnvironment().getId());
+        } else if (version.isOlderThan(ServerVersion.V_1_16)) {
+            Object worldServer = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
+            return new Dimension(SpigotReflectionUtil.getDimensionId(worldServer));
+        } else {
+            Object serverLevel = SpigotReflectionUtil.convertBukkitWorldToWorldServer(world);
+            Object nbt = SpigotReflectionUtil.convertWorldServerDimensionToNMSNbt(serverLevel);
+            Dimension dimension = new Dimension(SpigotReflectionUtil.fromMinecraftNBT(nbt));
+            if (version.isOlderThan(ServerVersion.V_1_16_2)) {
+                dimension.setDimensionName(SpigotReflectionUtil.getDimensionKey(serverLevel));
+            }
+            dimension.setId(SpigotReflectionUtil.getDimensionId(serverLevel));
+            return dimension;
+        }
+    }
+
+    public static ParticleType<?> fromBukkitParticle(Enum<?> particle) {
+        return SpigotReflectionUtil.toPacketEventsParticle(particle);
+    }
+
+    public static Enum<?> toBukkitParticle(ParticleType<?> particle) {
+        return SpigotReflectionUtil.fromPacketEventsParticle(particle);
+    }
+
+    /**
+     * <strong>WARNING:</strong> This is not a safe operation, avoid usage
+     * of this method if possible!
+     * <p>
+     * Access the Bukkit Entity associated to the Entity ID.
+     *
+     * @param world    The world they are in. This field is optional, but is recommended as it could boost performance.
+     * @param entityId The associated Entity ID
+     * @return The Bukkit Entity
+     */
+    public static org.bukkit.entity.@Nullable Entity getEntityById(@Nullable World world, int entityId) {
+        return SpigotReflectionUtil.getEntityById(world, entityId);
+    }
+
+    public static Pose toBukkitPose(EntityPose pose) {
+        return Pose.values()[pose.ordinal()];
+    }
+
+    public static EntityPose fromBukkitPose(Pose pose) {
+        return EntityPose.values()[pose.ordinal()];
+    }
+
+    public static MainHand toBukkitHand(HumanoidArm arm) {
+        return MainHand.values()[arm.ordinal()];
+    }
+
+    /**
+     * Retrieves the metadata of a given Bukkit {@link org.bukkit.entity.Entity},
+     * returned as a list of {@link com.github.retrooper.packetevents.protocol.entity.data.EntityData}
+     * compatible with PacketEvents.
+     *
+     * @param entity the Bukkit entity to extract metadata from
+     * @return a list of the entity's metadata values
+     */
+    public static List<EntityData<?>> getEntityMetadata(Entity entity) {
+        return SpigotReflectionUtil.getEntityMetadata(entity);
     }
 }

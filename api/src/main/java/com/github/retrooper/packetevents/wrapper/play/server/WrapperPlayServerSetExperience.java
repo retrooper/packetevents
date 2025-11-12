@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ public class WrapperPlayServerSetExperience extends PacketWrapper<WrapperPlaySer
     @Override
     public void read() {
         experienceBar = readFloat();
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             level = readShort();
             totalExperience = readShort();
         } else {
@@ -54,7 +54,7 @@ public class WrapperPlayServerSetExperience extends PacketWrapper<WrapperPlaySer
     @Override
     public void write() {
         writeFloat(experienceBar);
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             writeShort(level);
             writeShort(totalExperience);
         } else {

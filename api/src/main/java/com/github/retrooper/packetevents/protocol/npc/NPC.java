@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,11 @@ package com.github.retrooper.packetevents.protocol.npc;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.player.*;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,10 +35,12 @@ import java.util.*;
 public class NPC {
     private final int id;
     private final UserProfile profile;
+    private GameMode gamemode;
     private Component tabName;
     private NamedTextColor nameColor;
     private Component prefixName;
     private Component suffixName;
+    private String teamName;
     private int displayPing = 0;
     private Location location = new Location(0.0, 0.0, 0.0, 0.0f, 0.0f);
     private ItemStack mainHand = null;
@@ -47,19 +51,21 @@ public class NPC {
     private ItemStack boots = null;
     private final Set<Object> channels = new HashSet<>();
 
-    public NPC(UserProfile profile, int entityId, @Nullable Component tabName, @Nullable NamedTextColor nameColor,
+    public NPC(UserProfile profile, int entityId, GameMode gamemode, @Nullable Component tabName, @Nullable NamedTextColor nameColor,
                @Nullable Component prefixName, @Nullable Component suffixName) {
         this.profile = profile;
         this.id = entityId;
+        this.gamemode = gamemode;
 
         this.tabName = tabName;
         this.nameColor = nameColor;
         this.prefixName = prefixName;
         this.suffixName = suffixName;
+        this.teamName = "npc-" + id;
     }
 
     public NPC(UserProfile profile, int entityId, @Nullable Component tabName) {
-        this(profile, entityId, tabName, null, null, null);
+        this(profile, entityId, GameMode.SURVIVAL, tabName, null, null, null);
     }
 
     public NPC(UserProfile profile, int entityId) {
@@ -72,15 +78,28 @@ public class NPC {
 
     public void spawn(Object channel) {
         if (hasSpawned(channel)) return;
-        WrapperPlayServerPlayerInfo playerInfoPacket =
-                new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getPlayerInfoData());
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoPacket);
+        PacketWrapper<?> playerInfo;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+            playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
+                    getModernPlayerInfoData());
+        }
+        else {
+            playerInfo = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getLegacyPlayerInfoData());
+        }
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
 
         //TODO Later if we want entity metadata, its not supported on newer server versions though(confirm if its mandatory on older versions)
-        WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(getId(),
-                getProfile().getUUID(),
-                getLocation());
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPlayer);
+
+        PacketWrapper<?> spawnPacket;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+            spawnPacket = new WrapperPlayServerSpawnEntity(getId(), getProfile().getUUID(), EntityTypes.PLAYER, getLocation(), getLocation().getYaw(), 0, null);
+        }
+        else {
+            spawnPacket = new WrapperPlayServerSpawnPlayer(getId(),
+                    getProfile().getUUID(),
+                    getLocation());
+        }
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPacket);
 
         //Create team
         if (getNameColor() != null || getPrefixName() != null
@@ -103,6 +122,7 @@ public class NPC {
             WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(getId());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, destroyEntities);
         }
+        channels.clear();
     }
 
     public void teleport(Location to) {
@@ -181,16 +201,44 @@ public class NPC {
     public void updateTabPing(int ping) {
         setDisplayPing(ping);
         for (Object channel : channels) {
-            WrapperPlayServerPlayerInfo playerInfo =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, getPlayerInfoData());
+            PacketWrapper<?> playerInfo;
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+                playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LATENCY, getModernPlayerInfoData());
+            }
+            else {
+                playerInfo =
+                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, getLegacyPlayerInfoData());
+            }
+            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
+        }
+    }
+
+    public void updateGameMode(GameMode gamemode) {
+        setGameMode(gamemode);
+        for (Object channel : channels) {
+            PacketWrapper<?> playerInfo;
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+                playerInfo = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_GAME_MODE,
+                        getModernPlayerInfoData());
+            }
+            else {
+                playerInfo =
+                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_GAME_MODE, getLegacyPlayerInfoData());
+            }
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfo);
         }
     }
 
     public void changeSkin(UUID skinUUID, List<TextureProperty> skinTextureProperties) {
         for (Object channel : channels) {
-            WrapperPlayServerPlayerInfo playerInfoRemove =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getPlayerInfoData());
+            PacketWrapper<?> playerInfoRemove;
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+                playerInfoRemove = new WrapperPlayServerPlayerInfoRemove(getProfile().getUUID());
+            }
+            else {
+                playerInfoRemove =
+                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, getLegacyPlayerInfoData());
+            }
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoRemove);
 
             WrapperPlayServerDestroyEntities destroyEntities =
@@ -199,27 +247,41 @@ public class NPC {
 
             getProfile().setTextureProperties(skinTextureProperties);
             getProfile().setUUID(skinUUID);
-            WrapperPlayServerPlayerInfo playerInfoAdd =
-                    new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getPlayerInfoData());
+            PacketWrapper<?> playerInfoAdd;
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_3)) {
+                playerInfoAdd = new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
+                        getModernPlayerInfoData());
+            }
+            else {
+                playerInfoAdd =
+                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, getLegacyPlayerInfoData());
+            }
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, playerInfoAdd);
 
-            WrapperPlayServerSpawnPlayer spawnPlayer =
-                    new WrapperPlayServerSpawnPlayer(getId(), getProfile().getUUID(), getLocation());
-            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPlayer);
+            PacketWrapper<?> spawnPacket;
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+                spawnPacket = new WrapperPlayServerSpawnEntity(getId(), getProfile().getUUID(), EntityTypes.PLAYER, getLocation(), getLocation().getYaw(), 0, null);
+            }
+            else {
+                spawnPacket = new WrapperPlayServerSpawnPlayer(getId(),
+                        getProfile().getUUID(),
+                        getLocation());
+            }
+            PacketEvents.getAPI().getProtocolManager().sendPacket(channel, spawnPacket);
         }
     }
 
-    public void updateNameTag(NPC npc) {
+    public void updateNameTag() {
         for (Object channel : channels) {
             //Destroy team
             WrapperPlayServerTeams removeTeam =
-                    new WrapperPlayServerTeams("custom_name_team",
+                    new WrapperPlayServerTeams(teamName,
                             WrapperPlayServerTeams.TeamMode.REMOVE,
                             Optional.empty());
             PacketEvents.getAPI().getProtocolManager().sendPacket(channel, removeTeam);
 
-            if (npc.getNameColor() != null || npc.getPrefixName() != null
-                    || npc.getSuffixName() != null) {
+            if (this.getNameColor() != null || this.getPrefixName() != null
+                    || this.getSuffixName() != null) {
                 PacketEvents.getAPI().getProtocolManager().sendPacket(channel, generateTeamsData());
             }
         }
@@ -350,6 +412,16 @@ public class NPC {
         this.suffixName = nameSuffix;
     }
 
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_18)) {
+            this.teamName = teamName.substring(0, 16);
+        } else this.teamName = teamName;
+    }
+
     @Nullable
     public Component getTabName() {
         return tabName;
@@ -367,12 +439,20 @@ public class NPC {
         return profile;
     }
 
+    public GameMode getGameMode() {
+        return gamemode;
+    }
+
+    public void setGameMode(GameMode gamemode) {
+        this.gamemode = gamemode;
+    }
+
     private WrapperPlayServerTeams generateTeamsData() {
-        return new WrapperPlayServerTeams("custom_name_team",
+        return new WrapperPlayServerTeams(teamName,
                 WrapperPlayServerTeams.TeamMode.CREATE,
                 Optional.of(
                         new WrapperPlayServerTeams.ScoreBoardTeamInfo(
-                                Component.text("custom_name_team"),
+                                Component.text(teamName),
                                 prefixName,
                                 suffixName,
                                 WrapperPlayServerTeams.NameTagVisibility.ALWAYS,
@@ -383,10 +463,15 @@ public class NPC {
                 getProfile().getName());
     }
 
-    public WrapperPlayServerPlayerInfo.PlayerData getPlayerInfoData() {
+    public WrapperPlayServerPlayerInfo.PlayerData getLegacyPlayerInfoData() {
         return new WrapperPlayServerPlayerInfo.PlayerData(getTabName(),
-                getProfile(), GameMode.SURVIVAL,
+                getProfile(), getGameMode(),
                 getDisplayPing());
+    }
+
+    public WrapperPlayServerPlayerInfoUpdate.PlayerInfo getModernPlayerInfoData() {
+        return new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(getProfile(), true,
+                getDisplayPing(), getGameMode(), getTabName(), null);
     }
 
     public int getDisplayPing() {
@@ -403,5 +488,9 @@ public class NPC {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public Set<Object> getChannels() {
+        return channels;
     }
 }

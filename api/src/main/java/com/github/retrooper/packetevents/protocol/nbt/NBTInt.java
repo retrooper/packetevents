@@ -32,6 +32,11 @@ public class NBTInt extends NBTNumber {
     }
 
     @Override
+    public Number getAsNumber() {
+        return value;
+    }
+
+    @Override
     public byte getAsByte() {
         return (byte) value;
     }
@@ -84,5 +89,10 @@ public class NBTInt extends NBTNumber {
     @Override
     public NBTInt copy() {
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Int(" + value + ")";
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 package com.github.retrooper.packetevents.util.crypto;
 
 public class SaltSignature {
-    private final long salt;
-    private final byte[] signature;
+    private long salt;
+    private byte[] signature;
 
     public SaltSignature(long salt, byte[] signature) {
         this.salt = salt;
@@ -31,7 +31,15 @@ public class SaltSignature {
         return salt;
     }
 
+    public void setSalt(long salt) {
+        this.salt = salt;
+    }
+
     public byte[] getSignature() {
         return signature;
+    }
+
+    public void setSignature(byte[] signature) {
+        this.signature = signature;
     }
 }

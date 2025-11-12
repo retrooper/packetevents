@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,13 +52,12 @@ public class Chunk_v1_8 implements BaseChunk {
     }
 
     @Override
-    public WrappedBlockState get(ClientVersion version, int x, int y, int z) {
-        int combinedID = this.blocks.get(x, y, z);
-        return WrappedBlockState.getByGlobalId(version, combinedID);
+    public int getBlockId(int x, int y, int z) {
+        return this.blocks.get(x, y, z);
     }
 
     @Override
-    public void set(ClientVersion version, int x, int y, int z, int combinedID) {
+    public void set(int x, int y, int z, int combinedID) {
         this.blocks.set(x, y, z, combinedID);
     }
 

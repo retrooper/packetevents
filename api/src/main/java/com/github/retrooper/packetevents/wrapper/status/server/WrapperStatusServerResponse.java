@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.wrapper.status.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.gson.JsonObject;
 
@@ -56,11 +56,11 @@ public class WrapperStatusServerResponse extends PacketWrapper<WrapperStatusServ
     }
 
     public JsonObject getComponent() {
-        return AdventureSerializer.getGsonSerializer().serializer().fromJson(componentJson, JsonObject.class);
+        return this.getSerializers().gson().serializer().fromJson(componentJson, JsonObject.class);
     }
 
     public void setComponent(JsonObject component) {
-        this.componentJson = AdventureSerializer.getGsonSerializer().serializer().toJson(component);
+        this.componentJson = this.getSerializers().gson().serializer().toJson(component);
     }
 
     public String getComponentJson() {

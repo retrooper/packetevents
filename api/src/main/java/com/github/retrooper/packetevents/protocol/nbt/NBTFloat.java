@@ -32,6 +32,11 @@ public class NBTFloat extends NBTNumber {
     }
 
     @Override
+    public Number getAsNumber() {
+        return value;
+    }
+
+    @Override
     public byte getAsByte() {
         return (byte) value;
     }
@@ -84,5 +89,10 @@ public class NBTFloat extends NBTNumber {
     @Override
     public NBTFloat copy() {
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Float(" + value + ")";
     }
 }

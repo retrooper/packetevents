@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,19 +57,27 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
     @Override
     public void read() {
         this.encryptedSharedSecret = readByteArray(ByteBufHelper.readableBytes(buffer));
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19) && !readBoolean()) {
-            this.saltSignature = readSaltSignature();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_2)
+                && !readBoolean()) {
+            saltSignature = readSaltSignature();
         } else {
-            this.encryptedVerifyToken = readByteArray();
+            encryptedVerifyToken = readByteArray();
         }
     }
 
     @Override
     public void write() {
         writeByteArray(encryptedSharedSecret);
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_19) && saltSignature != null) {
-            writeBoolean(false);
-            writeSaltSignature(saltSignature);
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                && serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_2)) {
+            writeBoolean(saltSignature == null);
+            if(saltSignature != null) {
+                writeSaltSignature(saltSignature);
+            } else {
+                writeByteArray(encryptedVerifyToken);
+            }
         } else {
             writeByteArray(encryptedVerifyToken);
         }

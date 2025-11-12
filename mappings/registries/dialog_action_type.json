@@ -1,0 +1,13 @@
+{
+  "V_1_21_6": [
+    "open_url",
+    "run_command",
+    "suggest_command",
+    "show_dialog",
+    "change_page",
+    "copy_to_clipboard",
+    "custom",
+    "dynamic/run_command",
+    "dynamic/custom"
+  ]
+}

@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,23 +25,27 @@
 package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
+import java.util.Arrays;
 
 /**
  * A palette backed by a List.
  */
 //TODO Equals & hashcode
 public class ListPalette implements Palette {
-    private final int maxId;
 
+    private final int bits;
     private final int[] data;
-    private int nextId = 0;
+    private int nextId;
 
     public ListPalette(int bitsPerEntry) {
-        this.maxId = (1 << bitsPerEntry) - 1;
-
-        this.data = new int[this.maxId + 1];
+        this.bits = bitsPerEntry;
+        this.data = new int[1 << bitsPerEntry];
+        this.nextId = 0;
     }
 
+    @Deprecated
     public ListPalette(int bitsPerEntry, NetStreamInput in) {
         this(bitsPerEntry);
 
@@ -50,6 +54,27 @@ public class ListPalette implements Palette {
             this.data[i] = in.readVarInt();
         }
         this.nextId = paletteLength;
+    }
+
+    public ListPalette(int bitsPerEntry, PacketWrapper<?> wrapper) {
+        this(bitsPerEntry);
+
+        int paletteLength = wrapper.readVarInt();
+        for (int i = 0; i < paletteLength; i++) {
+            this.data[i] = wrapper.readVarInt();
+        }
+        this.nextId = paletteLength;
+    }
+
+    public ListPalette(int bitsPerEntry, int[] data) {
+        this.bits = bitsPerEntry;
+        final int expectedSize = (1 << this.bits);
+        if (data.length > expectedSize) {
+            throw new IllegalArgumentException("Data length exceeds the max size the bits can hold");
+        } else {
+            this.data = Arrays.copyOf(data, expectedSize);
+        }
+        this.nextId = data.length;
     }
 
     @Override
@@ -66,7 +91,7 @@ public class ListPalette implements Palette {
                 break;
             }
         }
-        if (id == -1 && this.size() < this.maxId + 1) {
+        if (id == -1 && this.size() < this.data.length) {
             id = this.nextId++;
             this.data[id] = state;
         }
@@ -81,5 +106,10 @@ public class ListPalette implements Palette {
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public int getBits() {
+        return this.bits;
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,13 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Optional;
 
 public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServerServerData> {
+    private static final String BASE64_IMAGE_HEADER = "data:image/png;base64,";
+
     private @Nullable Component motd;
     private @Nullable String icon;
     private boolean previewsChat;
@@ -51,20 +55,47 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void read() {
-        motd = readOptional(PacketWrapper::readComponent);
-        icon = readOptional(PacketWrapper::readString);
-        previewsChat = readBoolean();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4) || readBoolean()) {
+            motd = readComponent();
+        }
+        if (readBoolean()) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
+                byte[] iconByteArray = readByteArray();
+                icon = BASE64_IMAGE_HEADER + new String(Base64.getEncoder().encode(iconByteArray), StandardCharsets.UTF_8);
+            } else {
+                icon = readString();
+            }
+        }
+        if (serverVersion.isOlderThan(ServerVersion.V_1_19_3)) {
+            previewsChat = readBoolean();
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)
+                && serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
             enforceSecureChat = readBoolean();
         }
     }
 
     @Override
     public void write() {
-        writeOptional(motd, PacketWrapper::writeComponent);
-        writeOptional(icon, PacketWrapper::writeString);
-        writeBoolean(previewsChat);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
+            writeComponent(motd);
+            byte[] iconByteArray;
+            if (icon == null) {
+                iconByteArray = null;
+            } else {
+                String iconData = icon.substring(BASE64_IMAGE_HEADER.length());
+                iconByteArray = Base64.getDecoder().decode(iconData.getBytes(StandardCharsets.UTF_8));
+            }
+            writeOptional(iconByteArray, PacketWrapper::writeByteArray);
+        } else {
+            writeOptional(motd, PacketWrapper::writeComponent);
+            writeOptional(icon, PacketWrapper::writeString);
+        }
+        if (serverVersion.isOlderThan(ServerVersion.V_1_19_3)) {
+            writeBoolean(previewsChat);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_1)
+                && serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
             writeBoolean(enforceSecureChat);
         }
     }
@@ -101,10 +132,16 @@ public class WrapperPlayServerServerData extends PacketWrapper<WrapperPlayServer
         this.previewsChat = previewsChat;
     }
 
+    /**
+     * <strong>WARNING:</strong> This was moved to {@link WrapperPlayServerJoinGame} with 1.20.5
+     */
     public boolean isEnforceSecureChat() {
         return enforceSecureChat;
     }
 
+    /**
+     * <strong>WARNING:</strong> This was moved to {@link WrapperPlayServerJoinGame} with 1.20.5
+     */
     public void setEnforceSecureChat(boolean enforceSecureChat) {
         this.enforceSecureChat = enforceSecureChat;
     }

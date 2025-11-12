@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
@@ -35,8 +34,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
     private int legacySlots; // 1.13-
     private int horseId; // 1.13-
 
-    private String title;
-    private Component titleAsComponent = null;
+    private Component title;
 
     private boolean useProvidedWindowTitle; // 1.7 only
 
@@ -49,7 +47,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         super(PacketType.Play.Server.OPEN_WINDOW);
         this.containerId = containerId;
         this.type = type;
-        this.title = AdventureSerializer.toJson(title);
+        this.title = title;
     }
 
     // 1.8 through 1.13
@@ -59,7 +57,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.legacyType = legacyType;
         this.legacySlots = legacySlots;
         this.horseId = horseId;
-        this.title = AdventureSerializer.toJson(title);
+        this.title = title;
     }
 
     // 1.7
@@ -67,7 +65,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         super(PacketType.Play.Server.OPEN_WINDOW);
         this.containerId = containerId;
         this.type = type;
-        this.title = AdventureSerializer.toJson(title);
+        this.title = title;
         this.legacySlots = legacySlots;
         this.useProvidedWindowTitle = useProvidedWindowTitle;
         this.horseId = horseId;
@@ -75,16 +73,17 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void read() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-            this.containerId = readUnsignedByte();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)
+                || this.serverVersion.isOlderThan(ServerVersion.V_1_14)) {
+            this.containerId = this.readContainerId();
         } else {
-            this.containerId = readVarInt();
+            this.containerId = this.readVarInt();
         }
 
         // 1.7 has a very different packet format
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             this.type = readUnsignedByte();
-            this.title = readString(32);
+            this.title = this.getSerializers().fromLegacy(this.readString(32));
             this.legacySlots = readUnsignedByte();
             this.useProvidedWindowTitle = readBoolean();
 
@@ -97,10 +96,10 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         // Known to be 1.8 or above
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             this.type = readVarInt();
-            this.title = readComponentJSON();
+            this.title = readComponent();
         } else {
             this.legacyType = readString();
-            this.title = readComponentJSON();
+            this.title = readComponent();
             this.legacySlots = readUnsignedByte();
             // This is only sent for horses
             if (legacyType.equals("EntityHorse")) {
@@ -111,16 +110,17 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
 
     @Override
     public void write() {
-        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-            writeByte(this.containerId);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)
+                || this.serverVersion.isOlderThan(ServerVersion.V_1_14)) {
+            this.writeContainerId(this.containerId);
         } else {
-            writeVarInt(this.containerId);
+            this.writeVarInt(this.containerId);
         }
 
         // 1.7 has a very different packet format
         if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             writeByte(this.type);
-            writeString(this.title);
+            writeString(this.getSerializers().asLegacy(this.title));
             writeByte(this.legacySlots);
             writeBoolean(this.useProvidedWindowTitle);
 
@@ -133,18 +133,10 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         // Known to be 1.8 or above
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             writeVarInt(this.type);
-            if (this.titleAsComponent != null) {
-                writeComponent(this.titleAsComponent);
-            } else {
-                writeString(this.title);
-            }
+            writeComponent(this.title);
         } else {
             writeString(this.legacyType);
-            if (this.titleAsComponent != null) {
-                writeComponent(this.titleAsComponent);
-            } else {
-                writeString(this.title);
-            }
+            writeComponent(this.title);
             writeByte(this.legacySlots);
             // This is only sent for horses
             if (legacyType.equals("EntityHorse")) {
@@ -161,7 +153,6 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.legacySlots = wrapper.legacySlots;
         this.horseId = wrapper.horseId;
         this.title = wrapper.title;
-        this.titleAsComponent = wrapper.titleAsComponent;
         this.useProvidedWindowTitle = wrapper.useProvidedWindowTitle;
     }
 
@@ -206,12 +197,11 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
     }
 
     public Component getTitle() {
-        if (titleAsComponent != null) return titleAsComponent;
-        return titleAsComponent = AdventureSerializer.parseComponent(title);
+        return this.title;
     }
 
     public void setTitle(Component title) {
-        titleAsComponent = title;
+        this.title = title;
     }
 
     public boolean isUseProvidedWindowTitle() {

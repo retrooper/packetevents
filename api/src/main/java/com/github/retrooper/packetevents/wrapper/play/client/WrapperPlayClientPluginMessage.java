@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
             this.channelName = readString(20);
         }
 
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             //It is ignored, because we don't need it
             int legacyDataSize = readShort();
         }
@@ -75,7 +75,7 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
         else {
             writeString(this.channelName, 20);
         }
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             writeShort(this.data.length);
         }
         writeBytes(this.data);

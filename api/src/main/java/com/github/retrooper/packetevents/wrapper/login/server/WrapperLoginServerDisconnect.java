@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.wrapper.login.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 
@@ -42,12 +41,12 @@ public class WrapperLoginServerDisconnect extends PacketWrapper<WrapperLoginServ
 
     @Override
     public void read() {
-        this.reason = readComponent();
+        this.reason = this.readComponentAsJSON();
     }
 
     @Override
     public void write() {
-        writeComponent(reason);
+        this.writeComponentAsJSON(this.reason);
     }
 
     @Override

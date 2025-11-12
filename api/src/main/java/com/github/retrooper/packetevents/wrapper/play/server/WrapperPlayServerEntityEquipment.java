@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,11 +45,17 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
 
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             entityId = readInt();
         } else {
             entityId = readVarInt();
         }
+        readEquipment();
+    }
+
+    // allow this to be overridden by a subclass
+    // this could be used to save performance if you don't need to read the equipment
+    protected void readEquipment() {
         equipment = new ArrayList<>();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             byte value;
@@ -72,7 +78,7 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             writeInt(entityId);
         } else {
             writeVarInt(entityId);
