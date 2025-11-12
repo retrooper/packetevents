@@ -1,5 +1,3 @@
-package com.github.retrooper.packetevents.protocol.sound;
-
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
  * Copyright (C) 2024 retrooper and contributors
