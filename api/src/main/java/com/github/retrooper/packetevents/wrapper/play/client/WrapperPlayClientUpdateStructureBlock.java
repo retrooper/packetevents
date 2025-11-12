@@ -20,9 +20,9 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.world.states.enums.Mirror;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Mode;
-import com.github.retrooper.packetevents.protocol.world.states.enums.Rotation;
+import com.github.retrooper.packetevents.protocol.world.SturctureRotation;
+import com.github.retrooper.packetevents.protocol.world.StructureMirror;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Range;
@@ -42,8 +42,8 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
     private byte sizeX;
     private byte sizeY;
     private byte sizeZ;
-    private Mirror mirror;
-    private Rotation rotation;
+    private StructureMirror mirror;
+    private StructureRotation rotation;
     private String metadata;
     private float integrity;
     private long seed;
@@ -60,7 +60,7 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
                                                  @Range(from = -32, to = 32) byte offsetX, @Range(from = -32, to = 32) byte offsetY,
                                                  @Range(from = -32, to = 32) byte offsetZ, @Range(from = -32, to = 32) byte sizeX,
                                                  @Range(from = -32, to = 32) byte sizeY, @Range(from = -32, to = 32) byte sizeZ,
-                                                 Mirror mirror, Rotation rotation, String metadata, @Range(from = 0, to = 1) float integrity,
+                                                 StructureMirror mirror, StructureRotation rotation, String metadata, @Range(from = 0, to = 1) float integrity,
                                                  long seed, boolean ignoreEntities, boolean showAir, boolean showBoundingBox, short flags) {
         super(PacketType.Play.Client.UPDATE_STRUCTURE_BLOCK);
         this.position = position;
@@ -96,8 +96,8 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
         this.sizeX = readByte();
         this.sizeY = readByte();
         this.sizeZ = readByte();
-        this.mirror = Mirror.getById(readVarInt());
-        this.rotation = Rotation.getById(readVarInt());
+        this.mirror = StructureMirror.getById(readVarInt());
+        this.rotation = StructureRotation.getById(readVarInt());
         this.metadata = readString();
         this.integrity = readFloat();
         this.seed = readVarLong();
@@ -252,19 +252,19 @@ public class WrapperPlayClientUpdateStructureBlock extends PacketWrapper<Wrapper
         this.sizeZ = sizeZ;
     }
 
-    public Mirror getMirror() {
+    public StructureMirror getStructureMirror() {
         return mirror;
     }
 
-    public void setMirror(Mirror mirror) {
+    public void setStructureMirror(StructureMirror mirror) {
         this.mirror = mirror;
     }
 
-    public Rotation getRotation() {
+    public StructureRotation getStructureRotation() {
         return rotation;
     }
 
-    public void setRotation(Rotation rotation) {
+    public void setStructureRotation(StructureRotation rotation) {
         this.rotation = rotation;
     }
 
