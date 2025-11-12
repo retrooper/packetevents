@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
 public class WrapperPlayServerSetSlot extends PacketWrapper<WrapperPlayServerSetSlot> {
     private int windowID;
     private int stateID;
@@ -43,7 +44,7 @@ public class WrapperPlayServerSetSlot extends PacketWrapper<WrapperPlayServerSet
 
     @Override
     public void read() {
-        windowID = readByte();
+        this.windowID = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2) ? this.readContainerId() : this.readByte();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
             stateID = readVarInt();
         }
@@ -52,21 +53,21 @@ public class WrapperPlayServerSetSlot extends PacketWrapper<WrapperPlayServerSet
     }
 
     @Override
-    public void copy(WrapperPlayServerSetSlot wrapper) {
-        windowID = wrapper.windowID;
-        stateID = wrapper.stateID;
-        slot = wrapper.slot;
-        item = wrapper.item;
-    }
-
-    @Override
     public void write() {
-        writeByte(windowID);
+        this.writeContainerId(this.windowID);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
             writeVarInt(stateID);
         }
         writeShort(slot);
         writeItemStack(item);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSetSlot wrapper) {
+        windowID = wrapper.windowID;
+        stateID = wrapper.stateID;
+        slot = wrapper.slot;
+        item = wrapper.item;
     }
 
     public int getWindowId() {

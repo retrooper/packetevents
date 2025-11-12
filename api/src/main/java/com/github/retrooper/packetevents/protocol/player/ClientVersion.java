@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,12 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Client Version.
@@ -34,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.6.9
  */
 public enum ClientVersion {
+    V_1_7_2(4),
     V_1_7_10(5),
 
     V_1_8(47),
@@ -74,12 +80,49 @@ public enum ClientVersion {
     V_1_18_2(758),
 
     V_1_19(759),
+    V_1_19_1(760),
+    V_1_19_3(761),
+    V_1_19_4(762),
+    /**
+     * 1.20 and 1.20.1 have the same protocol version.
+     */
+    V_1_20(763),
+    V_1_20_2(764),
+    /**
+     * 1.20.3 and 1.20.4 have the same protocol version.
+     */
+    V_1_20_3(765),
+    /**
+     * 1.20.5 and 1.20.6 have the same protocol version.
+     */
+    V_1_20_5(766),
 
+    /**
+     * 1.21 and 1.21.1 have the same protocol version.
+     */
+    V_1_21(767),
+    /**
+     * 1.21.2 and 1.21.3 have the same protocol version.
+     */
+    V_1_21_2(768),
+    V_1_21_4(769),
+    V_1_21_5(770),
+    V_1_21_6(771),
+    /**
+     * 1.21.7 and 1.21.8 have the same protocol version.
+     */
+    V_1_21_7(772),
+    /**
+     * 1.21.9 and 1.21.10 have the same protocol version.
+     */
+    V_1_21_9(773),
     //TODO UPDATE Add new protocol version field
 
-    LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
+    @Deprecated
+    LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_2.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
-    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_19.protocolVersion + 1, true),
+    @Deprecated
+    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_21_9.protocolVersion + 1, true),
 
     UNKNOWN(-1, true);
 
@@ -87,15 +130,9 @@ public enum ClientVersion {
     private static final ClientVersion[] REVERSED_VALUES;
 
     static {
-        REVERSED_VALUES = values();
-        int i = 0;
-        int j = REVERSED_VALUES.length - 1;
-        ClientVersion tmp;
-        while (j > i) {
-            tmp = REVERSED_VALUES[j];
-            REVERSED_VALUES[j--] = REVERSED_VALUES[i];
-            REVERSED_VALUES[i++] = tmp;
-        }
+        List<ClientVersion> valuesAsList = Arrays.asList(values());
+        Collections.reverse(valuesAsList);
+        REVERSED_VALUES = valuesAsList.toArray(new ClientVersion[0]);
     }
 
     private static final int LOWEST_SUPPORTED_PROTOCOL_VERSION = LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1;
@@ -156,15 +193,14 @@ public enum ClientVersion {
     @NotNull
     public static ClientVersion getById(int protocolVersion) {
         if (protocolVersion < LOWEST_SUPPORTED_PROTOCOL_VERSION) {
-            return LOWER_THAN_SUPPORTED_VERSIONS;
+            return getOldest();
         } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
-            return HIGHER_THAN_SUPPORTED_VERSIONS;
+            return getLatest();
         } else {
             for (ClientVersion version : VALUES) {
                 if (version.protocolVersion > protocolVersion) {
                     break;
                 } else if (version.protocolVersion == protocolVersion) {
-                    //Cache for next time
                     return version;
                 }
             }
@@ -243,5 +279,35 @@ public enum ClientVersion {
      */
     public boolean isOlderThanOrEquals(ClientVersion target) {
         return this.protocolVersion <= target.protocolVersion;
+    }
+
+    /**
+     * Is this client version newer than, older than or equal to the compared client version?
+     * This method simply checks if this client version's protocol version is greater than, less than or equal to
+     * the compared client version's protocol version.
+     *
+     * @param comparison    Comparison type.
+     * @param targetVersion Compared client version.
+     * @return true or false, based on the comparison type.
+     * @see #isNewerThan(ClientVersion)
+     * @see #isNewerThanOrEquals(ClientVersion)
+     * @see #isOlderThan(ClientVersion)
+     * @see #isOlderThanOrEquals(ClientVersion)
+     */
+    public boolean is(@NotNull VersionComparison comparison, @NotNull ClientVersion targetVersion) {
+        switch (comparison) {
+            case EQUALS:
+                return protocolVersion == targetVersion.protocolVersion;
+            case NEWER_THAN:
+                return isNewerThan(targetVersion);
+            case NEWER_THAN_OR_EQUALS:
+                return isNewerThanOrEquals(targetVersion);
+            case OLDER_THAN:
+                return isOlderThan(targetVersion);
+            case OLDER_THAN_OR_EQUALS:
+                return isOlderThanOrEquals(targetVersion);
+            default:
+                return false;
+        }
     }
 }

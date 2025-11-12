@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +31,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServerTabComplete> {
-    private static final int MODERN_MESSAGE_LENGTH = 262144;
-    private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private Optional<Integer> transactionID;
     private Optional<CommandRange> commandRange;
     private List<CommandMatch> commandMatches;
@@ -68,17 +65,9 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             int matchLength = readVarInt();
             commandRange = Optional.of(new CommandRange(begin, begin + len));
             commandMatches = new ArrayList<>(matchLength);
-            int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
-                Component tooltip;
-                boolean hasTooltip = readBoolean();
-                if (hasTooltip) {
-                    String tooltipJson = readString(maxMessageLength);
-                    tooltip = AdventureSerializer.parseComponent(tooltipJson);
-                } else {
-                    tooltip = null;
-                }
+                Component tooltip = readOptional(PacketWrapper::readComponent);
                 CommandMatch commandMatch = new CommandMatch(text, tooltip);
                 commandMatches.add(commandMatch);
             }
@@ -87,8 +76,32 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             commandMatches = new ArrayList<>(matchLength);
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
-                CommandMatch commandMatch = new CommandMatch(text, (Component) null);
+                CommandMatch commandMatch = new CommandMatch(text, null);
                 commandMatches.add(commandMatch);
+            }
+        }
+    }
+
+    @Override
+    public void write() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            writeVarInt(transactionID.orElse(-1));
+            CommandRange commandRange = this.commandRange.get();
+            writeVarInt(commandRange.getBegin());
+            writeVarInt(commandRange.getLength());
+            writeVarInt(commandMatches.size());
+            for (CommandMatch match : commandMatches) {
+                writeString(match.getText());
+                boolean hasTooltip = match.getTooltip().isPresent();
+                writeBoolean(hasTooltip);
+                if (hasTooltip) {
+                    writeComponent(match.getTooltip().get());
+                }
+            }
+        } else {
+            writeVarInt(commandMatches.size());
+            for (CommandMatch match : commandMatches) {
+                writeString(match.getText());
             }
         }
     }
@@ -100,42 +113,12 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
         commandMatches = wrapper.commandMatches;
     }
 
-    @Override
-    public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeVarInt(transactionID.orElse(-1));
-            CommandRange commandRange = this.commandRange.get();
-            writeVarInt(commandRange.getBegin());
-            writeVarInt(commandRange.getLength());
-            writeVarInt(commandMatches.size());
-            int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-            for (CommandMatch match : commandMatches) {
-                writeString(match.getText());
-                boolean hasTooltip = match.getTooltip().isPresent();
-                writeBoolean(hasTooltip);
-                if (hasTooltip) {
-                    String tooltipJson = AdventureSerializer.toJson(match.getTooltip().get());
-                    writeString(tooltipJson, maxMessageLength);
-                }
-            }
-        } else {
-            writeVarInt(commandMatches.size());
-            for (CommandMatch match : commandMatches) {
-                writeString(match.getText());
-            }
-        }
-    }
-
     public Optional<Integer> getTransactionId() {
         return transactionID;
     }
 
-    public void setTransactionId(Integer transactionID) {
-        if (transactionID != null) {
-            this.transactionID = Optional.of(transactionID);
-        } else {
-            this.transactionID = Optional.empty();
-        }
+    public void setTransactionId(@Nullable Integer transactionID) {
+        this.transactionID = Optional.ofNullable(transactionID);
     }
 
     public Optional<CommandRange> getCommandRange() {
@@ -143,11 +126,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
     }
 
     public void setCommandRange(@Nullable CommandRange commandRange) {
-        if (commandRange != null) {
-            this.commandRange = Optional.of(commandRange);
-        } else {
-            this.commandRange = Optional.empty();
-        }
+        this.commandRange = Optional.ofNullable(commandRange);
     }
 
     public List<CommandMatch> getCommandMatches() {

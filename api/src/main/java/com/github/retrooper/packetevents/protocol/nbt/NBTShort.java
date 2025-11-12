@@ -31,6 +31,11 @@ public class NBTShort extends NBTNumber {
     }
 
     @Override
+    public Number getAsNumber() {
+        return value;
+    }
+
+    @Override
     public byte getAsByte() {
         return (byte) value;
     }
@@ -83,5 +88,10 @@ public class NBTShort extends NBTNumber {
     @Override
     public NBTShort copy() {
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Short(" + value + ")";
     }
 }

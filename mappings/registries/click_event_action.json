@@ -1,0 +1,42 @@
+{
+  "V_1_21_6": [
+    "open_url",
+    "open_file",
+    "run_command",
+    "suggest_command",
+    "show_dialog",
+    "change_page",
+    "copy_to_clipboard",
+    "custom"
+  ],
+  "V_1_15": [
+    "open_url",
+    "open_file",
+    "run_command",
+    "suggest_command",
+    "change_page",
+    "copy_to_clipboard"
+  ],
+  "V_1_9": [
+    "open_url",
+    "open_file",
+    "run_command",
+    "suggest_command",
+    "change_page"
+  ],
+  "V_1_8": [
+    "open_url",
+    "open_file",
+    "run_command",
+    "twitch_user_info",
+    "suggest_command",
+    "change_page"
+  ],
+  "V_1_7_2": [
+    "open_url",
+    "open_file",
+    "run_command",
+    "twitch_user_info",
+    "suggest_command"
+  ]
+}

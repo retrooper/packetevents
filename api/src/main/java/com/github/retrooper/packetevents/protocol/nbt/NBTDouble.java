@@ -32,6 +32,11 @@ public class NBTDouble extends NBTNumber {
     }
 
     @Override
+    public Number getAsNumber() {
+        return value;
+    }
+
+    @Override
     public byte getAsByte() {
         return (byte) value;
     }
@@ -84,5 +89,10 @@ public class NBTDouble extends NBTNumber {
     @Override
     public NBTDouble copy() {
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Double(" + value + ")";
     }
 }

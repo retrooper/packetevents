@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,11 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-// Thanks MCProtocolLib, this is taken entirely from them
 public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServerWorldBorder> {
     private WorldBorderAction action;
 
@@ -90,6 +91,76 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
         }
     }
 
+    @Override
+    public void read() {
+        action = readEnum(WorldBorderAction.class);
+        if (this.action == WorldBorderAction.SET_SIZE) {
+            this.radius = readDouble();
+        } else if (this.action == WorldBorderAction.LERP_SIZE) {
+            this.oldRadius = readDouble();
+            this.newRadius = readDouble();
+            this.speed = readVarLong();
+        } else if (this.action == WorldBorderAction.SET_CENTER) {
+            this.centerX = readDouble();
+            this.centerZ = readDouble();
+        } else if (this.action == WorldBorderAction.INITIALIZE) {
+            this.centerX = readDouble();
+            this.centerZ = readDouble();
+            this.oldRadius = readDouble();
+            this.newRadius = readDouble();
+            this.speed = readVarLong();
+            this.portalTeleportBoundary = readVarInt();
+            this.warningTime = readVarInt();
+            this.warningBlocks = readVarInt();
+        } else if (this.action == WorldBorderAction.SET_WARNING_TIME) {
+            this.warningTime = readVarInt();
+        } else if (this.action == WorldBorderAction.SET_WARNING_BLOCKS) {
+            this.warningBlocks = readVarInt();
+        }
+    }
+
+    @Override
+    public void write() {
+        writeEnum(action);
+        if (this.action == WorldBorderAction.SET_SIZE) {
+            writeDouble(this.radius);
+        } else if (this.action == WorldBorderAction.LERP_SIZE) {
+            writeDouble(this.oldRadius);
+            writeDouble(this.newRadius);
+            writeVarLong(this.speed);
+        } else if (this.action == WorldBorderAction.SET_CENTER) {
+            writeDouble(this.centerX);
+            writeDouble(this.centerZ);
+        } else if (this.action == WorldBorderAction.INITIALIZE) {
+            writeDouble(this.centerX);
+            writeDouble(this.centerZ);
+            writeDouble(this.oldRadius);
+            writeDouble(this.newRadius);
+            writeVarLong(this.speed);
+            writeVarInt(this.portalTeleportBoundary);
+            writeVarInt(this.warningTime);
+            writeVarInt(this.warningBlocks);
+        } else if (this.action == WorldBorderAction.SET_WARNING_TIME) {
+            writeVarInt(this.warningTime);
+        } else if (this.action == WorldBorderAction.SET_WARNING_BLOCKS) {
+            writeVarInt(this.warningBlocks);
+        }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerWorldBorder wrapper) {
+        this.action = wrapper.action;
+        this.radius = wrapper.radius;
+        this.oldRadius = wrapper.oldRadius;
+        this.newRadius = wrapper.newRadius;
+        this.speed = wrapper.speed;
+        this.centerX = wrapper.centerX;
+        this.centerZ = wrapper.centerZ;
+        this.portalTeleportBoundary = wrapper.portalTeleportBoundary;
+        this.warningTime = wrapper.warningTime;
+        this.warningBlocks = wrapper.warningBlocks;
+    }
+
     public WorldBorderAction getAction() {
         return this.action;
     }
@@ -130,74 +201,44 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
         return this.warningBlocks;
     }
 
-    @Override
-    public void read() {
-        this.action = WorldBorderAction.values()[this.readVarInt()];
-        if (this.action == WorldBorderAction.SET_SIZE) {
-            this.radius = readDouble();
-        } else if (this.action == WorldBorderAction.LERP_SIZE) {
-            this.oldRadius = readDouble();
-            this.newRadius = readDouble();
-            this.speed = readVarLong();
-        } else if (this.action == WorldBorderAction.SET_CENTER) {
-            this.centerX = readDouble();
-            this.centerZ = readDouble();
-        } else if (this.action == WorldBorderAction.INITIALIZE) {
-            this.centerX = readDouble();
-            this.centerZ = readDouble();
-            this.oldRadius = readDouble();
-            this.newRadius = readDouble();
-            this.speed = readVarLong();
-            this.portalTeleportBoundary = readVarInt();
-            this.warningTime = readVarInt();
-            this.warningBlocks = readVarInt();
-        } else if (this.action == WorldBorderAction.SET_WARNING_TIME) {
-            this.warningTime = readVarInt();
-        } else if (this.action == WorldBorderAction.SET_WARNING_BLOCKS) {
-            this.warningBlocks = readVarInt();
-        }
+    public void setAction(WorldBorderAction action) {
+        this.action = action;
     }
 
-    @Override
-    public void copy(WrapperPlayServerWorldBorder wrapper) {
-        this.action = wrapper.action;
-        this.radius = wrapper.radius;
-        this.oldRadius = wrapper.oldRadius;
-        this.newRadius = wrapper.newRadius;
-        this.speed = wrapper.speed;
-        this.centerX = wrapper.centerX;
-        this.centerZ = wrapper.centerZ;
-        this.portalTeleportBoundary = wrapper.portalTeleportBoundary;
-        this.warningTime = wrapper.warningTime;
-        this.warningBlocks = wrapper.warningBlocks;
+    public void setRadius(double radius) {
+        this.radius = radius;
     }
 
-    @Override
-    public void write() {
-        writeVarInt(this.action.ordinal());
-        if (this.action == WorldBorderAction.SET_SIZE) {
-            writeDouble(this.radius);
-        } else if (this.action == WorldBorderAction.LERP_SIZE) {
-            writeDouble(this.oldRadius);
-            writeDouble(this.newRadius);
-            writeVarLong(this.speed);
-        } else if (this.action == WorldBorderAction.SET_CENTER) {
-            writeDouble(this.centerX);
-            writeDouble(this.centerZ);
-        } else if (this.action == WorldBorderAction.INITIALIZE) {
-            writeDouble(this.centerX);
-            writeDouble(this.centerZ);
-            writeDouble(this.oldRadius);
-            writeDouble(this.newRadius);
-            writeVarLong(this.speed);
-            writeVarInt(this.portalTeleportBoundary);
-            writeVarInt(this.warningTime);
-            writeVarInt(this.warningBlocks);
-        } else if (this.action == WorldBorderAction.SET_WARNING_TIME) {
-            writeVarInt(this.warningTime);
-        } else if (this.action == WorldBorderAction.SET_WARNING_BLOCKS) {
-            writeVarInt(this.warningBlocks);
-        }
+    public void setOldRadius(double oldRadius) {
+        this.oldRadius = oldRadius;
+    }
+
+    public void setNewRadius(double newRadius) {
+        this.newRadius = newRadius;
+    }
+
+    public void setSpeed(long speed) {
+        this.speed = speed;
+    }
+
+    public void setCenterX(double centerX) {
+        this.centerX = centerX;
+    }
+
+    public void setCenterZ(double centerZ) {
+        this.centerZ = centerZ;
+    }
+
+    public void setPortalTeleportBoundary(int portalTeleportBoundary) {
+        this.portalTeleportBoundary = portalTeleportBoundary;
+    }
+
+    public void setWarningTime(int warningTime) {
+        this.warningTime = warningTime;
+    }
+
+    public void setWarningBlocks(int warningBlocks) {
+        this.warningBlocks = warningBlocks;
     }
 
     public enum WorldBorderAction {
@@ -207,5 +248,14 @@ public class WrapperPlayServerWorldBorder extends PacketWrapper<WrapperPlayServe
         INITIALIZE,
         SET_WARNING_TIME,
         SET_WARNING_BLOCKS;
+
+
+        public int getId() {
+            return ordinal();
+        }
+
+        public static WorldBorderAction fromId(int id) {
+            return WorldBorderAction.values()[id];
+        }
     }
 }

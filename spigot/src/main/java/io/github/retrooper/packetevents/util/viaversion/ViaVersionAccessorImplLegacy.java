@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,12 @@
 
 package io.github.retrooper.packetevents.util.viaversion;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import io.netty.channel.Channel;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -37,11 +42,12 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     private void load() {
         if (viaClass == null) {
             try {
-                viaClass = Class.forName("us.myles.ViaVersion.api.Via");
+                ClassLoader classLoader = PacketEvents.getAPI().getPlugin().getClass().getClassLoader();
+                viaClass = classLoader.loadClass("us.myles.ViaVersion.api.Via");
                 viaManagerField = viaClass.getDeclaredField("manager");
-                bukkitDecodeHandlerClass = Class.forName("us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler");
-                bukkitEncodeHandlerClass = Class.forName("us.myles.ViaVersion.bukkit.handlers.BukkitEncodeHandler");
-                Class<?> viaAPIClass = Class.forName("us.myles.ViaVersion.api.ViaAPI");
+                bukkitDecodeHandlerClass = classLoader.loadClass("us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler");
+                bukkitEncodeHandlerClass = classLoader.loadClass("us.myles.ViaVersion.bukkit.handlers.BukkitEncodeHandler");
+                Class<?> viaAPIClass = classLoader.loadClass("us.myles.ViaVersion.api.ViaAPI");
                 apiAccessor = viaClass.getMethod("getAPI");
                 getPlayerVersionMethod = viaAPIClass.getMethod("getPlayerVersion", Object.class);
             } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException e) {
@@ -51,7 +57,8 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
 
         if (userConnectionClass == null) {
             try {
-                userConnectionClass = Class.forName("us.myles.ViaVersion.api.data.UserConnection");
+                ClassLoader classLoader = PacketEvents.getAPI().getPlugin().getClass().getClassLoader();
+                userConnectionClass = classLoader.loadClass("us.myles.ViaVersion.api.data.UserConnection");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -69,6 +76,29 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
         }
         return -1;
     }
+
+    @Override
+    public int getProtocolVersion(User user) {
+        try {
+            if (user.getUUID() != null) {
+                Player player = Bukkit.getPlayer(user.getUUID());
+                if (player != null) {
+                    int version = getProtocolVersion(player);
+                    // -1 means via hasn't gotten join event yet
+                    if (version != -1) return version;
+                }
+            }
+            Object viaEncoder = ((Channel) user.getChannel()).pipeline().get("via-encoder");
+            Object connection = Reflection.getField(viaEncoder.getClass(), "connection").get(viaEncoder);
+            Object protocolInfo = Reflection.getField(connection.getClass(), "protocolInfo").get(connection);
+            Object protocolVersion = Reflection.getField(protocolInfo.getClass(), "protocolVersion").get(protocolInfo);
+            return protocolVersion instanceof Integer ? (int) protocolVersion : ((ProtocolVersion) protocolVersion).getVersion();
+        } catch (Exception e) {
+            PacketEvents.getAPI().getLogManager().warn("Unable to grab ViaVersion client version for player!");
+            return -1;
+        }
+    }
+
     @Override
     public Class<?> getUserConnectionClass() {
         load();

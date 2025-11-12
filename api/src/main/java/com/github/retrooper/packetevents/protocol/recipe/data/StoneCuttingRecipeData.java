@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,31 +20,47 @@ package com.github.retrooper.packetevents.protocol.recipe.data;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.recipe.Ingredient;
-import org.jetbrains.annotations.NotNull;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * <strong>WARNING:</strong> No longer exists since 1.21.2, network recipe data was rewritten.
+ */
+@ApiStatus.Obsolete
 public class StoneCuttingRecipeData implements RecipeData {
-    private final @NotNull String group;
-    private final @NotNull Ingredient ingredient;
+
+    private final String group;
+    private final Ingredient ingredient;
     private final ItemStack result;
 
-    public StoneCuttingRecipeData(@NotNull String group, @NotNull Ingredient ingredient, ItemStack result) {
+    public StoneCuttingRecipeData(String group, Ingredient ingredient, ItemStack result) {
         this.group = group;
         this.ingredient = ingredient;
         this.result = result;
     }
 
-    @NotNull
+    public static StoneCuttingRecipeData read(PacketWrapper<?> wrapper) {
+        String group = wrapper.readString();
+        Ingredient ingredient = Ingredient.read(wrapper);
+        ItemStack result = wrapper.readItemStack();
+        return new StoneCuttingRecipeData(group, ingredient, result);
+    }
+
+    public static void write(PacketWrapper<?> wrapper, StoneCuttingRecipeData data) {
+        wrapper.writeString(data.group);
+        Ingredient.write(wrapper, data.ingredient);
+        wrapper.writeItemStack(data.result);
+    }
+
     public String getGroup() {
-        return group;
+        return this.group;
     }
 
-    @NotNull
     public Ingredient getIngredient() {
-        return ingredient;
+        return this.ingredient;
     }
 
-    @NotNull
     public ItemStack getResult() {
-        return result;
+        return this.result;
     }
 }

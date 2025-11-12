@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,26 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.util.LpVector3d;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * Mojang name: ClientboundSetEntityMotionPacket
+ */
 public class WrapperPlayServerEntityVelocity extends PacketWrapper<WrapperPlayServerEntityVelocity> {
+
+    // with larger short values there is a loss of precision and
+    // re-encoding packets may cause the velocity to change
+    //
+    // as vanilla just casts to an int instead of properly rounding,
+    // packetevents has to add a small number to the calculated velocity
+    // to work around the loss of precision
+    //
+    // this is only an issue for versions older than 1.21.9, as with 1.21.9
+    // Mojang introduced a new format for serializing vectors with less precision
+    private static final double PRECISION_LOSS_FIX = 1e-11d;
+
     private int entityID;
     private Vector3d velocity;
 
@@ -40,35 +56,39 @@ public class WrapperPlayServerEntityVelocity extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            entityID = readInt();
+        this.entityID = this.serverVersion.isOlderThan(ServerVersion.V_1_8)
+                ? this.readInt() : this.readVarInt();
+
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9)) {
+            this.velocity = LpVector3d.read(this);
+        } else {
+            double velX = (double) this.readShort() / 8000d;
+            double velY = (double) this.readShort() / 8000d;
+            double velZ = (double) this.readShort() / 8000d;
+            this.velocity = new Vector3d(velX, velY, velZ);
         }
-        else {
-            entityID = readVarInt();
+    }
+
+    @Override
+    public void write() {
+        if (this.serverVersion.isOlderThan(ServerVersion.V_1_8)) {
+            this.writeInt(this.entityID);
+        } else {
+            this.writeVarInt(this.entityID);
         }
-        double velX = readShort() / 8000.0;
-        double velY = readShort() / 8000.0;
-        double velZ = readShort() / 8000.0;
-        velocity = new Vector3d(velX, velY, velZ);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9)) {
+            LpVector3d.write(this, this.velocity);
+        } else {
+            this.writeShort((int) (this.velocity.x * 8000d + Math.copySign(PRECISION_LOSS_FIX, this.velocity.x)));
+            this.writeShort((int) (this.velocity.y * 8000d + Math.copySign(PRECISION_LOSS_FIX, this.velocity.y)));
+            this.writeShort((int) (this.velocity.z * 8000d + Math.copySign(PRECISION_LOSS_FIX, this.velocity.z)));
+        }
     }
 
     @Override
     public void copy(WrapperPlayServerEntityVelocity wrapper) {
         entityID = wrapper.entityID;
         velocity = wrapper.velocity;
-    }
-
-    @Override
-    public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeInt(entityID);
-        }
-        else {
-            writeVarInt(entityID);
-        }
-       writeShort((int) (velocity.x * 8000.0));
-       writeShort((int) (velocity.y * 8000.0));
-       writeShort((int) (velocity.z * 8000.0));
     }
 
     public int getEntityId() {

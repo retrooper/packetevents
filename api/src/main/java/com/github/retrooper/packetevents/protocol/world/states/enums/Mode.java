@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,47 @@
 package com.github.retrooper.packetevents.protocol.world.states.enums;
 
 public enum Mode {
-    CORNER,
+
+    /**
+     * Only applies to comparators
+     */
     COMPARE,
-    DATA,
-    LOAD,
+    /**
+     * Only applies to comparators
+     */
+    SUBTRACT,
+
+    /**
+     * Only applies to structure blocks
+     */
     SAVE,
-    SUBTRACT
+    /**
+     * Only applies to structure blocks
+     */
+    LOAD,
+    /**
+     * Only applies to structure blocks
+     */
+    CORNER,
+    /**
+     * Only applies to structure blocks
+     */
+    DATA,
+
+    /**
+     * Added with 1.21.5, only applies to test blocks
+     */
+    START,
+    /**
+     * Added with 1.21.5, only applies to test blocks
+     */
+    LOG,
+    /**
+     * Added with 1.21.5, only applies to test blocks
+     */
+    FAIL,
+    /**
+     * Added with 1.21.5, only applies to test blocks
+     */
+    ACCEPT,
 }

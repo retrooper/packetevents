@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,19 +23,19 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayWorldBorderLerpSize extends PacketWrapper<WrapperPlayWorldBorderLerpSize> {
-    double oldDiameter;
-    double newDiameter;
-    long speed;
+    private double oldDiameter;
+    private double newDiameter;
+    private long speed;
+
+    public WrapperPlayWorldBorderLerpSize(PacketSendEvent event) {
+        super(event);
+    }
 
     public WrapperPlayWorldBorderLerpSize(double oldDiameter, double newDiameter, long speed) {
         super(PacketType.Play.Server.WORLD_BORDER_LERP_SIZE);
         this.oldDiameter = oldDiameter;
         this.newDiameter = newDiameter;
         this.speed = speed;
-    }
-
-    public WrapperPlayWorldBorderLerpSize(PacketSendEvent event) {
-        super(event);
     }
 
     @Override
@@ -46,17 +46,17 @@ public class WrapperPlayWorldBorderLerpSize extends PacketWrapper<WrapperPlayWor
     }
 
     @Override
-    public void copy(WrapperPlayWorldBorderLerpSize packet) {
-        this.oldDiameter = packet.oldDiameter;
-        this.newDiameter = packet.newDiameter;
-        this.speed = packet.speed;
-    }
-
-    @Override
     public void write() {
         writeDouble(oldDiameter);
         writeDouble(newDiameter);
         writeVarLong(speed);
+    }
+
+    @Override
+    public void copy(WrapperPlayWorldBorderLerpSize packet) {
+        this.oldDiameter = packet.oldDiameter;
+        this.newDiameter = packet.newDiameter;
+        this.speed = packet.speed;
     }
 
     public double getOldDiameter() {

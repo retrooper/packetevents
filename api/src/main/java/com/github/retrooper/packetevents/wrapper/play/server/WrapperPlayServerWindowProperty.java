@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlayServerWindowProperty> {
 
-    private byte containerId;
+    private int windowId;
     private int id;
     private int value;
 
@@ -32,40 +32,54 @@ public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlaySe
         super(event);
     }
 
-    public WrapperPlayServerWindowProperty(byte containerId, int id, int value) {
+    public WrapperPlayServerWindowProperty(byte windowId, int id, int value) {
+        this((int) windowId, id, value);
+    }
+
+    public WrapperPlayServerWindowProperty(int windowId, int id, int value) {
         super(PacketType.Play.Server.WINDOW_PROPERTY);
-        this.containerId = containerId;
+        this.windowId = windowId;
         this.id = id;
         this.value = value;
     }
 
     @Override
     public void read() {
-        this.containerId = (byte) readUnsignedByte();
+        this.windowId = this.readContainerId();
         this.id = readShort();
         this.value = readShort();
     }
 
     @Override
-    public void copy(WrapperPlayServerWindowProperty wrapper) {
-        this.containerId = wrapper.containerId;
-        this.id = wrapper.id;
-        this.value = wrapper.value;
-    }
-
-    @Override
     public void write() {
-        writeByte(this.containerId);
+        this.writeContainerId(this.windowId);
         writeShort(this.id);
         writeShort(this.value);
     }
 
-    public byte getContainerId() {
-        return containerId;
+    @Override
+    public void copy(WrapperPlayServerWindowProperty wrapper) {
+        this.windowId = wrapper.windowId;
+        this.id = wrapper.id;
+        this.value = wrapper.value;
     }
 
-    public void setContainerId(byte containerId) {
-        this.containerId = containerId;
+    public int getContainerId() {
+        return this.windowId;
+    }
+
+    public void setContainerId(int windowId) {
+        this.windowId = windowId;
+    }
+
+    @Deprecated
+    public byte getWindowIdB() {
+        return (byte) this.getContainerId();
+    }
+
+    @Deprecated
+    public void setWindowId(byte windowId) {
+        this.setContainerId(windowId);
     }
 
     public int getId() {
@@ -83,5 +97,4 @@ public class WrapperPlayServerWindowProperty extends PacketWrapper<WrapperPlaySe
     public void setValue(int value) {
         this.value = value;
     }
-
 }

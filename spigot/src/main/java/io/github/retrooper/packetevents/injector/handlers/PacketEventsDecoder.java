@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,26 +25,24 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
+import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
-import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
+import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
-public class PacketEventsDecoder extends ByteToMessageDecoder {
+public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public User user;
-    public volatile Player player;
-
-    public ByteToMessageDecoder mcDecoder = null;
-    public List<ByteToMessageDecoder> decoders = new ArrayList<>();
-    public boolean handledCompression;
-    public boolean skipDoubleTransform;
+    public Player player;
+    public boolean hasBeenRelocated;
 
     public PacketEventsDecoder(User user) {
         this.user = user;
@@ -53,33 +51,22 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
     public PacketEventsDecoder(PacketEventsDecoder decoder) {
         user = decoder.user;
         player = decoder.player;
+        hasBeenRelocated = decoder.hasBeenRelocated;
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
-        if (skipDoubleTransform) {
-            skipDoubleTransform = false;
-            out.add(input.retain());
-        }
-        ByteBuf outputBuffer = ctx.alloc().buffer().writeBytes(input);
         try {
-            boolean doRecompression =
-                    handleCompression(ctx, outputBuffer);
-            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, outputBuffer, true);
-            if (outputBuffer.isReadable()) {
-                if (doRecompression) {
-                    ByteBuf temp = ctx.alloc().buffer();
-                    compress(ctx, outputBuffer, temp);
-                    try {
-                        outputBuffer.clear().writeBytes(temp);
-                    } finally {
-                        temp.release();
-                    }
-                    skipDoubleTransform = true;
-                }
-                out.add(outputBuffer.retain());
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, true);
+            out.add(ByteBufHelper.retain(input));
+        } catch (Throwable e) {
+            // We must be sure all the exceptions caused by our handlers are PacketProcessExceptions
+            // In the case we have thrown an exception that is not a PacketProcessException, let's wrap it in order to
+            // allow exceptionCaught to handle it properly
+            if (ExceptionUtil.isException(e, PacketProcessException.class)) {
+                throw e;
+            } else {
+                throw new PacketProcessException(e);
             }
-        } finally {
-            outputBuffer.release();
         }
     }
 
@@ -87,76 +74,63 @@ public class PacketEventsDecoder extends ByteToMessageDecoder {
     public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
         if (buffer.isReadable()) {
             read(ctx, buffer, out);
-            for (ByteToMessageDecoder decoder : decoders) {
-                //Only support one output object
-                if (!out.isEmpty()) {
-                    Object input = out.get(0);
-                    out.clear();
-                    out.addAll(CustomPipelineUtil.callDecode(decoder, ctx, input));
-                    ByteBufHelper.release(input); // Decode doesn't free, so we must do it
-                }
-            }
-            if (mcDecoder != null && !out.isEmpty()) {
-                //Call minecraft decoder to convert the ByteBuf to an NMS object for the next handlers
-                try {
-                    Object input = out.get(0);
-                    out.clear();
-                    out.addAll(CustomPipelineUtil.callDecode(mcDecoder, ctx, input));
-                    ByteBufHelper.release(input); // Decode doesn't free, so we must do it
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-        //Check if the minecraft server will already print our exception for us.
-        if (ExceptionUtil.isException(cause, PacketProcessException.class) && !SpigotReflectionUtil.isMinecraftServerInstanceDebugging()
-                && (user == null || user.getConnectionState() != ConnectionState.HANDSHAKING)) {
-            cause.printStackTrace();
+        // If we didn't cause the exception, let the server handle it.
+        if (!ExceptionUtil.isException(cause, PacketProcessException.class)) {
+            super.exceptionCaught(ctx, cause);
+            return;
         }
-    }
 
-    private void compress(ChannelHandlerContext ctx, ByteBuf input, ByteBuf output) throws InvocationTargetException {
-        ChannelHandler compressor = ctx.pipeline().get("compress");
-        if (compressor != null) {
-            CustomPipelineUtil.callEncode(compressor, ctx, input, output);
+        boolean debug = PacketEvents.getAPI().getSettings().isDebugEnabled() || SpigotReflectionUtil.isMinecraftServerInstanceDebugging();
+        // We log exceptions only if the server is in debug mode or the player is fully connected to the server.
+        if (debug || (user != null && user.getDecoderState() != ConnectionState.HANDSHAKING)) {
+            if (PacketEvents.getAPI().getSettings().isFullStackTraceEnabled()) {
+                String state = user != null ? user.getDecoderState().name() : "null";
+                String clientVersion = user != null ? user.getClientVersion().getReleaseName() : "null";
+
+                PacketEvents.getAPI().getLogger().log(Level.WARNING, cause, () ->
+                        "An error occurred while processing a packet from " + user.getProfile().getName() +
+                        " (state: " + state +
+                        ", clientVersion: " + clientVersion +
+                        ", serverVersion: " + PacketEvents.getAPI().getServerManager().getVersion().getReleaseName() + ")");
+            } else {
+                PacketEvents.getAPI().getLogManager().warn(cause.getMessage());
+            }
         }
-    }
 
-    private void decompress(ChannelHandlerContext ctx, ByteBuf input, ByteBuf output) throws InvocationTargetException {
-        ChannelHandler decompressor = ctx.pipeline().get("decompress");
-        if (decompressor != null) {
-            ByteBuf temp = (ByteBuf) CustomPipelineUtil.callDecode(decompressor, ctx, input).get(0);
+        if (PacketEvents.getAPI().getSettings().isKickOnPacketExceptionEnabled()) {
             try {
-                output.clear().writeBytes(temp);
-            } finally {
-                temp.release();
+                if (user != null) {
+                    user.sendPacket(new WrapperPlayServerDisconnect(Component.text("Invalid packet")));
+                }
+            } catch (Exception ignored) { // There may (?) be an exception if the player is in the wrong state...
+                // Do nothing.
+            }
+            ctx.channel().close();
+            if (player != null) {
+                FoliaScheduler.getEntityScheduler().runDelayed(player, (Plugin) PacketEvents.getAPI().getPlugin(), (o) -> player.kickPlayer("Invalid packet"), null, 1);
+            }
+
+            if (user != null && user.getProfile().getName() != null) {
+                PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to an invalid packet!");
             }
         }
     }
 
-    private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        if (handledCompression) return false;
-        int decompressIndex = ctx.pipeline().names().indexOf("decompress");
-        if (decompressIndex == -1) return false;
-        handledCompression = true;
-        int peDecoderIndex = ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME);
-        if (peDecoderIndex == -1) return false;
-        if (decompressIndex > peDecoderIndex) {
-            //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
-            //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
-            decompress(ctx, buffer, buffer);
-            //Let us relocate and no longer deal with compression.
-            ChannelHandler encoder = ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
-            ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
-            PacketEventsDecoder decoder = (PacketEventsDecoder) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
-            ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, new PacketEventsDecoder(decoder));
-            return true;
+    @Override
+    public void userEventTriggered(final ChannelHandlerContext ctx, final Object event) throws Exception {
+        if (PacketEventsEncoder.COMPRESSION_ENABLED_EVENT == null || event != PacketEventsEncoder.COMPRESSION_ENABLED_EVENT) {
+            super.userEventTriggered(ctx, event);
+            return;
         }
-        return false;
+
+        // Via changes the order of handlers in this event, so we must respond to Via changing their stuff
+        ServerConnectionInitializer.relocateHandlers(ctx.channel(), this, user);
+        super.userEventTriggered(ctx, event);
     }
+
 }

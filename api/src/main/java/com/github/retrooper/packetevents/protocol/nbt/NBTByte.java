@@ -30,9 +30,18 @@ public class NBTByte extends NBTNumber {
         this((byte) (value ? 1 : 0));
     }
 
+    public boolean getAsBool() {
+        return this.value != 0;
+    }
+
     @Override
     public NBTType<NBTByte> getType() {
         return NBTType.BYTE;
+    }
+
+    @Override
+    public Number getAsNumber() {
+        return value;
     }
 
     @Override
@@ -88,5 +97,10 @@ public class NBTByte extends NBTNumber {
     @Override
     public NBTByte copy() {
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Byte(" + value + ")";
     }
 }

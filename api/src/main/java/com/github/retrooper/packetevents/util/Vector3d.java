@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,16 @@
 
 package com.github.retrooper.packetevents.util;
 
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTDouble;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
+import java.util.Objects;
 
 /**
  * 3D double Vector.
@@ -29,6 +38,9 @@ import com.github.retrooper.packetevents.protocol.world.BlockFace;
  * @since 1.8
  */
 public class Vector3d {
+
+    private static final Vector3d ZERO = new Vector3d();
+
     /**
      * X (coordinate/angle/whatever you wish)
      */
@@ -97,6 +109,35 @@ public class Vector3d {
         }
     }
 
+    public static Vector3d read(PacketWrapper<?> wrapper) {
+        double x = wrapper.readDouble();
+        double y = wrapper.readDouble();
+        double z = wrapper.readDouble();
+        return new Vector3d(x, y, z);
+    }
+
+    public static void write(PacketWrapper<?> wrapper, Vector3d vector) {
+        wrapper.writeDouble(vector.x);
+        wrapper.writeDouble(vector.y);
+        wrapper.writeDouble(vector.z);
+    }
+
+    public static Vector3d decode(NBT tag, ClientVersion version) {
+        NBTList<?> list = (NBTList<?>) tag;
+        double x = ((NBTNumber) list.getTag(0)).getAsDouble();
+        double y = ((NBTNumber) list.getTag(1)).getAsDouble();
+        double z = ((NBTNumber) list.getTag(2)).getAsDouble();
+        return new Vector3d(x, y, z);
+    }
+
+    public static NBT encode(Vector3d vector3d, ClientVersion version) {
+        NBTList<NBTDouble> list = new NBTList<>(NBTType.DOUBLE, 3);
+        list.addTag(new NBTDouble(vector3d.x));
+        list.addTag(new NBTDouble(vector3d.y));
+        list.addTag(new NBTDouble(vector3d.z));
+        return list;
+    }
+
     public double getX() {
         return x;
     }
@@ -129,6 +170,11 @@ public class Vector3d {
             return x == (double) vec.x && y == (double) vec.y && z == (double) vec.z;
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
     }
 
     public Vector3d add(double x, double y, double z) {
@@ -225,6 +271,6 @@ public class Vector3d {
     }
 
     public static Vector3d zero() {
-        return new Vector3d();
+        return ZERO;
     }
 }

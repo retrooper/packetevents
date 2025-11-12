@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,11 +28,11 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Arrays;
 
 public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayServerEntityEquipment> {
     private int entityId;
     private List<Equipment> equipment;
+
     public WrapperPlayServerEntityEquipment(PacketSendEvent event) {
         super(event);
     }
@@ -43,18 +43,19 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
         this.equipment = equipment;
     }
 
-    public WrapperPlayServerEntityEquipment(int entityId, Equipment... equipment) {
-        this(entityId, Arrays.asList(equipment));
-    }
-
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             entityId = readInt();
-        }
-        else {
+        } else {
             entityId = readVarInt();
         }
+        readEquipment();
+    }
+
+    // allow this to be overridden by a subclass
+    // this could be used to save performance if you don't need to read the equipment
+    protected void readEquipment() {
         equipment = new ArrayList<>();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             byte value;
@@ -64,13 +65,11 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
                 ItemStack itemStack = readItemStack();
                 equipment.add(new Equipment(equipmentSlot, itemStack));
             } while ((value & Byte.MIN_VALUE) != 0);
-        }
-        else {
+        } else {
             EquipmentSlot slot;
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
                 slot = EquipmentSlot.getById(serverVersion, readVarInt());
-            }
-            else {
+            } else {
                 slot = EquipmentSlot.getById(serverVersion, readShort());
             }
             equipment.add(new Equipment(slot, readItemStack()));
@@ -78,17 +77,10 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void copy(WrapperPlayServerEntityEquipment wrapper) {
-        entityId = wrapper.entityId;
-        equipment = wrapper.equipment;
-    }
-
-    @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             writeInt(entityId);
-        }
-        else {
+        } else {
             writeVarInt(entityId);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
@@ -98,17 +90,21 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
                 writeByte(last ? equipment.getSlot().getId(serverVersion) : (equipment.getSlot().getId(serverVersion) | Byte.MIN_VALUE));
                 writeItemStack(equipment.getItem());
             }
-        }
-        else {
+        } else {
             Equipment equipment = this.equipment.get(0);
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
                 writeVarInt(equipment.getSlot().getId(serverVersion));
-            }
-            else {
+            } else {
                 writeShort(equipment.getSlot().getId(serverVersion));
             }
             writeItemStack(equipment.getItem());
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerEntityEquipment wrapper) {
+        entityId = wrapper.entityId;
+        equipment = wrapper.equipment;
     }
 
     public int getEntityId() {

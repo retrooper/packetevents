@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ public enum ClientboundPacketType_1_12 {
     ENTITY_HEAD_LOOK,
 
     //This packet was added
-    SELECT_ADVANCEMENT_TAB,
+    SELECT_ADVANCEMENTS_TAB,
 
     WORLD_BORDER,
     CAMERA,
@@ -103,8 +103,8 @@ public enum ClientboundPacketType_1_12 {
     ENTITY_TELEPORT,
 
     //This packet was added
-    ADVANCEMENTS,
+    UPDATE_ADVANCEMENTS,
 
-    ENTITY_PROPERTIES,
+    UPDATE_ATTRIBUTES,
     ENTITY_EFFECT
 }

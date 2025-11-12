@@ -1,0 +1,6 @@
+[*.java]
+indent_style = space
+indent_size = 4
+ij_continuation_indent_size = 8
+ij_java_names_count_to_use_import_on_demand = 9999
+ij_java_class_count_to_use_import_on_demand = 9999

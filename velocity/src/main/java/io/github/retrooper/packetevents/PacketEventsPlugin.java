@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,47 +23,82 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.google.inject.Inject;
-import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import io.github.retrooper.packetevents.velocity.factory.VelocityPacketEventsBuilder;
+import org.bstats.charts.SimplePie;
+import org.bstats.velocity.Metrics;
+import org.slf4j.Logger;
 
-import java.util.logging.Logger;
+import java.nio.file.Path;
 
-@Plugin(id = "packetevents", name = "PacketEvents", version = "2.0.0")
 public class PacketEventsPlugin {
     private final ProxyServer server;
     private final Logger logger;
+    private final PluginContainer pluginContainer;
+    private final Path dataDirectory;
+    private final Metrics.Factory metricsFactory;
+
     @Inject
-    public PacketEventsPlugin(ProxyServer server, Logger logger) {
+    public PacketEventsPlugin(
+            final ProxyServer server,
+            final Logger logger,
+            final PluginContainer pluginContainer,
+            @DataDirectory Path dataDirectory,
+            Metrics.Factory metricsFactory) {
         this.server = server;
         this.logger = logger;
-        logger.info("Plugin started?");
+        this.pluginContainer = pluginContainer;
+        this.dataDirectory = dataDirectory;
+        this.metricsFactory = metricsFactory;
     }
 
-    @Subscribe(order = PostOrder.LATE)
+    @Subscribe
     public void onProxyInitialize(ProxyInitializeEvent event) {
         logger.info("Injecting packetevents...");
-        PluginContainer plugin = server.getPluginManager().getPlugin("packetevents").orElse(null);
-        PacketEvents.setAPI(VelocityPacketEventsBuilder.build(server, plugin));
+        PacketEvents.setAPI(VelocityPacketEventsBuilder.build(server, pluginContainer, logger, dataDirectory));
         PacketEvents.getAPI().load();
-        PacketEvents.getAPI().getSettings().debug(true);
-        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+        // It should only be enabled in a development environment, not globally
+        // PacketEvents.getAPI().getSettings().debug(true);
+        PacketListenerAbstract listener = new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
-                System.out.println("Incoming: " + event.getPacketType().getName());
+                //System.out.println("Incoming: " + event.getPacketType().getName());
+
+                //Testing sending packets to users on proxies!
+                /*if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                    if (new WrapperPlayClientInteractEntity(event).getAction() == WrapperPlayClientInteractEntity.InteractAction.ATTACK) {
+                        event.getUser().sendMessage(Component.text("Test message").color(NamedTextColor.RED));
+                        event.getUser().sendTitle(Component.text("Test title").color(NamedTextColor.GREEN),
+                                Component.text("subtitle test").color(NamedTextColor.RED),
+                                3, 3, 5);
+                    }
+                }*/
             }
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
-                System.out.println("Outgoing: " + event.getPacketType().getName());
+                //System.out.println("Outgoing: " + event.getPacketType().getName());
+                /*if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
+                    System.out.println("Before processing, pipe: " + ChannelHelper.pipelineHandlerNamesAsString(event.getChannel()));
+                    WrapperPlayServerSystemChatMessage msg = new WrapperPlayServerSystemChatMessage(event);
+                    System.out.println("After processing: " + msg.getMessage());
+                }*/
             }
-        });
+        };
+        //PacketEvents.getAPI().getEventManager().registerListener(listener);
         PacketEvents.getAPI().init();
+
+        // Enable bStats
+        Metrics metrics = metricsFactory.make(this, 11327);
+        //Just to have an idea of which versions of packetevents people use
+        metrics.addCustomChart(new SimplePie("packetevents_version", () -> PacketEvents.getAPI().getVersion().toStringWithoutSnapshot()));
+
+        logger.info("Plugin started");
     }
 
     @Subscribe

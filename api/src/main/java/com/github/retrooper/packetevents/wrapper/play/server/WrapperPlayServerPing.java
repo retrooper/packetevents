@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,48 +20,18 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPong;
+import com.github.retrooper.packetevents.wrapper.common.server.WrapperCommonServerPing;
 
 /**
- * This packet is currently used by mods to synchronize the client with the server.
- * It is not used by the vanilla server.
- * Most likely added as a replacement to the removed Window Confirmation packet.
- *
- * @see WrapperPlayClientPong
+ * {@inheritDoc}
  */
-public class WrapperPlayServerPing extends PacketWrapper<WrapperPlayServerPing> {
-    private int id;
+public class WrapperPlayServerPing extends WrapperCommonServerPing<WrapperPlayServerPing> {
 
     public WrapperPlayServerPing(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperPlayServerPing(int id) {
-        super(PacketType.Play.Server.PING);
-        this.id = id;
-    }
-
-    @Override
-    public void read() {
-        this.id = readInt();
-    }
-
-    @Override
-    public void copy(WrapperPlayServerPing wrapper) {
-        this.id = wrapper.id;
-    }
-
-    @Override
-    public void write() {
-        writeInt(id);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        super(PacketType.Play.Server.PING, id);
     }
 }

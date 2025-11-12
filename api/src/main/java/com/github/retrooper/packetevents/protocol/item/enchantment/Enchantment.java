@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,13 +19,12 @@
 package com.github.retrooper.packetevents.protocol.item.enchantment;
 
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
-import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 
 public class Enchantment {
     private EnchantmentType type;
     private int level;
 
-    private Enchantment(EnchantmentType type, int level) {
+    public Enchantment(EnchantmentType type, int level) {
         this.type = type;
         this.level = level;
     }

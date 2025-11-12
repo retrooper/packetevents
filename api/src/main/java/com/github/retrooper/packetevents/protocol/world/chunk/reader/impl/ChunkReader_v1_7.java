@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,19 +18,27 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.reader.impl;
 
-import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.ByteArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.NetworkChunkData;
 import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_7.Chunk_v1_7;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.BitSet;
 
 public class ChunkReader_v1_7 implements ChunkReader {
+
     @Override
-    public BaseChunk[] read(BitSet primarySet, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn) {
+    public BaseChunk[] read(
+            DimensionType dimensionType, BitSet chunkMask, BitSet secondaryChunkMask, boolean fullChunk,
+            boolean hasBlockLight, boolean hasSkyLight, int chunkSize, int arrayLength, PacketWrapper<?> wrapper
+    ) {
+        byte[] data = wrapper.readByteArrayOfSize(arrayLength);
+
         Chunk_v1_7[] chunks = new Chunk_v1_7[16];
         int pos = 0;
         int expected = 0;
@@ -50,16 +58,16 @@ public class ChunkReader_v1_7 implements ChunkReader {
         // That's probably why extended block data exists, although yeah it was never used.
         for (int pass = 0; pass < 5; pass++) {
             for (int ind = 0; ind < 16; ind++) {
-                if (primarySet.get(ind)) {
+                if (chunkMask.get(ind)) {
                     if (pass == 0) {
                         expected += 10240;
-                        if (sevenExtendedMask.get(ind)) {
+                        if (secondaryChunkMask.get(ind)) {
                             expected += 2048;
                         }
                     }
 
                     if (pass == 1) {
-                        chunks[ind] = new Chunk_v1_7(sky, sevenExtendedMask.get(ind));
+                        chunks[ind] = new Chunk_v1_7(sky, secondaryChunkMask.get(ind));
                         ByteArray3d blocks = chunks[ind].getBlocks();
                         System.arraycopy(data, pos, blocks.getData(), 0, blocks.getData().length);
                         pos += blocks.getData().length;
@@ -89,6 +97,10 @@ public class ChunkReader_v1_7 implements ChunkReader {
                 sky = true;
             }
         }
+
+        // reset reader index of buffer to end of data, we still need to read biome data
+        int ri = ByteBufHelper.readerIndex(wrapper.buffer);
+        ByteBufHelper.readerIndex(wrapper.buffer, ri - (arrayLength - pos));
 
         return chunks;
     }

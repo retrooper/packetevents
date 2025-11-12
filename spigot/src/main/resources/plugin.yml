@@ -1,7 +1,9 @@
 name: packetevents
-version: 2.0.0
+version: ${version}
+api-version: 1.13
 main: io.github.retrooper.packetevents.PacketEventsPlugin
 author: retrooper
+folia-supported: true
 softdepend:
   - ProtocolLib
   - ProtocolSupport

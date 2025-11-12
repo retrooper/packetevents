@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,9 +54,9 @@ public class WrapperPlayClientUpdateCommandBlock extends PacketWrapper<WrapperPl
 
     @Override
     public void read() {
-        this.position = new Vector3i(readLong());
+        this.position = new Vector3i(readLong(), this.serverVersion);
         this.command = readString();
-        this.mode = CommandBlockMode.VALUES[readVarInt()];
+        this.mode = CommandBlockMode.getById(readVarInt());
         this.flags = readUnsignedByte();
         this.doesTrackOutput = (flags & FLAG_TRACK_OUTPUT) != 0;
         this.conditional = (flags & FLAG_CONDITIONAL) != 0;
@@ -65,7 +65,7 @@ public class WrapperPlayClientUpdateCommandBlock extends PacketWrapper<WrapperPl
 
     @Override
     public void write() {
-        writeLong(position.getSerializedPosition());
+        writeLong(position.getSerializedPosition(this.serverVersion));
         writeString(command);
         writeVarInt(mode.ordinal());
         if (this.doesTrackOutput) {
@@ -148,10 +148,12 @@ public class WrapperPlayClientUpdateCommandBlock extends PacketWrapper<WrapperPl
     }
 
     public enum CommandBlockMode {
-        SEQUENCE,
-        AUTO,
-        REDSTONE;
+        SEQUENCE, AUTO, REDSTONE;
 
-        public static final CommandBlockMode[] VALUES = values();
+        private static final CommandBlockMode[] VALUES = values();
+
+        public static CommandBlockMode getById(int id) {
+            return VALUES[id];
+        }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,62 +21,82 @@ package com.github.retrooper.packetevents.util;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
-import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class PacketEventsImplHelper {
-    public static PacketSendEvent handleClientBoundPacket(Object channel, User user, Object player,
-                                                          Object buffer, boolean autoProtocolTranslation, boolean runPostTasks) throws PacketProcessException {
+public final class PacketEventsImplHelper {
+
+    private PacketEventsImplHelper() {
+    }
+
+    public static @Nullable ProtocolPacketEvent handlePacket(
+            Object channel, User user, Object player, Object buffer,
+            boolean autoProtocolTranslation, PacketSide side
+    ) throws Exception {
+        if (side == PacketSide.SERVER) {
+            return handleClientBoundPacket(channel, user, player, buffer, autoProtocolTranslation);
+        } else {
+            return handleServerBoundPacket(channel, user, player, buffer, autoProtocolTranslation);
+        }
+    }
+
+    public static @Nullable PacketSendEvent handleClientBoundPacket(
+            Object channel, User user, Object player, Object buffer,
+            boolean autoProtocolTranslation
+    ) throws Exception {
+        if (!ByteBufHelper.isReadable(buffer)) {
+            return null;
+        }
+
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
-        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer,
-                autoProtocolTranslation);
+        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer, autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
         });
         if (!packetSendEvent.isCancelled()) {
-            PacketWrapper<?> wrapper = packetSendEvent.getLastUsedWrapper();
-            if (wrapper != null) {
+            //Did they ever use a wrapper?
+            if (packetSendEvent.getLastUsedWrapper() != null) {
+                //Rewrite the buffer
                 ByteBufHelper.clear(buffer);
-                int packetId = packetSendEvent.getPacketId();
-                packetSendEvent.getLastUsedWrapper().writeVarInt(packetId);
-                try {
-                    packetSendEvent.getLastUsedWrapper().write();
-                } catch (Exception e) {
-                    throw new PacketProcessException("PacketEvents failed to re-encode an outgoing packet with its packet wrapper. Packet ID: " + packetId
-                            + ". Failed to encode " + wrapper.getClass().getSimpleName() + ".", e);
-                }
+                packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
+                packetSendEvent.getLastUsedWrapper().write();
+            } else {
+                //If no wrappers were used, just pass on the original buffer.
+                //Correct the reader index, basically what the next handler is expecting.
+                ByteBufHelper.readerIndex(buffer, preProcessIndex);
             }
-            ByteBufHelper.readerIndex(buffer, preProcessIndex);
         } else {
             //Make the buffer unreadable for the next handlers
             ByteBufHelper.clear(buffer);
         }
 
-        if (runPostTasks) {
-            if (packetSendEvent.hasPostTasks()) {
-                for (Runnable task : packetSendEvent.getPostTasks()) {
-                    task.run();
-                }
+        if (packetSendEvent.hasPostTasks()) {
+            for (Runnable task : packetSendEvent.getPostTasks()) {
+                task.run();
             }
         }
+
         return packetSendEvent;
     }
 
-    public static PacketReceiveEvent handleServerBoundPacket(Object channel, User user,
-                                                             Object player,
-                                                             Object buffer,
-                                                             boolean autoProtocolTranslation) throws PacketProcessException {
+    public static @Nullable PacketReceiveEvent handleServerBoundPacket(
+            Object channel, User user, Object player, Object buffer,
+            boolean autoProtocolTranslation
+    ) throws Exception {
+        if (!ByteBufHelper.isReadable(buffer)) {
+            return null;
+        }
+
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
-        PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer,
-                autoProtocolTranslation);
+        PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
@@ -88,11 +108,11 @@ public class PacketEventsImplHelper {
                 ByteBufHelper.clear(buffer);
                 packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
                 packetReceiveEvent.getLastUsedWrapper().write();
+            } else {
+                //If no wrappers were used, just pass on the original buffer.
+                //Correct the reader index, basically what the next handler is expecting.
+                ByteBufHelper.readerIndex(buffer, preProcessIndex);
             }
-            //If no wrappers were used, just pass on the original buffer.
-
-            //Correct the reader index, basically what the next handler is expecting.
-            ByteBufHelper.readerIndex(buffer, preProcessIndex);
         } else {
             //Cancelling the packet, lets clear the buffer
             ByteBufHelper.clear(buffer);
@@ -107,20 +127,19 @@ public class PacketEventsImplHelper {
 
     public static void handleDisconnection(Object channel, @Nullable UUID uuid) {
         synchronized (channel) {
-            User user = ProtocolManager.USERS.get(channel);
+            ProtocolManager protocolManager = PacketEvents.getAPI().getProtocolManager();
+            User user = protocolManager.getUser(channel);
 
             if (user != null) {
                 UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
                 PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
-                ProtocolManager.USERS.remove(user.getChannel());
+                protocolManager.removeUser(user.getChannel());
             }
 
             if (uuid == null) {
-                // Only way to be sure of removing a channel
-                ProtocolManager.CHANNELS.entrySet().removeIf(pair -> pair.getValue() == channel);
+                protocolManager.removeChannel(channel);
             } else {
-                // This is the efficient way that we should prefer
-                ProtocolManager.CHANNELS.remove(uuid);
+                protocolManager.removeChannelById(uuid);
             }
         }
     }

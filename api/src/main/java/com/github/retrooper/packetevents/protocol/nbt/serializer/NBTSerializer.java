@@ -19,14 +19,17 @@
 package com.github.retrooper.packetevents.protocol.nbt.serializer;
 
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NBTSerializer<IN, OUT> {
+@ApiStatus.NonExtendable
+public class NBTSerializer<IN, OUT> implements NBTReader<NBT, IN>, NBTWriter<NBT, OUT> {
 
     protected final IdReader<IN> idReader;
     protected final IdWriter<OUT> idWriter;
@@ -36,6 +39,7 @@ public class NBTSerializer<IN, OUT> {
     protected final Map<NBTType<? extends NBT>, Integer> typeToId = new HashMap<>();
     protected final Map<NBTType<? extends NBT>, TagReader<IN, ? extends NBT>> typeReaders = new HashMap<>();
     protected final Map<NBTType<? extends NBT>, TagWriter<OUT, ? extends NBT>> typeWriters = new HashMap<>();
+
     public NBTSerializer(
             IdReader<IN> idReader, IdWriter<OUT> idWriter,
             NameReader<IN> nameReader, NameWriter<OUT> nameWriter
@@ -46,22 +50,28 @@ public class NBTSerializer<IN, OUT> {
         this.nameWriter = nameWriter;
     }
 
-    public NBT deserializeTag(IN from) throws IOException {
-        NBTType<?> type = readTagType(from);
+    @Override
+    public NBT deserializeTag(NBTLimiter limiter, IN from, boolean named) throws IOException {
+        NBTType<?> type = readTagType(limiter, from);
         if (type == NBTType.END) {
             return null;
         }
-        readTagName(from);
-        return readTag(from, type);
+        if (named) {
+            readTagName(limiter, from);
+        }
+        return readTag(limiter, from, type);
     }
 
-    public void serializeTag(OUT to, NBT tag) throws IOException {
+    @Override
+    public void serializeTag(OUT to, NBT tag, boolean named) throws IOException {
         NBTType<?> type = tag.getType();
         writeTagType(to, type);
         if (tag.getType() == NBTType.END) {
             return;
         }
-        writeTagName(to, "");
+        if (named) {
+            writeTagName(to, "");
+        }
         writeTag(to, tag);
     }
 
@@ -82,8 +92,8 @@ public class NBTSerializer<IN, OUT> {
         typeWriters.put(type, typeWriter);
     }
 
-    protected NBTType<?> readTagType(IN from) throws IOException {
-        int id = idReader.readId(from);
+    NBTType<?> readTagType(NBTLimiter limiter, IN from) throws IOException {
+        int id = idReader.readId(limiter, from);
         NBTType<?> type = idToType.get(id);
         if (type == null) {
             throw new IOException(MessageFormat.format("Unknown nbt type id {0}", id));
@@ -91,19 +101,20 @@ public class NBTSerializer<IN, OUT> {
         return type;
     }
 
-    protected String readTagName(IN from) throws IOException {
-        return nameReader.readName(from);
+    @ApiStatus.Internal
+    String readTagName(NBTLimiter limiter, IN from) throws IOException {
+        return nameReader.readName(limiter, from);
     }
 
-    protected NBT readTag(IN from, NBTType<?> type) throws IOException {
+    NBT readTag(NBTLimiter limiter, IN from, NBTType<?> type) throws IOException {
         TagReader<IN, ? extends NBT> f = typeReaders.get(type);
         if (f == null) {
             throw new IOException(MessageFormat.format("No reader registered for nbt type {0}", type));
         }
-        return f.readTag(from);
+        return f.readTag(limiter, from);
     }
 
-    protected void writeTagType(OUT stream, NBTType<?> type) throws IOException {
+    void writeTagType(OUT stream, NBTType<?> type) throws IOException {
         int id = typeToId.getOrDefault(type, -1);
         if (id == -1) {
             throw new IOException(MessageFormat.format("Unknown nbt type {0}", type));
@@ -111,12 +122,12 @@ public class NBTSerializer<IN, OUT> {
         idWriter.writeId(stream, id);
     }
 
-    protected void writeTagName(OUT stream, String name) throws IOException {
+    void writeTagName(OUT stream, String name) throws IOException {
         nameWriter.writeName(stream, name);
     }
 
     @SuppressWarnings("unchecked")
-    protected void writeTag(OUT stream, NBT tag) throws IOException {
+    void writeTag(OUT stream, NBT tag) throws IOException {
         TagWriter<OUT, NBT> f = (TagWriter<OUT, NBT>) typeWriters.get(tag.getType());
         if (f == null) {
             throw new IOException(MessageFormat.format("No writer registered for nbt type {0}", tag.getType()));
@@ -126,7 +137,7 @@ public class NBTSerializer<IN, OUT> {
 
     @FunctionalInterface
     protected interface IdReader<T> {
-        int readId(T from) throws IOException;
+        int readId(NBTLimiter limiter, T from) throws IOException;
     }
 
     @FunctionalInterface
@@ -136,7 +147,7 @@ public class NBTSerializer<IN, OUT> {
 
     @FunctionalInterface
     protected interface NameReader<T> {
-        String readName(T from) throws IOException;
+        String readName(NBTLimiter limiter, T from) throws IOException;
     }
 
     @FunctionalInterface
@@ -146,7 +157,7 @@ public class NBTSerializer<IN, OUT> {
 
     @FunctionalInterface
     protected interface TagReader<IN, T extends NBT> {
-        T readTag(IN from) throws IOException;
+        T readTag(NBTLimiter limiter, IN from) throws IOException;
     }
 
     @FunctionalInterface

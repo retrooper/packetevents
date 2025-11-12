@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,26 +29,45 @@ import io.netty.util.Version;
 import java.util.Map;
 
 public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
+    public static final PEVersion MODERN_NETTY_VERSION = new PEVersion(4, 1, 24);
     public static boolean CHECKED_NETTY_VERSION;
     public static PEVersion NETTY_VERSION;
-    public static final PEVersion MODERN_NETTY_VERSION = new PEVersion(4, 1, 24);
+
+    private static PEVersion resolveNettyVersion() {
+        Map<String, Version> nettyArtifacts = Version.identify();
+
+        Version version = nettyArtifacts.getOrDefault("netty-common", nettyArtifacts.get("netty-all"));
+
+        if (version == null && !nettyArtifacts.values().isEmpty()) {
+            version = nettyArtifacts.values().iterator().next();
+        }
+
+        if (version != null) {
+            String stringVersion = version.artifactVersion();
+
+            // Remove the ".Final" from the version by just removing any words (non numbers or dots)
+            stringVersion = stringVersion.replaceAll("[^\\d.]", "");
+
+            // Make sure stringVersion only contains 3 values like 4.2.0 but not 4.2.0.2
+            String[] splitVersion = stringVersion.split("\\.");
+            if (splitVersion.length > 3) {
+                stringVersion = splitVersion[0] + "." + splitVersion[1] + "." + splitVersion[2];
+            }
+
+            // If the string ends with a dot, remove it
+            stringVersion = stringVersion.endsWith(".") ? stringVersion.substring(0, stringVersion.length() - 1) : stringVersion;
+
+            return PEVersion.fromString(stringVersion);
+        }
+        return null;
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = (Channel) msg;
         //Resolve netty version only once.
         if (NETTY_VERSION == null && !CHECKED_NETTY_VERSION) {
-            Map<String, Version> nettyArtifacts = Version.identify();
-            Version version = nettyArtifacts.getOrDefault("netty-common", nettyArtifacts.get("netty-all"));
-            if (version != null) {
-                String stringVersion = version.artifactVersion();
-                //Let us remove the ".Final" from the version by just removing any words (non numbers or dots)
-                stringVersion = stringVersion.replaceAll("[^\\d.]", "");
-                if (stringVersion.endsWith(".")) {
-                    //Remove "." at the end.
-                    stringVersion = stringVersion.substring(0, stringVersion.length() - 1);
-                }
-                NETTY_VERSION = new PEVersion(stringVersion);
-            }
+            NETTY_VERSION = resolveNettyVersion();
             CHECKED_NETTY_VERSION = true;
         }
 

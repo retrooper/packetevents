@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ public class WrapperPlayServerCollectItem extends PacketWrapper<WrapperPlayServe
     private int collectedEntityId;
     private int collectorEntityId;
     private int pickupItemCount;
+
     public WrapperPlayServerCollectItem(PacketSendEvent event) {
         super(event);
     }
@@ -36,6 +37,41 @@ public class WrapperPlayServerCollectItem extends PacketWrapper<WrapperPlayServe
         this.collectedEntityId = collectedEntityId;
         this.collectorEntityId = collectorEntityId;
         this.pickupItemCount = pickupItemCount;
+    }
+
+    @Override
+    public void read() {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
+            collectedEntityId = readInt();
+            collectorEntityId = readInt();
+        } else {
+            collectedEntityId = readVarInt();
+            collectorEntityId = readVarInt();
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
+                pickupItemCount = readVarInt();
+            }
+        }
+    }
+
+    @Override
+    public void write() {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
+            writeInt(collectedEntityId);
+            writeInt(collectorEntityId);
+        } else {
+            writeVarInt(collectedEntityId);
+            writeVarInt(collectorEntityId);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
+                writeVarInt(pickupItemCount);
+            }
+        }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerCollectItem wrapper) {
+        collectedEntityId = wrapper.collectedEntityId;
+        collectorEntityId = wrapper.collectorEntityId;
+        pickupItemCount = wrapper.pickupItemCount;
     }
 
     public int getCollectedEntityId() {
@@ -60,42 +96,5 @@ public class WrapperPlayServerCollectItem extends PacketWrapper<WrapperPlayServe
 
     public void setPickupItemCount(int pickupItemCount) {
         this.pickupItemCount = pickupItemCount;
-    }
-
-    @Override
-    public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            collectedEntityId = readInt();
-            collectorEntityId = readInt();
-        }
-        else {
-            collectedEntityId = readVarInt();
-            collectorEntityId = readVarInt();
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
-                pickupItemCount = readVarInt();
-            }
-        }
-    }
-
-    @Override
-    public void copy(WrapperPlayServerCollectItem wrapper) {
-        collectedEntityId = wrapper.collectedEntityId;
-        collectorEntityId = wrapper.collectorEntityId;
-        pickupItemCount = wrapper.pickupItemCount;
-    }
-
-    @Override
-    public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeInt(collectedEntityId);
-            writeInt(collectorEntityId);
-        }
-        else {
-            writeVarInt(collectedEntityId);
-            writeVarInt(collectorEntityId);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
-                writeVarInt(pickupItemCount);
-            }
-        }
     }
 }

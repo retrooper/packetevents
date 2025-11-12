@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,13 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEntityStatus extends PacketWrapper<WrapperPlayServerEntityStatus> {
     private int entityID;
     private int status;
+
     public WrapperPlayServerEntityStatus(PacketSendEvent event) {
         super(event);
     }
@@ -42,15 +43,15 @@ public class WrapperPlayServerEntityStatus extends PacketWrapper<WrapperPlayServ
     }
 
     @Override
-    public void copy(WrapperPlayServerEntityStatus wrapper) {
-        entityID = wrapper.entityID;
-        status = wrapper.status;
-    }
-
-    @Override
     public void write() {
         writeInt(entityID);
         writeByte(status);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerEntityStatus wrapper) {
+        entityID = wrapper.entityID;
+        status = wrapper.status;
     }
 
     public int getEntityId() {

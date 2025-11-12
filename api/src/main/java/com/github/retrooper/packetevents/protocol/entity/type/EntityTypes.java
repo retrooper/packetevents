@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,118 +19,54 @@
 package com.github.retrooper.packetevents.protocol.entity.type;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.TypesBuilder;
-import com.github.retrooper.packetevents.util.TypesBuilderData;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Collection;
 
-public class EntityTypes {
-    private static final Map<String, EntityType> ENTITY_TYPE_MAP = new HashMap<>();
-    //Key - mappings version, value - map with entity type ids and entity types
-    private static final Map<Byte, Map<Integer, EntityType>> ENTITY_TYPE_ID_MAP = new HashMap<>();
-    private static final Map<Byte, Map<Integer, EntityType>> LEGACY_ENTITY_TYPE_ID_MAP = new HashMap<>();
-    private static final TypesBuilder TYPES_BUILDER = new TypesBuilder("entity/entity_type_mappings",
-            ClientVersion.V_1_10,
-            ClientVersion.V_1_11,
-            ClientVersion.V_1_12,
-            ClientVersion.V_1_13,
-            ClientVersion.V_1_14,
-            ClientVersion.V_1_15,
-            ClientVersion.V_1_16,
-            ClientVersion.V_1_16_2,
-            ClientVersion.V_1_17,
-            ClientVersion.V_1_19);
-    private static final TypesBuilder LEGACY_TYPES_BUILDER = new TypesBuilder("entity/legacy_entity_type_mappings",
-            ClientVersion.V_1_8,
-            ClientVersion.V_1_9,
-            ClientVersion.V_1_10,
-            ClientVersion.V_1_11,
-            ClientVersion.V_1_12,
-            ClientVersion.V_1_13);
+public final class EntityTypes {
 
-    public static EntityType define(String key, @Nullable EntityType parent) {
-        TypesBuilderData data = TYPES_BUILDER.define(key);
-        TypesBuilderData legacyData = LEGACY_TYPES_BUILDER.define(key);
-        Optional<EntityType> optParent = Optional.ofNullable(parent);
-        EntityType entityType = new EntityType() {
-            private final int[] ids = data.getData();
-            private final int[] legacyIds = legacyData.getData();
+    private static final VersionedRegistry<EntityType> REGISTRY = new VersionedRegistry<>("entity_type");
+    private static final VersionedRegistry<EntityType> LEGACY_SPAWN_REGISTRY = new VersionedRegistry<>("legacy_spawn_entity_type");
 
-            @Override
-            public Optional<EntityType> getParent() {
-                return optParent;
-            }
+    private EntityTypes() {
+    }
 
-            @Override
-            public int getLegacyId(ClientVersion version) {
-                if (version.isNewerThanOrEquals(ClientVersion.V_1_14)) {
-                    return -1;
-                }
-                int index = LEGACY_TYPES_BUILDER.getDataIndex(version);
-                return legacyIds[index];
-            }
+    public static VersionedRegistry<EntityType> getRegistry() {
+        return REGISTRY;
+    }
 
-            @Override
-            public ResourceLocation getName() {
-                return data.getName();
-            }
+    @ApiStatus.Obsolete
+    public static VersionedRegistry<EntityType> getLegacySpawnRegistry() {
+        return LEGACY_SPAWN_REGISTRY;
+    }
 
-            @Override
-            public int getId(ClientVersion version) {
-                int index = TYPES_BUILDER.getDataIndex(version);
-                return ids[index];
-            }
-        };
-        ENTITY_TYPE_MAP.put(entityType.getName().toString(), entityType);
-        for (ClientVersion version : TYPES_BUILDER.getVersions()) {
-            int index = TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, EntityType> typeIdMap = ENTITY_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
-            typeIdMap.put(entityType.getId(version), entityType);
-        }
-
-        for (ClientVersion version : LEGACY_TYPES_BUILDER.getVersions()) {
-            int index = LEGACY_TYPES_BUILDER.getDataIndex(version);
-            Map<Integer, EntityType> legacyTypeIdMap = LEGACY_ENTITY_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
-            legacyTypeIdMap.put(entityType.getLegacyId(version), entityType);
-        }
-
-        return entityType;
+    @ApiStatus.Internal
+    public static EntityType define(String name, @Nullable EntityType parent) {
+        StaticEntityType type = REGISTRY.define(name, data ->
+                new StaticEntityType(data, parent));
+        return LEGACY_SPAWN_REGISTRY.define(name, type::setLegacyData);
     }
 
     public static boolean isTypeInstanceOf(EntityType type, EntityType parent) {
-        while (type != null) {
-            if (type == parent) {
-                return true;
-            }
-            if (type.getParent().isPresent()) {
-                type = type.getParent().get();
-            } else {
-                return false;
-            }
-        }
-        return false;
+        return type != null && type.isInstanceOf(parent);
     }
 
-    //with minecraft:key
     public static EntityType getByName(String name) {
-        return ENTITY_TYPE_MAP.get(name);
+        return REGISTRY.getByName(name);
     }
 
     public static EntityType getById(ClientVersion version, int id) {
-        int index = TYPES_BUILDER.getDataIndex(version);
-        return ENTITY_TYPE_ID_MAP.get((byte) index).get(id);
+        return REGISTRY.getById(version, id);
     }
 
+    @ApiStatus.Obsolete
     public static EntityType getByLegacyId(ClientVersion version, int id) {
         if (version.isNewerThanOrEquals(ClientVersion.V_1_14)) {
             return null;
         }
-        int index = LEGACY_TYPES_BUILDER.getDataIndex(version);
-        return LEGACY_ENTITY_TYPE_ID_MAP.get((byte) index).get(id);
+        return LEGACY_SPAWN_REGISTRY.getById(version, id);
     }
 
     // Credit to ViaVersion for these categories
@@ -161,6 +97,12 @@ public class EntityTypes {
     public static final EntityType PROJECTILE_ABSTRACT = define("projectile_abstract", ENTITY);
     public static final EntityType MINECART_ABSTRACT = define("minecart_abstract", ENTITY);
     public static final EntityType CHESTED_MINECART_ABSTRACT = define("chested_minecart_abstract", MINECART_ABSTRACT);
+    /**
+     * Not spawnable
+     *
+     * @versions 1.21.9+
+     */
+    public static final EntityType AVATAR = define("avatar", LIVINGENTITY);
     public static final EntityType AREA_EFFECT_CLOUD = define("area_effect_cloud", ENTITY);
     public static final EntityType ARMOR_STAND = define("armor_stand", LIVINGENTITY);
     public static final EntityType ALLAY = define("allay", ABSTRACT_CREATURE);
@@ -169,9 +111,16 @@ public class EntityTypes {
     public static final EntityType BAT = define("bat", ABSTRACT_AMBIENT);
     public static final EntityType BEE = define("bee", ABSTRACT_INSENTIENT);
     public static final EntityType BLAZE = define("blaze", ABSTRACT_MONSTER);
+    /**
+     * <strong>WARNING:</strong> Does not exist itself anymore since 1.21.2
+     */
     public static final EntityType BOAT = define("boat", ENTITY);
+    /**
+     * <strong>WARNING:</strong> Does not exist itself anymore since 1.21.2
+     */
     public static final EntityType CHEST_BOAT = define("chest_boat", BOAT);
     public static final EntityType CAT = define("cat", ABSTRACT_TAMEABLE_ANIMAL);
+    public static final EntityType CAMEL = define("camel", ABSTRACT_HORSE);
     public static final EntityType SPIDER = define("spider", ABSTRACT_MONSTER);
     public static final EntityType CAVE_SPIDER = define("cave_spider", SPIDER);
     public static final EntityType CHICKEN = define("chicken", ABSTRACT_ANIMAL);
@@ -257,6 +206,10 @@ public class EntityTypes {
     public static final EntityType EGG = define("egg", PROJECTILE_ABSTRACT);
     public static final EntityType ENDER_PEARL = define("ender_pearl", PROJECTILE_ABSTRACT);
     public static final EntityType EXPERIENCE_BOTTLE = define("experience_bottle", PROJECTILE_ABSTRACT);
+    /**
+     * <strong>WARNING:</strong> Does not exist itself anymore since 1.21.5, this has
+     * been split into {@link #SPLASH_POTION} and {@link #LINGERING_POTION}
+     */
     public static final EntityType POTION = define("potion", PROJECTILE_ABSTRACT);
     public static final EntityType TADPOLE = define("tadpole", ABSTRACT_FISHES);
     @Deprecated // Exists only in 1.9 and 1.10
@@ -279,7 +232,7 @@ public class EntityTypes {
     public static final EntityType ZOMBIE_HORSE = define("zombie_horse", ABSTRACT_HORSE);
     public static final EntityType ZOMBIE_VILLAGER = define("zombie_villager", ZOMBIE);
     public static final EntityType ZOMBIFIED_PIGLIN = define("zombified_piglin", ZOMBIE);
-    public static final EntityType PLAYER = define("player", LIVINGENTITY);
+    public static final EntityType PLAYER = define("player", AVATAR);
     public static final EntityType FISHING_BOBBER = define("fishing_bobber", ENTITY);
     public static final EntityType ENDER_SIGNAL = define("ender_signal", ENTITY);
     public static final EntityType THROWN_EXP_BOTTLE = define("thrown_exp_bottle", PROJECTILE_ABSTRACT);
@@ -292,9 +245,179 @@ public class EntityTypes {
     public static final EntityType MINECART_TNT = define("minecart_tnt", MINECART_ABSTRACT);
     public static final EntityType MINECART_HOPPER = define("minecart_hopper", MINECART_ABSTRACT);
     public static final EntityType MINECART_MOB_SPAWNER = define("minecart_mob_spawner", MINECART_ABSTRACT);
+    /**
+     * @versions 1.19.4+
+     */
+    public static final EntityType DISPLAY = define("display", ENTITY);
+    /**
+     * @versions 1.19.4+
+     */
+    public static final EntityType BLOCK_DISPLAY = define("block_display", DISPLAY);
+    /**
+     * @versions 1.19.4+
+     */
+    public static final EntityType ITEM_DISPLAY = define("item_display", DISPLAY);
+    /**
+     * @versions 1.19.4+
+     */
+    public static final EntityType TEXT_DISPLAY = define("text_display", DISPLAY);
+    /**
+     * @versions 1.19.4+
+     */
+    public static final EntityType INTERACTION = define("interaction", DISPLAY);
+    /**
+     * @versions 1.19.4+
+     */
+    public static final EntityType SNIFFER = define("sniffer", ABSTRACT_ANIMAL);
+    /**
+     * @versions 1.20.3+
+     */
+    public static final EntityType BREEZE = define("breeze", ABSTRACT_MONSTER);
+    /**
+     * @versions 1.20.3+
+     */
+    public static final EntityType ABSTRACT_WIND_CHARGE = define("abstract_wind_charge", PROJECTILE_ABSTRACT);
+    /**
+     * @versions 1.20.3+
+     */
+    public static final EntityType WIND_CHARGE = define("wind_charge", ABSTRACT_WIND_CHARGE);
+    /**
+     * @versions 1.20.5+
+     */
+    public static final EntityType ARMADILLO = define("armadillo", ABSTRACT_ANIMAL);
+    /**
+     * @versions 1.20.5+
+     */
+    public static final EntityType BOGGED = define("bogged", ABSTRACT_SKELETON);
+    /**
+     * @versions 1.20.5+
+     */
+    public static final EntityType BREEZE_WIND_CHARGE = define("breeze_wind_charge", ABSTRACT_WIND_CHARGE);
+    /**
+     * @versions 1.20.5+
+     */
+    public static final EntityType OMINOUS_ITEM_SPAWNER = define("ominous_item_spawner", ENTITY);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType ACACIA_BOAT = define("acacia_boat", BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType ACACIA_CHEST_BOAT = define("acacia_chest_boat", CHEST_BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType BAMBOO_CHEST_RAFT = define("bamboo_chest_raft", CHEST_BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType BAMBOO_RAFT = define("bamboo_raft", BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType BIRCH_BOAT = define("birch_boat", BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType BIRCH_CHEST_BOAT = define("birch_chest_boat", CHEST_BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType CHERRY_BOAT = define("cherry_boat", BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType CHERRY_CHEST_BOAT = define("cherry_chest_boat", CHEST_BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType CREAKING = define("creaking", ABSTRACT_MONSTER);
+    /**
+     * @versions 1.21.2-1.21.3
+     */
+    @ApiStatus.Obsolete
+    public static final EntityType CREAKING_TRANSIENT = define("creaking_transient", CREAKING);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType DARK_OAK_BOAT = define("dark_oak_boat", BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType DARK_OAK_CHEST_BOAT = define("dark_oak_chest_boat", CHEST_BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType JUNGLE_BOAT = define("jungle_boat", BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType JUNGLE_CHEST_BOAT = define("jungle_chest_boat", CHEST_BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType MANGROVE_BOAT = define("mangrove_boat", BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType MANGROVE_CHEST_BOAT = define("mangrove_chest_boat", CHEST_BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType OAK_BOAT = define("oak_boat", BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType OAK_CHEST_BOAT = define("oak_chest_boat", CHEST_BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType PALE_OAK_BOAT = define("pale_oak_boat", BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType PALE_OAK_CHEST_BOAT = define("pale_oak_chest_boat", CHEST_BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType SPRUCE_BOAT = define("spruce_boat", BOAT);
+    /**
+     * @versions 1.21.2+
+     */
+    public static final EntityType SPRUCE_CHEST_BOAT = define("spruce_chest_boat", CHEST_BOAT);
+    /**
+     * @versions 1.21.5+
+     */
+    public static final EntityType SPLASH_POTION = define("splash_potion", POTION);
+    /**
+     * @versions 1.21.5+
+     */
+    public static final EntityType LINGERING_POTION = define("lingering_potion", POTION);
+    /**
+     * @versions 1.21.6+
+     */
+    public static final EntityType HAPPY_GHAST = define("happy_ghast", ABSTRACT_ANIMAL);
+    /**
+     * @versions 1.21.9+
+     */
+    public static final EntityType COPPER_GOLEM = define("copper_golem", ABSTRACT_GOLEM);
+    /**
+     * @versions 1.21.9+
+     */
+    public static final EntityType MANNEQUIN = define("mannequin", AVATAR);
+
+    /**
+     * Returns an immutable view of the entity types.
+     *
+     * @return Entity Types
+     */
+    public static Collection<EntityType> values() {
+        return REGISTRY.getEntries();
+    }
 
     static {
-        TYPES_BUILDER.unloadFileMappings();
-        LEGACY_TYPES_BUILDER.unloadFileMappings();
+        REGISTRY.unloadMappings();
+        LEGACY_SPAWN_REGISTRY.unloadMappings();
     }
 }

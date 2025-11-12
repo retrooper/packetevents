@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -99,9 +99,13 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void receivePacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            //TODO Have we given ViaVersion a thought?
             List<String> handlerNames = ChannelHelper.pipelineHandlerNames(channel);
-            if (handlerNames.contains("ps_decoder_transformer")) {
+            //Account for ViaVersion
+            if (handlerNames.contains("via-encoder")) {
+                ChannelHelper.fireChannelReadInContext(channel, "via-decoder", byteBuf);
+            }
+            //Account for ProtocolSupport
+            else if (handlerNames.contains("ps_decoder_transformer")) {
                 //We want to skip ProtocolSupport's translation handlers,
                 //because the buffer is fit for the current server-version
                 ChannelHelper.fireChannelReadInContext(channel, "ps_decoder_transformer", byteBuf);
@@ -127,9 +131,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void receivePacketSilently(Object channel, Object byteBuf) {
-        //Receive the packet for all handlers after our decoder
-        //TODO Consider viaversion when we are in play state
-        ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
+        if (ChannelHelper.isOpen(channel)) {
+            ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
+        }
     }
 
     @Override

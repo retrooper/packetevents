@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServerBlockAction> {
     private Vector3i blockPosition;
-    private int actionID, actionData;
+    private int actionID;
+    private int actionData;
     private int blockTypeID;
 
     public WrapperPlayServerBlockAction(PacketSendEvent event) {
@@ -44,13 +45,12 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             int x = readInt();
             int y = readShort();
             int z = readInt();
             blockPosition = new Vector3i(x, y, z);
-        }
-        else {
+        } else {
             this.blockPosition = readBlockPosition();
         }
         this.actionID = readUnsignedByte();
@@ -60,12 +60,11 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             writeInt(blockPosition.x);
             writeShort(blockPosition.y);
             writeInt(blockPosition.z);
-        }
-        else {
+        } else {
             writeBlockPosition(blockPosition);
         }
         writeByte(actionID);

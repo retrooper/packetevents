@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,17 +47,17 @@ public class WrapperLoginServerPluginRequest extends PacketWrapper<WrapperLoginS
     }
 
     @Override
-    public void copy(WrapperLoginServerPluginRequest wrapper) {
-        this.messageID = wrapper.messageID;
-        this.channelName = wrapper.channelName;
-        this.data = wrapper.data;
-    }
-
-    @Override
     public void write() {
         writeVarInt(messageID);
         writeString(channelName);
         writeByteArray(data);
+    }
+
+    @Override
+    public void copy(WrapperLoginServerPluginRequest wrapper) {
+        this.messageID = wrapper.messageID;
+        this.channelName = wrapper.channelName;
+        this.data = wrapper.data;
     }
 
     public int getMessageId() {

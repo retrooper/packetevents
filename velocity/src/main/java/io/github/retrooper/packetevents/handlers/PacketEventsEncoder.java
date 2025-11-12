@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+
 @ChannelHandler.Sharable
 public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
     public Player player;
@@ -50,6 +51,8 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
                 packetSendEvent.getLastUsedWrapper().write();
             }
             buffer.readerIndex(firstReaderIndex);
+        } else {
+            ByteBufHelper.clear(packetSendEvent.getByteBuf());
         }
         if (packetSendEvent.hasPostTasks()) {
             for (Runnable task : packetSendEvent.getPostTasks()) {
@@ -61,15 +64,19 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
         if (!msg.isReadable()) return;
-        read(ctx, msg);
-        out.writeBytes(msg);
+
+        ByteBuf transformed = ctx.alloc().buffer().writeBytes(msg);
+        try {
+            read(ctx, transformed);
+            out.writeBytes(transformed);
+        } finally {
+            transformed.release();
+        }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
         super.exceptionCaught(ctx, cause);
-        //}
     }
 }
 

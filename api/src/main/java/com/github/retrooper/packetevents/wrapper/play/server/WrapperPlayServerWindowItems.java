@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        windowID = readUnsignedByte();
+        windowID = this.readContainerId();
         boolean v1_17_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1);
         if (v1_17_1) {
             stateID = readVarInt();
@@ -69,16 +69,8 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void copy(WrapperPlayServerWindowItems wrapper) {
-        windowID = wrapper.windowID;
-        stateID = wrapper.stateID;
-        items = wrapper.items;
-        carriedItem = wrapper.carriedItem;
-    }
-
-    @Override
     public void write() {
-        writeByte(windowID);
+        this.writeContainerId(this.windowID);
         boolean v1_17_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1);
         if (v1_17_1) {
             writeVarInt(stateID);
@@ -94,6 +86,14 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
         if (v1_17_1) {
             writeItemStack(carriedItem.orElse(ItemStack.EMPTY));
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerWindowItems wrapper) {
+        windowID = wrapper.windowID;
+        stateID = wrapper.stateID;
+        items = wrapper.items;
+        carriedItem = wrapper.carriedItem;
     }
 
     public int getWindowId() {

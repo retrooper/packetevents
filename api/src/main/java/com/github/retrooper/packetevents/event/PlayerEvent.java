@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,11 +24,11 @@ package com.github.retrooper.packetevents.event;
  * @author retrooper
  * @since 1.6.9
  */
-public interface PlayerEvent<T> {
+public interface PlayerEvent {
     /**
      * Associated player.
      *
      * @return Player.
      */
-    T getPlayer();
+    <T> T getPlayer();
 }

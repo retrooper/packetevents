@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,14 @@ package com.github.retrooper.packetevents.protocol.stats;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
-import com.github.retrooper.packetevents.util.MappingHelper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
+import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import net.kyori.adventure.text.Component;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,38 +44,47 @@ public class Statistics {
 
         if (version.isOlderThan(ServerVersion.V_1_12_2)) {
 
-            JsonObject mapping = MappingHelper.getJSONObject("stats/statistics");
+            try (final SequentialNBTReader.Compound rootMapping = MappingHelper.decompress("mappings/data/statistics")) {
+                rootMapping.skipOne(); //Skip version
+                SequentialNBTReader.Compound mapping = (SequentialNBTReader.Compound) rootMapping.next().getValue();
 
-            if (version.isOlderThanOrEquals(ServerVersion.V_1_8_3)) {
-                mapping = mapping.getAsJsonObject("V_1_8");
-            } else {
-                mapping = mapping.getAsJsonObject("V_1_12");
-            }
+                if (version.isOlderThanOrEquals(ServerVersion.V_1_8_3)) {
+                    mapping.skipOne(); // Skip to version 1.8
+                }
 
-            for (Map.Entry<String, JsonElement> entry : mapping.entrySet()) {
-                Component value = AdventureSerializer.parseComponent(entry.getValue().getAsString());
+                SequentialNBTReader.Compound toLoad = (SequentialNBTReader.Compound) mapping.next().getValue();
 
-                Statistic statistic = new Statistic() {
-                    @Override
-                    public String getId() {
-                        return entry.getKey();
-                    }
+                for (Map.Entry<String, NBT> entry : toLoad) {
+                    String value = ((NBTString) entry.getValue()).getValue();
+                    Statistic statistic = new Statistic() {
+                        private Component cachedDisplay;
 
-                    @Override
-                    public Component display() {
-                        return value;
-                    }
-
-                    @Override
-                    public boolean equals(Object obj) {
-                        if (obj instanceof Statistic) {
-                            return ((Statistic) obj).getId().equals(this.getId());
+                        @Override
+                        public String getId() {
+                            return entry.getKey();
                         }
-                        return false;
-                    }
-                };
 
-                STATISTIC_MAP.put(entry.getKey(), statistic);
+                        @Override
+                        public Component display() {
+                            if (cachedDisplay == null) {
+                                cachedDisplay = AdventureSerializer.serializer().fromJson(value);
+                            }
+                            return cachedDisplay;
+                        }
+
+                        @Override
+                        public boolean equals(Object obj) {
+                            if (obj instanceof Statistic) {
+                                return ((Statistic) obj).getId().equals(this.getId());
+                            }
+                            return false;
+                        }
+                    };
+
+                    STATISTIC_MAP.put(entry.getKey(), statistic);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Cannot load statistics mappings", e);
             }
         }
     }

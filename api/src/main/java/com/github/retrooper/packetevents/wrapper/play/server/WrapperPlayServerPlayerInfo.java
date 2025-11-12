@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,9 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.util.crypto.SignatureData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -68,16 +69,9 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         Collections.addAll(playerDataList, playerData);
     }
 
-    public WrapperPlayServerPlayerInfo(@NotNull Action action, PlayerData playerData) {
-        super(PacketType.Play.Server.PLAYER_INFO);
-        this.action = action;
-        this.playerDataList = new ArrayList<>();
-        this.playerDataList.add(playerData);
-    }
-
     @Override
     public void read() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             playerDataList = new ArrayList<>(1);
             //Only one player data
             String rawUsername = readString();
@@ -107,18 +101,24 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         for (int j = 0; j < propertyCount; j++) {
                             String propertyName = readString();
                             String propertyValue = readString();
-                            String propertySignature = readBoolean() ? readString() : null;
+                            String propertySignature = readOptional(PacketWrapper::readString);
                             TextureProperty textureProperty = new TextureProperty(propertyName, propertyValue, propertySignature);
                             userProfile.getTextureProperties().add(textureProperty);
                         }
-                        GameMode gameMode = GameMode.values()[readVarInt()];
+                        GameMode gameMode = GameMode.getById(readVarInt());
                         int ping = readVarInt();
                         Component displayName = readBoolean() ? readComponent() : null;
-                        data = new PlayerData(displayName, userProfile, gameMode, ping);
+
+                        SignatureData signatureData = null;
+                        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+                            signatureData = readOptional(PacketWrapper::readSignatureData);
+                        }
+
+                        data = new PlayerData(displayName, userProfile, gameMode, signatureData, ping);
                         break;
                     }
                     case UPDATE_GAME_MODE: {
-                        GameMode gameMode = GameMode.values()[readVarInt()];
+                        GameMode gameMode = GameMode.getById(readVarInt());
                         data = new PlayerData((Component) null, new UserProfile(uuid, null), gameMode, -1);
                         break;
                     }
@@ -144,14 +144,8 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void copy(WrapperPlayServerPlayerInfo wrapper) {
-        action = wrapper.action;
-        playerDataList = wrapper.playerDataList;
-    }
-
-    @Override
     public void write() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             //Only one player data can be sent
             PlayerData data = playerDataList.get(0);
             //We must convert the component string to a normal one
@@ -167,16 +161,11 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                 switch (action) {
                     case ADD_PLAYER: {
                         writeString(data.userProfile.getName(), 16);
-                        writeVarInt(data.userProfile.getTextureProperties().size());
-                        for (TextureProperty textureProperty : data.userProfile.getTextureProperties()) {
-                            writeString(textureProperty.getName());
-                            writeString(textureProperty.getValue());
-                            boolean hasSignature = textureProperty.getSignature() != null;
-                            writeBoolean(hasSignature);
-                            if (hasSignature) {
-                                writeString(textureProperty.getSignature());
-                            }
-                        }
+                        writeList(data.userProfile.getTextureProperties(), (wrapper, textureProperty) -> {
+                            wrapper.writeString(textureProperty.getName());
+                            wrapper.writeString(textureProperty.getValue());
+                            wrapper.writeOptional(textureProperty.getSignature(), PacketWrapper::writeString);
+                        });
                         writeVarInt(data.gameMode.ordinal());
                         writeVarInt(data.ping);
                         if (data.displayName != null) {
@@ -184,6 +173,9 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                             writeComponent(data.displayName);
                         } else {
                             writeBoolean(false);
+                        }
+                        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
+                            writeOptional(data.getSignatureData(), PacketWrapper::writeSignatureData);
                         }
                         break;
                     }
@@ -209,7 +201,12 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                 }
             }
         }
+    }
 
+    @Override
+    public void copy(WrapperPlayServerPlayerInfo wrapper) {
+        action = wrapper.action;
+        playerDataList = wrapper.playerDataList;
     }
 
     @Nullable
@@ -236,21 +233,51 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         private UserProfile userProfile;
         @Nullable
         private GameMode gameMode;
+        @Nullable
+        private SignatureData signatureData;
 
         private int ping;
 
-        public PlayerData(@Nullable Component displayName, @Nullable UserProfile userProfile, @Nullable GameMode gameMode, int ping) {
+        public PlayerData(@Nullable Component displayName, @Nullable UserProfile userProfile, @Nullable GameMode gameMode, @Nullable SignatureData signatureData, int ping) {
             this.displayName = displayName;
             this.userProfile = userProfile;
             this.gameMode = gameMode;
+            this.signatureData = signatureData;
             this.ping = ping;
         }
 
-        @Nullable
-        public UserProfile getUser() {
+        public PlayerData(@Nullable Component displayName, @Nullable UserProfile userProfile, @Nullable GameMode gameMode, int ping) {
+            this(displayName, userProfile, gameMode, null, ping);
+        }
+
+        public @Nullable UserProfile getUserProfile() {
             return userProfile;
         }
 
+        public void setUserProfile(@Nullable UserProfile userProfile) {
+            this.userProfile = userProfile;
+        }
+
+        public SignatureData getSignatureData() {
+            return signatureData;
+        }
+
+        public void setSignatureData(SignatureData signatureData) {
+            this.signatureData = signatureData;
+        }
+
+        /**
+         * @deprecated duplicate, use {@link #getUserProfile()} instead
+         */
+        @Deprecated
+        public @Nullable UserProfile getUser() {
+            return this.userProfile;
+        }
+
+        /**
+         * @deprecated duplicate, use {@link #setUserProfile(UserProfile)} instead
+         */
+        @Deprecated
         public void setUser(@Nullable UserProfile userProfile) {
             this.userProfile = userProfile;
         }

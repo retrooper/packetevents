@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,24 +20,25 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 // Inspired heavily by MCProtocolLib
 public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlayServerMultiBlockChange> {
-    Vector3i chunkPosition;
-    boolean trustEdges;
-    EncodedBlock[] blockData;
+    private Vector3i chunkPosition;
+    //Suppress light
+    private Boolean trustEdges;
+    private EncodedBlock[] blockData;
 
     public WrapperPlayServerMultiBlockChange(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerMultiBlockChange(Vector3i chunkPosition, boolean trustEdges, EncodedBlock[] blockData) {
+    public WrapperPlayServerMultiBlockChange(Vector3i chunkPosition, @Nullable Boolean trustEdges, EncodedBlock[] blockData) {
         super(PacketType.Play.Server.MULTI_BLOCK_CHANGE);
         this.chunkPosition = chunkPosition;
         this.trustEdges = trustEdges;
@@ -54,7 +55,9 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
             int sectionZ = (int) (encodedPosition << 22 >> 42);
             chunkPosition = new Vector3i(sectionX, sectionY, sectionZ);
 
-            trustEdges = readBoolean();
+            if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
+                trustEdges = readBoolean();
+            }
 
             blockData = new EncodedBlock[readVarInt()];
             for (int i = 0; i < blockData.length; i++) {
@@ -79,13 +82,6 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
     }
 
     @Override
-    public void copy(WrapperPlayServerMultiBlockChange wrapper) {
-        chunkPosition = wrapper.chunkPosition;
-        trustEdges = wrapper.trustEdges;
-        blockData = wrapper.blockData;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             long encodedPos = 0;
@@ -93,7 +89,9 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
             encodedPos |= (chunkPosition.getZ() & 0x3FFFFFL) << 20;
             writeLong(encodedPos | (chunkPosition.getY() & 0xFFFFFL));
 
-            writeBoolean(trustEdges);
+            if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_19_4)) {
+                writeBoolean(Boolean.TRUE.equals(trustEdges));
+            }
 
             writeVarInt(blockData.length);
             for (EncodedBlock blockDatum : blockData) {
@@ -113,12 +111,27 @@ public class WrapperPlayServerMultiBlockChange extends PacketWrapper<WrapperPlay
         }
     }
 
+    @Override
+    public void copy(WrapperPlayServerMultiBlockChange wrapper) {
+        chunkPosition = wrapper.chunkPosition;
+        trustEdges = wrapper.trustEdges;
+        blockData = wrapper.blockData;
+    }
+
     public Vector3i getChunkPosition() {
         return chunkPosition;
     }
 
+    public void setChunkPosition(Vector3i chunkPosition) {
+        this.chunkPosition = chunkPosition;
+    }
+
     public boolean getTrustEdges() {
-        return trustEdges;
+        return Boolean.TRUE.equals(trustEdges);
+    }
+
+    public void setTrustEdges(Boolean trustEdges) {
+        this.trustEdges = trustEdges;
     }
 
     public EncodedBlock[] getBlocks() {

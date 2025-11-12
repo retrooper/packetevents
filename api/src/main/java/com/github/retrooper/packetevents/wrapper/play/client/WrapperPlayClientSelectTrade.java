@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,18 +36,17 @@ public class WrapperPlayClientSelectTrade extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void read() {
-        //1.13+ packet
         this.slot = readVarInt();
-    }
-
-    @Override
-    public void copy(WrapperPlayClientSelectTrade wrapper) {
-        this.slot = wrapper.slot;
     }
 
     @Override
     public void write() {
         writeVarInt(slot);
+    }
+
+    @Override
+    public void copy(WrapperPlayClientSelectTrade wrapper) {
+        this.slot = wrapper.slot;
     }
 
     public int getSlot() {

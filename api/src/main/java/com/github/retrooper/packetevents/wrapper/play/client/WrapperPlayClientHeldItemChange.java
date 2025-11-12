@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,13 +43,13 @@ public class WrapperPlayClientHeldItemChange extends PacketWrapper<WrapperPlayCl
     }
 
     @Override
-    public void copy(WrapperPlayClientHeldItemChange wrapper) {
-        this.slot = wrapper.slot;
+    public void write() {
+        writeShort(slot);
     }
 
     @Override
-    public void write() {
-        writeShort(slot);
+    public void copy(WrapperPlayClientHeldItemChange wrapper) {
+        this.slot = wrapper.slot;
     }
 
     /**

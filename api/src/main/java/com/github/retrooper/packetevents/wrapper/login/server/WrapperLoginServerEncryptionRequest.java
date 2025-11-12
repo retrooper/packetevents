@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,16 +18,15 @@
 
 package com.github.retrooper.packetevents.wrapper.login.server;
 
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 
-import java.security.KeyFactory;
 import java.security.PublicKey;
-import java.security.spec.EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 
 /**
  * This packet is sent by the server to the client if the server is in online mode.
@@ -37,49 +36,62 @@ import java.security.spec.X509EncodedKeySpec;
  * @see WrapperLoginClientEncryptionResponse
  */
 public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLoginServerEncryptionRequest> {
+
     private String serverID;
-    private PublicKey publicKey;
+    private byte[] publicKeyBytes;
     private byte[] verifyToken;
+    private boolean shouldAuthenticate;
 
     public WrapperLoginServerEncryptionRequest(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken) {
-        super(PacketType.Login.Server.ENCRYPTION_REQUEST);
-        this.serverID = serverID;
-        this.publicKey = encrypt(publicKeyBytes);
-        this.verifyToken = verifyToken;
+    public WrapperLoginServerEncryptionRequest(String serverID, PublicKey publicKey, byte[] verifyToken) {
+        this(serverID, publicKey.getEncoded(), verifyToken);
     }
 
-    public WrapperLoginServerEncryptionRequest(String serverID, PublicKey publicKey, byte[] verifyToken) {
+    public WrapperLoginServerEncryptionRequest(String serverID, PublicKey publicKey, byte[] verifyToken, boolean shouldAuthenticate) {
+        this(serverID, publicKey.getEncoded(), verifyToken, shouldAuthenticate);
+    }
+
+    public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken) {
+        this(serverID, publicKeyBytes, verifyToken, true);
+    }
+
+    public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken, boolean shouldAuthenticate) {
         super(PacketType.Login.Server.ENCRYPTION_REQUEST);
         this.serverID = serverID;
-        this.publicKey = publicKey;
+        this.publicKeyBytes = publicKeyBytes;
         this.verifyToken = verifyToken;
+        this.shouldAuthenticate = shouldAuthenticate;
     }
 
     @Override
     public void read() {
         this.serverID = readString(20);
-        byte[] publicKeyBytes = readByteArray(ByteBufHelper.readableBytes(buffer));
-        this.publicKey = encrypt(publicKeyBytes);
+        this.publicKeyBytes = readByteArray(512);
         this.verifyToken = readByteArray(ByteBufHelper.readableBytes(buffer));
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.shouldAuthenticate = readBoolean();
+        }
+    }
+
+    @Override
+    public void write() {
+        writeString(this.serverID, 20);
+        writeByteArray(this.publicKeyBytes);
+        writeByteArray(this.verifyToken);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            writeBoolean(this.shouldAuthenticate);
+        }
     }
 
     @Override
     public void copy(WrapperLoginServerEncryptionRequest wrapper) {
         this.serverID = wrapper.serverID;
-        this.publicKey = wrapper.publicKey;
+        this.publicKeyBytes = wrapper.publicKeyBytes;
         this.verifyToken = wrapper.verifyToken;
-    }
-
-    @Override
-    public void write() {
-        writeString(serverID, 20);
-        byte[] encoded = publicKey.getEncoded();
-        writeByteArray(encoded);
-        writeByteArray(verifyToken);
+        this.shouldAuthenticate = wrapper.shouldAuthenticate;
     }
 
     /**
@@ -95,6 +107,14 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
         this.serverID = serverID;
     }
 
+    public byte[] getPublicKeyBytes() {
+        return publicKeyBytes;
+    }
+
+    public void setPublicKeyBytes(byte[] publicKeyBytes) {
+        this.publicKeyBytes = publicKeyBytes;
+    }
+
     /**
      * The public key is in DER encoding format.
      * More technically, it is in ASN.1 format.
@@ -104,11 +124,11 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
      * @return Public key
      */
     public PublicKey getPublicKey() {
-        return publicKey;
+        return MinecraftEncryptionUtil.publicKey(publicKeyBytes);
     }
 
     public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
+        this.publicKeyBytes = publicKey.getEncoded();
     }
 
     /**
@@ -125,14 +145,11 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
         this.verifyToken = verifyToken;
     }
 
-    private PublicKey encrypt(byte[] bytes) {
-        try {
-            EncodedKeySpec encodedKeySpec = new X509EncodedKeySpec(bytes);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            return keyFactory.generatePublic(encodedKeySpec);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }
+    public boolean isShouldAuthenticate() {
+        return this.shouldAuthenticate;
+    }
+
+    public void setShouldAuthenticate(boolean shouldAuthenticate) {
+        this.shouldAuthenticate = shouldAuthenticate;
     }
 }

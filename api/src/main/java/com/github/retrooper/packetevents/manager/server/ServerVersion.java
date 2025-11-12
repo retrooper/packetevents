@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.manager.server;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Server Version.
@@ -31,9 +32,10 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
  */
 public enum ServerVersion {
     //TODO Rename to MinecraftVersion?
-    V_1_7_10(5),
+    V_1_7_2(4), V_1_7_4(4), V_1_7_5(4),
+    V_1_7_6(5), V_1_7_7(5), V_1_7_8(5), V_1_7_9(5), V_1_7_10(5),
     V_1_8(47), V_1_8_3(47), V_1_8_8(47),
-    V_1_9(107), V_1_9_2(109), V_1_9_4(110),
+    V_1_9(107), V_1_9_1(108), V_1_9_2(109), V_1_9_4(110),
     //1.10 and 1.10.1 are redundant
     V_1_10(210), V_1_10_1(210), V_1_10_2(210),
     V_1_11(315), V_1_11_2(316),
@@ -44,7 +46,12 @@ public enum ServerVersion {
     V_1_16(735), V_1_16_1(736), V_1_16_2(751), V_1_16_3(753), V_1_16_4(754), V_1_16_5(754),
     V_1_17(755), V_1_17_1(756),
     V_1_18(757), V_1_18_1(757), V_1_18_2(758),
-    V_1_19(759),
+    //1.19.1 and 1.19.2 have the same protocol version
+    V_1_19(759), V_1_19_1(760), V_1_19_2(760), V_1_19_3(761), V_1_19_4(762),
+    //1.20 and 1.20.1 have the same protocol version. 1.20.3 and 1.20.4 have the same protocol version. 1.20.5 and 1.20.6 have the same protocol version
+    V_1_20(763), V_1_20_1(763), V_1_20_2(764), V_1_20_3(765), V_1_20_4(765), V_1_20_5(766), V_1_20_6(766),
+    //1.21 and 1.21.1 have the same protocol version. 1.21.2 and 1.21.3 have the same protocol version. 1.21.7 and 1.21.8 have the same protocol version. 1.21.9 and 1.21.10 have the same protocol version
+    V_1_21(767), V_1_21_1(767), V_1_21_2(768), V_1_21_3(768), V_1_21_4(769), V_1_21_5(770), V_1_21_6(771), V_1_21_7(772), V_1_21_8(772), V_1_21_9(773), V_1_21_10(773),
     //TODO UPDATE Add server version constant
     ERROR(-1, true);
 
@@ -86,17 +93,17 @@ public enum ServerVersion {
     }
 
     public static ServerVersion getLatest() {
-        return reversedValues()[1];
+        return REVERSED_VALUES[1];
     }
 
     public static ServerVersion getOldest() {
-        return values()[0];
+        return VALUES[0];
     }
 
     //TODO Optimize
     @Deprecated
     public static ServerVersion getById(int protocolVersion) {
-        for (ServerVersion version : values()) {
+        for (ServerVersion version : VALUES) {
             if (version.protocolVersion == protocolVersion) {
                 return version;
             }
@@ -114,6 +121,7 @@ public enum ServerVersion {
     /**
      * Get the release name of this server version.
      * For example, for the V_1_18 enum constant, it would return "1.18".
+     *
      * @return Release name
      */
     public String getReleaseName() {
@@ -138,31 +146,7 @@ public enum ServerVersion {
      * @return Is this server version newer than the compared server version.
      */
     public boolean isNewerThan(ServerVersion target) {
-        /*
-         * Some server versions have the same protocol version in the minecraft protocol.
-         * We still need this method to work in such cases.
-         * We first check if this is the case, if the protocol versions aren't the same, we can just use the protocol versions
-         * to compare the server versions.
-         */
-        if (target.protocolVersion != protocolVersion || this == target) {
-            return protocolVersion > target.protocolVersion;
-        }
-
-        /*
-         * The server versions unfortunately have the same protocol version.
-         * We need to look at this "reversedValues" variable.
-         * The reversed values variable is an array containing all enum constants in this enum but in a reversed order.
-         * I already made this variable a while ago for a different usage, you can check that out.
-         * The first one we find in the array is the newer version.
-         */
-        for (ServerVersion version : reversedValues()) {
-            if (version == target) {
-                return false;
-            }
-            if (version == this) return true;
-        }
-
-        return false;
+        return this.ordinal() > target.ordinal();
     }
 
     /**
@@ -174,28 +158,7 @@ public enum ServerVersion {
      * @return Is this server version older than the compared server version.
      */
     public boolean isOlderThan(ServerVersion target) {
-        /*
-         * Some server versions have the same protocol version in the minecraft protocol.
-         * We still need this method to work in such cases.
-         * We first check if this is the case, if the protocol versions aren't the same, we can just use the protocol versions
-         * to compare the server versions.
-         */
-        if (target.protocolVersion != protocolVersion || this == target) {
-            return protocolVersion < target.protocolVersion;
-        }
-        /*
-         * The server versions unfortunately have the same protocol version.
-         * We look at all enum constants in the ServerVersion enum in the order they have been defined in.
-         * The first one we find in the array is the newer version.
-         */
-        for (ServerVersion version : VALUES) {
-            if (version == this) {
-                return true;
-            } else if (version == target) {
-                return false;
-            }
-        }
-        return false;
+        return this.ordinal() < target.ordinal();
     }
 
     /**
@@ -207,7 +170,7 @@ public enum ServerVersion {
      * @return Is this server version newer than or equal to the compared server version.
      */
     public boolean isNewerThanOrEquals(ServerVersion target) {
-        return this == target || isNewerThan(target);
+        return this.ordinal() >= target.ordinal();
     }
 
     /**
@@ -219,6 +182,36 @@ public enum ServerVersion {
      * @return Is this server version older than or equal to the compared server version.
      */
     public boolean isOlderThanOrEquals(ServerVersion target) {
-        return this == target || isOlderThan(target);
+        return this.ordinal() <= target.ordinal();
+    }
+
+    /**
+     * Is this server version newer than, older than or equal to the compared server version?
+     * This method simply checks if this server version's protocol version is greater than, less than or equal to
+     * the compared server version's protocol version.
+     *
+     * @param comparison    Comparison type.
+     * @param targetVersion Compared server version.
+     * @return true or false, based on the comparison type.
+     * @see #isNewerThan(ServerVersion)
+     * @see #isNewerThanOrEquals(ServerVersion)
+     * @see #isOlderThan(ServerVersion)
+     * @see #isOlderThanOrEquals(ServerVersion)
+     */
+    public boolean is(@NotNull VersionComparison comparison, @NotNull ServerVersion targetVersion) {
+        switch (comparison) {
+            case EQUALS:
+                return protocolVersion == targetVersion.protocolVersion;
+            case NEWER_THAN:
+                return isNewerThan(targetVersion);
+            case NEWER_THAN_OR_EQUALS:
+                return isNewerThanOrEquals(targetVersion);
+            case OLDER_THAN:
+                return isOlderThan(targetVersion);
+            case OLDER_THAN_OR_EQUALS:
+                return isOlderThanOrEquals(targetVersion);
+            default:
+                return false;
+        }
     }
 }

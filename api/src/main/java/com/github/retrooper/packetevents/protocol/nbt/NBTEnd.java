@@ -47,4 +47,9 @@ public class NBTEnd extends NBT {
     public NBTEnd copy() {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "END";
+    }
 }

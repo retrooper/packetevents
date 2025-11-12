@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.util;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 
 import java.lang.reflect.InvocationTargetException;
@@ -35,7 +36,8 @@ public class GeyserUtil {
     public static boolean isGeyserPlayer(UUID uuid) {
         if (!CHECKED_FOR_GEYSER) {
             try {
-                GEYSER_CLASS = Class.forName("org.geysermc.api.Geyser");
+                ClassLoader classLoader = PacketEvents.getAPI().getPlugin().getClass().getClassLoader();
+                GEYSER_CLASS = classLoader.loadClass("org.geysermc.api.Geyser");
                 GEYSER_PRESENT = true;
             } catch (ClassNotFoundException e) {
                 GEYSER_PRESENT = false;
@@ -46,14 +48,15 @@ public class GeyserUtil {
         if (GEYSER_PRESENT) {
             if (GEYSER_API_CLASS == null) {
                 try {
-                    GEYSER_API_CLASS = Class.forName("org.geysermc.api.GeyserApiBase");
+                    ClassLoader classLoader = PacketEvents.getAPI().getPlugin().getClass().getClassLoader();
+                    GEYSER_API_CLASS = classLoader.loadClass("org.geysermc.api.GeyserApiBase");
                 }
                 catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }
             if (GEYSER_API_METHOD == null) {
-                GEYSER_API_METHOD = Reflection.getMethod(GEYSER_CLASS, "api", null, new Class<?>[]{});
+                GEYSER_API_METHOD = Reflection.getMethodExact(GEYSER_CLASS, "api", null);
             }
             if (CONNECTION_BY_UUID_METHOD == null) {
                 CONNECTION_BY_UUID_METHOD = Reflection.getMethod(GEYSER_API_CLASS, "connectionByUuid", 0);

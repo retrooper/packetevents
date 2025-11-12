@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,7 @@
 
 package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.event.simple.PacketLoginSendEvent;
-import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
-import com.github.retrooper.packetevents.event.simple.PacketStatusSendEvent;
+import com.github.retrooper.packetevents.event.simple.PacketHandshakeSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
@@ -28,7 +26,12 @@ import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 
-public class PacketSendEvent extends ProtocolPacketEvent<Object> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class PacketSendEvent extends ProtocolPacketEvent {
+    private List<Runnable> tasksAfterSend = null;
+
     protected PacketSendEvent(Object channel, User user, Object player, Object rawByteBuf,
                               boolean autoProtocolTranslation) throws PacketProcessException {
         super(PacketSide.SERVER, channel, user, player, rawByteBuf, autoProtocolTranslation);
@@ -48,19 +51,27 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
         listener.onPacketSend(this);
     }
 
+
+    public List<Runnable> getTasksAfterSend() {
+        if (tasksAfterSend == null) {
+            tasksAfterSend = new ArrayList<>();
+        }
+        return tasksAfterSend;
+    }
+
+    public boolean hasTasksAfterSend() {
+        return tasksAfterSend != null && !tasksAfterSend.isEmpty();
+    }
+
     @Override
     public PacketSendEvent clone() {
-        if (this instanceof PacketStatusSendEvent) {
-            return ((PacketStatusSendEvent)this).clone();
+        try {
+            Object clonedBuffer = ByteBufHelper.retainedDuplicate(getByteBuf());
+            return new PacketSendEvent(getPacketId(), getPacketType(), getServerVersion(),
+                    getChannel(), getUser(), getPlayer(), clonedBuffer);
+        } catch (PacketProcessException e) {
+            e.printStackTrace();
         }
-        else if (this instanceof PacketLoginSendEvent) {
-            return ((PacketLoginSendEvent)this).clone();
-        }
-        else if (this instanceof PacketPlaySendEvent) {
-            return ((PacketPlaySendEvent)this).clone();
-        }
-        else {
-            return null;
-        }
+        return null;
     }
 }

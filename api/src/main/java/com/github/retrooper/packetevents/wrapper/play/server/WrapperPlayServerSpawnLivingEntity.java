@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,11 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityMetadataProvider;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -45,13 +47,13 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     private float pitch;
     private float headPitch;
     private Vector3d velocity;
-    private List<EntityData> entityMetadata;
+    private List<EntityData<?>> entityMetadata;
 
     public WrapperPlayServerSpawnLivingEntity(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerSpawnLivingEntity(int entityID, UUID entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity, List<EntityData> entityMetadata) {
+    public WrapperPlayServerSpawnLivingEntity(int entityID, UUID entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity, List<EntityData<?>> entityMetadata) {
         super(PacketType.Play.Server.SPAWN_LIVING_ENTITY);
         this.entityID = entityID;
         this.entityUUID = entityUUID;
@@ -64,12 +66,24 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.entityMetadata = entityMetadata;
     }
 
+    public WrapperPlayServerSpawnLivingEntity(int entityID, UUID entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity, EntityMetadataProvider metadata) {
+        this(entityID, entityUUID, entityType, position, yaw, pitch, headPitch, velocity, metadata.entityData(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
+    }
+
     public WrapperPlayServerSpawnLivingEntity(int entityId, UUID entityUUID,
                                               EntityType entityType, Location location, float headPitch,
                                               Vector3d velocity,
-                                              List<EntityData> entityMetadata) {
+                                              List<EntityData<?>> entityMetadata) {
         this(entityId, entityUUID, entityType, location.getPosition(), location.getYaw(), location.getPitch(),
                 headPitch, velocity, entityMetadata);
+    }
+
+    public WrapperPlayServerSpawnLivingEntity(int entityId, UUID entityUUID,
+                                              EntityType entityType, Location location, float headPitch,
+                                              Vector3d velocity,
+                                              EntityMetadataProvider metadata) {
+        this(entityId, entityUUID, entityType, location.getPosition(), location.getYaw(), location.getPitch(),
+                headPitch, velocity, metadata.entityData(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
     }
 
     @Override
@@ -100,25 +114,10 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.velocity = new Vector3d(velX, velY, velZ);
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             this.entityMetadata = readEntityMetadata();
-        }
-        else {
+        } else {
             this.entityMetadata = new ArrayList<>();
         }
     }
-
-    @Override
-    public void copy(WrapperPlayServerSpawnLivingEntity wrapper) {
-        this.entityID = wrapper.entityID;
-        this.entityUUID = wrapper.entityUUID;
-        this.entityType = wrapper.entityType;
-        this.position = wrapper.position;
-        this.yaw = wrapper.yaw;
-        this.pitch = wrapper.pitch;
-        this.headPitch = wrapper.headPitch;
-        this.velocity = wrapper.velocity;
-        this.entityMetadata = wrapper.entityMetadata;
-    }
-
 
     @Override
     public void write() {
@@ -149,6 +148,19 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             writeEntityMetadata(entityMetadata);
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerSpawnLivingEntity wrapper) {
+        this.entityID = wrapper.entityID;
+        this.entityUUID = wrapper.entityUUID;
+        this.entityType = wrapper.entityType;
+        this.position = wrapper.position;
+        this.yaw = wrapper.yaw;
+        this.pitch = wrapper.pitch;
+        this.headPitch = wrapper.headPitch;
+        this.velocity = wrapper.velocity;
+        this.entityMetadata = wrapper.entityMetadata;
     }
 
     public int getEntityId() {
@@ -215,11 +227,15 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.velocity = velocity;
     }
 
-    public List<EntityData> getEntityMetadata() {
+    public List<EntityData<?>> getEntityMetadata() {
         return entityMetadata;
     }
 
-    public void setEntityMetadata(List<EntityData> entityMetadata) {
+    public void setEntityMetadata(List<EntityData<?>> entityMetadata) {
         this.entityMetadata = entityMetadata;
+    }
+
+    public void setEntityMetadata(EntityMetadataProvider metadata) {
+        this.entityMetadata = metadata.entityData(serverVersion.toClientVersion());
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayServerDestroyEntities> {
     private int[] entityIDs;
@@ -37,23 +37,21 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
 
     public WrapperPlayServerDestroyEntities(int entityID) {
         super(PacketType.Play.Server.DESTROY_ENTITIES);
-        this.entityIDs = new int[] {entityID};
+        this.entityIDs = new int[]{entityID};
     }
 
     @Override
     public void read() {
         if (serverVersion == ServerVersion.V_1_17) {
-            entityIDs = new int[] {readVarInt()};
-        }
-        else {
-            if (serverVersion == ServerVersion.V_1_7_10) {
+            entityIDs = new int[]{readVarInt()};
+        } else {
+            if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
                 int entityIDCount = readUnsignedByte();
                 entityIDs = new int[entityIDCount];
                 for (int i = 0; i < entityIDCount; i++) {
                     entityIDs[i] = readInt();
                 }
-            }
-            else {
+            } else {
                 int entityIDCount = readVarInt();
                 entityIDs = new int[entityIDCount];
                 for (int i = 0; i < entityIDCount; i++) {
@@ -64,29 +62,27 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void copy(WrapperPlayServerDestroyEntities wrapper) {
-        entityIDs = wrapper.entityIDs;
-    }
-
-    @Override
     public void write() {
         if (serverVersion == ServerVersion.V_1_17) {
             writeVarInt(entityIDs[0]);
-        }
-        else {
-            if (serverVersion == ServerVersion.V_1_7_10) {
+        } else {
+            if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
                 writeByte(entityIDs.length);
                 for (int entityID : entityIDs) {
                     writeInt(entityID);
                 }
-            }
-            else {
+            } else {
                 writeVarInt(entityIDs.length);
                 for (int entityID : entityIDs) {
                     writeVarInt(entityID);
                 }
             }
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerDestroyEntities wrapper) {
+        entityIDs = wrapper.entityIDs;
     }
 
     public int[] getEntityIds() {
