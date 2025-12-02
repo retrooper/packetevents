@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerSetPassengers extends PacketWrapper<WrapperPlayServerSetPassengers> {
-    int entityId;
-    int[] passengers;
+    private int entityId;
+    private int[] passengers;
 
     public WrapperPlayServerSetPassengers(PacketSendEvent event) {
         super(event);

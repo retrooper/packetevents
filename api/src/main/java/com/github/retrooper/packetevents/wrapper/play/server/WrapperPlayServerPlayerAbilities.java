@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,16 +56,6 @@ public class WrapperPlayServerPlayerAbilities extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void copy(WrapperPlayServerPlayerAbilities wrapper) {
-        godMode = wrapper.godMode;
-        flying = wrapper.flying;
-        flightAllowed = wrapper.flightAllowed;
-        creativeMode = wrapper.creativeMode;
-        flySpeed = wrapper.flySpeed;
-        fovModifier = wrapper.fovModifier;
-    }
-
-    @Override
     public void write() {
         byte mask = 0x00;
         if (godMode) {
@@ -86,6 +76,16 @@ public class WrapperPlayServerPlayerAbilities extends PacketWrapper<WrapperPlayS
         writeByte(mask);
         writeFloat(flySpeed);
         writeFloat(fovModifier);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerPlayerAbilities wrapper) {
+        godMode = wrapper.godMode;
+        flying = wrapper.flying;
+        flightAllowed = wrapper.flightAllowed;
+        creativeMode = wrapper.creativeMode;
+        flySpeed = wrapper.flySpeed;
+        fovModifier = wrapper.fovModifier;
     }
 
     public boolean isInGodMode() {

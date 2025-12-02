@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,10 @@ package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.world.BlockFace;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
+import java.util.Objects;
 
 /**
  * 3D int Vector.
@@ -53,6 +57,7 @@ public class Vector3i {
         this.z = 0;
     }
 
+    @Deprecated
     public Vector3i(long val) {
         this(val, PacketEvents.getAPI().getServerManager().getVersion());
     }
@@ -64,11 +69,7 @@ public class Vector3i {
 
         // 1.14 method for this is storing X Z Y
         // 1.17 added support for negative values
-        // 1.15+ might all be the same but let's be safe with not producing negative values on 1.14-1.16...
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            y = (int) (val << 52 >> 52);
-            z = (int) (val << 26 >> 38);
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             y = (int) (val << 52 >> 52);
             z = (int) (val << 26 >> 38);
         } else {
@@ -126,6 +127,19 @@ public class Vector3i {
         }
     }
 
+    public static Vector3i read(PacketWrapper<?> wrapper) {
+        int x = wrapper.readVarInt();
+        int y = wrapper.readVarInt();
+        int z = wrapper.readVarInt();
+        return new Vector3i(x, y, z);
+    }
+
+    public static void write(PacketWrapper<?> wrapper, Vector3i vector) {
+        wrapper.writeVarInt(vector.x);
+        wrapper.writeVarInt(vector.y);
+        wrapper.writeVarInt(vector.z);
+    }
+
     public long getSerializedPosition(ServerVersion serverVersion) {
         // 1.17 adds support for negative values
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
@@ -143,6 +157,7 @@ public class Vector3i {
         return ((long) (getX() & 0x3FFFFFF) << 38) | ((long) (getY() & 0xFFF) << 26) | (getZ() & 0x3FFFFFF);
     }
 
+    @Deprecated
     public long getSerializedPosition() {
         return getSerializedPosition(PacketEvents.getAPI().getServerManager().getVersion());
     }
@@ -181,6 +196,11 @@ public class Vector3i {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
+    }
+
     public Vector3d toVector3d() {
         return new Vector3d(x, y, z);
     }
@@ -193,8 +213,12 @@ public class Vector3i {
         return add(other.x, other.y, other.z);
     }
 
+    public Vector3i offset(BlockFace face) {
+        return add(face.getModX(), face.getModY(), face.getModZ());
+    }
+
     public Vector3i subtract(int x, int y, int z) {
-        return new Vector3i(this.x + x, this.y + y, this.z + z);
+        return new Vector3i(this.x - x, this.y - y, this.z - z);
     }
 
     public Vector3i subtract(Vector3i other) {

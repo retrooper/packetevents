@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,19 +47,19 @@ public class WrapperPlayServerVehicleMove extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void copy(WrapperPlayServerVehicleMove wrapper) {
-        position = wrapper.position;
-        yaw = wrapper.yaw;
-        pitch = wrapper.pitch;
-    }
-
-    @Override
     public void write() {
         writeDouble(position.x);
         writeDouble(position.y);
         writeDouble(position.z);
         writeFloat(yaw);
         writeFloat(pitch);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerVehicleMove wrapper) {
+        position = wrapper.position;
+        yaw = wrapper.yaw;
+        pitch = wrapper.pitch;
     }
 
     public Vector3d getPosition() {

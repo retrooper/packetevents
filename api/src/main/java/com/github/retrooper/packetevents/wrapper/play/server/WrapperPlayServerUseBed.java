@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerUseBed extends PacketWrapper<WrapperPlayServerUseBed> {
-    int entityId;
-    Vector3i position;
+    private int entityId;
+    private Vector3i position;
 
     public WrapperPlayServerUseBed(PacketSendEvent event) {
         super(event);
@@ -47,7 +47,7 @@ public class WrapperPlayServerUseBed extends PacketWrapper<WrapperPlayServerUseB
 
     @Override
     public void read() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             entityId = readVarInt();
             position = readBlockPosition();
         } else {
@@ -60,14 +60,8 @@ public class WrapperPlayServerUseBed extends PacketWrapper<WrapperPlayServerUseB
     }
 
     @Override
-    public void copy(WrapperPlayServerUseBed wrapper) {
-        wrapper.entityId = entityId;
-        wrapper.position = position;
-    }
-
-    @Override
     public void write() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             writeVarInt(entityId);
             writeBlockPosition(position);
         } else {
@@ -76,6 +70,12 @@ public class WrapperPlayServerUseBed extends PacketWrapper<WrapperPlayServerUseB
             writeByte(position.getY());
             writeInt(position.getZ());
         }
+    }
+
+    @Override
+    public void copy(WrapperPlayServerUseBed wrapper) {
+        wrapper.entityId = entityId;
+        wrapper.position = position;
     }
 
     public int getEntityId() {

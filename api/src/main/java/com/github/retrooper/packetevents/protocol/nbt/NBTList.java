@@ -27,14 +27,21 @@ import java.util.Objects;
 public class NBTList<T extends NBT> extends NBT {
 
     protected final NBTType<T> type;
-    protected final List<T> tags = new ArrayList<>();
+    protected final List<T> tags;
 
     public NBTList(NBTType<T> type) {
         this.type = type;
+        this.tags = new ArrayList<>();
+    }
+
+    public NBTList(NBTType<T> type, int size) {
+        this.type = type;
+        this.tags = new ArrayList<>(size);
     }
 
     public NBTList(NBTType<T> type, List<T> tags) {
         this.type = type;
+        this.tags = new ArrayList<>();
         this.tags.addAll(tags);
     }
 
@@ -44,6 +51,19 @@ public class NBTList<T extends NBT> extends NBT {
 
     public static NBTList<NBTString> createStringList() {
         return new NBTList<>(NBTType.STRING);
+    }
+
+    public static NBTType<?> getCommonTagType(List<? extends NBT> tags) {
+        NBTType<?> type = NBTType.END;
+        for (NBT tag : tags) {
+            if (type == NBTType.END) {
+                type = tag.getType();
+            } else if (type != tag.getType()) {
+                // there is no common type, fallback to heterogeneous list
+                return NBTType.COMPOUND;
+            }
+        }
+        return type; // common type found!
     }
 
     @Override
@@ -87,10 +107,62 @@ public class NBTList<T extends NBT> extends NBT {
         tags.add(tag);
     }
 
+    public void addTagUnsafe(int index, NBT nbt) {
+        addTag(index, (T) nbt);
+    }
+
+    public void addTagUnsafe(NBT nbt) {
+        addTag((T) nbt);
+    }
+
+    public void removeTag(int index) {
+        tags.remove(index);
+    }
+
     protected void validateAddTag(T tag) {
         if (type != tag.getType()) {
             throw new IllegalArgumentException(MessageFormat.format("Invalid tag type. Expected {0}, got {1}.", type.getNBTClass(), tag.getClass()));
         }
+    }
+
+    @SuppressWarnings("unchecked") // checked casts
+    public void addTagOrWrap(NBT tag) {
+        if (this.type == tag.getType()) {
+            this.tags.add((T) tag);
+        } else if (this.type == NBTType.COMPOUND) {
+            NBTCompound wrapped = new NBTCompound();
+            wrapped.setTag("", tag);
+            this.tags.add((T) wrapped);
+        } else {
+            throw new IllegalArgumentException("Can't add or wrap tag " + tag + " to list of type " + this.type);
+        }
+    }
+
+    private static NBT tryUnwrap(NBTCompound tag) {
+        if (tag.tags.size() == 1) {
+            NBT unwrapped = tag.getTagOrNull("");
+            if (unwrapped != null) {
+                return unwrapped;
+            }
+        }
+        return tag; // failed to unwrap
+    }
+
+    // vanilla allows heterogeneous lists by wrapping the different
+    // tag types in a compound tag list
+    public List<? extends NBT> unwrapTags() {
+        if (this.type != NBTType.COMPOUND) {
+            return new ArrayList<>(this.tags);
+        }
+        List<NBT> tags = new ArrayList<>(this.tags.size());
+        for (T tag : this.tags) {
+            if (tag instanceof NBTCompound) {
+                tags.add(tryUnwrap((NBTCompound) tag));
+            } else {
+                tags.add(tag);
+            }
+        }
+        return tags;
     }
 
     @SuppressWarnings("unchecked")
@@ -121,5 +193,10 @@ public class NBTList<T extends NBT> extends NBT {
             newTags.add((T) tag.copy());
         }
         return new NBTList<>(type, newTags);
+    }
+
+    @Override
+    public String toString() {
+        return "List(" + tags + ")";
     }
 }

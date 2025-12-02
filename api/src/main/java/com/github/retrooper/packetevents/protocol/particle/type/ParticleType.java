@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,32 @@
 package com.github.retrooper.packetevents.protocol.particle.type;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
-public interface ParticleType extends MappedEntity {
-    Function<PacketWrapper<?>, ParticleData> readDataFunction();
+public interface ParticleType<T extends ParticleData> extends MappedEntity {
 
-    BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction();
+    T readData(PacketWrapper<?> wrapper);
+
+    void writeData(PacketWrapper<?> wrapper, T data);
+
+    T decodeData(NBTCompound compound, ClientVersion version);
+
+    void encodeData(T value, ClientVersion version, NBTCompound compound);
+
+    @Deprecated
+    default Function<PacketWrapper<?>, ParticleData> readDataFunction() {
+        return this::readData;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Deprecated
+    default BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction() {
+        return (wrapper, data) -> this.writeData(wrapper, (T) data);
+    }
 }

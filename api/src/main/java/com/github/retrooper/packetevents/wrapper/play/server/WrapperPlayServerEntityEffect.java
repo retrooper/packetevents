@@ -2,10 +2,12 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.BitSet;
 
@@ -13,11 +15,13 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     private static final int FLAG_AMBIENT = 1;
     private static final int FLAG_VISIBLE = 2;
     private static final int FLAG_SHOW_ICONS = 4;
+
     private int entityID;
     private PotionType potionType;
     private int effectAmplifier;
     private int effectDurationTicks;
     private byte flags;
+    private NBTCompound factorData;
 
     public WrapperPlayServerEntityEffect(PacketSendEvent event) {
         super(event);
@@ -41,11 +45,16 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         } else {
             effectId = readByte();
         }
-        this.potionType = PotionTypes.getById(effectId);
-        this.effectAmplifier = readByte();
+        this.potionType = PotionTypes.getById(effectId, this.serverVersion);
+        this.effectAmplifier = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)
+                ? this.readVarInt() : this.readByte();
         this.effectDurationTicks = readVarInt();
         if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
             this.flags = readByte();
+        }
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                && this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
+            factorData = readOptional(PacketWrapper::readNBT);
         }
     }
 
@@ -53,14 +62,22 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     public void write() {
         writeVarInt(entityID);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18_2)) {
-            writeVarInt(potionType.getId());
+            writeVarInt(potionType.getId(serverVersion.toClientVersion()));
         } else {
-            writeByte(potionType.getId());
+            writeByte(potionType.getId(serverVersion.toClientVersion()));
         }
-        writeByte(effectAmplifier);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.writeVarInt(this.effectAmplifier);
+        } else {
+            this.writeByte(this.effectAmplifier);
+        }
         writeVarInt(effectDurationTicks);
         if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
             writeByte(flags);
+        }
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)
+                && this.serverVersion.isOlderThan(ServerVersion.V_1_20_5)) {
+            this.writeOptional(this.factorData, PacketWrapper::writeNBT);
         }
     }
 
@@ -71,6 +88,7 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
         effectAmplifier = wrapper.effectAmplifier;
         effectDurationTicks = wrapper.effectDurationTicks;
         flags = wrapper.flags;
+        factorData = wrapper.factorData;
     }
 
     public PotionType getPotionType() {
@@ -112,6 +130,15 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     private void setFlags(byte flags) {
         this.flags = flags;
     }
+
+    public @Nullable NBTCompound getFactorData() {
+        return factorData;
+    }
+
+    public void setFactorData(@Nullable NBTCompound factorData) {
+        this.factorData = factorData;
+    }
+
 
     private byte constructFlags(boolean ambient, boolean visible, boolean icons) {
         BitSet bitSet = new BitSet(3);

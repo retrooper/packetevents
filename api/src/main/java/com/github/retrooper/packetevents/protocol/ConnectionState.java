@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,12 @@ package com.github.retrooper.packetevents.protocol;
  * @since 1.8
  */
 public enum ConnectionState {
-    HANDSHAKING, STATUS, LOGIN, PLAY;
+    HANDSHAKING, STATUS, LOGIN, PLAY, CONFIGURATION;
 
     public static ConnectionState getById(int id) {
+        if (id >= values().length || id < 0) {
+            return null;
+        }
         return values()[id];
     }
 }

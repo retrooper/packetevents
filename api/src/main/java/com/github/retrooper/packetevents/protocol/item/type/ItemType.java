@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,25 +18,43 @@
 
 package com.github.retrooper.packetevents.protocol.item.type;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.component.StaticComponentMap;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes.ItemAttribute;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
 public interface ItemType extends MappedEntity {
+
     int getMaxAmount();
 
     int getMaxDurability();
 
-    boolean isMusicDisc();
+    default boolean isMusicDisc() {
+        return this.hasAttribute(ItemAttribute.MUSIC_DISC);
+    }
 
     ItemType getCraftRemainder();
 
     @Nullable
     StateType getPlacedType();
 
-    Set<ItemTypes.ItemAttribute> getAttributes();
+    Set<ItemAttribute> getAttributes();
 
-    boolean hasAttribute(ItemTypes.ItemAttribute attribute);
+    default boolean hasAttribute(ItemAttribute attribute) {
+        return this.getAttributes().contains(attribute);
+    }
+
+    @Deprecated
+    default StaticComponentMap getComponents() {
+        return this.getComponents(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+    }
+
+    default StaticComponentMap getComponents(ClientVersion clientVersion) {
+        return StaticComponentMap.EMPTY;
+    }
 }

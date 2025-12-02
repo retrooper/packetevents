@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,94 +19,108 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<WrapperPlayServerPlayerListHeaderAndFooter> {
+
+    @Deprecated
     public static boolean HANDLE_JSON = true;
-    private static final int MODERN_MESSAGE_LENGTH = 262144;
-    private static final int LEGACY_MESSAGE_LENGTH = 32767;
-    private String headerJson;
-    private String footerJson;
-    private Component headerComponent;
-    private Component footerComponent;
+
+    private Component header;
+    private Component footer;
 
     public WrapperPlayServerPlayerListHeaderAndFooter(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerPlayerListHeaderAndFooter(Component headerComponent, Component footerComponent) {
-        super(PacketType.Play.Server.PLAYER_LIST_HEADER_AND_FOOTER);
-        this.headerComponent = headerComponent;
-        this.footerComponent = footerComponent;
-    }
-
+    @Deprecated
     public WrapperPlayServerPlayerListHeaderAndFooter(String headerJson, String footerJson) {
         super(PacketType.Play.Server.PLAYER_LIST_HEADER_AND_FOOTER);
-        this.headerJson = headerJson;
-        this.footerJson = footerJson;
+        GsonComponentSerializer gson = this.getSerializers().gson();
+        this.header = gson.deserializeOrNull(headerJson);
+        this.footer = gson.deserializeOrNull(footerJson);
+    }
+
+    public WrapperPlayServerPlayerListHeaderAndFooter(Component header, Component footer) {
+        super(PacketType.Play.Server.PLAYER_LIST_HEADER_AND_FOOTER);
+        this.header = header;
+        this.footer = footer;
     }
 
     @Override
     public void read() {
-        headerJson = readComponentJSON();
-        footerJson = readComponentJSON();
-        if (HANDLE_JSON) {
-            headerComponent = AdventureSerializer.parseComponent(headerJson);
-            footerComponent = AdventureSerializer.parseComponent(footerJson);
-        }
-    }
-
-    @Override
-    public void copy(WrapperPlayServerPlayerListHeaderAndFooter wrapper) {
-        headerJson = wrapper.headerJson;
-        footerJson = wrapper.footerJson;
-        headerComponent = wrapper.headerComponent;
-        footerComponent = wrapper.footerComponent;
+        this.header = this.readComponent();
+        this.footer = this.readComponent();
     }
 
     @Override
     public void write() {
-        if (HANDLE_JSON) {
-            headerJson = AdventureSerializer.toJson(headerComponent);
-            footerJson = AdventureSerializer.toJson(footerComponent);
-        }
-        writeComponentJSON(headerJson);
-        writeComponentJSON(footerJson);
+        this.writeComponent(this.header);
+        this.writeComponent(this.footer);
     }
 
+    @Override
+    public void copy(WrapperPlayServerPlayerListHeaderAndFooter wrapper) {
+        this.header = wrapper.header;
+        this.footer = wrapper.footer;
+    }
+
+    public Component getHeader() {
+        return this.header;
+    }
+
+    public void setHeader(Component header) {
+        this.header = header;
+    }
+
+    public Component getFooter() {
+        return this.footer;
+    }
+
+    public void setFooter(Component footer) {
+        this.footer = footer;
+    }
+
+    @Deprecated
     public String getHeaderJson() {
-        return headerJson;
+        return this.getSerializers().asJson(this.getHeader());
     }
 
+    @Deprecated
     public void setHeaderJson(String headerJson) {
-        this.headerJson = headerJson;
+        this.setHeader(this.getSerializers().fromJson(headerJson));
     }
 
+    @Deprecated
     public String getFooterJson() {
-        return footerJson;
+        return this.getSerializers().asJson(this.getFooter());
     }
 
+    @Deprecated
     public void setFooterJson(String footerJson) {
-        this.footerJson = footerJson;
+        this.setFooter(this.getSerializers().fromJson(footerJson));
     }
 
+    @Deprecated
     public Component getHeaderComponent() {
-        return headerComponent;
+        return this.getHeader();
     }
 
+    @Deprecated
     public void setHeaderComponent(Component headerComponent) {
-        this.headerComponent = headerComponent;
+        this.setHeader(headerComponent);
     }
 
+    @Deprecated
     public Component getFooterComponent() {
-        return footerComponent;
+        return this.getFooter();
     }
 
+    @Deprecated
     public void setFooterComponent(Component footerComponent) {
-        this.footerComponent = footerComponent;
+        this.setFooter(footerComponent);
     }
 }

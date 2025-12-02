@@ -1,0 +1,11 @@
+{
+  "id": "packetevents",
+  "name": "PacketEvents",
+  "version": "${version}",
+  "description": "Packet library.",
+  "authors": [
+    "retrooper"
+  ],
+  "dependencies": [],
+  "main": "io.github.retrooper.packetevents.PacketEventsPlugin"
+}

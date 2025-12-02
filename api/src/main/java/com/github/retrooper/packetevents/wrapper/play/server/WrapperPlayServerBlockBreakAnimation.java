@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerBlockBreakAnimation extends PacketWrapper<WrapperPlayServerBlockBreakAnimation> {
     private int entityID;
@@ -43,16 +43,28 @@ public class WrapperPlayServerBlockBreakAnimation extends PacketWrapper<WrapperP
     @Override
     public void read() {
         entityID = readVarInt();
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             int x = readInt();
             int y = readInt();
             int z = readInt();
             blockPosition = new Vector3i(x, y, z);
-        }
-        else {
+        } else {
             blockPosition = readBlockPosition();
         }
-        destroyStage = readByte();
+        destroyStage = (byte) readUnsignedByte();
+    }
+
+    @Override
+    public void write() {
+        writeVarInt(entityID);
+        if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
+            writeInt(blockPosition.x);
+            writeInt(blockPosition.y);
+            writeInt(blockPosition.z);
+        } else {
+            writeBlockPosition(blockPosition);
+        }
+        writeByte(destroyStage);
     }
 
     @Override
@@ -60,20 +72,6 @@ public class WrapperPlayServerBlockBreakAnimation extends PacketWrapper<WrapperP
         entityID = wrapper.entityID;
         blockPosition = wrapper.blockPosition;
         destroyStage = wrapper.destroyStage;
-    }
-
-    @Override
-    public void write() {
-        writeVarInt(entityID);
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeInt(blockPosition.x);
-            writeInt(blockPosition.y);
-            writeInt(blockPosition.z);
-        }
-        else {
-            writeBlockPosition(blockPosition);
-        }
-        writeByte(destroyStage);
     }
 
     public int getEntityId() {

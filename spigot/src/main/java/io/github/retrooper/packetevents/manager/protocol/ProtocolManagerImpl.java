@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,54 +46,66 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public void sendPacket(Object channel, Object packet) {
+    public void sendPacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
             //When ProtocolSupport is available, and we send a message through their logic handler,
             //we must retain the message.
-            if (ProtocolSupportUtil.isAvailable() && packet instanceof ByteBuf) {
-                ((ByteBuf) packet).retain();
+            if (ProtocolSupportUtil.isAvailable() && byteBuf instanceof ByteBuf) {
+                ((ByteBuf) byteBuf).retain();
             }
-            ChannelHelper.writeAndFlush(channel, packet);
+            ChannelHelper.writeAndFlush(channel, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
-    public void sendPacketSilently(Object channel, Object packet) {
+    public void sendPacketSilently(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
             //Only call the encoders after ours in the pipeline.
             //Here we do not need to retain when ProtocolSupport is present
-            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, packet);
+            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
-    public void writePacket(Object channel, Object packet) {
+    public void writePacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
             //Write to all encoders.
             //When ProtocolSupport is available, and we send a message through their logic handler,
             //we must retain the message.
-            if (ProtocolSupportUtil.isAvailable() && packet instanceof ByteBuf) {
-                ((ByteBuf) packet).retain();
+            if (ProtocolSupportUtil.isAvailable() && byteBuf instanceof ByteBuf) {
+                ((ByteBuf) byteBuf).retain();
             }
-            ChannelHelper.write(channel, packet);
+            ChannelHelper.write(channel, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
-    public void writePacketSilently(Object channel, Object packet) {
+    public void writePacketSilently(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
             //Only call the encoders after ours in the pipeline
             //Here we do not need to retain when ProtocolSupport is present
-            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, packet);
+            ChannelHelper.writeInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
     public void receivePacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            //TODO Have we given ViaVersion a thought?
             List<String> handlerNames = ChannelHelper.pipelineHandlerNames(channel);
-            if (handlerNames.contains("ps_decoder_transformer")) {
+            //Account for ViaVersion
+            if (handlerNames.contains("via-encoder")) {
+                ChannelHelper.fireChannelReadInContext(channel, "via-decoder", byteBuf);
+            }
+            //Account for ProtocolSupport
+            else if (handlerNames.contains("ps_decoder_transformer")) {
                 //We want to skip ProtocolSupport's translation handlers,
                 //because the buffer is fit for the current server-version
                 ChannelHelper.fireChannelReadInContext(channel, "ps_decoder_transformer", byteBuf);
@@ -112,14 +124,18 @@ public class ProtocolManagerImpl implements ProtocolManager {
                     ChannelHelper.fireChannelReadInContext(channel, "splitter", byteBuf);
                 }
             }
+        } else {
+            ((ByteBuf) byteBuf).release();
         }
     }
 
     @Override
     public void receivePacketSilently(Object channel, Object byteBuf) {
-        //Receive the packet for all handlers after our decoder
-        //TODO Consider viaversion when we are in play state
-        ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
+        if (ChannelHelper.isOpen(channel)) {
+            ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
+        } else {
+            ((ByteBuf) byteBuf).release();
+        }
     }
 
     @Override

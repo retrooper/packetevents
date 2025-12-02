@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,11 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityMetadataProvider;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -28,27 +30,26 @@ import java.util.List;
 
 public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlayServerEntityMetadata> {
     private int entityID;
-    private List<EntityData> entityMetadata;
+    private List<EntityData<?>> entityMetadata;
 
     public WrapperPlayServerEntityMetadata(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityMetadata(int entityID, List<EntityData> entityMetadata) {
+    public WrapperPlayServerEntityMetadata(int entityID, List<EntityData<?>> entityMetadata) {
         super(PacketType.Play.Server.ENTITY_METADATA);
         this.entityID = entityID;
         this.entityMetadata = entityMetadata;
     }
+
+    public WrapperPlayServerEntityMetadata(int entityID, EntityMetadataProvider metadata) {
+        this(entityID, metadata.entityData(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
+    }
+
     @Override
     public void read() {
         entityID = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) ? readVarInt() : readInt();
         entityMetadata = readEntityMetadata();
-    }
-
-    @Override
-    public void copy(WrapperPlayServerEntityMetadata wrapper) {
-        entityID = wrapper.entityID;
-        entityMetadata = wrapper.entityMetadata;
     }
 
     @Override
@@ -61,6 +62,12 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
         writeEntityMetadata(entityMetadata);
     }
 
+    @Override
+    public void copy(WrapperPlayServerEntityMetadata wrapper) {
+        entityID = wrapper.entityID;
+        entityMetadata = wrapper.entityMetadata;
+    }
+
     public int getEntityId() {
         return entityID;
     }
@@ -69,11 +76,15 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
         this.entityID = entityID;
     }
 
-    public List<EntityData> getEntityMetadata() {
+    public List<EntityData<?>> getEntityMetadata() {
         return entityMetadata;
     }
 
-    public void setEntityMetadata(List<EntityData> entityMetadata) {
+    public void setEntityMetadata(List<EntityData<?>> entityMetadata) {
         this.entityMetadata = entityMetadata;
+    }
+
+    public void setEntityMetadata(EntityMetadataProvider metadata) {
+        this.entityMetadata = metadata.entityData(serverVersion.toClientVersion());
     }
 }

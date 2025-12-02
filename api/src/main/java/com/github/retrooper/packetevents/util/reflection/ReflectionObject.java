@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.util.reflection;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -138,7 +139,7 @@ public class ReflectionObject implements ReflectionObjectReader, ReflectionObjec
                 e.printStackTrace();
             }
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new IllegalStateException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(clazz) + " class!");
+            throw new IllegalStateException("PacketEvents failed to find any field indexed " + index + " in the " + clazz.getSimpleName() + " class!");
         }
         return null;
     }
@@ -146,6 +147,11 @@ public class ReflectionObject implements ReflectionObjectReader, ReflectionObjec
     @Override
     public <T> T readObject(int index, Class<? extends T> type) {
         return read(index, type);
+    }
+
+    @Override
+    public <T> T[] readObjectArray(int index, Class<? extends T> type) {
+        return (T[]) read(0, Array.newInstance(type, 0).getClass());
     }
 
     @Override
@@ -159,7 +165,7 @@ public class ReflectionObject implements ReflectionObjectReader, ReflectionObjec
             Field field = getField(type, index);
             return (T) field.get(object);
         } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException e) {
-            throw new IllegalStateException("PacketEvents failed to find a " + ClassUtil.getClassSimpleName(type) + " indexed " + index + " by its type in the " + clazz.getName() + " class!");
+            throw new IllegalStateException("PacketEvents failed to find a " + type.getSimpleName() + " indexed " + index + " by its type in the " + clazz.getName() + " class!");
         }
     }
 
@@ -255,7 +261,7 @@ public class ReflectionObject implements ReflectionObjectReader, ReflectionObjec
             Field f = clazz.getDeclaredFields()[index];
             f.set(object, value);
         } catch (Exception e) {
-            throw new IllegalStateException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(clazz) + " class!");
+            throw new IllegalStateException("PacketEvents failed to find any field indexed " + index + " in the " + clazz.getSimpleName() + " class!");
         }
     }
 
@@ -271,7 +277,7 @@ public class ReflectionObject implements ReflectionObjectReader, ReflectionObjec
     public void write(Class<?> type, int index, Object value) throws IllegalStateException {
         Field field = getField(type, index);
         if (field == null) {
-            throw new IllegalStateException("PacketEvents failed to find a " + ClassUtil.getClassSimpleName(type) + " indexed " + index + " by its type in the " + clazz.getName() + " class!");
+            throw new IllegalStateException("PacketEvents failed to find a " + type.getSimpleName() + " indexed " + index + " by its type in the " + clazz.getName() + " class!");
         }
         try {
             field.set(object, value);
@@ -294,7 +300,7 @@ public class ReflectionObject implements ReflectionObjectReader, ReflectionObjec
         if (fields.length >= index + 1) {
             return fields[index];
         } else {
-            throw new IllegalStateException("PacketEvents failed to find a " + ClassUtil.getClassSimpleName(type) + " indexed " + index + " by its type in the " + clazz.getName() + " class!");
+            throw new IllegalStateException("PacketEvents failed to find a " + type.getSimpleName() + " indexed " + index + " by its type in the " + clazz.getName() + " class!");
         }
     }
 

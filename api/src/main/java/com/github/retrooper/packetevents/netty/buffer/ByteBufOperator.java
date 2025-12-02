@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ package com.github.retrooper.packetevents.netty.buffer;
 import java.nio.charset.Charset;
 
 public interface ByteBufOperator {
+    int capacity(Object buffer);
+    Object capacity(Object buffer, int capacity);
     int readerIndex(Object buffer);
     Object readerIndex(Object buffer, int readerIndex);
 
@@ -33,12 +35,15 @@ public interface ByteBufOperator {
 
     byte readByte(Object buffer);
     short readShort(Object buffer);
+    int readMedium(Object buffer);
     int readInt(Object buffer);
     long readUnsignedInt(Object buffer);
     long readLong(Object buffer);
 
     void writeByte(Object buffer, int value);
     void writeShort(Object buffer, int value);
+    void writeShortLE(Object buffer, int value);
+    void writeMedium(Object buffer, int value);
     void writeInt(Object buffer, int value);
     void writeLong(Object buffer, long value);
 
@@ -69,6 +74,8 @@ public interface ByteBufOperator {
     Object resetReaderIndex(Object buffer);
     Object markWriterIndex(Object buffer);
     Object resetWriterIndex(Object buffer);
+
+    Object allocateNewBuffer(Object buffer);
 
     default float readFloat(Object buffer) {
         return Float.intBitsToFloat(readInt(buffer));

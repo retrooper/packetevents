@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 
 package com.github.retrooper.packetevents.injector;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
-import org.jetbrains.annotations.Nullable;
 
 public interface ChannelInjector {
+
     default boolean isServerBound() {
         return true;
     }
@@ -31,13 +31,15 @@ public interface ChannelInjector {
 
     void uninject();
 
-    User getUser(Object channel);
-
-    void changeConnectionState(Object channel, @Nullable ConnectionState connectionState);
-
     void updateUser(Object channel, User user);
 
     void setPlayer(Object channel, Object player);
 
-    boolean hasPlayer(Object player);
+    boolean isPlayerSet(Object channel);
+
+    boolean isProxy();
+
+    default PacketSide getPacketSide() {
+        return PacketSide.SERVER;
+    }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
     private double deltaY;
     private double deltaZ;
     private boolean onGround;
+
     public WrapperPlayServerEntityRelativeMove(PacketSendEvent event) {
         super(event);
     }
@@ -63,15 +64,6 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
     }
 
     @Override
-    public void copy(WrapperPlayServerEntityRelativeMove wrapper) {
-        entityID = wrapper.entityID;
-        deltaX = wrapper.deltaX;
-        deltaY = wrapper.deltaY;
-        deltaZ = wrapper.deltaZ;
-        onGround = wrapper.onGround;
-    }
-
-    @Override
     public void write() {
         writeVarInt(entityID);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
@@ -85,6 +77,15 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
             writeByte((byte) (deltaZ * LEGACY_DELTA_DIVISOR));
         }
         writeBoolean(onGround);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerEntityRelativeMove wrapper) {
+        entityID = wrapper.entityID;
+        deltaX = wrapper.deltaX;
+        deltaY = wrapper.deltaY;
+        deltaZ = wrapper.deltaZ;
+        onGround = wrapper.onGround;
     }
 
     public int getEntityId() {

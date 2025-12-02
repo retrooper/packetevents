@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ public enum ClientboundPacketType_1_18 {
     UPDATE_LIGHT,
     JOIN_GAME,
     MAP_DATA,
-    TRADE_LIST,
+    MERCHANT_OFFERS,
     ENTITY_RELATIVE_MOVE,
     ENTITY_RELATIVE_MOVE_AND_ROTATION,
     ENTITY_ROTATION,
@@ -87,7 +87,7 @@ public enum ClientboundPacketType_1_18 {
     RESPAWN,
     ENTITY_HEAD_LOOK,
     MULTI_BLOCK_CHANGE,
-    SELECT_ADVANCEMENT_TAB,
+    SELECT_ADVANCEMENTS_TAB,
     ACTION_BAR,
     WORLD_BORDER_CENTER,
     WORLD_BORDER_LERP_SIZE,
@@ -122,8 +122,8 @@ public enum ClientboundPacketType_1_18 {
     NBT_QUERY_RESPONSE,
     COLLECT_ITEM,
     ENTITY_TELEPORT,
-    ADVANCEMENTS,
-    ENTITY_PROPERTIES,
+    UPDATE_ADVANCEMENTS,
+    UPDATE_ATTRIBUTES,
     ENTITY_EFFECT,
     DECLARE_RECIPES,
     TAGS

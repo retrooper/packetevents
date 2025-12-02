@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,11 @@ public abstract class SimplePacketListenerAbstract extends PacketListenerCommon 
             onPacketStatusReceive((PacketStatusReceiveEvent) event);
         } else if (event instanceof PacketLoginReceiveEvent) {
             onPacketLoginReceive((PacketLoginReceiveEvent) event);
-        } else if (event instanceof PacketPlayReceiveEvent) {
+        }
+        else if (event instanceof PacketConfigReceiveEvent) {
+            onPacketConfigReceive((PacketConfigReceiveEvent) event);
+        }
+        else if (event instanceof PacketPlayReceiveEvent) {
             onPacketPlayReceive((PacketPlayReceiveEvent) event);
         }
     }
@@ -52,7 +56,11 @@ public abstract class SimplePacketListenerAbstract extends PacketListenerCommon 
             onPacketStatusSend((PacketStatusSendEvent) event);
         } else if (event instanceof PacketLoginSendEvent) {
             onPacketLoginSend((PacketLoginSendEvent) event);
-        } else if (event instanceof PacketPlaySendEvent) {
+        }
+        else if (event instanceof PacketConfigSendEvent) {
+            onPacketConfigSend((PacketConfigSendEvent) event);
+        }
+        else if (event instanceof PacketPlaySendEvent) {
             onPacketPlaySend((PacketPlaySendEvent) event);
         }
     }
@@ -70,6 +78,12 @@ public abstract class SimplePacketListenerAbstract extends PacketListenerCommon 
     }
 
     public void onPacketLoginSend(PacketLoginSendEvent event) {
+    }
+
+    public void onPacketConfigReceive(PacketConfigReceiveEvent event) {
+    }
+
+    public void onPacketConfigSend(PacketConfigSendEvent event) {
     }
 
     public void onPacketPlayReceive(PacketPlayReceiveEvent event) {

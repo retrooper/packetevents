@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ public class LegacyFlexibleStorage extends BaseStorage {
         }
 
         this.bitsPerEntry = bitsPerEntry;
-        this.data = Arrays.copyOf(data, data.length);
+        this.data = data;
 
         this.size = this.data.length * 64 / this.bitsPerEntry;
         this.maxEntryValue = (1L << this.bitsPerEntry) - 1;
@@ -80,7 +80,8 @@ public class LegacyFlexibleStorage extends BaseStorage {
         this.data[startIndex] = this.data[startIndex] & ~(this.maxEntryValue << startBitSubIndex) | ((long) value & this.maxEntryValue) << startBitSubIndex;
         if (startIndex != endIndex) {
             int endBitSubIndex = 64 - startBitSubIndex;
-            this.data[endIndex] = this.data[endIndex] >>> endBitSubIndex << endBitSubIndex | ((long) value & this.maxEntryValue) >> endBitSubIndex;
+            int j1 = this.bitsPerEntry - endBitSubIndex;
+            this.data[endIndex] = this.data[endIndex] >>> j1 << j1 | ((long) value & this.maxEntryValue) >> endBitSubIndex;
         }
     }
 

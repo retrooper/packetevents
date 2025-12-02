@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2024 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,70 +18,99 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
+import com.github.retrooper.packetevents.util.LegacyFormat;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperPlayServerScoreboardObjective> {
 
     private String name;
     private ObjectiveMode mode;
-    private Optional<String> displayName;
-    private Optional<HealthDisplay> display;
-
-    public enum HealthDisplay {
-        INTEGER,
-        HEARTS;
-
-        @Nullable
-        public static HealthDisplay getByName(String name) {
-            for (HealthDisplay display : values()) {
-                if (display.name().equalsIgnoreCase(name)) {
-                    return display;
-                }
-            }
-
-            return null;
-        }
-    }
-
-    public enum ObjectiveMode {
-        CREATE,
-        REMOVE,
-        UPDATE;
-    }
+    private Component displayName;
+    private @Nullable RenderType renderType;
+    private @Nullable ScoreFormat scoreFormat;
 
     public WrapperPlayServerScoreboardObjective(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerScoreboardObjective(String name, ObjectiveMode mode, Optional<String> displayName, Optional<HealthDisplay> display) {
+    public WrapperPlayServerScoreboardObjective(String name, ObjectiveMode mode, Component displayName,
+                                                @Nullable RenderType renderType) {
+        this(name, mode, displayName, renderType, null);
+    }
+
+    public WrapperPlayServerScoreboardObjective(String name, ObjectiveMode mode, Component displayName,
+                                                @Nullable RenderType renderType, @Nullable ScoreFormat scoreFormat) {
         super(PacketType.Play.Server.SCOREBOARD_OBJECTIVE);
         this.name = name;
         this.mode = mode;
         this.displayName = displayName;
-        this.display = display;
+        this.renderType = renderType;
+        this.scoreFormat = scoreFormat;
     }
 
     @Override
     public void read() {
-        name = readString();
-        mode = ObjectiveMode.values()[readByte()];
-        if (mode == ObjectiveMode.CREATE || mode == ObjectiveMode.UPDATE) {
-            displayName = Optional.ofNullable(readString());
-            if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-                display = Optional.ofNullable(HealthDisplay.getByName(readString()));
-            } else {
-                display = Optional.of(HealthDisplay.values()[readVarInt()]);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            name = readString();
+        } else {
+            name = readString(16);
+        }
+        mode = ObjectiveMode.getById(readByte());
+        if (mode != ObjectiveMode.CREATE && mode != ObjectiveMode.UPDATE) {
+            displayName = Component.empty();
+            renderType = RenderType.INTEGER;
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+                scoreFormat = null;
             }
         } else {
-            displayName = Optional.empty();
-            display = Optional.empty();
+            if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
+                displayName = this.getSerializers().fromLegacy(this.readString(32));
+                renderType = RenderType.getByName(readString());
+            } else {
+                displayName = readComponent();
+                renderType = RenderType.getById(readVarInt());
+                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+                    scoreFormat = readOptional(ScoreFormat::readTyped);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void write() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            writeString(name);
+        } else {
+            writeString(name, 16);
+        }
+        writeByte((byte) mode.ordinal());
+        if (this.mode == ObjectiveMode.CREATE || this.mode == ObjectiveMode.UPDATE) {
+            if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
+                String legacyText = this.getSerializers().asLegacy(this.displayName);
+                writeString(LegacyFormat.trimLegacyFormat(legacyText, 32));
+                if (renderType != null) {
+                    writeString(renderType.name().toLowerCase());
+                } else {
+                    writeString(RenderType.INTEGER.name().toLowerCase());
+                }
+            } else {
+                writeComponent(displayName);
+                if (renderType != null) {
+                    writeVarInt(renderType.ordinal());
+                } else {
+                    writeVarInt(RenderType.INTEGER.ordinal());
+                }
+                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+                    writeOptional(scoreFormat, ScoreFormat::writeTyped);
+                }
+            }
         }
     }
 
@@ -90,22 +119,8 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
         name = wrapper.name;
         mode = wrapper.mode;
         displayName = wrapper.displayName;
-        display = wrapper.display;
-    }
-
-    @Override
-    public void write() {
-        writeString(name);
-        writeByte((byte) mode.ordinal());
-        if (this.mode == ObjectiveMode.CREATE || this.mode == ObjectiveMode.UPDATE) {
-            writeString(this.displayName.orElse(""));
-            if (serverVersion == ServerVersion.V_1_7_10)
-                writeString("integer");
-            else if (serverVersion.isOlderThan(ServerVersion.V_1_13))
-                writeString(display.orElse(HealthDisplay.INTEGER).name().toLowerCase());
-            else
-                writeVarInt(display.orElse(HealthDisplay.INTEGER).ordinal());
-        }
+        renderType = wrapper.renderType;
+        scoreFormat = wrapper.scoreFormat;
     }
 
     public String getName() {
@@ -124,20 +139,71 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
         this.mode = mode;
     }
 
-    public Optional<String> getDisplayName() {
+    public Component getDisplayName() {
         return displayName;
     }
 
-    public void setDisplayName(Optional<String> displayName) {
+    public void setDisplayName(@Nullable Component displayName) {
         this.displayName = displayName;
     }
 
-    public Optional<HealthDisplay> getDisplay() {
-        return display;
+    public @Nullable RenderType getRenderType() {
+        return renderType;
     }
 
-    public void setDisplay(Optional<HealthDisplay> display) {
-        this.display = display;
+    public void setRenderType(@Nullable RenderType renderType) {
+        this.renderType = renderType;
     }
 
+    public @Nullable ScoreFormat getScoreFormat() {
+        return this.scoreFormat;
+    }
+
+    public void setScoreFormat(@Nullable ScoreFormat scoreFormat) {
+        this.scoreFormat = scoreFormat;
+    }
+
+    public enum ObjectiveMode {
+        CREATE,
+        REMOVE,
+        UPDATE;
+
+        private static final ObjectiveMode[] VALUES = values();
+
+        @Nullable
+        public static ObjectiveMode getByName(String name) {
+            for (ObjectiveMode mode : VALUES) {
+                if (mode.name().equalsIgnoreCase(name)) {
+                    return mode;
+                }
+            }
+            return null;
+        }
+
+        public static ObjectiveMode getById(int id) {
+            return VALUES[id];
+        }
+    }
+
+    public enum RenderType {
+        INTEGER,
+        HEARTS;
+
+        private static final RenderType[] VALUES = values();
+
+        @Nullable
+        public static RenderType getByName(String name) {
+            for (RenderType display : VALUES) {
+                if (display.name().equalsIgnoreCase(name)) {
+                    return display;
+                }
+            }
+            return null;
+        }
+
+        @Nullable
+        public static RenderType getById(int id) {
+            return VALUES[id];
+        }
+    }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,28 +28,35 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
  * This message is sent from the client to the server when the "Done" button is pushed after placing a sign.
  */
 public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClientUpdateSign> {
-    private String[] textLines;
     private Vector3i blockPosition;
+    private String[] textLines;
+    private boolean isFrontText;
 
     public WrapperPlayClientUpdateSign(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientUpdateSign(Vector3i blockPosition, String[] textLines) {
+    public WrapperPlayClientUpdateSign(Vector3i blockPosition, String[] textLines, boolean isFrontText) {
         super(PacketType.Play.Client.UPDATE_SIGN);
         this.blockPosition = blockPosition;
         this.textLines = textLines;
+        this.isFrontText = isFrontText;
     }
 
     @Override
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            this.blockPosition = new Vector3i(readLong());
+            this.blockPosition = new Vector3i(readLong(), this.serverVersion);
         } else {
             int x = readInt();
             int y = readShort();
             int z = readInt();
             this.blockPosition = new Vector3i(x, y, z);
+        }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
+            isFrontText = readBoolean();
+        } else {
+            isFrontText = true;
         }
         textLines = new String[4];
         for (int i = 0; i < 4; i++) {
@@ -58,24 +65,28 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
     }
 
     @Override
-    public void copy(WrapperPlayClientUpdateSign wrapper) {
-        this.blockPosition = wrapper.blockPosition;
-        this.textLines = wrapper.textLines;
-    }
-
-    @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            long positionVector = blockPosition.getSerializedPosition();
+            long positionVector = blockPosition.getSerializedPosition(this.serverVersion);
             writeLong(positionVector);
         } else {
             writeInt(blockPosition.x);
             writeShort(blockPosition.y);
             writeInt(blockPosition.z);
         }
-        for (int i = 0; i < 4; i++) {
-            writeString(textLines[i], 384);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)) {
+            writeBoolean(isFrontText);
         }
+        for (int i = 0; i < 4; i++) {
+            writeString(textLines[i]);
+        }
+    }
+
+    @Override
+    public void copy(WrapperPlayClientUpdateSign wrapper) {
+        this.blockPosition = wrapper.blockPosition;
+        this.isFrontText = wrapper.isFrontText;
+        this.textLines = wrapper.textLines;
     }
 
     /**
@@ -112,5 +123,13 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
      */
     public void setTextLines(String[] textLines) {
         this.textLines = textLines;
+    }
+
+    public boolean isFrontText() {
+        return isFrontText;
+    }
+
+    public void setFrontText(boolean frontText) {
+        isFrontText = frontText;
     }
 }

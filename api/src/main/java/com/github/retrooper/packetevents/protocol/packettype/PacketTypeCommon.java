@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.packettype;
 
+import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 public interface PacketTypeCommon {
 
@@ -27,4 +30,8 @@ public interface PacketTypeCommon {
     }
 
     int getId(ClientVersion version);
+
+    PacketSide getSide();
+
+    @Nullable Class<? extends PacketWrapper<?>> getWrapperClass();
 }

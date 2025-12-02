@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,14 @@ import com.github.retrooper.packetevents.PacketEvents;
 import java.nio.charset.Charset;
 
 public class ByteBufHelper {
+    public static int capacity(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().capacity(buffer);
+    }
+
+    public static Object capacity(Object buffer, int capacity) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().capacity(buffer, capacity);
+    }
+
     public static int readerIndex(Object buffer) {
         return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readerIndex(buffer);
     }
@@ -93,6 +101,18 @@ public class ByteBufHelper {
 
     public static void writeShort(Object buffer, int value) {
         PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeShort(buffer, value);
+    }
+
+    public static void writeShortLE(Object buffer, int value) {
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeShortLE(buffer, value);
+    }
+
+    public static int readMedium(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().readMedium(buffer);
+    }
+
+    public static void writeMedium(Object buffer, int value) {
+        PacketEvents.getAPI().getNettyManager().getByteBufOperator().writeMedium(buffer, value);
     }
 
     public static int readInt(Object buffer) {
@@ -221,6 +241,19 @@ public class ByteBufHelper {
 
     public static Object resetWriterIndex(Object buffer) {
         return PacketEvents.getAPI().getNettyManager().getByteBufOperator().resetWriterIndex(buffer);
+    }
+
+    public static Object allocateNewBuffer(Object buffer) {
+        return PacketEvents.getAPI().getNettyManager().getByteBufOperator().allocateNewBuffer(buffer);
+    }
+
+    public static int getByteSize(int value) {
+        for (int i = 1; i < 5; ++i) {
+            if ((value & -1 << i * 7) == 0) {
+                return i;
+            }
+        }
+        return 5;
     }
 
     public static int readVarInt(Object buffer) {

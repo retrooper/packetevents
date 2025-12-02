@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,9 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayServerOpenHorseWindow> {
-    int windowId;
-    int slotCount;
-    int entityId;
+    private int windowId;
+    private int slotCount;
+    private int entityId;
 
     public WrapperPlayServerOpenHorseWindow(PacketSendEvent event) {
         super(event);
@@ -40,9 +40,16 @@ public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayS
 
     @Override
     public void read() {
-        this.windowId = readUnsignedByte();
+        this.windowId = this.readContainerId();
         this.slotCount = readVarInt();
         this.entityId = readInt();
+    }
+
+    @Override
+    public void write() {
+        this.writeContainerId(windowId);
+        writeVarInt(slotCount);
+        writeInt(entityId);
     }
 
     @Override
@@ -50,13 +57,6 @@ public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayS
         this.windowId = other.windowId;
         this.slotCount = other.slotCount;
         this.entityId = other.entityId;
-    }
-
-    @Override
-    public void write() {
-        writeByte(windowId);
-        writeVarInt(slotCount);
-        writeInt(entityId);
     }
 
     public int getWindowId() {

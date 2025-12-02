@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,10 @@
  */
 
 package com.github.retrooper.packetevents.util;
+
+import com.github.retrooper.packetevents.protocol.world.BlockFace;
+
+import java.util.Objects;
 
 /**
  * 3D float Vector.
@@ -129,12 +133,21 @@ public class Vector3f {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
+    }
+
     public Vector3f add(float x, float y, float z) {
         return new Vector3f(this.x + x, this.y + y, this.z + z);
     }
 
     public Vector3f add(Vector3f other) {
         return add(other.x, other.y, other.z);
+    }
+
+    public Vector3f offset(BlockFace face) {
+        return add(face.getModX(), face.getModY(), face.getModZ());
     }
 
     public Vector3f subtract(float x, float y, float z) {

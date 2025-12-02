@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,8 @@ import java.util.Set;
 
 public class ExceptionUtil {
     public static boolean isException(Throwable t, Class<?> clazz) {
-        Class<?> throwableClass = t.getClass();
         while (t != null) {
-            if (clazz.isAssignableFrom(throwableClass)) {
+            if (clazz.isAssignableFrom(t.getClass())) {
                 return true;
             }
 

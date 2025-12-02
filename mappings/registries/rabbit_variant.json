@@ -1,0 +1,11 @@
+{
+  "V_1_8": {
+    "brown": 0,
+    "white": 1,
+    "black": 2,
+    "white_splotched": 3,
+    "gold": 4,
+    "salt": 5,
+    "evil": 99
+  }
+}

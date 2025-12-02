@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,17 +23,17 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerWorldBorderCenter extends PacketWrapper<WrapperPlayServerWorldBorderCenter> {
-    double x;
-    double z;
+    private double x;
+    private double z;
+
+    public WrapperPlayServerWorldBorderCenter(PacketSendEvent event) {
+        super(event);
+    }
 
     public WrapperPlayServerWorldBorderCenter(double x, double z) {
         super(PacketType.Play.Server.WORLD_BORDER_CENTER);
         this.x = x;
         this.z = z;
-    }
-
-    public WrapperPlayServerWorldBorderCenter(PacketSendEvent event) {
-        super(event);
     }
 
     @Override
@@ -43,15 +43,15 @@ public class WrapperPlayServerWorldBorderCenter extends PacketWrapper<WrapperPla
     }
 
     @Override
-    public void copy(WrapperPlayServerWorldBorderCenter wrapper) {
-        this.x = wrapper.x;
-        this.z = wrapper.z;
-    }
-
-    @Override
     public void write() {
         writeDouble(this.x);
         writeDouble(this.z);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerWorldBorderCenter wrapper) {
+        this.x = wrapper.x;
+        this.z = wrapper.z;
     }
 
     public double getX() {

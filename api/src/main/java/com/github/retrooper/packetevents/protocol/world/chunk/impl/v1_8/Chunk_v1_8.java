@@ -1,3 +1,21 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2022 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -34,13 +52,12 @@ public class Chunk_v1_8 implements BaseChunk {
     }
 
     @Override
-    public WrappedBlockState get(ClientVersion version, int x, int y, int z) {
-        int combinedID = this.blocks.get(x, y, z);
-        return WrappedBlockState.getByGlobalId(version, combinedID);
+    public int getBlockId(int x, int y, int z) {
+        return this.blocks.get(x, y, z);
     }
 
     @Override
-    public void set(ClientVersion version, int x, int y, int z, int combinedID) {
+    public void set(int x, int y, int z, int combinedID) {
         this.blocks.set(x, y, z, combinedID);
     }
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,13 +18,15 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.reader.impl;
 
-import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.NetworkChunkData;
 import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.ShortArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8.Chunk_v1_8;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -34,10 +36,15 @@ import java.util.BitSet;
 public class ChunkReader_v1_8 implements ChunkReader {
 
     @Override
-    public BaseChunk[] read(BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn) {
+    public BaseChunk[] read(
+            DimensionType dimensionType, BitSet chunkMask, BitSet secondaryChunkMask, boolean fullChunk,
+            boolean hasBlockLight, boolean hasSkyLight, int chunkSize, int arrayLength, PacketWrapper<?> wrapper
+    ) {
+        byte[] data = wrapper.readByteArrayOfSize(arrayLength);
+
         Chunk_v1_8[] chunks = new Chunk_v1_8[16];
         int pos = 0;
-        int expected = 0;
+        int expected = fullChunk ? 256 : 0; // 256 if full chunk for the biome data, always sent if full chunk
         boolean sky = false;
 
         ShortBuffer buf = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
@@ -48,14 +55,14 @@ public class ChunkReader_v1_8 implements ChunkReader {
         // 3 = Get sky light.
         for (int pass = 0; pass < 4; pass++) {
             for (int ind = 0; ind < 16; ind++) {
-                if (set.get(ind)) {
+                if (chunkMask.get(ind)) {
                     if (pass == 0) {
                         // Block length + Blocklight length
                         expected += (4096 * 2) + 2048;
                     }
 
                     if (pass == 1) {
-                        chunks[ind] = new Chunk_v1_8(sky || hasSkyLight);
+                        chunks[ind] = new Chunk_v1_8(sky || hasBlockLight);
                         ShortArray3d blocks = chunks[ind].getBlocks();
                         buf.position(pos / 2);
                         buf.get(blocks.getData(), 0, blocks.getData().length);
@@ -68,7 +75,7 @@ public class ChunkReader_v1_8 implements ChunkReader {
                         pos += blocklight.getData().length;
                     }
 
-                    if (pass == 3 && (sky || hasSkyLight)) {
+                    if (pass == 3 && (sky || hasBlockLight)) {
                         NibbleArray3d skylight = chunks[ind].getSkyLight();
                         System.arraycopy(data, pos, skylight.getData(), 0, skylight.getData().length);
                         pos += skylight.getData().length;
@@ -78,9 +85,13 @@ public class ChunkReader_v1_8 implements ChunkReader {
 
             if (pass == 0 && data.length > expected) {
                 // If we have more data than blocks and blocklight combined, there must be skylight data as well.
-                sky = checkForSky;
+                sky = hasSkyLight;
             }
         }
+
+        // reset reader index of buffer to end of data, we still need to read biome data
+        int ri = ByteBufHelper.readerIndex(wrapper.buffer);
+        ByteBufHelper.readerIndex(wrapper.buffer, ri - (arrayLength - pos));
 
         return chunks;
     }
@@ -98,33 +109,33 @@ public class ChunkReader_v1_8 implements ChunkReader {
         // 1 = Add blocks.
         // 2 = Add block light.
         // 3 = Add sky light.
-        for(int pass = 0; pass < 4; pass++) {
-            for(int ind = 0; ind < chunks.length; ++ind) {
+        for (int pass = 0; pass < 4; pass++) {
+            for (int ind = 0; ind < chunks.length; ++ind) {
                 Chunk_v1_8 chunk = chunks[ind];
-                if(chunk != null && (!fullChunk || !chunk.isEmpty())) {
-                    if(pass == 0) {
+                if (chunk != null && (!fullChunk || !chunk.isEmpty())) {
+                    if (pass == 0) {
                         chunkMask |= 1 << ind;
                         length += chunk.getBlocks().getData().length * 2;
                         length += chunk.getBlockLight().getData().length;
-                        if(chunk.getSkyLight() != null) {
+                        if (chunk.getSkyLight() != null) {
                             length += chunk.getSkyLight().getData().length;
                         }
                     }
 
-                    if(pass == 1) {
+                    if (pass == 1) {
                         short blocks[] = chunk.getBlocks().getData();
                         buf.position(pos / 2);
                         buf.put(blocks, 0, blocks.length);
                         pos += blocks.length * 2;
                     }
 
-                    if(pass == 2) {
+                    if (pass == 2) {
                         byte blocklight[] = chunk.getBlockLight().getData();
                         System.arraycopy(blocklight, 0, data, pos, blocklight.length);
                         pos += blocklight.length;
                     }
 
-                    if(pass == 3 && chunk.getSkyLight() != null) {
+                    if (pass == 3 && chunk.getSkyLight() != null) {
                         byte skylight[] = chunk.getSkyLight().getData();
                         System.arraycopy(skylight, 0, data, pos, skylight.length);
                         pos += skylight.length;
@@ -133,14 +144,14 @@ public class ChunkReader_v1_8 implements ChunkReader {
                 }
             }
 
-            if(pass == 0) {
+            if (pass == 0) {
                 data = new byte[length];
                 buf = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
             }
         }
 
         // Add biomes.
-        if(fullChunk) {
+        if (fullChunk) {
             System.arraycopy(biomes, 0, data, pos, biomes.length);
             pos += biomes.length;
         }

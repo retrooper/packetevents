@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ public enum WorldType {
     DEBUG_ALL_BLOCK_STATES("debug_all_block_states"),
     DEFAULT_1_1("default_1_1");
 
+    private static final WorldType[] VALUES = values();
     private final String name;
 
     WorldType(String name) {
@@ -42,7 +43,7 @@ public enum WorldType {
 
     @Nullable
     public static WorldType getByName(String name) {
-        for (WorldType type : values()) {
+        for (WorldType type : VALUES) {
             if (type.name.equals(name)) {
                 return type;
             }

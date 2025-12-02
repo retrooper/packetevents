@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,9 +38,9 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientWi
  * @see WrapperPlayClientWindowConfirmation
  */
 public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPlayServerWindowConfirmation> {
-    int windowId;
-    short actionId;
-    boolean accepted;
+    private int windowId;
+    private short actionId;
+    private boolean accepted;
 
     public WrapperPlayServerWindowConfirmation(PacketSendEvent event) {
         super(event);

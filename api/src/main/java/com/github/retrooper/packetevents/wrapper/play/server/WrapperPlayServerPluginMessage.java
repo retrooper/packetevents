@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -42,19 +44,39 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
         this.data = data;
     }
 
+    public WrapperPlayServerPluginMessage(ResourceLocation channelName, byte[] data) {
+        super(PacketType.Play.Server.PLUGIN_MESSAGE);
+        this.channelName = channelName.toString();
+        this.data = data;
+    }
+
     @Override
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            this.channelName = readString(32767);
+            this.channelName = readString();
         }
         else {
             this.channelName = readString(20);
         }
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
             //We ignore this, because it's not needed.
             int legacyDataSize = readShort();
         }
         this.data = readRemainingBytes();
+    }
+
+    @Override
+    public void write() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            writeString(this.channelName);
+        }
+        else {
+            writeString(this.channelName, 20);
+        }
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
+            writeShort(data.length);
+        }
+        writeBytes(data);
     }
 
     @Override
@@ -63,42 +85,36 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
         this.data = wrapper.data;
     }
 
-    @Override
-    public void write() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            writeString(this.channelName, 32767);
-        }
-        else {
-            writeString(this.channelName, 20);
-        }
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeShort(data.length);
-        }
-        writeBytes(data);
-    }
-
     /**
-     * Name of the plugin channel used to send the data.
-     *
-     * @return Plugin channel name
+     * The channel name of the plugin message.
+     * @return The channel name.
      */
     public String getChannelName() {
         return channelName;
     }
 
+    /**
+     * Sets the channel name of the plugin message.
+     * @param channelName The channel name.
+     */
     public void setChannelName(String channelName) {
-        this.channelName = channelName;
+       this.channelName = channelName;
     }
 
     /**
-     * Any data, depending on the channel.
+     * The data of the plugin message.
      *
-     * @return Data
+     * @return The data.
      */
     public byte[] getData() {
         return data;
     }
 
+    /**
+     * Sets the data of the plugin message.
+     *
+     * @param data The data.
+     */
     public void setData(byte[] data) {
         this.data = data;
     }

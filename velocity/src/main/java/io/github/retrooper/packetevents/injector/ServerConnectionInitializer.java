@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +21,17 @@ package io.github.retrooper.packetevents.injector;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
-import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import io.github.retrooper.packetevents.handlers.PacketDecoder;
-import io.github.retrooper.packetevents.handlers.PacketEncoder;
+import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import io.github.retrooper.packetevents.handlers.PacketEventsDecoder;
+import io.github.retrooper.packetevents.handlers.PacketEventsEncoder;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 
 public class ServerConnectionInitializer {
-    public static void prepareChannel(Channel channel, PacketDecoder decoder, PacketEncoder encoder) {
+    public static void addChannelHandlers(Channel channel, PacketEventsDecoder decoder, PacketEventsEncoder encoder) {
         channel.pipeline().addBefore("minecraft-decoder", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addBefore("minecraft-encoder", PacketEvents.ENCODER_NAME, encoder);
     }
@@ -43,22 +44,21 @@ public class ServerConnectionInitializer {
             channel.unsafe().closeForcibly();
             return;
         }
-        PacketDecoder decoder = new PacketDecoder(user);
-        PacketEncoder encoder = new PacketEncoder(user);
-        prepareChannel(channel, decoder, encoder);
+        PacketEventsDecoder decoder = new PacketEventsDecoder(user);
+        PacketEventsEncoder encoder = new PacketEventsEncoder(user);
+        addChannelHandlers(channel, decoder, encoder);
+        channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
+        PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
     }
 
     public static void destroyChannel(Channel channel) {
-        User user = ProtocolManager.USERS.get(channel);
-        UserDisconnectEvent disconnectEvent = new UserDisconnectEvent(user);
-        PacketEvents.getAPI().getEventManager().callEvent(disconnectEvent);
         channel.pipeline().remove(PacketEvents.DECODER_NAME);
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
     }
 
     public static void reloadChannel(Channel channel) {
-        PacketDecoder decoder = (PacketDecoder) channel.pipeline().remove(PacketEvents.DECODER_NAME);
-        PacketEncoder encoder = (PacketEncoder) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-        prepareChannel(channel, decoder, encoder);
+        PacketEventsDecoder decoder = (PacketEventsDecoder) channel.pipeline().remove(PacketEvents.DECODER_NAME);
+        PacketEventsEncoder encoder = (PacketEventsEncoder) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+        addChannelHandlers(channel, decoder, encoder);
     }
 }

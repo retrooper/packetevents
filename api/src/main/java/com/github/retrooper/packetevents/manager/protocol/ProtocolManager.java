@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,21 +20,23 @@ package com.github.retrooper.packetevents.manager.protocol;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface ProtocolManager {
-    Map<String, Object> CHANNELS = new ConcurrentHashMap<>();
+    @ApiStatus.Internal
+    Map<UUID, Object> CHANNELS = new ConcurrentHashMap<>();
+    // Use SocketAddress because ProtocolLib wraps Channels with NettyChannelProxy class
+    @ApiStatus.Internal
     Map<Object, User> USERS = new ConcurrentHashMap<>();
 
     default Collection<User> getUsers() {
@@ -47,163 +49,144 @@ public interface ProtocolManager {
 
     //Methods to implement
     ProtocolVersion getPlatformVersion();
-
-    void sendPacket(Object channel, Object packet);
-
-    void sendPacketSilently(Object channel, Object packet);
-
-    void writePacket(Object channel, Object packet);
-
-    void writePacketSilently(Object channel, Object packet);
-
-    void receivePacket(Object channel, Object packet);
-
-    void receivePacketSilently(Object channel, Object packet);
-
+    void sendPacket(Object channel, Object byteBuf);
+    void sendPacketSilently(Object channel, Object byteBuf);
+    void writePacket(Object channel, Object byteBuf);
+    void writePacketSilently(Object channel, Object byteBuf);
+    void receivePacket(Object channel, Object byteBuf);
+    void receivePacketSilently(Object channel, Object byteBuf);
     ClientVersion getClientVersion(Object channel);
+    //TODO Define method that accepts an array of channels/set/list of channels.
 
-    default void sendPacketAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            sendPacket(channel, byteBuf);
-        });
+    default void sendPackets(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            sendPacket(channel, buf);
+        }
     }
 
-    default void sendPacketSilentlyAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            sendPacketSilently(channel, byteBuf);
-        });
+    default void sendPacketsSilently(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            sendPacketSilently(channel, buf);
+        }
     }
 
-    default void writePacketAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            writePacket(channel, byteBuf);
-        });
+    default void writePackets(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            writePacket(channel, buf);
+        }
     }
 
-    default void writePacketSilentlyAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            writePacketSilently(channel, byteBuf);
-        });
+    default void writePacketsSilently(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            writePacketSilently(channel, buf);
+        }
     }
 
-    default void receivePacketAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            receivePacket(channel, byteBuf);
-        });
+    default void receivePackets(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            receivePacket(channel, buf);
+        }
     }
 
-    default void receivePacketSilentlyAsync(Object channel, Object byteBuf) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            receivePacketSilently(channel, byteBuf);
-        });
+    default void receivePacketsSilently(Object channel, Object... byteBuf) {
+        for (Object buf : byteBuf) {
+            receivePacketSilently(channel, buf);
+        }
     }
 
-    //TODO Make it clear that this only updates the connection state in our user.
-    //Sometimes you should use getInjector().changeConnectionState because that can allow the injector to make adjustments.
-    //This is very important, especially on Spigot.
-    //As soon as we switch to the play state on spigot, our injector makes some adjustments.
-    default void changeConnectionState(Object channel, ConnectionState connectionState) {
-        getUser(channel).setConnectionState(connectionState);
-    }
 
     default void setClientVersion(Object channel, ClientVersion version) {
         getUser(channel).setClientVersion(version);
     }
 
-    default void sendPacket(Object channel, PacketWrapper<?> wrapper) {
+    @ApiStatus.Internal
+    default Object[] transformWrappers(PacketWrapper<?> wrapper, Object channel, boolean outgoing) {
+        //It is possible that our packet transformer util decides to transform one wrapper into multiple packets.
+        //(Correcting some mistakes on your end)
         PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            sendPacket(channel, packet.buffer);
+        Object[] buffers = new Object[wrappers.length];
+        for (int i = 0; i < wrappers.length; i++) {
+            PacketWrapper<?> wrappper = wrappers[i];
+            synchronized (wrappper.bufferLock) {
+                wrappper.prepareForSend(channel, outgoing);
+                buffers[i] = wrappper.buffer;
+                // Fix race condition when sending packets to multiple people (due to when the buffer is freed)
+                wrappper.buffer = null;
+            }
         }
+        return buffers;
     }
 
-    default void sendPacketAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            sendPacket(channel, wrapper);
-        });
+    default void sendPacket(Object channel, PacketWrapper<?> wrapper) {
+        Object[] transformed = transformWrappers(wrapper, channel, true);
+        sendPackets(channel, transformed);
     }
 
     default void sendPacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            sendPacketSilently(channel, packet.buffer);
-        }
-    }
-
-    default void sendPacketSilentlyAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            sendPacketSilently(channel, wrapper);
-        });
+        Object[] transformed = transformWrappers(wrapper, channel, true);
+        sendPacketsSilently(channel, transformed);
     }
 
     default void writePacket(Object channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            writePacket(channel, packet.buffer);
-        }
-    }
-
-    default void writePacketAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            writePacket(channel, wrapper);
-        });
+        Object[] transformed = transformWrappers(wrapper, channel, true);
+        writePackets(channel, transformed);
     }
 
     default void writePacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            writePacketSilently(channel, packet.buffer);
-        }
-    }
-
-    default void writePacketSilentlyAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            writePacketSilently(channel, wrapper);
-        });
+        Object[] transformed = transformWrappers(wrapper, channel, true);
+        writePacketsSilently(channel, transformed);
     }
 
     default void receivePacket(Object channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            receivePacket(channel, packet.buffer);
-        }
-    }
-
-    default void receivePacketAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            receivePacket(channel, wrapper);
-        });
+        Object[] transformed = transformWrappers(wrapper, channel, false);
+        receivePackets(channel, transformed);
     }
 
     default void receivePacketSilently(Object channel, PacketWrapper<?> wrapper) {
-        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
-        for (PacketWrapper<?> packet : wrappers) {
-            packet.prepareForSend();
-            receivePacketSilently(channel, packet.buffer);
-        }
-    }
-
-    default void receivePacketSilentlyAsync(Object channel, PacketWrapper<?> wrapper) {
-        ChannelHelper.runInEventLoop(channel, () -> {
-            receivePacketSilently(channel, wrapper);
-        });
+        Object[] transformed = transformWrappers(wrapper, channel, false);
+        receivePacketsSilently(channel, transformed);
     }
 
     default User getUser(Object channel) {
-        return USERS.get(channel);
+        Object pipeline = ChannelHelper.getPipeline(channel);
+        return USERS.get(pipeline);
     }
 
+    @ApiStatus.Internal
+    default User removeUser(Object channel) {
+        Object pipeline = ChannelHelper.getPipeline(channel);
+        return USERS.remove(pipeline);
+    }
+
+    @ApiStatus.Internal
     default void setUser(Object channel, User user) {
-        USERS.put(channel, user);
+        synchronized (channel) {
+            Object pipeline = ChannelHelper.getPipeline(channel);
+            USERS.put(pipeline, user);
+        }
         PacketEvents.getAPI().getInjector().updateUser(channel, user);
     }
 
-    default Object getChannel(String username) {
-        return CHANNELS.get(username);
+    default Object getChannel(UUID uuid) {
+        return CHANNELS.get(uuid);
+    }
+
+    @ApiStatus.Internal
+    default void setChannel(UUID uuid, Object channel) {
+        CHANNELS.put(uuid, channel);
+    }
+
+    @ApiStatus.Internal
+    default void removeChannel(Object channel) {
+        CHANNELS.values().remove(channel);
+    }
+
+    @ApiStatus.Internal
+    default void removeChannelById(UUID uuid) {
+        CHANNELS.remove(uuid);
+    }
+
+    default boolean hasChannel(Object channel) {
+        return CHANNELS.containsValue(channel);
     }
 }

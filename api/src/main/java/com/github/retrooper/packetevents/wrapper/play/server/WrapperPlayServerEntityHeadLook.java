@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,15 +44,15 @@ public class WrapperPlayServerEntityHeadLook extends PacketWrapper<WrapperPlaySe
     }
 
     @Override
-    public void copy(WrapperPlayServerEntityHeadLook wrapper) {
-        entityID = wrapper.entityID;
-        headYaw = wrapper.headYaw;
-    }
-
-    @Override
     public void write() {
         writeVarInt(entityID);
         writeByte((int) (headYaw * ROTATION_FACTOR));
+    }
+
+    @Override
+    public void copy(WrapperPlayServerEntityHeadLook wrapper) {
+        entityID = wrapper.entityID;
+        headYaw = wrapper.headYaw;
     }
 
     public int getEntityId() {

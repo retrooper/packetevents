@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,29 +19,12 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerChangeGameState extends PacketWrapper<WrapperPlayServerChangeGameState> {
     private Reason reason;
     private float value;
-
-    public enum Reason {
-        NO_RESPAWN_BLOCK_AVAILABLE,
-        END_RAINING,
-        BEGIN_RAINING,
-        CHANGE_GAME_MODE,
-        WIN_GAME,
-        DEMO_EVENT,
-        ARROW_HIT_PLAYER,
-        RAIN_LEVEL_CHANGE,
-        THUNDER_LEVEL_CHANGE,
-        PLAY_PUFFER_FISH_STING_SOUND,
-        PLAY_ELDER_GUARDIAN_MOB_APPEARANCE,
-        ENABLE_RESPAWN_SCREEN;
-
-        public static final Reason[] VALUES = values();
-    }
 
     public WrapperPlayServerChangeGameState(PacketSendEvent event) {
         super(event);
@@ -61,20 +44,20 @@ public class WrapperPlayServerChangeGameState extends PacketWrapper<WrapperPlayS
 
     @Override
     public void read() {
-        reason = Reason.VALUES[readByte()];
+        reason = Reason.getById(readUnsignedByte());
         value = readFloat();
-    }
-
-    @Override
-    public void copy(WrapperPlayServerChangeGameState wrapper) {
-        reason = wrapper.reason;
-        value = wrapper.value;
     }
 
     @Override
     public void write() {
         writeByte(reason.ordinal());
         writeFloat(value);
+    }
+
+    @Override
+    public void copy(WrapperPlayServerChangeGameState wrapper) {
+        reason = wrapper.reason;
+        value = wrapper.value;
     }
 
     public Reason getReason() {
@@ -91,5 +74,28 @@ public class WrapperPlayServerChangeGameState extends PacketWrapper<WrapperPlayS
 
     public void setValue(float value) {
         this.value = value;
+    }
+
+    public enum Reason {
+        NO_RESPAWN_BLOCK_AVAILABLE,
+        END_RAINING,
+        BEGIN_RAINING,
+        CHANGE_GAME_MODE,
+        WIN_GAME,
+        DEMO_EVENT,
+        ARROW_HIT_PLAYER,
+        RAIN_LEVEL_CHANGE,
+        THUNDER_LEVEL_CHANGE,
+        PLAY_PUFFER_FISH_STING_SOUND,
+        PLAY_ELDER_GUARDIAN_MOB_APPEARANCE,
+        ENABLE_RESPAWN_SCREEN,
+        LIMITED_CRAFTING,
+        START_LOADING_CHUNKS;
+
+        private static final Reason[] VALUES = values();
+
+        public static Reason getById(int index) {
+            return VALUES[index];
+        }
     }
 }

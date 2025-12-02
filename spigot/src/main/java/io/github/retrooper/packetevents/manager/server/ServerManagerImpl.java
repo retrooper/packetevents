@@ -1,6 +1,6 @@
 /*
  * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * Copyright (C) 2022 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,10 @@ package io.github.retrooper.packetevents.manager.server;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.PEVersion;
+import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -28,16 +32,25 @@ public class ServerManagerImpl implements ServerManager {
     private ServerVersion serverVersion;
 
     private ServerVersion resolveVersionNoCache() {
+        Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
+        String bukkitVersion = Bukkit.getBukkitVersion();
+        ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
+
+        String failureToDetectVersionMsg = "Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the Server version is " + fallbackVersion.name() + "...\n If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc";
+
+        if (bukkitVersion.contains("Unknown")) {
+            plugin.getLogger().warning(failureToDetectVersionMsg);
+            return fallbackVersion;
+        }
+
         for (final ServerVersion val : ServerVersion.reversedValues()) {
             //For example "V_1_18" -> "1.18"
-            if (Bukkit.getBukkitVersion().contains(val.getReleaseName())) {
+            if (bukkitVersion.contains(val.getReleaseName())) {
                 return val;
             }
         }
 
-        ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
-        Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
-        plugin.getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the server version is " + fallbackVersion.name() + "...");
+        plugin.getLogger().warning(failureToDetectVersionMsg);
         return fallbackVersion;
     }
 
@@ -47,5 +60,10 @@ public class ServerManagerImpl implements ServerManager {
             serverVersion = resolveVersionNoCache();
         }
         return serverVersion;
+    }
+
+    @Override
+    public Object getRegistryCacheKey(User user, ClientVersion version) {
+        return GlobalRegistryHolder.getGlobalRegistryCacheKey(user, version);
     }
 }
