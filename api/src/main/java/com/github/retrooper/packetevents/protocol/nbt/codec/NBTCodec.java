@@ -136,10 +136,9 @@ public class NBTCodec {
         else if (nbt instanceof NBTCompound) {
             JsonObject jsonObject = new JsonObject();
             Map<String, NBT> compoundTags = ((NBTCompound)nbt).getTags();
-            for (String tagName : compoundTags.keySet()) {
-                NBT tag = compoundTags.get(tagName);
-                JsonElement jsonValue = nbtToJson(tag, parseByteAsBool);
-                jsonObject.add(tagName, jsonValue);
+            for (Map.Entry<String, NBT> entry : compoundTags.entrySet()) {
+                JsonElement jsonValue = nbtToJson(entry.getValue(), parseByteAsBool);
+                jsonObject.add(entry.getKey(), jsonValue);
             }
             return jsonObject;
         }

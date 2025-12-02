@@ -37,8 +37,9 @@ public class ItemRecipes {
 
     public static ItemRecipes read(PacketWrapper<?> wrapper) {
         NBTList<?> recipes = (NBTList<?>) wrapper.readNBTRaw();
-        List<ResourceLocation> recipeKeys = new ArrayList<>(recipes.size());
-        for (int i = 0; i < recipes.size(); i++) {
+        int size = recipes.size();
+        List<ResourceLocation> recipeKeys = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
             NBTString tag = (NBTString) recipes.getTag(i);
             recipeKeys.add(new ResourceLocation(tag.getValue()));
         }

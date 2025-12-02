@@ -308,10 +308,11 @@ public class NBTCompound extends NBT {
         } else {
             // determine list type using first value in list
             NBT firstVal = encoder.encode(wrapper, value.get(0));
-            NBTList<?> list = new NBTList<>(firstVal.getType(), value.size());
+            int size = value.size();
+            NBTList<?> list = new NBTList<>(firstVal.getType(), size);
             list.addTagUnsafe(firstVal);
             // add remaining list entries
-            for (int i = 1; i < value.size(); i++) {
+            for (int i = 1; i < size; i++) {
                 list.addTagUnsafe(encoder.encode(wrapper, value.get(i)));
             }
             this.setTag(key, list);

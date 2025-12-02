@@ -80,6 +80,9 @@ public enum ClientVersion {
     V_1_18_2(758),
 
     V_1_19(759),
+    /**
+    * 1.19.1 and 1.19.2 have the same protocol version.
+    */
     V_1_19_1(760),
     V_1_19_3(761),
     V_1_19_4(762),

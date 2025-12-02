@@ -142,8 +142,9 @@ public final class NbtCodecs {
                 return ((NBTIntArray) nbt).getValue();
             }
             List<? extends NBT> list = GENERIC_LIST.decode(nbt, wrapper);
-            int[] array = new int[list.size()];
-            for (int i = 0; i < list.size(); i++) {
+            int size = list.size();
+            int[] array = new int[size];
+            for (int i = 0; i < size; i++) {
                 NBT tag = list.get(i);
                 if (!(tag instanceof NBTNumber)) {
                     throw new RuntimeException("Some elements are not numbers: " + list);

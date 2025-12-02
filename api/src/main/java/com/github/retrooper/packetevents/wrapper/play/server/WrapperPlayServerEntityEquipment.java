@@ -84,9 +84,10 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
             writeVarInt(entityId);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            for (int i = 0; i < this.equipment.size(); i++) {
+            int size = this.equipment.size();
+            for (int i = 0; i < size; i++) {
                 Equipment equipment = this.equipment.get(i);
-                boolean last = i == (this.equipment.size() - 1);
+                boolean last = i == (size - 1);
                 writeByte(last ? equipment.getSlot().getId(serverVersion) : (equipment.getSlot().getId(serverVersion) | Byte.MIN_VALUE));
                 writeItemStack(equipment.getItem());
             }
