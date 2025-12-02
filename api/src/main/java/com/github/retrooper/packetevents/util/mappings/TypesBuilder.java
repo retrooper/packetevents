@@ -98,7 +98,8 @@ public class TypesBuilder {
 
         final Consumer<ClientVersion> mapLoader = version -> {
             final Map<String, Integer> map = new HashMap<>();
-            for (int i = 0; i < lastEntries.size(); i++) {
+            int size = lastEntries.size();
+            for (int i = 0; i < size; i++) {
                 map.put(lastEntries.get(i), i);
             }
             this.entries.put(version, map);
