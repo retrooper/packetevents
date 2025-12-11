@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.particle.type;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleBlockStateData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleColorData;
@@ -25,22 +26,29 @@ import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleDustColorTransitionData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleDustData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleItemStackData;
+import com.github.retrooper.packetevents.protocol.particle.data.ParticlePowerData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleSculkChargeData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleShriekData;
+import com.github.retrooper.packetevents.protocol.particle.data.ParticleSpellData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleTrailData;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleVibrationData;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper.Reader;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper.Writer;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Collection;
 
+@NullMarked
 public final class ParticleTypes {
 
     private static final VersionedRegistry<ParticleType<?>> REGISTRY = new VersionedRegistry<>("particle_type");
+    public static final NbtCodec<ParticleType<?>> CODEC = NbtCodecs.forRegistry(REGISTRY);
 
     private ParticleTypes() {
     }
@@ -102,7 +110,9 @@ public final class ParticleTypes {
     public static final ParticleType<ParticleData> CLOUD = define("cloud");
     public static final ParticleType<ParticleData> CRIT = define("crit");
     public static final ParticleType<ParticleData> DAMAGE_INDICATOR = define("damage_indicator");
-    public static final ParticleType<ParticleData> DRAGON_BREATH = define("dragon_breath");
+    public static final ParticleType<ParticlePowerData> DRAGON_BREATH = define("dragon_breath",
+            ParticlePowerData::read, ParticlePowerData::write,
+            ParticlePowerData::decode, ParticlePowerData::encode);
     public static final ParticleType<ParticleData> DRIPPING_LAVA = define("dripping_lava");
     public static final ParticleType<ParticleData> FALLING_LAVA = define("falling_lava");
     public static final ParticleType<ParticleData> LANDING_LAVA = define("landing_lava");
@@ -114,7 +124,9 @@ public final class ParticleTypes {
     public static final ParticleType<ParticleDustColorTransitionData> DUST_COLOR_TRANSITION = define("dust_color_transition",
             ParticleDustColorTransitionData::read, ParticleDustColorTransitionData::write,
             ParticleDustColorTransitionData::decode, ParticleDustColorTransitionData::encode);
-    public static final ParticleType<ParticleData> EFFECT = define("effect");
+    public static final ParticleType<ParticleSpellData> EFFECT = define("effect",
+            ParticleSpellData::read, ParticleSpellData::write,
+            ParticleSpellData::decode, ParticleSpellData::encode);
     public static final ParticleType<ParticleData> ELDER_GUARDIAN = define("elder_guardian");
     public static final ParticleType<ParticleData> ENCHANTED_HIT = define("enchanted_hit");
     public static final ParticleType<ParticleData> ENCHANT = define("enchant");
@@ -138,11 +150,32 @@ public final class ParticleTypes {
     public static final ParticleType<ParticleData> SCULK_CHARGE_POP = define("sculk_charge_pop");
     public static final ParticleType<ParticleData> SOUL_FIRE_FLAME = define("soul_fire_flame");
     public static final ParticleType<ParticleData> SOUL = define("soul");
-    public static final ParticleType<ParticleData> FLASH = define("flash");
+    public static final ParticleType<ParticleColorData> FLASH = define("flash",
+            wrapper -> {
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_9)) {
+                    return ParticleColorData.read(wrapper);
+                }
+                return new ParticleColorData(0);
+            }, (wrapper, data) -> {
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_9)) {
+                    ParticleColorData.write(wrapper, data);
+                }
+            }, (compound, version) -> {
+                if (version.isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
+                    return ParticleColorData.decode(compound, version);
+                }
+                return new ParticleColorData(0);
+            }, (data, version, compound) -> {
+                if (version.isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
+                    ParticleColorData.encode(data, version, compound);
+                }
+            });
     public static final ParticleType<ParticleData> HAPPY_VILLAGER = define("happy_villager");
     public static final ParticleType<ParticleData> COMPOSTER = define("composter");
     public static final ParticleType<ParticleData> HEART = define("heart");
-    public static final ParticleType<ParticleData> INSTANT_EFFECT = define("instant_effect");
+    public static final ParticleType<ParticleSpellData> INSTANT_EFFECT = define("instant_effect",
+            ParticleSpellData::read, ParticleSpellData::write,
+            ParticleSpellData::decode, ParticleSpellData::encode);
     public static final ParticleType<ParticleItemStackData> ITEM = define("item",
             ParticleItemStackData::read, ParticleItemStackData::write,
             ParticleItemStackData::decode, ParticleItemStackData::encode);

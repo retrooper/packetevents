@@ -22,10 +22,13 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributeMap;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -33,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+@NullMarked
 public final class Biomes {
 
     private static final VersionedRegistry<Biome> REGISTRY = new VersionedRegistry<>("worldgen/biome");
@@ -66,7 +70,8 @@ public final class Biomes {
         return REGISTRY.define(key, data -> {
             NBTCompound dataTag = BIOME_DATA.get(data.getName());
             if (dataTag != null) {
-                return Biome.decode(dataTag, ClientVersion.getLatest(), data);
+                PacketWrapper<?> wrapper = PacketWrapper.createDummyWrapper(ClientVersion.getLatest());
+                return Biome.CODEC.decode(dataTag, wrapper).copy(data);
             } else if (allowNoData) {
                 BiomeEffects effects = new BiomeEffects(0xC0D8FF, 0x3F76E4, 0x050533,
                         0x78A7FF, OptionalInt.empty(), OptionalInt.empty(),
@@ -74,7 +79,8 @@ public final class Biomes {
                         Optional.empty(), Optional.empty(),
                         Optional.empty(), Optional.empty());
                 return new StaticBiome(data, true, 0.8f,
-                        Biome.TemperatureModifier.NONE, 0.4f, effects);
+                        Biome.TemperatureModifier.NONE, 0.4f, null,
+                        null, null, effects, EnvironmentAttributeMap.EMPTY);
             }
             throw new IllegalArgumentException("Can't define biome " + data.getName() + ", no data found");
         });
@@ -226,7 +232,9 @@ public final class Biomes {
     public static final Biome WINDSWEPT_SAVANNA = define("windswept_savanna");
     public static final Biome WOODED_BADLANDS = define("wooded_badlands");
 
-    // added with 1.21.2
+    /**
+     * @versions 1.21.2+
+     */
     public static final Biome PALE_GARDEN = define("pale_garden");
 
     static {

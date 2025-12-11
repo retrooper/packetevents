@@ -13,8 +13,10 @@ repositories {
     maven("https://repo.viaversion.com/")
 }
 
+val spongeVersion: String = "17.0.0-SNAPSHOT"
+
 sponge {
-    apiVersion("12.0.0-SNAPSHOT")
+    apiVersion(spongeVersion)
     loader {
         name(PluginLoaders.JAVA_PLAIN)
         version("2.5.1-SNAPSHOT")
@@ -35,6 +37,43 @@ sponge {
         }
     }
 }
+
+val adventureVersion: String = libs.versions.adventure.get()
+
+// Automatically generates AdventureInfo class based on current target Sponge and Adventure version.
+val generateAdventureVersionClass by tasks.registering {
+    val outputDir = layout.buildDirectory.dir("generated/sources/adventureVersion").get().asFile
+    val pkg = "io.github.retrooper.packetevents.sponge.internal"
+    val file = File(outputDir, "$pkg/AdventureInfo.java")
+
+    doLast {
+        file.parentFile.mkdirs()
+        file.writeText(
+            """
+            package $pkg;
+
+            public final class AdventureInfo {
+                public static final String EXPECTED_ADVENTURE_VERSION = "$adventureVersion";
+                public static final String EXPECTED_SPONGE_VERSION = "$spongeVersion";
+            }
+            """.trimIndent()
+        )
+    }
+
+    // Expose generated dir to source sets
+    sourceSets["main"].java.srcDir(outputDir)
+}
+
+tasks {
+    compileJava {
+        dependsOn(generateAdventureVersionClass)
+    }
+
+    withType<JavaCompile> {
+        options.release = 21
+    }
+}
+
 
 dependencies {
     compileOnly(libs.netty)

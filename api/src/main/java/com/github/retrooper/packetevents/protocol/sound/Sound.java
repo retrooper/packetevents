@@ -21,17 +21,43 @@ package com.github.retrooper.packetevents.protocol.sound;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
-import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
-import java.util.Optional;
-
+@NullMarked
 public interface Sound extends MappedEntity {
+
+    NbtCodec<Sound> CODEC = new NbtCodec<Sound>() {
+        @Override
+        public Sound decode(NBT nbt, PacketWrapper<?> wrapper) {
+            if (nbt instanceof NBTString) {
+                return Sounds.getByNameOrCreate(((NBTString) nbt).getValue());
+            }
+            NBTCompound compound = nbt.castOrThrow(NBTCompound.class);
+            ResourceLocation soundId = compound.getOrThrow("sound_id", ResourceLocation.CODEC, wrapper);
+            Float range = compound.getOrNull("range", NbtCodecs.FLOAT, wrapper);
+            return new StaticSound(soundId, range);
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, Sound value) {
+            if (value.isRegistered()) {
+                return new NBTString(value.getName().toString());
+            }
+            NBTCompound compound = new NBTCompound();
+            compound.set("sound_id", value.getSoundId(), ResourceLocation.CODEC, wrapper);
+            if (value.getRange() != null) {
+                compound.set("range", value.getRange(), NbtCodecs.FLOAT, wrapper);
+            }
+            return compound;
+        }
+    };
 
     ResourceLocation getSoundId();
 
@@ -62,15 +88,9 @@ public interface Sound extends MappedEntity {
         return decode(nbt, PacketWrapper.createDummyWrapper(version));
     }
 
+    @Deprecated
     static Sound decode(NBT nbt, PacketWrapper<?> wrapper) {
-        if (nbt instanceof NBTString) {
-            return Sounds.getByNameOrCreate(((NBTString) nbt).getValue());
-        }
-        NBTCompound compound = (NBTCompound) nbt;
-        ResourceLocation soundId = new ResourceLocation(((NBTCompound) nbt).getStringTagValueOrThrow("sound_id"));
-        Float range = Optional.ofNullable(compound.getNumberTagOrNull("range"))
-                .map(NBTNumber::getAsFloat).orElse(null);
-        return new StaticSound(soundId, range);
+        return CODEC.decode(nbt, wrapper);
     }
 
     @Deprecated
@@ -78,15 +98,8 @@ public interface Sound extends MappedEntity {
         return encode(PacketWrapper.createDummyWrapper(version), sound);
     }
 
+    @Deprecated
     static NBT encode(PacketWrapper<?> wrapper, Sound sound) {
-        if (sound.isRegistered()) {
-            return new NBTString(sound.getName().toString());
-        }
-        NBTCompound compound = new NBTCompound();
-        compound.setTag("sound_id", new NBTString(sound.getSoundId().toString()));
-        if (sound.getRange() != null) {
-            compound.setTag("range", new NBTFloat(sound.getRange()));
-        }
-        return compound;
+        return CODEC.encode(wrapper, sound);
     }
 }

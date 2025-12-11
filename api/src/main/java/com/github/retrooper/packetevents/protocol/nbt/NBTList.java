@@ -138,6 +138,16 @@ public class NBTList<T extends NBT> extends NBT {
         }
     }
 
+    private static NBT tryUnwrap(NBTCompound tag) {
+        if (tag.tags.size() == 1) {
+            NBT unwrapped = tag.getTagOrNull("");
+            if (unwrapped != null) {
+                return unwrapped;
+            }
+        }
+        return tag; // failed to unwrap
+    }
+
     // vanilla allows heterogeneous lists by wrapping the different
     // tag types in a compound tag list
     public List<? extends NBT> unwrapTags() {
@@ -146,12 +156,10 @@ public class NBTList<T extends NBT> extends NBT {
         }
         List<NBT> tags = new ArrayList<>(this.tags.size());
         for (T tag : this.tags) {
-            if (!(tag instanceof NBTCompound) || ((NBTCompound) tag).size() != 1) {
-                continue;
-            }
-            NBT wrapped = ((NBTCompound) tag).getTagOrNull("");
-            if (wrapped != null) {
-                tags.add(wrapped);
+            if (tag instanceof NBTCompound) {
+                tags.add(tryUnwrap((NBTCompound) tag));
+            } else {
+                tags.add(tag);
             }
         }
         return tags;

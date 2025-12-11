@@ -67,7 +67,7 @@ public final class LpVector3d {
         }
         long maxLong = MathUtil.ceilLong(max);
         boolean large = (maxLong & 0b11L) != maxLong;
-        long mul = large ? ((maxLong % 0b11L) | 0b100L) : maxLong;
+        long mul = large ? ((maxLong & 0b11L) | 0b100L) : maxLong;
         long packedX = pack(x / (double) maxLong) << 3;
         long packedY = pack(y / (double) maxLong) << 18;
         long packedZ = pack(z / (double) maxLong) << 33;

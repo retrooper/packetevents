@@ -26,5 +26,5 @@ import org.jspecify.annotations.NullMarked;
 @FunctionalInterface
 public interface NbtDecoder<T> {
 
-    T decode(NBT nbt, PacketWrapper<?> wrapper);
+    T decode(NBT nbt, PacketWrapper<?> wrapper) throws NbtCodecException;
 }

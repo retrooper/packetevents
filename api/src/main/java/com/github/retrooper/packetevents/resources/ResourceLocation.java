@@ -24,12 +24,11 @@ import com.github.retrooper.packetevents.protocol.util.NbtCodec;
 import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.KeyPattern;
 import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
-
-import java.util.Objects;
 
 @NullMarked
 public class ResourceLocation implements Keyed {
@@ -37,31 +36,20 @@ public class ResourceLocation implements Keyed {
     public static final NbtCodec<ResourceLocation> CODEC = NbtCodecs.STRING
             .apply(ResourceLocation::new, ResourceLocation::toString);
 
-    public static final String VANILLA_NAMESPACE = "minecraft";
+    public static final String VANILLA_NAMESPACE = Key.MINECRAFT_NAMESPACE;
 
-    protected final String namespace;
-    protected final String key;
+    private final Key key;
 
     public ResourceLocation(Key key) {
-        this(key.namespace(), key.value());
-    }
-
-    public ResourceLocation(String namespace, String key) {
-        this.namespace = namespace;
         this.key = key;
     }
 
+    public ResourceLocation(@KeyPattern.Namespace String namespace, @KeyPattern.Value String key) {
+        this.key = Key.key(namespace, key);
+    }
+
     public ResourceLocation(String location) {
-        String[] array = new String[]{VANILLA_NAMESPACE, location};
-        int index = location.indexOf(":");
-        if (index != -1) {
-            array[1] = location.substring(index + 1);
-            if (index >= 1) {
-                array[0] = location.substring(0, index);
-            }
-        }
-        this.namespace = array[0];
-        this.key = array[1];
+        this.key = Key.key(location);
     }
 
     public static ResourceLocation read(PacketWrapper<?> wrapper) {
@@ -115,37 +103,37 @@ public class ResourceLocation implements Keyed {
 
     @Override
     public Key key() {
-        return Key.key(this.namespace, this.key);
+        return key;
     }
 
     public String getNamespace() {
-        return namespace;
+        return key.namespace();
     }
 
     public String getKey() {
-        return key;
+        return key.value();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.namespace, this.key);
+        return key.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ResourceLocation) {
             ResourceLocation other = (ResourceLocation) obj;
-            return other.namespace.equals(namespace) && other.key.equals(key);
+            return other.key.equals(this.key);
         }
         return false;
     }
 
     @Override
     public String toString() {
-        return namespace + ":" + key;
+        return key.asString();
     }
 
-    public static ResourceLocation minecraft(String key) {
+    public static ResourceLocation minecraft(@KeyPattern.Value String key) {
         return new ResourceLocation(VANILLA_NAMESPACE, key);
     }
 }

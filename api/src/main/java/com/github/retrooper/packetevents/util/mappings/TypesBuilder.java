@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTRe
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.VersionMapper;
+import com.github.retrooper.packetevents.util.VersionRange;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
@@ -98,7 +99,8 @@ public class TypesBuilder {
 
         final Consumer<ClientVersion> mapLoader = version -> {
             final Map<String, Integer> map = new HashMap<>();
-            for (int i = 0; i < lastEntries.size(); i++) {
+            int size = lastEntries.size();
+            for (int i = 0; i < size; i++) {
                 map.put(lastEntries.get(i), i);
             }
             this.entries.put(version, map);
@@ -160,7 +162,22 @@ public class TypesBuilder {
     }
 
     public int getDataIndex(ClientVersion rawVersion) {
-        return versionMapper.getIndex(rawVersion);
+        return this.versionMapper.getIndex(rawVersion);
+    }
+
+    public VersionMapper getVersionMapper() {
+        return this.versionMapper;
+    }
+
+    public void addExtraVersionStep(ClientVersion version) {
+        VersionMapper newMapper = this.versionMapper.withExtra(version);
+        if (this.versionMapper != newMapper) {
+            // version was inserted, update entries
+            int baseIndex = this.versionMapper.getIndex(version);
+            ClientVersion baseVersion = this.versionMapper.getVersions()[baseIndex];
+            this.entries.put(version, this.entries.get(baseVersion));
+            this.versionMapper = newMapper; // save new mapper
+        }
     }
 
     @VisibleForTesting
@@ -173,11 +190,11 @@ public class TypesBuilder {
         entries = null;
     }
 
-    public TypesBuilderData define(String key) {
+    public TypesBuilderData define(String key, VersionRange range) {
         final ResourceLocation name = new ResourceLocation(key);
-        final int[] ids = new int[getVersions().length];
+        final int[] ids = new int[this.getVersions().length];
         int index = 0;
-        for (ClientVersion v : getVersions()) {
+        for (ClientVersion v : this.getVersions()) {
             final Map<String, Integer> map = entries.get(v);
             if (map.containsKey(key)) {
                 int id = map.get(key);
@@ -187,7 +204,7 @@ public class TypesBuilder {
             }
             index++;
         }
-        return new TypesBuilderData(this, name, ids);
+        return new TypesBuilderData(name, ids, this, range);
     }
 
     public @Nullable Map<ClientVersion, Map<String, Integer>> getEntries() {

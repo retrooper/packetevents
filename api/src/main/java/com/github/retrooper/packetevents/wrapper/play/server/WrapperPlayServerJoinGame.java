@@ -134,7 +134,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, (DimensionTypeRef) null,
                 difficulty, worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo, enableRespawnScreen,
                 isDebug, isFlat, lastDeathPosition, portalCooldown);
-        this.dimensionTypeRef = dimensionType.asRef(this.serverVersion.toClientVersion());
+        this.dimensionTypeRef = dimensionType.asRef(this);
     }
 
     public WrapperPlayServerJoinGame(
@@ -151,7 +151,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo,
                 enableRespawnScreen, limitedCrafting, isDebug, isFlat, lastDeathPosition,
                 portalCooldown);
-        this.dimensionTypeRef = dimensionType.asRef(this.serverVersion.toClientVersion());
+        this.dimensionTypeRef = dimensionType.asRef(this);
     }
 
     public WrapperPlayServerJoinGame(
@@ -184,7 +184,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 difficulty, worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo,
                 enableRespawnScreen, limitedCrafting, isDebug, isFlat, lastDeathPosition,
                 portalCooldown, seaLevel, enforcesSecureChat);
-        this.dimensionTypeRef = dimensionType.asRef(this.serverVersion.toClientVersion());
+        this.dimensionTypeRef = dimensionType.asRef(this);
     }
 
     public WrapperPlayServerJoinGame(
@@ -548,13 +548,12 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     }
 
     public DimensionType getDimensionType() {
-        IRegistry<DimensionType> registry = this.getRegistryHolder().getRegistryOr(
-                DimensionTypes.getRegistry(), this.serverVersion.toClientVersion());
-        return this.dimensionTypeRef.resolve(registry, this.serverVersion.toClientVersion());
+        IRegistry<DimensionType> registry = this.replaceRegistry(DimensionTypes.getRegistry());
+        return this.dimensionTypeRef.resolve(registry, this);
     }
 
     public void setDimensionType(DimensionType dimensionType) {
-        this.dimensionTypeRef = dimensionType.asRef(this.serverVersion.toClientVersion());
+        this.dimensionTypeRef = dimensionType.asRef(this);
     }
 
     @Deprecated

@@ -19,12 +19,15 @@
 package com.github.retrooper.packetevents.protocol.world.biome;
 
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
+import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributeMap;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 
+@NullMarked
 public class StaticBiome extends AbstractMappedEntity implements Biome {
 
     private final boolean precipitation;
@@ -35,29 +38,24 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
     private final @Nullable Float depth;
     private final @Nullable Float scale;
     private final BiomeEffects effects;
+    /**
+     * @versions 1.21.11+
+     */
+    private final EnvironmentAttributeMap attributes;
+
+    public StaticBiome(
+            boolean precipitation, float temperature, TemperatureModifier temperatureModifier,
+            float downfall, BiomeEffects effects, EnvironmentAttributeMap attributes
+    ) {
+        this(null, precipitation, temperature, temperatureModifier, downfall,
+                null, null, null, effects, attributes);
+    }
 
     public StaticBiome(
             boolean precipitation, float temperature, TemperatureModifier temperatureModifier,
             float downfall, BiomeEffects effects
     ) {
-        this(null, precipitation, temperature, temperatureModifier, downfall, effects);
-    }
-
-    @ApiStatus.Internal
-    @ApiStatus.Obsolete
-    public StaticBiome(@Nullable TypesBuilderData data, Precipitation precipitation, float temperature,
-                       TemperatureModifier temperatureModifier, float downfall, BiomeEffects effects) {
-        this(data, precipitation != Precipitation.NONE, temperature, temperatureModifier, downfall, effects);
-    }
-
-    @ApiStatus.Internal
-    public StaticBiome(
-            @Nullable TypesBuilderData data, boolean precipitation,
-            float temperature, TemperatureModifier temperatureModifier,
-            float downfall, BiomeEffects effects
-    ) {
-        this(data, precipitation, temperature, temperatureModifier,
-                downfall, null, null, null, effects);
+        this(precipitation, temperature, temperatureModifier, downfall, effects, EnvironmentAttributeMap.EMPTY);
     }
 
     public StaticBiome(
@@ -66,16 +64,7 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
             @Nullable Float scale, BiomeEffects effects
     ) {
         this(null, precipitation, temperature, temperatureModifier, downfall,
-                category, depth, scale, effects);
-    }
-
-    @ApiStatus.Internal
-    @ApiStatus.Obsolete
-    public StaticBiome(@Nullable TypesBuilderData data, Precipitation precipitation, float temperature,
-                       TemperatureModifier temperatureModifier, float downfall, @Nullable Category category,
-                       @Nullable Float depth, @Nullable Float scale, BiomeEffects effects) {
-        this(data, precipitation != Precipitation.NONE, temperature, temperatureModifier,
-                downfall, category, depth, scale, effects);
+                category, depth, scale, effects, EnvironmentAttributeMap.EMPTY);
     }
 
     @ApiStatus.Internal
@@ -83,7 +72,7 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
             @Nullable TypesBuilderData data, boolean precipitation,
             float temperature, TemperatureModifier temperatureModifier,
             float downfall, @Nullable Category category, @Nullable Float depth,
-            @Nullable Float scale, BiomeEffects effects
+            @Nullable Float scale, BiomeEffects effects, EnvironmentAttributeMap attributes
     ) {
         super(data);
         this.precipitation = precipitation;
@@ -94,12 +83,13 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
         this.depth = depth;
         this.scale = scale;
         this.effects = effects;
+        this.attributes = attributes;
     }
 
     @Override
     public Biome copy(@Nullable TypesBuilderData newData) {
         return new StaticBiome(newData, this.precipitation, this.temperature, this.temperatureModifier,
-                this.downfall, this.category, this.depth, this.scale, this.effects);
+                this.downfall, this.category, this.depth, this.scale, this.effects, this.attributes);
     }
 
     @Override
@@ -158,6 +148,11 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
     }
 
     @Override
+    public EnvironmentAttributeMap getAttributes() {
+        return this.attributes;
+    }
+
+    @Override
     public boolean deepEquals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticBiome)) return false;
@@ -170,17 +165,18 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
         if (this.category != that.category) return false;
         if (!Objects.equals(this.depth, that.depth)) return false;
         if (!Objects.equals(this.scale, that.scale)) return false;
-        return this.effects.equals(that.effects);
+        if (!this.effects.equals(that.effects)) return false;
+        return this.attributes.equals(that.attributes);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.precipitation, this.temperature,
-                this.temperatureModifier, this.downfall, this.category, this.depth, this.scale, this.effects);
+        return Objects.hash(super.hashCode(), this.precipitation, this.temperature, this.temperatureModifier,
+                this.downfall, this.category, this.depth, this.scale, this.effects, this.attributes);
     }
 
     @Override
     public String toString() {
-        return "StaticBiome{precipitation=" + this.precipitation + ", temperature=" + this.temperature + ", temperatureModifier=" + this.temperatureModifier + ", downfall=" + this.downfall + ", category=" + this.category + ", depth=" + this.depth + ", scale=" + this.scale + ", effects=" + this.effects + '}';
+        return "StaticBiome{precipitation=" + this.precipitation + ", temperature=" + this.temperature + ", temperatureModifier=" + this.temperatureModifier + ", downfall=" + this.downfall + ", category=" + this.category + ", depth=" + this.depth + ", scale=" + this.scale + ", effects=" + this.effects + ", attributes=" + this.attributes + '}';
     }
 }

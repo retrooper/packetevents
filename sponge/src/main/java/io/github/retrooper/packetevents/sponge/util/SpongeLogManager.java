@@ -18,43 +18,39 @@
 
 package io.github.retrooper.packetevents.sponge.util;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.LogManager;
-import net.kyori.adventure.text.Component;
+import io.github.retrooper.packetevents.sponge.PacketEventsPlugin;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.plugin.PluginContainer;
 
+import java.util.Map;
 import java.util.logging.Level;
 
 public class SpongeLogManager extends LogManager {
 
-    private static final Component PREFIX = Component.text("[packetevents]", NamedTextColor.AQUA).append(Component.text(" ", NamedTextColor.WHITE));
+    private static final Map<java.util.logging.Level, org.apache.logging.log4j.Level> LEVEL_CONVERSION = Map.of(
+            java.util.logging.Level.FINEST, org.apache.logging.log4j.Level.TRACE,
+            java.util.logging.Level.FINER, org.apache.logging.log4j.Level.TRACE,
+            java.util.logging.Level.FINE, org.apache.logging.log4j.Level.DEBUG,
+            java.util.logging.Level.INFO, org.apache.logging.log4j.Level.INFO,
+            java.util.logging.Level.WARNING, org.apache.logging.log4j.Level.WARN,
+            java.util.logging.Level.SEVERE, org.apache.logging.log4j.Level.ERROR
+    );
+
+    private final Logger logger;
+    // If this is true, then the logger will not add the [packetevents] prefix
+    private final boolean isPacketEvents;
+
+    public SpongeLogManager(PluginContainer pluginContainer) {
+        this.logger = pluginContainer.logger();
+        this.isPacketEvents = pluginContainer.instance() instanceof PacketEventsPlugin;
+    }
 
     @Override
     protected void log(Level level, @Nullable NamedTextColor color, String message) {
-        Sponge.systemSubject().sendMessage(PREFIX.append(Component.text(message, color)));
-    }
-
-    @Override
-    public void info(String message) {
-        log(Level.INFO, NamedTextColor.WHITE, message);
-    }
-
-    @Override
-    public void warn(final String message) {
-        log(Level.WARNING, NamedTextColor.YELLOW, message);
-    }
-
-    @Override
-    public void severe(String message) {
-        log(Level.SEVERE, NamedTextColor.RED, message);
-    }
-
-    @Override
-    public void debug(String message) {
-        if (PacketEvents.getAPI().getSettings().isDebugEnabled()) {
-            log(Level.FINE, NamedTextColor.GRAY, message);
-        }
+        String plainMessage = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
+        logger.log(LEVEL_CONVERSION.getOrDefault(level, org.apache.logging.log4j.Level.INFO), isPacketEvents ? plainMessage : "[packetevents] " + plainMessage);
     }
 }

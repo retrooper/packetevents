@@ -18,10 +18,15 @@
 
 package com.github.retrooper.packetevents.protocol.util;
 
+import com.github.retrooper.packetevents.protocol.color.AlphaColor;
+import com.github.retrooper.packetevents.protocol.color.Color;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByteArray;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTDouble;
+import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.nbt.NBTIntArray;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
@@ -30,7 +35,11 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTLongArray;
 import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.Either;
 import com.github.retrooper.packetevents.util.UniqueIdUtil;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
@@ -45,10 +54,55 @@ import java.util.UUID;
 @ApiStatus.Experimental
 public final class NbtCodecs {
 
+    public static final NbtCodec<Integer> INT = new NbtCodec<Integer>() {
+        @Override
+        public Integer decode(NBT nbt, PacketWrapper<?> wrapper) {
+            return nbt.castOrThrow(NBTNumber.class).getAsInt();
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, Integer value) {
+            return new NBTInt(value);
+        }
+    };
+    public static final NbtCodec<Double> DOUBLE = new NbtCodec<Double>() {
+        @Override
+        public Double decode(NBT nbt, PacketWrapper<?> wrapper) {
+            return nbt.castOrThrow(NBTNumber.class).getAsDouble();
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, Double value) {
+            return new NBTDouble(value);
+        }
+    };
+    public static final NbtCodec<Float> FLOAT = new NbtCodec<Float>() {
+        @Override
+        public Float decode(NBT nbt, PacketWrapper<?> wrapper) {
+            return nbt.castOrThrow(NBTNumber.class).getAsFloat();
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, Float value) {
+            return new NBTFloat(value);
+        }
+    };
+    public static final NbtCodec<Boolean> BOOLEAN = new NbtCodec<Boolean>() {
+        @Override
+        public Boolean decode(NBT nbt, PacketWrapper<?> wrapper) {
+            return nbt.castOrThrow(NBTNumber.class).getAsByte() != 0;
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, Boolean value) {
+            return new NBTByte(value);
+        }
+    };
+
     public static final NbtCodec<String> STRING = new NbtCodec<String>() {
         @Override
         public String decode(NBT nbt, PacketWrapper<?> wrapper) {
-            return ((NBTString) nbt).getValue();
+            return nbt.castOrThrow(NBTString.class).getValue();
         }
 
         @Override
@@ -89,7 +143,7 @@ public final class NbtCodecs {
                 }
                 return list;
             }
-            throw new RuntimeException("Not a list: " + nbt);
+            throw new NbtCodecException("Not a list: " + nbt);
         }
 
         @Override
@@ -142,13 +196,10 @@ public final class NbtCodecs {
                 return ((NBTIntArray) nbt).getValue();
             }
             List<? extends NBT> list = GENERIC_LIST.decode(nbt, wrapper);
-            int[] array = new int[list.size()];
-            for (int i = 0; i < list.size(); i++) {
-                NBT tag = list.get(i);
-                if (!(tag instanceof NBTNumber)) {
-                    throw new RuntimeException("Some elements are not numbers: " + list);
-                }
-                array[i] = ((NBTNumber) tag).getAsInt();
+            int size = list.size();
+            int[] array = new int[size];
+            for (int i = 0; i < size; i++) {
+                array[i] = list.get(i).castOrThrow(NBTNumber.class).getAsInt();
             }
             return array;
         }
@@ -162,7 +213,96 @@ public final class NbtCodecs {
     public static final NbtCodec<UUID> UUID = INT_ARRAY
             .apply(UniqueIdUtil::fromIntArray, UniqueIdUtil::toIntArray);
 
+    public static final NbtCodec<Color> RGB_COLOR = new NbtCodec<Color>() {
+        @Override
+        public Color decode(NBT nbt, PacketWrapper<?> wrapper) {
+            if (nbt instanceof NBTString) {
+                String string = ((NBTString) nbt).getValue();
+                if (string.isEmpty() || string.charAt(0) != '#') {
+                    throw new NbtCodecException("Hex color must begin with #");
+                } else if (string.length() - 1 != 6) {
+                    throw new NbtCodecException("Hex color is wrong, expected 6 digits but got " + string);
+                }
+                try {
+                    String digits = string.substring(1);
+                    int rgb = Integer.parseInt(digits, 16);
+                    return new Color(rgb);
+                } catch (NumberFormatException exception) {
+                    throw new NbtCodecException(exception);
+                }
+            } else if (nbt instanceof NBTNumber) {
+                return new Color(((NBTNumber) nbt).getAsInt());
+            }
+            return Color.WHITE; // TODO vector, oh yeah!
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, Color value) {
+            return new NBTInt(value.asRGB());
+        }
+    };
+    public static final NbtCodec<AlphaColor> ARGB_COLOR = new NbtCodec<AlphaColor>() {
+        @Override
+        public AlphaColor decode(NBT nbt, PacketWrapper<?> wrapper) {
+            if (nbt instanceof NBTString) {
+                String string = ((NBTString) nbt).getValue();
+                if (string.isEmpty() || string.charAt(0) != '#') {
+                    throw new NbtCodecException("Hex color must begin with #");
+                } else if (string.length() - 1 != 8) {
+                    throw new NbtCodecException("Hex color is wrong, expected 8 digits but got " + string);
+                }
+                try {
+                    String digits = string.substring(1);
+                    int rgb = Integer.parseUnsignedInt(digits, 16);
+                    return new AlphaColor(rgb);
+                } catch (NumberFormatException exception) {
+                    throw new NbtCodecException(exception);
+                }
+            } else if (nbt instanceof NBTNumber) {
+                return new AlphaColor(((NBTNumber) nbt).getAsInt());
+            }
+            return AlphaColor.WHITE; // TODO vector, oh yeah!
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, AlphaColor value) {
+            return new NBTInt(value.asRGB());
+        }
+    };
+
+    public static final NbtCodec<NBT> NOOP = new NbtCodec<NBT>() {
+        @Override
+        public NBT decode(NBT nbt, PacketWrapper<?> wrapper) {
+            return nbt;
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, NBT value) {
+            return value;
+        }
+    };
+
+    private static final NbtCodec<?> ERROR_CODEC = new NbtCodec<Object>() {
+        @Override
+        public Object decode(NBT nbt, PacketWrapper<?> wrapper) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, Object value) {
+            throw new UnsupportedOperationException();
+        }
+    };
+
     private NbtCodecs() {
+    }
+
+    /**
+     * @return a codec which always throws {@link UnsupportedOperationException} when called
+     */
+    @SuppressWarnings("unchecked") // safe to cast, type isn't used
+    public static <T> NbtCodec<T> errorCodec() {
+        return (NbtCodec<T>) ERROR_CODEC;
     }
 
     public static <T extends Enum<T> & CodecNameable> NbtCodec<T> forEnum(T[] values) {
@@ -183,7 +323,7 @@ public final class NbtCodecs {
                 String key = ((NBTString) nbt).getValue();
                 T value = this.map.get(key);
                 if (value == null) {
-                    throw new RuntimeException("Can't find " + key + " in " + this.map.keySet());
+                    throw new NbtCodecException("Can't find " + key + " in " + this.map.keySet());
                 }
                 return value;
             }
@@ -191,6 +331,61 @@ public final class NbtCodecs {
             @Override
             public NBT encode(PacketWrapper<?> wrapper, T value) {
                 return new NBTString(value.getCodecName());
+            }
+        };
+    }
+
+    public static <T extends MappedEntity> NbtCodec<T> forRegistry(IRegistry<T> registry) {
+        return new NbtCodec<T>() {
+            @Override
+            public T decode(NBT nbt, PacketWrapper<?> wrapper) {
+                IRegistry<T> replacedRegistry = wrapper.replaceRegistry(registry);
+                T entry = null;
+                if (nbt instanceof NBTNumber) {
+                    ClientVersion version = wrapper.getServerVersion().toClientVersion();
+                    int id = ((NBTNumber) nbt).getAsInt();
+                    entry = replacedRegistry.getById(version, id);
+                } else if (nbt instanceof NBTString) {
+                    entry = replacedRegistry.getByName(((NBTString) nbt).getValue());
+                }
+                if (entry == null) {
+                    throw new NbtCodecException("Can't decode registry " + registry.getRegistryKey());
+                }
+                return entry;
+            }
+
+            @Override
+            public NBT encode(PacketWrapper<?> wrapper, T value) {
+                if (!value.isRegistered()) {
+                    throw new NbtCodecException("Unregistered entry");
+                }
+                return ResourceLocation.CODEC.encode(wrapper, value.getName());
+            }
+        };
+    }
+
+    public static <L, R> NbtCodec<Either<L, R>> either(NbtCodec<L> left, NbtCodec<R> right) {
+        return new NbtCodec<Either<L, R>>() {
+            @Override
+            public Either<L, R> decode(NBT nbt, PacketWrapper<?> wrapper) throws NbtCodecException {
+                try {
+                    return Either.createLeft(left.decode(nbt, wrapper));
+                } catch (NbtCodecException leftException) {
+                    try {
+                        return Either.createRight(right.decode(nbt, wrapper));
+                    } catch (NbtCodecException rightException) {
+                        rightException.addSuppressed(leftException);
+                        throw rightException;
+                    }
+                }
+            }
+
+            @Override
+            public NBT encode(PacketWrapper<?> wrapper, Either<L, R> value) throws NbtCodecException {
+                return value.map(
+                        v -> left.encode(wrapper, v),
+                        v -> right.encode(wrapper, v)
+                );
             }
         };
     }

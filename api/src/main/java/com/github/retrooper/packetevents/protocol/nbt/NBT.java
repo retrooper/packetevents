@@ -18,6 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.nbt;
 
+import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public abstract class NBT {
 
     public abstract NBTType<?> getType();
@@ -34,4 +38,12 @@ public abstract class NBT {
     }
 
     public abstract NBT copy();
+
+    @SuppressWarnings("unchecked")
+    public <T> T castOrThrow(Class<T> clazz) throws NbtCodecException {
+        if (clazz.isInstance(this)) {
+            return (T) this;
+        }
+        throw new NbtCodecException("expected: " + clazz.getName() + ", actual: " + this);
+    }
 }

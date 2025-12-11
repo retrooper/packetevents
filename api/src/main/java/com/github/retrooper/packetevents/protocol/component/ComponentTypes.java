@@ -45,6 +45,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.VillagerVari
 import com.github.retrooper.packetevents.protocol.component.builtin.WolfCollarComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.WolfSoundVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.WolfVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.ZombieNautilusVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ArmorTrim;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BannerLayers;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BundleContents;
@@ -54,6 +55,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.DebugSt
 import com.github.retrooper.packetevents.protocol.component.builtin.item.FireworkExplosion;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.FoodProperties;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAdventurePredicate;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAttackRange;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAttributeModifiers;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBees;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBlockStateProperties;
@@ -64,6 +66,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemCon
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemContainerLoot;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemCustomModelData;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDamageResistant;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDamageType;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDeathProtection;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDyeColor;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantable;
@@ -72,11 +75,14 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEqu
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemFireworks;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemInstrument;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemJukeboxPlayable;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemKineticWeapon;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLock;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMapDecorations;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMapPostProcessingState;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMinimumAttackCharge;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemModel;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPiercingWeapon;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPotionContents;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPotionDurationScale;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemProfile;
@@ -85,11 +91,13 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPro
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemRarity;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemRecipes;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemRepairable;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemSwingAnimation;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemTool;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemTooltipDisplay;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemTooltipStyle;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemUnbreakable;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemUseCooldown;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemUseEffects;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemUseRemainder;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemWeapon;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.LodestoneTracker;
@@ -479,6 +487,47 @@ public final class ComponentTypes {
      */
     public static final ComponentType<ShulkerColorComponent> SHULKER_COLOR = define("shulker/color",
             ShulkerColorComponent::read, ShulkerColorComponent::write);
+
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ComponentType<ItemUseEffects> USE_EFFECTS = define("use_effects",
+            ItemUseEffects::read, ItemUseEffects::write);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ComponentType<ItemMinimumAttackCharge> MINIMUM_ATTACK_CHARGE = define("minimum_attack_charge",
+            ItemMinimumAttackCharge::read, ItemMinimumAttackCharge::write);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ComponentType<ItemDamageType> DAMAGE_TYPE = define("damage_type",
+            ItemDamageType::read, ItemDamageType::write);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ComponentType<ItemAttackRange> ATTACK_RANGE = define("attack_range",
+            ItemAttackRange::read, ItemAttackRange::write);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ComponentType<ItemPiercingWeapon> PIERCING_WEAPON = define("piercing_weapon",
+            ItemPiercingWeapon::read, ItemPiercingWeapon::write);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ComponentType<ItemKineticWeapon> KINETIC_WEAPON = define("kinetic_weapon",
+            ItemKineticWeapon::read, ItemKineticWeapon::write);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ComponentType<ItemSwingAnimation> SWING_ANIMATION = define("swing_animation",
+            ItemSwingAnimation::read, ItemSwingAnimation::write);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ComponentType<ZombieNautilusVariantComponent> ZOMBIE_NAUTILUS_VARIANT = define("zombie_nautilus/variant",
+            ZombieNautilusVariantComponent::read, ZombieNautilusVariantComponent::write);
 
     /**
      * Returns an immutable view of the component types.

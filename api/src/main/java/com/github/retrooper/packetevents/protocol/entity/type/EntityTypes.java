@@ -406,6 +406,26 @@ public final class EntityTypes {
      * @versions 1.21.9+
      */
     public static final EntityType MANNEQUIN = define("mannequin", AVATAR);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final EntityType CAMEL_HUSK = define("camel_husk", CAMEL);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final EntityType ABSTRACT_NAUTILUS = define("abstract_nautilus", ABSTRACT_TAMEABLE_ANIMAL);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final EntityType NAUTILUS = define("nautilus", ABSTRACT_NAUTILUS);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final EntityType PARCHED = define("parched", ABSTRACT_SKELETON);
+    /**
+     * @versions 1.21.11+
+     */
+    public static final EntityType ZOMBIE_NAUTILUS = define("zombie_nautilus", ABSTRACT_NAUTILUS);
 
     /**
      * Returns an immutable view of the entity types.

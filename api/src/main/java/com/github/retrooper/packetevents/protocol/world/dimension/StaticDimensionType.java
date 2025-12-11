@@ -19,40 +19,111 @@
 package com.github.retrooper.packetevents.protocol.world.dimension;
 
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRefSet;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
+import com.github.retrooper.packetevents.protocol.mapper.ResolvableEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributeMap;
+import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributes;
+import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Timeline;
+import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Timelines;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.resources.TagKey;
+import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 import java.util.OptionalLong;
 
-public class StaticDimensionType extends AbstractMappedEntity implements DimensionType {
+@NullMarked
+public class StaticDimensionType extends AbstractMappedEntity implements DimensionType, ResolvableEntity {
 
-    private static final @Nullable Integer DEFAULT_CLOUD_HEIGHT = 192;
-
-    private final OptionalLong fixedTime;
-    private final boolean hasSkyLight;
-    private final boolean hasCeiling;
-    private final boolean ultraWarm;
+    /**
+     * @versions 1.21.11+
+     */
+    private final boolean hasFixedTime;
+    /**
+     * @versions 1.21.11+
+     */
+    private final Skybox skybox;
+    /**
+     * @versions 1.21.11+
+     */
+    private final CardinalLight cardinalLight;
+    /**
+     * @versions 1.21.11+
+     */
+    private final EnvironmentAttributeMap attributes;
+    /**
+     * @versions 1.21.11+
+     */
+    private final MappedEntityRefSet<Timeline> timelinesRef;
+    /**
+     * @versions 1.21.11+
+     */
+    private @Nullable MappedEntitySet<Timeline> timelines;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
+    private final @Nullable Long fixedTime;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     private final boolean natural;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
+    private final boolean bedWorks;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
+    private final boolean respawnAnchorWorks;
+    /**
+     * @versions 1.16.2-1.21.10
+     */
+    @ApiStatus.Obsolete
+    private final @Nullable ResourceLocation effects;
+    /**
+     * @versions 1.16.2+
+     */
     private final double coordinateScale;
-    private final boolean bedWorking;
-    private final boolean respawnAnchorWorking;
+    /**
+     * @versions 1.17+
+     */
     private final int minY;
+    /**
+     * @versions 1.17+
+     */
     private final int height;
-    private final int logicalHeight;
-    private final String infiniburnTag;
-    private final @Nullable ResourceLocation effectsLocation;
-    private final float ambientLight;
-    private final @Nullable Integer cloudHeight;
-    private final boolean piglinSafe;
-    private final boolean hasRaids;
-    private final @Nullable NBT monsterSpawnLightLevel;
+    /**
+     * @versions 1.19+
+     */
+    @ApiStatus.Experimental
+    private final NBT monsterSpawnLightLevel;
+    /**
+     * @versions 1.19+
+     */
     private final int monsterSpawnBlockLightLimit;
+    private final boolean hasSkylight;
+    private final boolean hasCeiling;
+    private final int logicalHeight;
+    private final TagKey infiniburn;
+    private final float ambientLight;
 
+    /**
+     * @deprecated use {@link DimensionTypeBuilder}
+     */
+    @Deprecated
     public StaticDimensionType(
             OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling,
             boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorking, boolean respawnAnchorWorking,
@@ -60,11 +131,15 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
             float ambientLight, boolean piglinSafe, boolean hasRaids, @Nullable NBT monsterSpawnLightLevel,
             int monsterSpawnBlockLightLimit
     ) {
-        this(null, fixedTime, hasSkyLight, hasCeiling, ultraWarm, natural, coordinateScale, bedWorking, respawnAnchorWorking,
-                minY, height, logicalHeight, infiniburnTag, effectsLocation, ambientLight,
-                DEFAULT_CLOUD_HEIGHT, piglinSafe, hasRaids, monsterSpawnLightLevel, monsterSpawnBlockLightLimit);
+        this(fixedTime, hasSkyLight, hasCeiling, ultraWarm, natural, coordinateScale, bedWorking, respawnAnchorWorking,
+                minY, height, logicalHeight, infiniburnTag, effectsLocation, ambientLight, 192,
+                piglinSafe, hasRaids, monsterSpawnLightLevel, monsterSpawnBlockLightLimit);
     }
 
+    /**
+     * @deprecated use {@link DimensionTypeBuilder}
+     */
+    @Deprecated
     public StaticDimensionType(
             OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling,
             boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorking, boolean respawnAnchorWorking,
@@ -72,52 +147,80 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
             float ambientLight, @Nullable Integer cloudHeight, boolean piglinSafe, boolean hasRaids,
             @Nullable NBT monsterSpawnLightLevel, int monsterSpawnBlockLightLimit
     ) {
-        this(null, fixedTime, hasSkyLight, hasCeiling, ultraWarm, natural, coordinateScale, bedWorking, respawnAnchorWorking,
-                minY, height, logicalHeight, infiniburnTag, effectsLocation, ambientLight, cloudHeight, piglinSafe, hasRaids,
-                monsterSpawnLightLevel, monsterSpawnBlockLightLimit);
+        this(null, fixedTime.isPresent(), Skybox.OVERWORLD, CardinalLight.DEFAULT, EnvironmentAttributeMap.create()
+                        .set(EnvironmentAttributes.GAMEPLAY_WATER_EVAPORATES, ultraWarm)
+                        .set(EnvironmentAttributes.VISUAL_CLOUD_HEIGHT, cloudHeight != null ? cloudHeight : 192f)
+                        .set(EnvironmentAttributes.GAMEPLAY_NETHER_PORTAL_SPAWNS_PIGLIN, !piglinSafe)
+                        .set(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, hasRaids)
+                        .copyImmutable(), MappedEntitySet.createEmpty(), fixedTime.isPresent() ? fixedTime.getAsLong() : null,
+                natural, bedWorking, respawnAnchorWorking, effectsLocation, coordinateScale, minY, height,
+                monsterSpawnLightLevel != null ? monsterSpawnLightLevel : new NBTInt(7),
+                monsterSpawnBlockLightLimit, hasSkyLight, hasCeiling, logicalHeight, TagKey.parse(infiniburnTag), ambientLight
+        );
     }
 
     @ApiStatus.Internal
     public StaticDimensionType(
-            @Nullable TypesBuilderData data, OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling,
-            boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorking, boolean respawnAnchorWorking,
-            int minY, int height, int logicalHeight, String infiniburnTag, @Nullable ResourceLocation effectsLocation,
-            float ambientLight, @Nullable Integer cloudHeight, boolean piglinSafe, boolean hasRaids,
-            @Nullable NBT monsterSpawnLightLevel, int monsterSpawnBlockLightLimit
+            @Nullable TypesBuilderData data, boolean hasFixedTime, Skybox skybox, CardinalLight cardinalLight,
+            EnvironmentAttributeMap attributes, MappedEntityRefSet<Timeline> timelinesRef, @Nullable Long fixedTime,
+            boolean natural, boolean bedWorks, boolean respawnAnchorWorks, @Nullable ResourceLocation effects,
+            double coordinateScale, int minY, int height, NBT monsterSpawnLightLevel, int monsterSpawnBlockLightLimit,
+            boolean hasSkylight, boolean hasCeiling, int logicalHeight, TagKey infiniburn, float ambientLight
     ) {
         super(data);
+        this.hasFixedTime = hasFixedTime;
+        this.skybox = skybox;
+        this.cardinalLight = cardinalLight;
+        this.attributes = attributes;
+        this.timelinesRef = timelinesRef;
         this.fixedTime = fixedTime;
-        this.hasSkyLight = hasSkyLight;
-        this.hasCeiling = hasCeiling;
-        this.ultraWarm = ultraWarm;
         this.natural = natural;
+        this.bedWorks = bedWorks;
+        this.respawnAnchorWorks = respawnAnchorWorks;
+        this.effects = effects;
         this.coordinateScale = coordinateScale;
-        this.bedWorking = bedWorking;
-        this.respawnAnchorWorking = respawnAnchorWorking;
         this.minY = minY;
         this.height = height;
-        this.logicalHeight = logicalHeight;
-        this.infiniburnTag = infiniburnTag;
-        this.effectsLocation = effectsLocation;
-        this.ambientLight = ambientLight;
-        this.cloudHeight = cloudHeight;
-        this.piglinSafe = piglinSafe;
-        this.hasRaids = hasRaids;
         this.monsterSpawnLightLevel = monsterSpawnLightLevel;
         this.monsterSpawnBlockLightLimit = monsterSpawnBlockLightLimit;
+        this.hasSkylight = hasSkylight;
+        this.hasCeiling = hasCeiling;
+        this.logicalHeight = logicalHeight;
+        this.infiniburn = infiniburn;
+        this.ambientLight = ambientLight;
+    }
+
+    @Override
+    public void doResolve(PacketWrapper<?> wrapper) {
+        IRegistry<Timeline> registry = wrapper.replaceRegistry(Timelines.getRegistry());
+        this.timelines = this.timelinesRef.resolve(wrapper, registry);
     }
 
     @Override
     public DimensionType copy(@Nullable TypesBuilderData newData) {
-        return new StaticDimensionType(newData, this.fixedTime, this.hasSkyLight, this.hasCeiling, this.ultraWarm,
-                this.natural, this.coordinateScale, this.bedWorking, this.respawnAnchorWorking, this.minY, this.height,
-                this.logicalHeight, this.infiniburnTag, this.effectsLocation, this.ambientLight, this.cloudHeight,
-                this.piglinSafe, this.hasRaids, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit);
+        return new StaticDimensionType(
+                this.data, this.hasFixedTime, this.skybox, this.cardinalLight, this.attributes, this.timelinesRef,
+                this.fixedTime, this.natural, this.bedWorks, this.respawnAnchorWorks, this.effects, this.coordinateScale,
+                this.minY, this.height, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit, this.hasSkylight,
+                this.hasCeiling, this.logicalHeight, this.infiniburn, this.ambientLight
+        );
+    }
+
+    @Override
+    public boolean hasFixedTime() {
+        return this.hasFixedTime;
     }
 
     @Override
     public OptionalLong getFixedTime() {
-        return this.fixedTime;
+        return this.fixedTime != null
+                ? OptionalLong.of(this.fixedTime)
+                : OptionalLong.empty();
+    }
+
+    @Override
+    public boolean hasSkyLight() {
+        return this.hasSkylight;
     }
 
     @Override
@@ -126,13 +229,8 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     }
 
     @Override
-    public boolean hasSkyLight() {
-        return this.hasSkyLight;
-    }
-
-    @Override
     public boolean isUltraWarm() {
-        return this.ultraWarm;
+        return this.attributes.getOrDefault(EnvironmentAttributes.GAMEPLAY_WATER_EVAPORATES);
     }
 
     @Override
@@ -147,37 +245,40 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
 
     @Override
     public boolean isBedWorking() {
-        return this.bedWorking;
+        return this.bedWorks;
     }
 
     @Override
     public boolean isRespawnAnchorWorking() {
-        return this.respawnAnchorWorking;
+        return this.respawnAnchorWorks;
     }
 
     @Override
-    public int getMinY(ClientVersion version) {
+    public int getMinY() {
         return this.minY;
     }
 
     @Override
-    public int getHeight(ClientVersion version) {
+    public int getHeight() {
         return this.height;
     }
 
     @Override
-    public int getLogicalHeight(ClientVersion version) {
+    public int getLogicalHeight() {
         return this.logicalHeight;
     }
 
     @Override
-    public String getInfiniburnTag() {
-        return this.infiniburnTag;
+    public TagKey getInfiniburn() {
+        return this.infiniburn;
     }
 
     @Override
-    public @Nullable ResourceLocation getEffectsLocation() {
-        return this.effectsLocation;
+    public ResourceLocation getEffectsLocation() {
+        if (this.effects == null) {
+            throw new UnsupportedOperationException();
+        }
+        return this.effects;
     }
 
     @Override
@@ -187,21 +288,21 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
 
     @Override
     public @Nullable Integer getCloudHeight() {
-        return this.cloudHeight;
+        return this.attributes.getOrDefault(EnvironmentAttributes.VISUAL_CLOUD_HEIGHT).intValue();
     }
 
     @Override
     public boolean isPiglinSafe() {
-        return this.piglinSafe;
+        return !this.attributes.getOrDefault(EnvironmentAttributes.GAMEPLAY_PIGLINS_ZOMBIFY);
     }
 
     @Override
     public boolean hasRaids() {
-        return this.hasRaids;
+        return this.attributes.getOrDefault(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID);
     }
 
     @Override
-    public @Nullable NBT getMonsterSpawnLightLevel() {
+    public NBT getMonsterSpawnLightLevel() {
         return this.monsterSpawnLightLevel;
     }
 
@@ -211,38 +312,62 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     }
 
     @Override
+    public Skybox getSkybox() {
+        return this.skybox;
+    }
+
+    @Override
+    public CardinalLight getCardinalLight() {
+        return this.cardinalLight;
+    }
+
+    @Override
+    public EnvironmentAttributeMap getAttributes() {
+        return this.attributes;
+    }
+
+    @Override
+    public MappedEntitySet<Timeline> getTimelines() {
+        if (this.timelines == null) {
+            throw new UnsupportedOperationException();
+        }
+        return this.timelines;
+    }
+
+    @Override
+    public MappedEntityRefSet<Timeline> getTimelinesRef() {
+        return this.timelinesRef;
+    }
+
+    @Override
     public boolean deepEquals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof StaticDimensionType)) return false;
+        if (obj == null || getClass() != obj.getClass()) return false;
         if (!super.equals(obj)) return false;
         StaticDimensionType that = (StaticDimensionType) obj;
-        if (this.hasSkyLight != that.hasSkyLight) return false;
-        if (this.hasCeiling != that.hasCeiling) return false;
-        if (this.ultraWarm != that.ultraWarm) return false;
+        if (this.hasFixedTime != that.hasFixedTime) return false;
         if (this.natural != that.natural) return false;
+        if (this.bedWorks != that.bedWorks) return false;
+        if (this.respawnAnchorWorks != that.respawnAnchorWorks) return false;
         if (Double.compare(that.coordinateScale, this.coordinateScale) != 0) return false;
-        if (this.bedWorking != that.bedWorking) return false;
-        if (this.respawnAnchorWorking != that.respawnAnchorWorking) return false;
         if (this.minY != that.minY) return false;
         if (this.height != that.height) return false;
+        if (this.monsterSpawnBlockLightLimit != that.monsterSpawnBlockLightLimit) return false;
+        if (this.hasSkylight != that.hasSkylight) return false;
+        if (this.hasCeiling != that.hasCeiling) return false;
         if (this.logicalHeight != that.logicalHeight) return false;
         if (Float.compare(that.ambientLight, this.ambientLight) != 0) return false;
-        if (this.piglinSafe != that.piglinSafe) return false;
-        if (this.hasRaids != that.hasRaids) return false;
-        if (this.monsterSpawnBlockLightLimit != that.monsterSpawnBlockLightLimit) return false;
-        if (!this.fixedTime.equals(that.fixedTime)) return false;
-        if (!this.infiniburnTag.equals(that.infiniburnTag)) return false;
-        if (!Objects.equals(this.effectsLocation, that.effectsLocation)) return false;
-        return Objects.equals(this.monsterSpawnLightLevel, that.monsterSpawnLightLevel);
+        if (this.skybox != that.skybox) return false;
+        if (this.cardinalLight != that.cardinalLight) return false;
+        if (!this.attributes.equals(that.attributes)) return false;
+        if (!this.timelinesRef.equals(that.timelinesRef)) return false;
+        if (!Objects.equals(this.fixedTime, that.fixedTime)) return false;
+        if (!Objects.equals(this.effects, that.effects)) return false;
+        if (!this.monsterSpawnLightLevel.equals(that.monsterSpawnLightLevel)) return false;
+        return this.infiniburn.equals(that.infiniburn);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.fixedTime, this.hasSkyLight, this.hasCeiling, this.ultraWarm, this.natural, this.coordinateScale, this.bedWorking, this.respawnAnchorWorking, this.minY, this.height, this.logicalHeight, this.infiniburnTag, this.effectsLocation, this.ambientLight, this.piglinSafe, this.hasRaids, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit);
-    }
-
-    @Override
-    public String toString() {
-        return "StaticDimensionType{fixedTime=" + this.fixedTime + ", hasSkyLight=" + this.hasSkyLight + ", hasCeiling=" + this.hasCeiling + ", ultraWarm=" + this.ultraWarm + ", natural=" + this.natural + ", coordinateScale=" + this.coordinateScale + ", bedWorking=" + this.bedWorking + ", respawnAnchorWorking=" + this.respawnAnchorWorking + ", minY=" + this.minY + ", height=" + this.height + ", logicalHeight=" + this.logicalHeight + ", infiniburnTag='" + this.infiniburnTag + '\'' + ", effectsLocation=" + this.effectsLocation + ", ambientLight=" + this.ambientLight + ", piglinSafe=" + this.piglinSafe + ", hasRaids=" + this.hasRaids + ", monsterSpawnLightLevel=" + this.monsterSpawnLightLevel + ", monsterSpawnBlockLightLimit=" + this.monsterSpawnBlockLightLimit + '}';
+        return Objects.hash(super.hashCode(), this.hasFixedTime, this.skybox, this.cardinalLight, this.attributes, this.timelinesRef, this.fixedTime, this.natural, this.bedWorks, this.respawnAnchorWorks, this.effects, this.coordinateScale, this.minY, this.height, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit, this.hasSkylight, this.hasCeiling, this.logicalHeight, this.infiniburn, this.ambientLight);
     }
 }

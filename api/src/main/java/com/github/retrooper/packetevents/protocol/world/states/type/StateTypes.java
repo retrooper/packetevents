@@ -1497,7 +1497,7 @@ public final class StateTypes {
         MaterialType materialType;
 
         public Builder name(String name) {
-            this.name = new ResourceLocation(name);
+            this.name = new ResourceLocation(name.toLowerCase(Locale.ROOT));
             return this;
         }
 
@@ -1542,8 +1542,7 @@ public final class StateTypes {
         }
 
         public StateType build() {
-            String definedName = this.name.getKey().toLowerCase(Locale.ROOT);
-            return REGISTRY.define(definedName, data -> new StateType(
+            return REGISTRY.define(name.getKey(), data -> new StateType(
                     data, this.blastResistance, this.hardness, this.isSolid, this.isBlocking, this.isAir,
                     this.requiresCorrectTool, this.isShapeExceedsCube, this.materialType
             ).getMapped()).getStateType();

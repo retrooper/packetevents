@@ -25,7 +25,7 @@ import org.jspecify.annotations.NullMarked;
 @ApiStatus.NonExtendable
 public interface NBTLimiter {
 
-    int DEFAULT_MAX_SIZE = Integer.getInteger("packetevents.nbt.default-max-size", 1 << 20); // 2MiB
+    int DEFAULT_MAX_SIZE = Integer.getInteger("packetevents.nbt.default-max-size", 2 << 20); // 2MiB
     int DEFAULT_MAX_DEPTH = Integer.getInteger("packetevents.nbt.default-max-depth", 512);
 
     static NBTLimiter noop() {

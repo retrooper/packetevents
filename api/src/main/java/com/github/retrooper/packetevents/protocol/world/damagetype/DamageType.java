@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -43,6 +44,14 @@ public interface DamageType extends MappedEntity, CopyableEntity<DamageType>, De
     DamageEffects getEffects();
 
     DeathMessageType getDeathMessageType();
+
+    static DamageType read(PacketWrapper<?> wrapper) {
+        return wrapper.readMappedEntity(DamageTypes.getRegistry());
+    }
+
+    static void write(PacketWrapper<?> wrapper, DamageType damageType) {
+        wrapper.writeMappedEntity(damageType);
+    }
 
     static DamageType decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;

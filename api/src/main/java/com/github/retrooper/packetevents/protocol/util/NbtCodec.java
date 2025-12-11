@@ -23,11 +23,48 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @NullMarked
 public interface NbtCodec<T> extends NbtEncoder<T>, NbtDecoder<T> {
+
+    static <T> NbtCodec<T> codec(NbtEncoder<T> encoder, NbtDecoder<T> decoder) {
+        return new NbtCodec<T>() {
+            @Override
+            public T decode(NBT nbt, PacketWrapper<?> wrapper) {
+                return decoder.decode(nbt, wrapper);
+            }
+
+            @Override
+            public NBT encode(PacketWrapper<?> wrapper, T value) {
+                return encoder.encode(wrapper, value);
+            }
+        };
+    }
+
+    default NbtCodec<T> validate(Predicate<T> predicate) {
+        return new NbtCodec<T>() {
+            @Override
+            public T decode(NBT nbt, PacketWrapper<?> wrapper) throws NbtCodecException {
+                T val = NbtCodec.this.decode(nbt, wrapper);
+                if (!predicate.test(val)) {
+                    throw new NbtCodecException("Decode predicate failed " + predicate);
+                }
+                return val;
+            }
+
+            @Override
+            public NBT encode(PacketWrapper<?> wrapper, T value) throws NbtCodecException {
+                if (!predicate.test(value)) {
+                    throw new NbtCodecException("Encode predicate failed " + predicate);
+                }
+                return NbtCodec.this.encode(wrapper, value);
+            }
+        };
+    }
 
     default <Z> NbtCodec<Z> apply(Function<T, Z> forward, Function<Z, T> back) {
         return new NbtCodec<Z>() {
@@ -46,13 +83,24 @@ public interface NbtCodec<T> extends NbtEncoder<T>, NbtDecoder<T> {
     default NbtCodec<List<T>> applyList() {
         return new NbtCodec<List<T>>() {
             @Override
-            public List<T> decode(NBT nbt, PacketWrapper<?> wrapper) {
-                List<? extends NBT> list = NbtCodecs.GENERIC_LIST.decode(nbt, wrapper);
-                List<T> ret = new ArrayList<>(list.size());
-                for (NBT tag : list) {
-                    ret.add(NbtCodec.this.decode(tag, wrapper));
+            public List<T> decode(NBT nbt, PacketWrapper<?> wrapper) throws NbtCodecException {
+                try {
+                    List<? extends NBT> list = NbtCodecs.GENERIC_LIST.decode(nbt, wrapper);
+                    List<T> ret = new ArrayList<>(list.size());
+                    for (NBT tag : list) {
+                        ret.add(NbtCodec.this.decode(tag, wrapper));
+                    }
+                    return ret;
+                } catch (NbtCodecException leftException) {
+                    try {
+                        // fallback to compact list codec
+                        T element = NbtCodec.this.decode(nbt, wrapper);
+                        return Collections.singletonList(element);
+                    } catch (NbtCodecException rightException) {
+                        leftException.addSuppressed(rightException);
+                        throw leftException;
+                    }
                 }
-                return ret;
             }
 
             @Override

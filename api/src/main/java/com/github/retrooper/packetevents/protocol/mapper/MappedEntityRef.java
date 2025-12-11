@@ -106,7 +106,7 @@ public interface MappedEntityRef<T extends MappedEntity> extends Supplier<T> {
                         }
                         // replace registry and lookup entity
                         IRegistry<T> registry = registryHolder.getRegistryOr(this.registry, this.version);
-                        entity = registry.getByNameOrThrow(this.name);
+                        entity = registry.getByNameOrThrow(this.version, this.name);
                         this.entity = entity;
                     }
                 }

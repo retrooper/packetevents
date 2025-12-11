@@ -1852,6 +1852,74 @@ public final class ItemTypes {
      * @versions 1.21.9+
      */
     public static final ItemType WAXED_OXIDIZED_COPPER_GOLEM_STATUE = builder("waxed_oxidized_copper_golem_statue").setMaxAmount(64).setPlacedType(StateTypes.WAXED_OXIDIZED_COPPER_GOLEM_STATUE).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType NAUTILUS_SPAWN_EGG = builder("nautilus_spawn_egg").setMaxAmount(64).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType CAMEL_HUSK_SPAWN_EGG = builder("camel_husk_spawn_egg").setMaxAmount(64).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType PARCHED_SPAWN_EGG = builder("parched_spawn_egg").setMaxAmount(64).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType ZOMBIE_NAUTILUS_SPAWN_EGG = builder("zombie_nautilus_spawn_egg").setMaxAmount(64).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType NETHERITE_HORSE_ARMOR = builder("netherite_horse_armor").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT, ItemAttribute.NETHERITE_TIER).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType WOODEN_SPEAR = builder("wooden_spear").setMaxAmount(1).setMaxDurability(59).setAttributes(ItemAttribute.WOOD_TIER, ItemAttribute.FUEL).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType STONE_SPEAR = builder("stone_spear").setMaxAmount(1).setMaxDurability(131).setAttributes(ItemAttribute.STONE_TIER).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType COPPER_SPEAR = builder("copper_spear").setMaxAmount(1).setMaxDurability(190).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType IRON_SPEAR = builder("iron_spear").setMaxAmount(1).setMaxDurability(250).setAttributes(ItemAttribute.IRON_TIER).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType GOLDEN_SPEAR = builder("golden_spear").setMaxAmount(1).setMaxDurability(32).setAttributes(ItemAttribute.GOLD_TIER).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType DIAMOND_SPEAR = builder("diamond_spear").setMaxAmount(1).setMaxDurability(1561).setAttributes(ItemAttribute.DIAMOND_TIER).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType NETHERITE_SPEAR = builder("netherite_spear").setMaxAmount(1).setMaxDurability(2031).setAttributes(ItemAttribute.FIRE_RESISTANT, ItemAttribute.NETHERITE_TIER).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType IRON_NAUTILUS_ARMOR = builder("iron_nautilus_armor").setMaxAmount(1).setAttributes(ItemAttribute.IRON_TIER).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType GOLDEN_NAUTILUS_ARMOR = builder("golden_nautilus_armor").setMaxAmount(1).setAttributes(ItemAttribute.GOLD_TIER).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType DIAMOND_NAUTILUS_ARMOR = builder("diamond_nautilus_armor").setMaxAmount(1).setAttributes(ItemAttribute.DIAMOND_TIER).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType NETHERITE_NAUTILUS_ARMOR = builder("netherite_nautilus_armor").setMaxAmount(1).setAttributes(ItemAttribute.FIRE_RESISTANT, ItemAttribute.NETHERITE_TIER).build();
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemType COPPER_NAUTILUS_ARMOR = builder("copper_nautilus_armor").setMaxAmount(1).build();
 
     /**
      * @deprecated Burning furnace shows up as a missing texture, removed in 1.9
@@ -1985,7 +2053,7 @@ public final class ItemTypes {
         ClientVersion[] versions = new ClientVersion[]{
                 ClientVersion.V_1_20_5, ClientVersion.V_1_21, ClientVersion.V_1_21_2,
                 ClientVersion.V_1_21_4, ClientVersion.V_1_21_5, ClientVersion.V_1_21_6,
-                ClientVersion.V_1_21_7, ClientVersion.V_1_21_9,
+                ClientVersion.V_1_21_7, ClientVersion.V_1_21_9, ClientVersion.V_1_21_11,
         };
         for (ClientVersion version : versions) {
             parseAllComponents(version);

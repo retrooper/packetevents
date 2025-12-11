@@ -22,7 +22,9 @@ import com.github.retrooper.packetevents.protocol.entity.cow.CowVariant.ModelTyp
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public final class CowVariants {
 
     private static final VersionedRegistry<CowVariant> REGISTRY =

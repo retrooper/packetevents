@@ -26,11 +26,20 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
+@ApiStatus.NonExtendable
 public interface DimensionTypeRef {
 
-    DimensionType resolve(IRegistry<DimensionType> registry, ClientVersion version);
+    @Deprecated
+    default DimensionType resolve(IRegistry<DimensionType> registry, ClientVersion version) {
+        return this.resolve(registry, PacketWrapper.createDummyWrapper(version));
+    }
+
+    DimensionType resolve(IRegistry<DimensionType> registry, PacketWrapper<?> wrapper);
 
     default ResourceLocation getName() {
         throw new UnsupportedOperationException();
@@ -85,18 +94,23 @@ public interface DimensionTypeRef {
     final class DirectRef implements DimensionTypeRef {
 
         private final DimensionType dimensionType;
-        private final ClientVersion version;
+        private final PacketWrapper<?> wrapper;
 
+        @Deprecated
         public DirectRef(DimensionType dimensionType, ClientVersion version) {
+            this(dimensionType, PacketWrapper.createDummyWrapper(version));
+        }
+
+        public DirectRef(DimensionType dimensionType, PacketWrapper<?> wrapper) {
             this.dimensionType = dimensionType;
-            this.version = version;
+            this.wrapper = wrapper;
         }
 
         @Override
-        public DimensionType resolve(IRegistry<DimensionType> registry, ClientVersion version) {
-            if (this.version != version) {
-                throw new IllegalArgumentException("Expected version " + this.version + ", received " + version
-                        + " for direct dimension type ref " + this.dimensionType);
+        public DimensionType resolve(IRegistry<DimensionType> registry, PacketWrapper<?> wrapper) {
+            if (wrapper.getServerVersion() != this.wrapper.getServerVersion()) {
+                throw new IllegalArgumentException("Expected version " + this.wrapper.getServerVersion()
+                        + ", received " + wrapper.getServerVersion() + " for direct dimension type ref " + this.dimensionType);
             }
             return this.dimensionType;
         }
@@ -108,12 +122,12 @@ public interface DimensionTypeRef {
 
         @Override
         public int getId() {
-            return this.dimensionType.getId(this.version);
+            return this.dimensionType.getId(this.getVersion());
         }
 
         @Override
         public NBT getData() {
-            return DimensionType.encode(this.dimensionType, this.version);
+            return DimensionType.CODEC.encode(this.wrapper, this.dimensionType);
         }
 
         public DimensionType getDimensionType() {
@@ -121,7 +135,7 @@ public interface DimensionTypeRef {
         }
 
         public ClientVersion getVersion() {
-            return this.version;
+            return this.wrapper.getServerVersion().toClientVersion();
         }
     }
 
@@ -134,8 +148,9 @@ public interface DimensionTypeRef {
         }
 
         @Override
-        public DimensionType resolve(IRegistry<DimensionType> registry, ClientVersion version) {
-            return registry.getByName(this.name);
+        public DimensionType resolve(IRegistry<DimensionType> registry, PacketWrapper<?> wrapper) {
+            ClientVersion version = wrapper.getServerVersion().toClientVersion();
+            return registry.getByNameOrThrow(version, this.name);
         }
 
         @Override
@@ -153,8 +168,9 @@ public interface DimensionTypeRef {
         }
 
         @Override
-        public DimensionType resolve(IRegistry<DimensionType> registry, ClientVersion version) {
-            return registry.getById(version, this.id);
+        public DimensionType resolve(IRegistry<DimensionType> registry, PacketWrapper<?> wrapper) {
+            ClientVersion version = wrapper.getServerVersion().toClientVersion();
+            return registry.getByIdOrThrow(version, this.id);
         }
 
         @Override
@@ -172,7 +188,7 @@ public interface DimensionTypeRef {
         }
 
         @Override
-        public DimensionType resolve(IRegistry<DimensionType> registry, ClientVersion version) {
+        public DimensionType resolve(IRegistry<DimensionType> registry, PacketWrapper<?> wrapper) {
             // workaround to make DimensionType#getId work
             //
             // some 1.16 versions don't send any info about the registry id or name
@@ -187,7 +203,7 @@ public interface DimensionTypeRef {
                     return dimensionType;
                 }
             }
-            return DimensionType.decode(this.data, version, null);
+            return DimensionType.CODEC.decode(this.data, wrapper);
         }
 
         public @Nullable ResourceLocation getNullableName() {

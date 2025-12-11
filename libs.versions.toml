@@ -11,7 +11,7 @@ bungeecord = "1.21-R0.1"
 velocity = "3.4.0-SNAPSHOT"
 fabric-loom = "1.11.8"
 spongeGradle = "2.3.0"
-classgraph = "4.8.179"
+classgraph = "4.8.184"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }

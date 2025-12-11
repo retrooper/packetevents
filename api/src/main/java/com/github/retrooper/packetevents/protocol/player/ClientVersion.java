@@ -80,6 +80,9 @@ public enum ClientVersion {
     V_1_18_2(758),
 
     V_1_19(759),
+    /**
+    * 1.19.1 and 1.19.2 have the same protocol version.
+    */
     V_1_19_1(760),
     V_1_19_3(761),
     V_1_19_4(762),
@@ -116,13 +119,14 @@ public enum ClientVersion {
      * 1.21.9 and 1.21.10 have the same protocol version.
      */
     V_1_21_9(773),
+    V_1_21_11(774),
     //TODO UPDATE Add new protocol version field
 
     @Deprecated
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_2.protocolVersion - 1, true),
     //TODO UPDATE Update HIGHER_THAN_SUPPORTED_VERSIONS field
     @Deprecated
-    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_21_9.protocolVersion + 1, true),
+    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_21_11.protocolVersion + 1, true),
 
     UNKNOWN(-1, true);
 

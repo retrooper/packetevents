@@ -113,6 +113,12 @@ public final class EnchantEffectComponentTypes {
     public static ComponentType<NBT> TRIDENT_SPIN_ATTACK_STRENGTH = define("trident_spin_attack_strength",
             (nbt, version) -> nbt, (val, version) -> val);
 
+    /**
+     * @versions 1.21.11+
+     */
+    public static ComponentType<NBT> POST_PIERCING_ATTACK = define("post_piercing_attack",
+            (nbt, version) -> nbt, (val, version) -> val);
+
     static {
         REGISTRY.unloadMappings();
     }

@@ -2,6 +2,7 @@ import com.github.retrooper.compression.strategy.dir.JsonBase64DataDirStrategy
 import com.github.retrooper.compression.strategy.dir.JsonRegistryCompressionDirStrategy
 import com.github.retrooper.compression.strategy.dir.JsonToNbtDirStrategy
 import com.github.retrooper.excludeAdventure
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     packetevents.`shadow-conventions`
@@ -86,6 +87,9 @@ tasks {
 
     test {
         useJUnitPlatform()
+        testLogging {
+            exceptionFormat = TestExceptionFormat.FULL
+        }
     }
 
     shadowJar {

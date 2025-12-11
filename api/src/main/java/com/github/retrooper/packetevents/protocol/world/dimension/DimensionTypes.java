@@ -18,107 +18,273 @@
 
 package com.github.retrooper.packetevents.protocol.world.dimension;
 
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.color.AlphaColor;
+import com.github.retrooper.packetevents.protocol.color.Color;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.particle.Particle;
+import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.sound.Sounds;
+import com.github.retrooper.packetevents.protocol.world.attributes.AmbientSounds;
+import com.github.retrooper.packetevents.protocol.world.attributes.BackgroundMusic;
+import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributes;
+import com.github.retrooper.packetevents.protocol.world.biome.BiomeEffects.MoodSettings;
+import com.github.retrooper.packetevents.protocol.world.biome.BiomeEffects.MusicSettings;
+import com.github.retrooper.packetevents.protocol.world.states.defaulttags.BlockTags;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.VersionRange;
+import com.github.retrooper.packetevents.util.adventure.AdventureNbtUtil;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.util.Ticks;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
-import java.util.OptionalLong;
+import java.util.Collections;
+import java.util.function.Consumer;
 
 @NullMarked
 public final class DimensionTypes {
 
-    private static final VersionedRegistry<DimensionType> REGISTRY = new VersionedRegistry<>("dimension_type");
+    private static final VersionedRegistry<DimensionType> REGISTRY = new VersionedRegistry<>(
+            "dimension_type", ClientVersion.V_1_18);
 
     private DimensionTypes() {
+    }
+
+    @ApiStatus.Internal
+    public static DimensionType define(String name, Consumer<DimensionTypeBuilder> builder) {
+        return define(name, VersionRange.ALL_VERSIONS, builder);
+    }
+
+    @ApiStatus.Internal
+    public static DimensionType define(String name, VersionRange range, Consumer<DimensionTypeBuilder> builder) {
+        return REGISTRY.define(name, range, data -> {
+            DimensionTypeBuilder dimBuilder = DimensionTypeBuilder.dimensionTypeBuilder();
+            builder.accept(dimBuilder); // fill with data
+            return dimBuilder.build(data);
+        });
     }
 
     public static VersionedRegistry<DimensionType> getRegistry() {
         return REGISTRY;
     }
 
-    private static final int PRE118_MIN_Y = 0, PRE118_HEIGHT = 256 - PRE118_MIN_Y;
-    private static final int POST118_MIN_Y = -64, POST118_HEIGHT = 256 + 64 - POST118_MIN_Y;
+    /**
+     * @versions -1.17.2
+     */
+    @ApiStatus.Obsolete
+    public static final DimensionType OVERWORLD_PRE_1_18 = define("overworld", new VersionRange(null, ClientVersion.V_1_17_1),
+            builder -> builder
+                    .setCoordinateScale(1d)
+                    .setMinY(0).setHeight(256).setLogicalHeight(256)
+                    .setInfiniburn(BlockTags.INFINIBURN_OVERWORLD.getKey())
+                    .setHasCeiling(false).setHasSkylight(true).setAmbientLight(0f)
+                    .setNatural(true).setRespawnAnchorWorks(false).setBedWorks(true)
+                    .setEffects(new ResourceLocation("overworld"))
+                    .setAttribute(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, true)
+    );
+    /**
+     * @versions 1.18+
+     */
+    public static final DimensionType OVERWORLD = define("overworld", new VersionRange(ClientVersion.V_1_18, null),
+            builder -> builder
+                    // .setTimelines(new MappedEntityRef.Named<>()) TODO how?
+                    .setMonsterSpawnLightLevel(AdventureNbtUtil.fromAdventure(
+                            CompoundBinaryTag.builder()
+                                    .putString("type", new ResourceLocation("uniform").toString())
+                                    .putInt("min_inclusive", 0)
+                                    .putInt("max_inclusive", 7)
+                                    // legacy formatting
+                                    .put("value", CompoundBinaryTag.builder()
+                                            .putInt("min_inclusive", 0)
+                                            .putInt("max_inclusive", 7)
+                                            .build())
+                                    .build()
+                    ))
+                    .setMonsterSpawnBlockLightLimit(0)
+                    .setCoordinateScale(1d)
+                    .setMinY(-64).setHeight(384).setLogicalHeight(384)
+                    .setInfiniburn(BlockTags.INFINIBURN_OVERWORLD.getKey())
+                    .setHasCeiling(false).setHasSkylight(true).setAmbientLight(0f)
+                    .setAttribute(EnvironmentAttributes.AUDIO_BACKGROUND_MUSIC,
+                            new BackgroundMusic(
+                                    new MusicSettings(
+                                            Sounds.MUSIC_GAME,
+                                            10 * 60 * Ticks.TICKS_PER_SECOND,
+                                            20 * 60 * Ticks.TICKS_PER_SECOND,
+                                            false
+                                    ),
+                                    new MusicSettings(
+                                            Sounds.MUSIC_CREATIVE,
+                                            10 * 60 * Ticks.TICKS_PER_SECOND,
+                                            20 * 60 * Ticks.TICKS_PER_SECOND,
+                                            false
+                                    ),
+                                    null
+                            ))
+                    .setAttribute(EnvironmentAttributes.AUDIO_AMBIENT_SOUNDS, new AmbientSounds(
+                            null,
+                            new MoodSettings(
+                                    Sounds.AMBIENT_CAVE,
+                                    5 * 60 * Ticks.TICKS_PER_SECOND,
+                                    8,
+                                    2d
+                            ),
+                            Collections.emptyList()
+                    ))
+                    .setAttribute(EnvironmentAttributes.VISUAL_CLOUD_HEIGHT, 192.33f)
+                    .setAttribute(EnvironmentAttributes.VISUAL_CLOUD_COLOR, new AlphaColor(0xCCFFFFFF))
+                    .setAttribute(EnvironmentAttributes.VISUAL_FOG_COLOR, new Color(0xC0D8FF))
+                    .setAttribute(EnvironmentAttributes.VISUAL_SKY_COLOR, new Color(0x78A7FF))
+                    // pre 1.21.11 properties
+                    .setNatural(true).setRespawnAnchorWorks(false).setBedWorks(true)
+                    .setEffects(new ResourceLocation("overworld"))
+                    .setAttribute(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, true)
+    );
 
-    public static final DimensionType OVERWORLD = REGISTRY.define("overworld", data -> {
-        NBTCompound monsterSpawnLightLevel = new NBTCompound();
-        monsterSpawnLightLevel.setTag("type", new NBTString("minecraft:uniform"));
-        monsterSpawnLightLevel.setTag("min_inclusive", new NBTInt(0));
-        monsterSpawnLightLevel.setTag("max_inclusive", new NBTInt(7));
+    /**
+     * @versions -1.17.2
+     */
+    @ApiStatus.Obsolete
+    public static final DimensionType OVERWORLD_CAVES_PRE_1_18 = define("overworld_caves", new VersionRange(null, ClientVersion.V_1_17_1),
+            builder -> builder
+                    .setCoordinateScale(1d)
+                    .setMinY(0).setHeight(256).setLogicalHeight(256)
+                    .setInfiniburn(BlockTags.INFINIBURN_OVERWORLD.getKey())
+                    .setHasCeiling(true).setHasSkylight(true).setAmbientLight(0f)
+                    .setNatural(true).setRespawnAnchorWorks(false).setBedWorks(true)
+                    .setEffects(new ResourceLocation("overworld"))
+                    .setAttribute(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, true)
+    );
+    /**
+     * @versions 1.18+
+     */
+    public static final DimensionType OVERWORLD_CAVES = define("overworld_caves", new VersionRange(ClientVersion.V_1_18, null),
+            builder -> builder
+                    // .setTimelines(new MappedEntityRef.Named<>()) TODO how?
+                    .setMonsterSpawnLightLevel(AdventureNbtUtil.fromAdventure(
+                            CompoundBinaryTag.builder()
+                                    .putString("type", new ResourceLocation("uniform").toString())
+                                    .putInt("min_inclusive", 0)
+                                    .putInt("max_inclusive", 7)
+                                    // legacy formatting
+                                    .put("value", CompoundBinaryTag.builder()
+                                            .putInt("min_inclusive", 0)
+                                            .putInt("max_inclusive", 7)
+                                            .build())
+                                    .build()
+                    ))
+                    .setMonsterSpawnBlockLightLimit(0)
+                    .setCoordinateScale(1d)
+                    .setMinY(-64).setHeight(384).setLogicalHeight(384)
+                    .setInfiniburn(BlockTags.INFINIBURN_OVERWORLD.getKey())
+                    .setHasCeiling(true).setHasSkylight(true).setAmbientLight(0f)
+                    .setAttribute(EnvironmentAttributes.AUDIO_BACKGROUND_MUSIC,
+                            new BackgroundMusic(
+                                    new MusicSettings(
+                                            Sounds.MUSIC_GAME,
+                                            10 * 60 * Ticks.TICKS_PER_SECOND,
+                                            20 * 60 * Ticks.TICKS_PER_SECOND,
+                                            false
+                                    ),
+                                    new MusicSettings(
+                                            Sounds.MUSIC_CREATIVE,
+                                            10 * 60 * Ticks.TICKS_PER_SECOND,
+                                            20 * 60 * Ticks.TICKS_PER_SECOND,
+                                            false
+                                    ),
+                                    null
+                            ))
+                    .setAttribute(EnvironmentAttributes.AUDIO_AMBIENT_SOUNDS, new AmbientSounds(
+                            null,
+                            new MoodSettings(
+                                    Sounds.AMBIENT_CAVE,
+                                    5 * 60 * Ticks.TICKS_PER_SECOND,
+                                    8,
+                                    2d
+                            ),
+                            Collections.emptyList()
+                    ))
+                    .setAttribute(EnvironmentAttributes.VISUAL_CLOUD_HEIGHT, 192.33f)
+                    .setAttribute(EnvironmentAttributes.VISUAL_CLOUD_COLOR, new AlphaColor(0xCCFFFFFF))
+                    .setAttribute(EnvironmentAttributes.VISUAL_FOG_COLOR, new Color(0xC0D8FF))
+                    .setAttribute(EnvironmentAttributes.VISUAL_SKY_COLOR, new Color(0x78A7FF))
+                    // pre 1.21.11 properties
+                    .setNatural(true).setRespawnAnchorWorks(false).setBedWorks(true)
+                    .setEffects(new ResourceLocation("overworld"))
+                    .setAttribute(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, true)
+    );
 
-        return new StaticDimensionType(data, OptionalLong.empty(), true, false,
-                false, true, 1d, true, false,
-                POST118_MIN_Y, POST118_HEIGHT, POST118_HEIGHT, "#minecraft:infiniburn_overworld",
-                ResourceLocation.minecraft("overworld"), 0f, 192, false,
-                true, monsterSpawnLightLevel, 0) {
-            @Override
-            public int getMinY(ClientVersion version) {
-                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_MIN_Y : PRE118_MIN_Y;
-            }
+    public static final DimensionType THE_END = define("the_end",
+            builder -> builder
+                    // .setTimelines(new MappedEntityRef.Named<>()) TODO how?
+                    .setHasFixedTime(true)
+                    .setMonsterSpawnBlockLightLimit(0)
+                    .setMonsterSpawnLightLevel(new NBTInt(15))
+                    .setCoordinateScale(1d)
+                    .setSkybox(DimensionType.Skybox.END)
+                    .setMinY(0).setHeight(256).setLogicalHeight(256)
+                    .setInfiniburn(BlockTags.INFINIBURN_END.getKey())
+                    .setHasCeiling(false).setHasSkylight(true).setAmbientLight(0.25f)
+                    .setAttribute(EnvironmentAttributes.AUDIO_BACKGROUND_MUSIC,
+                            new BackgroundMusic(
+                                    new MusicSettings(
+                                            Sounds.MUSIC_END,
+                                            5 * 60 * Ticks.TICKS_PER_SECOND,
+                                            20 * 60 * Ticks.TICKS_PER_SECOND,
+                                            true
+                                    ),
+                                    null,
+                                    null
+                            ))
+                    .setAttribute(EnvironmentAttributes.AUDIO_AMBIENT_SOUNDS, new AmbientSounds(
+                            null,
+                            new MoodSettings(
+                                    Sounds.AMBIENT_CAVE,
+                                    5 * 60 * Ticks.TICKS_PER_SECOND,
+                                    8,
+                                    2d
+                            ),
+                            Collections.emptyList()
+                    ))
+                    .setAttribute(EnvironmentAttributes.VISUAL_FOG_COLOR, new Color(0x181318))
+                    .setAttribute(EnvironmentAttributes.VISUAL_SKY_COLOR, new Color(0x000000))
+                    .setAttribute(EnvironmentAttributes.VISUAL_SKY_LIGHT_COLOR, new Color(0xE580FF))
+                    .setAttribute(EnvironmentAttributes.VISUAL_SKY_LIGHT_FACTOR, 0f)
+                    // pre 1.21.11 properties
+                    .setNatural(false).setRespawnAnchorWorks(false).setBedWorks(false)
+                    .setEffects(new ResourceLocation("the_end")).setFixedTime(5L * 60L * Ticks.TICKS_PER_SECOND)
+                    .setAttribute(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, true)
+    );
 
-            @Override
-            public int getHeight(ClientVersion version) {
-                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_HEIGHT : PRE118_HEIGHT;
-            }
-
-            @Override
-            public int getLogicalHeight(ClientVersion version) {
-                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_HEIGHT : PRE118_HEIGHT;
-            }
-        };
-    });
-
-    public static final DimensionType OVERWORLD_CAVES = REGISTRY.define("overworld_caves", data -> {
-        NBTCompound monsterSpawnLightLevel = new NBTCompound();
-        monsterSpawnLightLevel.setTag("type", new NBTString("minecraft:uniform"));
-        monsterSpawnLightLevel.setTag("min_inclusive", new NBTInt(0));
-        monsterSpawnLightLevel.setTag("max_inclusive", new NBTInt(7));
-
-        return new StaticDimensionType(data, OptionalLong.empty(), true, true,
-                false, true, 1d, true, false,
-                POST118_MIN_Y, POST118_HEIGHT, POST118_HEIGHT, "#minecraft:infiniburn_overworld",
-                ResourceLocation.minecraft("overworld"), 0f, 192, false,
-                true, monsterSpawnLightLevel, 0) {
-            @Override
-            public int getMinY(ClientVersion version) {
-                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_MIN_Y : PRE118_MIN_Y;
-            }
-
-            @Override
-            public int getHeight(ClientVersion version) {
-                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_HEIGHT : PRE118_HEIGHT;
-            }
-
-            @Override
-            public int getLogicalHeight(ClientVersion version) {
-                return version.isNewerThanOrEquals(ClientVersion.V_1_18) ? POST118_HEIGHT : PRE118_HEIGHT;
-            }
-        };
-    });
-
-    public static final DimensionType THE_END = REGISTRY.define("the_end", data -> {
-        NBTCompound monsterSpawnLightLevel = new NBTCompound();
-        monsterSpawnLightLevel.setTag("type", new NBTString("minecraft:uniform"));
-        monsterSpawnLightLevel.setTag("min_inclusive", new NBTInt(0));
-        monsterSpawnLightLevel.setTag("max_inclusive", new NBTInt(7));
-
-        return new StaticDimensionType(data, OptionalLong.of(6000L), false, false,
-                false, false, 1d, false, false,
-                0, 256, 256, "#minecraft:infiniburn_end",
-                ResourceLocation.minecraft("the_end"), 0f, null,
-                false, true, monsterSpawnLightLevel, 0);
-    });
-
-    public static final DimensionType THE_NETHER = REGISTRY.define("the_nether",
-            data -> new StaticDimensionType(data, OptionalLong.of(18000L), false,
-                    true, true, false, 8d, false,
-                    true, 0, 256, 128,
-                    "#minecraft:infiniburn_nether", ResourceLocation.minecraft("the_nether"),
-                    0.1f, null, true, false,
-                    new NBTInt(7), 15));
+    public static final DimensionType THE_NETHER = define("the_nether",
+            builder -> builder
+                    // .setTimelines(new MappedEntityRef.Named<>()) TODO how?
+                    .setHasFixedTime(true)
+                    .setMonsterSpawnLightLevel(new NBTInt(7))
+                    .setMonsterSpawnBlockLightLimit(15)
+                    .setCoordinateScale(8d)
+                    .setSkybox(DimensionType.Skybox.NONE)
+                    .setCardinalLight(DimensionType.CardinalLight.NETHER)
+                    .setMinY(0).setHeight(256).setLogicalHeight(128)
+                    .setInfiniburn(BlockTags.INFINIBURN_NETHER.getKey())
+                    .setHasCeiling(true).setHasSkylight(false).setAmbientLight(0.1f)
+                    .setAttribute(EnvironmentAttributes.VISUAL_SKY_LIGHT_FACTOR, 0f)
+                    .setAttribute(EnvironmentAttributes.VISUAL_SKY_LIGHT_COLOR, new Color(0x7A7AFF))
+                    .setAttribute(EnvironmentAttributes.GAMEPLAY_SKY_LIGHT_LEVEL, 4f)
+                    .setAttribute(EnvironmentAttributes.VISUAL_FOG_START_DISTANCE, 10f)
+                    .setAttribute(EnvironmentAttributes.VISUAL_FOG_END_DISTANCE, 96f)
+                    .setAttribute(EnvironmentAttributes.VISUAL_DEFAULT_DRIPSTONE_PARTICLE,
+                            new Particle<>(ParticleTypes.DRIPPING_DRIPSTONE_LAVA))
+                    .setAttribute(EnvironmentAttributes.GAMEPLAY_PIGLINS_ZOMBIFY, false)
+                    .setAttribute(EnvironmentAttributes.GAMEPLAY_FAST_LAVA, true)
+                    .setAttribute(EnvironmentAttributes.GAMEPLAY_WATER_EVAPORATES, true)
+                    // pre 1.21.11 properties
+                    .setNatural(false).setRespawnAnchorWorks(true).setBedWorks(false)
+                    .setEffects(new ResourceLocation("the_nether"))
+                    .setFixedTime(15L * 60L * Ticks.TICKS_PER_SECOND)
+    );
 
     static {
         REGISTRY.unloadMappings();

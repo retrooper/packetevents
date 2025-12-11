@@ -113,7 +113,8 @@ public class ClassStructureTest extends BaseDummyAPITest {
                                         .anyMatch(annotation -> annotation.getName().contains(Nullable.class.getSimpleName())))
                                 // the parameter type annotation disappears for non-static inner classes for some reason,
                                 // fall back to normal parameter annotations
-                                .orElseGet(() -> param.hasAnnotation(Nullable.class)))) {
+                                .orElseGet(() -> param.hasAnnotation(Nullable.class) || param.hasAnnotation(org.jspecify.annotations.Nullable.class)))) {
+                    // TODO jspecify @Nullable gets ignored by classgraph
                     issues.add(classPrefix + " TypesBuilderData parameter type doesn't have @Nullable annotation: " + dataCtor.toStringWithSimpleNames());
                 }
             }
@@ -184,6 +185,7 @@ public class ClassStructureTest extends BaseDummyAPITest {
                     // temporarily load mappings again to validate each entry has a matching constant
                     TypesBuilder typesBuilder = registry.getTypesBuilder();
                     typesBuilder.load();
+                    registry.postLoadMappings();
 
                     Map<ClientVersion, Map<String, Integer>> entries = typesBuilder.getEntries();
                     assert entries != null; // ensured above
@@ -194,7 +196,7 @@ public class ClassStructureTest extends BaseDummyAPITest {
                             .distinct()
                             .filter(name -> registry.getByName(name) == null)
                             .collect(Collectors.joining(","));
-                    typesBuilder.unloadFileMappings();
+                    registry.unloadMappings();
 
                     if (!invalidEntries.isEmpty()) {
                         fail("Found invalid entries in registry " + registry.getRegistryKey() + ": " + invalidEntries);

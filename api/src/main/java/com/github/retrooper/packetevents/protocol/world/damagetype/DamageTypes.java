@@ -120,10 +120,20 @@ public final class DamageTypes {
     public static final DamageType WITHER = define("wither", "wither", 0.0F);
     public static final DamageType WITHER_SKULL = define("wither_skull", "witherSkull", 0.1F);
 
-    // added with 1.21.2
+    /**
+     * @versions 1.21.2+
+     */
     public static final DamageType ENDER_PEARL = define("ender_pearl", "fall", DamageScaling.WHEN_CAUSED_BY_LIVING_NON_PLAYER,
             0.0F, DamageEffects.HURT, DeathMessageType.FALL_VARIANTS);
+    /**
+     * @versions 1.21.2+
+     */
     public static final DamageType MACE_SMASH = define("mace_smash", "mace_smash", 0.1F);
+
+    /**
+     * @versions 1.21.11+
+     */
+    public static final DamageType SPEAR = define("spear", "spear", 0.1f);
 
     /**
      * Returns an immutable view of the damagetypes.

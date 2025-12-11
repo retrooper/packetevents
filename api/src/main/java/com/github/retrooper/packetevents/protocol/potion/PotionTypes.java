@@ -98,40 +98,90 @@ public final class PotionTypes {
     public static final PotionType HUNGER = define("hunger");
     public static final PotionType WEAKNESS = define("weakness");
     public static final PotionType POISON = define("poison");
-
-    // Added in 1.4.2
+    /**
+     * @versions 1.4.2+
+     */
     public static final PotionType WITHER = define("wither");
-
-    // Added in 1.6.1
+    /**
+     * @versions 1.6.1+
+     */
     public static final PotionType HEALTH_BOOST = define("health_boost");
+    /**
+     * @versions 1.6.1+
+     */
     public static final PotionType ABSORPTION = define("absorption");
+    /**
+     * @versions 1.6.1+
+     */
     public static final PotionType SATURATION = define("saturation");
-
-    // Added in 1.9
+    /**
+     * @versions 1.9+
+     */
     public static final PotionType GLOWING = define("glowing");
+    /**
+     * @versions 1.9+
+     */
     public static final PotionType LEVITATION = define("levitation");
+    /**
+     * @versions 1.9+
+     */
     public static final PotionType LUCK = define("luck");
+    /**
+     * @versions 1.9+
+     */
     public static final PotionType UNLUCK = define("unluck");
-
-    // Added in 1.13
+    /**
+     * @versions 1.13+
+     */
     public static final PotionType SLOW_FALLING = define("slow_falling");
+    /**
+     * @versions 1.13+
+     */
     public static final PotionType CONDUIT_POWER = define("conduit_power");
+    /**
+     * @versions 1.13+
+     */
     public static final PotionType DOLPHINS_GRACE = define("dolphins_grace");
-
-    // Added in 1.14
+    /**
+     * @versions 1.14+
+     */
     public static final PotionType BAD_OMEN = define("bad_omen");
+    /**
+     * @versions 1.14+
+     */
     public static final PotionType HERO_OF_THE_VILLAGE = define("hero_of_the_village");
-
-    // Added in 1.19
+    /**
+     * @versions 1.19+
+     */
     public static final PotionType DARKNESS = define("darkness");
-
-    // Added in 1.20.5
+    /**
+     * @versions 1.20.5+
+     */
     public static final PotionType TRIAL_OMEN = define("trial_omen");
+    /**
+     * @versions 1.20.5+
+     */
     public static final PotionType RAID_OMEN = define("raid_omen");
+    /**
+     * @versions 1.20.5+
+     */
     public static final PotionType WIND_CHARGED = define("wind_charged");
+    /**
+     * @versions 1.20.5+
+     */
     public static final PotionType WEAVING = define("weaving");
+    /**
+     * @versions 1.20.5+
+     */
     public static final PotionType OOZING = define("oozing");
+    /**
+     * @versions 1.20.5+
+     */
     public static final PotionType INFESTED = define("infested");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final PotionType BREATH_OF_THE_NAUTILUS = define("breath_of_the_nautilus");
 
     /**
      * Returns an immutable view of the potion types.

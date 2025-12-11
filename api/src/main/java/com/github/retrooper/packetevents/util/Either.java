@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 public class Either<L, R> {
 
@@ -40,8 +41,16 @@ public class Either<L, R> {
         return new Either<>(null, right);
     }
 
+    public static <T> T unwrap(Either<T, ? extends T> either) {
+        return either.left != null ? either.left : either.right;
+    }
+
     public Object get() {
         return this.left != null ? this.left : this.right;
+    }
+
+    public <T> T map(Function<L, T> leftFn, Function<R, T> rightFn) {
+        return this.left != null ? leftFn.apply(this.left) : rightFn.apply(this.right);
     }
 
     public boolean isLeft() {

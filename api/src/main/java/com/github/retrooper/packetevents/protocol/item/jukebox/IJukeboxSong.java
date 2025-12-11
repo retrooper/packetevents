@@ -49,7 +49,7 @@ public interface IJukeboxSong extends MappedEntity, CopyableEntity<IJukeboxSong>
 
     static IJukeboxSong decode(NBT nbt, PacketWrapper<?> wrapper, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
-        Sound sound = compound.getOrThrow("sound_event", Sound::decode, wrapper);
+        Sound sound = compound.getOrThrow("sound_event", Sound.CODEC, wrapper);
         Component description = compound.getOrThrow("description", wrapper.getSerializers(), wrapper);
         float length = compound.getNumberTagOrThrow("length_in_seconds").getAsFloat();
         int comparator_output = compound.getNumberTagOrThrow("comparator_output").getAsInt();
@@ -63,7 +63,7 @@ public interface IJukeboxSong extends MappedEntity, CopyableEntity<IJukeboxSong>
 
     static NBT encode(PacketWrapper<?> wrapper, IJukeboxSong song) {
         NBTCompound compound = new NBTCompound();
-        compound.set("sound_event", song.getSound(), Sound::encode, wrapper);
+        compound.set("sound_event", song.getSound(), Sound.CODEC, wrapper);
         compound.set("description", song.getDescription(), wrapper.getSerializers(), wrapper);
         compound.setTag("length_in_seconds", new NBTFloat(song.getLengthInSeconds()));
         compound.setTag("comparator_output", new NBTInt(song.getComparatorOutput()));

@@ -40,6 +40,7 @@ import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.SimpleTypesBuilderData;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
@@ -49,7 +50,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class SpigotConversionUtil {
+public final class SpigotConversionUtil {
+
+    private SpigotConversionUtil() {
+    }
+
     public static Location fromBukkitLocation(org.bukkit.Location location) {
         return new Location(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
     }
@@ -179,8 +184,8 @@ public class SpigotConversionUtil {
             NBTCompound peNbt = SpigotReflectionUtil.fromMinecraftNBT(nbt);
             ResourceLocation dimensionTypeName = new ResourceLocation(SpigotReflectionUtil.getDimensionKey(serverLevel));
             int dimensionTypeId = SpigotReflectionUtil.getDimensionId(serverLevel);
-            return DimensionType.decode(peNbt, version.toClientVersion(),
-                    new SimpleTypesBuilderData(dimensionTypeName, dimensionTypeId));
+            return DimensionType.CODEC.decode(peNbt, PacketWrapper.createDummyWrapper(version.toClientVersion()))
+                    .copy(new SimpleTypesBuilderData(dimensionTypeName, dimensionTypeId));
         }
     }
 

@@ -111,15 +111,27 @@ public class MappingHelper {
 
     public static <T extends MappedEntity> void registerMapping(
             TypesBuilder builder,
-            Map<String, T> typeMap,
-            Map<Byte, Map<Integer, T>> typeIdMap,
+            Map<String, T>[] typeNames,
+            Map<Integer, T>[] typeIds,
             TypesBuilderData typeData,
             T type
     ) {
-        typeMap.put(typeData.getName().toString(), type);
         for (ClientVersion version : builder.getVersions()) {
+            if (!typeData.getVersions().contains(version)) {
+                continue; // not in range
+            }
             int index = builder.getDataIndex(version);
-            Map<Integer, T> idMap = typeIdMap.computeIfAbsent((byte) index, k -> new HashMap<>());
+            // set by version-specific name
+            Map<String, T> nameMap = typeNames[index];
+            if (nameMap == null) {
+                typeNames[index] = nameMap = new HashMap<>();
+            }
+            nameMap.put(typeData.getName().toString(), type);
+            // set by version-specific id
+            Map<Integer, T> idMap = typeIds[index];
+            if (idMap == null) {
+                typeIds[index] = idMap = new HashMap<>();
+            }
             idMap.put(typeData.getId(version), type);
         }
     }

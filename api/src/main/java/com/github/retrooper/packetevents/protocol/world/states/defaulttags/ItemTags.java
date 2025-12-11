@@ -252,7 +252,7 @@ public class ItemTags {
      */
     public static final ItemTags ENCHANTABLE_SHARP_WEAPON = bind("enchantable/sharp_weapon");
     /**
-     * Added with 1.20.5
+     * @versions 1.20.5-1.21.10
      */
     public static final ItemTags ENCHANTABLE_SWORD = bind("enchantable/sword");
     /**
@@ -545,6 +545,43 @@ public class ItemTags {
      */
     public static final ItemTags SHEARABLE_FROM_COPPER_GOLEM = bind("shearable_from_copper_golem");
 
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemTags ZOMBIE_HORSE_FOOD = bind("shearable_from_copper_golem");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemTags CAMEL_HUSK_FOOD = bind("camel_husk_food");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemTags NAUTILUS_BUCKET_FOOD = bind("nautilus_bucket_food");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemTags NAUTILUS_TAMING_ITEMS = bind("nautilus_taming_items");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemTags SPEARS = bind("spears");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemTags NAUTILUS_FOOD = bind("nautilus_food");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemTags ENCHANTABLE_MELEE_WEAPON = bind("enchantable/melee_weapon");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemTags ENCHANTABLE_SWEEPING = bind("enchantable/sweeping");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final ItemTags ENCHANTABLE_LUNGE = bind("enchantable/lunge");
+
     static {
         copy(BlockTags.WOOL, ItemTags.WOOL);
         copy(BlockTags.PLANKS, ItemTags.PLANKS);
@@ -621,10 +658,12 @@ public class ItemTags {
         copy(ItemTags.COW_FOOD, ItemTags.SHEEP_FOOD);
         ItemTags.CAT_FOOD.add(ItemTypes.COD, ItemTypes.SALMON);
         ItemTags.HORSE_FOOD.add(ItemTypes.WHEAT, ItemTypes.SUGAR, ItemTypes.HAY_BLOCK, ItemTypes.APPLE, ItemTypes.CARROT, ItemTypes.GOLDEN_CARROT, ItemTypes.GOLDEN_APPLE, ItemTypes.ENCHANTED_GOLDEN_APPLE);
+        ItemTags.ZOMBIE_HORSE_FOOD.add(ItemTypes.RED_MUSHROOM);
         ItemTags.HORSE_TEMPT_ITEMS.add(ItemTypes.GOLDEN_CARROT, ItemTypes.GOLDEN_APPLE, ItemTypes.ENCHANTED_GOLDEN_APPLE);
         ItemTags.HARNESSES.add(ItemTypes.WHITE_HARNESS, ItemTypes.ORANGE_HARNESS, ItemTypes.MAGENTA_HARNESS, ItemTypes.LIGHT_BLUE_HARNESS, ItemTypes.YELLOW_HARNESS, ItemTypes.LIME_HARNESS, ItemTypes.PINK_HARNESS, ItemTypes.GRAY_HARNESS, ItemTypes.LIGHT_GRAY_HARNESS, ItemTypes.CYAN_HARNESS, ItemTypes.PURPLE_HARNESS, ItemTypes.BLUE_HARNESS, ItemTypes.BROWN_HARNESS, ItemTypes.GREEN_HARNESS, ItemTypes.RED_HARNESS, ItemTypes.BLACK_HARNESS);
         ItemTags.HAPPY_GHAST_FOOD.add(ItemTypes.SNOWBALL);
         ItemTags.CAMEL_FOOD.add(ItemTypes.CACTUS);
+        ItemTags.CAMEL_HUSK_FOOD.add(ItemTypes.RABBIT_FOOT);
         ItemTags.ARMADILLO_FOOD.add(ItemTypes.SPIDER_EYE);
         ItemTags.CHICKEN_FOOD.add(ItemTypes.WHEAT_SEEDS, ItemTypes.MELON_SEEDS, ItemTypes.PUMPKIN_SEEDS, ItemTypes.BEETROOT_SEEDS, ItemTypes.TORCHFLOWER_SEEDS, ItemTypes.PITCHER_POD);
         ItemTags.FROG_FOOD.add(ItemTypes.SLIME_BALL);
@@ -640,6 +679,8 @@ public class ItemTags {
         copy(ItemTags.CHICKEN_FOOD, ItemTags.PARROT_FOOD);
         ItemTags.PARROT_POISONOUS_FOOD.add(ItemTypes.COOKIE);
         ItemTags.AXOLOTL_FOOD.add(ItemTypes.TROPICAL_FISH_BUCKET);
+        ItemTags.NAUTILUS_BUCKET_FOOD.add(ItemTypes.PUFFERFISH_BUCKET, ItemTypes.COD_BUCKET, ItemTypes.SALMON_BUCKET, ItemTypes.TROPICAL_FISH_BUCKET);
+        ItemTags.NAUTILUS_TAMING_ITEMS.add(ItemTypes.PUFFERFISH_BUCKET, ItemTypes.PUFFERFISH);
         ItemTags.NON_FLAMMABLE_WOOD.add(ItemTypes.WARPED_STEM, ItemTypes.STRIPPED_WARPED_STEM, ItemTypes.WARPED_HYPHAE, ItemTypes.STRIPPED_WARPED_HYPHAE, ItemTypes.CRIMSON_STEM, ItemTypes.STRIPPED_CRIMSON_STEM, ItemTypes.CRIMSON_HYPHAE, ItemTypes.STRIPPED_CRIMSON_HYPHAE, ItemTypes.CRIMSON_PLANKS, ItemTypes.WARPED_PLANKS, ItemTypes.CRIMSON_SLAB, ItemTypes.WARPED_SLAB, ItemTypes.CRIMSON_PRESSURE_PLATE, ItemTypes.WARPED_PRESSURE_PLATE, ItemTypes.CRIMSON_FENCE, ItemTypes.WARPED_FENCE, ItemTypes.CRIMSON_TRAPDOOR, ItemTypes.WARPED_TRAPDOOR, ItemTypes.CRIMSON_FENCE_GATE, ItemTypes.WARPED_FENCE_GATE, ItemTypes.CRIMSON_STAIRS, ItemTypes.WARPED_STAIRS, ItemTypes.CRIMSON_BUTTON, ItemTypes.WARPED_BUTTON, ItemTypes.CRIMSON_DOOR, ItemTypes.WARPED_DOOR, ItemTypes.CRIMSON_SIGN, ItemTypes.WARPED_SIGN, ItemTypes.WARPED_HANGING_SIGN, ItemTypes.CRIMSON_HANGING_SIGN, ItemTypes.WARPED_SHELF, ItemTypes.CRIMSON_SHELF);
         ItemTags.CHEST_BOATS.add(ItemTypes.OAK_CHEST_BOAT, ItemTypes.SPRUCE_CHEST_BOAT, ItemTypes.BIRCH_CHEST_BOAT, ItemTypes.JUNGLE_CHEST_BOAT, ItemTypes.ACACIA_CHEST_BOAT, ItemTypes.DARK_OAK_CHEST_BOAT, ItemTypes.PALE_OAK_CHEST_BOAT, ItemTypes.MANGROVE_CHEST_BOAT, ItemTypes.BAMBOO_CHEST_RAFT, ItemTypes.CHERRY_CHEST_BOAT);
         ItemTags.FISHES.add(ItemTypes.COD, ItemTypes.COOKED_COD, ItemTypes.SALMON, ItemTypes.COOKED_SALMON, ItemTypes.PUFFERFISH, ItemTypes.TROPICAL_FISH);
@@ -682,6 +723,7 @@ public class ItemTags {
         ItemTags.HOES.add(ItemTypes.DIAMOND_HOE, ItemTypes.STONE_HOE, ItemTypes.GOLDEN_HOE, ItemTypes.NETHERITE_HOE, ItemTypes.WOODEN_HOE, ItemTypes.IRON_HOE, ItemTypes.COPPER_HOE);
         ItemTags.PICKAXES.add(ItemTypes.DIAMOND_PICKAXE, ItemTypes.STONE_PICKAXE, ItemTypes.GOLDEN_PICKAXE, ItemTypes.NETHERITE_PICKAXE, ItemTypes.WOODEN_PICKAXE, ItemTypes.IRON_PICKAXE, ItemTypes.COPPER_PICKAXE);
         ItemTags.SHOVELS.add(ItemTypes.DIAMOND_SHOVEL, ItemTypes.STONE_SHOVEL, ItemTypes.GOLDEN_SHOVEL, ItemTypes.NETHERITE_SHOVEL, ItemTypes.WOODEN_SHOVEL, ItemTypes.IRON_SHOVEL, ItemTypes.COPPER_SHOVEL);
+        ItemTags.SPEARS.add(ItemTypes.DIAMOND_SPEAR, ItemTypes.STONE_SPEAR, ItemTypes.GOLDEN_SPEAR, ItemTypes.NETHERITE_SPEAR, ItemTypes.WOODEN_SPEAR, ItemTypes.IRON_SPEAR, ItemTypes.COPPER_SPEAR);
         ItemTags.VILLAGER_PLANTABLE_SEEDS.add(ItemTypes.WHEAT_SEEDS, ItemTypes.POTATO, ItemTypes.CARROT, ItemTypes.BEETROOT_SEEDS, ItemTypes.TORCHFLOWER_SEEDS, ItemTypes.PITCHER_POD);
         ItemTags.DYEABLE.add(ItemTypes.LEATHER_HELMET, ItemTypes.LEATHER_CHESTPLATE, ItemTypes.LEATHER_LEGGINGS, ItemTypes.LEATHER_BOOTS, ItemTypes.LEATHER_HORSE_ARMOR, ItemTypes.WOLF_ARMOR);
         copy(ItemTags.COALS, ItemTags.FURNACE_MINECART_FUEL);
@@ -689,14 +731,14 @@ public class ItemTags {
         ItemTags.BOOK_CLONING_TARGET.add(ItemTypes.WRITABLE_BOOK);
         ItemTags.SKELETON_PREFERRED_WEAPONS.add(ItemTypes.BOW);
         ItemTags.DROWNED_PREFERRED_WEAPONS.add(ItemTypes.TRIDENT);
-        ItemTags.PIGLIN_PREFERRED_WEAPONS.add(ItemTypes.CROSSBOW);
-        copy(ItemTags.PIGLIN_PREFERRED_WEAPONS, ItemTags.PILLAGER_PREFERRED_WEAPONS);
+        ItemTags.PIGLIN_PREFERRED_WEAPONS.add(ItemTypes.CROSSBOW, ItemTypes.GOLDEN_SPEAR);
+        ItemTags.PILLAGER_PREFERRED_WEAPONS.add(ItemTypes.CROSSBOW);
         ItemTags.WITHER_SKELETON_DISLIKED_WEAPONS.add(ItemTypes.BOW, ItemTypes.CROSSBOW);
         ItemTags.SHEARABLE_FROM_COPPER_GOLEM.add(ItemTypes.POPPY);
         ItemTags.ENCHANTABLE_FISHING.add(ItemTypes.FISHING_ROD);
         copy(ItemTags.DROWNED_PREFERRED_WEAPONS, ItemTags.ENCHANTABLE_TRIDENT);
         copy(ItemTags.SKELETON_PREFERRED_WEAPONS, ItemTags.ENCHANTABLE_BOW);
-        copy(ItemTags.PIGLIN_PREFERRED_WEAPONS, ItemTags.ENCHANTABLE_CROSSBOW);
+        copy(ItemTags.PILLAGER_PREFERRED_WEAPONS, ItemTags.ENCHANTABLE_CROSSBOW);
         ItemTags.ENCHANTABLE_MACE.add(ItemTypes.MACE);
         ItemTags.MAP_INVISIBILITY_EQUIPMENT.add(ItemTypes.CARVED_PUMPKIN);
         copy(ItemTags.MAP_INVISIBILITY_EQUIPMENT, ItemTags.GAZE_DISGUISE_EQUIPMENT);
@@ -709,11 +751,12 @@ public class ItemTags {
         copy(BlockTags.FLOWERS, ItemTags.FLOWERS);
         copy(BlockTags.FENCES, ItemTags.FENCES);
         copy(BlockTags.DAMPENS_VIBRATIONS, ItemTags.DAMPENS_VIBRATIONS);
-        ItemTags.PIGLIN_LOVED.addTag(ItemTags.GOLD_ORES).add(ItemTypes.GOLD_BLOCK, ItemTypes.GILDED_BLACKSTONE, ItemTypes.LIGHT_WEIGHTED_PRESSURE_PLATE, ItemTypes.GOLD_INGOT, ItemTypes.BELL, ItemTypes.CLOCK, ItemTypes.GOLDEN_CARROT, ItemTypes.GLISTERING_MELON_SLICE, ItemTypes.GOLDEN_APPLE, ItemTypes.ENCHANTED_GOLDEN_APPLE, ItemTypes.GOLDEN_HELMET, ItemTypes.GOLDEN_CHESTPLATE, ItemTypes.GOLDEN_LEGGINGS, ItemTypes.GOLDEN_BOOTS, ItemTypes.GOLDEN_HORSE_ARMOR, ItemTypes.GOLDEN_SWORD, ItemTypes.GOLDEN_PICKAXE, ItemTypes.GOLDEN_SHOVEL, ItemTypes.GOLDEN_AXE, ItemTypes.GOLDEN_HOE, ItemTypes.RAW_GOLD, ItemTypes.RAW_GOLD_BLOCK);
+        ItemTags.PIGLIN_LOVED.addTag(ItemTags.GOLD_ORES).add(ItemTypes.GOLD_BLOCK, ItemTypes.GILDED_BLACKSTONE, ItemTypes.LIGHT_WEIGHTED_PRESSURE_PLATE, ItemTypes.GOLD_INGOT, ItemTypes.BELL, ItemTypes.CLOCK, ItemTypes.GOLDEN_CARROT, ItemTypes.GLISTERING_MELON_SLICE, ItemTypes.GOLDEN_APPLE, ItemTypes.ENCHANTED_GOLDEN_APPLE, ItemTypes.GOLDEN_HELMET, ItemTypes.GOLDEN_CHESTPLATE, ItemTypes.GOLDEN_LEGGINGS, ItemTypes.GOLDEN_BOOTS, ItemTypes.GOLDEN_HORSE_ARMOR, ItemTypes.GOLDEN_NAUTILUS_ARMOR, ItemTypes.GOLDEN_SWORD, ItemTypes.GOLDEN_SPEAR, ItemTypes.GOLDEN_PICKAXE, ItemTypes.GOLDEN_SHOVEL, ItemTypes.GOLDEN_AXE, ItemTypes.GOLDEN_HOE, ItemTypes.RAW_GOLD, ItemTypes.RAW_GOLD_BLOCK);
         ItemTags.WOLF_FOOD.addTag(ItemTags.MEAT).add(ItemTypes.COD, ItemTypes.COOKED_COD, ItemTypes.SALMON, ItemTypes.COOKED_SALMON, ItemTypes.TROPICAL_FISH, ItemTypes.PUFFERFISH, ItemTypes.RABBIT_STEW);
         ItemTags.HAPPY_GHAST_TEMPT_ITEMS.addTag(ItemTags.HAPPY_GHAST_FOOD).addTag(ItemTags.HARNESSES);
         ItemTags.PANDA_EATS_FROM_GROUND.addTag(ItemTags.PANDA_FOOD).add(ItemTypes.CAKE);
         ItemTags.STRIDER_TEMPT_ITEMS.addTag(ItemTags.STRIDER_FOOD).add(ItemTypes.WARPED_FUNGUS_ON_A_STICK);
+        ItemTags.NAUTILUS_FOOD.addTag(ItemTags.FISHES).addTag(ItemTags.NAUTILUS_BUCKET_FOOD);
         ItemTags.BOATS.addTag(ItemTags.CHEST_BOATS).add(ItemTypes.OAK_BOAT, ItemTypes.SPRUCE_BOAT, ItemTypes.BIRCH_BOAT, ItemTypes.JUNGLE_BOAT, ItemTypes.ACACIA_BOAT, ItemTypes.DARK_OAK_BOAT, ItemTypes.PALE_OAK_BOAT, ItemTypes.MANGROVE_BOAT, ItemTypes.BAMBOO_RAFT, ItemTypes.CHERRY_BOAT);
         ItemTags.WOODEN_TOOL_MATERIALS.addTag(ItemTags.PLANKS);
         ItemTags.TRIMMABLE_ARMOR.addTag(ItemTags.FOOT_ARMOR).addTag(ItemTags.LEG_ARMOR).addTag(ItemTags.CHEST_ARMOR).addTag(ItemTags.HEAD_ARMOR);
@@ -724,18 +767,20 @@ public class ItemTags {
         ItemTags.ENCHANTABLE_LEG_ARMOR.addTag(ItemTags.LEG_ARMOR);
         ItemTags.ENCHANTABLE_CHEST_ARMOR.addTag(ItemTags.CHEST_ARMOR);
         ItemTags.ENCHANTABLE_HEAD_ARMOR.addTag(ItemTags.HEAD_ARMOR);
-        ItemTags.ENCHANTABLE_SWORD.addTag(ItemTags.SWORDS);
-        ItemTags.ENCHANTABLE_SHARP_WEAPON.addTag(ItemTags.SWORDS).addTag(ItemTags.AXES);
+        ItemTags.ENCHANTABLE_MELEE_WEAPON.addTag(ItemTags.SWORDS).addTag(ItemTags.SPEARS);
+        ItemTags.ENCHANTABLE_SWEEPING.addTag(ItemTags.SWORDS);
         ItemTags.ENCHANTABLE_MINING.addTag(ItemTags.AXES).addTag(ItemTags.PICKAXES).addTag(ItemTags.SHOVELS).addTag(ItemTags.HOES).add(ItemTypes.SHEARS);
         ItemTags.ENCHANTABLE_MINING_LOOT.addTag(ItemTags.AXES).addTag(ItemTags.PICKAXES).addTag(ItemTags.SHOVELS).addTag(ItemTags.HOES);
-        ItemTags.ENCHANTABLE_DURABILITY.addTag(ItemTags.FOOT_ARMOR).addTag(ItemTags.LEG_ARMOR).addTag(ItemTags.CHEST_ARMOR).addTag(ItemTags.HEAD_ARMOR).addTag(ItemTags.SWORDS).addTag(ItemTags.AXES).addTag(ItemTags.PICKAXES).addTag(ItemTags.SHOVELS).addTag(ItemTags.HOES).add(ItemTypes.ELYTRA, ItemTypes.SHIELD, ItemTypes.BOW, ItemTypes.CROSSBOW, ItemTypes.TRIDENT, ItemTypes.FLINT_AND_STEEL, ItemTypes.SHEARS, ItemTypes.BRUSH, ItemTypes.FISHING_ROD, ItemTypes.CARROT_ON_A_STICK, ItemTypes.WARPED_FUNGUS_ON_A_STICK, ItemTypes.MACE);
+        ItemTags.ENCHANTABLE_LUNGE.addTag(ItemTags.SPEARS);
+        ItemTags.ENCHANTABLE_DURABILITY.addTag(ItemTags.FOOT_ARMOR).addTag(ItemTags.LEG_ARMOR).addTag(ItemTags.CHEST_ARMOR).addTag(ItemTags.HEAD_ARMOR).addTag(ItemTags.SWORDS).addTag(ItemTags.AXES).addTag(ItemTags.PICKAXES).addTag(ItemTags.SHOVELS).addTag(ItemTags.HOES).addTag(ItemTags.SPEARS).add(ItemTypes.ELYTRA, ItemTypes.SHIELD, ItemTypes.BOW, ItemTypes.CROSSBOW, ItemTypes.TRIDENT, ItemTypes.FLINT_AND_STEEL, ItemTypes.SHEARS, ItemTypes.BRUSH, ItemTypes.FISHING_ROD, ItemTypes.CARROT_ON_A_STICK, ItemTypes.WARPED_FUNGUS_ON_A_STICK, ItemTypes.MACE);
         ItemTags.ENCHANTABLE_EQUIPPABLE.addTag(ItemTags.FOOT_ARMOR).addTag(ItemTags.LEG_ARMOR).addTag(ItemTags.CHEST_ARMOR).addTag(ItemTags.HEAD_ARMOR).addTag(ItemTags.SKULLS).add(ItemTypes.ELYTRA, ItemTypes.CARVED_PUMPKIN);
         copy(BlockTags.LOGS, ItemTags.LOGS);
         ItemTags.ENCHANTABLE_ARMOR.addTag(ItemTags.ENCHANTABLE_FOOT_ARMOR).addTag(ItemTags.ENCHANTABLE_LEG_ARMOR).addTag(ItemTags.ENCHANTABLE_CHEST_ARMOR).addTag(ItemTags.ENCHANTABLE_HEAD_ARMOR);
-        ItemTags.ENCHANTABLE_FIRE_ASPECT.addTag(ItemTags.ENCHANTABLE_SWORD).add(ItemTypes.MACE);
-        ItemTags.ENCHANTABLE_WEAPON.addTag(ItemTags.ENCHANTABLE_SHARP_WEAPON).add(ItemTypes.MACE);
+        ItemTags.ENCHANTABLE_FIRE_ASPECT.addTag(ItemTags.ENCHANTABLE_MELEE_WEAPON).add(ItemTypes.MACE);
+        ItemTags.ENCHANTABLE_SHARP_WEAPON.addTag(ItemTags.ENCHANTABLE_MELEE_WEAPON).addTag(ItemTags.AXES);
         ItemTags.ENCHANTABLE_VANISHING.addTag(ItemTags.ENCHANTABLE_DURABILITY).addTag(ItemTags.SKULLS).add(ItemTypes.COMPASS, ItemTypes.CARVED_PUMPKIN);
         copy(BlockTags.COMPLETES_FIND_TREE_TUTORIAL, ItemTags.COMPLETES_FIND_TREE_TUTORIAL);
+        ItemTags.ENCHANTABLE_WEAPON.addTag(ItemTags.ENCHANTABLE_SHARP_WEAPON).add(ItemTypes.MACE);
 
         // deprecated/legacy tags
         for (ItemType type : ItemTypes.getRegistry().getEntries()) {
@@ -746,6 +791,7 @@ public class ItemTags {
         copy(BlockTags.TALL_FLOWERS, ItemTags.TALL_FLOWERS);
         copy(BlockTags.FLOWERS, ItemTags.FLOWERS);
         ItemTags.TRIM_TEMPLATES.add(ItemTypes.WARD_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.COAST_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.EYE_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.DUNE_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.WILD_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.RIB_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.TIDE_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.VEX_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.RAISER_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.HOST_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.FLOW_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTypes.BOLT_ARMOR_TRIM_SMITHING_TEMPLATE);
+        ItemTags.ENCHANTABLE_SWORD.addTag(ItemTags.SWORDS);
     }
 
     String name;

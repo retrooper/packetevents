@@ -128,10 +128,23 @@ public final class EnchantmentTypes {
     public static final EnchantmentType MENDING = define("mending");
     public static final EnchantmentType VANISHING_CURSE = define("vanishing_curse");
 
-    // Added in 1.20.5
+    /**
+     * @versions 1.20.5+
+     */
     public static final EnchantmentType DENSITY = define("density");
+    /**
+     * @versions 1.20.5+
+     */
     public static final EnchantmentType BREACH = define("breach");
+    /**
+     * @versions 1.20.5+
+     */
     public static final EnchantmentType WIND_BURST = define("wind_burst");
+
+    /**
+     * @versions 1.21.11+
+     */
+    public static final EnchantmentType LUNGE = define("lunge");
 
     static {
         ENCHANTMENT_DATA.clear();

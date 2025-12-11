@@ -88,7 +88,7 @@ public interface Instrument extends MappedEntity, CopyableEntity<Instrument>, De
 
     static Instrument decode(NBT nbt, PacketWrapper<?> wrapper, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
-        Sound sound = compound.getOrThrow("sound_event", Sound::decode, wrapper);
+        Sound sound = compound.getOrThrow("sound_event", Sound.CODEC, wrapper);
         float useSeconds = compound.getNumberTagOrThrow("use_duration").getAsFloat();
         float range = compound.getNumberTagOrThrow("range").getAsFloat();
         Component description = compound.getOrThrow("description", wrapper.getSerializers(), wrapper);
@@ -102,7 +102,7 @@ public interface Instrument extends MappedEntity, CopyableEntity<Instrument>, De
 
     static NBT encode(PacketWrapper<?> wrapper, Instrument instrument) {
         NBTCompound compound = new NBTCompound();
-        compound.set("sound_event", instrument.getSound(), Sound::encode, wrapper);
+        compound.set("sound_event", instrument.getSound(), Sound.CODEC, wrapper);
         compound.setTag("use_duration", new NBTFloat(instrument.getUseSeconds()));
         compound.setTag("range", new NBTFloat(instrument.getRange()));
         compound.set("description", instrument.getDescription(), wrapper.getSerializers(), wrapper);

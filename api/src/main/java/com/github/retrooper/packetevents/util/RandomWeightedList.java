@@ -26,12 +26,17 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import org.jetbrains.annotations.NotNull;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
+import com.github.retrooper.packetevents.protocol.util.NbtMapCodec;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+@NullMarked
 public class RandomWeightedList<T> implements Iterable<RandomWeightedList.Entry<T>> {
 
     private List<Entry<T>> entries;
@@ -39,6 +44,7 @@ public class RandomWeightedList<T> implements Iterable<RandomWeightedList.Entry<
     public RandomWeightedList() {
         this(new ArrayList<>());
     }
+
     public RandomWeightedList(List<Entry<T>> entries) {
         this.entries = entries;
     }
@@ -52,6 +58,12 @@ public class RandomWeightedList<T> implements Iterable<RandomWeightedList.Entry<
         this.entries.add(entry);
     }
 
+    public static <T> NbtCodec<RandomWeightedList<T>> codec(NbtCodec<T> codec) {
+        return Entry.codec(codec).applyList()
+                .apply(RandomWeightedList::new, RandomWeightedList::getEntries);
+    }
+
+    @Deprecated
     public static <T> RandomWeightedList<T> decode(NBT nbt, ClientVersion version, Decoder<T> decoder) {
         List<Entry<T>> entries;
         if (nbt instanceof NBTCompound) {
@@ -69,6 +81,7 @@ public class RandomWeightedList<T> implements Iterable<RandomWeightedList.Entry<
         return new RandomWeightedList<>(entries);
     }
 
+    @Deprecated
     public static <T> NBT encode(RandomWeightedList<T> list, ClientVersion version, Encoder<T> encoder) {
         NBTList<NBTCompound> nbt = new NBTList<>(NBTType.COMPOUND, list.entries.size());
         for (Entry<T> entry : list.entries) {
@@ -85,8 +98,16 @@ public class RandomWeightedList<T> implements Iterable<RandomWeightedList.Entry<
         this.entries = entries;
     }
 
+    public int size() {
+        return this.entries.size();
+    }
+
+    public boolean isEmpty() {
+        return this.entries.isEmpty();
+    }
+
     @Override
-    public @NotNull Iterator<Entry<T>> iterator() {
+    public Iterator<Entry<T>> iterator() {
         return this.entries.iterator();
     }
 
@@ -100,6 +121,24 @@ public class RandomWeightedList<T> implements Iterable<RandomWeightedList.Entry<
             this.weight = weight;
         }
 
+        public static <T> NbtCodec<Entry<T>> codec(NbtCodec<T> codec) {
+            return new NbtMapCodec<Entry<T>>() {
+                @Override
+                public Entry<T> decode(NBTCompound compound, PacketWrapper<?> wrapper) throws NbtCodecException {
+                    int weight = compound.getNumberTagOrThrow("weight").getAsInt();
+                    T data = compound.getOrThrow("data", codec, wrapper);
+                    return new Entry<>(data, weight);
+                }
+
+                @Override
+                public void encode(NBTCompound compound, PacketWrapper<?> wrapper, Entry<T> value) throws NbtCodecException {
+                    compound.setTag("weight", new NBTInt(value.weight));
+                    compound.set("data", value.data, codec, wrapper);
+                }
+            }.codec();
+        }
+
+        @Deprecated
         public static <T> Entry<T> decode(NBT nbt, ClientVersion version, Decoder<T> decoder) {
             NBTCompound compound = (NBTCompound) nbt;
             int weight = compound.getNumberTagOrThrow("weight").getAsInt();
@@ -107,6 +146,7 @@ public class RandomWeightedList<T> implements Iterable<RandomWeightedList.Entry<
             return new Entry<>(data, weight);
         }
 
+        @Deprecated
         public static <T> NBTCompound encode(Entry<T> entry, ClientVersion version, Encoder<T> encoder) {
             NBTCompound compound = new NBTCompound();
             compound.setTag("weight", new NBTInt(entry.weight));

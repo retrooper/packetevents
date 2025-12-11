@@ -27,10 +27,14 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.MathUtil;
 import org.jetbrains.annotations.Range;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public final class AlphaColor extends Color {
 
     public static final AlphaColor WHITE = new AlphaColor(0xFFFFFFFF);
+    public static final AlphaColor BLACK = new AlphaColor(0xFF000000);
+    public static final AlphaColor TRANSPARENT = new AlphaColor(0x00000000);
 
     private final int alpha;
 
@@ -49,7 +53,7 @@ public final class AlphaColor extends Color {
             @Range(from = 0L, to = 255L) int blue
     ) {
         super(red, green, blue);
-        this.alpha = alpha;
+        this.alpha = MathUtil.clamp(alpha, 0, 255);
     }
 
     public AlphaColor(
@@ -101,8 +105,9 @@ public final class AlphaColor extends Color {
         return list;
     }
 
-    public AlphaColor withAlpha(@Range(from = 0L, to = 255L) int alpha) {
-        return new AlphaColor(alpha, this.red, this.green, this.blue);
+    @Override
+    public AlphaColor withAlpha() {
+        return this;
     }
 
     @Override
@@ -125,22 +130,92 @@ public final class AlphaColor extends Color {
         return (this.alpha << 24) | (this.red << 16) | (this.green << 8) | this.blue;
     }
 
+    @Override
+    public AlphaColor plus(Color other) {
+        return new AlphaColor(
+                this.alpha,
+                this.red + other.red,
+                this.green + other.green,
+                this.blue + other.blue
+        );
+    }
+
+    @Override
+    public AlphaColor minus(Color other) {
+        return new AlphaColor(
+                this.alpha,
+                this.red - other.red,
+                this.green - other.green,
+                this.blue - other.blue
+        );
+    }
+
+    @Override
+    public AlphaColor times(Color other) {
+        if (other.alpha() == 255 && other.red == 255 && other.green == 255 && other.blue == 255) {
+            return this;
+        }
+        return new AlphaColor(
+                (this.alpha * other.alpha()) / 255,
+                (this.red * other.red) / 255,
+                (this.green * other.green) / 255,
+                (this.blue * other.blue) / 255
+        );
+    }
+
+    public AlphaColor blendWith(AlphaColor source) {
+        int srcAlpha = source.alpha;
+        if (srcAlpha == 255) {
+            return source;
+        } else if (srcAlpha == 0) {
+            return this;
+        }
+        int alpha = srcAlpha + (this.alpha * (255 - srcAlpha)) / 255;
+        return new AlphaColor(
+                alpha,
+                alphaBlendChannel(alpha, srcAlpha, this.red, source.red),
+                alphaBlendChannel(alpha, srcAlpha, this.green, source.green),
+                alphaBlendChannel(alpha, srcAlpha, this.blue, source.blue)
+        );
+    }
+
+    protected static int alphaBlendChannel(int alpha, int srcAlpha, int dest, int src) {
+        return (src * srcAlpha + dest * (alpha - srcAlpha)) / alpha;
+    }
+
+    @Override
+    public AlphaColor asGrayscale() {
+        int grayscale = (int) ((float) this.red * 0.30f + (float) this.green * 0.59f + (float) this.blue * 0.11f);
+        return new AlphaColor(this.alpha, grayscale, grayscale, grayscale);
+    }
+
+    @Override
+    public AlphaColor scale(float scale) {
+        return this.scale(scale, scale, scale);
+    }
+
+    @Override
+    public AlphaColor scale(float redScale, float greenScale, float blueScale) {
+        return new AlphaColor(
+                this.alpha,
+                (int) ((float) this.red * redScale),
+                (int) ((float) this.green * greenScale),
+                (int) ((float) this.blue * blueScale)
+        );
+    }
+
+    @Override
+    public AlphaColor lerpSrgb(Color dest, float t) {
+        return new AlphaColor(
+                MathUtil.lerp(t, this.alpha, dest.alpha()),
+                MathUtil.lerp(t, this.red, dest.red),
+                MathUtil.lerp(t, this.green, dest.green),
+                MathUtil.lerp(t, this.blue, dest.blue)
+        );
+    }
+
+    @Override
     public @Range(from = 0L, to = 255L) int alpha() {
         return this.alpha;
-    }
-
-    @Override
-    public @Range(from = 0L, to = 255L) int red() {
-        return this.red;
-    }
-
-    @Override
-    public @Range(from = 0L, to = 255L) int green() {
-        return this.green;
-    }
-
-    @Override
-    public @Range(from = 0L, to = 255L) int blue() {
-        return this.blue;
     }
 }

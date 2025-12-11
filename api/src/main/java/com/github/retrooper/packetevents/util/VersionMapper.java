@@ -19,19 +19,33 @@
 package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Arrays;
+
+@ApiStatus.Internal
 public class VersionMapper {
+
     private final ClientVersion[] versions;
     private final ClientVersion[] reversedVersions;
 
     public VersionMapper(ClientVersion... versions) {
-        this.versions = versions;
-        reversedVersions = new ClientVersion[versions.length];
-        int index = 0;
-        for (int i = versions.length - 1; i >= 0; i--) {
-            reversedVersions[index] = versions[i];
-            index++;
+        this.versions = versions.clone();
+        Arrays.sort(this.versions);
+
+        this.reversedVersions = new ClientVersion[this.versions.length];
+        for (int i = this.versions.length - 1, j = 0; i >= 0; i--, j++) {
+            this.reversedVersions[j] = this.versions[i];
         }
+    }
+
+    public VersionMapper withExtra(ClientVersion extraStep) {
+        if (Arrays.binarySearch(this.versions, extraStep) >= 0) {
+            return this; // already contained
+        }
+        ClientVersion[] clonedVersions = Arrays.copyOf(this.versions, this.versions.length + 1);
+        clonedVersions[clonedVersions.length - 1] = extraStep; // insert extra mapping step, sorting will be handled by the ctor
+        return new VersionMapper(clonedVersions);
     }
 
     public ClientVersion[] getVersions() {
@@ -52,5 +66,9 @@ public class VersionMapper {
         }
         //Give them the oldest version
         return 0;
+    }
+
+    public int size() {
+        return this.versions.length;
     }
 }

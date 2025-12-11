@@ -124,6 +124,7 @@ public class MappedEntitySet<T extends MappedEntity> implements MappedEntityRefS
 
     public static <Z extends MappedEntity> MappedEntitySet<Z> decode(
             NBT nbt, PacketWrapper<?> wrapper, IRegistry<Z> registry) {
+        ClientVersion version = wrapper.getServerVersion().toClientVersion();
         List<Z> list;
         if (nbt instanceof NBTString) {
             String singleEntry = ((NBTString) nbt).getValue();
@@ -136,14 +137,14 @@ public class MappedEntitySet<T extends MappedEntity> implements MappedEntityRefS
             // single entry list
             list = new ArrayList<>(1);
             ResourceLocation key = new ResourceLocation(singleEntry);
-            list.add(registry.getByNameOrThrow(key));
+            list.add(registry.getByNameOrThrow(version, key));
         } else {
             // assume it's a list
             NBTList<?> listTag = (NBTList<?>) nbt;
             list = new ArrayList<>(listTag.size());
             for (NBT tag : listTag.getTags()) {
                 ResourceLocation key = new ResourceLocation(((NBTString) tag).getValue());
-                list.add(registry.getByNameOrThrow(key));
+                list.add(registry.getByNameOrThrow(version, key));
             }
         }
         return new MappedEntitySet<>(list);
@@ -313,7 +314,7 @@ public class MappedEntitySet<T extends MappedEntity> implements MappedEntityRefS
         public MappedEntitySet<T> resolve(ClientVersion version, IRegistry<T> registry) {
             List<T> entities = new ArrayList<>(this.entries.size());
             for (String entityName : this.entries) {
-                entities.add(registry.getByNameOrThrow(entityName));
+                entities.add(registry.getByNameOrThrow(version, entityName));
             }
             return new MappedEntitySet<>(entities);
         }

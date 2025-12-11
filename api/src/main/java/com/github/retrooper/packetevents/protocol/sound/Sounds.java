@@ -2520,6 +2520,274 @@ public final class Sounds {
      * @versions 1.21.9+
      */
     public static final Sound WEATHER_END_FLASH = define("weather.end_flash");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_ARMOR_EQUIP_NAUTILUS = define("item.armor.equip_nautilus");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_ARMOR_UNEQUIP_NAUTILUS = define("item.armor.unequip_nautilus");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_BABY_NAUTILUS_AMBIENT = define("entity.baby_nautilus.ambient");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_BABY_NAUTILUS_AMBIENT_LAND = define("entity.baby_nautilus.ambient_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_BABY_NAUTILUS_DEATH = define("entity.baby_nautilus.death");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_BABY_NAUTILUS_DEATH_LAND = define("entity.baby_nautilus.death_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_BABY_NAUTILUS_EAT = define("entity.baby_nautilus.eat");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_BABY_NAUTILUS_HURT = define("entity.baby_nautilus.hurt");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_BABY_NAUTILUS_HURT_LAND = define("entity.baby_nautilus.hurt_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_RIDING = define("entity.nautilus.riding");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_BABY_NAUTILUS_SWIM = define("entity.baby_nautilus.swim");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_CAMEL_HUSK_AMBIENT = define("entity.camel_husk.ambient");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_CAMEL_HUSK_DASH = define("entity.camel_husk.dash");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_CAMEL_HUSK_DASH_READY = define("entity.camel_husk.dash_ready");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_CAMEL_HUSK_DEATH = define("entity.camel_husk.death");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_CAMEL_HUSK_EAT = define("entity.camel_husk.eat");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_CAMEL_HUSK_HURT = define("entity.camel_husk.hurt");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_CAMEL_HUSK_SADDLE = define("entity.camel_husk.saddle");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_CAMEL_HUSK_SIT = define("entity.camel_husk.sit");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_CAMEL_HUSK_STAND = define("entity.camel_husk.stand");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_CAMEL_HUSK_STEP = define("entity.camel_husk.step");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_CAMEL_HUSK_STEP_SAND = define("entity.camel_husk.step_sand");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_SPEAR_LUNGE_1 = define("item.spear.lunge_1");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_SPEAR_LUNGE_2 = define("item.spear.lunge_2");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_SPEAR_LUNGE_3 = define("item.spear.lunge_3");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_AMBIENT = define("entity.nautilus.ambient");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_AMBIENT_LAND = define("entity.nautilus.ambient_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_DASH = define("entity.nautilus.dash");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_DASH_LAND = define("entity.nautilus.dash_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_DASH_READY = define("entity.nautilus.dash_ready");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_DASH_READY_LAND = define("entity.nautilus.dash_ready_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_DEATH = define("entity.nautilus.death");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_DEATH_LAND = define("entity.nautilus.death_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_EAT = define("entity.nautilus.eat");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_HURT = define("entity.nautilus.hurt");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_HURT_LAND = define("entity.nautilus.hurt_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_NAUTILUS_SWIM = define("entity.nautilus.swim");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_PARCHED_AMBIENT = define("entity.parched.ambient");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_PARCHED_DEATH = define("entity.parched.death");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_PARCHED_HURT = define("entity.parched.hurt");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_PARCHED_STEP = define("entity.parched.step");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_PARROT_IMITATE_CAMEL_HUSK = define("entity.parrot.imitate.camel_husk");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_PARROT_IMITATE_PARCHED = define("entity.parrot.imitate.parched");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_PARROT_IMITATE_ZOMBIE_HORSE = define("entity.parrot.imitate.zombie_horse");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_PARROT_IMITATE_ZOMBIE_NAUTILUS = define("entity.parrot.imitate.zombie_nautilus");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_SPEAR_USE = define("item.spear.use");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_SPEAR_HIT = define("item.spear.hit");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_SPEAR_ATTACK = define("item.spear.attack");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_SPEAR_WOOD_USE = define("item.spear_wood.use");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_SPEAR_WOOD_HIT = define("item.spear_wood.hit");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_SPEAR_WOOD_ATTACK = define("item.spear_wood.attack");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_HORSE_ANGRY = define("entity.zombie_horse.angry");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_HORSE_EAT = define("entity.zombie_horse.eat");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_AMBIENT = define("entity.zombie_nautilus.ambient");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_AMBIENT_LAND = define("entity.zombie_nautilus.ambient_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_DASH = define("entity.zombie_nautilus.dash");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_DASH_LAND = define("entity.zombie_nautilus.dash_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_DASH_READY = define("entity.zombie_nautilus.dash_ready");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_DASH_READY_LAND = define("entity.zombie_nautilus.dash_ready_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_DEATH = define("entity.zombie_nautilus.death");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_DEATH_LAND = define("entity.zombie_nautilus.death_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_EAT = define("entity.zombie_nautilus.eat");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_HURT = define("entity.zombie_nautilus.hurt");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_HURT_LAND = define("entity.zombie_nautilus.hurt_land");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ENTITY_ZOMBIE_NAUTILUS_SWIM = define("entity.zombie_nautilus.swim");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_NAUTILUS_SADDLE_UNDERWATER_EQUIP = define("item.nautilus_saddle_underwater_equip");
+    /**
+     * @versions 1.21.11+
+     */
+    public static final Sound ITEM_NAUTILUS_SADDLE_EQUIP = define("item.nautilus_saddle_equip");
 
     /**
      * Returns an immutable view of the sounds.

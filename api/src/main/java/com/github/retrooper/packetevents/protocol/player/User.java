@@ -327,27 +327,27 @@ public class User implements IRegistryHolder {
     // dimension type related methods
 
     public int getMinWorldHeight() {
-        return this.getMinWorldHeight(null);
+        return this.dimensionType.getMinY();
     }
 
+    /**
+     * @deprecated use {@link #getMinWorldHeight()}
+     */
+    @Deprecated
     public int getMinWorldHeight(@Nullable ClientVersion version) {
-        if (version == null) {
-            version = PacketEvents.getAPI().getInjector().isProxy() ? this.getClientVersion() :
-                    PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
-        }
-        return this.dimensionType.getMinY(version);
+        return this.getMinWorldHeight();
     }
 
     public int getTotalWorldHeight() {
-        return this.getTotalWorldHeight(null);
+        return this.dimensionType.getHeight();
     }
 
+    /**
+     * @deprecated use {@link #getTotalWorldHeight()}
+     */
+    @Deprecated
     public int getTotalWorldHeight(@Nullable ClientVersion version) {
-        if (version == null) {
-            version = PacketEvents.getAPI().getInjector().isProxy() ? this.getClientVersion() :
-                    PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
-        }
-        return this.dimensionType.getHeight(version);
+        return this.getTotalWorldHeight();
     }
 
     public DimensionType getDimensionType() {

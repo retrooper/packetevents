@@ -73,14 +73,14 @@ public class SpongePacketEventsBuilder {
     }
 
     public static PacketEventsAPI<PluginContainer> buildNoCache(PluginContainer plugin, PacketEventsSettings inSettings) {
-        return new PacketEventsAPI<PluginContainer>() {
+        return new PacketEventsAPI<>() {
             private final PacketEventsSettings settings = inSettings;
             private final ProtocolManager protocolManager = new ProtocolManagerImpl();
             private final ServerManager serverManager = new ServerManagerImpl();
             private final PlayerManager playerManager = new PlayerManagerImpl();
             private final NettyManager nettyManager = new NettyManagerImpl();
             private final SpongeChannelInjector injector = new SpongeChannelInjector();
-            private final LogManager logManager = new SpongeLogManager();
+            private final LogManager logManager = new SpongeLogManager(plugin);
             private boolean loaded;
             private boolean initialized;
             private boolean terminated;

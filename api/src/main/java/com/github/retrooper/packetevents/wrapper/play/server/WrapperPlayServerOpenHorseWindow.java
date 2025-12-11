@@ -22,7 +22,12 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * Mojang name: ClientboundMountScreenOpenPacket<br/>
+ * Mojang name pre 1.21.11: ClientboundHorseScreenOpenPacket
+ */
 public class WrapperPlayServerOpenHorseWindow extends PacketWrapper<WrapperPlayServerOpenHorseWindow> {
+
     private int windowId;
     private int slotCount;
     private int entityId;

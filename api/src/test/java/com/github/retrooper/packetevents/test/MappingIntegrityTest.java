@@ -1,3 +1,21 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2025 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.github.retrooper.packetevents.test;
 
 import com.github.retrooper.packetevents.protocol.attribute.Attributes;
@@ -5,6 +23,8 @@ import com.github.retrooper.packetevents.protocol.item.enchantment.type.Enchantm
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.biome.Biomes;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Axis;
 import com.github.retrooper.packetevents.protocol.world.states.enums.East;
@@ -14,12 +34,15 @@ import com.github.retrooper.packetevents.protocol.world.states.enums.South;
 import com.github.retrooper.packetevents.protocol.world.states.enums.West;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.test.base.BaseDummyAPITest;
+import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@NullMarked
 public class MappingIntegrityTest extends BaseDummyAPITest {
 
     @Test
@@ -60,6 +83,14 @@ public class MappingIntegrityTest extends BaseDummyAPITest {
     public void testItemTypeMapping() {
         assertNotNull(ItemTypes.getByName("minecraft:piglin_head"));
         assertNotNull(ItemTypes.getByName("piglin_head"));
+    }
+
+    @Test
+    @DisplayName("Test dimension type mappings")
+    public void testDimensionTypeMapping() {
+        VersionedRegistry<DimensionType> registry = DimensionTypes.getRegistry();
+        assertEquals(256, registry.getByNameOrThrow(ClientVersion.V_1_17_1, "overworld").getHeight());
+        assertEquals(384, registry.getByNameOrThrow(ClientVersion.V_1_18, "overworld").getHeight());
     }
 
     @Test

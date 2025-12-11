@@ -1,0 +1,17 @@
+{
+  "V_1_21_11": [
+    "boolean",
+    "tri_state",
+    "float",
+    "angle_degrees",
+    "rgb_color",
+    "argb_color",
+    "moon_phase",
+    "activity",
+    "bed_rule",
+    "particle",
+    "ambient_particles",
+    "background_music",
+    "ambient_sounds"
+  ]
+}

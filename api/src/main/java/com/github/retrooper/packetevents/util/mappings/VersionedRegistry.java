@@ -18,9 +18,12 @@
 
 package com.github.retrooper.packetevents.util.mappings;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.MapUtil;
+import com.github.retrooper.packetevents.util.VersionRange;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
@@ -28,38 +31,66 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 @NullMarked
 public final class VersionedRegistry<T extends MappedEntity> implements IRegistry<T> {
 
+    private static final String REGISTRY_MAPPINGS_PREFIX = "registries/";
+
     private final ResourceLocation registryKey;
     private final TypesBuilder typesBuilder;
+    private final ClientVersion[] extraSteps;
 
-    private final Map<String, T> typeMap = new HashMap<>();
-    private final Map<Byte, Map<Integer, T>> typeIdMap = new HashMap<>();
+    private final Map<String, T>[] typeNames;
+    private final Map<Integer, T>[] typeIds;
+    private final Set<T> entries = new HashSet<>();
 
     public VersionedRegistry(String registry) {
-        this(registry, "registries/" + registry);
+        this(registry, new ClientVersion[0]);
+    }
+
+    public VersionedRegistry(String registry, ClientVersion... extraSteps) {
+        this(registry, REGISTRY_MAPPINGS_PREFIX + registry, extraSteps);
     }
 
     public VersionedRegistry(String registry, String mappingsPath) {
-        this(new ResourceLocation(registry), mappingsPath);
+        this(registry, mappingsPath, new ClientVersion[0]);
+    }
+
+    public VersionedRegistry(String registry, String mappingsPath, ClientVersion... extraSteps) {
+        this(new ResourceLocation(registry), mappingsPath, extraSteps);
     }
 
     public VersionedRegistry(ResourceLocation registryKey, String mappingsPath) {
+        this(registryKey, mappingsPath, new ClientVersion[0]);
+    }
+
+    @SuppressWarnings("unchecked") // there is no way to create arrays with generic types properly
+    public VersionedRegistry(ResourceLocation registryKey, String mappingsPath, ClientVersion... extraSteps) {
         this.registryKey = registryKey;
         this.typesBuilder = new TypesBuilder(mappingsPath);
-        this.typesBuilder.registry = this;
+        this.extraSteps = extraSteps;
+        this.postLoadMappings();
+
+        int versions = this.typesBuilder.getVersionMapper().size();
+        this.typeNames = new Map[versions];
+        this.typeIds = new Map[versions];
     }
 
     @ApiStatus.Internal
     public <Z extends T> Z define(String name, Function<TypesBuilderData, Z> builder) {
-        TypesBuilderData typeData = this.typesBuilder.define(name);
+        return this.define(name, VersionRange.ALL_VERSIONS, builder);
+    }
+
+    @ApiStatus.Internal
+    public <Z extends T> Z define(String name, VersionRange range, Function<TypesBuilderData, Z> builder) {
+        TypesBuilderData typeData = this.typesBuilder.define(name, range);
         Z instance = builder.apply(typeData);
-        MappingHelper.registerMapping(this.typesBuilder, this.typeMap, this.typeIdMap, typeData, instance);
+        MappingHelper.registerMapping(this.typesBuilder, this.typeNames, this.typeIds, typeData, instance);
         return instance;
     }
 
@@ -69,27 +100,74 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
         return this.typesBuilder;
     }
 
+    @VisibleForTesting
+    @ApiStatus.Internal
+    public void postLoadMappings() {
+        this.typesBuilder.registry = this;
+        // add extra steps to version mapper
+        for (ClientVersion extraStep : this.extraSteps) {
+            this.typesBuilder.addExtraVersionStep(extraStep);
+        }
+    }
+
     @ApiStatus.Internal
     public void unloadMappings() {
         this.typesBuilder.unloadFileMappings();
+
+        // de-duplicate map objects for names to save memory;
+        // only lookup last map to save time
+        Map<String, T> lastNameMap = this.typeNames[0];
+        for (int i = 1; i < this.typeNames.length; i++) {
+            Map<String, T> nameMap = this.typeNames[i];
+            if (MapUtil.isDeepEqual(lastNameMap, nameMap)) {
+                this.typeNames[i] = lastNameMap;
+            } else {
+                lastNameMap = nameMap;
+            }
+        }
+
+        // add all entries to a set
+        Set<String> entryNames = new HashSet<>();
+        // reverse iteration so we add the newest entry for each name
+        for (int i = this.typeNames.length - 1; i >= 0; --i) {
+            for (Map.Entry<String, T> entry : this.typeNames[i].entrySet()) {
+                // de-duplicate by name to prevent adding the same entry from multiple versions
+                if (entryNames.add(entry.getKey())) {
+                    this.entries.add(entry.getValue());
+                }
+            }
+        }
+    }
+
+    @Override
+    public @Nullable T getByName(ClientVersion version, ResourceLocation name) {
+        int index = this.typesBuilder.getDataIndex(version);
+        return this.typeNames[index].get(name.toString());
+    }
+
+    @Override
+    public @Nullable T getByName(ClientVersion version, String name) {
+        int index = this.typesBuilder.getDataIndex(version);
+        // prepend "minecraft:" prefix if no other namespace has been specified
+        return this.typeNames[index].get(ResourceLocation.normString(name));
     }
 
     @Override
     public @Nullable T getByName(ResourceLocation name) {
-        return this.typeMap.get(name.toString()); // skip norming call
+        ClientVersion version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        return this.getByName(version, name);
     }
 
     @Override
     public @Nullable T getByName(String name) {
-        // prepend "minecraft:" prefix if no other namespace has been specified
-        return this.typeMap.get(ResourceLocation.normString(name));
+        ClientVersion version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        return this.getByName(version, name);
     }
 
     @Override
     public @Nullable T getById(ClientVersion version, int id) {
         int index = this.typesBuilder.getDataIndex(version);
-        Map<Integer, T> idMap = this.typeIdMap.get((byte) index);
-        return idMap.get(id);
+        return this.typeIds[index].get(id);
     }
 
     @Override
@@ -102,12 +180,12 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
      */
     @Override
     public Collection<T> getEntries() {
-        return Collections.unmodifiableCollection(this.typeMap.values());
+        return Collections.unmodifiableCollection(this.entries);
     }
 
     @Override
     public int size() {
-        return this.typeMap.size();
+        return this.entries.size();
     }
 
     @Override

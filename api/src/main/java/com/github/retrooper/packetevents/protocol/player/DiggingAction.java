@@ -19,13 +19,19 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 public enum DiggingAction {
+
     START_DIGGING,
     CANCELLED_DIGGING,
     FINISHED_DIGGING,
     DROP_ITEM_STACK,
     DROP_ITEM,
     RELEASE_USE_ITEM,
-    SWAP_ITEM_WITH_OFFHAND;
+    SWAP_ITEM_WITH_OFFHAND,
+    /**
+     * @versions 1.21.11+
+     */
+    STAB,
+    ;
 
     private static final DiggingAction[] VALUES = values();
 

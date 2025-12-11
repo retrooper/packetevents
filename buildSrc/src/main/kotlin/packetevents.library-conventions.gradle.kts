@@ -29,6 +29,9 @@ java {
 
 tasks {
     withType<JavaCompile> {
+        options.compilerArgs.add("-parameters")
+        options.compilerArgs.add("-g")
+
         sequenceOf("unchecked", "deprecation", "removal")
             .forEach { options.compilerArgs.add("-Xlint:$it") }
 

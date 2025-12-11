@@ -30,6 +30,35 @@ import java.util.function.BiFunction;
 @NullMarked
 public interface IRegistry<T extends MappedEntity> extends BiFunction<ClientVersion, Integer, T> {
 
+    // versioned name getter
+
+    default T getByNameOrThrow(ClientVersion version, ResourceLocation name) {
+        T value = this.getByName(version, name);
+        if (value == null) {
+            throw new IllegalArgumentException("Can't resolve '" + name + "' in '" + this.getRegistryKey() + "' for " + version);
+        }
+        return value;
+    }
+
+    default @Nullable T getByName(ClientVersion version, ResourceLocation name) {
+        return this.getByName(version, name.toString());
+    }
+
+    default T getByNameOrThrow(ClientVersion version, String name) {
+        T value = this.getByName(version, name);
+        if (value == null) {
+            String normedName = ResourceLocation.normString(name);
+            throw new IllegalArgumentException("Can't resolve '" + normedName + "' in '" + this.getRegistryKey() + "' for " + version);
+        }
+        return value;
+    }
+
+    default @Nullable T getByName(ClientVersion version, String name) {
+        return this.getByName(name);
+    }
+
+    // static name getter
+
     default T getByNameOrThrow(ResourceLocation name) {
         T value = this.getByName(name);
         if (value == null) {
@@ -54,6 +83,8 @@ public interface IRegistry<T extends MappedEntity> extends BiFunction<ClientVers
     @Nullable
     T getByName(String name);
 
+    // versioned id getter
+
     default T getByIdOrThrow(ClientVersion version, int id) {
         T value = this.getById(version, id);
         if (value == null) {
@@ -67,10 +98,12 @@ public interface IRegistry<T extends MappedEntity> extends BiFunction<ClientVers
     T getById(ClientVersion version, int id);
 
     default int getId(String entityName, ClientVersion version) {
-        return this.getId(this.getByNameOrThrow(entityName), version);
+        return this.getId(this.getByNameOrThrow(version, entityName), version);
     }
 
     int getId(MappedEntity entity, ClientVersion version);
+
+    // misc
 
     /**
      * Returns an immutable view of the registry entries.

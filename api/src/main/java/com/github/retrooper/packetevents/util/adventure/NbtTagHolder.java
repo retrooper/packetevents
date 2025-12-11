@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.util.adventure;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.util.Codec;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -34,13 +33,12 @@ public final class NbtTagHolder implements BinaryTagHolder {
     }
 
     @Override
-    public @NotNull String string() {
-        // TODO snbt serialization is currently not supported by packetevents
-        throw new UnsupportedOperationException();
+    public String string() {
+        return AdventureNbtUtil.toString(this.tag);
     }
 
     @Override
-    public <T, DX extends Exception> @NotNull T get(@NotNull Codec<T, String, DX, ?> codec) throws DX {
+    public <T, DX extends Exception> T get(Codec<T, String, DX, ?> codec) throws DX {
         return codec.decode(this.string());
     }
 

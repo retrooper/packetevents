@@ -51,8 +51,15 @@ import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.protocol.chat.*;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
+import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
+import com.github.retrooper.packetevents.protocol.chat.MessageSignature;
+import com.github.retrooper.packetevents.protocol.chat.Node;
+import com.github.retrooper.packetevents.protocol.chat.Parsers;
 import com.github.retrooper.packetevents.protocol.chat.Parsers.Parser;
+import com.github.retrooper.packetevents.protocol.chat.RemoteChatSession;
+import com.github.retrooper.packetevents.protocol.chat.SignedCommandArgument;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMask;
 import com.github.retrooper.packetevents.protocol.chat.filter.FilterMaskType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
@@ -83,7 +90,11 @@ import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.WorldBlockPosition;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.*;
+import com.github.retrooper.packetevents.util.Either;
+import com.github.retrooper.packetevents.util.KnownPack;
+import com.github.retrooper.packetevents.util.MathUtil;
+import com.github.retrooper.packetevents.util.StringUtil;
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.crypto.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.util.crypto.SaltSignature;
@@ -102,7 +113,18 @@ import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -1429,6 +1451,18 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
 
     public <Z extends Enum<?>> Z readEnum(Z[] values) {
         return values[this.readVarInt()];
+    }
+
+    public <Z extends Enum<?>> Z readEnum(Class<Z> clazz, Z fallback) {
+        return this.readEnum(clazz.getEnumConstants(), fallback);
+    }
+
+    public <Z extends Enum<?>> Z readEnum(Z[] values, Z fallback) {
+        int id = this.readVarInt();
+        if (id < 0 || id >= values.length) {
+            return fallback;
+        }
+        return values[id];
     }
 
     public void writeEnum(Enum<?> value) {

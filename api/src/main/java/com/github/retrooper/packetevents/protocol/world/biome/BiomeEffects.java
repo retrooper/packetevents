@@ -18,45 +18,219 @@
 
 package com.github.retrooper.packetevents.protocol.world.biome;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.color.Color;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTDouble;
 import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
-import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
+import com.github.retrooper.packetevents.protocol.util.CodecNameable;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
+import com.github.retrooper.packetevents.protocol.util.NbtMapCodec;
+import com.github.retrooper.packetevents.protocol.world.attributes.AmbientSounds;
+import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributeMap;
+import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributes;
 import com.github.retrooper.packetevents.util.RandomWeightedList;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.util.Index;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
-
+@NullMarked
 public class BiomeEffects {
 
+    private static final Color FALLBACK_FOG_COLOR = new Color(0xC0D8FF);
+    private static final Color FALLBACK_WATER_FOG_COLOR = new Color(0x050533);
+    private static final Color FALLBACK_SKY_COLOR = new Color(0x77A8FF);
     private static final float FALLBACK_MUSIC_VOLUME = 1f;
 
-    private final int fogColor;
-    private final int waterColor;
-    private final int waterFogColor;
-    private final int skyColor;
-    private final OptionalInt foliageColor;
-    private final OptionalInt grassColor;
+    public static final NbtCodec<BiomeEffects> CODEC = codecWithAttributes(null);
+
+    public static NbtCodec<BiomeEffects> codecWithAttributes(@Nullable EnvironmentAttributeMap attributes) {
+        return new NbtMapCodec<BiomeEffects>() {
+            @Override
+            public BiomeEffects decode(NBTCompound compound, PacketWrapper<?> wrapper) throws NbtCodecException {
+                Color waterColor = compound.getOrThrow("water_color", NbtCodecs.RGB_COLOR, wrapper);
+                Color foliageColor = compound.getOrNull("foliage_color", NbtCodecs.RGB_COLOR, wrapper);
+                Color grassColor = compound.getOrNull("grass_color", NbtCodecs.RGB_COLOR, wrapper);
+                GrassColorModifier grassColorModifier = compound.getOr("grass_color_modifier", GrassColorModifier.CODEC, GrassColorModifier.NONE, wrapper);
+
+                Color dryFoliageColor = null;
+                Color fogColor = null;
+                Color waterFogColor = null;
+                Color skyColor = null;
+                ParticleSettings particle = null;
+                Sound ambientSound = null;
+                MoodSettings moodSound = null;
+                AdditionsSettings additionsSound = null;
+                float musicVolume;
+                RandomWeightedList<MusicSettings> music;
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_11)) {
+                    dryFoliageColor = compound.getOrNull("dry_foliage_color", NbtCodecs.RGB_COLOR, wrapper);
+                    if (attributes != null) {
+                        // set legacy fields using new attribute values (if present)
+                        fogColor = attributes.getOrDefault(EnvironmentAttributes.VISUAL_FOG_COLOR);
+                        waterFogColor = attributes.getOrDefault(EnvironmentAttributes.VISUAL_WATER_FOG_COLOR);
+                        skyColor = attributes.getOrDefault(EnvironmentAttributes.VISUAL_SKY_COLOR);
+                        List<ParticleSettings> particles = attributes.getOrDefault(EnvironmentAttributes.VISUAL_AMBIENT_PARTICLES);
+                        particle = particles.isEmpty() ? null : particles.get(0);
+                        AmbientSounds ambientSounds = attributes.getOrDefault(EnvironmentAttributes.AUDIO_AMBIENT_SOUNDS);
+                        ambientSound = ambientSounds.getLoop();
+                        moodSound = ambientSounds.getMood();
+                        additionsSound = ambientSounds.getAdditions().isEmpty() ? null : ambientSounds.getAdditions().get(0);
+                        musicVolume = attributes.getOrDefault(EnvironmentAttributes.AUDIO_MUSIC_VOLUME);
+                        music = attributes.getOrDefault(EnvironmentAttributes.AUDIO_BACKGROUND_MUSIC).asList();
+                    } else {
+                        musicVolume = FALLBACK_MUSIC_VOLUME;
+                        music = new RandomWeightedList<>();
+                    }
+                } else {
+                    fogColor = compound.getOrThrow("fog_color", NbtCodecs.RGB_COLOR, wrapper);
+                    waterFogColor = compound.getOrThrow("water_fog_color", NbtCodecs.RGB_COLOR, wrapper);
+                    skyColor = compound.getOrThrow("sky_color", NbtCodecs.RGB_COLOR, wrapper);
+                    particle = compound.getOrNull("particle", ParticleSettings.CODEC, wrapper);
+                    ambientSound = compound.getOrNull("ambient_sound", Sound.CODEC, wrapper);
+                    moodSound = compound.getOrNull("mood_sound", MoodSettings.CODEC, wrapper);
+                    additionsSound = compound.getOrNull("additions_sound", AdditionsSettings.CODEC, wrapper);
+
+                    if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_4)) {
+                        musicVolume = compound.getOr("music_volume", NbtCodecs.FLOAT, FALLBACK_MUSIC_VOLUME, wrapper);
+                        music = compound.getOrSupply("music", MusicSettings.LIST_CODEC, RandomWeightedList::new, wrapper);
+                    } else {
+                        MusicSettings entry = compound.getOrNull("music", MusicSettings.CODEC, wrapper);
+                        music = entry != null ? new RandomWeightedList<>(entry, 1) : new RandomWeightedList<>();
+                        musicVolume = FALLBACK_MUSIC_VOLUME;
+                    }
+                }
+
+                if (fogColor == null) {
+                    fogColor = FALLBACK_FOG_COLOR;
+                }
+                if (waterFogColor == null) {
+                    waterFogColor = FALLBACK_WATER_FOG_COLOR;
+                }
+                if (skyColor == null) {
+                    skyColor = FALLBACK_SKY_COLOR;
+                }
+
+                return new BiomeEffects(fogColor, waterColor, waterFogColor, skyColor, foliageColor, dryFoliageColor, grassColor,
+                        grassColorModifier, particle, ambientSound, moodSound, additionsSound, music, musicVolume);
+            }
+
+            @Override
+            public void encode(NBTCompound compound, PacketWrapper<?> wrapper, BiomeEffects value) throws NbtCodecException {
+                compound.set("water_color", value.waterColor, NbtCodecs.RGB_COLOR, wrapper);
+                if (value.foliageColor != null) {
+                    compound.set("foliage_color", value.foliageColor, NbtCodecs.RGB_COLOR, wrapper);
+                }
+                if (value.grassColor != null) {
+                    compound.set("grass_color", value.grassColor, NbtCodecs.RGB_COLOR, wrapper);
+                }
+                if (value.grassColorModifier != GrassColorModifier.NONE) {
+                    compound.set("grass_color_modifier", value.grassColorModifier, GrassColorModifier.CODEC, wrapper);
+                }
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_11)) {
+                    if (value.dryFoliageColor != null) {
+                        compound.set("dry_foliage_color", value.dryFoliageColor, NbtCodecs.RGB_COLOR, wrapper);
+                    }
+                } else {
+                    compound.set("fog_color", value.fogColor, NbtCodecs.RGB_COLOR, wrapper);
+                    compound.set("water_fog_color", value.waterFogColor, NbtCodecs.RGB_COLOR, wrapper);
+                    compound.set("sky_color", value.skyColor, NbtCodecs.RGB_COLOR, wrapper);
+                    if (value.particle != null) {
+                        compound.set("particle", value.particle, ParticleSettings.CODEC, wrapper);
+                    }
+                    if (value.ambientSound != null) {
+                        compound.set("ambient_sound", value.ambientSound, Sound.CODEC, wrapper);
+                    }
+                    if (value.moodSound != null) {
+                        compound.set("mood_sound", value.moodSound, MoodSettings.CODEC, wrapper);
+                    }
+                    if (value.additionsSound != null) {
+                        compound.set("additions_sound", value.additionsSound, AdditionsSettings.CODEC, wrapper);
+                    }
+                    if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_4)) {
+                        compound.set("music_volume", value.musicVolume, NbtCodecs.FLOAT, wrapper);
+                        compound.set("music", value.music, MusicSettings.LIST_CODEC, wrapper);
+                    } else {
+                        if (!value.music.isEmpty()) {
+                            RandomWeightedList.Entry<MusicSettings> entry = value.music.getEntries().get(0);
+                            compound.set("music", entry.getData(), MusicSettings.CODEC, wrapper);
+                        }
+                    }
+                }
+            }
+        }.codec();
+    }
+
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
+    private final Color fogColor;
+    private final Color waterColor;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
+    private final Color waterFogColor;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
+    private final Color skyColor;
+    private final @Nullable Color foliageColor;
+    /**
+     * @versions 1.21.11+
+     */
+    private final @Nullable Color dryFoliageColor;
+    private final @Nullable Color grassColor;
     private final GrassColorModifier grassColorModifier;
-    private final Optional<ParticleSettings> particle;
-    private final Optional<Sound> ambientSound;
-    private final Optional<MoodSettings> moodSound;
-    private final Optional<AdditionsSettings> additionsSound;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
+    private final @Nullable ParticleSettings particle;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
+    private final @Nullable Sound ambientSound;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
+    private final @Nullable MoodSettings moodSound;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
+    private final @Nullable AdditionsSettings additionsSound;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     private final RandomWeightedList<MusicSettings> music;
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     private final float musicVolume;
 
+    @ApiStatus.Obsolete
     public BiomeEffects(
             int fogColor, int waterColor, int waterFogColor, int skyColor,
             OptionalInt foliageColor, OptionalInt grassColor,
@@ -75,6 +249,7 @@ public class BiomeEffects {
                 FALLBACK_MUSIC_VOLUME);
     }
 
+    @ApiStatus.Obsolete
     public BiomeEffects(
             int fogColor, int waterColor, int waterFogColor, int skyColor,
             OptionalInt foliageColor, OptionalInt grassColor,
@@ -86,11 +261,34 @@ public class BiomeEffects {
             RandomWeightedList<MusicSettings> music,
             float musicVolume
     ) {
+        this(new Color(fogColor), new Color(waterColor), new Color(waterFogColor),
+                new Color(skyColor), foliageColor.isPresent() ? new Color(foliageColor.getAsInt()) : null,
+                null, grassColor.isPresent() ? new Color(grassColor.getAsInt()) : null,
+                grassColorModifier, particle.orElse(null), ambientSound.orElse(null),
+                moodSound.orElse(null), additionsSound.orElse(null), music, musicVolume);
+    }
+
+    public BiomeEffects(
+            Color waterColor, @Nullable Color foliageColor, @Nullable Color dryFoliageColor,
+            @Nullable Color grassColor, GrassColorModifier grassColorModifier
+    ) {
+        this(Color.BLACK, waterColor, Color.BLACK, Color.BLACK, foliageColor,
+                dryFoliageColor, grassColor, grassColorModifier, null, null, null,
+                null, new RandomWeightedList<>(), FALLBACK_MUSIC_VOLUME);
+    }
+
+    public BiomeEffects(
+            Color fogColor, Color waterColor, Color waterFogColor, Color skyColor, @Nullable Color foliageColor,
+            @Nullable Color dryFoliageColor, @Nullable Color grassColor, GrassColorModifier grassColorModifier,
+            @Nullable ParticleSettings particle, @Nullable Sound ambientSound, @Nullable MoodSettings moodSound,
+            @Nullable AdditionsSettings additionsSound, RandomWeightedList<MusicSettings> music, float musicVolume
+    ) {
         this.fogColor = fogColor;
         this.waterColor = waterColor;
         this.waterFogColor = waterFogColor;
         this.skyColor = skyColor;
         this.foliageColor = foliageColor;
+        this.dryFoliageColor = dryFoliageColor;
         this.grassColor = grassColor;
         this.grassColorModifier = grassColorModifier;
         this.particle = particle;
@@ -101,123 +299,92 @@ public class BiomeEffects {
         this.musicVolume = musicVolume;
     }
 
-    public static BiomeEffects decode(NBT nbt, ClientVersion version) {
-        NBTCompound compound = (NBTCompound) nbt;
-        int fogColor = compound.getNumberTagOrThrow("fog_color").getAsInt();
-        int waterColor = compound.getNumberTagOrThrow("water_color").getAsInt();
-        int waterFogColor = compound.getNumberTagOrThrow("water_fog_color").getAsInt();
-        int skyColor = compound.getNumberTagOrThrow("sky_color").getAsInt();
-        OptionalInt foliageColor = Optional.ofNullable(compound.getNumberTagOrNull("foliage_color"))
-                .map(NBTNumber::getAsInt).map(OptionalInt::of).orElseGet(OptionalInt::empty);
-        OptionalInt grassColor = Optional.ofNullable(compound.getNumberTagOrNull("grass_color"))
-                .map(NBTNumber::getAsInt).map(OptionalInt::of).orElseGet(OptionalInt::empty);
-        GrassColorModifier grassColorModifier = Optional.ofNullable(compound.getStringTagValueOrNull("grass_color_modifier"))
-                .map(id -> indexValueOrThrow(GrassColorModifier.ID_INDEX, id)).orElse(GrassColorModifier.NONE);
-        Optional<ParticleSettings> particle = Optional.ofNullable(compound.getTagOrNull("particle"))
-                .map(tag -> ParticleSettings.decode(tag, version));
-        Optional<Sound> ambientSound = Optional.ofNullable(compound.getTagOrNull("ambient_sound"))
-                .map(tag -> Sound.decode(tag, version));
-        Optional<MoodSettings> moodSound = Optional.ofNullable(compound.getTagOrNull("mood_sound"))
-                .map(tag -> MoodSettings.decode(tag, version));
-        Optional<AdditionsSettings> additionsSound = Optional.ofNullable(compound.getTagOrNull("additions_sound"))
-                .map(tag -> AdditionsSettings.decode(tag, version));
-
-        NBT musicTag = compound.getTagOrNull("music");
-        RandomWeightedList<MusicSettings> music = musicTag == null ? new RandomWeightedList<>() : null;
-        float musicVolume = FALLBACK_MUSIC_VOLUME;
-        if (version.isNewerThanOrEquals(ClientVersion.V_1_21_4)) {
-            NBTNumber musicVolumeTag = compound.getNumberTagOrNull("music_volume");
-            if (musicVolumeTag != null) {
-                musicVolume = musicVolumeTag.getAsFloat();
-            }
-            if (musicTag != null) {
-                music = RandomWeightedList.decode(musicTag, version, MusicSettings::decode);
-            }
-        } else if (musicTag != null) {
-            music = new RandomWeightedList<>(MusicSettings.decode(musicTag, version), 1);
-        }
-        return new BiomeEffects(fogColor, waterColor, waterFogColor, skyColor, foliageColor, grassColor,
-                grassColorModifier, particle, ambientSound, moodSound, additionsSound, music, musicVolume);
-    }
-
-    public static NBT encode(BiomeEffects effects, ClientVersion version) {
-        NBTCompound compound = new NBTCompound();
-        compound.setTag("fog_color", new NBTInt(effects.fogColor));
-        compound.setTag("water_color", new NBTInt(effects.waterColor));
-        compound.setTag("water_fog_color", new NBTInt(effects.waterFogColor));
-        compound.setTag("sky_color", new NBTInt(effects.skyColor));
-        effects.foliageColor.ifPresent(color ->
-                compound.setTag("foliage_color", new NBTInt(color)));
-        effects.grassColor.ifPresent(color ->
-                compound.setTag("grass_color", new NBTInt(color)));
-        if (effects.grassColorModifier != GrassColorModifier.NONE) {
-            compound.setTag("grass_color_modifier", new NBTString(effects.grassColorModifier.getId()));
-        }
-        effects.particle.ifPresent(settings -> compound.setTag(
-                "particle", ParticleSettings.encode(settings, version)));
-        effects.ambientSound.ifPresent(sound -> compound.setTag(
-                "ambient_sound", Sound.encode(sound, version)));
-        effects.moodSound.ifPresent(sound -> compound.setTag(
-                "mood_sound", MoodSettings.encode(sound, version)));
-        effects.additionsSound.ifPresent(sound -> compound.setTag(
-                "additions_sound", AdditionsSettings.encode(sound, version)));
-
-        if (version.isNewerThanOrEquals(ClientVersion.V_1_21_4)) {
-            compound.setTag("music_volume", new NBTFloat(effects.musicVolume));
-            compound.setTag("music", RandomWeightedList.encode(effects.music, version, MusicSettings::encode));
-        } else {
-            List<RandomWeightedList.Entry<MusicSettings>> entries = effects.music.getEntries();
-            if (!entries.isEmpty()) {
-                compound.setTag("music", MusicSettings.encode(entries.get(0).getData(), version));
-            }
-        }
-        return compound;
-    }
-
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     public int getFogColor() {
-        return this.fogColor;
+        return this.fogColor.asRGB();
     }
 
     public int getWaterColor() {
-        return this.waterColor;
+        return this.waterColor.asRGB();
     }
 
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     public int getWaterFogColor() {
-        return this.waterFogColor;
+        return this.waterFogColor.asRGB();
     }
 
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     public int getSkyColor() {
-        return this.skyColor;
+        return this.skyColor.asRGB();
     }
 
     public OptionalInt getFoliageColor() {
-        return this.foliageColor;
+        if (this.foliageColor != null) {
+            return OptionalInt.of(this.foliageColor.asRGB());
+        }
+        return OptionalInt.empty();
+    }
+
+    public @Nullable Color getDryFoliageColor() {
+        return this.dryFoliageColor;
     }
 
     public OptionalInt getGrassColor() {
-        return this.grassColor;
+        if (this.grassColor != null) {
+            return OptionalInt.of(this.grassColor.asRGB());
+        }
+        return OptionalInt.empty();
     }
 
     public GrassColorModifier getGrassColorModifier() {
         return this.grassColorModifier;
     }
 
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     public Optional<ParticleSettings> getParticle() {
-        return this.particle;
+        return Optional.ofNullable(this.particle);
     }
 
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     public Optional<Sound> getAmbientSound() {
-        return this.ambientSound;
+        return Optional.ofNullable(this.ambientSound);
     }
 
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     public Optional<MoodSettings> getMoodSound() {
-        return this.moodSound;
+        return Optional.ofNullable(this.moodSound);
     }
 
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     public RandomWeightedList<MusicSettings> getMusics() {
         return this.music;
     }
 
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     public Optional<MusicSettings> getMusic() {
         List<RandomWeightedList.Entry<MusicSettings>> entries = this.music.getEntries();
         if (entries.isEmpty()) {
@@ -226,40 +393,21 @@ public class BiomeEffects {
         return Optional.of(entries.get(0).getData());
     }
 
+    /**
+     * @versions -1.21.10
+     */
+    @ApiStatus.Obsolete
     public Optional<AdditionsSettings> getAdditionsSound() {
-        return this.additionsSound;
+        return Optional.ofNullable(this.additionsSound);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof BiomeEffects)) return false;
-        BiomeEffects that = (BiomeEffects) obj;
-        if (this.fogColor != that.fogColor) return false;
-        if (this.waterColor != that.waterColor) return false;
-        if (this.waterFogColor != that.waterFogColor) return false;
-        if (this.skyColor != that.skyColor) return false;
-        if (!this.foliageColor.equals(that.foliageColor)) return false;
-        if (!this.grassColor.equals(that.grassColor)) return false;
-        if (this.grassColorModifier != that.grassColorModifier) return false;
-        if (!this.particle.equals(that.particle)) return false;
-        if (!this.ambientSound.equals(that.ambientSound)) return false;
-        if (!this.moodSound.equals(that.moodSound)) return false;
-        if (!this.additionsSound.equals(that.additionsSound)) return false;
-        return this.music.equals(that.music);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.fogColor, this.waterColor, this.waterFogColor, this.skyColor, this.foliageColor, this.grassColor, this.grassColorModifier, this.particle, this.ambientSound, this.moodSound, this.additionsSound, this.music);
-    }
-
-    public enum GrassColorModifier {
+    public enum GrassColorModifier implements CodecNameable {
 
         NONE("none"),
         DARK_FOREST("dark_forest"),
         SWAMP("swamp");
 
+        public static final NbtCodec<GrassColorModifier> CODEC = NbtCodecs.forEnum(values());
         public static final Index<String, GrassColorModifier> ID_INDEX = Index.create(
                 GrassColorModifier.class, GrassColorModifier::getId);
 
@@ -272,9 +420,31 @@ public class BiomeEffects {
         public String getId() {
             return this.id;
         }
+
+        @Override
+        public String getCodecName() {
+            return this.id;
+        }
     }
 
     public static final class ParticleSettings {
+
+        public static final NbtCodec<ParticleSettings> CODEC = new NbtMapCodec<ParticleSettings>() {
+            @Override
+            public ParticleSettings decode(NBTCompound compound, PacketWrapper<?> wrapper) throws NbtCodecException {
+                String key = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_11) ? "particle" : "options";
+                Particle<?> particle = Particle.CODEC.decode(compound.getTagOrThrow(key), wrapper);
+                float probability = compound.getNumberTagOrThrow("probability").getAsFloat();
+                return new ParticleSettings(particle, probability);
+            }
+
+            @Override
+            public void encode(NBTCompound compound, PacketWrapper<?> wrapper, ParticleSettings value) throws NbtCodecException {
+                String key = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_11) ? "particle" : "options";
+                compound.set(key, value.particle, Particle.CODEC, wrapper);
+                compound.setTag("probability", new NBTFloat(value.probability));
+            }
+        }.codec();
 
         private final Particle<?> particle;
         private final float probability;
@@ -284,6 +454,7 @@ public class BiomeEffects {
             this.probability = probability;
         }
 
+        @Deprecated
         public static ParticleSettings decode(NBT nbt, ClientVersion version) {
             NBTCompound compound = (NBTCompound) nbt;
             Particle<?> particle = Particle.decode(compound.getTagOrNull("options"), version);
@@ -291,6 +462,7 @@ public class BiomeEffects {
             return new ParticleSettings(particle, probability);
         }
 
+        @Deprecated
         public static NBT encode(ParticleSettings settings, ClientVersion version) {
             NBTCompound compound = new NBTCompound();
             compound.setTag("options", Particle.encode(settings.particle, version));
@@ -305,9 +477,41 @@ public class BiomeEffects {
         public float getProbability() {
             return this.probability;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof ParticleSettings)) return false;
+            ParticleSettings that = (ParticleSettings) obj;
+            if (Float.compare(that.probability, this.probability) != 0) return false;
+            return this.particle.equals(that.particle);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.particle, this.probability);
+        }
     }
 
     public static final class MoodSettings {
+
+        public static final NbtCodec<MoodSettings> CODEC = new NbtMapCodec<MoodSettings>() {
+            @Override
+            public MoodSettings decode(NBTCompound compound, PacketWrapper<?> wrapper) throws NbtCodecException {
+                Sound sound = compound.getOrThrow("sound", Sound.CODEC, wrapper);
+                int tickDelay = compound.getOrThrow("tick_delay", NbtCodecs.INT, wrapper);
+                int blockSearchExtent = compound.getOrThrow("block_search_extent", NbtCodecs.INT, wrapper);
+                double soundOffset = compound.getOrThrow("offset", NbtCodecs.DOUBLE, wrapper);
+                return new MoodSettings(sound, tickDelay, blockSearchExtent, soundOffset);
+            }
+
+            @Override
+            public void encode(NBTCompound compound, PacketWrapper<?> wrapper, MoodSettings value) throws NbtCodecException {
+                compound.set("sound", value.sound, Sound.CODEC, wrapper);
+                compound.set("tick_delay", value.tickDelay, NbtCodecs.INT, wrapper);
+                compound.set("block_search_extent", value.blockSearchExtent, NbtCodecs.INT, wrapper);
+                compound.set("offset", value.soundOffset, NbtCodecs.DOUBLE, wrapper);
+            }
+        }.codec();
 
         private final Sound sound;
         private final int tickDelay;
@@ -321,6 +525,7 @@ public class BiomeEffects {
             this.soundOffset = soundOffset;
         }
 
+        @Deprecated
         public static MoodSettings decode(NBT nbt, ClientVersion version) {
             NBTCompound compound = (NBTCompound) nbt;
             Sound sound = Sound.decode(compound.getTagOrThrow("sound"), version);
@@ -330,6 +535,7 @@ public class BiomeEffects {
             return new MoodSettings(sound, tickDelay, blockSearchExtent, soundOffset);
         }
 
+        @Deprecated
         public static NBT encode(MoodSettings settings, ClientVersion version) {
             NBTCompound compound = new NBTCompound();
             compound.setTag("sound", Sound.encode(settings.sound, version));
@@ -374,6 +580,22 @@ public class BiomeEffects {
 
     public static final class AdditionsSettings {
 
+        public static final NbtCodec<AdditionsSettings> CODEC = new NbtMapCodec<AdditionsSettings>() {
+            @Override
+            public AdditionsSettings decode(NBTCompound compound, PacketWrapper<?> wrapper) throws NbtCodecException {
+                Sound sound = compound.getOrThrow("sound", Sound.CODEC, wrapper);
+                double tickChance = compound.getOrThrow("tick_chance", NbtCodecs.DOUBLE, wrapper);
+                return new AdditionsSettings(sound, tickChance);
+            }
+
+            @Override
+            public void encode(NBTCompound compound, PacketWrapper<?> wrapper, AdditionsSettings value) throws NbtCodecException {
+                compound.set("sound", value.sound, Sound.CODEC, wrapper);
+                compound.set("tick_chance", value.tickChance, NbtCodecs.DOUBLE, wrapper);
+            }
+        }.codec();
+        public static final NbtCodec<List<AdditionsSettings>> LIST_CODEC = CODEC.applyList();
+
         private final Sound sound;
         private final double tickChance;
 
@@ -382,6 +604,7 @@ public class BiomeEffects {
             this.tickChance = tickChance;
         }
 
+        @Deprecated
         public static AdditionsSettings decode(NBT nbt, ClientVersion version) {
             NBTCompound compound = (NBTCompound) nbt;
             Sound sound = Sound.decode(compound.getTagOrThrow("sound"), version);
@@ -389,6 +612,7 @@ public class BiomeEffects {
             return new AdditionsSettings(sound, tickChance);
         }
 
+        @Deprecated
         public static NBT encode(AdditionsSettings settings, ClientVersion version) {
             NBTCompound compound = new NBTCompound();
             compound.setTag("sound", Sound.encode(settings.sound, version));
@@ -421,6 +645,26 @@ public class BiomeEffects {
 
     public static final class MusicSettings {
 
+        public static final NbtCodec<MusicSettings> CODEC = new NbtMapCodec<MusicSettings>() {
+            @Override
+            public MusicSettings decode(NBTCompound compound, PacketWrapper<?> wrapper) throws NbtCodecException {
+                Sound sound = compound.getOrThrow("sound", Sound.CODEC, wrapper);
+                int minDelay = compound.getNumberTagOrThrow("min_delay").getAsInt();
+                int maxDelay = compound.getNumberTagOrThrow("max_delay").getAsInt();
+                boolean replaceMusic = compound.getBoolean("replace_current_music");
+                return new MusicSettings(sound, minDelay, maxDelay, replaceMusic);
+            }
+
+            @Override
+            public void encode(NBTCompound compound, PacketWrapper<?> wrapper, MusicSettings value) throws NbtCodecException {
+                compound.set("sound", value.sound, Sound.CODEC, wrapper);
+                compound.setTag("min_delay", new NBTInt(value.minDelay));
+                compound.setTag("max_delay", new NBTInt(value.maxDelay));
+                compound.setTag("replace_current_music", new NBTByte(value.replaceMusic));
+            }
+        }.codec();
+        public static final NbtCodec<RandomWeightedList<MusicSettings>> LIST_CODEC = RandomWeightedList.codec(MusicSettings.CODEC);
+
         private final Sound sound;
         private final int minDelay;
         private final int maxDelay;
@@ -433,6 +677,7 @@ public class BiomeEffects {
             this.replaceMusic = replaceMusic;
         }
 
+        @Deprecated
         public static MusicSettings decode(NBT nbt, ClientVersion version) {
             NBTCompound compound = (NBTCompound) nbt;
             Sound sound = Sound.decode(compound.getTagOrThrow("sound"), version);
@@ -442,6 +687,7 @@ public class BiomeEffects {
             return new MusicSettings(sound, minDelay, maxDelay, replaceMusic);
         }
 
+        @Deprecated
         public static NBT encode(MusicSettings settings, ClientVersion version) {
             NBTCompound compound = new NBTCompound();
             compound.setTag("sound", Sound.encode(settings.sound, version));
