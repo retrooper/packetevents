@@ -8,6 +8,8 @@ import java.util.Arrays;
  * A simple open-addressing hash map optimized for int keys and values.</br>
  * It uses linear probing and supports a default return value of {@link #EMPTY_VALUE}.<br/>
  * Only to be used with non-negative keys and values.
+ * <p>
+ * Greatly inspired by <a href="https://github.com/aeron-io/agrona/blob/5512dda83e1b1a8dc38a6286e440237b1a7e480c/agrona/src/main/java/org/agrona/collections/Int2IntHashMap.java">Int2IntHashMap.java</a>, licensed under the terms of the Apache License 2.0.
  */
 @ApiStatus.Internal
 class Int2IntHashMap {
