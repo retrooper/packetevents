@@ -104,6 +104,9 @@ final class Int2IntHashMap {
         int mask = newCapacity - 1;
         for (int i = 0, len = oldData.length; i < len; i++) {
             long entry = oldData[i];
+            if (entry == EMPTY_VALUE) {
+                continue;
+            }
             int key = (int) (entry & 0xFFFFFFFFL);
             int index = this.hash(key) & mask;
             // we can skip checking for matches against this same key as
