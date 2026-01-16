@@ -5,24 +5,25 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.Arrays;
 
 /**
- * A simple open-addressing hash map optimized for int keys and values.
- * It uses linear probing and supports a default return value of -1.
+ * A simple open-addressing hash map optimized for int keys and values.</br>
+ * It uses linear probing and supports a default return value of {@link #EMPTY_VALUE}.<br/>
  * Only to be used with non-negative keys and values.
  */
 @ApiStatus.Internal
-class Int2IntOpenHashMap {
+class Int2IntHashMap {
 
     private static final float LOAD_FACTOR = 0.75f;
+    public static final int EMPTY_VALUE = -1;
 
     private int[] data;
     private int size;
     private int threshold;
 
-    public Int2IntOpenHashMap(int expectedSize) {
+    public Int2IntHashMap(int expectedSize) {
         int capacity = tableSizeFor(expectedSize);
         this.threshold = (int) (capacity * LOAD_FACTOR);
         this.data = new int[capacity * 2];
-        Arrays.fill(this.data, -1);
+        Arrays.fill(this.data, EMPTY_VALUE);
     }
 
     private static int tableSizeFor(int cap) {
@@ -34,13 +35,13 @@ class Int2IntOpenHashMap {
         int capacity = data.length >> 1;
         int mask = capacity - 1;
         int index = hash(key) & mask;
-        while (data[index * 2] != -1) {
+        while (data[index * 2] != EMPTY_VALUE) {
             if (data[index * 2] == key) {
                 return data[index * 2 + 1];
             }
             index = (index + 1) & mask;
         }
-        return -1;
+        return EMPTY_VALUE;
     }
 
     public void put(int key, int value) {
@@ -50,7 +51,7 @@ class Int2IntOpenHashMap {
         int capacity = data.length >> 1;
         int mask = capacity - 1;
         int index = hash(key) & mask;
-        while (data[index * 2] != -1) {
+        while (data[index * 2] != EMPTY_VALUE) {
             if (data[index * 2] == key) {
                 data[index * 2 + 1] = value;
                 return;
@@ -69,7 +70,7 @@ class Int2IntOpenHashMap {
         int capacity = data.length >> 1;
         int mask = capacity - 1;
         int index = hash(key) & mask;
-        while (data[index * 2] != -1) {
+        while (data[index * 2] != EMPTY_VALUE) {
             if (data[index * 2] == key) {
                 return;
             }
@@ -86,12 +87,12 @@ class Int2IntOpenHashMap {
 
         threshold = (int) (newCapacity * LOAD_FACTOR);
         data = new int[newCapacity * 2];
-        Arrays.fill(data, -1);
+        Arrays.fill(data, EMPTY_VALUE);
         size = 0;
 
         for (int i = 0; i < oldCapacity; i++) {
             int key = oldData[i * 2];
-            if (key != -1) {
+            if (key != EMPTY_VALUE) {
                 put(key, oldData[i * 2 + 1]);
             }
         }
