@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
 import org.jetbrains.annotations.Nullable;
@@ -60,7 +61,7 @@ public final class PacketEventsImplHelper {
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
-        });
+        }, !autoProtocolTranslation);
         if (!packetSendEvent.isCancelled()) {
             //Did they ever use a wrapper?
             if (packetSendEvent.getLastUsedWrapper() != null) {
@@ -100,7 +101,7 @@ public final class PacketEventsImplHelper {
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);
-        });
+        }, !autoProtocolTranslation);
         if (!packetReceiveEvent.isCancelled()) {
             //Did they ever use a wrapper?
             if (packetReceiveEvent.getLastUsedWrapper() != null) {

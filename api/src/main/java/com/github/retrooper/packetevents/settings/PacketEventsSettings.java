@@ -40,6 +40,7 @@ public class PacketEventsSettings {
     private boolean fullStackTraceEnabled = false;
     private boolean kickOnPacketExceptionEnabled = true;
     private boolean kickIfTerminated = true;
+    private boolean preViaInjection = false;
     private Function<String, InputStream> resourceProvider = path -> PacketEventsSettings.class
             .getClassLoader()
             .getResourceAsStream(path);
@@ -153,6 +154,18 @@ public class PacketEventsSettings {
     }
 
     /**
+     * This decides if PacketEvents should also put handlers before ViaVersion.
+     *
+     * @param preViaInjection Value
+     * @return Settings instance.
+     */
+    @ApiStatus.Internal
+    public PacketEventsSettings preViaInjection(boolean preViaInjection) {
+        this.preViaInjection = preViaInjection;
+        return this;
+    }
+
+    /**
      * Some projects may want to implement a CDN with resources like asset mappings
      * By default, all resources are retrieved from the ClassLoader
      *
@@ -239,6 +252,15 @@ public class PacketEventsSettings {
      */
     public boolean isKickIfTerminated() {
         return kickIfTerminated;
+    }
+
+    /**
+     * Should PacketEvents also put handlers before ViaVersion?
+     *
+     * @return Getter for {@link #preViaInjection}
+     */
+    public boolean isPreViaInjection() {
+        return preViaInjection;
     }
 
     /**

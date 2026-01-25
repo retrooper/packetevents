@@ -61,6 +61,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     private @Nullable List<Runnable> postTasks = null;
 
     private boolean cloned;
+    private boolean autoProtocolTranslation;
     private boolean needsReEncode = PacketEvents.getAPI().getSettings().reEncodeByDefault();
 
     public ProtocolPacketEvent(
@@ -71,11 +72,12 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         this.channel = channel;
         this.user = user;
         this.player = player;
+        this.autoProtocolTranslation = autoProtocolTranslation;
 
         if (autoProtocolTranslation || user.getClientVersion() == null) {
             this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
         } else {
-            this.serverVersion = user.getPacketVersion().toServerVersion();
+            this.serverVersion = user.getClientVersion().toServerVersion();
         }
 
         this.byteBuf = byteBuf;
@@ -204,6 +206,10 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
 
     public PacketTypeCommon getPacketType() {
         return packetType;
+    }
+
+    public boolean isAutoProtocolTranslation() {
+        return autoProtocolTranslation;
     }
 
     @Deprecated

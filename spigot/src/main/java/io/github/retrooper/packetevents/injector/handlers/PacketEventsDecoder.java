@@ -29,6 +29,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDi
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -43,20 +44,28 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public User user;
     public Player player;
     public boolean hasBeenRelocated;
+    public boolean preVia;
 
-    public PacketEventsDecoder(User user) {
+    public PacketEventsDecoder(User user, boolean preVia) {
         this.user = user;
+        this.preVia = preVia;
     }
 
     public PacketEventsDecoder(PacketEventsDecoder decoder) {
         user = decoder.user;
         player = decoder.player;
         hasBeenRelocated = decoder.hasBeenRelocated;
+        preVia = decoder.preVia;
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
         try {
-            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, true);
+            // We still call preVia listeners if ViaVersion is not available
+            if (!preVia && PacketEvents.getAPI().getSettings().isPreViaInjection() && !ViaVersionUtil.isAvailable()) {
+                PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, preVia);
+            }
+
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, !preVia);
             out.add(ByteBufHelper.retain(input));
         } catch (Throwable e) {
             // We must be sure all the exceptions caused by our handlers are PacketProcessExceptions
@@ -91,12 +100,14 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
             if (PacketEvents.getAPI().getSettings().isFullStackTraceEnabled()) {
                 String state = user != null ? user.getDecoderState().name() : "null";
                 String clientVersion = user != null ? user.getClientVersion().getReleaseName() : "null";
+                String username = user != null && user.getProfile().getName() != null ? user.getProfile().getName() : player != null ? player.getName() : "null";
 
                 PacketEvents.getAPI().getLogger().log(Level.WARNING, cause, () ->
-                        "An error occurred while processing a packet from " + user.getProfile().getName() +
+                        "An error occurred while processing a packet from " + username +
                         " (state: " + state +
                         ", clientVersion: " + clientVersion +
-                        ", serverVersion: " + PacketEvents.getAPI().getServerManager().getVersion().getReleaseName() + ")");
+                        ", serverVersion: " + PacketEvents.getAPI().getServerManager().getVersion().getReleaseName() +
+                        ", preVia: " + preVia + ")");
             } else {
                 PacketEvents.getAPI().getLogManager().warn(cause.getMessage());
             }
@@ -115,9 +126,8 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
                 FoliaScheduler.getEntityScheduler().runDelayed(player, (Plugin) PacketEvents.getAPI().getPlugin(), (o) -> player.kickPlayer("Invalid packet"), null, 1);
             }
 
-            if (user != null && user.getProfile().getName() != null) {
-                PacketEvents.getAPI().getLogManager().warn("Disconnected " + user.getProfile().getName() + " due to an invalid packet!");
-            }
+            String username = user != null && user.getProfile().getName() != null ? user.getProfile().getName() : player != null ? player.getName() : "null";
+            PacketEvents.getAPI().getLogManager().warn("Disconnected " + username + " due to an invalid packet!");
         }
     }
 
@@ -129,7 +139,13 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         }
 
         // Via changes the order of handlers in this event, so we must respond to Via changing their stuff
-        ServerConnectionInitializer.relocateHandlers(ctx.channel(), this, user);
+        // We should trigger relocation after via, thanks to PacketEventsHandlerMonitor
+        if (!preVia) {
+            // 1.20.4 has a bug where userEventTriggered is called twice, so Via relocates twice uselessly and we must do so
+            ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, false, true);
+            if (PacketEvents.getAPI().getSettings().isPreViaInjection() && ViaVersionUtil.isAvailable())
+                ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, true, true);
+        }
         super.userEventTriggered(ctx, event);
     }
 
