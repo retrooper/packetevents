@@ -19,13 +19,17 @@
 package io.github.retrooper.packetevents.factory.fabric;
 
 import com.github.retrooper.packetevents.util.LogManager;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.jetbrains.annotations.Nullable;
+import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.ComponentLike;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
 
 import java.util.Map;
 
+@NullMarked
+@Deprecated(forRemoval = true)
 public class FabricLogger extends LogManager {
 
     private static final Map<java.util.logging.Level, Level> LEVEL_CONVERSION = Map.of(
@@ -44,9 +48,9 @@ public class FabricLogger extends LogManager {
     }
 
     @Override
-    protected void log(java.util.logging.Level level, @Nullable NamedTextColor color, String message) {
-        String plainMessage = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
+    public void log(java.util.logging.Level level, ComponentLike component, @Nullable Throwable error) {
+        String plainMessage = LegacyComponentSerializer.legacySection().serialize(component.asComponent());
         Level logLevel = LEVEL_CONVERSION.getOrDefault(level, Level.INFO);
-        this.logger.makeLoggingEventBuilder(logLevel).log(plainMessage);
+        this.logger.makeLoggingEventBuilder(logLevel).setCause(error).log(plainMessage);
     }
 }

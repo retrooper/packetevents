@@ -95,7 +95,7 @@ public class SpigotPacketEventsBuilder {
             private final PlayerManager playerManager = new PlayerManagerImpl();
             private final NettyManager nettyManager = new NettyManagerImpl();
             private final SpigotChannelInjector injector = new SpigotChannelInjector();
-            private final LogManager logManager = new BukkitLogManager();
+            private final LogManager logManager = new BukkitLogManager(this);
             private boolean loaded;
             private boolean initialized;
             private boolean lateBind = false;
@@ -151,12 +151,12 @@ public class SpigotPacketEventsBuilder {
                     Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
                     String bukkitVersion = Bukkit.getBukkitVersion();
 
-                    AtomicBoolean stopping =  new AtomicBoolean(false);
+                    AtomicBoolean stopping = new AtomicBoolean(false);
                     BiConsumer<PEVersion, UpdateChecker.UpdateCheckerStatus> unsupportedSoftwareLogic = (peVersion, status) -> {
                         if (bukkitVersion.contains("Unknown")) {
                             ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
                             String failureToDetectVersionMsg = "Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + bukkitVersion + ". We will assume the Server version is " + fallbackVersion.name() + "...\n If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc";
-                            plugin.getLogger().warning(failureToDetectVersionMsg);
+                            getLogManager().warn(failureToDetectVersionMsg);
                         } else {
                             // Our PEVersion class can parse this version and detect if it is a newer version than what is currently supported
                             PEVersion bukkitServerVersion = PEVersion.fromString(bukkitVersion.substring(0, bukkitVersion.indexOf("-")));
@@ -168,16 +168,16 @@ public class SpigotPacketEventsBuilder {
                                 String releaseBuildsMsg = "Please test the latest stable release, as it should already have support for your Minecraft version: https://modrinth.com/plugin/packetevents";
 
                                 /* Here's a breakdown of the logic:
-                                * If this build does not support the current Minecraft version and
-                                * the user is running an outdated version of PacketEvents
-                                * or PacketEvents somehow fails to check for an update,
-                                * we direct them toward the latest release.
-                                * If up-to-date, we direct them to development builds.
-                                * */
+                                 * If this build does not support the current Minecraft version and
+                                 * the user is running an outdated version of PacketEvents
+                                 * or PacketEvents somehow fails to check for an update,
+                                 * we direct them toward the latest release.
+                                 * If up-to-date, we direct them to development builds.
+                                 * */
                                 String newBuildsMsg = (status == UpdateChecker.UpdateCheckerStatus.OUTDATED
                                         || status == UpdateChecker.UpdateCheckerStatus.FAILED || status == null) ? releaseBuildsMsg : developmentBuildsMsg;
 
-                                plugin.getLogger().warning("Your build of PacketEvents does not support the Minecraft version "
+                                getLogManager().warn("Your build of PacketEvents does not support the Minecraft version "
                                         + bukkitServerVersion + "! The latest Minecraft version supported by your build of PacketEvents is " + latestSupportedVersion + ". "
                                         + newBuildsMsg +
                                         " If you're in need of any help, join our Discord server: https://discord.gg/DVHxPPxHZc");
@@ -189,8 +189,7 @@ public class SpigotPacketEventsBuilder {
 
                     if (settings.shouldCheckForUpdates()) {
                         getUpdateChecker().handleUpdateCheck(unsupportedSoftwareLogic);
-                    }
-                    else {
+                    } else {
                         // We were not authorized to run a GitHub API call to check for the latest version.
                         unsupportedSoftwareLogic.accept(null, null);
                     }

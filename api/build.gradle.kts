@@ -35,6 +35,7 @@ dependencies {
     testImplementation(libs.bundles.adventure)
     testImplementation(project(":patch:adventure-text-serializer-gson"))
     testImplementation(libs.adventure.text.serializer.legacy)
+    testImplementation(libs.adventure.text.logger.slf4j)
     testImplementation(project(":netty-common"))
     testImplementation(testlibs.mockbukkit)
     testImplementation(testlibs.paper.api)

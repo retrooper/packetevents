@@ -33,7 +33,6 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
-import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
@@ -48,14 +47,12 @@ import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerA
 import io.github.retrooper.packetevents.injector.VelocityPipelineInjector;
 import io.github.retrooper.packetevents.manager.PlayerManagerImpl;
 import io.netty.channel.Channel;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.logging.Level;
 
 public class VelocityPacketEventsBuilder {
     private static PacketEventsAPI<PluginContainer> INSTANCE;
@@ -158,12 +155,6 @@ public class VelocityPacketEventsBuilder {
 
             private final ChannelInjector injector = new VelocityPipelineInjector(server);
             private final NettyManager nettyManager = new NettyManagerImpl();
-            private final LogManager logManager = new LogManager() {
-                @Override
-                protected void log(Level level, @Nullable NamedTextColor color, String message) {
-                    System.out.println(message);
-                }
-            };
             private boolean loaded;
             private boolean initialized;
             private boolean terminated;
@@ -263,11 +254,6 @@ public class VelocityPacketEventsBuilder {
             @Override
             public boolean isTerminated() {
                 return terminated;
-            }
-
-            @Override
-            public LogManager getLogManager() {
-                return logManager;
             }
 
             @Override

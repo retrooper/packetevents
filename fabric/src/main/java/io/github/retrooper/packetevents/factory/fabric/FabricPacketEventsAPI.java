@@ -29,20 +29,15 @@ import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
-import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 
 public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger("PacketEvents");
 
     private final String modId;
     private final EnvType environment;
@@ -53,7 +48,6 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
     private final PlayerManagerAbstract playerManager;
     private final ChannelInjector injector;
     private final NettyManager nettyManager = new NettyManagerImpl();
-    private final LogManager logManager = new FabricLogger(LOGGER);
 
     private boolean loaded;
     private boolean initialized;
@@ -160,11 +154,6 @@ public class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
     @Override
     public ServerManager getServerManager() {
         return this.serverManager;
-    }
-
-    @Override
-    public LogManager getLogManager() {
-        return this.logManager;
     }
 
     @Override

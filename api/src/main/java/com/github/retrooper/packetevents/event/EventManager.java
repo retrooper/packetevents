@@ -22,22 +22,23 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.logging.Level;
 
 /**
  * Class for event managing. Implements both, internal and API methods.
  *
+ * @author retrooper
+ * @author ShadowOfHeaven (optimization)
  * @apiNote It is highly recommended to register the event listeners at server start-up,
  * without frequent modifications during runtime, since this class needs to recalculate all of
  * its event listeners during any modifications. In other words, it assumes that reads (events fired)
  * greatly outnumber writes (listeners modifications). If your case requires frequent listener modifications,
  * open a pull request on GitHub and describe your case.
- *
- * @author retrooper
- * @author ShadowOfHeaven (optimization)
  *
  */
 
@@ -85,7 +86,7 @@ public class EventManager {
             } catch (Exception t) {
                 // ignore handshake exceptions
                 if (t.getClass() != InvalidHandshakeException.class && (t.getCause() == null || t.getCause().getClass() != InvalidHandshakeException.class)) {
-                    PacketEvents.getAPI().getLogger().log(Level.WARNING, "PacketEvents caught an unhandled exception while calling your listener.", t);
+                    PacketEvents.getAPI().getLogManager().warn("PacketEvents caught an unhandled exception while calling your listener.", t);
                 }
             }
             if (postCallListenerAction != null) {
