@@ -22,9 +22,13 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 /**
@@ -52,7 +56,16 @@ public class EventManager {
     //Since reads greatly outnumber writes, create an array for the best possible iteration time
     //Updated as a whole on writes, no index modifications are allowed
     private volatile PacketListenerCommon[] listeners = new PacketListenerCommon[0];
+    private final Consumer<PacketListenerCommon> onRegisterListener;
 
+    public EventManager() {
+        onRegisterListener = listener -> {
+        };
+    }
+
+    public EventManager(Consumer<PacketListenerCommon> onRegisterListener) {
+        this.onRegisterListener = onRegisterListener;
+    }
 
     /**
      * Call the PacketEvent.
@@ -178,6 +191,8 @@ public class EventManager {
     //Internal registration methods, specifically separated for lesser overhead when registering an array of Listeners
 
     private void registerListenerNoRecalculation(PacketListenerCommon listener) {
+        onRegisterListener.accept(listener);
+
         Set<PacketListenerCommon> listenerSet = this.listenersMap.computeIfAbsent(listener.getPriority(), p -> new CopyOnWriteArraySet<>());
         listenerSet.add(listener);
     }

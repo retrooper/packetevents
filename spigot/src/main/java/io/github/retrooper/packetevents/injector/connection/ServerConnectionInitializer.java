@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.injector.connection;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -26,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
@@ -35,9 +37,21 @@ import io.netty.channel.ChannelHandler;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 
 public class ServerConnectionInitializer {
+
+    // This is called each time a new listener is registered
+    public static final Consumer<PacketListenerCommon> PRE_VIA_LISTENER_REGISTERED = listener -> {
+        if (!listener.isPreVia() || !ViaVersionUtil.isAvailable()) return;
+
+        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+        if (!injector.isPreViaInjected()) {
+            injector.setPreViaInjected(true);
+            injector.injectNetworkManagers();
+        }
+    };
 
     public static void initChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
@@ -73,7 +87,8 @@ public class ServerConnectionInitializer {
             }
 
             relocateHandlers(channel, user, false, false);
-            if (PacketEvents.getAPI().getSettings().isPreViaInjection() && ViaVersionUtil.isAvailable()) relocateHandlers(channel, user, true, false);
+            SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+            if (injector.isPreViaInjected()) relocateHandlers(channel, user, true, false);
 
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
             PacketEvents.getAPI().getProtocolManager().setUser(channel, user);

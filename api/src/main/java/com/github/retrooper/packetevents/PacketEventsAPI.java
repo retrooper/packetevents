@@ -34,11 +34,19 @@ import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 import java.util.logging.Logger;
 
 public abstract class PacketEventsAPI<T> {
-    private final EventManager eventManager = new EventManager();
+    private final EventManager eventManager;
     private final PacketEventsSettings settings = new PacketEventsSettings();
     private final UpdateChecker updateChecker = new UpdateChecker();
     private final LogManager logManager = new LogManager();
     private static final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
+
+    public PacketEventsAPI(EventManager eventManager) {
+        this.eventManager = eventManager;
+    }
+
+    public PacketEventsAPI() {
+        this(new EventManager());
+    }
 
     public EventManager getEventManager() {
         return eventManager;

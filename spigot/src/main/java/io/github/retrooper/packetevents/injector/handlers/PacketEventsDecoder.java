@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
@@ -61,7 +62,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
         try {
             // We still call preVia listeners if ViaVersion is not available
-            if (!preVia && PacketEvents.getAPI().getSettings().isPreViaInjection() && !ViaVersionUtil.isAvailable()) {
+            if (!preVia && !ViaVersionUtil.isAvailable()) {
                 PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, preVia);
             }
 
@@ -143,7 +144,9 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         if (!preVia) {
             // 1.20.4 has a bug where userEventTriggered is called twice, so Via relocates twice uselessly and we must do so
             ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, false, true);
-            if (PacketEvents.getAPI().getSettings().isPreViaInjection() && ViaVersionUtil.isAvailable())
+
+            SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+            if (injector.isPreViaInjected())
                 ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, true, true);
         }
         super.userEventTriggered(ctx, event);

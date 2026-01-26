@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.factory.spigot;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
+import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
@@ -88,7 +89,7 @@ public class SpigotPacketEventsBuilder {
     }
 
     public static PacketEventsAPI<Plugin> buildNoCache(Plugin plugin, PacketEventsSettings inSettings) {
-        return new PacketEventsAPI<Plugin>() {
+        return new PacketEventsAPI<Plugin>(new EventManager(ServerConnectionInitializer.PRE_VIA_LISTENER_REGISTERED)) {
             private final PacketEventsSettings settings = inSettings;
             private final ProtocolManager protocolManager = new ProtocolManagerImpl();
             private final ServerManager serverManager = new ServerManagerImpl();
