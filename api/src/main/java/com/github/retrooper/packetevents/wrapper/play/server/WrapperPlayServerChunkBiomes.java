@@ -19,18 +19,10 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufInputStream;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufOutputStream;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
-import com.github.retrooper.packetevents.protocol.stream.NetStreamInputWrapper;
-import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
-import com.github.retrooper.packetevents.protocol.stream.NetStreamOutputWrapper;
 import com.github.retrooper.packetevents.protocol.world.chunk.*;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.DataPalette;
-import com.github.retrooper.packetevents.protocol.world.chunk.palette.Palette;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.PaletteType;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.SingletonPalette;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.*;
@@ -52,39 +44,41 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
         this.chunkPalettesMap = chunkPalettesMap;
     }
 
-    public WrapperPlayServerChunkBiomes(long[] chunkKeys, DataPalette biomePalette) {
+    public WrapperPlayServerChunkBiomes(long[] chunkKeys, DataPalette biomePalette, int worldHeight) {
         super(PacketType.Play.Server.CHUNK_BIOMES);
         this.chunkPalettesMap = new HashMap<>();
         for (long chunkKey : chunkKeys) {
-            this.chunkPalettesMap.put(chunkKey, new ChunkData(biomePalette));
+            this.chunkPalettesMap.put(chunkKey, new ChunkData(biomePalette, worldHeight / 16));
+        }
+    }
+
+    public WrapperPlayServerChunkBiomes(long[] chunkKeys, DataPalette biomePalette) {
+        this(chunkKeys, biomePalette, 384);
+    }
+
+    public WrapperPlayServerChunkBiomes(long[] chunkKeys, int biomeID, int worldHeight) {
+        super(PacketType.Play.Server.CHUNK_BIOMES);
+        this.chunkPalettesMap = new HashMap<>();
+        for (long chunkKey : chunkKeys) {
+            this.chunkPalettesMap.put(chunkKey, new ChunkData(biomeID, worldHeight / 16));
         }
     }
 
     public WrapperPlayServerChunkBiomes(long[] chunkKeys, int biomeID) {
-        super(PacketType.Play.Server.CHUNK_BIOMES);
-        this.chunkPalettesMap = new HashMap<>();
-        for (long chunkKey : chunkKeys) {
-            this.chunkPalettesMap.put(chunkKey, new ChunkData(biomeID));
-        }
+        this(chunkKeys, biomeID, 384);
     }
 
     @Override
     public void read() {
         chunkPalettesMap = new HashMap<>();
-        int chunkSize = 24;
-        byte chunkAmount = readByte();
+        int chunkAmount = readVarInt();
         for (int chunkIndex = 0; chunkIndex < chunkAmount; chunkIndex++) {
             int chunkZ = readInt();
             int chunkX = readInt();
             int bufferSize = readVarInt();
             List<DataPalette> chunkPalettes = new ArrayList<>();
-            NetStreamInput stream = new NetStreamInput(new ByteBufInputStream(this.buffer));
-            for (int i = 0; i < chunkSize; i++) {
-                DataPalette biomePalette = DataPalette.read(
-                        stream,
-                        PaletteType.BIOME,
-                        true,
-                        false);
+            while (ByteBufHelper.readableBytes(buffer) > 0 && ByteBufHelper.readerIndex(buffer) < ByteBufHelper.writerIndex(buffer)) {
+                DataPalette biomePalette = PaletteType.BIOME.read(this);
                 chunkPalettes.add(biomePalette);
             }
             ChunkData chunkData = new ChunkData(chunkPalettes, bufferSize);
@@ -94,31 +88,32 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void write() {
-        writeByte(chunkPalettesMap.size());
+        writeVarInt(chunkPalettesMap.size());
         for (Map.Entry<Long, ChunkData> entry : chunkPalettesMap.entrySet()) {
             long chunkKey = entry.getKey();
             int chunkX = getChunkX(chunkKey);
             int chunkZ = getChunkZ(chunkKey);
             writeInt(chunkZ);
             writeInt(chunkX);
-            int calculatedBufferSize = 0;
             List<DataPalette> chunkPalettes = entry.getValue().palettes;
+
+            int calculatedBufferSize = 0;
+            int bufferIndex = ByteBufHelper.writerIndex(buffer);
+            int sizeBefore = ByteBufHelper.readableBytes(buffer);
+
             for (DataPalette biomePalette : chunkPalettes) {
-                Object tempBuffer = ByteBufHelper.allocateNewBuffer(buffer);
-
-                int sizeBefore = ByteBufHelper.readableBytes(tempBuffer);
-                DataPalette.write(new NetStreamOutput(new ByteBufOutputStream(tempBuffer)), biomePalette, false);
-                int sizeAfter = ByteBufHelper.readableBytes(tempBuffer);
-
+                PaletteType.write(this, biomePalette);
+                int sizeAfter = ByteBufHelper.readableBytes(buffer);
                 calculatedBufferSize += (sizeAfter - sizeBefore);
+                ByteBufHelper.writerIndex(buffer, bufferIndex);
             }
+
             writeVarInt(calculatedBufferSize);
-            for (DataPalette chunkPalette : chunkPalettes) {
-                DataPalette.write(new NetStreamOutputWrapper(this), chunkPalette, false);
+
+            for (DataPalette biomePalette : chunkPalettes) {
+                PaletteType.write(this, biomePalette);
             }
         }
-
-
     }
 
     @Override
@@ -140,7 +135,8 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
 
     public static class ChunkData {
         List<DataPalette> palettes;
-        final int bufferSize; // size in bytes of the serialized palettes (Only != 0 if read from packet)
+        /// Size in bytes of the serialized palettes (Only != 0 if read from packet)
+        final int bufferSize;
 
         private ChunkData(List<DataPalette> palettes, int bufferSize) {
             this.bufferSize = bufferSize;
@@ -152,22 +148,22 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
             this.bufferSize = 0;
         }
 
-        public ChunkData(DataPalette palette) {
+        public ChunkData(DataPalette palette, int sectionAmount) {
             this.palettes = new ArrayList<>();
-            for (int i = 0; i < 24; i++) {
+            for (int i = 0; i < sectionAmount; i++) {
                 this.palettes.add(palette);
             }
             this.bufferSize = 0;
         }
 
-        public ChunkData(int biomeID) {
+        public ChunkData(int biomeID, int sectionAmount) {
             this.palettes = new ArrayList<>();
             DataPalette biomePalette = new DataPalette(
                     new SingletonPalette(biomeID),
                     new BitStorage(1, 64),
                     PaletteType.BIOME
             );
-            for (int i = 0; i < 24; i++) {
+            for (int i = 0; i < sectionAmount; i++) {
                 palettes.add(biomePalette);
             }
             this.bufferSize = 0;
