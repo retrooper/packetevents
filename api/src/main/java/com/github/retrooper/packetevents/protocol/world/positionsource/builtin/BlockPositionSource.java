@@ -25,7 +25,11 @@ import com.github.retrooper.packetevents.protocol.world.positionsource.PositionS
 import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSourceTypes;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
+@NullMarked
 public class BlockPositionSource extends PositionSource {
 
     private Vector3i pos;
@@ -58,5 +62,17 @@ public class BlockPositionSource extends PositionSource {
 
     public void setPos(Vector3i pos) {
         this.pos = pos;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        BlockPositionSource that = (BlockPositionSource) obj;
+        return this.pos.equals(that.pos);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.pos);
     }
 }

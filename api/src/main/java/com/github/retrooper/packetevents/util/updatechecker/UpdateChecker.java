@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.util.PEVersion;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.gson.JsonObject;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
@@ -31,6 +32,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * PacketEvents update checker.
@@ -38,7 +42,9 @@ import java.net.URLConnection;
  * @author retrooper
  * @since 1.6.9
  */
+@ApiStatus.Internal
 public class UpdateChecker {
+    @ApiStatus.Internal
     public String checkLatestReleasedVersion() {
         try {
             URLConnection connection = new URL("https://api.github.com/repos/retrooper/packetevents/releases/latest").openConnection();
@@ -56,11 +62,15 @@ public class UpdateChecker {
     /**
      * Check for an update and log in the console (ALL DONE ON THE CURRENT THREAD).
      */
-    public UpdateCheckerStatus checkForUpdate() {
+    @ApiStatus.Internal
+    public UpdateCheckerStatus checkForUpdate(@Nullable Consumer<PEVersion> latestVersionHolder) {
         PEVersion localVersion = PacketEvents.getAPI().getVersion();
         PEVersion newVersion;
         try {
             newVersion = PEVersion.fromString(checkLatestReleasedVersion());
+            if (latestVersionHolder != null) {
+                latestVersionHolder.accept(newVersion);
+            }
         } catch (Exception ex) {
             PacketEvents.getAPI().getLogManager().warn("Failed to check for updates. "
                     + (ex.getCause() != null ? ex.getCause().getClass().getName() + ": " + ex.getCause().getMessage() : ex.getMessage()));
@@ -91,18 +101,38 @@ public class UpdateChecker {
         }
     }
 
+    @ApiStatus.Internal
+    public UpdateCheckerStatus checkForUpdate() {
+        return checkForUpdate(null);
+    }
+
+    @Deprecated @ApiStatus.Internal
     public void handleUpdateCheck(@Nullable Runnable updateCheckCallback) {
         Thread thread = new Thread(() -> {
             PacketEvents.getAPI().getLogManager().info("Checking for updates, please wait...");
-            UpdateChecker.UpdateCheckerStatus status = checkForUpdate();
+            UpdateCheckerStatus status = checkForUpdate();
             if (updateCheckCallback != null)
                 updateCheckCallback.run();
         }, "packetevents-update-check-thread");
         thread.start();
     }
 
+    @ApiStatus.Internal
+    public void handleUpdateCheck(@Nullable BiConsumer<PEVersion, UpdateCheckerStatus> updateResultHolder) {
+        Thread thread = new Thread(() -> {
+            PacketEvents.getAPI().getLogManager().info("Checking for updates, please wait...");
+            AtomicReference<PEVersion> latestVersion = new AtomicReference<>();
+            Consumer<PEVersion> latestVersionHolder = latestVersion::set;
+            UpdateCheckerStatus status = checkForUpdate(latestVersionHolder);
+            if (updateResultHolder != null)
+                updateResultHolder.accept(latestVersion.get(), status);
+        }, "packetevents-update-check-thread");
+        thread.start();
+    }
+
+    @ApiStatus.Internal
     public void handleUpdateCheck() {
-       handleUpdateCheck(null);
+       handleUpdateCheck((Runnable) null);
     }
 
     /**

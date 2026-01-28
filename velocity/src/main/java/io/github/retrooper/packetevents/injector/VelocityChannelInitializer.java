@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.injector;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -42,6 +43,12 @@ public class VelocityChannelInitializer extends ChannelInitializer<Channel> {
         }
         INIT_CHANNEL.invoke(wrappedInitializer, channel);
 
+        if (PacketEvents.getAPI().isTerminated()) return;
         ServerConnectionInitializer.initChannel(channel, ConnectionState.HANDSHAKING);
     }
+
+    public ChannelInitializer<Channel> getWrappedInitializer() {
+        return wrappedInitializer;
+    }
+
 }

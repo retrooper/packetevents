@@ -1,7 +1,7 @@
 <!--suppress HtmlDeprecatedAttribute -->
 <div align="center">
     <h2><i>PacketEvents</i></h2>
-    <h3><i>A powerful networking library for Minecraft packet processing and manipulation.</i></h3>
+    <h3>PacketEvents is a protocol library tailored to Minecraft Java Edition, designed to facilitate the processing and transmission of packets.</h3>
     <a href="https://github.com/retrooper/packetevents/actions"><img src="https://img.shields.io/github/actions/workflow/status/retrooper/packetevents/gradle-publish.yml?style=for-the-badge&logo=github"></a>
     <a href="https://discord.gg/DVHxPPxHZc"><img src="https://img.shields.io/discord/721686193061888071?color=5562e9&logo=discord&logoColor=white&style=for-the-badge"></a>
     <img src="https://img.shields.io/github/license/retrooper/packetevents?style=for-the-badge&logo=github">
@@ -11,7 +11,7 @@
 <h3>Resources</h3>
 
 - [Read documentation](https://docs.packetevents.com/)
-    - [Getting Started](https://docs.packetevents.com/getting-started)
+    - [Getting Started](https://docs.packetevents.com/development-setup)
     - [JavaDocs](https://javadocs.packetevents.com)
 - [Releases](https://github.com/retrooper/packetevents/releases/)
     - [Modrinth](https://modrinth.com/plugin/packetevents)

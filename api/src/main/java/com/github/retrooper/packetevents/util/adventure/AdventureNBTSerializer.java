@@ -38,6 +38,8 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
+import com.github.retrooper.packetevents.protocol.util.NbtDecoder;
 import com.github.retrooper.packetevents.util.UniqueIdUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.key.Key;
@@ -169,7 +171,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
 
         // Serialized as tree
         NBTCompound compound = requireType(input, NBTType.COMPOUND);
-        NBTReader reader = new NBTReader(compound);
+        NBTReader reader = new NBTReader(wrapper, compound);
 
         Function<NBT, String> textFunction = nbt -> {
             if (nbt.getType() == NBTType.STRING) {
@@ -461,7 +463,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         if (input.isEmpty()) return Style.empty();
 
         Style.Builder style = Style.style();
-        NBTReader reader = new NBTReader(input);
+        NBTReader reader = new NBTReader(wrapper, input);
 
         reader.useUTF("font", value -> style.font(Key.key(value)));
         reader.useUTF("color", value -> {
@@ -569,7 +571,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                     if (entity != null) {
                         style.hoverEvent(HoverEvent.showEntity(
                                 entity.readUTF(modernEvents ? "id" : "type", Key::key),
-                                entity.readIntArray(modernEvents ? "uuid" : "id", UniqueIdUtil::fromIntArray),
+                                entity.read(modernEvents ? "uuid" : "id", NbtCodecs.LENIENT_UUID),
                                 entity.read("name", name -> this.deserialize(name, wrapper))));
                     }
                     break;
@@ -808,9 +810,12 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
     // -------------------------------------------------
 
     static class NBTReader {
+
+        private final PacketWrapper<?> wrapper;
         private final NBTCompound compound;
 
-        public NBTReader(NBTCompound compound) {
+        public NBTReader(PacketWrapper<?> wrapper, NBTCompound compound) {
+            this.wrapper = wrapper;
             this.compound = compound;
         }
 
@@ -894,12 +899,19 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             useTag(key, consumer);
         }
 
+        public <R> R read(String key, NbtDecoder<R> decoder) {
+            return withTag(key, tag -> decoder.decode(tag, this.wrapper));
+        }
+
         public <R> R read(String key, Function<NBT, R> function) {
             return withTag(key, function);
         }
 
         public NBTReader child(String key) {
-            return withTag(key, tag -> new NBTReader(requireType(tag, NBTType.COMPOUND)));
+            return withTag(key, tag -> {
+                NBTCompound compound = requireType(tag, NBTType.COMPOUND);
+                return new NBTReader(this.wrapper, compound);
+            });
         }
 
         public NBTType<?> type(String key) {

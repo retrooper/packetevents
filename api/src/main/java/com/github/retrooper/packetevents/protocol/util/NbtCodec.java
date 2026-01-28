@@ -113,4 +113,27 @@ public interface NbtCodec<T> extends NbtEncoder<T>, NbtDecoder<T> {
             }
         };
     }
+
+    default NbtCodec<T> withAlternative(NbtDecoder<T> alternative) {
+        return new NbtCodec<T>() {
+            @Override
+            public T decode(NBT nbt, PacketWrapper<?> wrapper) throws NbtCodecException {
+                try {
+                    return NbtCodec.this.decode(nbt, wrapper);
+                } catch (NbtCodecException primaryException) {
+                    try {
+                        return alternative.decode(nbt, wrapper);
+                    } catch (NbtCodecException altException) {
+                        primaryException.addSuppressed(altException);
+                        throw primaryException;
+                    }
+                }
+            }
+
+            @Override
+            public NBT encode(PacketWrapper<?> wrapper, T value) throws NbtCodecException {
+                return NbtCodec.this.encode(wrapper, value);
+            }
+        };
+    }
 }

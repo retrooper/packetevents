@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.sound;
 
+import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
@@ -27,11 +28,11 @@ import com.github.retrooper.packetevents.protocol.util.NbtCodec;
 import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public interface Sound extends MappedEntity {
+public interface Sound extends MappedEntity, DeepComparableEntity {
 
     NbtCodec<Sound> CODEC = new NbtCodec<Sound>() {
         @Override

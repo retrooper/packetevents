@@ -103,11 +103,14 @@ public interface DimensionType extends MappedEntity, CopyableEntity<DimensionTyp
                 builder.setCoordinateScale(compound.getBoolean("shrunk") ? 8d : 1d);
             }
 
+            builder.setInfiniburn(version.isNewerThanOrEquals(ServerVersion.V_1_18_2)
+                    ? compound.getOrThrow("infiniburn", TagKey.CODEC, wrapper)
+                    : new TagKey(compound.getOrThrow("infiniburn", ResourceLocation.CODEC, wrapper)));
+
             return builder
                     .setHasSkylight(compound.getBooleanOrThrow("has_skylight"))
                     .setHasCeiling(compound.getBooleanOrThrow("has_ceiling"))
                     .setLogicalHeight(compound.getNumberTagValueOrThrow("logical_height").intValue())
-                    .setInfiniburn(compound.getOrThrow("infiniburn", TagKey.CODEC, wrapper))
                     .setAmbientLight(compound.getNumberTagValueOrThrow("ambient_light").floatValue())
                     .build();
         }
@@ -172,7 +175,11 @@ public interface DimensionType extends MappedEntity, CopyableEntity<DimensionTyp
             compound.setTag("has_skylight", new NBTByte(value.hasSkyLight()));
             compound.setTag("has_ceiling", new NBTByte(value.hasCeiling()));
             compound.setTag("logical_height", new NBTInt(value.getLogicalHeight()));
-            compound.set("infiniburn", value.getInfiniburn(), TagKey.CODEC, wrapper);
+            if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_18_2)) {
+                compound.set("infiniburn", value.getInfiniburn(), TagKey.CODEC, wrapper);
+            } else {
+                compound.set("infiniburn", value.getInfiniburn().getId(), ResourceLocation.CODEC, wrapper);
+            }
             compound.setTag("ambient_light", new NBTFloat(value.getAmbientLight()));
         }
     }.codec();

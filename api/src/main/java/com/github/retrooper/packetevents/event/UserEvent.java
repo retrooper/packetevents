@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.protocol.player.User;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Event that involves users.
@@ -26,6 +27,8 @@ import com.github.retrooper.packetevents.protocol.player.User;
  * @author retrooper
  * @since 2.0.0
  */
+@NullMarked
 public interface UserEvent {
+
     User getUser();
 }

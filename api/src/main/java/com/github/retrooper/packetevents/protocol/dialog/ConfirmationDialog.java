@@ -24,8 +24,8 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -87,9 +87,8 @@ public class ConfirmationDialog extends AbstractMappedEntity implements Dialog {
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof ConfirmationDialog)) return false;
-        if (!super.equals(obj)) return false;
         ConfirmationDialog that = (ConfirmationDialog) obj;
         if (!this.common.equals(that.common)) return false;
         if (!this.yesButton.equals(that.yesButton)) return false;
@@ -98,6 +97,6 @@ public class ConfirmationDialog extends AbstractMappedEntity implements Dialog {
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.common, this.yesButton, this.noButton);
+        return Objects.hash(this.common, this.yesButton, this.noButton);
     }
 }

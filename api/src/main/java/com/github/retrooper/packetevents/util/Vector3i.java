@@ -217,6 +217,17 @@ public class Vector3i {
         return add(face.getModX(), face.getModY(), face.getModZ());
     }
 
+    /**
+     * Offsets the vector by a specific BlockFace direction and distance.
+     *
+     * @param face     The direction in which to offset.
+     * @param distance The distance to offset in that direction.
+     * @return A new Vector3i with the calculated offset.
+     */
+    public Vector3i offset(BlockFace face, int distance) {
+        return distance == 0 ? this : add(face.getModX() * distance, face.getModY() * distance, face.getModZ() * distance);
+    }
+
     public Vector3i subtract(int x, int y, int z) {
         return new Vector3i(this.x - x, this.y - y, this.z - z);
     }

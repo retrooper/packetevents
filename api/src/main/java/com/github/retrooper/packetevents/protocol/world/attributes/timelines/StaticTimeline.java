@@ -43,7 +43,7 @@ public class StaticTimeline extends AbstractMappedEntity implements Timeline {
 
     @ApiStatus.Internal
     public StaticTimeline(
-            @org.jetbrains.annotations.Nullable TypesBuilderData data,
+            @Nullable TypesBuilderData data,
             @Nullable Integer periodTicks, Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks
     ) {
         super(data);
@@ -67,9 +67,8 @@ public class StaticTimeline extends AbstractMappedEntity implements Timeline {
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
-        if (obj == null || getClass() != obj.getClass()) return false;
-        if (!super.equals(obj)) return false;
+    public boolean deepEquals(@Nullable Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
         StaticTimeline that = (StaticTimeline) obj;
         if (!Objects.equals(this.periodTicks, that.periodTicks)) return false;
         return this.tracks.equals(that.tracks);
@@ -77,6 +76,6 @@ public class StaticTimeline extends AbstractMappedEntity implements Timeline {
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.periodTicks, this.tracks);
+        return Objects.hash(this.periodTicks, this.tracks);
     }
 }

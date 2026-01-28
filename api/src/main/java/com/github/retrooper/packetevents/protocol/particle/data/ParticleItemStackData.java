@@ -24,8 +24,13 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
+@NullMarked
 public class ParticleItemStackData extends ParticleData implements LegacyConvertible {
+
     private ItemStack itemStack;
 
     public ParticleItemStackData(ItemStack itemStack) {
@@ -75,4 +80,15 @@ public class ParticleItemStackData extends ParticleData implements LegacyConvert
         return LegacyParticleData.ofTwo(itemStack.getType().getId(version), itemStack.getLegacyData());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        ParticleItemStackData that = (ParticleItemStackData) obj;
+        return this.itemStack.equals(that.itemStack);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.itemStack);
+    }
 }

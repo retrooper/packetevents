@@ -25,9 +25,16 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
+@NullMarked
 public class ParticleDustColorTransitionData extends ParticleData {
-    //0.01 - 4
+
+    /**
+     * Possible values range from 0.01 to 4.0 (inclusive).
+     */
     private float scale;
     private Color start;
     private Color end;
@@ -209,5 +216,19 @@ public class ParticleDustColorTransitionData extends ParticleData {
 
     public void setEnd(Color end) {
         this.end = end;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        ParticleDustColorTransitionData that = (ParticleDustColorTransitionData) obj;
+        if (Float.compare(that.scale, this.scale) != 0) return false;
+        if (!this.start.equals(that.start)) return false;
+        return this.end.equals(that.end);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.scale, this.start, this.end);
     }
 }

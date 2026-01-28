@@ -33,6 +33,8 @@ import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 
+import java.util.Locale;
+
 public class NettyPacketEventsBuilder {
     private static PacketEventsAPI<BuildData> INSTANCE;
 
@@ -86,12 +88,13 @@ public class NettyPacketEventsBuilder {
             public void load() {
                 if (!loaded) {
                     //Resolve server version and cache
-                    PacketEvents.IDENTIFIER = "pe-" + data.getName().toLowerCase();
-                    PacketEvents.ENCODER_NAME = "pe-encoder-" + data.getName().toLowerCase();
-                    PacketEvents.DECODER_NAME = "pe-decoder-" + data.getName().toLowerCase();
-                    PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + data.getName().toLowerCase();
-                    PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + data.getName().toLowerCase();
-                    PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + data.getName().toLowerCase();
+                    String id = data.getName().toLowerCase(Locale.ROOT);
+                    PacketEvents.IDENTIFIER = "pe-" + id;
+                    PacketEvents.ENCODER_NAME = "pe-encoder-" + id;
+                    PacketEvents.DECODER_NAME = "pe-decoder-" + id;
+                    PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
+                    PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
+                    PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
                     injector.inject();
 
                     loaded = true;

@@ -29,6 +29,8 @@ import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.mapper.ResolvableEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
@@ -52,9 +54,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class User implements IRegistryHolder {
 
@@ -66,7 +68,7 @@ public class User implements IRegistryHolder {
     private int entityId = -1;
 
     private DimensionType dimensionType = DimensionTypes.OVERWORLD;
-    private final Map<ResourceLocation, IRegistry<?>> registries = new HashMap<>();
+    private final Map<ResourceLocation, IRegistry<?>> registries = new ConcurrentHashMap<>();
 
     public User(Object channel,
                 ConnectionState connectionState, ClientVersion clientVersion,
@@ -87,6 +89,19 @@ public class User implements IRegistryHolder {
     @ApiStatus.Internal
     public void putRegistry(IRegistry<?> registry) {
         this.registries.put(registry.getRegistryKey(), registry);
+    }
+
+    @ApiStatus.Internal
+    public void finalizeRegistries(PacketWrapper<?> wrapper) {
+        // do some resolving stuff for registry entries which may
+        // reference the same registry they are in
+        for (IRegistry<?> registry : this.registries.values()) {
+            for (MappedEntity entry : registry.getEntries()) {
+                if (entry instanceof ResolvableEntity) {
+                    ((ResolvableEntity) entry).doResolve(wrapper);
+                }
+            }
+        }
     }
 
     public Object getChannel() {

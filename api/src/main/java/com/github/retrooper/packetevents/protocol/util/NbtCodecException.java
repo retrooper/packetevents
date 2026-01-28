@@ -23,6 +23,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class NbtCodecException extends RuntimeException {
 
+    private static final boolean DEBUG_TRACES = Boolean.getBoolean("packetevents.debug.nbt-codec-trace");
+
     public NbtCodecException(String message) {
         super(message);
     }
@@ -37,6 +39,7 @@ public class NbtCodecException extends RuntimeException {
 
     @Override
     public synchronized Throwable fillInStackTrace() {
-        return this; // no stack trace for us
+        // don't fill in stack traces by default
+        return DEBUG_TRACES ? super.fillInStackTrace() : this;
     }
 }

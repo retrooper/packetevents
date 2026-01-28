@@ -19,8 +19,11 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.protocol.player.User;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class UserLoginEvent extends PacketEvent implements CallableEvent, UserEvent, PlayerEvent {
+
     private final User user;
     private final Object player;
 

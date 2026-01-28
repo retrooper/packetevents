@@ -22,10 +22,12 @@ import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@NullMarked
 public class StaticCatVariant extends AbstractMappedEntity implements CatVariant {
 
     private final ResourceLocation assetId;
@@ -51,15 +53,14 @@ public class StaticCatVariant extends AbstractMappedEntity implements CatVariant
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof StaticCatVariant)) return false;
-        if (!super.equals(obj)) return false;
         StaticCatVariant that = (StaticCatVariant) obj;
         return this.assetId.equals(that.assetId);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.assetId);
+        return Objects.hash(this.assetId);
     }
 }

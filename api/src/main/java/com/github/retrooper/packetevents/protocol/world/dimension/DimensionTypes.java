@@ -216,7 +216,7 @@ public final class DimensionTypes {
                     .setAttribute(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, true)
     );
 
-    public static final DimensionType THE_END = define("the_end",
+    private static final Consumer<DimensionTypeBuilder> THE_END_COMMON =
             builder -> builder
                     // .setTimelines(new MappedEntityRef.Named<>()) TODO how?
                     .setHasFixedTime(true)
@@ -255,8 +255,21 @@ public final class DimensionTypes {
                     // pre 1.21.11 properties
                     .setNatural(false).setRespawnAnchorWorks(false).setBedWorks(false)
                     .setEffects(new ResourceLocation("the_end")).setFixedTime(5L * 60L * Ticks.TICKS_PER_SECOND)
-                    .setAttribute(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, true)
-    );
+                    .setAttribute(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, true);
+
+    /**
+     * @versions -1.21.8
+     */
+    @ApiStatus.Obsolete
+    public static final DimensionType THE_END_PRE_1_21_9 = define("the_end",
+            new VersionRange(null, ClientVersion.V_1_21_7),
+            THE_END_COMMON.andThen(builder -> builder.setHasSkylight(false)));
+
+    /**
+     * @versions 1.21.9+
+     */
+    public static final DimensionType THE_END = define("the_end",
+            new VersionRange(ClientVersion.V_1_21_9, null), THE_END_COMMON);
 
     public static final DimensionType THE_NETHER = define("the_nether",
             builder -> builder

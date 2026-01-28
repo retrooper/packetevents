@@ -365,7 +365,8 @@ import java.util.Map;
 
 public final class PacketType {
 
-    private static boolean PREPARED = false;
+    private static volatile boolean PREPARED = false;
+    private static final Object PREPARE_LOCK = new Object();
 
     //TODO UPDATE Update packet type mappings (clientbound pt. 1)
     private static final VersionMapper CLIENTBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
@@ -438,14 +439,30 @@ public final class PacketType {
             ClientVersion.V_1_21_6,
             ClientVersion.V_1_21_9);
 
-    public static void prepare() {
-        PacketType.Play.Client.load();
-        PacketType.Play.Server.load();
-        PacketType.Configuration.Client.load();
-        PacketType.Configuration.Server.load();
-        PREPARED = true;
+    private PacketType() {
     }
 
+    @ApiStatus.Internal
+    public static void prepare() {
+        if (PREPARED) {
+            return;
+        }
+
+        synchronized (PREPARE_LOCK) {
+            if (PREPARED) {
+                return;
+            }
+
+            PacketType.Play.Client.load();
+            PacketType.Play.Server.load();
+            PacketType.Configuration.Client.load();
+            PacketType.Configuration.Server.load();
+
+            PREPARED = true;
+        }
+    }
+
+    @ApiStatus.Internal
     public static boolean isPrepared() {
         return PREPARED;
     }
@@ -843,9 +860,8 @@ public final class PacketType {
             }
 
             public static @Nullable PacketTypeCommon getById(ClientVersion version, int packetId) {
-                if (!PREPARED) {
-                    PacketType.prepare();
-                }
+                PacketType.prepare();
+
                 int index = SERVERBOUND_CONFIG_VERSION_MAPPER.getIndex(version);
                 Map<Integer, PacketTypeCommon> map = PACKET_TYPE_ID_MAP.get((byte) index);
                 return map.get(packetId);
@@ -858,9 +874,8 @@ public final class PacketType {
 
             @Override
             public int getId(ClientVersion version) {
-                if (!PREPARED) {
-                    PacketType.prepare();
-                }
+                PacketType.prepare();
+
                 int index = SERVERBOUND_CONFIG_VERSION_MAPPER.getIndex(version);
                 return this.ids[index];
             }
@@ -977,9 +992,8 @@ public final class PacketType {
             }
 
             public static @Nullable PacketTypeCommon getById(ClientVersion version, int packetId) {
-                if (!PREPARED) {
-                    PacketType.prepare();
-                }
+                PacketType.prepare();
+
                 int index = CLIENTBOUND_CONFIG_VERSION_MAPPER.getIndex(version);
                 Map<Integer, PacketTypeCommon> map = PACKET_TYPE_ID_MAP.get((byte) index);
                 return map.get(packetId);
@@ -992,9 +1006,8 @@ public final class PacketType {
 
             @Override
             public int getId(ClientVersion version) {
-                if (!PREPARED) {
-                    PacketType.prepare();
-                }
+                PacketType.prepare();
+
                 int index = CLIENTBOUND_CONFIG_VERSION_MAPPER.getIndex(version);
                 return this.ids[index];
             }
@@ -1187,9 +1200,8 @@ public final class PacketType {
 
             @Nullable
             public static PacketTypeCommon getById(ClientVersion version, int packetId) {
-                if (!PREPARED) {
-                    PacketType.prepare();
-                }
+                PacketType.prepare();
+
                 int index = SERVERBOUND_PLAY_VERSION_MAPPER.getIndex(version);
                 Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
                 return packetIdMap.get(packetId);
@@ -1237,9 +1249,8 @@ public final class PacketType {
             }
 
             public int getId(ClientVersion version) {
-                if (!PREPARED) {
-                    PacketType.prepare();
-                }
+                PacketType.prepare();
+
                 int index = SERVERBOUND_PLAY_VERSION_MAPPER.getIndex(version);
                 return ids[index];
             }
@@ -1589,18 +1600,16 @@ public final class PacketType {
             }
 
             public int getId(ClientVersion version) {
-                if (!PREPARED) {
-                    PacketType.prepare();
-                }
+                PacketType.prepare();
+
                 int index = CLIENTBOUND_PLAY_VERSION_MAPPER.getIndex(version);
                 return ids[index];
             }
 
             @Nullable
             public static PacketTypeCommon getById(ClientVersion version, int packetId) {
-                if (!PREPARED) {
-                    PacketType.prepare();
-                }
+                PacketType.prepare();
+
                 int index = CLIENTBOUND_PLAY_VERSION_MAPPER.getIndex(version);
                 Map<Integer, PacketTypeCommon> map = PACKET_TYPE_ID_MAP.get((byte) index);
                 return map.get(packetId);

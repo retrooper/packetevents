@@ -32,6 +32,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
+import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerConfigurationEnd;
 import com.github.retrooper.packetevents.wrapper.configuration.server.WrapperConfigServerRegistryData;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
@@ -106,6 +107,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             if (joinGame.getDimensionCodec() != null) { // 1.16 to 1.20.1
                 SynchronizedRegistriesHandler.handleLegacyRegistries(user, joinGame,
                         joinGame.getDimensionCodec());
+                user.finalizeRegistries(joinGame);
             }
 
             user.setDimensionType(joinGame.getDimensionType());
@@ -119,6 +121,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
             user.setEncoderState(ConnectionState.CONFIGURATION);
         } else if (event.getPacketType() == PacketType.Configuration.Server.CONFIGURATION_END) {
             user.setEncoderState(ConnectionState.PLAY);
+            user.finalizeRegistries(new WrapperConfigServerConfigurationEnd(event));
         }
     }
 

@@ -421,7 +421,7 @@ public final class StateTypes {
     /**
      * @versions 1.21.6-1.21.8
      */
-    @ApiStatus.Obsolete
+    @ApiStatus.Obsolete @RuntimeObsolete(since = "2.11.1", reason = "Removed and replaced with different chain types in 1.21.9")
     public static StateType CHAIN = StateTypes.builder().name("CHAIN").blastResistance(6.0f).hardness(5.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
     public static StateType GLASS_PANE = StateTypes.builder().name("GLASS_PANE").blastResistance(0.3f).hardness(0.3f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.GLASS).build();
     public static StateType MELON = StateTypes.builder().name("MELON").blastResistance(1.0f).hardness(1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.VEGETABLE).build();
@@ -530,9 +530,9 @@ public final class StateTypes {
     public static StateType BLACK_CARPET = StateTypes.builder().name("BLACK_CARPET").blastResistance(0.1f).hardness(0.1f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.CLOTH_DECORATION).build();
     public static StateType TERRACOTTA = StateTypes.builder().name("TERRACOTTA").blastResistance(4.2f).hardness(1.25f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType PACKED_ICE = StateTypes.builder().name("PACKED_ICE").blastResistance(0.5f).hardness(0.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.ICE_SOLID).build();
-    @ApiStatus.Obsolete @RuntimeObsolete
-    public static StateType GRASS_PATH = StateTypes.builder().name("GRASS_PATH").blastResistance(0.65f).hardness(0.65f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DIRT).build();
     public static StateType DIRT_PATH = StateTypes.builder().name("DIRT_PATH").blastResistance(0.65f).hardness(0.65f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DIRT).build();
+    @ApiStatus.Obsolete @RuntimeObsolete(since = "2.9.0", reason = "Renamed to DIRT_PATH in 1.17")
+    public static StateType GRASS_PATH = StateTypes.builder().name("GRASS_PATH").blastResistance(0.65f).hardness(0.65f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DIRT).build();
     public static StateType SUNFLOWER = StateTypes.builder().name("SUNFLOWER").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
     public static StateType LILAC = StateTypes.builder().name("LILAC").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
     public static StateType ROSE_BUSH = StateTypes.builder().name("ROSE_BUSH").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();

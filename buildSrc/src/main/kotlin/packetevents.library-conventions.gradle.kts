@@ -68,6 +68,27 @@ tasks {
         }
     }
 
+    val writeVersionFile by tasks.registering {
+        val outFile = layout.buildDirectory.file("generated/${rootProject.name}_${project.name}_version.txt")
+        outputs.file(outFile)
+
+        doLast {
+            outFile.map { it.asFile }.get().apply {
+                parentFile.mkdirs()
+                writeText(project.version.toString())
+            }
+        }
+    }
+
+    // write version file to each jar; this solves our issue of modrinth not accepting
+    // uploads of the same file twice, caused by the sources jar of some modules not changing for some versions
+    withType<Jar> {
+        dependsOn(writeVersionFile)
+        metaInf {
+            from(writeVersionFile)
+        }
+    }
+
     defaultTasks("build")
 }
 
@@ -89,7 +110,8 @@ publishing {
                 pom {
                     withXml {
                         val (libraryDeps, projectDeps) = allDependencies.get().partition { it !is ProjectDependency }
-                        val dependenciesNode = asNode().get("dependencies") as? Node ?: asNode().appendNode("dependencies")
+                        val dependenciesNode =
+                            asNode().get("dependencies") as? Node ?: asNode().appendNode("dependencies")
 
                         libraryDeps.forEach {
                             val dependencyNode = dependenciesNode.appendNode("dependency")

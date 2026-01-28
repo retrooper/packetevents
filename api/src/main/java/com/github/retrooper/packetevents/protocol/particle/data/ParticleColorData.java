@@ -24,7 +24,11 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
+@NullMarked
 public class ParticleColorData extends ParticleData {
 
     private AlphaColor color;
@@ -81,5 +85,17 @@ public class ParticleColorData extends ParticleData {
     @Override
     public boolean isEmpty() {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        ParticleColorData that = (ParticleColorData) obj;
+        return this.color.equals(that.color);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.color);
     }
 }

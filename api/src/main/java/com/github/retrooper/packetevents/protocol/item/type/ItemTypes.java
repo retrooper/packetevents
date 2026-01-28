@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -2074,7 +2075,7 @@ public final class ItemTypes {
     }
 
     public static Builder builder(String key) {
-        return new Builder(key.toLowerCase());
+        return new Builder(key.toLowerCase(Locale.ROOT));
     }
 
     @ApiStatus.Internal

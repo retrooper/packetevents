@@ -24,17 +24,25 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
+import org.jetbrains.annotations.UnknownNullability;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class PacketReceiveEvent extends ProtocolPacketEvent {
-    protected PacketReceiveEvent(Object channel, User user, Object player, Object rawByteBuf,
-                                 boolean autoProtocolTranslation) throws PacketProcessException {
+
+    protected PacketReceiveEvent(
+            Object channel, User user,
+            @UnknownNullability Object player, Object rawByteBuf,
+            boolean autoProtocolTranslation
+    ) throws PacketProcessException {
         super(PacketSide.CLIENT, channel, user, player, rawByteBuf, autoProtocolTranslation);
     }
 
-    protected PacketReceiveEvent(int packetID, PacketTypeCommon packetType,
-                                 ServerVersion serverVersion,
-                                 Object channel, User user, Object player,
-                                 Object byteBuf) throws PacketProcessException {
+    protected PacketReceiveEvent(
+            int packetID, PacketTypeCommon packetType, ServerVersion serverVersion,
+            Object channel, User user,
+            @UnknownNullability Object player, Object byteBuf
+    ) throws PacketProcessException {
         super(packetID, packetType, serverVersion,
                 channel, user, player, byteBuf);
     }
@@ -46,13 +54,8 @@ public class PacketReceiveEvent extends ProtocolPacketEvent {
 
     @Override
     public PacketReceiveEvent clone() {
-        try {
-            Object clonedBuffer = ByteBufHelper.retainedDuplicate(getByteBuf());
-            return new PacketReceiveEvent(getPacketId(), getPacketType(), getServerVersion(),
-                    getChannel(), getUser(), getPlayer(), clonedBuffer);
-        } catch (PacketProcessException e) {
-            e.printStackTrace();
-        }
-        return null;
+        Object clonedBuffer = ByteBufHelper.retainedDuplicate(getByteBuf());
+        return new PacketReceiveEvent(getPacketId(), getPacketType(), getServerVersion(),
+                getChannel(), getUser(), getPlayer(), clonedBuffer);
     }
 }

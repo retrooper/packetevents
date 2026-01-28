@@ -443,7 +443,7 @@ final class StyleSerializer extends TypeAdapter<Style> {
                 out.endObject();
             }
 
-            if (this.emitCamelCaseClick && (BackwardCompatUtil.IS_4_22_0_OR_NEWER || action.payloadType() == ClickEvent.Payload.Text.class)) { // packetevents patch
+            if (this.emitCamelCaseClick && (!BackwardCompatUtil.IS_4_22_0_OR_NEWER || action.payloadType() == ClickEvent.Payload.Text.class)) { // packetevents patch
                 out.name(CLICK_EVENT_CAMEL);
                 out.beginObject();
                 out.name(CLICK_EVENT_ACTION);

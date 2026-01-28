@@ -29,15 +29,19 @@ import com.github.retrooper.packetevents.protocol.world.positionsource.PositionS
 import com.github.retrooper.packetevents.protocol.world.positionsource.PositionSourceTypes;
 import com.github.retrooper.packetevents.util.UniqueIdUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+@NullMarked
 public class EntityPositionSource extends PositionSource {
 
     private static final UUID EMPTY_UNIQUE_ID = new UUID(0, 0);
 
-    private Optional<UUID> entityUniqueId;
+    private @Nullable UUID entityUniqueId;
     private int entityId;
     private float offsetY;
 
@@ -53,7 +57,7 @@ public class EntityPositionSource extends PositionSource {
 
     public EntityPositionSource(Optional<UUID> entityUniqueId, float offsetY) {
         super(PositionSourceTypes.ENTITY);
-        this.entityUniqueId = entityUniqueId;
+        this.entityUniqueId = entityUniqueId.orElse(null);
         this.offsetY = offsetY;
     }
 
@@ -87,7 +91,7 @@ public class EntityPositionSource extends PositionSource {
 
     public static void encodeSource(EntityPositionSource source, ClientVersion version, NBTCompound compound) {
         if (version.isNewerThanOrEquals(ClientVersion.V_1_19)) {
-            UUID uniqueId = source.entityUniqueId.orElse(EMPTY_UNIQUE_ID);
+            UUID uniqueId = source.entityUniqueId != null ? source.entityUniqueId : EMPTY_UNIQUE_ID;
             compound.setTag("source_entity", new NBTIntArray(UniqueIdUtil.toIntArray(uniqueId)));
             compound.setTag("y_offset", new NBTFloat(source.offsetY));
         } else {
@@ -99,14 +103,14 @@ public class EntityPositionSource extends PositionSource {
      * Note: Only used when handling particles through registries and version is at least 1.19.
      */
     public Optional<UUID> getEntityUniqueId() {
-        return this.entityUniqueId;
+        return Optional.ofNullable(this.entityUniqueId);
     }
 
     /**
      * Note: Only used when handling particles through registries and version is at least 1.19.
      */
     public void setEntityUniqueId(Optional<UUID> entityUniqueId) {
-        this.entityUniqueId = entityUniqueId;
+        this.entityUniqueId = entityUniqueId.orElse(null);
     }
 
     /**
@@ -129,5 +133,19 @@ public class EntityPositionSource extends PositionSource {
 
     public void setOffsetY(float offsetY) {
         this.offsetY = offsetY;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        EntityPositionSource that = (EntityPositionSource) obj;
+        if (this.entityId != that.entityId) return false;
+        if (Float.compare(that.offsetY, this.offsetY) != 0) return false;
+        return Objects.equals(this.entityUniqueId, that.entityUniqueId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.entityUniqueId, this.entityId, this.offsetY);
     }
 }

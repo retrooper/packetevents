@@ -45,7 +45,7 @@ public class WrapperLoginClientPluginResponse extends PacketWrapper<WrapperLogin
         this.messageID = readVarInt();
         this.successful = readBoolean();
         if (this.successful) {
-            this.data = readByteArray(ByteBufHelper.readableBytes(buffer));
+            this.data = readBytes(ByteBufHelper.readableBytes(buffer));
         } else {
             this.data = new byte[0];
         }
@@ -56,7 +56,7 @@ public class WrapperLoginClientPluginResponse extends PacketWrapper<WrapperLogin
         writeVarInt(messageID);
         writeBoolean(successful);
         if (successful) {
-            writeByteArray(data);
+            writeBytes(data);
         }
     }
 

@@ -20,15 +20,18 @@ package com.github.retrooper.packetevents.protocol.item.trimmaterial;
 
 import com.github.retrooper.packetevents.protocol.item.armormaterial.ArmorMaterial;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
 
+@NullMarked
 public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMaterial {
 
     private final String assetName;
@@ -88,7 +91,7 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
     @ApiStatus.Obsolete
     @Override
     public ItemType getIngredient() {
-        return this.ingredient;
+        return this.ingredient != null ? this.ingredient : ItemTypes.AIR;
     }
 
     @Override
@@ -107,10 +110,9 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticTrimMaterial)) return false;
-        if (!super.equals(obj)) return false;
         StaticTrimMaterial that = (StaticTrimMaterial) obj;
         if (Float.compare(that.itemModelIndex, this.itemModelIndex) != 0) return false;
         if (!this.assetName.equals(that.assetName)) return false;
@@ -121,7 +123,7 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.assetName, this.ingredient, this.itemModelIndex, this.overrideArmorMaterials, this.description);
+        return Objects.hash(this.assetName, this.ingredient, this.itemModelIndex, this.overrideArmorMaterials, this.description);
     }
 
     @Override

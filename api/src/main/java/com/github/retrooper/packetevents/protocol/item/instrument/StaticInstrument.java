@@ -23,10 +23,12 @@ import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@NullMarked
 public class StaticInstrument extends AbstractMappedEntity implements Instrument {
 
     private final Sound sound;
@@ -78,10 +80,9 @@ public class StaticInstrument extends AbstractMappedEntity implements Instrument
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticInstrument)) return false;
-        if (!super.equals(obj)) return false;
         StaticInstrument that = (StaticInstrument) obj;
         if (this.useSeconds != that.useSeconds) return false;
         if (Float.compare(that.range, this.range) != 0) return false;
@@ -91,6 +92,6 @@ public class StaticInstrument extends AbstractMappedEntity implements Instrument
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.sound, this.useSeconds, this.range, this.description);
+        return Objects.hash(this.sound, this.useSeconds, this.range, this.description);
     }
 }

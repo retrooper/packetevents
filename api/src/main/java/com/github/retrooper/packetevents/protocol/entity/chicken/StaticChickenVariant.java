@@ -22,10 +22,12 @@ import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@NullMarked
 public class StaticChickenVariant extends AbstractMappedEntity implements ChickenVariant {
 
     private final ModelType modelType;
@@ -58,9 +60,8 @@ public class StaticChickenVariant extends AbstractMappedEntity implements Chicke
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof StaticChickenVariant)) return false;
-        if (!super.equals(obj)) return false;
         StaticChickenVariant that = (StaticChickenVariant) obj;
         if (!this.modelType.equals(that.modelType)) return false;
         return this.assetId.equals(that.assetId);
@@ -68,6 +69,6 @@ public class StaticChickenVariant extends AbstractMappedEntity implements Chicke
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.modelType, this.assetId);
+        return Objects.hash(this.modelType, this.assetId);
     }
 }

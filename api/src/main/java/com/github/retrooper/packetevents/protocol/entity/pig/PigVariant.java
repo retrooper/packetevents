@@ -30,8 +30,10 @@ import com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.util.Index;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public interface PigVariant extends MappedEntity, CopyableEntity<PigVariant>, DeepComparableEntity {
 
     ModelType getModelType();

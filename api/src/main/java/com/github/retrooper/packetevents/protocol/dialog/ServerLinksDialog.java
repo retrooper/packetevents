@@ -25,8 +25,8 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -108,9 +108,8 @@ public class ServerLinksDialog extends AbstractMappedEntity implements Dialog {
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof ServerLinksDialog)) return false;
-        if (!super.equals(obj)) return false;
         ServerLinksDialog that = (ServerLinksDialog) obj;
         if (this.columns != that.columns) return false;
         if (this.buttonWidth != that.buttonWidth) return false;
@@ -120,6 +119,6 @@ public class ServerLinksDialog extends AbstractMappedEntity implements Dialog {
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.common, this.exitAction, this.columns, this.buttonWidth);
+        return Objects.hash(this.common, this.exitAction, this.columns, this.buttonWidth);
     }
 }

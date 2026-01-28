@@ -22,10 +22,12 @@ import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@NullMarked
 public class StaticPaintingVariant extends AbstractMappedEntity implements PaintingVariant {
 
     private final int width;
@@ -65,10 +67,9 @@ public class StaticPaintingVariant extends AbstractMappedEntity implements Paint
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticPaintingVariant)) return false;
-        if (!super.equals(obj)) return false;
         StaticPaintingVariant that = (StaticPaintingVariant) obj;
         if (this.width != that.width) return false;
         if (this.height != that.height) return false;
@@ -77,7 +78,7 @@ public class StaticPaintingVariant extends AbstractMappedEntity implements Paint
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.width, this.height, this.assetId);
+        return Objects.hash(this.width, this.height, this.assetId);
     }
 
     @Override

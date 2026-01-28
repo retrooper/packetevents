@@ -99,7 +99,9 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
             return;
         }
 
-        api.getEventManager().callEvent(new UserLoginEvent(user, this.minecraft.player));
+        LocalPlayer player = this.minecraft.player;
+        assert player != null; // initialized in this method
+        api.getEventManager().callEvent(new UserLoginEvent(user, player));
     }
 
     /**

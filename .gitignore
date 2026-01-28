@@ -126,3 +126,5 @@ run/
 
 # Build Source Kotlin
 /buildSrc/.kotlin/
+
+.env

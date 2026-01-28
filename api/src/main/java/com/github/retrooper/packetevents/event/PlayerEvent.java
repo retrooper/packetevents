@@ -18,17 +18,22 @@
 
 package com.github.retrooper.packetevents.event;
 
+import org.jetbrains.annotations.UnknownNullability;
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Every event that has an associated player is recommended to implement this interface.
  *
  * @author retrooper
  * @since 1.6.9
  */
+@NullMarked
 public interface PlayerEvent {
+
     /**
      * Associated player.
      *
      * @return Player.
      */
-    <T> T getPlayer();
+    <T> @UnknownNullability T getPlayer();
 }

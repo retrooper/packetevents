@@ -37,6 +37,7 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
+import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
@@ -202,6 +203,7 @@ public class BungeePacketEventsBuilder {
                     PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
 
                     WrappedBlockState.ensureLoad();
+                    SynchronizedRegistriesHandler.init();
 
                     injector.inject();
                     loaded = true;

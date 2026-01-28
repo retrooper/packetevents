@@ -22,7 +22,9 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public abstract class PositionSource {
 
     protected final PositionSourceType<?> type;

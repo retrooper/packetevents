@@ -25,7 +25,7 @@ dependencies {
 
 tasks {
     named<RunVelocity>("runVelocity") {
-        velocityVersion("3.3.0-SNAPSHOT")
+        velocityVersion("3.4.0-SNAPSHOT")
         runDirectory = rootDir.resolve("run/velocity/")
 
         javaLauncher = project.javaToolchains.launcherFor {

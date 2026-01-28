@@ -35,7 +35,7 @@ public class StaticEnvironmentAttribute<T> extends AbstractMappedEntity implemen
 
     @ApiStatus.Internal
     public StaticEnvironmentAttribute(
-            @org.jetbrains.annotations.Nullable TypesBuilderData data,
+            @Nullable TypesBuilderData data,
             @Nullable AttributeType<T> attributeType, @Nullable T defaultValue
     ) {
         super(data);

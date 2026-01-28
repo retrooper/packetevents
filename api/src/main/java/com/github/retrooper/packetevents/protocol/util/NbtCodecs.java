@@ -212,6 +212,26 @@ public final class NbtCodecs {
 
     public static final NbtCodec<UUID> UUID = INT_ARRAY
             .apply(UniqueIdUtil::fromIntArray, UniqueIdUtil::toIntArray);
+    public static final NbtCodec<UUID> STRING_UUID = new NbtCodec<UUID>() {
+        @Override
+        public UUID decode(NBT nbt, PacketWrapper<?> wrapper) throws NbtCodecException {
+            String uuidStr = ((NBTString) nbt).getValue();
+            if (uuidStr.length() == 36) { // fast length check
+                try {
+                    // try parsing uuid
+                    return java.util.UUID.fromString(uuidStr);
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+            throw new NbtCodecException("Invalid UUID " + uuidStr);
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, UUID value) throws NbtCodecException {
+            return new NBTString(value.toString());
+        }
+    };
+    public static final NbtCodec<UUID> LENIENT_UUID = UUID.withAlternative(STRING_UUID);
 
     public static final NbtCodec<Color> RGB_COLOR = new NbtCodec<Color>() {
         @Override

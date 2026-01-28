@@ -15,12 +15,14 @@ import com.github.retrooper.packetevents.util.LogManager;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
+import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
 import java.util.logging.Level;
 
 public class TestPacketEventsBuilder {
@@ -60,12 +62,7 @@ public class TestPacketEventsBuilder {
                     return ProtocolVersion.UNKNOWN;
                 }
             };
-            private final ServerManager serverManager = new ServerManagerAbstract() {
-                @Override
-                public ServerVersion getVersion() {
-                    return ServerVersion.getLatest();
-                }
-            };
+            private final ServerManager serverManager = new ServerManagerImpl();
 
             private final NettyManager nettyManager = new NettyManagerImpl();
             private final LogManager logManager = new LogManager() {
@@ -89,7 +86,7 @@ public class TestPacketEventsBuilder {
             public void load() {
                 if (!loaded) {
                     //Resolve server version and cache
-                    String id = plugin.getName().toLowerCase();
+                    String id = plugin.getName().toLowerCase(Locale.ROOT);
                     PacketEvents.IDENTIFIER = "pe-" + id;
                     PacketEvents.ENCODER_NAME = "pe-encoder-" + id;
                     PacketEvents.DECODER_NAME = "pe-decoder-" + id;
@@ -97,9 +94,7 @@ public class TestPacketEventsBuilder {
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
                     PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
 
-                    if (!PacketType.isPrepared()) {
-                        PacketType.prepare();
-                    }
+                    PacketType.prepare();
 
                     loaded = true;
                 }

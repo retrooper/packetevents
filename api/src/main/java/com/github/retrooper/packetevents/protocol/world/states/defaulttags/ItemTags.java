@@ -583,6 +583,7 @@ public class ItemTags {
     public static final ItemTags ENCHANTABLE_LUNGE = bind("enchantable/lunge");
 
     static {
+        // auto-generated, do not edit manually!
         copy(BlockTags.WOOL, ItemTags.WOOL);
         copy(BlockTags.PLANKS, ItemTags.PLANKS);
         copy(BlockTags.STONE_BRICKS, ItemTags.STONE_BRICKS);
@@ -781,6 +782,7 @@ public class ItemTags {
         ItemTags.ENCHANTABLE_VANISHING.addTag(ItemTags.ENCHANTABLE_DURABILITY).addTag(ItemTags.SKULLS).add(ItemTypes.COMPASS, ItemTypes.CARVED_PUMPKIN);
         copy(BlockTags.COMPLETES_FIND_TREE_TUTORIAL, ItemTags.COMPLETES_FIND_TREE_TUTORIAL);
         ItemTags.ENCHANTABLE_WEAPON.addTag(ItemTags.ENCHANTABLE_SHARP_WEAPON).add(ItemTypes.MACE);
+        // auto-generated end
 
         // deprecated/legacy tags
         for (ItemType type : ItemTypes.getRegistry().getEntries()) {

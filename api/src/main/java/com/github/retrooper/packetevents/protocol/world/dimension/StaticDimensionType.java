@@ -24,19 +24,17 @@ import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.mapper.ResolvableEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributeMap;
 import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributes;
 import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Timeline;
 import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Timelines;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.resources.TagKey;
-import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.OptionalLong;
@@ -192,14 +190,13 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
 
     @Override
     public void doResolve(PacketWrapper<?> wrapper) {
-        IRegistry<Timeline> registry = wrapper.replaceRegistry(Timelines.getRegistry());
-        this.timelines = this.timelinesRef.resolve(wrapper, registry);
+        this.timelines = this.timelinesRef.resolve(wrapper, Timelines.getRegistry());
     }
 
     @Override
     public DimensionType copy(@Nullable TypesBuilderData newData) {
         return new StaticDimensionType(
-                this.data, this.hasFixedTime, this.skybox, this.cardinalLight, this.attributes, this.timelinesRef,
+                newData, this.hasFixedTime, this.skybox, this.cardinalLight, this.attributes, this.timelinesRef,
                 this.fixedTime, this.natural, this.bedWorks, this.respawnAnchorWorks, this.effects, this.coordinateScale,
                 this.minY, this.height, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit, this.hasSkylight,
                 this.hasCeiling, this.logicalHeight, this.infiniburn, this.ambientLight
@@ -340,9 +337,8 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
-        if (obj == null || getClass() != obj.getClass()) return false;
-        if (!super.equals(obj)) return false;
+    public boolean deepEquals(@Nullable Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
         StaticDimensionType that = (StaticDimensionType) obj;
         if (this.hasFixedTime != that.hasFixedTime) return false;
         if (this.natural != that.natural) return false;
@@ -368,6 +364,6 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.hasFixedTime, this.skybox, this.cardinalLight, this.attributes, this.timelinesRef, this.fixedTime, this.natural, this.bedWorks, this.respawnAnchorWorks, this.effects, this.coordinateScale, this.minY, this.height, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit, this.hasSkylight, this.hasCeiling, this.logicalHeight, this.infiniburn, this.ambientLight);
+        return Objects.hash(this.hasFixedTime, this.skybox, this.cardinalLight, this.attributes, this.timelinesRef, this.fixedTime, this.natural, this.bedWorks, this.respawnAnchorWorks, this.effects, this.coordinateScale, this.minY, this.height, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit, this.hasSkylight, this.hasCeiling, this.logicalHeight, this.infiniburn, this.ambientLight);
     }
 }

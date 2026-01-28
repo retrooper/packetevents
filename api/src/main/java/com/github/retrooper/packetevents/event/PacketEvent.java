@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.TimeStampMode;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * An event in both of PacketEvents' event systems.
@@ -28,7 +29,9 @@ import com.github.retrooper.packetevents.util.TimeStampMode;
  * @author retrooper
  * @since 1.2.6
  */
+@NullMarked
 public abstract class PacketEvent implements CallableEvent {
+
     private final long timestamp;
 
     public PacketEvent() {

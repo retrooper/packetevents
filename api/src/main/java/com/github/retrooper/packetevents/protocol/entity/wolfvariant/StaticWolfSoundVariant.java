@@ -22,10 +22,12 @@ import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@NullMarked
 public class StaticWolfSoundVariant extends AbstractMappedEntity implements WolfSoundVariant {
 
     private final Sound ambientSound;
@@ -93,9 +95,8 @@ public class StaticWolfSoundVariant extends AbstractMappedEntity implements Wolf
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof StaticWolfSoundVariant)) return false;
-        if (!super.equals(obj)) return false;
         StaticWolfSoundVariant that = (StaticWolfSoundVariant) obj;
         if (!this.ambientSound.equals(that.ambientSound)) return false;
         if (!this.deathSound.equals(that.deathSound)) return false;
@@ -107,6 +108,6 @@ public class StaticWolfSoundVariant extends AbstractMappedEntity implements Wolf
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.ambientSound, this.deathSound, this.growlSound, this.hurtSound, this.pantSound, this.whineSound);
+        return Objects.hash(this.ambientSound, this.deathSound, this.growlSound, this.hurtSound, this.pantSound, this.whineSound);
     }
 }

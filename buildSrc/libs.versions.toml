@@ -5,7 +5,7 @@ via-nbt = "5.1.2"
 fast-util = "8.5.17"
 gson = "2.8.9"
 java-diff-utils = "4.12"
-mod-publish = "1.0.0"
+mod-publish = "1.1.0"
 runtask = "3.0.0"
 
 [libraries]

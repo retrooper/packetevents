@@ -21,11 +21,13 @@ package com.github.retrooper.packetevents.protocol.chat;
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@NullMarked
 public class StaticChatType extends AbstractMappedEntity implements ChatType {
 
     private final @UnknownNullability("only nullable for 1.19") ChatTypeDecoration chatDecoration;
@@ -61,9 +63,9 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
     @ApiStatus.Internal
     public StaticChatType(
             @Nullable TypesBuilderData data,
-            @UnknownNullability("only nullable for 1.19") ChatTypeDecoration chatDecoration,
+            @Nullable ChatTypeDecoration chatDecoration,
             @Nullable ChatTypeDecoration overlayDecoration,
-            @UnknownNullability("only nullable for 1.19") ChatTypeDecoration narrationDecoration,
+            @Nullable ChatTypeDecoration narrationDecoration,
             @Nullable NarrationPriority narrationPriority
     ) {
         super(data);
@@ -100,10 +102,9 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticChatType)) return false;
-        if (!super.equals(obj)) return false;
         StaticChatType that = (StaticChatType) obj;
         if (!Objects.equals(this.chatDecoration, that.chatDecoration)) return false;
         if (!Objects.equals(this.overlayDecoration, that.overlayDecoration)) return false;
@@ -113,7 +114,7 @@ public class StaticChatType extends AbstractMappedEntity implements ChatType {
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.chatDecoration, this.overlayDecoration, this.narrationDecoration, this.narrationPriority);
+        return Objects.hash(this.chatDecoration, this.overlayDecoration, this.narrationDecoration, this.narrationPriority);
     }
 
     @Override

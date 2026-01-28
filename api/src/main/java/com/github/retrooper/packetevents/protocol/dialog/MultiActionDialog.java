@@ -25,8 +25,8 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -68,7 +68,6 @@ public class MultiActionDialog extends AbstractMappedEntity implements Dialog {
         List<ActionButton> actions = compound.getListOrThrow("actions", ActionButton::decode, wrapper);
         ActionButton action = compound.getOrNull("exit_action", ActionButton::decode, wrapper);
         int columns = compound.getNumberTagValueOrDefault("columns", 2).intValue();
-        int buttonWidth = compound.getNumberTagValueOrDefault("button_width", 150).intValue();
         return new MultiActionDialog(null, common, actions, action, columns);
     }
 
@@ -110,9 +109,8 @@ public class MultiActionDialog extends AbstractMappedEntity implements Dialog {
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof MultiActionDialog)) return false;
-        if (!super.equals(obj)) return false;
         MultiActionDialog that = (MultiActionDialog) obj;
         if (this.columns != that.columns) return false;
         if (!this.common.equals(that.common)) return false;
@@ -122,6 +120,6 @@ public class MultiActionDialog extends AbstractMappedEntity implements Dialog {
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.common, this.actions, this.exitAction, this.columns);
+        return Objects.hash(this.common, this.actions, this.exitAction, this.columns);
     }
 }

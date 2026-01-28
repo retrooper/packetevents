@@ -18,8 +18,7 @@
 
 package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.event.PacketEvent;
-import com.github.retrooper.packetevents.event.PacketListenerAbstract;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The {@link PacketEvent} implements this interface.
@@ -31,7 +30,9 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
  * @author retrooper
  * @since 1.8
  */
+@NullMarked
 public interface CallableEvent {
+
     default void call(PacketListenerCommon listener) {
         listener.onPacketEventExternal((PacketEvent) this);
     }

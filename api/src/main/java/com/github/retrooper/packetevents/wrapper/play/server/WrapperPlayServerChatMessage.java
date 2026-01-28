@@ -28,7 +28,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
 public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServerChatMessage> {
-    private static final ChatMessageProcessor CHAT_LEGACY_PROCESSOR;
+    private static final ChatMessageProcessor CHAT_V1_7_PROCESSOR;
+    private static final ChatMessageProcessor CHAT_V1_8_PROCESSOR;
     private static final ChatMessageProcessor CHAT_V1_16_PROCESSOR;
     private static final ChatMessageProcessor CHAT_V1_19_PROCESSOR;
     private static final ChatMessageProcessor CHAT_V1_19_1_PROCESSOR;
@@ -36,7 +37,8 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     private static final ChatMessageProcessor CHAT_V1_21_5_PROCESSOR;
 
     static {
-        CHAT_LEGACY_PROCESSOR = new ChatMessageProcessorLegacy();
+        CHAT_V1_7_PROCESSOR = new ChatMessageProcessor_v1_7();
+        CHAT_V1_8_PROCESSOR = new ChatMessageProcessorLegacy();
         CHAT_V1_16_PROCESSOR = new ChatMessageProcessor_v1_16();
         CHAT_V1_19_PROCESSOR = new ChatMessageProcessor_v1_19();
         CHAT_V1_19_1_PROCESSOR = new ChatMessageProcessor_v1_19_1();
@@ -90,8 +92,10 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
             return CHAT_V1_19_PROCESSOR;
         } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             return CHAT_V1_16_PROCESSOR;
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            return CHAT_V1_8_PROCESSOR;
         } else {
-            return CHAT_LEGACY_PROCESSOR;
+            return CHAT_V1_7_PROCESSOR;
         }
     }
 }

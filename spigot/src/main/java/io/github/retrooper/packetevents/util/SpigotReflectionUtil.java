@@ -1117,6 +1117,9 @@ public final class SpigotReflectionUtil {
                 return null;
             }
             Entity entity = getBukkitEntity(nmsEntity);
+            if (entity == null) {
+                return null;
+            }
             ENTITY_ID_CACHE.put(id, entity);
             return entity;
         } catch (IllegalAccessException | InvocationTargetException exception) {

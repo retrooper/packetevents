@@ -23,10 +23,11 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
 import com.github.retrooper.packetevents.util.LegacyFormat;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Locale;
 
 public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperPlayServerScoreboardObjective> {
 
@@ -96,9 +97,9 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
                 String legacyText = this.getSerializers().asLegacy(this.displayName);
                 writeString(LegacyFormat.trimLegacyFormat(legacyText, 32));
                 if (renderType != null) {
-                    writeString(renderType.name().toLowerCase());
+                    writeString(renderType.name().toLowerCase(Locale.ROOT));
                 } else {
-                    writeString(RenderType.INTEGER.name().toLowerCase());
+                    writeString(RenderType.INTEGER.name().toLowerCase(Locale.ROOT));
                 }
             } else {
                 writeComponent(displayName);

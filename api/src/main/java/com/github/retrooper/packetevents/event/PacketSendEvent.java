@@ -18,32 +18,38 @@
 
 package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.event.simple.PacketHandshakeSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
+import org.jetbrains.annotations.UnknownNullability;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@NullMarked
 public class PacketSendEvent extends ProtocolPacketEvent {
-    private List<Runnable> tasksAfterSend = null;
 
-    protected PacketSendEvent(Object channel, User user, Object player, Object rawByteBuf,
-                              boolean autoProtocolTranslation) throws PacketProcessException {
+    private @Nullable List<Runnable> tasksAfterSend = null;
+
+    protected PacketSendEvent(
+            Object channel, User user,
+            @UnknownNullability Object player, Object rawByteBuf,
+            boolean autoProtocolTranslation
+    ) throws PacketProcessException {
         super(PacketSide.SERVER, channel, user, player, rawByteBuf, autoProtocolTranslation);
     }
 
-    protected PacketSendEvent(int packetID, PacketTypeCommon packetType,
-                              ServerVersion serverVersion,
-                              Object channel, User user,
-                              Object player, Object byteBuf) throws PacketProcessException {
-        super(packetID, packetType,
-                serverVersion,
-                channel, user, player, byteBuf);
+    protected PacketSendEvent(
+            int packetID, PacketTypeCommon packetType, ServerVersion serverVersion,
+            Object channel, User user,
+            @UnknownNullability Object player, Object byteBuf
+    ) throws PacketProcessException {
+        super(packetID, packetType, serverVersion, channel, user, player, byteBuf);
     }
 
     @Override
@@ -65,13 +71,8 @@ public class PacketSendEvent extends ProtocolPacketEvent {
 
     @Override
     public PacketSendEvent clone() {
-        try {
-            Object clonedBuffer = ByteBufHelper.retainedDuplicate(getByteBuf());
-            return new PacketSendEvent(getPacketId(), getPacketType(), getServerVersion(),
-                    getChannel(), getUser(), getPlayer(), clonedBuffer);
-        } catch (PacketProcessException e) {
-            e.printStackTrace();
-        }
-        return null;
+        Object clonedBuffer = ByteBufHelper.retainedDuplicate(getByteBuf());
+        return new PacketSendEvent(getPacketId(), getPacketType(), getServerVersion(),
+                getChannel(), getUser(), getPlayer(), clonedBuffer);
     }
 }

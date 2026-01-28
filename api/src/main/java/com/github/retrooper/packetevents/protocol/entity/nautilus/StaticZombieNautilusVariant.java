@@ -63,9 +63,8 @@ public class StaticZombieNautilusVariant extends AbstractMappedEntity implements
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
-        if (obj == null || getClass() != obj.getClass()) return false;
-        if (!super.equals(obj)) return false;
+    public boolean deepEquals(@Nullable Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
         StaticZombieNautilusVariant that = (StaticZombieNautilusVariant) obj;
         if (this.modelType != that.modelType) return false;
         return this.assetId.equals(that.assetId);
@@ -73,6 +72,6 @@ public class StaticZombieNautilusVariant extends AbstractMappedEntity implements
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.modelType, this.assetId);
+        return Objects.hash(this.modelType, this.assetId);
     }
 }

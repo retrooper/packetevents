@@ -62,7 +62,8 @@ public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T
 
     @Override
     public @Nullable T getByName(String name) {
-        return this.typeMap.get(name);
+        // prepend "minecraft:" prefix if no other namespace has been specified
+        return this.typeMap.get(ResourceLocation.normString(name));
     }
 
     @Override
@@ -72,7 +73,9 @@ public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T
 
     @Override
     public int getId(String entityName, ClientVersion version) {
-        return this.reverseTypeIdMap.getOrDefault(entityName, -1);
+        // prepend "minecraft:" prefix if no other namespace has been specified
+        String normedName = ResourceLocation.normString(entityName);
+        return this.reverseTypeIdMap.getOrDefault(normedName, -1);
     }
 
     @Override

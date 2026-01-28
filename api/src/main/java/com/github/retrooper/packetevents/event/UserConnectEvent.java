@@ -19,8 +19,11 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.protocol.player.User;
+import org.jspecify.annotations.NullMarked;
 
-public class UserConnectEvent extends PacketEvent implements CancellableEvent, UserEvent{
+@NullMarked
+public class UserConnectEvent extends PacketEvent implements CancellableEvent, UserEvent {
+
     private final User user;
     private boolean cancelled;
 

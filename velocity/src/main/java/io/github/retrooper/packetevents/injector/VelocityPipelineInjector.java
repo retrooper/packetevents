@@ -55,16 +55,12 @@ public class VelocityPipelineInjector implements ChannelInjector {
             SERVER_INITIALIZER_HOLDER_CLASS = Reflection.getClassByNameWithoutException("com.velocitypowered.proxy.network.ServerChannelInitializerHolder");
             BACKEND_INITIALIZER_HOLDER_CLASS = Reflection.getClassByNameWithoutException("com.velocitypowered.proxy.network.BackendChannelInitializerHolder");
             SET_SERVER_INTIIALIZER = Reflection.getMethod(SERVER_INITIALIZER_HOLDER_CLASS, 0, ChannelInitializer.class);
-            SET_BACKEND_INITIALIZER = Reflection.getMethod(BACKEND_INITIALIZER_HOLDER_CLASS, 0, ChannelInitializer.class);
         }
-        ReflectionObject reflectServer = new ReflectionObject(server);
-        Object connectionManager = reflectServer.readObject(0, CONNECTION_MANAGER_CLASS);
-        ReflectionObject reflectConnectionManager = new ReflectionObject(connectionManager);
-        Object proxyInitializerHolder = reflectConnectionManager.readObject(0, SERVER_INITIALIZER_HOLDER_CLASS);
-        ChannelInitializer<Channel> wrappedProxyInitializer = ((Supplier<ChannelInitializer<Channel>>) proxyInitializerHolder).get();
+        Supplier<ChannelInitializer<Channel>> initializerHolder = getServerChannelInitializerHolder();
+        ChannelInitializer<Channel> wrappedProxyInitializer = initializerHolder.get();
         VelocityChannelInitializer initializer = new VelocityChannelInitializer(wrappedProxyInitializer);
         try {
-            SET_SERVER_INTIIALIZER.invoke(proxyInitializerHolder, initializer);
+            SET_SERVER_INTIIALIZER.invoke(initializerHolder, initializer);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -80,7 +76,18 @@ public class VelocityPipelineInjector implements ChannelInjector {
 
     @Override
     public void uninject() {
-
+        Supplier<ChannelInitializer<Channel>> initializerHolder = getServerChannelInitializerHolder();
+        ChannelInitializer<Channel> wrapper = initializerHolder.get();
+        // Check if it's our initializer, could be wrapped by other plugins
+        if (wrapper instanceof VelocityChannelInitializer) {
+            try {
+                SET_SERVER_INTIIALIZER.invoke(initializerHolder, ((VelocityChannelInitializer) wrapper).getWrappedInitializer());
+            } catch (IllegalAccessException | InvocationTargetException exception) {
+                throw new RuntimeException("Failed to uninject from frontend pipeline", exception);
+            }
+        } else {
+            throw new IllegalStateException("Failed to uninject from frontend pipeline: can't unwrap foreign channel initializer");
+        }
     }
 
     @Override
@@ -118,5 +125,12 @@ public class VelocityPipelineInjector implements ChannelInjector {
     @Override
     public boolean isProxy() {
         return true;
+    }
+
+    private Supplier<ChannelInitializer<Channel>> getServerChannelInitializerHolder() {
+        ReflectionObject reflectServer = new ReflectionObject(server);
+        Object connectionManager = reflectServer.readObject(0, CONNECTION_MANAGER_CLASS);
+        ReflectionObject reflectConnectionManager = new ReflectionObject(connectionManager);
+        return (Supplier<ChannelInitializer<Channel>>) reflectConnectionManager.readObject(0, SERVER_INITIALIZER_HOLDER_CLASS);
     }
 }
