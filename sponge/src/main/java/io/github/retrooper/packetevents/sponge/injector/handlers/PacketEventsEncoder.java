@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
@@ -47,6 +48,7 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     public User user;
     public UUID player;
+    private boolean needToHandleCompression;
     private boolean handledCompression;
     private ChannelPromise promise;
 
@@ -57,14 +59,23 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     public PacketEventsEncoder(ChannelHandler encoder) {
         user = ((PacketEventsEncoder) encoder).user;
         player = ((PacketEventsEncoder) encoder).player;
+        needToHandleCompression = ((PacketEventsEncoder) encoder).needToHandleCompression;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
         promise = ((PacketEventsEncoder) encoder).promise;
     }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
-        handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
+        boolean needsRecompression = handleCompression(ctx, byteBuf);
+        PacketSendEvent event = handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
+        if (!handledCompression && event != null) {
+            if (event.getConnectionState() == ConnectionState.PLAY) {
+                // Late injection or server doesn't have compression enabled
+                handledCompression = true;
+            } else if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
+                needToHandleCompression = true;
+            }
+        }
 
         if (needsRecompression) {
             compress(ctx, byteBuf);
@@ -153,11 +164,12 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     }
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        if (handledCompression) return false;
-        int compressIndex = ctx.pipeline().names().indexOf("compress");
+        if (!needToHandleCompression || handledCompression) return false;
+        List<String> handlerNames = ctx.pipeline().names();
+        int compressIndex = handlerNames.indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = handlerNames.indexOf(PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
         if (compressIndex > peEncoderIndex) {
             //We are ahead of the decompression handler (they are added dynamically) so let us relocate.

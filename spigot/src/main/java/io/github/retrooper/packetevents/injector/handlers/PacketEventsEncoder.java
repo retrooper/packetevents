@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
@@ -45,6 +46,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
+import java.util.List;
 import java.util.Queue;
 
 public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
@@ -66,6 +68,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
     public User user;
     public Player player;
+    private boolean needToHandleCompression;
     private boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
     private ChannelPromise promise;
 
@@ -79,6 +82,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     public PacketEventsEncoder(ChannelHandler encoder) {
         user = ((PacketEventsEncoder) encoder).user;
         player = ((PacketEventsEncoder) encoder).player;
+        needToHandleCompression = ((PacketEventsEncoder) encoder).needToHandleCompression;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
         promise = ((PacketEventsEncoder) encoder).promise;
     }
@@ -130,8 +134,16 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         this.promise = promise;
 
         if (msg instanceof ByteBuf) {
-            boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
-            this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.promise);
+            boolean needsRecompression = this.handleCompression(ctx, (ByteBuf) msg);
+            PacketSendEvent event = this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.promise);
+            if (!handledCompression && event != null) {
+                if (event.getConnectionState() == ConnectionState.PLAY) {
+                    // Late injection or server doesn't have compression enabled
+                    handledCompression = true;
+                } else if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
+                    needToHandleCompression = true;
+                }
+            }
 
             // check if the packet got cancelled
             if (!((ByteBuf) msg).isReadable()) {
@@ -236,11 +248,12 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        if (handledCompression) return false;
-        int compressIndex = ctx.pipeline().names().indexOf("compress");
+        if (!needToHandleCompression || handledCompression) return false;
+        List<String> handlerNames = ctx.pipeline().names();
+        int compressIndex = handlerNames.indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = handlerNames.indexOf(PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
         if (compressIndex > peEncoderIndex) {
             //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
