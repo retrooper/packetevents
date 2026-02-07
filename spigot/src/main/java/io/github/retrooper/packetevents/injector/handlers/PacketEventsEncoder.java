@@ -68,7 +68,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
     public User user;
     public Player player;
-    private boolean needToHandleCompression;
+    private boolean handleCompression;
     private boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
     private ChannelPromise promise;
 
@@ -82,7 +82,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     public PacketEventsEncoder(ChannelHandler encoder) {
         user = ((PacketEventsEncoder) encoder).user;
         player = ((PacketEventsEncoder) encoder).player;
-        needToHandleCompression = ((PacketEventsEncoder) encoder).needToHandleCompression;
+        handleCompression = ((PacketEventsEncoder) encoder).handleCompression;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
         promise = ((PacketEventsEncoder) encoder).promise;
     }
@@ -141,7 +141,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
                     // Late injection or server doesn't have compression enabled
                     handledCompression = true;
                 } else if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
-                    needToHandleCompression = true;
+                    handleCompression = true;
                 }
             }
 
@@ -248,7 +248,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        if (!needToHandleCompression || handledCompression) return false;
+        if (!handleCompression || handledCompression) return false;
         List<String> handlerNames = ctx.pipeline().names();
         int compressIndex = handlerNames.indexOf("compress");
         if (compressIndex == -1) return false;
