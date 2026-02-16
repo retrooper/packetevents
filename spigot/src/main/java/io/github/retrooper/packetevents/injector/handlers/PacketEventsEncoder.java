@@ -99,15 +99,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private @Nullable PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
-        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, true);
-        if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
-            promise.addListener((p) -> {
-                for (Runnable task : packetSendEvent.getTasksAfterSend()) {
-                    task.run();
-                }
-            });
-        }
-        return packetSendEvent;
+        return PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, true);
     }
 
     @Override
@@ -129,9 +121,10 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         promise.addListener(p -> this.promise = oldPromise);
         this.promise = promise;
 
+        PacketSendEvent packetSendEvent = null;
         if (msg instanceof ByteBuf) {
             boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
-            this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.promise);
+            packetSendEvent = this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.promise);
 
             // check if the packet got cancelled
             if (!((ByteBuf) msg).isReadable()) {
@@ -146,6 +139,12 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         }
 
         ctx.write(msg, promise);
+
+        if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
+            for (Runnable task : packetSendEvent.getTasksAfterSend()) {
+                task.run();
+            }
+        }
     }
 
     @Override
