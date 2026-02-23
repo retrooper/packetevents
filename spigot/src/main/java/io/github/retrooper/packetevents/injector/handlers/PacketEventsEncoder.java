@@ -41,7 +41,6 @@ import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
@@ -98,10 +97,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         }
     }
 
-    private @Nullable PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
-        return PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, true);
-    }
-
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         // if we are told to hold all messages, add them to the queue
@@ -124,7 +119,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         PacketSendEvent packetSendEvent = null;
         if (msg instanceof ByteBuf) {
             boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
-            packetSendEvent = this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.promise);
+            packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), this.user, this.player, msg, true);
 
             // check if the packet got cancelled
             if (!((ByteBuf) msg).isReadable()) {
@@ -142,7 +137,11 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
         if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
             for (Runnable task : packetSendEvent.getTasksAfterSend()) {
-                task.run();
+                try {
+                    task.run();
+                } catch (Throwable throwable) {
+                    throw new PacketProcessException("Error while handling post-send-task " + task + " for " + packetSendEvent, throwable);
+                }
             }
         }
     }
