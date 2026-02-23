@@ -4,14 +4,13 @@ import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.flattener.ComponentFlattener;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
 import java.util.logging.Level;
 
 /**
@@ -21,53 +20,34 @@ import java.util.logging.Level;
 @ApiStatus.Internal
 public final class Slf4jLogManager extends LogManager {
 
-    private static final @Nullable Class<?> LOGGER_CLASS = Reflection.getClassByNameWithoutException("org.slf4j.Logger");
+    private static final boolean EXISTS = Reflection.getClassByNameWithoutException("org.slf4j.Logger") != null;
 
-    private final Object logger;
-    private final Method trace, debug, info, warn, error;
+    private final Logger logger;
 
     public Slf4jLogManager(PacketEventsAPI<?> packetevents) {
         super(packetevents);
-
-        if (LOGGER_CLASS == null) {
-            throw new UnsupportedOperationException("Can't find slf4j logger class");
-        }
-        try {
-            this.logger = LOGGER_CLASS.getMethod("logger", String.class)
-                    .invoke(null, LOGGER_NAME);
-            this.trace = LOGGER_CLASS.getMethod("trace", String.class, Throwable.class);
-            this.debug = LOGGER_CLASS.getMethod("debug", String.class, Throwable.class);
-            this.info = LOGGER_CLASS.getMethod("info", String.class, Throwable.class);
-            this.warn = LOGGER_CLASS.getMethod("warn", String.class, Throwable.class);
-            this.error = LOGGER_CLASS.getMethod("error", String.class, Throwable.class);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException(exception);
-        }
+        this.logger = LoggerFactory.getLogger(LOGGER_NAME);
     }
 
     public static boolean exists() {
-        return LOGGER_CLASS != null;
+        return EXISTS;
     }
 
     @Override
     public void log(Level level, ComponentLike component, @Nullable Throwable error) {
         String message = AdventureSerializer.stringify(component.asComponent());
-        try {
-            if (level == Level.FINEST || level == Level.FINER) {
-                this.trace.invoke(this.logger, message, error);
-            } else if (level == Level.FINE) {
-                this.debug.invoke(this.logger, message, error);
-            } else if (level == Level.INFO) {
-                this.info.invoke(this.logger, message, error);
-            } else if (level == Level.WARNING) {
-                this.warn.invoke(this.logger, message, error);
-            } else if (level == Level.SEVERE) {
-                this.error.invoke(this.logger, message, error);
-            } else {
-                throw new UnsupportedOperationException(level + " is unsupported (" + component + ")");
-            }
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException(exception);
+        if (level == Level.FINEST || level == Level.FINER) {
+            this.logger.trace(message, error);
+        } else if (level == Level.FINE) {
+            this.logger.debug(message, error);
+        } else if (level == Level.INFO) {
+            this.logger.info(message, error);
+        } else if (level == Level.WARNING) {
+            this.logger.warn(message, error);
+        } else if (level == Level.SEVERE) {
+            this.logger.error(message, error);
+        } else {
+            throw new UnsupportedOperationException(level + " is unsupported (" + component + ")");
         }
     }
 }

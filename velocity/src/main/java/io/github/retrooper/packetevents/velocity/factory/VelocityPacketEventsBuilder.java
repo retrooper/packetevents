@@ -231,8 +231,7 @@ public class VelocityPacketEventsBuilder {
                     try {
                         this.injector.uninject();
                     } catch (Exception exception) {
-                        this.logManager.warn("Failed to uninject from initializer");
-                        exception.printStackTrace();
+                        this.getLogManager().warn("Failed to uninject from initializer", exception);
                     }
                     // Remove handlers for players
                     for (User user : this.protocolManager.getUsers()) {

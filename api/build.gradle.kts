@@ -31,6 +31,7 @@ dependencies {
         excludeAdventure()
     }
     compileOnly(libs.gson)
+    compileOnly(libs.adventure.text.logger.slf4j)
 
     testImplementation(libs.bundles.adventure)
     testImplementation(project(":patch:adventure-text-serializer-gson"))
