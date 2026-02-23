@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.util.LogManager;
-import com.viaversion.viaversion.libs.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.Bukkit;
