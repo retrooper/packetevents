@@ -27,6 +27,10 @@ import net.minecraft.SharedConstants;
 
 public class FabricServerManager extends ServerManagerAbstract {
 
+    static {
+        SharedConstants.tryDetectVersion();
+    }
+
     private ServerVersion version;
 
     private ServerVersion resolveVersion() {
