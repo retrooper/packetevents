@@ -18,13 +18,13 @@ import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 import static net.kyori.adventure.text.format.NamedTextColor.RED;
 import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
 import static net.kyori.adventure.text.format.NamedTextColor.YELLOW;
-import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection;
 
 @NullMarked
 @ApiStatus.NonExtendable
 public abstract class LogManager {
 
     protected static final String LOGGER_NAME = "packetevents";
+    private static final char LEGACY_COLOR_CHAR = '§';
 
     protected final PacketEventsAPI<?> packetevents;
 
@@ -35,6 +35,23 @@ public abstract class LogManager {
     @Deprecated
     public LogManager() {
         this(PacketEvents.getAPI());
+    }
+
+    /**
+     * Legacy method for ensuring backwards compatibility with
+     * plugins which do try to use our {@link LogManager} with legacy
+     * color log messages.
+     */
+    private static String stripLegacyColors(String message) {
+        int sectionIndex;
+        while ((sectionIndex = message.indexOf(LEGACY_COLOR_CHAR)) != -1) {
+            if (message.length() < sectionIndex + 2) {
+                break; // out of bounds
+            }
+            // cut away the legacy color code
+            message = message.substring(0, sectionIndex) + message.substring(sectionIndex + 2);
+        }
+        return message;
     }
 
     @ApiStatus.Internal
@@ -53,7 +70,7 @@ public abstract class LogManager {
     }
 
     protected void log(Level level, @Nullable NamedTextColor color, String message, @Nullable Throwable error) {
-        ComponentLike component = legacySection().deserialize(message);
+        ComponentLike component = text(stripLegacyColors(message));
         if (color != null) {
             component = text().append(component).color(color);
         }
