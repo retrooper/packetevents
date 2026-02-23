@@ -33,6 +33,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import com.github.retrooper.packetevents.util.PEVersions;
 import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
@@ -179,6 +180,8 @@ public class VelocityPacketEventsBuilder {
                     // Register internal packet listener (should be the first listener)
                     // This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalPacketListener());
+
+                    this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW + ("packetevents".equals(id) ? "" : " for " + id));
                 }
             }
 

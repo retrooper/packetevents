@@ -29,6 +29,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import com.github.retrooper.packetevents.util.PEVersions;
 import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import io.github.retrooper.packetevents.sponge.InternalSpongeListener;
 import io.github.retrooper.packetevents.sponge.injector.SpongeChannelInjector;
@@ -121,6 +122,8 @@ public class SpongePacketEventsBuilder {
                 // Register internal packet listener (should be the first listener)
                 // This listener doesn't do any modifications to the packets, just reads data
                 getEventManager().registerListener(new InternalSpongePacketListener());
+
+                this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW + ("packetevents".equals(id) ? "" : " for " + plugin.metadata().id()));
             }
 
             @Override

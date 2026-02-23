@@ -32,6 +32,7 @@ import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
+import com.github.retrooper.packetevents.util.PEVersions;
 import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
@@ -135,6 +136,8 @@ public class SpigotPacketEventsBuilder {
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalBukkitPacketListener());
+
+                    this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW + ("packetevents".equals(id) ? "" : " for " + plugin.getName()));
                 }
             }
 

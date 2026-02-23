@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import com.github.retrooper.packetevents.util.PEVersions;
 import io.github.retrooper.packetevents.impl.netty.BuildData;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
@@ -102,6 +103,8 @@ public class NettyPacketEventsBuilder {
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
                     getEventManager().registerListener(new InternalPacketListener());
+
+                    this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW + ("packetevents".equals(id) ? "" : " for " + data.getName()));
                 }
             }
 
