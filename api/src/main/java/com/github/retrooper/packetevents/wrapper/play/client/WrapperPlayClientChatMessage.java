@@ -35,6 +35,18 @@ import java.util.Optional;
  * This packet is used to send a chat message to the server.
  */
 public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClientChatMessage> {
+    private static int getLegacyMaxChatLength() {
+        final String value = System.getProperty("packetevents.legacyClientChatMaxLength");
+        if (value != null) {
+            try {
+                return Integer.parseInt(value.trim());
+            } catch (final NumberFormatException e) {
+                // Exception has been handled
+            }
+        }
+        return 100;
+    }
+
     private String message;
     private MessageSignData messageSignData;
     private @Nullable LastSeenMessages.Update lastSeenMessages;
@@ -60,7 +72,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void read() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : getLegacyMaxChatLength();
         this.message = readString(maxMessageLength);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             Instant timestamp = readTimestamp();
@@ -81,7 +93,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void write() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : 100;
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : getLegacyMaxChatLength();
         writeString(this.message, maxMessageLength);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeTimestamp(messageSignData.getTimestamp());
