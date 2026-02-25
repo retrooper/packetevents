@@ -24,7 +24,6 @@ import com.github.retrooper.packetevents.protocol.chat.LastSeenMessages;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.crypto.MessageSignData;
-import com.github.retrooper.packetevents.util.crypto.SaltSignature;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,17 +34,7 @@ import java.util.Optional;
  * This packet is used to send a chat message to the server.
  */
 public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClientChatMessage> {
-    private static int getLegacyMaxChatLength() {
-        final String value = System.getProperty("packetevents.legacyClientChatMaxLength");
-        if (value != null) {
-            try {
-                return Integer.parseInt(value.trim());
-            } catch (final NumberFormatException e) {
-                // Exception has been handled
-            }
-        }
-        return 100;
-    }
+    private static final int LEGACY_MAX_LENGTH = Integer.getInteger("packetevents.legacy-chat-max-length", 100);
 
     private String message;
     private MessageSignData messageSignData;
@@ -72,7 +61,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void read() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : getLegacyMaxChatLength();
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : LEGACY_MAX_LENGTH;
         this.message = readString(maxMessageLength);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             Instant timestamp = readTimestamp();
@@ -93,7 +82,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void write() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : getLegacyMaxChatLength();
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11) ? 256 : LEGACY_MAX_LENGTH;
         writeString(this.message, maxMessageLength);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeTimestamp(messageSignData.getTimestamp());
