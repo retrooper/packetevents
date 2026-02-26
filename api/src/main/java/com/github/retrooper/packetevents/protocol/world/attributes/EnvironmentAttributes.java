@@ -51,15 +51,21 @@ public final class EnvironmentAttributes {
     }
 
     @ApiStatus.Internal
+    public static <T> EnvironmentAttribute<T> defineUnsynced(String name, AttributeType<T> attributeType, T defaultValue) {
+        return REGISTRY.define(name, data ->
+                new StaticEnvironmentAttribute<>(data, false, attributeType, defaultValue));
+    }
+
+    @ApiStatus.Internal
     public static <T> EnvironmentAttribute<T> defineUnsynced(String name) {
         return REGISTRY.define(name, data ->
-                new StaticEnvironmentAttribute<>(data, null, null));
+                new StaticEnvironmentAttribute<>(data, false, null, null));
     }
 
     @ApiStatus.Internal
     public static <T> EnvironmentAttribute<T> define(String name, AttributeType<T> attributeType, T defaultValue) {
         return REGISTRY.define(name, data ->
-                new StaticEnvironmentAttribute<>(data, attributeType, defaultValue));
+                new StaticEnvironmentAttribute<>(data, true, attributeType, defaultValue));
     }
 
     public static EnvironmentAttribute<Color> VISUAL_FOG_COLOR = define("visual/fog_color", AttributeTypes.RGB_COLOR, Color.BLACK);
@@ -92,7 +98,7 @@ public final class EnvironmentAttributes {
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Boolean> GAMEPLAY_CAN_START_RAID = defineUnsynced("gameplay/can_start_raid");
+    public static EnvironmentAttribute<Boolean> GAMEPLAY_CAN_START_RAID = defineUnsynced("gameplay/can_start_raid", AttributeTypes.BOOLEAN, true);
     public static EnvironmentAttribute<Boolean> GAMEPLAY_WATER_EVAPORATES = define("gameplay/water_evaporates", AttributeTypes.BOOLEAN, false);
     /**
      * Not synced via network, not usable via packetevents.
@@ -103,60 +109,60 @@ public final class EnvironmentAttributes {
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Boolean> GAMEPLAY_RESPAWN_ANCHOR_WORKS = defineUnsynced("gameplay/respawn_anchor_works");
+    public static EnvironmentAttribute<Boolean> GAMEPLAY_RESPAWN_ANCHOR_WORKS = defineUnsynced("gameplay/respawn_anchor_works", AttributeTypes.BOOLEAN, false);
     /**
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Boolean> GAMEPLAY_NETHER_PORTAL_SPAWNS_PIGLIN = defineUnsynced("gameplay/nether_portal_spawns_piglin");
+    public static EnvironmentAttribute<Boolean> GAMEPLAY_NETHER_PORTAL_SPAWNS_PIGLIN = defineUnsynced("gameplay/nether_portal_spawns_piglin", AttributeTypes.BOOLEAN, false);
     public static EnvironmentAttribute<Boolean> GAMEPLAY_FAST_LAVA = define("gameplay/fast_lava", AttributeTypes.BOOLEAN, false);
     /**
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Boolean> GAMEPLAY_INCREASED_FIRE_BURNOUT = defineUnsynced("gameplay/increased_fire_burnout");
+    public static EnvironmentAttribute<Boolean> GAMEPLAY_INCREASED_FIRE_BURNOUT = defineUnsynced("gameplay/increased_fire_burnout", AttributeTypes.BOOLEAN, false);
     /**
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<TriState> GAMEPLAY_EYEBLOSSOM_OPEN = defineUnsynced("gameplay/eyeblossom_open");
+    public static EnvironmentAttribute<TriState> GAMEPLAY_EYEBLOSSOM_OPEN = defineUnsynced("gameplay/eyeblossom_open", AttributeTypes.TRI_STATE, TriState.NOT_SET);
     /**
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Float> GAMEPLAY_TURTLE_EGG_HATCH_CHANCE = defineUnsynced("gameplay/turtle_egg_hatch_chance");
+    public static EnvironmentAttribute<Float> GAMEPLAY_TURTLE_EGG_HATCH_CHANCE = defineUnsynced("gameplay/turtle_egg_hatch_chance", AttributeTypes.FLOAT, 0f);
     public static EnvironmentAttribute<Boolean> GAMEPLAY_PIGLINS_ZOMBIFY = define("gameplay/piglins_zombify", AttributeTypes.BOOLEAN, true);
     /**
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Boolean> GAMEPLAY_SNOW_GOLEM_MELTS = defineUnsynced("gameplay/snow_golem_melts");
+    public static EnvironmentAttribute<Boolean> GAMEPLAY_SNOW_GOLEM_MELTS = defineUnsynced("gameplay/snow_golem_melts", AttributeTypes.BOOLEAN, false);
     public static EnvironmentAttribute<Boolean> GAMEPLAY_CREAKING_ACTIVE = define("gameplay/creaking_active", AttributeTypes.BOOLEAN, false);
     /**
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Float> GAMEPLAY_SURFACE_SLIME_SPAWN_CHANCE = defineUnsynced("gameplay/surface_slime_spawn_chance");
+    public static EnvironmentAttribute<Float> GAMEPLAY_SURFACE_SLIME_SPAWN_CHANCE = defineUnsynced("gameplay/surface_slime_spawn_chance", AttributeTypes.FLOAT, 0f);
     /**
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Float> GAMEPLAY_CAT_WAKING_UP_GIFT_CHANCE = defineUnsynced("gameplay/cat_waking_up_gift_chance");
+    public static EnvironmentAttribute<Float> GAMEPLAY_CAT_WAKING_UP_GIFT_CHANCE = defineUnsynced("gameplay/cat_waking_up_gift_chance", AttributeTypes.FLOAT, 0f);
     /**
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Boolean> GAMEPLAY_BEES_STAY_IN_HIVE = defineUnsynced("gameplay/bees_stay_in_hive");
+    public static EnvironmentAttribute<Boolean> GAMEPLAY_BEES_STAY_IN_HIVE = defineUnsynced("gameplay/bees_stay_in_hive", AttributeTypes.BOOLEAN, false);
     /**
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Boolean> GAMEPLAY_MONSTERS_BURN = defineUnsynced("gameplay/monsters_burn");
+    public static EnvironmentAttribute<Boolean> GAMEPLAY_MONSTERS_BURN = defineUnsynced("gameplay/monsters_burn", AttributeTypes.BOOLEAN, false);
     /**
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Boolean> GAMEPLAY_CAN_PILLAGER_PATROL_SPAWN = defineUnsynced("gameplay/can_pillager_patrol_spawn");
+    public static EnvironmentAttribute<Boolean> GAMEPLAY_CAN_PILLAGER_PATROL_SPAWN = defineUnsynced("gameplay/can_pillager_patrol_spawn", AttributeTypes.BOOLEAN, true);
     /**
      * Not synced via network, not usable via packetevents.
      */
