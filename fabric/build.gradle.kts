@@ -46,7 +46,10 @@ configure<ModPublishExtension> {
 
 tasks {
     register<ServerProductionRunTask>("prodServer") {
-        minecraftVersion = libs.versions.fabric.minecraft.official.get()
+        // always run this task if asked to
+        outputs.upToDateWhen { false }
+
+        minecraftVersion = "1.21.11"
         loaderVersion = libs.versions.fabric.loader
         runDir = project.layout.projectDirectory.dir("run").dir(minecraftVersion.get())
 
