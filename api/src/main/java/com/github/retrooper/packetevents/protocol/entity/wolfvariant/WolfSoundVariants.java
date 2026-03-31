@@ -18,11 +18,13 @@
 
 package com.github.retrooper.packetevents.protocol.entity.wolfvariant;
 
-import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @versions 1.21.5+
+ */
 public final class WolfSoundVariants {
 
     private static final VersionedRegistry<WolfSoundVariant> REGISTRY =
@@ -36,31 +38,25 @@ public final class WolfSoundVariants {
     }
 
     @ApiStatus.Internal
-    public static WolfSoundVariant define(String name, String suffix) {
-        return define(name, Sounds.getByName("entity.wolf" + suffix + ".ambient"),
-                Sounds.getByName("entity.wolf" + suffix + ".death"),
-                Sounds.getByName("entity.wolf" + suffix + ".growl"),
-                Sounds.getByName("entity.wolf" + suffix + ".hurt"),
-                Sounds.getByName("entity.wolf" + suffix + ".pant"),
-                Sounds.getByName("entity.wolf" + suffix + ".whine"));
+    public static WolfSoundVariant define(String name, String soundId) {
+        WolfSoundSet adultSounds = WolfSoundSet.getOrThrow("entity." + soundId + ".", Sounds.ENTITY_WOLF_STEP);
+        WolfSoundSet babySounds = WolfSoundSet.getOrThrow("entity.baby_wolf.", Sounds.ENTITY_BABY_WOLF_STEP);
+        return define(name, adultSounds, babySounds);
     }
 
     @ApiStatus.Internal
-    public static WolfSoundVariant define(
-            String name, Sound ambientSound, Sound deathSound, Sound growlSound,
-            Sound hurtSound, Sound pantSound, Sound whineSound
-    ) {
+    public static WolfSoundVariant define(String name, WolfSoundSet adultSounds, WolfSoundSet babySounds) {
         return REGISTRY.define(name, data -> new StaticWolfSoundVariant(
-                data, ambientSound, deathSound, growlSound, hurtSound, pantSound, whineSound));
+                data, adultSounds, babySounds));
     }
 
-    public static final WolfSoundVariant CLASSIC = define("classic", "");
-    public static final WolfSoundVariant PUGLIN = define("puglin", "_puglin");
-    public static final WolfSoundVariant SAD = define("sad", "_sad");
-    public static final WolfSoundVariant ANGRY = define("angry", "_angry");
-    public static final WolfSoundVariant GRUMPY = define("grumpy", "_grumpy");
-    public static final WolfSoundVariant BIG = define("big", "_big");
-    public static final WolfSoundVariant CUTE = define("cute", "_cute");
+    public static final WolfSoundVariant CLASSIC = define("classic", "wolf");
+    public static final WolfSoundVariant PUGLIN = define("puglin", "wolf_puglin");
+    public static final WolfSoundVariant SAD = define("sad", "wolf_sad");
+    public static final WolfSoundVariant ANGRY = define("angry", "wolf_angry");
+    public static final WolfSoundVariant GRUMPY = define("grumpy", "wolf_grumpy");
+    public static final WolfSoundVariant BIG = define("big", "wolf_big");
+    public static final WolfSoundVariant CUTE = define("cute", "wolf_cute");
 
     static {
         REGISTRY.unloadMappings();

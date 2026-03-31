@@ -151,7 +151,7 @@ public class SpigotPacketEventsBuilder {
                     Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
                     String bukkitVersion = Bukkit.getBukkitVersion();
 
-                    AtomicBoolean stopping =  new AtomicBoolean(false);
+                    AtomicBoolean stopping = new AtomicBoolean(false);
                     BiConsumer<PEVersion, UpdateChecker.UpdateCheckerStatus> unsupportedSoftwareLogic = (peVersion, status) -> {
                         if (bukkitVersion.contains("Unknown")) {
                             ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
@@ -168,12 +168,12 @@ public class SpigotPacketEventsBuilder {
                                 String releaseBuildsMsg = "Please test the latest stable release, as it should already have support for your Minecraft version: https://modrinth.com/plugin/packetevents";
 
                                 /* Here's a breakdown of the logic:
-                                * If this build does not support the current Minecraft version and
-                                * the user is running an outdated version of PacketEvents
-                                * or PacketEvents somehow fails to check for an update,
-                                * we direct them toward the latest release.
-                                * If up-to-date, we direct them to development builds.
-                                * */
+                                 * If this build does not support the current Minecraft version and
+                                 * the user is running an outdated version of PacketEvents
+                                 * or PacketEvents somehow fails to check for an update,
+                                 * we direct them toward the latest release.
+                                 * If up-to-date, we direct them to development builds.
+                                 * */
                                 String newBuildsMsg = (status == UpdateChecker.UpdateCheckerStatus.OUTDATED
                                         || status == UpdateChecker.UpdateCheckerStatus.FAILED || status == null) ? releaseBuildsMsg : developmentBuildsMsg;
 
@@ -189,8 +189,7 @@ public class SpigotPacketEventsBuilder {
 
                     if (settings.shouldCheckForUpdates()) {
                         getUpdateChecker().handleUpdateCheck(unsupportedSoftwareLogic);
-                    }
-                    else {
+                    } else {
                         // We were not authorized to run a GitHub API call to check for the latest version.
                         unsupportedSoftwareLogic.accept(null, null);
                     }
@@ -248,7 +247,7 @@ public class SpigotPacketEventsBuilder {
             private void checkCompatibility() {
                 // PacketEvents is now enabled, we can now check
                 ViaVersionUtil.checkIfViaIsPresent();
-                ProtocolSupportUtil.checkIfProtocolSupportIsPresent();
+                ProtocolSupportUtil.isAvailable(); // load
                 //If ViaVersion is present, it must be 4.5.0 or higher
                 Plugin viaPlugin = Bukkit.getPluginManager().getPlugin("ViaVersion");
                 if (viaPlugin != null) {

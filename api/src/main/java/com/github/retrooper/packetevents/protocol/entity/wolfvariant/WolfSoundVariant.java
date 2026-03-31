@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.entity.wolfvariant;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
@@ -25,25 +26,101 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * @versions 1.21.5+
+ */
 @NullMarked
 public interface WolfSoundVariant extends MappedEntity, CopyableEntity<WolfSoundVariant>, DeepComparableEntity {
 
-    Sound getAmbientSound();
+    NbtCodec<WolfSoundVariant> CODEC = new NbtCodec<WolfSoundVariant>() {
+        @Override
+        public WolfSoundVariant decode(NBT tag, PacketWrapper<?> wrapper) throws NbtCodecException {
+            if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_1)) {
+                WolfSoundSet sounds = WolfSoundSet.CODEC.decode(tag, wrapper);
+                return new StaticWolfSoundVariant(sounds, sounds);
+            }
+            NBTCompound compound = (NBTCompound) tag;
+            WolfSoundSet adultSounds = compound.getOrThrow("adult_sounds", WolfSoundSet.CODEC, wrapper);
+            WolfSoundSet babySounds = compound.getOrThrow("baby_sounds", WolfSoundSet.CODEC, wrapper);
+            return new StaticWolfSoundVariant(adultSounds, babySounds);
+        }
 
-    Sound getDeathSound();
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, WolfSoundVariant value) throws NbtCodecException {
+            if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_1)) {
+                return WolfSoundSet.CODEC.encode(wrapper, value.getAdultSounds());
+            }
+            NBTCompound tag = new NBTCompound();
+            tag.set("adult_sounds", value.getAdultSounds(), WolfSoundSet.CODEC, wrapper);
+            tag.set("baby_sounds", value.getBabySounds(), WolfSoundSet.CODEC, wrapper);
+            return tag;
+        }
+    };
 
-    Sound getGrowlSound();
+    /**
+     * @versions 26.1+
+     */
+    WolfSoundSet getAdultSounds();
 
-    Sound getHurtSound();
+    /**
+     * @versions 26.1+
+     */
+    WolfSoundSet getBabySounds();
 
-    Sound getPantSound();
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @Deprecated
+    default Sound getAmbientSound() {
+        return this.getAdultSounds().getAmbientSound();
+    }
 
-    Sound getWhineSound();
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @Deprecated
+    default Sound getDeathSound() {
+        return this.getAdultSounds().getDeathSound();
+    }
+
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @Deprecated
+    default Sound getGrowlSound() {
+        return this.getAdultSounds().getGrowlSound();
+    }
+
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @Deprecated
+    default Sound getHurtSound() {
+        return this.getAdultSounds().getHurtSound();
+    }
+
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @Deprecated
+    default Sound getPantSound() {
+        return this.getAdultSounds().getPantSound();
+    }
+
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @Deprecated
+    default Sound getWhineSound() {
+        return this.getAdultSounds().getWhineSound();
+    }
 
     static WolfSoundVariant read(PacketWrapper<?> wrapper) {
         return wrapper.readMappedEntity(WolfSoundVariants.getRegistry());
@@ -53,25 +130,13 @@ public interface WolfSoundVariant extends MappedEntity, CopyableEntity<WolfSound
         wrapper.writeMappedEntity(variant);
     }
 
-    static WolfSoundVariant decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
-        NBTCompound compound = (NBTCompound) nbt;
-        Sound ambientSound = Sound.decode(compound.getTagOrThrow("ambient_sound"), version);
-        Sound deathSound = Sound.decode(compound.getTagOrThrow("death_sound"), version);
-        Sound growlSound = Sound.decode(compound.getTagOrThrow("growl_sound"), version);
-        Sound hurtSound = Sound.decode(compound.getTagOrThrow("hurt_sound"), version);
-        Sound pantSound = Sound.decode(compound.getTagOrThrow("pant_sound"), version);
-        Sound whineSound = Sound.decode(compound.getTagOrThrow("whine_sound"), version);
-        return new StaticWolfSoundVariant(data, ambientSound, deathSound, growlSound, hurtSound, pantSound, whineSound);
+    @Deprecated
+    static WolfSoundVariant decode(NBT tag, ClientVersion version, @Nullable TypesBuilderData data) {
+        return CODEC.decode(tag, PacketWrapper.createDummyWrapper(version)).copy(data);
     }
 
+    @Deprecated
     static NBT encode(WolfSoundVariant variant, ClientVersion version) {
-        NBTCompound compound = new NBTCompound();
-        compound.setTag("ambient_sound", Sound.encode(variant.getAmbientSound(), version));
-        compound.setTag("death_sound", Sound.encode(variant.getDeathSound(), version));
-        compound.setTag("growl_sound", Sound.encode(variant.getGrowlSound(), version));
-        compound.setTag("hurt_sound", Sound.encode(variant.getHurtSound(), version));
-        compound.setTag("pant_sound", Sound.encode(variant.getPantSound(), version));
-        compound.setTag("whine_sound", Sound.encode(variant.getWhineSound(), version));
-        return compound;
+        return CODEC.encode(PacketWrapper.createDummyWrapper(version), variant);
     }
 }

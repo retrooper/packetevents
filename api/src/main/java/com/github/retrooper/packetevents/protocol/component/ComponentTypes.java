@@ -21,8 +21,11 @@ package com.github.retrooper.packetevents.protocol.component;
 import com.github.retrooper.packetevents.protocol.color.DyeColor;
 import com.github.retrooper.packetevents.protocol.component.builtin.AxolotlVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.CatCollarComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.CatSoundVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.CatVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.ChickenSoundVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.ChickenVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.CowSoundVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.CowVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.FoxVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.FrogVariantComponent;
@@ -31,6 +34,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.LlamaVariant
 import com.github.retrooper.packetevents.protocol.component.builtin.MooshroomVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.PaintingVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.ParrotVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.PigSoundVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.PigVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.RabbitVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.SalmonSizeComponent;
@@ -54,6 +58,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.CustomD
 import com.github.retrooper.packetevents.protocol.component.builtin.item.DebugStickState;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.FireworkExplosion;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.FoodProperties;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAdditionalTradeCost;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAdventurePredicate;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAttackRange;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAttributeModifiers;
@@ -106,7 +111,6 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.Suspici
 import com.github.retrooper.packetevents.protocol.component.builtin.item.WritableBookContent;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.WrittenBookContent;
 import com.github.retrooper.packetevents.protocol.item.instrument.Instrument;
-import com.github.retrooper.packetevents.protocol.mapper.MaybeMappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -271,8 +275,7 @@ public final class ComponentTypes {
             ItemInstrument::read, ItemInstrument::write);
     @Deprecated
     public static final ComponentType<Instrument> INSTRUMENT = ITEM_INSTRUMENT.legacyMap(
-            inst -> inst.getInstrument().getValue(),
-            inst -> new ItemInstrument(new MaybeMappedEntity<>(inst)));
+            inst -> inst.getInstrument().getValue(), ItemInstrument::new);
     public static final ComponentType<Integer> OMINOUS_BOTTLE_AMPLIFIER = define("ominous_bottle_amplifier",
             PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
     public static final ComponentType<ItemRecipes> RECIPES = define("recipes",
@@ -528,6 +531,36 @@ public final class ComponentTypes {
      */
     public static final ComponentType<ZombieNautilusVariantComponent> ZOMBIE_NAUTILUS_VARIANT = define("zombie_nautilus/variant",
             ZombieNautilusVariantComponent::read, ZombieNautilusVariantComponent::write);
+
+    /**
+     * @versions 26.1+
+     */
+    public static final ComponentType<DyeColor> DYE = define("dye", DyeColor::read, DyeColor::write);
+    /**
+     * @versions 26.1+
+     */
+    public static final ComponentType<ItemAdditionalTradeCost> ADDITIONAL_TRADE_COST = define("additional_trade_cost",
+            ItemAdditionalTradeCost::read, ItemAdditionalTradeCost::write);
+    /**
+     * @versions 26.1+
+     */
+    public static final ComponentType<CatSoundVariantComponent> CAT_SOUND_VARIANT = define("cat/sound_variant",
+            CatSoundVariantComponent::read, CatSoundVariantComponent::write);
+    /**
+     * @versions 26.1+
+     */
+    public static final ComponentType<ChickenSoundVariantComponent> CHICKEN_SOUND_VARIANT = define("chicken/sound_variant",
+            ChickenSoundVariantComponent::read, ChickenSoundVariantComponent::write);
+    /**
+     * @versions 26.1+
+     */
+    public static final ComponentType<CowSoundVariantComponent> COW_SOUND_VARIANT = define("cow/sound_variant",
+            CowSoundVariantComponent::read, CowSoundVariantComponent::write);
+    /**
+     * @versions 26.1+
+     */
+    public static final ComponentType<PigSoundVariantComponent> PIG_SOUND_VARIANT = define("pig/sound_variant",
+            PigSoundVariantComponent::read, PigSoundVariantComponent::write);
 
     /**
      * Returns an immutable view of the component types.

@@ -119,7 +119,7 @@ public class ItemEquippable {
         ResourceLocation assetId = wrapper.readOptional(PacketWrapper::readIdentifier);
         ResourceLocation cameraOverlay = wrapper.readOptional(PacketWrapper::readIdentifier);
         MappedEntitySet<EntityType> allowedEntities = wrapper.readOptional(
-                ew -> MappedEntitySet.read(ew, EntityTypes::getById));
+                ew -> MappedEntitySet.read(ew, EntityTypes.getRegistry()));
         boolean dispensable = wrapper.readBoolean();
         boolean swappable = wrapper.readBoolean();
         boolean damageOnHurt = wrapper.readBoolean();

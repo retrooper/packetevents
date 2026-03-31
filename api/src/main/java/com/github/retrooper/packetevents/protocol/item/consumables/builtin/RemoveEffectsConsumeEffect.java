@@ -35,7 +35,7 @@ public class RemoveEffectsConsumeEffect extends ConsumeEffect<RemoveEffectsConsu
     }
 
     public static RemoveEffectsConsumeEffect read(PacketWrapper<?> wrapper) {
-        MappedEntitySet<PotionType> effects = MappedEntitySet.read(wrapper, PotionTypes::getById);
+        MappedEntitySet<PotionType> effects = MappedEntitySet.read(wrapper, PotionTypes.getRegistry());
         return new RemoveEffectsConsumeEffect(effects);
     }
 

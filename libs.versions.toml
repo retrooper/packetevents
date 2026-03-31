@@ -2,16 +2,19 @@
 adventure = "4.25.0"
 examination = "1.3.0"
 netty = "4.1.72.Final"
-jetbrains-annotations = "23.0.0"
 via-version = "4.5.0"
-protocol-support = "3d24efeda6"
 bstats = "3.1.0"
-paper = "1.21.9-rc1-R0.1-SNAPSHOT"
+paper = "1.21.11-R0.1-SNAPSHOT"
 bungeecord = "1.21-R0.1"
 velocity = "3.4.0-SNAPSHOT"
-fabric-loom = "1.11.8"
+fabric-loader = "0.18.4"
+fabric-minecraft-intermediary = "1.21.11"
+fabric-minecraft-official = "26.1"
+parchment-mappings = "2025.12.20"
 spongeGradle = "2.3.0"
 classgraph = "4.8.184"
+checkerqual = "3.53.1"
+slf4j = "2.0.17"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
@@ -27,20 +30,23 @@ bstats-bukkit = { group = "org.bstats", name = "bstats-bukkit", version.ref = "b
 bstats-bungeecord = { group = "org.bstats", name = "bstats-bungeecord", version.ref = "bstats" }
 bstats-velocity = { group = "org.bstats", name = "bstats-velocity", version.ref = "bstats" }
 bstats-sponge = { group = "org.bstats", name = "bstats-sponge", version.ref = "bstats" }
-jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrains-annotations" }
 gson = { group = "com.google.code.gson", name = "gson", version = "2.11.0" }
 netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 via-version = { group = "com.viaversion", name = "viaversion", version.ref = "via-version" }
-protocol-support = { group = "com.github.ProtocolSupport", name = "ProtocolSupport", version.ref = "protocol-support" }
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungeecord" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 classgraph = { group = "io.github.classgraph", name = "classgraph", version.ref = "classgraph" }
+checkerqual = { module = "org.checkerframework:checker-qual", version.ref = "checkerqual" }
+fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+fabric-minecraft-intermediary = { module = "com.mojang:minecraft", version.ref = "fabric-minecraft-intermediary" }
+fabric-minecraft-official = { module = "com.mojang:minecraft", version.ref = "fabric-minecraft-official" }
+parchment-mappings = { module = "org.parchmentmc.data:parchment-1.21.11", version.ref = "parchment-mappings" }
 
 [bundles]
 adventure = ["adventure-api", "adventure-nbt", "adventure-key", "adventure-examination-api", "adventure-examination-string"]
 adventure-serializers = ["adventure-text-serializer-gson", "adventure-text-serializer-json-legacy", "adventure-text-serializer-legacy"]
 
 [plugins]
-fabric-loom = { id = "fabric-loom", version.ref = "fabric-loom" }
 spongeGradle = { id = "org.spongepowered.gradle.plugin", version.ref = "spongeGradle" }

@@ -7,6 +7,7 @@ gson = "2.8.9"
 java-diff-utils = "4.12"
 mod-publish = "1.1.0"
 runtask = "3.0.0"
+fabric-loom = "1.15.5"
 
 [libraries]
 shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version.ref = "shadow" }
@@ -17,3 +18,4 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 java-diff-utils = { group = "io.github.java-diff-utils", name = "java-diff-utils", version.ref = "java-diff-utils" }
 mod-publish = { group = "me.modmuss50", name = "mod-publish-plugin", version.ref = "mod-publish" }
 runtask = { group = "xyz.jpenilla", name = "run-task", version.ref = "runtask" }
+fabric-loom = { module = "net.fabricmc:fabric-loom", version.ref = "fabric-loom" }

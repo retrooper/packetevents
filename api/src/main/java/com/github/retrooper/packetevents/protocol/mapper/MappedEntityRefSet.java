@@ -29,8 +29,7 @@ public interface MappedEntityRefSet<T extends MappedEntity> {
 
     default MappedEntitySet<T> resolve(PacketWrapper<?> wrapper, IRegistry<T> registry) {
         ClientVersion version = wrapper.getServerVersion().toClientVersion();
-        IRegistry<T> replacedRegistry = wrapper.getRegistryHolder().getRegistryOr(registry, version);
-        return this.resolve(version, replacedRegistry);
+        return this.resolve(version, wrapper.replaceRegistry(registry));
     }
 
     default MappedEntitySet<T> resolve(ClientVersion version, IRegistryHolder registryHolder, IRegistry<T> registry) {

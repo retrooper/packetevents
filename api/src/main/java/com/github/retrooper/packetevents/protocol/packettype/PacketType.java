@@ -47,6 +47,7 @@ import com.github.retrooper.packetevents.protocol.packettype.clientbound.Clientb
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_8;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_9;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_9_3;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_26_1;
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_20_2;
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_20_3;
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_20_5;
@@ -80,6 +81,7 @@ import com.github.retrooper.packetevents.protocol.packettype.serverbound.Serverb
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_7_10;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_8;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_9;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_26_1;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.VersionMapper;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -126,6 +128,7 @@ import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServer
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerSetCompression;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAdvancementTab;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAttack;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChangeGameMode;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatAck;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatCommand;
@@ -177,12 +180,14 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSe
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetBeaconEffect;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetDifficulty;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetDisplayedRecipe;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetGameRule;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetRecipeBookState;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetStructureBlock;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetTestBlock;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSlotStateChange;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSpectate;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSpectateEntity;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerBoat;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerVehicle;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
@@ -258,12 +263,14 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityVelocity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerExplosion;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerFacePlayer;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerGameRuleValues;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerGameTestHighlightPos;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerHeldItemChange;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerHurtAnimation;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerInitializeWorldBorder;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerKeepAlive;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerLowDiskSpaceWarning;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMapData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMerchantOffers;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMoveMinecart;
@@ -395,7 +402,8 @@ public final class PacketType {
             ClientVersion.V_1_21_2,
             ClientVersion.V_1_21_5,
             ClientVersion.V_1_21_6,
-            ClientVersion.V_1_21_9);
+            ClientVersion.V_1_21_9,
+            ClientVersion.V_26_1);
 
     //TODO UPDATE Update packet type mappings (serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
@@ -421,7 +429,8 @@ public final class PacketType {
             ClientVersion.V_1_21_4,
             ClientVersion.V_1_21_5,
             ClientVersion.V_1_21_6,
-            ClientVersion.V_1_21_9);
+            ClientVersion.V_1_21_9,
+            ClientVersion.V_26_1);
 
     // TODO UPDATE Update packet type mappings (config clientbound pt. 1)
     private static final VersionMapper CLIENTBOUND_CONFIG_VERSION_MAPPER = new VersionMapper(
@@ -1179,6 +1188,19 @@ public final class PacketType {
              * @versions 1.21.9+
              */
             DEBUG_SUBSCRIPTION_REQUEST(WrapperPlayClientDebugSubscriptionRequest.class),
+
+            /**
+             * @versions 26.1+
+             */
+            ATTACK(WrapperPlayClientAttack.class),
+            /**
+             * @versions 26.1+
+             */
+            SET_GAME_RULE(WrapperPlayClientSetGameRule.class),
+            /**
+             * @versions 26.1+
+             */
+            SPECTATE_ENTITY(WrapperPlayClientSpectateEntity.class),
             ;
 
             private static int INDEX = 0;
@@ -1244,6 +1266,7 @@ public final class PacketType {
                 loadPacketIds(ServerboundPacketType_1_21_5.values());
                 loadPacketIds(ServerboundPacketType_1_21_6.values());
                 loadPacketIds(ServerboundPacketType_1_21_9.values());
+                loadPacketIds(ServerboundPacketType_26_1.values());
                 //TODO UPDATE Update packet type mappings (serverbound pt. 2)
             }
 
@@ -1565,21 +1588,30 @@ public final class PacketType {
              */
             DEBUG_BLOCK_VALUE(WrapperPlayServerDebugBlockValue.class),
             /**
-              @versions 1.21.9+
+             * @versions 1.21.9+
              */
             DEBUG_CHUNK_VALUE(WrapperPlayServerDebugChunkValue.class),
             /**
-              @versions 1.21.9+
+             * @versions 1.21.9+
              */
             DEBUG_ENTITY_VALUE(WrapperPlayServerDebugEntityValue.class),
             /**
-              @versions 1.21.9+
+             * @versions 1.21.9+
              */
             DEBUG_EVENT(WrapperPlayServerDebugEvent.class),
             /**
-              @versions 1.21.9+
+             * @versions 1.21.9+
              */
             GAME_TEST_HIGHLIGHT_POS(WrapperPlayServerGameTestHighlightPos.class),
+
+            /**
+             * @versions 26.1+
+             */
+            GAME_RULE_VALUES(WrapperPlayServerGameRuleValues.class),
+            /**
+             * @versions 26.1+
+             */
+            LOW_DISK_SPACE_WARNING(WrapperPlayServerLowDiskSpaceWarning.class),
             ;
 
             private static int INDEX = 0;
@@ -1660,6 +1692,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_21_5.values());
                 loadPacketIds(ClientboundPacketType_1_21_6.values());
                 loadPacketIds(ClientboundPacketType_1_21_9.values());
+                loadPacketIds(ClientboundPacketType_26_1.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }

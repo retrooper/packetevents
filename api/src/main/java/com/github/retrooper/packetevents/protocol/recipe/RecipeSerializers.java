@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 /**
- * <strong>WARNING:</strong> No longer exists since 1.21.2, network recipe data was rewritten.
+ * <strong>WARNING:</strong> No longer exists on the network since 1.21.2, network recipe data was rewritten.
  */
 @ApiStatus.Obsolete
 public final class RecipeSerializers {
@@ -128,6 +128,25 @@ public final class RecipeSerializers {
             SmithingTrimRecipeData::read, SmithingTrimRecipeData::write);
     public static final RecipeSerializer<SimpleRecipeData> CRAFTING_DECORATED_POT = define("crafting_decorated_pot",
             SimpleRecipeData::read, SimpleRecipeData::write);
+
+    /**
+     * Dummy entry.
+     *
+     * @versions 26.1+
+     */
+    private static final RecipeSerializer<SimpleRecipeData> CRAFTING_IMBUE = define("crafting_imbue", SimpleRecipeData::read, SimpleRecipeData::write);
+    /**
+     * Dummy entry.
+     *
+     * @versions 26.1+
+     */
+    private static final RecipeSerializer<SimpleRecipeData> CRAFTING_DYE = define("crafting_dye", SimpleRecipeData::read, SimpleRecipeData::write);
+    /**
+     * Dummy entry.
+     *
+     * @versions 1.21.2+
+     */
+    private static final RecipeSerializer<SimpleRecipeData> CRAFTING_TRANSMUTE = define("crafting_transmute", SimpleRecipeData::read, SimpleRecipeData::write);
 
     /**
      * Returns an immutable view of the banner patterns.

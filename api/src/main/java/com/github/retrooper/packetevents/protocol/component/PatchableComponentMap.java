@@ -18,7 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.component;
 
+import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
+import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+@NullMarked
 public class PatchableComponentMap implements IComponentMap {
 
     public static final PatchableComponentMap EMPTY = new PatchableComponentMap(
@@ -33,43 +37,78 @@ public class PatchableComponentMap implements IComponentMap {
 
     private final Map<ComponentType<?>, ?> base;
     private final Map<ComponentType<?>, Optional<?>> patches;
+    private final IRegistryHolder registries;
 
     public PatchableComponentMap(StaticComponentMap base) {
-        this(base.getDelegate(), new HashMap<>());
+        this(base.delegate, new HashMap<>(), base.registries);
     }
 
+    @Deprecated
     public PatchableComponentMap(Map<ComponentType<?>, ?> base) {
-        this(base, new HashMap<>());
+        this(base, new HashMap<>(), GlobalRegistryHolder.INSTANCE);
     }
 
     public PatchableComponentMap(
             StaticComponentMap base,
             Map<ComponentType<?>, Optional<?>> patches
     ) {
-        this(base.getDelegate(), patches);
+        this(base.delegate, patches, base.registries);
     }
 
+    @Deprecated
     public PatchableComponentMap(
             Map<ComponentType<?>, ?> base,
             Map<ComponentType<?>, Optional<?>> patches
     ) {
-        this.base = Collections.unmodifiableMap(new HashMap<>(base));
-        this.patches = patches;
+        this(base, patches, GlobalRegistryHolder.INSTANCE);
     }
 
-    @SuppressWarnings("unchecked") // no
+    public PatchableComponentMap(StaticComponentMap base, IRegistryHolder registries) {
+        this(base.delegate, new HashMap<>(), registries);
+    }
+
+    public PatchableComponentMap(Map<ComponentType<?>, ?> base, IRegistryHolder registries) {
+        this(base, new HashMap<>(), registries);
+    }
+
+    public PatchableComponentMap(
+            StaticComponentMap base,
+            Map<ComponentType<?>, Optional<?>> patches,
+            IRegistryHolder registries
+    ) {
+        this(base.delegate, patches, registries);
+    }
+
+    public PatchableComponentMap(
+            Map<ComponentType<?>, ?> base,
+            Map<ComponentType<?>, Optional<?>> patches,
+            IRegistryHolder registries
+    ) {
+        this.base = Collections.unmodifiableMap(new HashMap<>(base));
+        this.patches = patches;
+        this.registries = registries;
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     public <T> @Nullable T get(ComponentType<T> type) {
         Optional<?> patched = this.patches.get(type);
-        if (patched != null) {
-            return (T) patched.orElse(null);
+        Object v = patched != null
+                ? (T) patched.orElse(null)
+                : (T) this.base.get(type);
+        if (v instanceof ComponentValueRef) {
+            v = ((ComponentValueRef<?>) v).resolve(this.registries);
         }
-        return (T) this.base.get(type);
+        return (T) v;
     }
 
     @Override
     public <T> void set(ComponentType<T> type, Optional<T> value) {
         Object baseVal = this.base.get(type);
+        if (baseVal instanceof ComponentValueRef) {
+            baseVal = ((ComponentValueRef<?>) baseVal).resolve(this.registries);
+        }
+
         T newVal = value.orElse(null);
         if (Objects.equals(baseVal, newVal)) {
             this.patches.remove(type); // fallback to base
@@ -84,14 +123,24 @@ public class PatchableComponentMap implements IComponentMap {
         return patched != null ? patched.isPresent() : this.base.containsKey(type);
     }
 
-    public PatchableComponentMap copy() {
-        return new PatchableComponentMap(this.base, new HashMap<>(this.patches));
+    @Override
+    public PatchableComponentMap withRegistries(IRegistryHolder registries) {
+        if (this.registries != registries) {
+            return new PatchableComponentMap(this.base, this.patches, this.registries);
+        }
+        return this;
     }
 
+    public PatchableComponentMap copy() {
+        return new PatchableComponentMap(this.base, new HashMap<>(this.patches), this.registries);
+    }
+
+    @Deprecated
     public Map<ComponentType<?>, ?> getBase() {
         return this.base;
     }
 
+    @Deprecated
     public Map<ComponentType<?>, Optional<?>> getPatches() {
         return this.patches;
     }

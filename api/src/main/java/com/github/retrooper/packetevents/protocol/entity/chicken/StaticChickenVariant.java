@@ -27,26 +27,45 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * @versions 1.21.5+
+ */
 @NullMarked
 public class StaticChickenVariant extends AbstractMappedEntity implements ChickenVariant {
 
     private final ModelType modelType;
     private final ResourceLocation assetId;
+    private final ResourceLocation babyAssetId;
 
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @ApiStatus.Obsolete
     public StaticChickenVariant(ModelType modelType, ResourceLocation assetId) {
-        this(null, modelType, assetId);
+        this(null, modelType, assetId, assetId);
+    }
+
+    /**
+     * @versions 26.1+
+     */
+    public StaticChickenVariant(ModelType modelType, ResourceLocation assetId, ResourceLocation babyAssetId) {
+        this(null, modelType, assetId, babyAssetId);
     }
 
     @ApiStatus.Internal
-    public StaticChickenVariant(@Nullable TypesBuilderData data, ModelType modelType, ResourceLocation assetId) {
+    public StaticChickenVariant(
+            @Nullable TypesBuilderData data, ModelType modelType,
+            ResourceLocation assetId, ResourceLocation babyAssetId
+    ) {
         super(data);
         this.modelType = modelType;
         this.assetId = assetId;
+        this.babyAssetId = babyAssetId;
     }
 
     @Override
     public ChickenVariant copy(@Nullable TypesBuilderData newData) {
-        return new StaticChickenVariant(newData, this.modelType, this.assetId);
+        return new StaticChickenVariant(newData, this.modelType, this.assetId, this.babyAssetId);
     }
 
     @Override
@@ -60,15 +79,21 @@ public class StaticChickenVariant extends AbstractMappedEntity implements Chicke
     }
 
     @Override
+    public ResourceLocation getBabyAssetId() {
+        return this.babyAssetId;
+    }
+
+    @Override
     public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof StaticChickenVariant)) return false;
         StaticChickenVariant that = (StaticChickenVariant) obj;
         if (!this.modelType.equals(that.modelType)) return false;
-        return this.assetId.equals(that.assetId);
+        if (!this.assetId.equals(that.assetId)) return false;
+        return this.babyAssetId.equals(that.babyAssetId);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(this.modelType, this.assetId);
+        return Objects.hash(this.modelType, this.assetId, this.babyAssetId);
     }
 }

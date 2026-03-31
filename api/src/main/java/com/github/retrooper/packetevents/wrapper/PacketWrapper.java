@@ -143,6 +143,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     // For sending chunk data packets, which need this data
     @Nullable
     protected User user;
+    protected IRegistryHolder registries = GlobalRegistryHolder.INSTANCE;
 
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
@@ -1478,6 +1479,14 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         return entity;
     }
 
+    public <Z extends MappedEntity> Z replaceRegistry(IRegistry<Z> registry, Z entity) {
+        IRegistry<Z> replacedRegistry = this.replaceRegistry(registry);
+        if (replacedRegistry != registry) {
+            return replacedRegistry.getByNameOrThrow(this.serverVersion.toClientVersion(), entity.getName());
+        }
+        return entity;
+    }
+
     public <Z extends MappedEntity> IRegistry<Z> replaceRegistry(IRegistry<Z> registry) {
         return this.getRegistryHolder().getRegistryOr(registry, this.serverVersion.toClientVersion());
     }
@@ -1486,7 +1495,12 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         // workaround to make packet wrappers work without user context on spigot/fabric servers
         // this will not work for bungee or velocity, as we need to have some reference to get
         // the actual cache key
-        return this.user != null ? this.user : GlobalRegistryHolder.INSTANCE;
+        return this.user != null ? this.user : this.registries;
+    }
+
+    @ApiStatus.Internal
+    public void setRegistryHolder(IRegistryHolder registries) {
+        this.registries = registries;
     }
 
     public <Z extends MappedEntity> Z readMappedEntityOrDirect(
@@ -1503,13 +1517,11 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     }
 
     public <Z extends MappedEntity> Z readMappedEntity(IRegistry<Z> registry) {
-        IRegistry<Z> replacedRegistry = this.getRegistryHolder().getRegistryOr(registry, this.serverVersion.toClientVersion());
-        return this.readMappedEntity((BiFunction<ClientVersion, Integer, Z>) replacedRegistry);
+        return this.readMappedEntity((BiFunction<ClientVersion, Integer, Z>) this.replaceRegistry(registry));
     }
 
     public <Z extends MappedEntity> Z readMappedEntityOrDirect(IRegistry<Z> registry, Reader<Z> directReader) {
-        IRegistry<Z> replacedRegistry = this.getRegistryHolder().getRegistryOr(registry, this.serverVersion.toClientVersion());
-        return this.readMappedEntityOrDirect((BiFunction<ClientVersion, Integer, Z>) replacedRegistry, directReader);
+        return this.readMappedEntityOrDirect((BiFunction<ClientVersion, Integer, Z>) this.replaceRegistry(registry), directReader);
     }
 
     public void writeMappedEntity(MappedEntity entity) {

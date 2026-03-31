@@ -9,9 +9,8 @@ plugins {
 }
 
 repositories {
-    maven("https://jitpack.io")
-    maven("https://repo.viaversion.com/")
     maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://repo.viaversion.com/everything/")
 }
 
 dependencies {
@@ -23,7 +22,6 @@ dependencies {
 
     compileOnly(libs.paper)
     compileOnly(libs.via.version)
-    compileOnly(libs.protocol.support)
 }
 
 tasks {
@@ -34,10 +32,11 @@ tasks {
         }
     }
 
-    // 1.8.8 - 1.16.5 = Java 8
-    // 1.17           = Java 16
-    // 1.18 - 1.20.4  = Java 17
-    // 1.20.5+        = Java 21
+    // 1.8.8 - 1.16.5   = Java 8
+    // 1.17             = Java 16
+    // 1.18 - 1.20.4    = Java 17
+    // 1.20.5 - 1.21.11 = Java 21
+    // 26.1+            = Java 25
     val version = "1.21.11"
     val javaVersion = JavaLanguageVersion.of(21)
 

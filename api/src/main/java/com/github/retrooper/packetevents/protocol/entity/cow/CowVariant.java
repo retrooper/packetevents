@@ -18,13 +18,18 @@
 
 package com.github.retrooper.packetevents.protocol.entity.cow;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.CodecNameable;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
+import com.github.retrooper.packetevents.protocol.util.NbtMapCodec;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
@@ -33,12 +38,40 @@ import net.kyori.adventure.util.Index;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * @versions 1.21.5+
+ */
 @NullMarked
 public interface CowVariant extends MappedEntity, CopyableEntity<CowVariant>, DeepComparableEntity {
+
+    NbtCodec<CowVariant> CODEC = new NbtMapCodec<CowVariant>() {
+        @Override
+        public CowVariant decode(NBTCompound tag, PacketWrapper<?> wrapper) throws NbtCodecException {
+            ModelType modelType = tag.getOr("model", ModelType.CODEC, ModelType.NORMAL, wrapper);
+            ResourceLocation assetId = tag.getOrThrow("asset_id", ResourceLocation.CODEC, wrapper);
+            ResourceLocation babyAssetId = wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_1) ? assetId
+                    : tag.getOrThrow("baby_asset_id", ResourceLocation.CODEC, wrapper);
+            return new StaticCowVariant(modelType, assetId, babyAssetId);
+        }
+
+        @Override
+        public void encode(NBTCompound tag, PacketWrapper<?> wrapper, CowVariant value) throws NbtCodecException {
+            tag.set("model", value.getModelType(), ModelType.CODEC, wrapper);
+            tag.set("asset_id", value.getAssetId(), ResourceLocation.CODEC, wrapper);
+            if (wrapper.getServerVersion().isNewerThan(ServerVersion.V_26_1)) {
+                tag.set("baby_asset_id", value.getBabyAssetId(), ResourceLocation.CODEC, wrapper);
+            }
+        }
+    }.codec();
 
     ModelType getModelType();
 
     ResourceLocation getAssetId();
+
+    /**
+     * @versions 26.1+
+     */
+    ResourceLocation getBabyAssetId();
 
     static CowVariant read(PacketWrapper<?> wrapper) {
         return wrapper.readMappedEntity(CowVariants.getRegistry());
@@ -48,22 +81,17 @@ public interface CowVariant extends MappedEntity, CopyableEntity<CowVariant>, De
         wrapper.writeMappedEntity(variant);
     }
 
-    static CowVariant decode(NBT nbt, ClientVersion version, @Nullable TypesBuilderData data) {
-        NBTCompound compound = (NBTCompound) nbt;
-        String modelTypeString = compound.getStringTagValueOrNull("model");
-        ModelType modelType = modelTypeString != null ? ModelType.getByName(modelTypeString) : ModelType.NORMAL;
-        ResourceLocation assetId = new ResourceLocation(compound.getStringTagValueOrThrow("asset_id"));
-        return new StaticCowVariant(data, modelType, assetId);
+    @Deprecated
+    static CowVariant decode(NBT tag, ClientVersion version, @Nullable TypesBuilderData data) {
+        return CODEC.decode(tag, PacketWrapper.createDummyWrapper(version)).copy(data);
     }
 
+    @Deprecated
     static NBT encode(CowVariant variant, ClientVersion version) {
-        NBTCompound compound = new NBTCompound();
-        compound.setTag("model", new NBTString(variant.getModelType().getName()));
-        compound.setTag("asset_id", new NBTString(variant.getAssetId().toString()));
-        return compound;
+        return CODEC.encode(PacketWrapper.createDummyWrapper(version), variant);
     }
 
-    enum ModelType {
+    enum ModelType implements CodecNameable {
 
         NORMAL("normal"),
         COLD("cold"),
@@ -72,6 +100,7 @@ public interface CowVariant extends MappedEntity, CopyableEntity<CowVariant>, De
 
         private static final Index<String, ModelType> NAME_INDEX = Index.create(
                 ModelType.class, ModelType::getName);
+        public static final NbtCodec<ModelType> CODEC = NbtCodecs.forEnum(values());
 
         private final String name;
 
@@ -84,6 +113,11 @@ public interface CowVariant extends MappedEntity, CopyableEntity<CowVariant>, De
         }
 
         public String getName() {
+            return this.name;
+        }
+
+        @Override
+        public String getCodecName() {
             return this.name;
         }
     }

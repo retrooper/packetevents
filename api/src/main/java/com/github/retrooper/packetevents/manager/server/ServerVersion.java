@@ -52,6 +52,7 @@ public enum ServerVersion {
     V_1_20(763), V_1_20_1(763), V_1_20_2(764), V_1_20_3(765), V_1_20_4(765), V_1_20_5(766), V_1_20_6(766),
     //1.21 and 1.21.1 have the same protocol version. 1.21.2 and 1.21.3 have the same protocol version. 1.21.7 and 1.21.8 have the same protocol version. 1.21.9 and 1.21.10 have the same protocol version
     V_1_21(767), V_1_21_1(767), V_1_21_2(768), V_1_21_3(768), V_1_21_4(769), V_1_21_5(770), V_1_21_6(771), V_1_21_7(772), V_1_21_8(772), V_1_21_9(773), V_1_21_10(773), V_1_21_11(774),
+    V_26_1(775),
     //TODO UPDATE Add server version constant
     ERROR(-1, true);
 

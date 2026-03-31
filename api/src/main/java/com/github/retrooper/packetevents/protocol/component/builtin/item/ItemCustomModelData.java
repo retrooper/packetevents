@@ -25,6 +25,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Custom model data was completely rewritten with 1.21.4.
@@ -130,5 +131,26 @@ public class ItemCustomModelData {
         } else {
             this.floats.set(0, (float) legacyId);
         }
+    }
+
+    @Override
+    public final boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ItemCustomModelData)) return false;
+        ItemCustomModelData that = (ItemCustomModelData) obj;
+        if (!floats.equals(that.floats)) return false;
+        if (!flags.equals(that.flags)) return false;
+        if (!strings.equals(that.strings)) return false;
+        return colors.equals(that.colors);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.floats, this.flags, this.strings, this.colors);
+    }
+
+    @Override
+    public String toString() {
+        return "ItemCustomModelData{floats=" + floats + ", flags=" + ", strings=" + flags + strings + ", colors=" + colors + '}';
     }
 }
