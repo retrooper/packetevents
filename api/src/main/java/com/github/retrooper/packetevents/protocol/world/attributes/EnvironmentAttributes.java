@@ -130,7 +130,7 @@ public final class EnvironmentAttributes {
      * Not synced via network, not usable via packetevents.
      */
     @ApiStatus.Obsolete
-    public static EnvironmentAttribute<Float> GAMEPLAY_TURTLE_EGG_HATCH_CHANCE = defineUnsynced("gameplay/turtle_egg_hatch_chance", AttributeTypes.FLOAT, 0f);
+    public static EnvironmentAttribute<Float> GAMEPLAY_TURTLE_EGG_HATCH_CHANCE = defineUnsynced("gameplay/turtle_egg_hatch_chance", AttributeTypes.FLOAT, 0.002f);
     public static EnvironmentAttribute<Boolean> GAMEPLAY_PIGLINS_ZOMBIFY = define("gameplay/piglins_zombify", AttributeTypes.BOOLEAN, true);
     /**
      * Not synced via network, not usable via packetevents.
