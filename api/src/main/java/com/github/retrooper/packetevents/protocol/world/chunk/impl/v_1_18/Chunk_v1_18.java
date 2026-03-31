@@ -18,7 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.impl.v_1_18;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInputWrapper;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
@@ -26,12 +28,15 @@ import com.github.retrooper.packetevents.protocol.stream.NetStreamOutputWrapper;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.DataPalette;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.PaletteType;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class Chunk_v1_18 implements BaseChunk {
 
-    private static final int AIR = 0;
+    private final ClientVersion version;
 
     private int blockCount;
     /**
@@ -41,7 +46,13 @@ public class Chunk_v1_18 implements BaseChunk {
     private final DataPalette chunkData;
     private final DataPalette biomeData;
 
+    @Deprecated
     public Chunk_v1_18() {
+        this(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
+    }
+
+    public Chunk_v1_18(ClientVersion version) {
+        this.version = version;
         this.chunkData = PaletteType.CHUNK.create();
         this.biomeData = PaletteType.BIOME.create();
     }
@@ -50,17 +61,38 @@ public class Chunk_v1_18 implements BaseChunk {
      * @versions -1.21.11
      */
     @ApiStatus.Obsolete
+    @Deprecated
     public Chunk_v1_18(int blockCount, DataPalette chunkData, DataPalette biomeData) {
-        this(blockCount, 0, chunkData, biomeData);
+        this(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), blockCount, 0, chunkData, biomeData);
+    }
+
+    /**
+     * @versions 26.1+
+     */
+    @Deprecated
+    public Chunk_v1_18(
+            int blockCount, int fluidCount,
+            DataPalette chunkData, DataPalette biomeData
+    ) {
+        this(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), blockCount, fluidCount, chunkData, biomeData);
+    }
+
+    /**
+     * @versions -1.21.11
+     */
+    @ApiStatus.Obsolete
+    public Chunk_v1_18(ClientVersion version, int blockCount, DataPalette chunkData, DataPalette biomeData) {
+        this(version, blockCount, 0, chunkData, biomeData);
     }
 
     /**
      * @versions 26.1+
      */
     public Chunk_v1_18(
-            int blockCount, int fluidCount,
+            ClientVersion version, int blockCount, int fluidCount,
             DataPalette chunkData, DataPalette biomeData
     ) {
+        this.version = version;
         this.blockCount = blockCount;
         this.fluidCount = fluidCount;
         this.chunkData = chunkData;
@@ -68,9 +100,10 @@ public class Chunk_v1_18 implements BaseChunk {
     }
 
     public static Chunk_v1_18 read(PacketWrapper<?> wrapper) {
-        boolean paletteLengthPrefix = wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5);
-        boolean hasFluidCount = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1);
-        return read(new NetStreamInputWrapper(wrapper), paletteLengthPrefix, hasFluidCount);
+        ClientVersion version = wrapper.getServerVersion().toClientVersion();
+        boolean paletteLengthPrefix = version.isOlderThan(ClientVersion.V_1_21_5);
+        boolean hasFluidCount = version.isNewerThanOrEquals(ClientVersion.V_26_1);
+        return read(version, new NetStreamInputWrapper(wrapper), paletteLengthPrefix, hasFluidCount);
     }
 
     /**
@@ -94,13 +127,21 @@ public class Chunk_v1_18 implements BaseChunk {
      */
     @Deprecated
     public static Chunk_v1_18 read(NetStreamInput in, boolean paletteLengthPrefix, boolean hasFluidCount) {
+        return read(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), in, paletteLengthPrefix, hasFluidCount);
+    }
+
+    /**
+     * @deprecated use {@link #read(PacketWrapper)} instead
+     */
+    @Deprecated
+    public static Chunk_v1_18 read(ClientVersion version, NetStreamInput in, boolean paletteLengthPrefix, boolean hasFluidCount) {
         int blockCount = in.readShort();
         int fluidCount = hasFluidCount ? in.readShort() : 0;
         DataPalette chunkPalette = DataPalette.read(in, PaletteType.CHUNK,
                 true, paletteLengthPrefix);
         DataPalette biomePalette = DataPalette.read(in, PaletteType.BIOME,
                 true, paletteLengthPrefix);
-        return new Chunk_v1_18(blockCount, fluidCount, chunkPalette, biomePalette);
+        return new Chunk_v1_18(version, blockCount, fluidCount, chunkPalette, biomePalette);
     }
 
     public static void write(PacketWrapper<?> wrapper, Chunk_v1_18 section) {
@@ -144,18 +185,43 @@ public class Chunk_v1_18 implements BaseChunk {
     }
 
     @Override
-    public void set(int x, int y, int z, int state) {
-        int curr = this.chunkData.set(x, y, z, state);
-        if (state != AIR && curr == AIR) {
-            this.blockCount++;
-        } else if (state == AIR && curr != AIR) {
+    public void set(int x, int y, int z, WrappedBlockState state) {
+        int curr = this.chunkData.set(x, y, z, state.getGlobalId());
+        WrappedBlockState currState = WrappedBlockState.getByGlobalId(this.version, curr);
+
+        // track block count
+        if (currState.getType().isAir()) {
+            if (!state.getType().isAir()) {
+                this.blockCount++;
+            }
+        } else if (state.getType().isAir()) {
             this.blockCount--;
+        }
+        if (this.version.isNewerThanOrEquals(ClientVersion.V_26_1)) {
+            // track fluid count
+            if (!currState.isFluid()) {
+                if (state.isFluid()) {
+                    this.fluidCount++;
+                }
+            } else if (!state.isFluid()) {
+                this.fluidCount--;
+            }
         }
     }
 
     @Override
+    public void set(int x, int y, int z, int combinedID) {
+        this.set(x, y, z, WrappedBlockState.getByGlobalId(this.version, combinedID));
+    }
+
+    @Override
+    public void set(ClientVersion version, int x, int y, int z, int combinedID) {
+        this.set(x, y, z, WrappedBlockState.getByGlobalId(version, combinedID));
+    }
+
+    @Override
     public boolean isEmpty() {
-        return this.blockCount == 0 && this.fluidCount == 0;
+        return this.blockCount == 0;
     }
 
     public int getBlockCount() {
