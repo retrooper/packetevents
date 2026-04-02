@@ -69,7 +69,7 @@ val generateAdventureVersionClass by tasks.registering {
 
 sourceSets {
     main {
-        java.srcDir(generateAdventureVersionClass.get().outputs)
+        java.srcDir(generateAdventureVersionClass)
     }
 }
 
