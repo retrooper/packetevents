@@ -76,10 +76,12 @@ tasks {
         val outFile = layout.buildDirectory.file("generated/${rootProject.name}_${project.name}_version.txt")
         outputs.file(outFile)
 
+        val projectVersion = project.version.toString()
+
         doLast {
             outFile.map { it.asFile }.get().apply {
                 parentFile.mkdirs()
-                writeText(project.version.toString())
+                writeText(projectVersion)
             }
         }
     }
