@@ -172,7 +172,7 @@ public class SpigotPacketEventsBuilder {
                     BiConsumer<PEVersion, UpdateChecker.UpdateCheckerStatus> unsupportedSoftwareLogic = (peVersion, status) -> {
                         if (minceraftVersion.contains("Unknown")) {
                             ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
-                            String failureToDetectVersionMsg = "Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + minceraftVersion + ". We will assume the Server version is " + fallbackVersion.name() + "...\n If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc";
+                            String failureToDetectVersionMsg = "Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + minceraftVersion + ". We will assume the Server version is " + fallbackVersion.name() + "... If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc";
                             plugin.getLogger().warning(failureToDetectVersionMsg);
                         } else {
                             // Our PEVersion class can parse this version and detect if it is a newer version than what is currently supported
