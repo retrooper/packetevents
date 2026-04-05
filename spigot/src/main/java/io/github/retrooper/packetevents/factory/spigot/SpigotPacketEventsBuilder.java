@@ -181,8 +181,12 @@ public class SpigotPacketEventsBuilder {
                                         + bukkitServerVersion + "! The latest Minecraft version supported by your build of PacketEvents is " + latestSupportedVersion + ". "
                                         + newBuildsMsg +
                                         " If you're in need of any help, join our Discord server: https://discord.gg/DVHxPPxHZc");
-                                Bukkit.getPluginManager().disablePlugin(plugin);
-                                stopping.set(true);
+                                // don't disable if this is just a patch version change
+                                if (bukkitServerVersion.major() > latestSupportedVersion.major()
+                                        || bukkitServerVersion.minor() > latestSupportedVersion.minor()) {
+                                    Bukkit.getPluginManager().disablePlugin(plugin);
+                                    stopping.set(true);
+                                }
                             }
                         }
                     };
