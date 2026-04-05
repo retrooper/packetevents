@@ -5,7 +5,7 @@
 This update fixes various bugs. It's encouraged that users update.
 Again, huge thanks to all users who have donated their hard-earned money to PacketEvents since the previous release. It's been received & it's very much appreciated.
 
-Recent donors: PebbleHost, SSomar1607, ipavdev, Suleyman Abulkhasan, frap
+Recent donors: PebbleHost, SSomar1607, ipavdev, Meed, frap
 
 Also, thanks to the contributors that made this update possible.
 

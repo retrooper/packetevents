@@ -166,17 +166,17 @@ public class SpigotPacketEventsBuilder {
                 load();
                 if (!initialized) {
                     Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
-                    String minceraftVersion = this.getMinecraftVersion();
+                    String minecraftVersion = this.getMinecraftVersion();
 
                     AtomicBoolean stopping = new AtomicBoolean(false);
                     BiConsumer<PEVersion, UpdateChecker.UpdateCheckerStatus> unsupportedSoftwareLogic = (peVersion, status) -> {
-                        if (minceraftVersion.contains("Unknown")) {
+                        if (minecraftVersion.contains("Unknown")) {
                             ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
-                            String failureToDetectVersionMsg = "Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + minceraftVersion + ". We will assume the Server version is " + fallbackVersion.name() + "... If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc";
+                            String failureToDetectVersionMsg = "Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + minecraftVersion + ". We will assume the Server version is " + fallbackVersion.name() + "... If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc";
                             plugin.getLogger().warning(failureToDetectVersionMsg);
                         } else {
                             // Our PEVersion class can parse this version and detect if it is a newer version than what is currently supported
-                            PEVersion bukkitServerVersion = PEVersion.fromString(minceraftVersion);
+                            PEVersion bukkitServerVersion = PEVersion.fromString(minecraftVersion);
                             PEVersion latestSupportedVersion = PEVersion.fromString(ServerVersion.getLatest().getReleaseName());
                             if (bukkitServerVersion.isNewerThan(latestSupportedVersion)) {
                                 // We do not support this version yet, so let us warn the user
