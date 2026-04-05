@@ -143,23 +143,40 @@ public class SpigotPacketEventsBuilder {
                 return loaded;
             }
 
+            private String getMinecraftVersion() {
+                try {
+                    return Bukkit.getMinecraftVersion();
+                } catch (NoSuchMethodError ignored) {
+                    // expected on decade-old versions
+
+                    String bukkitVersion = Bukkit.getBukkitVersion();
+                    // trim away unimportant metadata
+                    int dashIndex = bukkitVersion.indexOf('-');
+                    if (dashIndex != -1) {
+                        return bukkitVersion.substring(0, dashIndex);
+                    }
+                    // don't know how to "parse" this
+                    return bukkitVersion;
+                }
+            }
+
             @Override
             public void init() {
                 //Load if we haven't loaded already
                 load();
                 if (!initialized) {
                     Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
-                    String bukkitVersion = Bukkit.getBukkitVersion();
+                    String minceraftVersion = this.getMinecraftVersion();
 
                     AtomicBoolean stopping = new AtomicBoolean(false);
                     BiConsumer<PEVersion, UpdateChecker.UpdateCheckerStatus> unsupportedSoftwareLogic = (peVersion, status) -> {
-                        if (bukkitVersion.contains("Unknown")) {
+                        if (minceraftVersion.contains("Unknown")) {
                             ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
-                            String failureToDetectVersionMsg = "Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + bukkitVersion + ". We will assume the Server version is " + fallbackVersion.name() + "...\n If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc";
+                            String failureToDetectVersionMsg = "Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + minceraftVersion + ". We will assume the Server version is " + fallbackVersion.name() + "...\n If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc";
                             plugin.getLogger().warning(failureToDetectVersionMsg);
                         } else {
                             // Our PEVersion class can parse this version and detect if it is a newer version than what is currently supported
-                            PEVersion bukkitServerVersion = PEVersion.fromString(bukkitVersion.substring(0, bukkitVersion.indexOf("-")));
+                            PEVersion bukkitServerVersion = PEVersion.fromString(minceraftVersion);
                             PEVersion latestSupportedVersion = PEVersion.fromString(ServerVersion.getLatest().getReleaseName());
                             if (bukkitServerVersion.isNewerThan(latestSupportedVersion)) {
                                 // We do not support this version yet, so let us warn the user
