@@ -24,6 +24,13 @@ dependencies {
     compileOnly(libs.via.version)
 }
 
+// we compile against latest paper, which requires a newer java version than we target
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
 tasks {
     shadowJar {
         // Paper doesn't need to map spigot -> mojang since we support both
