@@ -14,7 +14,7 @@ Also, thanks to the contributors that made this update possible, especially @boo
 
 Visit our website: https://packetevents.com\
 Documentation: https://docs.packetevents.com\
-JavaDocs: https://javadocs.packetevents.com\
+JavaDocs: https://javadocs.packetevents.com
 
 ## What's Changed (Summary)
 * Added support for Minecraft 26.1 (and 26.1.1)
@@ -22,7 +22,7 @@ JavaDocs: https://javadocs.packetevents.com\
 
 **View Full Changelog**: https://github.com/retrooper/packetevents/compare/v2.11.2...v2.12.0
 
-### If you want to support PacketEvents, consider donating to us on [PayPal](https://paypal.me/packetevents), [Streamlabs](https://streamlabs.com/retrooper) or [GitHub Sponsors](https://github.com/sponsors/retrooper).
+### If you want to support PacketEvents, consider donating to us on [PayPal](https://paypal.me/packetevents), [Streamlabs](https://streamlabs.com/retrooper), or [GitHub Sponsors](https://github.com/sponsors/retrooper).
 
 ## Maven/Gradle Dependency Setup Guide
 
