@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Mojang name: ClientboundChunksBiomesPacket
+ *
  * @version 1.19.4+
  */
 public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServerChunkBiomes> {
