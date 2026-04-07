@@ -33,6 +33,7 @@ import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -56,7 +57,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         // https://howoldisminecraft188.today/
         boolean netty410 = false;
         try {
-            ChannelPromise.class.getDeclaredMethod("unvoid");
+            ChannelFuture.class.getDeclaredMethod("isVoid");
             netty410 = true;
         } catch (NoSuchMethodException ignored) {
         }
@@ -66,7 +67,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     public User user;
     public Player player;
     private boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
-    private ChannelPromise promise;
 
     private final Queue<QueuedMessage> queuedMessages = new ArrayDeque<>();
     private boolean hold = false;
@@ -79,7 +79,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         user = ((PacketEventsEncoder) encoder).user;
         player = ((PacketEventsEncoder) encoder).player;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
-        promise = ((PacketEventsEncoder) encoder).promise;
     }
 
     public void setHold(Channel ch, boolean hold) throws Exception {
@@ -104,17 +103,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
             this.queuedMessages.add(new QueuedMessage(msg, promise));
             return;
         }
-
-        // We must restore the old promise (in case we are stacking promises such as sending packets on send event)
-        // If the old promise was successful, set it to null to avoid memory leaks.
-        ChannelPromise oldPromise = this.promise != null && !this.promise.isSuccess() ? this.promise : null;
-        if (NETTY_4_1_0) {
-            // "unvoid" will just make sure we can actually add listeners to this promise...
-            // since 1.21.6, mojang will give us void promises when they don't care about the result
-            promise = promise.unvoid();
-        }
-        promise.addListener(p -> this.promise = oldPromise);
-        this.promise = promise;
 
         PacketSendEvent packetSendEvent = null;
         if (msg instanceof ByteBuf) {
