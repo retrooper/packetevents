@@ -105,7 +105,7 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
         }
 
         public static ChunkBiomeData read(PacketWrapper<?> wrapper) {
-            int endIndex = ByteBufHelper.readerIndex(wrapper.buffer) + wrapper.readVarInt();
+            int endIndex = wrapper.readVarInt() + ByteBufHelper.readerIndex(wrapper.buffer);
             List<DataPalette> sections = new ArrayList<>();
             while (ByteBufHelper.readerIndex(wrapper.buffer) < endIndex) {
                 sections.add(PaletteType.BIOME.read(wrapper));
