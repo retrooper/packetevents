@@ -30,20 +30,13 @@ class MappingCompressionPlugin : Plugin<Project> {
 
         val task = target.tasks.register<MappingCompressionTask>(MappingCompressionTask.TASK_NAME) {
             group = target.rootProject.name
-            outputs.upToDateWhen {
-                if (outDir?.exists() != true)
-                    return@upToDateWhen false
-
-                val genModified = outDir!!.toFile().walk().maxOf { it.lastModified() }
-                mappingsDir!!.toFile().walk()
-                    .filter { it.isFile }
-                    .any { it.lastModified() > genModified }
-            }
         }
 
         target.afterEvaluate {
             task.configure {
                 inputs.dir(ext.mappingDirectory)
+                outputs.dir(ext.outDirectory)
+
                 mappingsDir = ext.mappingDirectory.get().asFile.toPath()
                 outDir = ext.outDirectory.get().asFile.toPath()
                 strategies = ext.strategies

@@ -30,22 +30,25 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class StaticEnvironmentAttribute<T> extends AbstractMappedEntity implements EnvironmentAttribute<T> {
 
+    private final boolean isSynced;
     private final @Nullable AttributeType<T> attributeType;
     private final @Nullable T defaultValue;
 
     @ApiStatus.Internal
     public StaticEnvironmentAttribute(
             @Nullable TypesBuilderData data,
+            boolean isSynced,
             @Nullable AttributeType<T> attributeType, @Nullable T defaultValue
     ) {
         super(data);
+        this.isSynced = isSynced;
         this.attributeType = attributeType;
         this.defaultValue = defaultValue;
     }
 
     @Override
     public boolean isSynced() {
-        return this.attributeType != null;
+        return this.isSynced;
     }
 
     @Override

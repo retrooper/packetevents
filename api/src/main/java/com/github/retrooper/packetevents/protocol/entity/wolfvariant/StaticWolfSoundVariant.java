@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.entity.wolfvariant;
 
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
+import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
@@ -27,87 +28,89 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * @versions 1.21.5+
+ */
 @NullMarked
 public class StaticWolfSoundVariant extends AbstractMappedEntity implements WolfSoundVariant {
 
-    private final Sound ambientSound;
-    private final Sound deathSound;
-    private final Sound growlSound;
-    private final Sound hurtSound;
-    private final Sound pantSound;
-    private final Sound whineSound;
+    /**
+     * @versions 26.1+
+     */
+    private final WolfSoundSet adultSounds;
+    /**
+     * @versions 26.1+
+     */
+    private final WolfSoundSet babySounds;
 
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @Deprecated
     public StaticWolfSoundVariant(
             Sound ambientSound, Sound deathSound, Sound growlSound,
             Sound hurtSound, Sound pantSound, Sound whineSound
     ) {
-        this(null, ambientSound, deathSound, growlSound, hurtSound, pantSound, whineSound);
+        this(new WolfSoundSet(ambientSound, deathSound, growlSound, hurtSound, pantSound, whineSound, Sounds.ENTITY_WOLF_STEP));
+    }
+
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @ApiStatus.Obsolete
+    public StaticWolfSoundVariant(WolfSoundSet sounds) {
+        this(null, sounds, sounds);
+    }
+
+    /**
+     * @versions 26.1+
+     */
+    public StaticWolfSoundVariant(WolfSoundSet adultSounds, WolfSoundSet babySounds) {
+        this(null, adultSounds, babySounds);
     }
 
     @ApiStatus.Internal
     public StaticWolfSoundVariant(
-            @Nullable TypesBuilderData data, Sound ambientSound, Sound deathSound,
-            Sound growlSound, Sound hurtSound, Sound pantSound, Sound whineSound
+            @Nullable TypesBuilderData data,
+            WolfSoundSet adultSounds,
+            WolfSoundSet babySounds
     ) {
         super(data);
-        this.ambientSound = ambientSound;
-        this.deathSound = deathSound;
-        this.growlSound = growlSound;
-        this.hurtSound = hurtSound;
-        this.pantSound = pantSound;
-        this.whineSound = whineSound;
+        this.adultSounds = adultSounds;
+        this.babySounds = babySounds;
     }
 
     @Override
     public WolfSoundVariant copy(@Nullable TypesBuilderData newData) {
-        return new StaticWolfSoundVariant(newData, this.ambientSound, this.deathSound,
-                this.growlSound, this.hurtSound, this.pantSound, this.whineSound);
+        return new StaticWolfSoundVariant(newData, this.adultSounds, this.babySounds);
     }
 
+    /**
+     * @versions 26.1+
+     */
     @Override
-    public Sound getAmbientSound() {
-        return this.ambientSound;
+    public WolfSoundSet getAdultSounds() {
+        return this.adultSounds;
     }
 
+    /**
+     * @versions 26.1+
+     */
     @Override
-    public Sound getDeathSound() {
-        return this.deathSound;
-    }
-
-    @Override
-    public Sound getGrowlSound() {
-        return this.growlSound;
-    }
-
-    @Override
-    public Sound getHurtSound() {
-        return this.hurtSound;
-    }
-
-    @Override
-    public Sound getPantSound() {
-        return this.pantSound;
-    }
-
-    @Override
-    public Sound getWhineSound() {
-        return this.whineSound;
+    public WolfSoundSet getBabySounds() {
+        return this.babySounds;
     }
 
     @Override
     public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof StaticWolfSoundVariant)) return false;
         StaticWolfSoundVariant that = (StaticWolfSoundVariant) obj;
-        if (!this.ambientSound.equals(that.ambientSound)) return false;
-        if (!this.deathSound.equals(that.deathSound)) return false;
-        if (!this.growlSound.equals(that.growlSound)) return false;
-        if (!this.hurtSound.equals(that.hurtSound)) return false;
-        if (!this.pantSound.equals(that.pantSound)) return false;
-        return this.whineSound.equals(that.whineSound);
+        if (!this.adultSounds.equals(that.adultSounds)) return false;
+        return this.babySounds.equals(that.babySounds);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(this.ambientSound, this.deathSound, this.growlSound, this.hurtSound, this.pantSound, this.whineSound);
+        return Objects.hash(this.adultSounds, this.babySounds);
     }
 }

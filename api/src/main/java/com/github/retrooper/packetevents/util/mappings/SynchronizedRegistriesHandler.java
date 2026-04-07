@@ -23,16 +23,24 @@ import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.dialog.Dialog;
 import com.github.retrooper.packetevents.protocol.dialog.Dialogs;
+import com.github.retrooper.packetevents.protocol.entity.cat.CatSoundVariant;
+import com.github.retrooper.packetevents.protocol.entity.cat.CatSoundVariants;
 import com.github.retrooper.packetevents.protocol.entity.cat.CatVariant;
 import com.github.retrooper.packetevents.protocol.entity.cat.CatVariants;
+import com.github.retrooper.packetevents.protocol.entity.chicken.ChickenSoundVariant;
+import com.github.retrooper.packetevents.protocol.entity.chicken.ChickenSoundVariants;
 import com.github.retrooper.packetevents.protocol.entity.chicken.ChickenVariant;
 import com.github.retrooper.packetevents.protocol.entity.chicken.ChickenVariants;
+import com.github.retrooper.packetevents.protocol.entity.cow.CowSoundVariant;
+import com.github.retrooper.packetevents.protocol.entity.cow.CowSoundVariants;
 import com.github.retrooper.packetevents.protocol.entity.cow.CowVariant;
 import com.github.retrooper.packetevents.protocol.entity.cow.CowVariants;
 import com.github.retrooper.packetevents.protocol.entity.frog.FrogVariant;
 import com.github.retrooper.packetevents.protocol.entity.frog.FrogVariants;
 import com.github.retrooper.packetevents.protocol.entity.nautilus.ZombieNautilusVariant;
 import com.github.retrooper.packetevents.protocol.entity.nautilus.ZombieNautilusVariants;
+import com.github.retrooper.packetevents.protocol.entity.pig.PigSoundVariant;
+import com.github.retrooper.packetevents.protocol.entity.pig.PigSoundVariants;
 import com.github.retrooper.packetevents.protocol.entity.pig.PigVariant;
 import com.github.retrooper.packetevents.protocol.entity.pig.PigVariants;
 import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfSoundVariant;
@@ -64,6 +72,8 @@ import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Tim
 import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Timelines;
 import com.github.retrooper.packetevents.protocol.world.biome.Biome;
 import com.github.retrooper.packetevents.protocol.world.biome.Biomes;
+import com.github.retrooper.packetevents.protocol.world.clock.WorldClock;
+import com.github.retrooper.packetevents.protocol.world.clock.WorldClocks;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageType;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageTypes;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
@@ -100,12 +110,12 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(TrimPatterns.getRegistry(), (NbtEntryDecoder<TrimPattern>) TrimPattern::decode),
                 new RegistryEntry<>(TrimMaterials.getRegistry(), (NbtEntryDecoder<TrimMaterial>) TrimMaterial::decode),
                 new RegistryEntry<>(WolfVariants.getRegistry(), (NbtEntryDecoder<WolfVariant>) WolfVariant::decode),
-                new RegistryEntry<>(WolfSoundVariants.getRegistry(), WolfSoundVariant::decode),
+                new RegistryEntry<>(WolfSoundVariants.getRegistry(), WolfSoundVariant.CODEC),
                 new RegistryEntry<>(PigVariants.getRegistry(), PigVariant::decode),
                 new RegistryEntry<>(FrogVariants.getRegistry(), FrogVariant::decode),
-                new RegistryEntry<>(CatVariants.getRegistry(), CatVariant::decode),
-                new RegistryEntry<>(CowVariants.getRegistry(), CowVariant::decode),
-                new RegistryEntry<>(ChickenVariants.getRegistry(), ChickenVariant::decode),
+                new RegistryEntry<>(CatVariants.getRegistry(), CatVariant.CODEC),
+                new RegistryEntry<>(CowVariants.getRegistry(), CowVariant.CODEC),
+                new RegistryEntry<>(ChickenVariants.getRegistry(), ChickenVariant.CODEC),
                 new RegistryEntry<>(ZombieNautilusVariants.getRegistry(), ZombieNautilusVariant::decode),
                 new RegistryEntry<>(PaintingVariants.getRegistry(), PaintingVariant::decode),
                 new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType.CODEC),
@@ -115,7 +125,12 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(JukeboxSongs.getRegistry(), (NbtEntryDecoder<IJukeboxSong>) IJukeboxSong::decode),
                 new RegistryEntry<>(Instruments.getRegistry(), (NbtEntryDecoder<Instrument>) Instrument::decode),
                 new RegistryEntry<>(Dialogs.getRegistry(), Dialog::decodeDirect),
-                new RegistryEntry<>(Timelines.getRegistry(), Timeline.CODEC)
+                new RegistryEntry<>(Timelines.getRegistry(), Timeline.CODEC),
+                new RegistryEntry<>(PigSoundVariants.getRegistry(), PigSoundVariant.CODEC),
+                new RegistryEntry<>(CatSoundVariants.getRegistry(), CatSoundVariant.CODEC),
+                new RegistryEntry<>(CowSoundVariants.getRegistry(), CowSoundVariant.CODEC),
+                new RegistryEntry<>(ChickenSoundVariants.getRegistry(), ChickenSoundVariant.CODEC),
+                new RegistryEntry<>(WorldClocks.getRegistry(), WorldClock.DIRECT_CODEC)
         ).forEach(entry -> REGISTRY_KEYS.put(entry.getRegistryKey(), entry));
     }
 
@@ -153,14 +168,18 @@ public final class SynchronizedRegistriesHandler {
         if (registryData == null) {
             return;
         }
-        SimpleRegistry<?> syncedRegistry;
-        if (FORCE_PER_USER_REGISTRIES || cacheKey == null) {
-            syncedRegistry = registryData.createFromElements(elements, wrapper); // no caching
-        } else {
-            syncedRegistry = registryData.computeSyncedRegistry(cacheKey, () ->
-                    registryData.createFromElements(elements, wrapper));
+        try {
+            SimpleRegistry<?> syncedRegistry;
+            if (FORCE_PER_USER_REGISTRIES || cacheKey == null) {
+                syncedRegistry = registryData.createFromElements(elements, wrapper); // no caching
+            } else {
+                syncedRegistry = registryData.computeSyncedRegistry(cacheKey, () ->
+                        registryData.createFromElements(elements, wrapper));
+            }
+            user.putRegistry(syncedRegistry);
+        } catch (Exception exception) {
+            throw new IllegalStateException("Error while reading registry " + registryName + " for " + user, exception);
         }
-        user.putRegistry(syncedRegistry);
     }
 
     public static void handleLegacyRegistries(

@@ -1,4 +1,21 @@
 {
+  "V_26_1": [
+    "damage",
+    "enchantments",
+    "stored_enchantments",
+    "potion_contents",
+    "custom_data",
+    "container",
+    "bundle_contents",
+    "firework_explosion",
+    "fireworks",
+    "writable_book_content",
+    "written_book_content",
+    "attribute_modifiers",
+    "trim",
+    "jukebox_playable",
+    "villager/variant"
+  ],
   "V_1_21_5": [
     "damage",
     "enchantments",

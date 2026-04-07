@@ -20,11 +20,15 @@ package com.github.retrooper.packetevents.protocol.world.attributes.timelines;
 
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttribute;
+import com.github.retrooper.packetevents.protocol.world.clock.WorldClock;
+import com.github.retrooper.packetevents.protocol.world.clock.WorldClocks;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -34,26 +38,58 @@ import java.util.Objects;
 @NullMarked
 public class StaticTimeline extends AbstractMappedEntity implements Timeline {
 
+    /**
+     * @versions 26.1+
+     */
+    private final WorldClock clock;
     private final @Nullable Integer periodTicks;
     private final Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks;
+    /**
+     * @versions 26.1+
+     */
+    private final Map<ResourceLocation, TimeMarkerInfo> timeMarkers;
 
+    /**
+     * @versions 1.21.11
+     */
+    @ApiStatus.Obsolete
     public StaticTimeline(@Nullable Integer periodTicks, Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks) {
-        this(null, periodTicks, tracks);
+        this(null, WorldClocks.OVERWORLD, periodTicks, tracks, Collections.emptyMap());
+    }
+
+    /**
+     * @versions 26.1+
+     */
+    public StaticTimeline(
+            WorldClock clock, @Nullable Integer periodTicks,
+            Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks,
+            Map<ResourceLocation, TimeMarkerInfo> timeMarkers
+    ) {
+        this(null, clock, periodTicks, tracks, timeMarkers);
     }
 
     @ApiStatus.Internal
     public StaticTimeline(
             @Nullable TypesBuilderData data,
-            @Nullable Integer periodTicks, Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks
+            WorldClock clock, @Nullable Integer periodTicks,
+            Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>> tracks,
+            Map<ResourceLocation, TimeMarkerInfo> timeMarkers
     ) {
         super(data);
+        this.clock = clock;
         this.periodTicks = periodTicks;
-        this.tracks = tracks;
+        this.tracks = Collections.unmodifiableMap(tracks);
+        this.timeMarkers = Collections.unmodifiableMap(timeMarkers);
     }
 
     @Override
     public Timeline copy(@Nullable TypesBuilderData newData) {
-        return new StaticTimeline(newData, this.periodTicks, this.tracks);
+        return new StaticTimeline(newData, this.clock, this.periodTicks, this.tracks, this.timeMarkers);
+    }
+
+    @Override
+    public WorldClock getClock() {
+        return this.clock;
     }
 
     @Override
@@ -67,15 +103,22 @@ public class StaticTimeline extends AbstractMappedEntity implements Timeline {
     }
 
     @Override
+    public Map<ResourceLocation, TimeMarkerInfo> getTimeMarkers() {
+        return this.timeMarkers;
+    }
+
+    @Override
     public boolean deepEquals(@Nullable Object obj) {
         if (obj == null || this.getClass() != obj.getClass()) return false;
         StaticTimeline that = (StaticTimeline) obj;
+        if (!this.clock.equals(that.clock)) return false;
         if (!Objects.equals(this.periodTicks, that.periodTicks)) return false;
-        return this.tracks.equals(that.tracks);
+        if (!this.tracks.equals(that.tracks)) return false;
+        return this.timeMarkers.equals(that.timeMarkers);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(this.periodTicks, this.tracks);
+        return Objects.hash(this.clock, this.periodTicks, this.tracks, this.timeMarkers);
     }
 }

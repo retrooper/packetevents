@@ -131,7 +131,8 @@ public final class ItemStackSerialization {
 
         PatchableComponentMap components = new PatchableComponentMap(
                 itemType.getComponents(wrapper.getServerVersion().toClientVersion()),
-                new HashMap<>(presentCount + absentCount));
+                new HashMap<>(presentCount + absentCount),
+                wrapper.getRegistryHolder());
         for (int i = 0; i < presentCount; i++) {
             ComponentType<?> type = wrapper.readMappedEntity(ComponentTypes.getRegistry());
             // this is not 1:1 how vanilla decodes the length prefix, vanilla slices the buffer and

@@ -18,33 +18,74 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
+import com.github.retrooper.packetevents.protocol.world.damagetype.DamageType;
+import com.github.retrooper.packetevents.protocol.world.damagetype.DamageTypes;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 
+/**
+ * @versions 1.21.2+
+ */
+@NullMarked
 public class ItemDamageResistant {
 
-    private ResourceLocation typesTagKey;
+    /**
+     * @versions 26.1+
+     */
+    private MappedEntitySet<DamageType> types;
 
-    public ItemDamageResistant(ResourceLocation typesTagKey) {
-        this.typesTagKey = typesTagKey;
+    public ItemDamageResistant(ResourceLocation types) {
+        this(new MappedEntitySet<>(types));
+    }
+
+    public ItemDamageResistant(MappedEntitySet<DamageType> types) {
+        this.types = types;
     }
 
     public static ItemDamageResistant read(PacketWrapper<?> wrapper) {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            return new ItemDamageResistant(MappedEntitySet.read(wrapper, DamageTypes.getRegistry()));
+        }
         return new ItemDamageResistant(wrapper.readIdentifier());
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemDamageResistant resistant) {
-        wrapper.writeIdentifier(resistant.typesTagKey);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            MappedEntitySet.write(wrapper, resistant.types);
+        } else {
+            wrapper.writeIdentifier(resistant.getTypesTagKey());
+        }
+    }
+
+    /**
+     * @versions 26.1+
+     */
+    public MappedEntitySet<DamageType> getTypes() {
+        return this.types;
+    }
+
+    /**
+     * @versions 26.1+
+     */
+    public void setTypes(MappedEntitySet<DamageType> types) {
+        this.types = types;
     }
 
     public ResourceLocation getTypesTagKey() {
-        return this.typesTagKey;
+        ResourceLocation tagKey = this.types.getTagKey();
+        if (tagKey == null) {
+            throw new IllegalStateException("No tag key present");
+        }
+        return tagKey;
     }
 
-    public void setTypesTagKey(ResourceLocation typesTagKey) {
-        this.typesTagKey = typesTagKey;
+    public void setTypesTagKey(ResourceLocation types) {
+        this.types = new MappedEntitySet<>(types);
     }
 
     @Override
@@ -52,16 +93,16 @@ public class ItemDamageResistant {
         if (this == obj) return true;
         if (!(obj instanceof ItemDamageResistant)) return false;
         ItemDamageResistant that = (ItemDamageResistant) obj;
-        return this.typesTagKey.equals(that.typesTagKey);
+        return this.types.equals(that.types);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this.typesTagKey);
+        return Objects.hashCode(this.types);
     }
 
     @Override
     public String toString() {
-        return "ItemDamageResistant{typesTagKey=" + this.typesTagKey + '}';
+        return "ItemDamageResistant{types=" + this.types + '}';
     }
 }

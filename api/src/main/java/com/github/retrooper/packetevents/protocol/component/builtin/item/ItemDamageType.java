@@ -18,10 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.MaybeMappedEntity;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageType;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
@@ -38,18 +40,29 @@ public class ItemDamageType {
         this(new MaybeMappedEntity<>(damageType));
     }
 
+    /**
+     * @versions 1.21.11
+     */
+    @ApiStatus.Obsolete
     public ItemDamageType(MaybeMappedEntity<DamageType> damageType) {
         this.damageType = damageType;
     }
 
     public static ItemDamageType read(PacketWrapper<?> wrapper) {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            return new ItemDamageType(DamageType.read(wrapper));
+        }
         MaybeMappedEntity<DamageType> damageType = MaybeMappedEntity.read(wrapper,
                 DamageTypes.getRegistry(), DamageType::read);
         return new ItemDamageType(damageType);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemDamageType component) {
-        MaybeMappedEntity.write(wrapper, component.damageType, DamageType::write);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            DamageType.write(wrapper, component.damageType.getValueOrThrow());
+        } else {
+            MaybeMappedEntity.write(wrapper, component.damageType, DamageType::write);
+        }
     }
 
     public MaybeMappedEntity<DamageType> getDamageType() {

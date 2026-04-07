@@ -298,6 +298,14 @@ public final class ParticleTypes {
      * @versions 1.21.9+
      */
     public static final ParticleType<ParticleData> COPPER_FIRE_FLAME = define("copper_fire_flame");
+    /**
+     * @versions 26.1+
+     */
+    public static final ParticleType<ParticleData> PAUSE_MOB_GROWTH = define("pause_mob_growth");
+    /**
+     * @versions 26.1+
+     */
+    public static final ParticleType<ParticleData> RESET_MOB_GROWTH = define("reset_mob_growth");
 
     /**
      * Returns an immutable view of the particle types.

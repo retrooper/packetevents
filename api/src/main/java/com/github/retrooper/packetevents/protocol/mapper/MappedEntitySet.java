@@ -89,6 +89,11 @@ public class MappedEntitySet<T extends MappedEntity> implements MappedEntityRefS
         }
     }
 
+    public static <Z extends MappedEntity> MappedEntitySet<Z> read(PacketWrapper<?> wrapper, IRegistry<Z> registry) {
+        IRegistry<Z> replacedRegistry = wrapper.replaceRegistry(registry);
+        return read(wrapper, (BiFunction<ClientVersion, Integer, Z>) replacedRegistry);
+    }
+
     public static <Z extends MappedEntity> MappedEntitySet<Z> read(
             PacketWrapper<?> wrapper, BiFunction<ClientVersion, Integer, Z> getter) {
         int count = wrapper.readVarInt() - 1;

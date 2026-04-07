@@ -119,6 +119,10 @@ public final class AttributeTypes {
     public static final AttributeType<Float> ANGLE_DEGREES = define("angle_degrees", NbtCodecs.FLOAT, AttributeModifier.FLOAT_LIBRARY);
     public static final AttributeType<Color> RGB_COLOR = define("rgb_color", NbtCodecs.RGB_COLOR, AttributeModifier.RGB_COLOR_LIBRARY);
     public static final AttributeType<AlphaColor> ARGB_COLOR = define("argb_color", NbtCodecs.ARGB_COLOR, AttributeModifier.ARGB_COLOR_LIBRARY);
+    /**
+     * @versions 26.1+
+     */
+    public static final AttributeType<Integer> INTEGER = define("integer", NbtCodecs.INT, AttributeModifier.INTEGER_LIBRARY);
     public static final AttributeType<MoonPhase> MOON_PHASE = define("moon_phase", MoonPhase.CODEC);
     /**
      * Not synced via network, not usable via packetevents.

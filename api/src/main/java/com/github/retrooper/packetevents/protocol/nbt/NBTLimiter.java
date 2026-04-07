@@ -70,7 +70,7 @@ public interface NBTLimiter {
                 if (amount < 0) {
                     throw new IllegalArgumentException("Can't increment NBT limiter by negative amount: " + amount);
                 } else if (this.bytes + amount > maxBytes) {
-                    throw new IllegalArgumentException("NBT size limit reached (" + this.bytes + "/" + maxBytes + ")");
+                    throw new IllegalArgumentException("NBT size limit reached (" + this.bytes + " + " + amount + " > " + maxBytes + ")");
                 }
                 this.bytes += amount;
             }

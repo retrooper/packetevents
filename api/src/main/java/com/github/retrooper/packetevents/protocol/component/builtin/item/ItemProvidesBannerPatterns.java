@@ -18,45 +18,90 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.item.banner.BannerPattern;
+import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 
+/**
+ * @versions 1.21.5+
+ */
+@NullMarked
 public class ItemProvidesBannerPatterns {
 
-    private ResourceLocation tagKey;
+    /**
+     * @versions 26.1+
+     */
+    private MappedEntitySet<BannerPattern> set;
+
+    /**
+     * @versions 26.1+
+     */
+    public ItemProvidesBannerPatterns(MappedEntitySet<BannerPattern> set) {
+        this.set = set;
+    }
 
     public ItemProvidesBannerPatterns(ResourceLocation tagKey) {
-        this.tagKey = tagKey;
+        this(new MappedEntitySet<>(tagKey));
     }
 
     public static ItemProvidesBannerPatterns read(PacketWrapper<?> wrapper) {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            MappedEntitySet<BannerPattern> set = MappedEntitySet.read(wrapper, BannerPatterns.getRegistry());
+            return new ItemProvidesBannerPatterns(set);
+        }
         ResourceLocation tagKey = wrapper.readIdentifier();
         return new ItemProvidesBannerPatterns(tagKey);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemProvidesBannerPatterns patterns) {
-        wrapper.writeIdentifier(patterns.tagKey);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            MappedEntitySet.write(wrapper, patterns.set);
+        } else {
+            wrapper.writeIdentifier(patterns.getTagKey());
+        }
+    }
+
+    /**
+     * @versions 26.1+
+     */
+    public MappedEntitySet<BannerPattern> getSet() {
+        return this.set;
+    }
+
+    /**
+     * @versions 26.1+
+     */
+    public void setSet(MappedEntitySet<BannerPattern> set) {
+        this.set = set;
     }
 
     public ResourceLocation getTagKey() {
-        return this.tagKey;
+        ResourceLocation tagKey = this.set.getTagKey();
+        if (tagKey == null) {
+            throw new IllegalStateException("No tag key present");
+        }
+        return tagKey;
     }
 
     public void setTagKey(ResourceLocation tagKey) {
-        this.tagKey = tagKey;
+        this.set = new MappedEntitySet<>(tagKey);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ItemProvidesBannerPatterns)) return false;
         ItemProvidesBannerPatterns that = (ItemProvidesBannerPatterns) obj;
-        return this.tagKey.equals(that.tagKey);
+        return this.set.equals(that.set);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this.tagKey);
+        return Objects.hashCode(this.set);
     }
 }

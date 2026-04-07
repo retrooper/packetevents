@@ -21,13 +21,17 @@ package com.github.retrooper.packetevents.protocol.entity.data;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemProfile;
 import com.github.retrooper.packetevents.protocol.entity.armadillo.ArmadilloState;
+import com.github.retrooper.packetevents.protocol.entity.cat.CatSoundVariant;
 import com.github.retrooper.packetevents.protocol.entity.cat.CatVariant;
+import com.github.retrooper.packetevents.protocol.entity.chicken.ChickenSoundVariant;
 import com.github.retrooper.packetevents.protocol.entity.chicken.ChickenVariant;
+import com.github.retrooper.packetevents.protocol.entity.cow.CowSoundVariant;
 import com.github.retrooper.packetevents.protocol.entity.cow.CowVariant;
 import com.github.retrooper.packetevents.protocol.entity.data.struct.CopperGolemState;
 import com.github.retrooper.packetevents.protocol.entity.data.struct.WeatheringCopperState;
 import com.github.retrooper.packetevents.protocol.entity.frog.FrogVariant;
 import com.github.retrooper.packetevents.protocol.entity.nautilus.ZombieNautilusVariant;
+import com.github.retrooper.packetevents.protocol.entity.pig.PigSoundVariant;
 import com.github.retrooper.packetevents.protocol.entity.pig.PigVariant;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.entity.sniffer.SnifferState;
@@ -307,6 +311,27 @@ public final class EntityDataTypes {
      */
     public static final EntityDataType<HumanoidArm> HUMANOID_ARM =
             define("humanoid_arm", HumanoidArm::read, HumanoidArm::write);
+
+    /**
+     * @versions 26.1+
+     */
+    public static final EntityDataType<CatSoundVariant> CAT_SOUND_VARIANT =
+            define("cat_sound_variant_type", CatSoundVariant::read, CatSoundVariant::write);
+    /**
+     * @versions 26.1+
+     */
+    public static final EntityDataType<ChickenSoundVariant> CHICKEN_SOUND_VARIANT =
+            define("chicken_sound_variant_type", ChickenSoundVariant::read, ChickenSoundVariant::write);
+    /**
+     * @versions 26.1+
+     */
+    public static final EntityDataType<CowSoundVariant> COW_SOUND_VARIANT =
+            define("cow_sound_variant_type", CowSoundVariant::read, CowSoundVariant::write);
+    /**
+     * @versions 26.1+
+     */
+    public static final EntityDataType<PigSoundVariant> PIG_SOUND_VARIANT =
+            define("pig_sound_variant_type", PigSoundVariant::read, PigSoundVariant::write);
 
     private EntityDataTypes() {
     }

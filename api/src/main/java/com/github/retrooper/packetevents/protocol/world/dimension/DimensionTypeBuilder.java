@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAt
 import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributeMap;
 import com.github.retrooper.packetevents.protocol.world.attributes.modifiers.AttributeModifier;
 import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Timeline;
+import com.github.retrooper.packetevents.protocol.world.clock.WorldClock;
 import com.github.retrooper.packetevents.protocol.world.states.defaulttags.BlockTags;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.resources.TagKey;
@@ -108,6 +109,14 @@ public final class DimensionTypeBuilder {
     private int logicalHeight = 256;
     private TagKey infiniburn = BlockTags.INFINIBURN_OVERWORLD.getKey();
     private float ambientLight = 0f;
+    /**
+     * @versions 26.1+
+     */
+    private @Nullable WorldClock defaultClock;
+    /**
+     * @versions 26.1+
+     */
+    private boolean hasEnderDragonFight;
 
     private DimensionTypeBuilder() {
     }
@@ -126,7 +135,7 @@ public final class DimensionTypeBuilder {
                 this.fixedTime, this.natural, this.bedWorks, this.respawnAnchorWorks, this.effects,
                 this.coordinateScale, this.minY, this.height, this.monsterSpawnLightLevel,
                 this.monsterSpawnBlockLightLimit, this.hasSkylight, this.hasCeiling, this.logicalHeight,
-                this.infiniburn, this.ambientLight
+                this.infiniburn, this.ambientLight, this.defaultClock, this.hasEnderDragonFight
         );
     }
 
@@ -221,7 +230,7 @@ public final class DimensionTypeBuilder {
         return this;
     }
 
-    public ResourceLocation getEffects() {
+    public @Nullable ResourceLocation getEffects() {
         return this.effects;
     }
 
@@ -319,6 +328,24 @@ public final class DimensionTypeBuilder {
 
     public DimensionTypeBuilder setAmbientLight(float ambientLight) {
         this.ambientLight = ambientLight;
+        return this;
+    }
+
+    public @Nullable WorldClock getDefaultClock() {
+        return this.defaultClock;
+    }
+
+    public DimensionTypeBuilder setDefaultClock(@Nullable WorldClock defaultClock) {
+        this.defaultClock = defaultClock;
+        return this;
+    }
+
+    public boolean isHasEnderDragonFight() {
+        return this.hasEnderDragonFight;
+    }
+
+    public DimensionTypeBuilder setHasEnderDragonFight(boolean hasEnderDragonFight) {
+        this.hasEnderDragonFight = hasEnderDragonFight;
         return this;
     }
 }

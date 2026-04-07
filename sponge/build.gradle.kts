@@ -44,7 +44,13 @@ val adventureVersion: String = libs.versions.adventure.get()
 val generateAdventureVersionClass by tasks.registering {
     val outputDir = layout.buildDirectory.dir("generated/sources/adventureVersion").get().asFile
     val pkg = "io.github.retrooper.packetevents.sponge.internal"
-    val file = File(outputDir, "$pkg/AdventureInfo.java")
+    val file = File(outputDir, "${pkg.replace(".", "/")}/AdventureInfo.java")
+
+    inputs.properties(
+        "adventureVersion" to adventureVersion,
+        "spongeVersion" to spongeVersion,
+    )
+    outputs.dir(outputDir)
 
     doLast {
         file.parentFile.mkdirs()
@@ -59,13 +65,16 @@ val generateAdventureVersionClass by tasks.registering {
             """.trimIndent()
         )
     }
+}
 
-    // Expose generated dir to source sets
-    sourceSets["main"].java.srcDir(outputDir)
+sourceSets {
+    main {
+        java.srcDir(generateAdventureVersionClass.get().outputs)
+    }
 }
 
 tasks {
-    compileJava {
+    withType<Jar> {
         dependsOn(generateAdventureVersionClass)
     }
 
