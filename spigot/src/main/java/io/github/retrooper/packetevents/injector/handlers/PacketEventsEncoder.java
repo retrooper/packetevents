@@ -33,6 +33,7 @@ import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -57,7 +58,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         // https://howoldisminecraft188.today/
         boolean netty410 = false;
         try {
-            ChannelPromise.class.getDeclaredMethod("unvoid");
+            ChannelFuture.class.getDeclaredMethod("isVoid");
             netty410 = true;
         } catch (NoSuchMethodException ignored) {
         }
@@ -70,7 +71,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
     public boolean relocateOnCompression;
     public boolean compressionHandled = PacketHandlerRelocation.COMPRESSION_ENABLED_EVENT != null;
-    private ChannelPromise promise;
 
     private final Queue<QueuedMessage> queuedMessages = new ArrayDeque<>();
     private boolean hold = false;
@@ -85,7 +85,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         this.player = encoder.player;
         this.relocateOnCompression = encoder.relocateOnCompression;
         this.compressionHandled = encoder.compressionHandled;
-        this.promise = encoder.promise;
         this.hold = encoder.hold;
         this.preVia = encoder.preVia;
     }
@@ -105,22 +104,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         }
     }
 
-    private @Nullable PacketSendEvent handleClientBoundPacket(
-            Channel channel, User user, Object player, ByteBuf buffer, boolean autoProtocolTranslation,
-            ConnectionState connectionState, boolean clientListeners, ChannelPromise promise
-    ) throws Exception {
-        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(
-                channel, user, player, buffer, autoProtocolTranslation, connectionState, clientListeners);
-        if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
-            promise.addListener((p) -> {
-                for (Runnable task : packetSendEvent.getTasksAfterSend()) {
-                    task.run();
-                }
-            });
-        }
-        return packetSendEvent;
-    }
-
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         // if we are told to hold all messages, add them to the queue
@@ -129,22 +112,13 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
             return;
         }
 
-        // We must restore the old promise (in case we are stacking promises such as sending packets on send event)
-        // If the old promise was successful, set it to null to avoid memory leaks.
-        ChannelPromise oldPromise = this.promise != null && !this.promise.isSuccess() ? this.promise : null;
-        if (NETTY_4_1_0) {
-            // "unvoid" will just make sure we can actually add listeners to this promise...
-            // since 1.21.6, mojang will give us void promises when they don't care about the result
-            promise = promise.unvoid();
-        }
-        promise.addListener(p -> this.promise = oldPromise);
-        this.promise = promise;
-
+        PacketSendEvent packetSendEvent = null;
+        PacketSendEvent fallbackSendEvent = null;
         if (msg instanceof ByteBuf) {
             boolean needsRecompression = this.maybeRelocateForCompression(ctx, (ByteBuf) msg);
             ConnectionState connectionState = this.preVia == PreViaState.PRE_VIA ? this.user.getClientEncoderState() : this.user.getEncoderState();
-            this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg,
-                    this.preVia != PreViaState.PRE_VIA, connectionState, this.preVia == PreViaState.PRE_VIA, this.promise);
+            packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), this.user, this.player, msg,
+                    this.preVia != PreViaState.PRE_VIA, connectionState, this.preVia == PreViaState.PRE_VIA);
 
             // check if the packet got canceled
             if (!((ByteBuf) msg).isReadable()) {
@@ -155,8 +129,8 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
             // no viaversion present, still call fallback handlers
             if (this.preVia == PreViaState.FALLBACK) {
-                this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg,
-                        false, this.user.getClientEncoderState(), true, this.promise);
+                fallbackSendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), this.user, this.player, msg,
+                        false, this.user.getClientEncoderState(), true);
 
                 // check if the packet got canceled by a client-versioned listener
                 if (!((ByteBuf) msg).isReadable()) {
@@ -172,6 +146,22 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         }
 
         ctx.write(msg, promise);
+
+        runTasksAfterSend(packetSendEvent);
+        runTasksAfterSend(fallbackSendEvent);
+    }
+
+    private static void runTasksAfterSend(@Nullable PacketSendEvent event) {
+        if (event == null || !event.hasTasksAfterSend()) {
+            return;
+        }
+        for (Runnable task : event.getTasksAfterSend()) {
+            try {
+                task.run();
+            } catch (Throwable throwable) {
+                throw new PacketProcessException("Error while handling post-send-task " + task + " for " + event, throwable);
+            }
+        }
     }
 
     @Override
