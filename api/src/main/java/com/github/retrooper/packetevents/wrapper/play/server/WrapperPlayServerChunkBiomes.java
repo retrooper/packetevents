@@ -37,9 +37,6 @@ import java.util.Map;
  */
 public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServerChunkBiomes> {
 
-    /// Vanilla default overworld world total height
-    private static final int DEFAULT_WORLD_HEIGHT = 384;
-
     private Map<Long, ChunkData> chunkPalettesMap;
 
     public WrapperPlayServerChunkBiomes(PacketSendEvent event) {
@@ -59,20 +56,12 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
         }
     }
 
-    public WrapperPlayServerChunkBiomes(long[] chunkKeys, DataPalette biomePalette) {
-        this(chunkKeys, biomePalette, DEFAULT_WORLD_HEIGHT);
-    }
-
     public WrapperPlayServerChunkBiomes(long[] chunkKeys, int biomeID, int worldHeight) {
         super(PacketType.Play.Server.CHUNK_BIOMES);
         this.chunkPalettesMap = new HashMap<>();
         for (long chunkKey : chunkKeys) {
             this.chunkPalettesMap.put(chunkKey, new ChunkData(biomeID, worldHeight / 16));
         }
-    }
-
-    public WrapperPlayServerChunkBiomes(long[] chunkKeys, int biomeID) {
-        this(chunkKeys, biomeID, DEFAULT_WORLD_HEIGHT);
     }
 
     @Override
