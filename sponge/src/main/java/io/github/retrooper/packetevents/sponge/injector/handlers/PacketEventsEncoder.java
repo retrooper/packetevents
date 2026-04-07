@@ -23,7 +23,6 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.CancelPacketException;
 import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
@@ -66,13 +65,14 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         Object player = this.player == null ? null : Sponge.server().player(this.player).orElse(null);
         PacketSendEvent event = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, true);
 
-        if (needsRecompression) {
-            compress(ctx, byteBuf);
+        if (!byteBuf.isReadable()) {
+            byteBuf.release();
+            promise.trySuccess();
+            return;
         }
 
-        // So apparently, this is how ViaVersion hacks around bungeecord not supporting sending empty packets
-        if (!ByteBufHelper.isReadable(byteBuf)) {
-            throw CancelPacketException.INSTANCE;
+        if (needsRecompression) {
+            compress(ctx, byteBuf);
         }
 
         ctx.write(byteBuf, promise);
