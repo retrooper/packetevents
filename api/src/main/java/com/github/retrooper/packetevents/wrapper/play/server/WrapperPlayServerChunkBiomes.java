@@ -21,6 +21,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.world.biome.Biome;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.DataPalette;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.PaletteType;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.SingletonPalette;
@@ -28,7 +30,6 @@ import com.github.retrooper.packetevents.protocol.world.chunk.storage.BitStorage
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,22 +49,6 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
     public WrapperPlayServerChunkBiomes(Map<Long, ChunkBiomeData> chunks) {
         super(PacketType.Play.Server.CHUNK_BIOMES);
         this.chunks = chunks;
-    }
-
-    public WrapperPlayServerChunkBiomes(long[] chunkKeys, DataPalette biomePalette, int worldHeight) {
-        super(PacketType.Play.Server.CHUNK_BIOMES);
-        this.chunks = new HashMap<>();
-        for (long chunkKey : chunkKeys) {
-            this.chunks.put(chunkKey, new ChunkBiomeData(biomePalette, worldHeight / 16));
-        }
-    }
-
-    public WrapperPlayServerChunkBiomes(long[] chunkKeys, int biomeID, int worldHeight) {
-        super(PacketType.Play.Server.CHUNK_BIOMES);
-        this.chunks = new HashMap<>();
-        for (long chunkKey : chunkKeys) {
-            this.chunks.put(chunkKey, new ChunkBiomeData(biomeID, worldHeight / 16));
-        }
     }
 
     @Override
@@ -86,7 +71,7 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
     }
 
     public ChunkBiomeData getChunk(int chunkX, int chunkZ) {
-        return chunks.get(getChunkKey(chunkX, chunkZ));
+        return this.chunks.get(getChunkKey(chunkX, chunkZ));
     }
 
     public static class ChunkBiomeData {
@@ -97,23 +82,25 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
             this.sections = sections;
         }
 
-        public ChunkBiomeData(DataPalette palette, int sectionAmount) {
-            this.sections = new ArrayList<>();
-            for (int i = 0; i < sectionAmount; i++) {
-                this.sections.add(palette);
+        public static ChunkBiomeData createWithRepeatingPalette(DataPalette palette, int sectionCount) {
+            ChunkBiomeData data = new ChunkBiomeData(new ArrayList<>());
+            for (int i = 0; i < sectionCount; i++) {
+                data.sections.add(palette);
             }
+            return data;
         }
 
-        public ChunkBiomeData(int biomeID, int sectionAmount) {
-            this.sections = new ArrayList<>();
-            DataPalette biomePalette = new DataPalette(
-                    new SingletonPalette(biomeID),
-                    new BitStorage(1, 64),
+        public static ChunkBiomeData createWithSingleBiome(Biome biome, ClientVersion version, int sectionCount) {
+            return createWithSingleBiome(biome.getId(version), sectionCount);
+        }
+
+        public static ChunkBiomeData createWithSingleBiome(int biomeId, int sectionCount) {
+            DataPalette palette = new DataPalette(
+                    new SingletonPalette(biomeId),
+                    new BitStorage(0, PaletteType.BIOME.getStorageSize()),
                     PaletteType.BIOME
             );
-            for (int i = 0; i < sectionAmount; i++) {
-                this.sections.add(biomePalette);
-            }
+            return createWithRepeatingPalette(palette, sectionCount);
         }
 
         public static ChunkBiomeData read(PacketWrapper<?> wrapper) {
