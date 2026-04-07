@@ -21,6 +21,8 @@ package com.github.retrooper.packetevents.util;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
 @NullMarked
 public final class Vector2i {
 
@@ -54,5 +56,18 @@ public final class Vector2i {
 
     public int getZ() {
         return this.z;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Vector2i)) return false;
+        Vector2i vector2i = (Vector2i) obj;
+        if (this.x != vector2i.x) return false;
+        return this.z == vector2i.z;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.x, this.z);
     }
 }

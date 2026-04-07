@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.world.chunk.palette.DataPalett
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.PaletteType;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.SingletonPalette;
 import com.github.retrooper.packetevents.protocol.world.chunk.storage.BitStorage;
+import com.github.retrooper.packetevents.util.Vector2i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.ArrayList;
@@ -40,25 +41,25 @@ import java.util.Map;
  */
 public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServerChunkBiomes> {
 
-    private Map<Long, ChunkBiomeData> chunks;
+    private Map<Vector2i, ChunkBiomeData> chunks;
 
     public WrapperPlayServerChunkBiomes(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerChunkBiomes(Map<Long, ChunkBiomeData> chunks) {
+    public WrapperPlayServerChunkBiomes(Map<Vector2i, ChunkBiomeData> chunks) {
         super(PacketType.Play.Server.CHUNK_BIOMES);
         this.chunks = chunks;
     }
 
     @Override
     public void read() {
-        this.chunks = this.readMap(PacketWrapper::readLong, ChunkBiomeData::read);
+        this.chunks = this.readMap(Vector2i::read, ChunkBiomeData::read);
     }
 
     @Override
     public void write() {
-        this.writeMap(this.chunks, PacketWrapper::writeLong, ChunkBiomeData::write);
+        this.writeMap(this.chunks, Vector2i::write, ChunkBiomeData::write);
     }
 
     @Override
@@ -66,12 +67,12 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
         this.chunks = wrapper.chunks;
     }
 
-    public Map<Long, ChunkBiomeData> getChunks() {
+    public Map<Vector2i, ChunkBiomeData> getChunks() {
         return this.chunks;
     }
 
-    public ChunkBiomeData getChunk(int chunkX, int chunkZ) {
-        return this.chunks.get(getChunkKey(chunkX, chunkZ));
+    public ChunkBiomeData getChunk(Vector2i chunkPos) {
+        return this.chunks.get(chunkPos);
     }
 
     public static class ChunkBiomeData {
