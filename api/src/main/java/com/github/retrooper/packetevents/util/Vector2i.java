@@ -70,4 +70,9 @@ public final class Vector2i {
     public int hashCode() {
         return Objects.hash(this.x, this.z);
     }
+
+    @Override
+    public String toString() {
+        return "Vector2i[" + this.x + "," + this.z + "]";
+    }
 }
