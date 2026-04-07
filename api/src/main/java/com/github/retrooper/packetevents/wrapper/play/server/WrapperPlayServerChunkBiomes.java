@@ -109,6 +109,10 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
             while (ByteBufHelper.readerIndex(wrapper.buffer) < endIndex) {
                 sections.add(PaletteType.BIOME.read(wrapper));
             }
+            // ensure the length prefix matches
+            if (ByteBufHelper.readerIndex(wrapper.buffer) != endIndex) {
+                throw new IllegalStateException("Unexpected buffer position, expected " + endIndex + ", received " + wrapper.buffer);
+            }
             return new ChunkBiomeData(sections);
         }
 
@@ -129,5 +133,4 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
             }
         }
     }
-
 }
