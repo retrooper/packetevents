@@ -66,50 +66,12 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void read() {
-        chunks = new HashMap<>();
-        int chunkAmount = readVarInt();
-        for (int chunkIndex = 0; chunkIndex < chunkAmount; chunkIndex++) {
-            int chunkZ = readInt();
-            int chunkX = readInt();
-            int endIndex = ByteBufHelper.readerIndex(this.buffer) + this.readVarInt();
-            List<DataPalette> chunkPalettes = new ArrayList<>();
-            while (ByteBufHelper.readerIndex(this.buffer) < endIndex) {
-                DataPalette biomePalette = PaletteType.BIOME.read(this);
-                chunkPalettes.add(biomePalette);
-            }
-            ChunkBiomeData chunkData = new ChunkBiomeData(chunkPalettes);
-            chunks.put(getChunkKey(chunkX, chunkZ), chunkData);
-        }
+        this.chunks = this.readMap(PacketWrapper::readLong, ChunkBiomeData::read);
     }
 
     @Override
     public void write() {
-        writeVarInt(chunks.size());
-        for (Map.Entry<Long, ChunkBiomeData> entry : chunks.entrySet()) {
-            long chunkKey = entry.getKey();
-            int chunkX = getChunkX(chunkKey);
-            int chunkZ = getChunkZ(chunkKey);
-            writeInt(chunkZ);
-            writeInt(chunkX);
-            List<DataPalette> chunkPalettes = entry.getValue().palettes;
-
-            int calculatedBufferSize = 0;
-            int bufferIndex = ByteBufHelper.writerIndex(buffer);
-            int sizeBefore = ByteBufHelper.readableBytes(buffer);
-
-            for (DataPalette biomePalette : chunkPalettes) {
-                PaletteType.write(this, biomePalette);
-                int sizeAfter = ByteBufHelper.readableBytes(buffer);
-                calculatedBufferSize += (sizeAfter - sizeBefore);
-                ByteBufHelper.writerIndex(buffer, bufferIndex);
-            }
-
-            writeVarInt(calculatedBufferSize);
-
-            for (DataPalette biomePalette : chunkPalettes) {
-                PaletteType.write(this, biomePalette);
-            }
-        }
+        this.writeMap(this.chunks, PacketWrapper::writeLong, ChunkBiomeData::write);
     }
 
     @Override
@@ -127,31 +89,56 @@ public class WrapperPlayServerChunkBiomes extends PacketWrapper<WrapperPlayServe
 
     public static class ChunkBiomeData {
 
-        private final List<DataPalette> palettes;
+        private final List<DataPalette> sections;
 
-        private ChunkBiomeData(List<DataPalette> palettes) {
-            this.palettes = palettes;
+        private ChunkBiomeData(List<DataPalette> sections) {
+            this.sections = sections;
         }
 
         public ChunkBiomeData(DataPalette palette, int sectionAmount) {
-            this.palettes = new ArrayList<>();
+            this.sections = new ArrayList<>();
             for (int i = 0; i < sectionAmount; i++) {
-                this.palettes.add(palette);
+                this.sections.add(palette);
             }
         }
 
         public ChunkBiomeData(int biomeID, int sectionAmount) {
-            this.palettes = new ArrayList<>();
+            this.sections = new ArrayList<>();
             DataPalette biomePalette = new DataPalette(
                     new SingletonPalette(biomeID),
                     new BitStorage(1, 64),
                     PaletteType.BIOME
             );
             for (int i = 0; i < sectionAmount; i++) {
-                this.palettes.add(biomePalette);
+                this.sections.add(biomePalette);
             }
         }
 
+        public static ChunkBiomeData read(PacketWrapper<?> wrapper) {
+            int endIndex = ByteBufHelper.readerIndex(wrapper.buffer) + wrapper.readVarInt();
+            List<DataPalette> sections = new ArrayList<>();
+            while (ByteBufHelper.readerIndex(wrapper.buffer) < endIndex) {
+                sections.add(PaletteType.BIOME.read(wrapper));
+            }
+            return new ChunkBiomeData(sections);
+        }
+
+        public static void write(PacketWrapper<?> wrapper, ChunkBiomeData biomeData) {
+            // fake write, we need to figure out how large this is
+            // TODO use extra calculation instead of writing twice
+            int startIndex = ByteBufHelper.writerIndex(wrapper.buffer);
+            for (DataPalette biomePalette : biomeData.sections) {
+                PaletteType.write(wrapper, biomePalette);
+            }
+            int dataLength = ByteBufHelper.writerIndex(wrapper.buffer) - startIndex;
+            ByteBufHelper.writerIndex(wrapper.buffer, startIndex);
+
+            // real write
+            wrapper.writeVarInt(dataLength);
+            for (DataPalette biomePalette : biomeData.sections) {
+                PaletteType.write(wrapper, biomePalette);
+            }
+        }
     }
 
 }
