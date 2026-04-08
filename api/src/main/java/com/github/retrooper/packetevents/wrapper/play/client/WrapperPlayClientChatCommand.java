@@ -42,7 +42,8 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void read() {
-        this.command = readString(256);
+        this.command = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)
+                ? this.readString() : this.readString(256);
         Instant timestamp = readTimestamp();
         long salt = readLong();
         this.messageSignData = new MessageSignData(new SaltSignature(salt, new byte[0]), timestamp);
@@ -62,7 +63,11 @@ public class WrapperPlayClientChatCommand extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void write() {
-        writeString(command, 256);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            this.writeString(this.command);
+        } else {
+            this.writeString(this.command, 256);
+        }
         writeTimestamp(messageSignData.getTimestamp());
         writeLong(messageSignData.getSaltSignature().getSalt());
         writeSignedCommandArguments(signedArguments);

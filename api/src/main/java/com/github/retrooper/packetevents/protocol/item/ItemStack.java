@@ -288,14 +288,14 @@ public class ItemStack {
         if (this.hasComponentPatches()) {
             return this.getComponents().getOr(type, otherValue);
         }
-        return this.getType().getComponents().getOr(type, otherValue);
+        return this.getType().getComponents(this.version).getOr(type, otherValue);
     }
 
     public <T> Optional<T> getComponent(ComponentType<T> type) {
         if (this.hasComponentPatches()) {
             return this.getComponents().getOptional(type);
         }
-        return this.getType().getComponents().getOptional(type);
+        return this.getType().getComponents(this.version).getOptional(type);
     }
 
     public <T> void setComponent(ComponentType<T> type, T value) {
@@ -314,7 +314,7 @@ public class ItemStack {
         if (this.hasComponentPatches()) {
             return this.getComponents().has(type);
         }
-        return this.getType().getComponents().has(type);
+        return this.getType().getComponents(this.version).has(type);
     }
 
     public boolean hasComponentPatches() {
@@ -324,7 +324,9 @@ public class ItemStack {
     public PatchableComponentMap getComponents() {
         if (this.components == null) { // lazy load on access
             this.components = new PatchableComponentMap(
-                    this.type.getComponents(), new HashMap<>(4));
+                    this.type.getComponents(this.version),
+                    new HashMap<>(4),
+                    this.registryHolder);
         }
         return this.components;
     }

@@ -76,6 +76,10 @@ public class Vector3d {
         this.z = z;
     }
 
+    public Vector3d(Vector3f vector) {
+        this(vector.x, vector.y, vector.z);
+    }
+
     /**
      * Constructor allowing you to specify an array.
      * X will be set to the first index of an array(if it exists, otherwise 0).

@@ -23,6 +23,9 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @versions 1.21.5+
+ */
 public final class ChickenVariants {
 
     private static final VersionedRegistry<ChickenVariant> REGISTRY =
@@ -33,18 +36,19 @@ public final class ChickenVariants {
 
     @ApiStatus.Internal
     public static ChickenVariant define(String name, ModelType modelType, String texture) {
-        ResourceLocation assetId = new ResourceLocation("entity/chicken/" + texture);
+        ResourceLocation assetId = new ResourceLocation("entity/chicken/chicken_" + texture);
+        ResourceLocation babyAssetId = new ResourceLocation("entity/chicken/chicken_" + texture + "_baby");
         return REGISTRY.define(name, data ->
-                new StaticChickenVariant(data, modelType, assetId));
+                new StaticChickenVariant(data, modelType, assetId, babyAssetId));
     }
 
     public static VersionedRegistry<ChickenVariant> getRegistry() {
         return REGISTRY;
     }
 
-    public static final ChickenVariant COLD = define("cold", ModelType.COLD, "cold_chicken");
-    public static final ChickenVariant TEMPERATE = define("temperate", ModelType.NORMAL, "temperate_chicken");
-    public static final ChickenVariant WARM = define("warm", ModelType.NORMAL, "warm_chicken");
+    public static final ChickenVariant COLD = define("cold", ModelType.COLD, "cold");
+    public static final ChickenVariant TEMPERATE = define("temperate", ModelType.NORMAL, "temperate");
+    public static final ChickenVariant WARM = define("warm", ModelType.NORMAL, "warm");
 
     static {
         REGISTRY.unloadMappings();

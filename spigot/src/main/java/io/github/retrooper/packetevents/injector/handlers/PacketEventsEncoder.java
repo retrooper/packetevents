@@ -23,7 +23,6 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
@@ -34,6 +33,7 @@ import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -42,7 +42,6 @@ import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
@@ -59,7 +58,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         // https://howoldisminecraft188.today/
         boolean netty410 = false;
         try {
-            ChannelPromise.class.getDeclaredMethod("unvoid");
+            ChannelFuture.class.getDeclaredMethod("isVoid");
             netty410 = true;
         } catch (NoSuchMethodException ignored) {
         }
@@ -70,7 +69,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     public Player player;
     private boolean handleCompression;
     private boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
-    private ChannelPromise promise;
 
     private final Queue<QueuedMessage> queuedMessages = new ArrayDeque<>();
     private boolean hold = false;
@@ -84,7 +82,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         player = ((PacketEventsEncoder) encoder).player;
         handleCompression = ((PacketEventsEncoder) encoder).handleCompression;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
-        promise = ((PacketEventsEncoder) encoder).promise;
     }
 
     public void setHold(Channel ch, boolean hold) throws Exception {
@@ -102,18 +99,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         }
     }
 
-    private @Nullable PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
-        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, true);
-        if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
-            promise.addListener((p) -> {
-                for (Runnable task : packetSendEvent.getTasksAfterSend()) {
-                    task.run();
-                }
-            });
-        }
-        return packetSendEvent;
-    }
-
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         // if we are told to hold all messages, add them to the queue
@@ -122,28 +107,10 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
             return;
         }
 
-        // We must restore the old promise (in case we are stacking promises such as sending packets on send event)
-        // If the old promise was successful, set it to null to avoid memory leaks.
-        ChannelPromise oldPromise = this.promise != null && !this.promise.isSuccess() ? this.promise : null;
-        if (NETTY_4_1_0) {
-            // "unvoid" will just make sure we can actually add listeners to this promise...
-            // since 1.21.6, mojang will give us void promises when they don't care about the result
-            promise = promise.unvoid();
-        }
-        promise.addListener(p -> this.promise = oldPromise);
-        this.promise = promise;
-
+        PacketSendEvent packetSendEvent = null;
         if (msg instanceof ByteBuf) {
-            boolean needsRecompression = this.handleCompression(ctx, (ByteBuf) msg);
-            PacketSendEvent event = this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.promise);
-            if (!handledCompression && event != null) {
-                if (event.getConnectionState() == ConnectionState.PLAY) {
-                    // Late injection or server doesn't have compression enabled
-                    handledCompression = true;
-                } else if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
-                    handleCompression = true;
-                }
-            }
+            boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
+            packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), this.user, this.player, msg, true);
 
             // check if the packet got cancelled
             if (!((ByteBuf) msg).isReadable()) {
@@ -158,6 +125,16 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         }
 
         ctx.write(msg, promise);
+
+        if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
+            for (Runnable task : packetSendEvent.getTasksAfterSend()) {
+                try {
+                    task.run();
+                } catch (Throwable throwable) {
+                    throw new PacketProcessException("Error while handling post-send-task " + task + " for " + packetSendEvent, throwable);
+                }
+            }
+        }
     }
 
     @Override

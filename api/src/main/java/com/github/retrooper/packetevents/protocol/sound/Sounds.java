@@ -2788,6 +2788,262 @@ public final class Sounds {
      * @versions 1.21.11+
      */
     public static final Sound ITEM_NAUTILUS_SADDLE_EQUIP = define("item.nautilus_saddle_equip");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CAT_AMBIENT = define("entity.baby_cat.ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CAT_STRAY_AMBIENT = define("entity.baby_cat.stray_ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CAT_DEATH = define("entity.baby_cat.death");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CAT_EAT = define("entity.baby_cat.eat");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CAT_HISS = define("entity.baby_cat.hiss");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CAT_BEG_FOR_FOOD = define("entity.baby_cat.beg_for_food");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CAT_HURT = define("entity.baby_cat.hurt");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CAT_PURR = define("entity.baby_cat.purr");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CAT_PURREOW = define("entity.baby_cat.purreow");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CAT_ROYAL_AMBIENT = define("entity.cat_royal.ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CAT_ROYAL_STRAY_AMBIENT = define("entity.cat_royal.stray_ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CAT_ROYAL_HISS = define("entity.cat_royal.hiss");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CAT_ROYAL_HURT = define("entity.cat_royal.hurt");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CAT_ROYAL_DEATH = define("entity.cat_royal.death");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CAT_ROYAL_EAT = define("entity.cat_royal.eat");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CAT_ROYAL_BEG_FOR_FOOD = define("entity.cat_royal.beg_for_food");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CAT_ROYAL_PURR = define("entity.cat_royal.purr");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CAT_ROYAL_PURREOW = define("entity.cat_royal.purreow");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CHICKEN_AMBIENT = define("entity.baby_chicken.ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CHICKEN_DEATH = define("entity.baby_chicken.death");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CHICKEN_HURT = define("entity.baby_chicken.hurt");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_CHICKEN_STEP = define("entity.baby_chicken.step");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CHICKEN_PICKY_AMBIENT = define("entity.chicken_picky.ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CHICKEN_PICKY_HURT = define("entity.chicken_picky.hurt");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_CHICKEN_PICKY_DEATH = define("entity.chicken_picky.death");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_COW_MOODY_AMBIENT = define("entity.cow_moody.ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_COW_MOODY_HURT = define("entity.cow_moody.hurt");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_COW_MOODY_DEATH = define("entity.cow_moody.death");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_COW_MOODY_STEP = define("entity.cow_moody.step");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ITEM_GOLDEN_DANDELION_USE = define("item.golden_dandelion.use");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ITEM_GOLDEN_DANDELION_UNUSE = define("item.golden_dandelion.unuse");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_HORSE_AMBIENT = define("entity.baby_horse.ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_HORSE_ANGRY = define("entity.baby_horse.angry");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_HORSE_BREATHE = define("entity.baby_horse.breathe");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_HORSE_DEATH = define("entity.baby_horse.death");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_HORSE_EAT = define("entity.baby_horse.eat");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_HORSE_HURT = define("entity.baby_horse.hurt");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_HORSE_LAND = define("entity.baby_horse.land");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_HORSE_STEP = define("entity.baby_horse.step");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound BLOCK_NOTE_BLOCK_TRUMPET = define("block.note_block.trumpet");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound BLOCK_NOTE_BLOCK_TRUMPET_EXPOSED = define("block.note_block.trumpet_exposed");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound BLOCK_NOTE_BLOCK_TRUMPET_OXIDIZED = define("block.note_block.trumpet_oxidized");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound BLOCK_NOTE_BLOCK_TRUMPET_WEATHERED = define("block.note_block.trumpet_weathered");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_PIG_STEP = define("entity.baby_pig.step");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_PIG_AMBIENT = define("entity.baby_pig.ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_PIG_EAT = define("entity.baby_pig.eat");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_PIG_HURT = define("entity.baby_pig.hurt");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_PIG_DEATH = define("entity.baby_pig.death");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_PIG_EAT = define("entity.pig.eat");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_PIG_MINI_AMBIENT = define("entity.pig_mini.ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_PIG_MINI_HURT = define("entity.pig_mini.hurt");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_PIG_MINI_DEATH = define("entity.pig_mini.death");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_PIG_MINI_EAT = define("entity.pig_mini.eat");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_PIG_BIG_AMBIENT = define("entity.pig_big.ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_PIG_BIG_HURT = define("entity.pig_big.hurt");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_PIG_BIG_DEATH = define("entity.pig_big.death");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_PIG_BIG_EAT = define("entity.pig_big.eat");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_WOLF_AMBIENT = define("entity.baby_wolf.ambient");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_WOLF_DEATH = define("entity.baby_wolf.death");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_WOLF_GROWL = define("entity.baby_wolf.growl");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_WOLF_HURT = define("entity.baby_wolf.hurt");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_WOLF_PANT = define("entity.baby_wolf.pant");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_WOLF_STEP = define("entity.baby_wolf.step");
+    /**
+     * @versions 26.1+
+     */
+    public static final Sound ENTITY_BABY_WOLF_WHINE = define("entity.baby_wolf.whine");
 
     /**
      * Returns an immutable view of the sounds.

@@ -11,7 +11,8 @@ kotlin {
 repositories {
     gradlePluginPortal()
     mavenCentral()
-    maven("https://repo.viaversion.com")
+    maven("https://repo.viaversion.com/everything/")
+    maven("https://maven.fabricmc.net/")
 }
 
 dependencies {
@@ -22,6 +23,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.java.diff.utils)
     implementation(libs.mod.publish)
+    implementation(libs.fabric.loom)
 
     // downgrade jackson module for publishing plugin to work
     implementation(libs.runtask) {

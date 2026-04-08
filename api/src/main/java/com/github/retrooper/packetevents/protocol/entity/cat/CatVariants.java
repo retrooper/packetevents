@@ -22,6 +22,9 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @versions 1.21.5+
+ */
 public final class CatVariants {
 
     private static final VersionedRegistry<CatVariant> REGISTRY =
@@ -32,9 +35,10 @@ public final class CatVariants {
 
     @ApiStatus.Internal
     public static CatVariant define(String name) {
-        ResourceLocation assetId = new ResourceLocation("entity/cat/" + name);
+        ResourceLocation assetId = new ResourceLocation("entity/cat/cat_" + name);
+        ResourceLocation babyAssetId = new ResourceLocation("entity/cat/cat_" + name + "_baby");
         return REGISTRY.define(name, data ->
-                new StaticCatVariant(data, assetId));
+                new StaticCatVariant(data, assetId, babyAssetId));
     }
 
     public static VersionedRegistry<CatVariant> getRegistry() {

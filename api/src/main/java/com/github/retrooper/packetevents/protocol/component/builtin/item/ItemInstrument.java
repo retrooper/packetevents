@@ -23,32 +23,43 @@ import com.github.retrooper.packetevents.protocol.item.instrument.Instrument;
 import com.github.retrooper.packetevents.protocol.item.instrument.Instruments;
 import com.github.retrooper.packetevents.protocol.mapper.MaybeMappedEntity;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
 
+/**
+ * @versions 1.20.5+
+ */
 public class ItemInstrument {
 
     private MaybeMappedEntity<Instrument> instrument;
 
+    public ItemInstrument(Instrument instrument) {
+        this(new MaybeMappedEntity<>(instrument));
+    }
+
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @ApiStatus.Obsolete
     public ItemInstrument(MaybeMappedEntity<Instrument> instrument) {
         this.instrument = instrument;
     }
 
     public static ItemInstrument read(PacketWrapper<?> wrapper) {
-        MaybeMappedEntity<Instrument> instrument;
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
-            instrument = MaybeMappedEntity.read(wrapper, Instruments.getRegistry(), Instrument::read);
-        } else {
-            instrument = new MaybeMappedEntity<>(Instrument.read(wrapper));
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)
+                || wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
+            return new ItemInstrument(Instrument.read(wrapper));
         }
-        return new ItemInstrument(instrument);
+        return new ItemInstrument(MaybeMappedEntity.read(wrapper, Instruments.getRegistry(), Instrument::read));
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemInstrument instrument) {
-        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
-            MaybeMappedEntity.write(wrapper, instrument.instrument, Instrument::write);
-        } else {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)
+                || wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
             Instrument.write(wrapper, instrument.instrument.getValueOrThrow());
+        } else {
+            MaybeMappedEntity.write(wrapper, instrument.instrument, Instrument::write);
         }
     }
 

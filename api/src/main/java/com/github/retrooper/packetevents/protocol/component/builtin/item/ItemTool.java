@@ -141,7 +141,7 @@ public class ItemTool {
         }
 
         public static Rule read(PacketWrapper<?> wrapper) {
-            MappedEntitySet<StateType.Mapped> blocks = MappedEntitySet.read(wrapper, StateTypes::getMappedById);
+            MappedEntitySet<StateType.Mapped> blocks = MappedEntitySet.read(wrapper, StateTypes.getRegistry());
             Float speed = wrapper.readOptional(PacketWrapper::readFloat);
             Boolean correctForDrops = wrapper.readOptional(PacketWrapper::readBoolean);
             return new Rule(blocks, speed, correctForDrops);

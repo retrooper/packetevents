@@ -34,19 +34,29 @@ public class ItemJukeboxPlayable {
 
     private MaybeMappedEntity<IJukeboxSong> song;
     /**
-     * Removed in 1.21.5
+     * @versions 1.21-1.21.4
      */
     @ApiStatus.Obsolete
     private boolean showInTooltip;
 
+    public ItemJukeboxPlayable(IJukeboxSong song) {
+        this(new MaybeMappedEntity<>(song));
+    }
+
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @ApiStatus.Obsolete
     public ItemJukeboxPlayable(MaybeMappedEntity<IJukeboxSong> song) {
         this(song, true);
     }
 
     /**
-     * {@link #showInTooltip} has been removed in 1.21.5
+     * @versions 1.21-1.21.4
+     * @deprecated use {@link #ItemJukeboxPlayable(MaybeMappedEntity, boolean)}
      */
     @ApiStatus.Obsolete
+    @Deprecated
     public ItemJukeboxPlayable(
             @Nullable JukeboxSong song,
             @Nullable ResourceLocation songKey,
@@ -56,8 +66,10 @@ public class ItemJukeboxPlayable {
     }
 
     /**
-     * use {@link #ItemJukeboxPlayable(MaybeMappedEntity, boolean)}
+     * @versions 1.21-1.21.4
+     * @deprecated use {@link #ItemJukeboxPlayable(MaybeMappedEntity, boolean)}
      */
+    @ApiStatus.Obsolete
     @Deprecated
     public ItemJukeboxPlayable(
             @Nullable IJukeboxSong song,
@@ -68,7 +80,7 @@ public class ItemJukeboxPlayable {
     }
 
     /**
-     * {@link #showInTooltip} has been removed in 1.21.5
+     * @versions 1.21-1.21.4
      */
     @ApiStatus.Obsolete
     public ItemJukeboxPlayable(
@@ -80,13 +92,20 @@ public class ItemJukeboxPlayable {
     }
 
     public static ItemJukeboxPlayable read(PacketWrapper<?> wrapper) {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            return new ItemJukeboxPlayable(IJukeboxSong.read(wrapper));
+        }
         MaybeMappedEntity<IJukeboxSong> song = MaybeMappedEntity.read(wrapper, JukeboxSongs.getRegistry(), IJukeboxSong::read);
         boolean showInTooltip = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5) || wrapper.readBoolean();
         return new ItemJukeboxPlayable(song, showInTooltip);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemJukeboxPlayable jukeboxPlayable) {
-        MaybeMappedEntity.write(wrapper, jukeboxPlayable.song, IJukeboxSong::write);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            IJukeboxSong.write(wrapper, jukeboxPlayable.song.getValueOrThrow());
+        } else {
+            MaybeMappedEntity.write(wrapper, jukeboxPlayable.song, IJukeboxSong::write);
+        }
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
             wrapper.writeBoolean(jukeboxPlayable.showInTooltip);
         }
@@ -137,7 +156,7 @@ public class ItemJukeboxPlayable {
     }
 
     /**
-     * Removed in 1.21.5
+     * @versions 1.21-1.21.4
      */
     @ApiStatus.Obsolete
     public boolean isShowInTooltip() {
@@ -145,7 +164,7 @@ public class ItemJukeboxPlayable {
     }
 
     /**
-     * Removed in 1.21.5
+     * @versions 1.21-1.21.4
      */
     @ApiStatus.Obsolete
     public void setShowInTooltip(boolean showInTooltip) {

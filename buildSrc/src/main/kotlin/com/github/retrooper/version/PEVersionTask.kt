@@ -55,6 +55,7 @@ abstract class PEVersionTask : DefaultTask() {
                 }
             }
         """.trimIndent())
+        file.setLastModified(0L)
     }
 
     private data class Version(

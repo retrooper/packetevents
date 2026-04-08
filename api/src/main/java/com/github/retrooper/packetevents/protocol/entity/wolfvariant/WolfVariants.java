@@ -27,6 +27,9 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collections;
 
+/**
+ * @versions 1.20.5+
+ */
 public final class WolfVariants {
 
     private static final VersionedRegistry<WolfVariant> REGISTRY = new VersionedRegistry<>("wolf_variant");
@@ -39,23 +42,22 @@ public final class WolfVariants {
         return define(name, "wolf_" + name, biomes);
     }
 
+    @SuppressWarnings("PatternValidation")
     @ApiStatus.Internal
     public static WolfVariant define(String name, String assetId, MappedEntitySet<Biome> biomes) {
-        return define(name, ResourceLocation.minecraft("entity/wolf/" + assetId),
-                ResourceLocation.minecraft("entity/wolf/" + assetId + "_tame"),
-                ResourceLocation.minecraft("entity/wolf/" + assetId + "_angry"), biomes);
+        WolfAssetSet assets = WolfAssetSet.getOrThrow(ResourceLocation.VANILLA_NAMESPACE,
+                "entity/wolf/" + assetId, "");
+        WolfAssetSet babyAssets = WolfAssetSet.getOrThrow(ResourceLocation.VANILLA_NAMESPACE,
+                "entity/wolf/" + assetId, "_baby");
+        return define(name, assets, babyAssets, biomes);
     }
 
     @ApiStatus.Internal
     public static WolfVariant define(
-            String name,
-            ResourceLocation wildTexture,
-            ResourceLocation tameTexture,
-            ResourceLocation angryTexture,
-            MappedEntitySet<Biome> biomes
+            String name, WolfAssetSet assets, WolfAssetSet babyAssets, MappedEntitySet<Biome> biomes
     ) {
         return REGISTRY.define(name, data -> new StaticWolfVariant(
-                data, wildTexture, tameTexture, angryTexture, biomes));
+                data, assets, babyAssets, biomes));
     }
 
     public static VersionedRegistry<WolfVariant> getRegistry() {

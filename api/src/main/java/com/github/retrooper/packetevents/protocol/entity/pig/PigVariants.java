@@ -23,28 +23,31 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @versions 1.21.5+
+ */
 public final class PigVariants {
 
-    private static final VersionedRegistry<PigVariant> REGISTRY =
-            new VersionedRegistry<>("pig_variant");
+    private static final VersionedRegistry<PigVariant> REGISTRY = new VersionedRegistry<>("pig_variant");
 
     private PigVariants() {
     }
 
     @ApiStatus.Internal
     public static PigVariant define(String name, ModelType modelType, String texture) {
-        ResourceLocation assetId = new ResourceLocation("entity/pig/" + texture);
+        ResourceLocation assetId = new ResourceLocation("entity/pig/pig_" + texture);
+        ResourceLocation babyAssetId = new ResourceLocation("entity/pig/pig_" + texture + "_baby");
         return REGISTRY.define(name, data ->
-                new StaticPigVariant(data, modelType, assetId));
+                new StaticPigVariant(data, modelType, assetId, babyAssetId));
     }
 
     public static VersionedRegistry<PigVariant> getRegistry() {
         return REGISTRY;
     }
 
-    public static final PigVariant COLD = define("cold", ModelType.COLD, "cold_pig");
-    public static final PigVariant TEMPERATE = define("temperate", ModelType.NORMAL, "temperate_pig");
-    public static final PigVariant WARM = define("warm", ModelType.NORMAL, "warm_pig");
+    public static final PigVariant COLD = define("cold", ModelType.COLD, "cold");
+    public static final PigVariant TEMPERATE = define("temperate", ModelType.NORMAL, "temperate");
+    public static final PigVariant WARM = define("warm", ModelType.NORMAL, "warm");
 
     static {
         REGISTRY.unloadMappings();

@@ -31,6 +31,7 @@ dependencies {
         excludeAdventure()
     }
     compileOnly(libs.gson)
+    compileOnly(libs.checkerqual)
 
     testImplementation(libs.bundles.adventure)
     testImplementation(project(":patch:adventure-text-serializer-gson"))
@@ -68,6 +69,9 @@ tasks {
     }
 
     javadoc {
+        val options = options as StandardJavadocDocletOptions
+        options.use(true)
+        options.tags("versions:A:Minecraft Versions:")
         mustRunAfter(generateVersionsFile)
     }
 
