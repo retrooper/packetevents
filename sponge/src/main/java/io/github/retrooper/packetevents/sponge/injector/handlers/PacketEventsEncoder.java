@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.exception.CancelPacketException;
 import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
@@ -37,6 +38,7 @@ import io.netty.channel.ChannelPromise;
 import org.spongepowered.api.Sponge;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.UUID;
 
 public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
@@ -63,9 +65,17 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
             super.write(ctx, msg, promise);
             return;
         }
-        boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
+        boolean needsRecompression = handleCompression(ctx, byteBuf);
         Object player = this.player == null ? null : Sponge.server().player(this.player).orElse(null);
         PacketSendEvent event = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, true);
+        if (!handledCompression && event != null) {
+            if (event.getConnectionState() == ConnectionState.PLAY) {
+                // Late injection or server doesn't have compression enabled
+                handledCompression = true;
+            } else if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
+                handleCompression = true;
+            }
+        }
 
         if (!byteBuf.isReadable()) {
             byteBuf.release();

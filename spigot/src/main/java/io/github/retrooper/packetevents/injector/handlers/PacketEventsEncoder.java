@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
@@ -109,8 +110,16 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
         PacketSendEvent packetSendEvent = null;
         if (msg instanceof ByteBuf) {
-            boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
+            boolean needsRecompression = this.handleCompression(ctx, (ByteBuf) msg);
             packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), this.user, this.player, msg, true);
+            if (!handledCompression && packetSendEvent != null) {
+                if (packetSendEvent.getConnectionState() == ConnectionState.PLAY) {
+                    // Late injection or server doesn't have compression enabled
+                    handledCompression = true;
+                } else if (packetSendEvent.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
+                    handleCompression = true;
+                }
+            }
 
             // check if the packet got cancelled
             if (!((ByteBuf) msg).isReadable()) {
