@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.exception.CancelPacketException;
 import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
@@ -37,12 +38,14 @@ import io.netty.channel.ChannelPromise;
 import org.spongepowered.api.Sponge;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.UUID;
 
 public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
     public User user;
     public UUID player;
+    private boolean handleCompression;
     private boolean handledCompression;
 
     public PacketEventsEncoder(User user) {
@@ -52,6 +55,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     public PacketEventsEncoder(ChannelHandler encoder) {
         user = ((PacketEventsEncoder) encoder).user;
         player = ((PacketEventsEncoder) encoder).player;
+        handleCompression = ((PacketEventsEncoder) encoder).handleCompression;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
     }
 
@@ -61,9 +65,17 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
             super.write(ctx, msg, promise);
             return;
         }
-        boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
+        boolean needsRecompression = handleCompression(ctx, byteBuf);
         Object player = this.player == null ? null : Sponge.server().player(this.player).orElse(null);
         PacketSendEvent event = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, true);
+        if (!handledCompression && event != null) {
+            if (event.getConnectionState() == ConnectionState.PLAY) {
+                // Late injection or server doesn't have compression enabled
+                handledCompression = true;
+            } else if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
+                handleCompression = true;
+            }
+        }
 
         if (!byteBuf.isReadable()) {
             byteBuf.release();
@@ -136,11 +148,12 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     }
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        if (handledCompression) return false;
-        int compressIndex = ctx.pipeline().names().indexOf("compress");
+        if (!handleCompression || handledCompression) return false;
+        List<String> handlerNames = ctx.pipeline().names();
+        int compressIndex = handlerNames.indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = handlerNames.indexOf(PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
         if (compressIndex > peEncoderIndex) {
             //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
