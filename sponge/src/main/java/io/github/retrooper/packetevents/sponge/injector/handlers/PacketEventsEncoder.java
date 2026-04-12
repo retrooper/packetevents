@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.CancelPacketException;
 import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
@@ -30,20 +31,24 @@ import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.sponge.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.sponge.util.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.MessageToMessageEncoder;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.UUID;
 
-public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
+public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     public User user;
     public UUID player;
     private boolean handledCompression;
+    private ChannelPromise promise;
 
     public PacketEventsEncoder(User user) {
         this.user = user;
@@ -53,40 +58,52 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         user = ((PacketEventsEncoder) encoder).user;
         player = ((PacketEventsEncoder) encoder).player;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
+        promise = ((PacketEventsEncoder) encoder).promise;
     }
 
     @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (!(msg instanceof ByteBuf byteBuf)) {
-            super.write(ctx, msg, promise);
-            return;
-        }
+    protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
         boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
-        Object player = this.player == null ? null : Sponge.server().player(this.player).orElse(null);
-        PacketSendEvent event = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, true);
-
-        if (!byteBuf.isReadable()) {
-            byteBuf.release();
-            promise.trySuccess();
-            return;
-        }
+        handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
 
         if (needsRecompression) {
             compress(ctx, byteBuf);
         }
 
-        ctx.write(byteBuf, promise);
-
-        if (event != null && event.hasTasksAfterSend()) {
-            for (Runnable task : event.getTasksAfterSend()) {
-                try {
-                    task.run();
-                } catch (Throwable throwable) {
-                    throw new PacketProcessException("Error while handling post-send-task " + task + " for " + event, throwable);
-                }
-            }
+        // So apparently, this is how ViaVersion hacks around bungeecord not supporting sending empty packets
+        if (!ByteBufHelper.isReadable(byteBuf)) {
+            throw CancelPacketException.INSTANCE;
         }
+
+        list.add(byteBuf.retain());
     }
+
+    private @Nullable PacketSendEvent handleClientBoundPacket(Channel channel, User user, UUID player, ByteBuf buffer, ChannelPromise promise) throws Exception {
+        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player == null ? null : Sponge.server().player(player).orElse(null), buffer, true);
+        if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
+            promise.addListener((p) -> {
+                for (Runnable task : packetSendEvent.getTasksAfterSend()) {
+                    task.run();
+                }
+            });
+        }
+        return packetSendEvent;
+    }
+
+    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        // We must restore the old promise (in case we are stacking promises such as sending packets on send event)
+        // If the old promise was successful, set it to null to avoid memory leaks.
+        ChannelPromise oldPromise = this.promise != null && !this.promise.isSuccess() ? this.promise : null;
+        if (promise.isVoid()) {
+            promise = ctx.newPromise();
+        }
+        promise.addListener(p -> this.promise = oldPromise);
+
+        this.promise = promise;
+        super.write(ctx, msg, promise);
+    }
+
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
