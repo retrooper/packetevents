@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
+import com.github.retrooper.packetevents.manager.PreViaInternalListener;
+import com.github.retrooper.packetevents.manager.PreViaSupport;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
@@ -135,7 +137,10 @@ public class SpigotPacketEventsBuilder {
 
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListener(new InternalBukkitPacketListener());
+                    getEventManager().registerListeners(new InternalBukkitPacketListener());
+                    if (PreViaSupport.shouldRegisterPreViaInternalListener()) {
+                        getEventManager().registerListeners(new PreViaInternalListener());
+                    }
                 }
             }
 

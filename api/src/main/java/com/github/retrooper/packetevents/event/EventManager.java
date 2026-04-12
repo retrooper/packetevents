@@ -56,6 +56,7 @@ public class EventManager {
     //Since reads greatly outnumber writes, create an array for the best possible iteration time
     //Updated as a whole on writes, no index modifications are allowed
     private volatile PacketListenerCommon[] listeners = new PacketListenerCommon[0];
+    private volatile boolean hasPreViaListeners = false;
     private final Consumer<PacketListenerCommon> onRegisterListener;
 
     public EventManager() {
@@ -171,6 +172,7 @@ public class EventManager {
         this.listenersMap.clear();
         synchronized (this) {//like booky10 said, the synchronization is necessary here
             this.listeners = new PacketListenerCommon[0];
+            this.hasPreViaListeners = false;
         }
     }
 
@@ -179,13 +181,24 @@ public class EventManager {
     private void recalculateListeners() {
         synchronized (this) {
             List<PacketListenerCommon> list = new ArrayList<>();
+            boolean hasPreViaListeners = false;
             //adds from LOWEST to MONITOR, so in the correct order
             for (PacketListenerPriority priority : PacketListenerPriority.values()) {
                 Set<PacketListenerCommon> set = this.listenersMap.get(priority);
-                if (set != null) list.addAll(set);
+                if (set != null) {
+                    list.addAll(set);
+                    for (PacketListenerCommon listener : set) {
+                        hasPreViaListeners |= listener.isPreVia();
+                    }
+                }
             }
             this.listeners = list.toArray(new PacketListenerCommon[0]);
+            this.hasPreViaListeners = hasPreViaListeners;
         }
+    }
+
+    public boolean hasPreViaListeners() {
+        return this.hasPreViaListeners;
     }
 
     //Internal registration methods, specifically separated for lesser overhead when registering an array of Listeners

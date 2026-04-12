@@ -69,6 +69,15 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
             @UnknownNullability Object player, Object byteBuf,
             boolean autoProtocolTranslation
     ) throws PacketProcessException {
+        this(packetSide, channel, user, player, byteBuf, autoProtocolTranslation,
+                packetSide == PacketSide.CLIENT ? user.getDecoderState() : user.getEncoderState());
+    }
+
+    protected ProtocolPacketEvent(
+            PacketSide packetSide, Object channel, User user,
+            @UnknownNullability Object player, Object byteBuf,
+            boolean autoProtocolTranslation, ConnectionState connectionState
+    ) throws PacketProcessException {
         this.channel = channel;
         this.user = user;
         this.player = player;
@@ -92,7 +101,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         }
 
         ClientVersion version = serverVersion.toClientVersion();
-        this.connectionState = packetSide == PacketSide.CLIENT ? user.getDecoderState() : user.getEncoderState();
+        this.connectionState = connectionState;
         PacketTypeCommon packetType = PacketType.getById(packetSide, this.connectionState, version, this.packetID);
         if (packetType == null) {
             // mojang messed up and keeps sending disconnect packets in the wrong protocol state

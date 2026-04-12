@@ -48,7 +48,7 @@ public class SpigotChannelInjector implements ChannelInjector {
     public final Set<Channel> injectedConnectionChannels = new HashSet<>();
     public List<Object> networkManagers;
     private int connectionChannelsListIndex = -1;
-    private boolean preViaInjected = false;
+    private boolean preViaPipelineInjected = false;
 
     public void updatePlayer(User user, Object player) {
         Object channel = user.getChannel();
@@ -133,7 +133,7 @@ public class SpigotChannelInjector implements ChannelInjector {
 
                     if (user == null) {
                         ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
-                    } else if (isPreViaInjected()) { // Always true but whatever
+                    } else if (hasPreViaPipelineInjected()) {
                         ServerConnectionInitializer.relocateHandlers(channel, user, true, false);
                     }
                 } catch (Exception e) {
@@ -260,11 +260,11 @@ public class SpigotChannelInjector implements ChannelInjector {
         return false;
     }
 
-    public boolean isPreViaInjected() {
-        return preViaInjected;
+    public boolean hasPreViaPipelineInjected() {
+        return preViaPipelineInjected;
     }
 
-    public void setPreViaInjected(boolean preViaInjected) {
-        this.preViaInjected = preViaInjected;
+    public void setPreViaPipelineInjected(boolean preViaPipelineInjected) {
+        this.preViaPipelineInjected = preViaPipelineInjected;
     }
 }

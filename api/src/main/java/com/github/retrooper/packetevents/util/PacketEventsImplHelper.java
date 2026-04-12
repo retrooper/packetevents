@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
 import org.jetbrains.annotations.Nullable;
@@ -52,12 +53,20 @@ public final class PacketEventsImplHelper {
             Object channel, User user, Object player, Object buffer,
             boolean autoProtocolTranslation
     ) throws Exception {
+        return handleClientBoundPacket(channel, user, player, buffer, autoProtocolTranslation, user.getEncoderState());
+    }
+
+    public static @Nullable PacketSendEvent handleClientBoundPacket(
+            Object channel, User user, Object player, Object buffer,
+            boolean autoProtocolTranslation, ConnectionState connectionState
+    ) throws Exception {
         if (!ByteBufHelper.isReadable(buffer)) {
             return null;
         }
 
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
-        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(channel, user, player, buffer, autoProtocolTranslation);
+        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(
+                channel, user, player, buffer, autoProtocolTranslation, connectionState);
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);

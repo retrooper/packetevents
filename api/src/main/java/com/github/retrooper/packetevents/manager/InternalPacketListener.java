@@ -82,7 +82,14 @@ public class InternalPacketListener extends PacketListenerAbstract {
                     : event.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
                 user.setEncoderState(ConnectionState.CONFIGURATION);
             } else {
-                user.setConnectionState(ConnectionState.PLAY);
+                // pre-via with modern client: encoder=PLAY, decoder=LOGIN
+                // pre-via decoder needs to see LOGIN_SUCCESS_ACK to set
+                // decoder state CONFIGURATION → PLAY (see PreViaInternalListener)
+                if (PreViaSupport.shouldUseLegacyLoginTracking(user)) {
+                    user.setEncoderState(ConnectionState.PLAY);
+                } else {
+                    user.setConnectionState(ConnectionState.PLAY);
+                }
             }
         }
 

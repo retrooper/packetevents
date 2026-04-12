@@ -27,10 +27,10 @@ import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
+import io.github.retrooper.packetevents.injector.connection.PreViaPipelineSupport;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
-import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -62,8 +62,8 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
         try {
             // We still call preVia listeners if ViaVersion is not available
-            if (!preVia && !ViaVersionUtil.isAvailable()) {
-                PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, preVia);
+            if (PreViaPipelineSupport.shouldDispatchFallbackPreViaEvents(preVia)) {
+                PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, false);
             }
 
             PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, !preVia);
@@ -146,7 +146,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
             ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, false, true);
 
             SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-            if (injector.isPreViaInjected())
+            if (injector.hasPreViaPipelineInjected())
                 ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, true, true);
         }
         super.userEventTriggered(ctx, event);

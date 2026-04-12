@@ -30,7 +30,6 @@ import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
-import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
@@ -44,11 +43,11 @@ public class ServerConnectionInitializer {
 
     // This is called each time a new listener is registered
     public static final Consumer<PacketListenerCommon> PRE_VIA_LISTENER_REGISTERED = listener -> {
-        if (!listener.isPreVia() || !ViaVersionUtil.isAvailable()) return;
+        if (!PreViaPipelineSupport.shouldInjectPreViaPipelineOnListenerRegistration(listener)) return;
 
         SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-        if (!injector.isPreViaInjected()) {
-            injector.setPreViaInjected(true);
+        if (!injector.hasPreViaPipelineInjected()) {
+            injector.setPreViaPipelineInjected(true);
             injector.injectNetworkManagers();
         }
     };
@@ -88,7 +87,7 @@ public class ServerConnectionInitializer {
 
             relocateHandlers(channel, user, false, false);
             SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-            if (injector.isPreViaInjected()) relocateHandlers(channel, user, true, false);
+            if (injector.hasPreViaPipelineInjected()) relocateHandlers(channel, user, true, false);
 
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
             PacketEvents.getAPI().getProtocolManager().setUser(channel, user);

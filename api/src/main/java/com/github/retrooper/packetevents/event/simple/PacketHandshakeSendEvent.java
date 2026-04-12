@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -18,7 +19,15 @@ public class PacketHandshakeSendEvent extends PacketSendEvent {
             @UnknownNullability Object player, Object rawByteBuf,
             boolean autoProtocolTranslation
     ) throws PacketProcessException {
-        super(channel, user, player, rawByteBuf, autoProtocolTranslation);
+        this(channel, user, player, rawByteBuf, autoProtocolTranslation, user.getEncoderState());
+    }
+
+    public PacketHandshakeSendEvent(
+            Object channel, User user,
+            @UnknownNullability Object player, Object rawByteBuf,
+            boolean autoProtocolTranslation, ConnectionState connectionState
+    ) throws PacketProcessException {
+        super(channel, user, player, rawByteBuf, autoProtocolTranslation, connectionState);
     }
 
     protected PacketHandshakeSendEvent(

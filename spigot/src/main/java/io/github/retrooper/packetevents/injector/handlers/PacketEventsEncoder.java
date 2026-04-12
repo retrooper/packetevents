@@ -28,11 +28,11 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
+import io.github.retrooper.packetevents.injector.connection.PreViaPipelineSupport;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
-import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -113,6 +113,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         PacketSendEvent preViaPacketSendEvent = null;
         if (msg instanceof ByteBuf) {
             boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
+            ConnectionState encoderState = this.user.getEncoderState();
             packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), this.user, this.player, msg, !preVia);
 
             // check if the packet got cancelled
@@ -123,9 +124,9 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
             }
 
             // We still call preVia listeners if ViaVersion is not available
-            if (!preVia && !ViaVersionUtil.isAvailable()) {
+            if (PreViaPipelineSupport.shouldDispatchFallbackPreViaEvents(preVia)) {
                 preViaPacketSendEvent = PacketEventsImplHelper.handleClientBoundPacket(
-                        ctx.channel(), this.user, this.player, msg, false);
+                        ctx.channel(), this.user, this.player, msg, false, encoderState);
             }
 
             if (needsRecompression) {
