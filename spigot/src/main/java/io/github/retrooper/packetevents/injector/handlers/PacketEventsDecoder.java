@@ -140,7 +140,6 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         }
 
         // Via changes the order of handlers in this event, so we must respond to Via changing their stuff
-        // We should trigger relocation after via, thanks to PacketEventsHandlerMonitor
         if (!preVia) {
             // 1.20.4 has a bug where userEventTriggered is called twice, so Via relocates twice uselessly and we must do so
             ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, false, true);
