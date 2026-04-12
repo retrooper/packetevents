@@ -11,20 +11,18 @@ class PEVersionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         val task = target.tasks.register<PEVersionTask>(PEVersionTask.TASK_NAME) {
-            group = target.rootProject.name.toString()
+            group = target.rootProject.name
 
             version = target.version.toString()
             outputDir = target.layout.buildDirectory.dir("generated/sources/src/java/main")
         }
 
-        target.afterEvaluate {
-            val sourceSets = target.extensions.getByName<SourceSetContainer>("sourceSets")
+        val sourceSets = target.extensions.getByName<SourceSetContainer>("sourceSets")
 
-            sequenceOf(SourceSet.MAIN_SOURCE_SET_NAME, SourceSet.TEST_SOURCE_SET_NAME).forEach {
-                sourceSets.getByName(it).java.srcDir(task.flatMap { it.outputDir })
+        sequenceOf(SourceSet.MAIN_SOURCE_SET_NAME, SourceSet.TEST_SOURCE_SET_NAME).forEach {
+            sourceSets.named(it) {
+                java.srcDir(task)
             }
-
-            task.get().generate()
         }
     }
 

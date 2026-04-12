@@ -1469,6 +1469,14 @@ public final class StateTypes {
      * @versions 1.21.9+
      */
     public static StateType WAXED_OXIDIZED_LIGHTNING_ROD = StateTypes.builder().name("WAXED_OXIDIZED_LIGHTNING_ROD").blastResistance(6.0f).hardness(3.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
+    /**
+     * @versions 26.1+
+     */
+    public static StateType GOLDEN_DANDELION = StateTypes.builder().name("GOLDEN_DANDELION").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.PLANT).build();
+    /**
+     * @versions 26.1+
+     */
+    public static StateType POTTED_GOLDEN_DANDELION = StateTypes.builder().name("POTTED_GOLDEN_DANDELION").blastResistance(0.0f).hardness(0.0f).isBlocking(true).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.DECORATION).build();
     // </editor-fold>
 
     static {

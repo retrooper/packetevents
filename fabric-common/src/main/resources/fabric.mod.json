@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "packetevents-fabric-common",
+  "version": "${version}",
+  "name": "PacketEvents Fabric (Common)",
+  "description": "",
+  "authors": [
+    "retrooper",
+    "booky10"
+  ],
+  "contact": {
+    "issues": "https://github.com/retrooper/packetevents/issues",
+    "sources": "https://github.com/retrooper/packetevents"
+  },
+  "license": "GPL-3.0",
+  "icon": "assets/packetevents/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "preLaunch": [
+      "io.github.retrooper.packetevents.PacketEventsMod"
+    ],
+    "main": [
+      "io.github.retrooper.packetevents.PacketEventsMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "java": ">=21"
+  },
+
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ],
+      "links": {
+        "modmenu.wiki": "https://docs.packetevents.com/",
+        "modmenu.discord": "https://discord.gg/5h9DndYWpp",
+        "modmenu.github_releases": "https://github.com/retrooper/packetevents/releases",
+        "modmenu.modrinth": "https://modrinth.com/mod/packetevents"
+      },
+      "parent": "packetevents",
+      "update_checker": false
+    }
+  }
+}

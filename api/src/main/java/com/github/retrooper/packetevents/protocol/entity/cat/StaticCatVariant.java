@@ -27,24 +27,40 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * @versions 1.21.5+
+ */
 @NullMarked
 public class StaticCatVariant extends AbstractMappedEntity implements CatVariant {
 
     private final ResourceLocation assetId;
+    /**
+     * @versions 26.1+
+     */
+    private final ResourceLocation babyAssetId;
 
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @ApiStatus.Obsolete
     public StaticCatVariant(ResourceLocation assetId) {
-        this(null, assetId);
+        this(null, assetId, assetId);
+    }
+
+    public StaticCatVariant(ResourceLocation assetId, ResourceLocation babyAssetId) {
+        this(null, assetId, babyAssetId);
     }
 
     @ApiStatus.Internal
-    public StaticCatVariant(@Nullable TypesBuilderData data, ResourceLocation assetId) {
+    public StaticCatVariant(@Nullable TypesBuilderData data, ResourceLocation assetId, ResourceLocation babyAssetId) {
         super(data);
         this.assetId = assetId;
+        this.babyAssetId = babyAssetId;
     }
 
     @Override
     public CatVariant copy(@Nullable TypesBuilderData newData) {
-        return new StaticCatVariant(newData, this.assetId);
+        return new StaticCatVariant(newData, this.assetId, this.babyAssetId);
     }
 
     @Override
@@ -53,14 +69,20 @@ public class StaticCatVariant extends AbstractMappedEntity implements CatVariant
     }
 
     @Override
+    public ResourceLocation getBabyAssetId() {
+        return this.babyAssetId;
+    }
+
+    @Override
     public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof StaticCatVariant)) return false;
         StaticCatVariant that = (StaticCatVariant) obj;
-        return this.assetId.equals(that.assetId);
+        if (!this.assetId.equals(that.assetId)) return false;
+        return this.babyAssetId.equals(that.babyAssetId);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(this.assetId);
+        return Objects.hash(this.assetId, this.babyAssetId);
     }
 }

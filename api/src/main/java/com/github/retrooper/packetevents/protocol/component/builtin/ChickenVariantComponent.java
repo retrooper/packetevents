@@ -18,29 +18,49 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.chicken.ChickenVariant;
 import com.github.retrooper.packetevents.protocol.entity.chicken.ChickenVariants;
 import com.github.retrooper.packetevents.protocol.mapper.MaybeMappedEntity;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
 
+/**
+ * @versions 1.21.5+
+ */
 public class ChickenVariantComponent {
 
     private MaybeMappedEntity<ChickenVariant> variant;
 
+    public ChickenVariantComponent(ChickenVariant variant) {
+        this(new MaybeMappedEntity<>(variant));
+    }
+
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @ApiStatus.Obsolete
     public ChickenVariantComponent(MaybeMappedEntity<ChickenVariant> variant) {
         this.variant = variant;
     }
 
     public static ChickenVariantComponent read(PacketWrapper<?> wrapper) {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            return new ChickenVariantComponent(ChickenVariant.read(wrapper));
+        }
         MaybeMappedEntity<ChickenVariant> variant = MaybeMappedEntity.read(wrapper,
                 ChickenVariants.getRegistry(), ChickenVariant::read);
         return new ChickenVariantComponent(variant);
     }
 
     public static void write(PacketWrapper<?> wrapper, ChickenVariantComponent component) {
-        MaybeMappedEntity.write(wrapper, component.variant, ChickenVariant::write);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            ChickenVariant.write(wrapper, component.variant.getValueOrThrow());
+        } else {
+            MaybeMappedEntity.write(wrapper, component.variant, ChickenVariant::write);
+        }
     }
 
     public MaybeMappedEntity<ChickenVariant> getVariant() {

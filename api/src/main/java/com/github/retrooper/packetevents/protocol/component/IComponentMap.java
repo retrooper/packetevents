@@ -22,7 +22,9 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
+import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
@@ -33,13 +35,10 @@ import java.util.Optional;
 @NullMarked
 public interface IComponentMap {
 
+    @SuppressWarnings("unchecked")
+    @ApiStatus.Internal
     static StaticComponentMap decode(NBT nbt, PacketWrapper<?> wrapper, IRegistry<? extends ComponentType<?>> registry) {
-        return decode(nbt, wrapper.getServerVersion().toClientVersion(), registry);
-    }
-
-    @Deprecated
-    @SuppressWarnings("unchecked") // safe in this case
-    static StaticComponentMap decode(NBT nbt, ClientVersion version, IRegistry<? extends ComponentType<?>> registry) {
+        ClientVersion version = wrapper.getServerVersion().toClientVersion();
         NBTCompound compound = (NBTCompound) nbt;
         StaticComponentMap.Builder components = StaticComponentMap.builder();
         for (Map.Entry<String, NBT> entry : compound.getTags().entrySet()) {
@@ -50,21 +49,21 @@ public interface IComponentMap {
             Object value = type.decode(entry.getValue(), version);
             components.set((ComponentType<? super Object>) type, value);
         }
-        return components.build();
+        return components.setRegistries(wrapper.getRegistryHolder()).build();
     }
 
+    @SuppressWarnings("unchecked")
+    @ApiStatus.Internal
     static NBT encode(PacketWrapper<?> wrapper, StaticComponentMap components) {
-        return encode(components, wrapper.getServerVersion().toClientVersion());
-    }
+        components = components.withRegistries(wrapper.getRegistryHolder());
+        ClientVersion version = wrapper.getServerVersion().toClientVersion();
 
-    @Deprecated
-    @SuppressWarnings("unchecked") // safe in this case
-    static NBT encode(StaticComponentMap components, ClientVersion version) {
         NBTCompound compound = new NBTCompound();
-        for (Map.Entry<ComponentType<?>, ?> entry : components.getDelegate().entrySet()) {
-            String key = entry.getKey().getName().toString();
-            NBT value = ((ComponentType<? super Object>) entry.getKey()).encode(entry.getValue(), version);
-            compound.setTag(key, value);
+        for (ComponentType<?> type : components.getKeys()) {
+            String key = type.getName().toString();
+            Object value = components.get(type);
+            NBT tag = ((ComponentType<? super Object>) type).encode(value, version);
+            compound.setTag(key, tag);
         }
         return compound;
     }
@@ -99,4 +98,6 @@ public interface IComponentMap {
     }
 
     <T> void set(ComponentType<T> type, Optional<T> value);
+
+    IComponentMap withRegistries(IRegistryHolder registries);
 }

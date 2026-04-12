@@ -14,6 +14,10 @@ import java.util.function.Function;
 @NullMarked
 public interface NbtMapCodec<T> extends NbtMapEncoder<T>, NbtMapDecoder<T> {
 
+    static <K, V> NbtMapCodec<Map<K, V>> codecOfMap(NbtCodec<K> keyCodec, NbtCodec<? extends V> valueCodec) {
+        return codecOfMap(keyCodec, __ -> valueCodec);
+    }
+
     static <K, V> NbtMapCodec<Map<K, V>> codecOfMap(NbtCodec<K> keyCodec, Function<K, NbtCodec<? extends V>> valueCodec) {
         return new NbtMapCodec<Map<K, V>>() {
             @Override

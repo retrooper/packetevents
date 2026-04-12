@@ -18,7 +18,7 @@
 package com.github.retrooper.compression.strategy.json
 
 import com.github.difflib.DiffUtils
-import com.github.difflib.algorithm.myers.MeyersDiff
+import com.github.difflib.algorithm.myers.MyersDiff
 import com.github.difflib.patch.ChangeDelta
 import com.github.difflib.patch.DeleteDelta
 import com.github.difflib.patch.InsertDelta
@@ -49,7 +49,7 @@ object JsonObjectCompressionStrategy : JsonCompressionStrategy() {
 
         for ((key, value) in entries) {
             val map = value.asJsonObject.asPrimitiveMap
-            val algo = MeyersDiff.factory().create<Map.Entry<String, JsonPrimitive>> { a, b -> a == b }
+            val algo = MyersDiff.factory().create<Map.Entry<String, JsonPrimitive>> { a, b -> a == b }
             val diff = DiffUtils.diff(ArrayList(ent.entries), ArrayList(map.entries), algo, null, false)
 
             val versionTag = CompoundTag()

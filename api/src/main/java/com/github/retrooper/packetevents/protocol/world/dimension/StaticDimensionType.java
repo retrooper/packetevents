@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAt
 import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributes;
 import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Timeline;
 import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Timelines;
+import com.github.retrooper.packetevents.protocol.world.clock.WorldClock;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.resources.TagKey;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
@@ -117,6 +118,14 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     private final int logicalHeight;
     private final TagKey infiniburn;
     private final float ambientLight;
+    /**
+     * @versions 26.1+
+     */
+    private final @Nullable WorldClock defaultClock;
+    /**
+     * @versions 26.1+
+     */
+    private final boolean hasEnderDragonFight;
 
     /**
      * @deprecated use {@link DimensionTypeBuilder}
@@ -153,7 +162,8 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
                         .copyImmutable(), MappedEntitySet.createEmpty(), fixedTime.isPresent() ? fixedTime.getAsLong() : null,
                 natural, bedWorking, respawnAnchorWorking, effectsLocation, coordinateScale, minY, height,
                 monsterSpawnLightLevel != null ? monsterSpawnLightLevel : new NBTInt(7),
-                monsterSpawnBlockLightLimit, hasSkyLight, hasCeiling, logicalHeight, TagKey.parse(infiniburnTag), ambientLight
+                monsterSpawnBlockLightLimit, hasSkyLight, hasCeiling, logicalHeight, TagKey.parse(infiniburnTag),
+                ambientLight, null, false
         );
     }
 
@@ -163,7 +173,8 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
             EnvironmentAttributeMap attributes, MappedEntityRefSet<Timeline> timelinesRef, @Nullable Long fixedTime,
             boolean natural, boolean bedWorks, boolean respawnAnchorWorks, @Nullable ResourceLocation effects,
             double coordinateScale, int minY, int height, NBT monsterSpawnLightLevel, int monsterSpawnBlockLightLimit,
-            boolean hasSkylight, boolean hasCeiling, int logicalHeight, TagKey infiniburn, float ambientLight
+            boolean hasSkylight, boolean hasCeiling, int logicalHeight, TagKey infiniburn, float ambientLight,
+            @Nullable WorldClock defaultClock, boolean hasEnderDragonFight
     ) {
         super(data);
         this.hasFixedTime = hasFixedTime;
@@ -186,6 +197,8 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
         this.logicalHeight = logicalHeight;
         this.infiniburn = infiniburn;
         this.ambientLight = ambientLight;
+        this.defaultClock = defaultClock;
+        this.hasEnderDragonFight = hasEnderDragonFight;
     }
 
     @Override
@@ -199,7 +212,7 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
                 newData, this.hasFixedTime, this.skybox, this.cardinalLight, this.attributes, this.timelinesRef,
                 this.fixedTime, this.natural, this.bedWorks, this.respawnAnchorWorks, this.effects, this.coordinateScale,
                 this.minY, this.height, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit, this.hasSkylight,
-                this.hasCeiling, this.logicalHeight, this.infiniburn, this.ambientLight
+                this.hasCeiling, this.logicalHeight, this.infiniburn, this.ambientLight, this.defaultClock, this.hasEnderDragonFight
         );
     }
 
@@ -337,6 +350,16 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
     }
 
     @Override
+    public boolean isHasEnderDragonFight() {
+        return this.hasEnderDragonFight;
+    }
+
+    @Override
+    public @Nullable WorldClock getDefaultClock() {
+        return this.defaultClock;
+    }
+
+    @Override
     public boolean deepEquals(@Nullable Object obj) {
         if (obj == null || this.getClass() != obj.getClass()) return false;
         StaticDimensionType that = (StaticDimensionType) obj;
@@ -354,16 +377,18 @@ public class StaticDimensionType extends AbstractMappedEntity implements Dimensi
         if (Float.compare(that.ambientLight, this.ambientLight) != 0) return false;
         if (this.skybox != that.skybox) return false;
         if (this.cardinalLight != that.cardinalLight) return false;
+        if (this.hasEnderDragonFight != that.hasEnderDragonFight) return false;
         if (!this.attributes.equals(that.attributes)) return false;
         if (!this.timelinesRef.equals(that.timelinesRef)) return false;
         if (!Objects.equals(this.fixedTime, that.fixedTime)) return false;
         if (!Objects.equals(this.effects, that.effects)) return false;
+        if (!Objects.equals(this.defaultClock, that.defaultClock)) return false;
         if (!this.monsterSpawnLightLevel.equals(that.monsterSpawnLightLevel)) return false;
         return this.infiniburn.equals(that.infiniburn);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(this.hasFixedTime, this.skybox, this.cardinalLight, this.attributes, this.timelinesRef, this.fixedTime, this.natural, this.bedWorks, this.respawnAnchorWorks, this.effects, this.coordinateScale, this.minY, this.height, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit, this.hasSkylight, this.hasCeiling, this.logicalHeight, this.infiniburn, this.ambientLight);
+        return Objects.hash(this.hasFixedTime, this.skybox, this.cardinalLight, this.attributes, this.timelinesRef, this.fixedTime, this.natural, this.bedWorks, this.respawnAnchorWorks, this.effects, this.coordinateScale, this.minY, this.height, this.monsterSpawnLightLevel, this.monsterSpawnBlockLightLimit, this.hasSkylight, this.hasCeiling, this.logicalHeight, this.infiniburn, this.ambientLight, this.defaultClock, this.hasEnderDragonFight);
     }
 }

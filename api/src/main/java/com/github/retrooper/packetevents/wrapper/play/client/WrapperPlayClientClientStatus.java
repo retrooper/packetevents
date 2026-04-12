@@ -20,11 +20,15 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * Mojang name: ServerboundClientCommandPacket
+ */
 public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClientClientStatus> {
+
     private Action action;
 
     public WrapperPlayClientClientStatus(PacketReceiveEvent event) {
@@ -38,18 +42,25 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
 
     @Override
     public void read() {
-        this.action = readMultiVersional(VersionComparison.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8,
-                wrapper -> Action.getById(wrapper.readVarInt()), packetWrapper -> Action.getById(packetWrapper.readByte()));
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            this.action = this.readEnum(Action.VALUES);
+        } else {
+            this.action = Action.VALUES[this.readByte()];
+        }
     }
 
     @Override
     public void write() {
-        writeMultiVersional(VersionComparison.NEWER_THAN_OR_EQUALS, ServerVersion.V_1_8, action.ordinal(), (wrapper, integer) -> {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) && integer == 2) {
-                throw new IllegalStateException("The WrapperGameClientClientStatus.Action.OPEN_INVENTORY_ACTION enum constant is not supported on 1.16+ servers!");
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+            if (this.action == Action.THIRD_ENTRY
+                    && this.serverVersion.isOlderThan(ServerVersion.V_26_1)
+                    && this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+                throw new IllegalStateException("Third entry not supported");
             }
-            wrapper.writeVarInt(integer);
-        }, PacketWrapper::writeByte);
+            this.writeEnum(this.action);
+        } else {
+            this.writeByte(this.action.ordinal());
+        }
     }
 
     @Override
@@ -58,7 +69,7 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
     }
 
     public Action getAction() {
-        return action;
+        return this.action;
     }
 
     public void setAction(Action action) {
@@ -66,11 +77,21 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
     }
 
     public enum Action {
+
         PERFORM_RESPAWN,
         REQUEST_STATS,
+        @ApiStatus.Internal
+        THIRD_ENTRY,
+        ;
 
-        // This only exists on 1.7.10 -> 1.15.2
-        OPEN_INVENTORY_ACHIEVEMENT;
+        /**
+         * @versions 1.7.10-1.15.2
+         */
+        public static final Action OPEN_INVENTORY_ACHIEVEMENT = THIRD_ENTRY;
+        /**
+         * @versions 26.1+
+         */
+        public static final Action REQUEST_GAMERULE_VALUES = THIRD_ENTRY;
 
         private static final Action[] VALUES = values();
 

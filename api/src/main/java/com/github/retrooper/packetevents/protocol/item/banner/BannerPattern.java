@@ -38,6 +38,14 @@ public interface BannerPattern extends MappedEntity, CopyableEntity<BannerPatter
 
     String getTranslationKey();
 
+    static BannerPattern read(PacketWrapper<?> wrapper) {
+        return wrapper.readMappedEntityOrDirect(BannerPatterns.getRegistry(), BannerPattern::readDirect);
+    }
+
+    static void write(PacketWrapper<?> wrapper, BannerPattern pattern) {
+        wrapper.writeMappedEntityOrDirect(pattern, BannerPattern::writeDirect);
+    }
+
     static BannerPattern readDirect(PacketWrapper<?> wrapper) {
         ResourceLocation assetId = wrapper.readIdentifier();
         String translationKey = wrapper.readString();

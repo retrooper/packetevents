@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @NullMarked
 @ApiStatus.Experimental
@@ -406,6 +407,20 @@ public final class NbtCodecs {
                         v -> left.encode(wrapper, v),
                         v -> right.encode(wrapper, v)
                 );
+            }
+        };
+    }
+
+    public static <T> NbtMapCodec<T> forUnit(Supplier<T> supplier) {
+        return new NbtMapCodec<T>() {
+            @Override
+            public T decode(NBTCompound tag, PacketWrapper<?> wrapper) throws NbtCodecException {
+                return supplier.get();
+            }
+
+            @Override
+            public void encode(NBTCompound tag, PacketWrapper<?> wrapper, T value) throws NbtCodecException {
+                // NO-OP
             }
         };
     }

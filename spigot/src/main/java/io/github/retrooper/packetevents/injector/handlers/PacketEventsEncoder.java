@@ -35,6 +35,7 @@ import io.github.retrooper.packetevents.util.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -43,7 +44,6 @@ import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
@@ -59,7 +59,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         // https://howoldisminecraft188.today/
         boolean netty410 = false;
         try {
-            ChannelPromise.class.getDeclaredMethod("unvoid");
+            ChannelFuture.class.getDeclaredMethod("isVoid");
             netty410 = true;
         } catch (NoSuchMethodException ignored) {
         }
@@ -69,7 +69,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     public User user;
     public Player player;
     private boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
-    private ChannelPromise promise;
 
     private final Queue<QueuedMessage> queuedMessages = new ArrayDeque<>();
     private boolean hold = false;
@@ -84,7 +83,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         user = ((PacketEventsEncoder) encoder).user;
         player = ((PacketEventsEncoder) encoder).player;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
-        promise = ((PacketEventsEncoder) encoder).promise;
         preVia = ((PacketEventsEncoder) encoder).preVia;
     }
 
@@ -103,18 +101,6 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         }
     }
 
-    private @Nullable PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise, boolean preVia) throws Exception {
-        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, !preVia);
-        if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
-            promise.addListener((p) -> {
-                for (Runnable task : packetSendEvent.getTasksAfterSend()) {
-                    task.run();
-                }
-            });
-        }
-        return packetSendEvent;
-    }
-
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         // if we are told to hold all messages, add them to the queue
@@ -123,24 +109,11 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
             return;
         }
 
-        // We must restore the old promise (in case we are stacking promises such as sending packets on send event)
-        // If the old promise was successful, set it to null to avoid memory leaks.
-        ChannelPromise oldPromise = this.promise != null && !this.promise.isSuccess() ? this.promise : null;
-        if (NETTY_4_1_0) {
-            // "unvoid" will just make sure we can actually add listeners to this promise...
-            // since 1.21.6, mojang will give us void promises when they don't care about the result
-            promise = promise.unvoid();
-        }
-        promise.addListener(p -> this.promise = oldPromise);
-        this.promise = promise;
-
+        PacketSendEvent packetSendEvent = null;
+        PacketSendEvent preViaPacketSendEvent = null;
         if (msg instanceof ByteBuf) {
             boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
-            this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.promise, preVia);
-
-            // We still call preVia listeners if ViaVersion is not available
-            if (!preVia && !ViaVersionUtil.isAvailable())
-                handleClientBoundPacket(ctx.channel(), user, player, (ByteBuf) msg, this.promise, !preVia);
+            packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(ctx.channel(), this.user, this.player, msg, !preVia);
 
             // check if the packet got cancelled
             if (!((ByteBuf) msg).isReadable()) {
@@ -149,12 +122,33 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
                 return; // abort handling
             }
 
+            // We still call preVia listeners if ViaVersion is not available
+            if (!preVia && !ViaVersionUtil.isAvailable()) {
+                preViaPacketSendEvent = PacketEventsImplHelper.handleClientBoundPacket(
+                        ctx.channel(), this.user, this.player, msg, false);
+            }
+
             if (needsRecompression) {
                 this.compress(ctx, (ByteBuf) msg);
             }
         }
 
         ctx.write(msg, promise);
+
+        this.runTasksAfterSend(packetSendEvent);
+        this.runTasksAfterSend(preViaPacketSendEvent);
+    }
+
+    private void runTasksAfterSend(PacketSendEvent packetSendEvent) {
+        if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
+            for (Runnable task : packetSendEvent.getTasksAfterSend()) {
+                try {
+                    task.run();
+                } catch (Throwable throwable) {
+                    throw new PacketProcessException("Error while handling post-send-task " + task + " for " + packetSendEvent, throwable);
+                }
+            }
+        }
     }
 
     @Override
@@ -252,16 +246,12 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         int peEncoderIndex = ctx.pipeline().names().indexOf((preVia ? "pre-" : "") + PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
 
-        if (compressIndex <= peEncoderIndex) return false; // We are fine, no need to relocate
+        if (compressIndex <= peEncoderIndex) return false;
 
         //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
-        //But first we need to compress the data and re-compress it after we do all our processing to avoid issues
-
+        //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
         boolean decompress = false;
-
-        // We don't need to handle decompression if the client is 1.7 or older
-        if (!preVia ||
-            !user.getClientVersion().isOlderThanOrEquals(ClientVersion.V_1_7_10)) {
+        if (!preVia || !user.getClientVersion().isOlderThanOrEquals(ClientVersion.V_1_7_10)) {
             decompress(ctx, buffer, buffer);
             decompress = true;
         }

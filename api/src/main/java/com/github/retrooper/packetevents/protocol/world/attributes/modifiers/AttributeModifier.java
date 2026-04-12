@@ -66,6 +66,16 @@ public interface AttributeModifier<T, A> {
             new AbstractMap.SimpleEntry<>(Operation.MULTIPLY, AlphaColorModifier.MULTIPLY),
             new AbstractMap.SimpleEntry<>(Operation.BLEND_TO_GRAY, AlphaColorModifier.BLEND_TO_GRAY)
     );
+    /**
+     * @versions 26.1+
+     */
+    Map<Operation, AttributeModifier<Integer, ?>> INTEGER_LIBRARY = MapUtil.createMap(
+            new AbstractMap.SimpleEntry<>(Operation.ADD, IntegerModifier.ADD),
+            new AbstractMap.SimpleEntry<>(Operation.SUBTRACT, IntegerModifier.SUBTRACT),
+            new AbstractMap.SimpleEntry<>(Operation.MULTIPLY, IntegerModifier.MULTIPLY),
+            new AbstractMap.SimpleEntry<>(Operation.MINIMUM, IntegerModifier.MINIMUM),
+            new AbstractMap.SimpleEntry<>(Operation.MAXIMUM, IntegerModifier.MAXIMUM)
+    );
 
     @SuppressWarnings("unchecked") // types don't matter
     static <T> AttributeModifier<T, T> override() {
