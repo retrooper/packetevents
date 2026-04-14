@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
+import com.github.retrooper.packetevents.manager.PreViaInternalListener;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class EventManager {
     //Updated as a whole on writes, no index modifications are allowed
     private volatile PacketListenerCommon[] listeners = new PacketListenerCommon[0];
     private volatile boolean hasPreViaListeners = false;
+    private volatile boolean hasPreViaInternalListener = false;
     private final Consumer<PacketListenerCommon> onRegisterListener;
 
     public EventManager() {
@@ -173,6 +175,7 @@ public class EventManager {
         synchronized (this) {//like booky10 said, the synchronization is necessary here
             this.listeners = new PacketListenerCommon[0];
             this.hasPreViaListeners = false;
+            this.hasPreViaInternalListener = false;
         }
     }
 
@@ -182,23 +185,35 @@ public class EventManager {
         synchronized (this) {
             List<PacketListenerCommon> list = new ArrayList<>();
             boolean hasPreViaListeners = false;
+            boolean hasPreViaInternalListener = false;
             //adds from LOWEST to MONITOR, so in the correct order
             for (PacketListenerPriority priority : PacketListenerPriority.values()) {
                 Set<PacketListenerCommon> set = this.listenersMap.get(priority);
                 if (set != null) {
                     list.addAll(set);
                     for (PacketListenerCommon listener : set) {
-                        hasPreViaListeners |= listener.isPreVia();
+                        if (listener.isPreVia()) {
+                            if (listener instanceof PreViaInternalListener) {
+                                hasPreViaInternalListener = true;
+                            } else {
+                                hasPreViaListeners = true;
+                            }
+                        }
                     }
                 }
             }
             this.listeners = list.toArray(new PacketListenerCommon[0]);
             this.hasPreViaListeners = hasPreViaListeners;
+            this.hasPreViaInternalListener = hasPreViaInternalListener;
         }
     }
 
     public boolean hasPreViaListeners() {
         return this.hasPreViaListeners;
+    }
+
+    public boolean hasPreViaInternalListener() {
+        return this.hasPreViaInternalListener;
     }
 
     //Internal registration methods, specifically separated for lesser overhead when registering an array of Listeners

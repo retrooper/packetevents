@@ -16,13 +16,17 @@ public final class PreViaSupport {
         return PacketEvents.getAPI().getEventManager().hasPreViaListeners();
     }
 
+    public static boolean hasPreViaInternalListener() {
+        return PacketEvents.getAPI().getEventManager().hasPreViaInternalListener();
+    }
+
     public static boolean shouldRegisterPreViaInternalListener() {
         return PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_20_2);
     }
 
     public static boolean shouldUseLegacyLoginTracking(User user) {
         return shouldRegisterPreViaInternalListener()
-                && hasPreViaListeners()
+                && hasPreViaInternalListener()
                 && user.getClientVersion() != null
                 && user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_20_2);
     }
