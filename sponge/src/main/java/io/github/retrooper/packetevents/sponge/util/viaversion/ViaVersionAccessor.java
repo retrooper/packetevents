@@ -19,9 +19,13 @@
 package io.github.retrooper.packetevents.sponge.util.viaversion;
 
 import com.github.retrooper.packetevents.protocol.player.User;
+import org.jspecify.annotations.NullMarked;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
+@NullMarked
 public interface ViaVersionAccessor {
+
+    int UNKNOWN_PROTOCOL_VERSION = -1;
 
     int getProtocolVersion(ServerPlayer player);
 

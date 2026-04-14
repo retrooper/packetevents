@@ -158,6 +158,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
     /**
      * @deprecated use {@link #setIntention(ConnectionIntention)}
      */
+    @Deprecated
     public void setNextConnectionState(ConnectionState nextConnectionState) {
         switch (nextConnectionState) {
             case LOGIN:
