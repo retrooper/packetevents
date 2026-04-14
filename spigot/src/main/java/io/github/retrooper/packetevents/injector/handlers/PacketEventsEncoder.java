@@ -258,7 +258,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         }
 
         //Let us relocate and no longer deal with compression.
-        ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, preVia, false);
+        ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, preVia);
         return decompress;
     }
 

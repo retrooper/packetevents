@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -134,7 +133,7 @@ public class SpigotChannelInjector implements ChannelInjector {
                     if (user == null) {
                         ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
                     } else if (hasPreViaPipelineInjected()) {
-                        ServerConnectionInitializer.relocateHandlers(channel, user, true, false);
+                        ServerConnectionInitializer.relocateHandlers(channel, user, true);
                     }
                 } catch (Exception e) {
                     PacketEvents.getAPI().getLogManager().severe("PacketEvents Spigot injector failed to inject into an existing channel. If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc");

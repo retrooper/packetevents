@@ -85,9 +85,9 @@ public class ServerConnectionInitializer {
                 return;
             }
 
-            relocateHandlers(channel, user, false, false);
+            relocateHandlers(channel, user, false);
             SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-            if (injector.hasPreViaPipelineInjected()) relocateHandlers(channel, user, true, false);
+            if (injector.hasPreViaPipelineInjected()) relocateHandlers(channel, user, true);
 
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
             PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
@@ -109,7 +109,7 @@ public class ServerConnectionInitializer {
         }
     }
 
-    public static void relocateHandlers(Channel ctx, User user, boolean preVia, boolean force) {
+    public static void relocateHandlers(Channel ctx, User user, boolean preVia) {
         try {
             if (PacketEvents.getAPI().getSettings().isDebugEnabled())
                 PacketEvents.getAPI().getLogManager().debug("Pre relocate, preVia: " + preVia + ", " + ChannelHelper.pipelineHandlerNamesAsString(ctx));
@@ -129,26 +129,15 @@ public class ServerConnectionInitializer {
                 targetEncoderName = ctx.pipeline().names().contains("outbound_config") ? "outbound_config" : "encoder";
             }
 
-            // If we are forced (by the event), we check if we actually NEED to move.
-            // If we are already physically located BEFORE the target in the pipeline list,
-            // we satisfy the requirement and should exit to prevent infinite loops.
-            if (force) {
-                boolean decoderGood = isAlreadyBefore(ctx, decoderName, targetDecoderName);
-                boolean encoderGood = isAlreadyBefore(ctx, encoderName, targetEncoderName);
-
-                if (decoderGood && encoderGood) {
-                    // We are already in the correct spot relative to Via/Vanilla.
-                    // Do not touch the pipeline.
-                    return;
-                }
-            }
-
             PacketEventsDecoder existingDecoder = (PacketEventsDecoder) ctx.pipeline().get(decoderName);
             ChannelHandler encoder;
             PacketEventsDecoder decoder;
 
             if (existingDecoder != null) {
-                if (existingDecoder.hasBeenRelocated && !force) return;
+                if (existingDecoder.hasBeenRelocated
+                        && handlersAlreadyRelocated(ctx, preVia, decoderName, targetDecoderName, encoderName, targetEncoderName)) {
+                    return;
+                }
                 existingDecoder.hasBeenRelocated = true;
 
                 decoder = new PacketEventsDecoder((PacketEventsDecoder) ctx.pipeline().remove(decoderName));
@@ -197,5 +186,24 @@ public class ServerConnectionInitializer {
 
         // We are good if we are earlier in the list than the target.
         return myIndex < targetIndex;
+    }
+
+    private static boolean handlersAlreadyRelocated(Channel ctx, boolean preVia, String decoderName, String targetDecoderName,
+                                                    String encoderName, String targetEncoderName) {
+        if (!isAlreadyBefore(ctx, decoderName, targetDecoderName)
+                || !isAlreadyBefore(ctx, encoderName, targetEncoderName)) {
+            return false;
+        }
+
+        if (!preVia) {
+            if (ctx.pipeline().get("decompress") != null && !isAlreadyBefore(ctx, "decompress", decoderName)) {
+                return false;
+            }
+            if (ctx.pipeline().get("compress") != null && !isAlreadyBefore(ctx, "compress", encoderName)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
