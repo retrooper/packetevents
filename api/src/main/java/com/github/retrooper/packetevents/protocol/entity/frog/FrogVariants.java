@@ -32,7 +32,7 @@ public final class FrogVariants {
 
     @ApiStatus.Internal
     public static FrogVariant define(String name, String texture) {
-        ResourceLocation assetId = new ResourceLocation("entity/frog/" + texture);
+        ResourceLocation assetId = new ResourceLocation("entity/frog/frog_" + texture);
         return REGISTRY.define(name, data ->
                 new StaticFrogVariant(data, assetId));
     }
@@ -41,9 +41,9 @@ public final class FrogVariants {
         return REGISTRY;
     }
 
-    public static final FrogVariant COLD = define("cold", "cold_frog");
-    public static final FrogVariant TEMPERATE = define("temperate", "temperate_frog");
-    public static final FrogVariant WARM = define("warm", "warm_frog");
+    public static final FrogVariant COLD = define("cold", "cold");
+    public static final FrogVariant TEMPERATE = define("temperate", "temperate");
+    public static final FrogVariant WARM = define("warm", "warm");
 
     static {
         REGISTRY.unloadMappings();

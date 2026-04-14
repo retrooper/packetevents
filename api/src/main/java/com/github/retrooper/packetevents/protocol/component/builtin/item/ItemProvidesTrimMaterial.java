@@ -18,28 +18,48 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterial;
 import com.github.retrooper.packetevents.protocol.item.trimmaterial.TrimMaterials;
 import com.github.retrooper.packetevents.protocol.mapper.MaybeMappedEntity;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
 
+/**
+ * @versions 1.21.5+
+ */
 public class ItemProvidesTrimMaterial {
 
     private MaybeMappedEntity<TrimMaterial> material;
 
+    public ItemProvidesTrimMaterial(TrimMaterial material) {
+        this(new MaybeMappedEntity<>(material));
+    }
+
+    /**
+     * @versions 1.21.5-1.21.11
+     */
+    @ApiStatus.Obsolete
     public ItemProvidesTrimMaterial(MaybeMappedEntity<TrimMaterial> material) {
         this.material = material;
     }
 
     public static ItemProvidesTrimMaterial read(PacketWrapper<?> wrapper) {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            return new ItemProvidesTrimMaterial(TrimMaterial.read(wrapper));
+        }
         MaybeMappedEntity<TrimMaterial> material = MaybeMappedEntity.read(wrapper, TrimMaterials.getRegistry(), TrimMaterial::read);
         return new ItemProvidesTrimMaterial(material);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemProvidesTrimMaterial material) {
-        MaybeMappedEntity.write(wrapper, material.material, TrimMaterial::write);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            TrimMaterial.write(wrapper, material.material.getValueOrThrow());
+        } else {
+            MaybeMappedEntity.write(wrapper, material.material, TrimMaterial::write);
+        }
     }
 
     public MaybeMappedEntity<TrimMaterial> getMaterial() {

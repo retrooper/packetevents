@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
 import java.util.logging.Level;
 
 public class TestPacketEventsBuilder {
@@ -85,7 +86,7 @@ public class TestPacketEventsBuilder {
             public void load() {
                 if (!loaded) {
                     //Resolve server version and cache
-                    String id = plugin.getName().toLowerCase();
+                    String id = plugin.getName().toLowerCase(Locale.ROOT);
                     PacketEvents.IDENTIFIER = "pe-" + id;
                     PacketEvents.ENCODER_NAME = "pe-encoder-" + id;
                     PacketEvents.DECODER_NAME = "pe-decoder-" + id;

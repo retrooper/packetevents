@@ -24,10 +24,12 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@NullMarked
 public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
 
     private Sound sound;
@@ -110,10 +112,9 @@ public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof JukeboxSong)) return false;
-        if (!super.equals(obj)) return false;
         JukeboxSong that = (JukeboxSong) obj;
         if (Float.compare(that.lengthInSeconds, this.lengthInSeconds) != 0) return false;
         if (this.comparatorOutput != that.comparatorOutput) return false;
@@ -123,7 +124,7 @@ public class JukeboxSong extends AbstractMappedEntity implements IJukeboxSong {
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.sound, this.description, this.lengthInSeconds, this.comparatorOutput);
+        return Objects.hash(this.sound, this.description, this.lengthInSeconds, this.comparatorOutput);
     }
 
     @Override

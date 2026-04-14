@@ -22,10 +22,12 @@ import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@NullMarked
 public class StaticBannerPattern extends AbstractMappedEntity implements BannerPattern {
 
     private final ResourceLocation assetId;
@@ -58,10 +60,9 @@ public class StaticBannerPattern extends AbstractMappedEntity implements BannerP
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticBannerPattern)) return false;
-        if (!super.equals(obj)) return false;
         StaticBannerPattern that = (StaticBannerPattern) obj;
         if (!this.assetId.equals(that.assetId)) return false;
         return this.translationKey.equals(that.translationKey);
@@ -69,7 +70,7 @@ public class StaticBannerPattern extends AbstractMappedEntity implements BannerP
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.assetId, this.translationKey);
+        return Objects.hash(this.assetId, this.translationKey);
     }
 
     @Override

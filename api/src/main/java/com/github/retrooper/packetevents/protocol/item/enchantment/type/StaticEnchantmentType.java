@@ -30,8 +30,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -115,10 +115,9 @@ public class StaticEnchantmentType extends AbstractMappedEntity implements Encha
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticEnchantmentType)) return false;
-        if (!super.equals(obj)) return false;
         StaticEnchantmentType that = (StaticEnchantmentType) obj;
         if (!this.description.equals(that.description)) return false;
         if (!this.definition.equals(that.definition)) return false;
@@ -128,7 +127,7 @@ public class StaticEnchantmentType extends AbstractMappedEntity implements Encha
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.description, this.definition, this.exclusiveSetRef, this.effects);
+        return Objects.hash(this.description, this.definition, this.exclusiveSetRef, this.effects);
     }
 
     @Override

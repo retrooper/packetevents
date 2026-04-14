@@ -218,5 +218,18 @@ public class EnvironmentAttributeMap {
         public AttributeModifier<T, A> getModifier() {
             return this.modifier;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null || this.getClass() != obj.getClass()) return false;
+            Entry<?, ?> entry = (Entry<?, ?>) obj;
+            if (this.modifier != entry.modifier) return false;
+            return this.argument.equals(entry.argument);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.argument, this.modifier);
+        }
     }
 }

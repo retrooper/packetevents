@@ -37,6 +37,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class ParticleVibrationData extends ParticleData {
@@ -248,5 +249,19 @@ public class ParticleVibrationData extends ParticleData {
     @Override
     public boolean isEmpty() {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        ParticleVibrationData that = (ParticleVibrationData) obj;
+        if (this.ticks != that.ticks) return false;
+        if (!this.startingPosition.equals(that.startingPosition)) return false;
+        return this.source.equals(that.source);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.startingPosition, this.source, this.ticks);
     }
 }

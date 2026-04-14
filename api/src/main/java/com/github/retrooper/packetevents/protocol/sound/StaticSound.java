@@ -22,10 +22,12 @@ import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@NullMarked
 public class StaticSound extends AbstractMappedEntity implements Sound {
 
     private final ResourceLocation soundId;
@@ -53,19 +55,15 @@ public class StaticSound extends AbstractMappedEntity implements Sound {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof StaticSound)) return false;
+    public boolean deepEquals(@Nullable Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
         StaticSound that = (StaticSound) obj;
-        if (this.isRegistered()) {
-            return super.equals(obj);
-        }
         if (!this.soundId.equals(that.soundId)) return false;
         return Objects.equals(this.range, that.range);
     }
 
     @Override
-    public int hashCode() {
-        return this.isRegistered() ? super.hashCode() : Objects.hash(this.soundId, this.range);
+    public int deepHashCode() {
+        return Objects.hash(this.soundId, this.range);
     }
 }

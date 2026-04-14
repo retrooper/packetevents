@@ -28,13 +28,16 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 
 import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
 
+@NullMarked
 public interface DamageType extends MappedEntity, CopyableEntity<DamageType>, DeepComparableEntity {
+
     String getMessageId();
 
     DamageScaling getScaling();

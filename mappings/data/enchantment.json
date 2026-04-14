@@ -1042,6 +1042,49 @@
                 },
                 "condition": "minecraft:entity_properties",
                 "entity": "this"
+              },
+              {
+                "condition": "minecraft:any_of",
+                "terms": [
+                  {
+                    "condition": "minecraft:inverted",
+                    "term": {
+                      "predicate": {
+                        "type_specific": {
+                          "type": "minecraft:player"
+                        }
+                      },
+                      "condition": "minecraft:entity_properties",
+                      "entity": "this"
+                    }
+                  },
+                  {
+                    "predicate": {
+                      "type_specific": {
+                        "type": "minecraft:player",
+                        "gamemode": [
+                          "creative"
+                        ]
+                      }
+                    },
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this"
+                  },
+                  {
+                    "predicate": {
+                      "type_specific": {
+                        "type": "minecraft:player",
+                        "food": {
+                          "level": {
+                            "min": 7
+                          }
+                        }
+                      }
+                    },
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this"
+                  }
+                ]
               }
             ]
           },

@@ -270,7 +270,7 @@ public class NBTCompound extends NBT {
         NBT tag = this.getTagOrNull(key);
         if (tag instanceof NBTList) {
             // entries in list format
-            List<? extends NBT> tags = ((NBTList<?>) tag).getTags();
+            List<? extends NBT> tags = ((NBTList<?>) tag).unwrapTags();
             List<T> list = new ArrayList<>(tags.size());
             for (NBT element : tags) {
                 list.add(decoder.decode(element, wrapper));
@@ -311,14 +311,14 @@ public class NBTCompound extends NBT {
         if (value.isEmpty()) {
             this.setTag(key, new NBTList<>(NBTType.END, 0));
         } else {
-            // determine list type using first value in list
-            NBT firstVal = encoder.encode(wrapper, value.get(0));
             int size = value.size();
-            NBTList<?> list = new NBTList<>(firstVal.getType(), size);
-            list.addTagUnsafe(firstVal);
-            // add remaining list entries
-            for (int i = 1; i < size; i++) {
-                list.addTagUnsafe(encoder.encode(wrapper, value.get(i)));
+            List<NBT> tags = new ArrayList<>(size);
+            for (T elem : value) {
+                tags.add(encoder.encode(wrapper, elem));
+            }
+            NBTList<?> list = new NBTList<>(NBTList.getCommonTagType(tags), size);
+            for (NBT tag : tags) {
+                list.addTagOrWrap(tag);
             }
             this.setTag(key, list);
         }

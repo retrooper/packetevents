@@ -18,6 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.particle.data;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ParticleData {
 
     static ParticleData EMPTY = new ParticleData();

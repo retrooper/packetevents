@@ -19,15 +19,18 @@
 package com.github.retrooper.packetevents.protocol.item.trimpattern;
 
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@NullMarked
 public class StaticTrimPattern extends AbstractMappedEntity implements TrimPattern {
 
     private final ResourceLocation assetId;
@@ -69,7 +72,7 @@ public class StaticTrimPattern extends AbstractMappedEntity implements TrimPatte
     @ApiStatus.Obsolete
     @Override
     public ItemType getTemplateItem() {
-        return this.templateItem;
+        return this.templateItem != null ? this.templateItem : ItemTypes.AIR;
     }
 
     @Override
@@ -83,10 +86,9 @@ public class StaticTrimPattern extends AbstractMappedEntity implements TrimPatte
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticTrimPattern)) return false;
-        if (!super.equals(obj)) return false;
         StaticTrimPattern that = (StaticTrimPattern) obj;
         if (this.decal != that.decal) return false;
         if (!this.assetId.equals(that.assetId)) return false;
@@ -96,7 +98,7 @@ public class StaticTrimPattern extends AbstractMappedEntity implements TrimPatte
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.assetId, this.templateItem, this.description, this.decal);
+        return Objects.hash(this.assetId, this.templateItem, this.description, this.decal);
     }
 
     @Override

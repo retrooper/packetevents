@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageType;
@@ -29,19 +30,38 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * @versions 1.21.5+
+ */
 public class ItemBlocksAttacks {
 
     private float blockDelaySeconds;
     private float disableCooldownScale;
     private List<DamageReduction> damageReductions;
     private ItemDamageFunction itemDamage;
-    private @Nullable ResourceLocation bypassedBy;
+    /**
+     * @versions 26.1+
+     */
+    private @Nullable MappedEntitySet<DamageType> bypassedBy;
     private @Nullable Sound blockSound;
     private @Nullable Sound disableSound;
 
     public ItemBlocksAttacks(
             float blockDelaySeconds, float disableCooldownScale, List<DamageReduction> damageReductions,
             ItemDamageFunction itemDamage, @Nullable ResourceLocation bypassedBy,
+            @Nullable Sound blockSound, @Nullable Sound disableSound
+    ) {
+        this(blockDelaySeconds, disableCooldownScale, damageReductions, itemDamage,
+                bypassedBy != null ? new MappedEntitySet<>(bypassedBy) : null,
+                blockSound, disableSound);
+    }
+
+    /**
+     * @versions 26.1+
+     */
+    public ItemBlocksAttacks(
+            float blockDelaySeconds, float disableCooldownScale, List<DamageReduction> damageReductions,
+            ItemDamageFunction itemDamage, @Nullable MappedEntitySet<DamageType> bypassedBy,
             @Nullable Sound blockSound, @Nullable Sound disableSound
     ) {
         this.blockDelaySeconds = blockDelaySeconds;
@@ -58,7 +78,9 @@ public class ItemBlocksAttacks {
         float disableCooldownScale = wrapper.readFloat();
         List<DamageReduction> damageReductions = wrapper.readList(DamageReduction::read);
         ItemDamageFunction itemDamage = ItemDamageFunction.read(wrapper);
-        ResourceLocation bypassedBy = wrapper.readOptional(PacketWrapper::readIdentifier);
+        MappedEntitySet<DamageType> bypassedBy = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)
+                ? wrapper.readOptional(ew -> MappedEntitySet.read(wrapper, DamageTypes.getRegistry()))
+                : wrapper.readOptional(ew -> new MappedEntitySet<>(ew.readIdentifier()));
         Sound blockSound = wrapper.readOptional(Sound::read);
         Sound disableSound = wrapper.readOptional(Sound::read);
         return new ItemBlocksAttacks(
@@ -71,7 +93,11 @@ public class ItemBlocksAttacks {
         wrapper.writeFloat(attack.disableCooldownScale);
         wrapper.writeList(attack.damageReductions, DamageReduction::write);
         ItemDamageFunction.write(wrapper, attack.itemDamage);
-        wrapper.writeOptional(attack.bypassedBy, PacketWrapper::writeIdentifier);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            wrapper.writeOptional(attack.bypassedBy, MappedEntitySet::write);
+        } else {
+            wrapper.writeOptional(attack.getBypassedBy(), PacketWrapper::writeIdentifier);
+        }
         wrapper.writeOptional(attack.blockSound, Sound::write);
         wrapper.writeOptional(attack.disableSound, Sound::write);
     }
@@ -108,12 +134,26 @@ public class ItemBlocksAttacks {
         this.itemDamage = itemDamage;
     }
 
-    public @Nullable ResourceLocation getBypassedBy() {
+    /**
+     * @versions 26.1+
+     */
+    public @Nullable MappedEntitySet<DamageType> getBypassedBySet() {
         return this.bypassedBy;
     }
 
-    public void setBypassedBy(@Nullable ResourceLocation bypassedBy) {
+    /**
+     * @versions 26.1+
+     */
+    public void setBypassedBySet(@Nullable MappedEntitySet<DamageType> bypassedBy) {
         this.bypassedBy = bypassedBy;
+    }
+
+    public @Nullable ResourceLocation getBypassedBy() {
+        return this.bypassedBy != null ? this.bypassedBy.getTagKey() : null;
+    }
+
+    public void setBypassedBy(@Nullable ResourceLocation bypassedBy) {
+        this.bypassedBy = bypassedBy != null ? new MappedEntitySet<>(bypassedBy) : null;
     }
 
     public @Nullable Sound getBlockSound() {

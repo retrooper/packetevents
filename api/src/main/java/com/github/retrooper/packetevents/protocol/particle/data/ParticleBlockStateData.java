@@ -23,7 +23,11 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
+@NullMarked
 public class ParticleBlockStateData extends ParticleData implements LegacyConvertible {
 
     private WrappedBlockState blockState;
@@ -82,4 +86,15 @@ public class ParticleBlockStateData extends ParticleData implements LegacyConver
         return LegacyParticleData.ofOne(blockState.getGlobalId());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        ParticleBlockStateData that = (ParticleBlockStateData) obj;
+        return this.blockState.equals(that.blockState);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.blockState);
+    }
 }

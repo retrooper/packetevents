@@ -21,10 +21,12 @@ package com.github.retrooper.packetevents.protocol.world.damagetype;
 import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@NullMarked
 public class StaticDamageType extends AbstractMappedEntity implements DamageType {
 
     private final String messageId;
@@ -78,10 +80,9 @@ public class StaticDamageType extends AbstractMappedEntity implements DamageType
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticDamageType)) return false;
-        if (!super.equals(obj)) return false;
         StaticDamageType that = (StaticDamageType) obj;
         if (Float.compare(that.exhaustion, this.exhaustion) != 0) return false;
         if (!this.messageId.equals(that.messageId)) return false;
@@ -92,7 +93,7 @@ public class StaticDamageType extends AbstractMappedEntity implements DamageType
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.messageId, this.scaling, this.exhaustion, this.effects, this.deathMessageType);
+        return Objects.hash(this.messageId, this.scaling, this.exhaustion, this.effects, this.deathMessageType);
     }
 
     @Override

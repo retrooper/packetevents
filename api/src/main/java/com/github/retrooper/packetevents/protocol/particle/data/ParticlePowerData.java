@@ -26,6 +26,8 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
 /**
  * @versions 1.21.9+
  */
@@ -73,5 +75,17 @@ public class ParticlePowerData extends ParticleData {
 
     public void setPower(float power) {
         this.power = power;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        ParticlePowerData that = (ParticlePowerData) obj;
+        return Float.compare(that.power, this.power) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.power);
     }
 }

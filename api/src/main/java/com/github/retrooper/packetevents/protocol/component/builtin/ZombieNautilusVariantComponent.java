@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.component.builtin;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.nautilus.ZombieNautilusVariant;
 import com.github.retrooper.packetevents.protocol.entity.nautilus.ZombieNautilusVariants;
 import com.github.retrooper.packetevents.protocol.mapper.MaybeMappedEntity;
@@ -32,18 +33,32 @@ public class ZombieNautilusVariantComponent {
 
     private MaybeMappedEntity<ZombieNautilusVariant> variant;
 
+    public ZombieNautilusVariantComponent(ZombieNautilusVariant variant) {
+        this(new MaybeMappedEntity<>(variant));
+    }
+
+    /**
+     * @versions 1.21.11
+     */
     public ZombieNautilusVariantComponent(MaybeMappedEntity<ZombieNautilusVariant> variant) {
         this.variant = variant;
     }
 
     public static ZombieNautilusVariantComponent read(PacketWrapper<?> wrapper) {
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            return new ZombieNautilusVariantComponent(ZombieNautilusVariant.read(wrapper));
+        }
         MaybeMappedEntity<ZombieNautilusVariant> variant = MaybeMappedEntity.read(wrapper,
                 ZombieNautilusVariants.getRegistry(), ZombieNautilusVariant::read);
         return new ZombieNautilusVariantComponent(variant);
     }
 
     public static void write(PacketWrapper<?> wrapper, ZombieNautilusVariantComponent component) {
-        MaybeMappedEntity.write(wrapper, component.variant, ZombieNautilusVariant::write);
+        if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_1)) {
+            ZombieNautilusVariant.write(wrapper, component.variant.getValueOrThrow());
+        } else {
+            MaybeMappedEntity.write(wrapper, component.variant, ZombieNautilusVariant::write);
+        }
     }
 
     public MaybeMappedEntity<ZombieNautilusVariant> getVariant() {

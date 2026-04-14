@@ -25,8 +25,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * Less/low precision encoding/decoding for {@link Vector3d},
- * introduced in Minecraft 1.21.9.
+ * Less/low precision encoding/decoding for {@link Vector3d}.
+ *
+ * @versions 1.21.9+
  */
 @NullMarked
 @ApiStatus.Internal

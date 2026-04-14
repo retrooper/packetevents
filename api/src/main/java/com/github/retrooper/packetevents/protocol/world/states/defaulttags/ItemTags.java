@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.Collections;
@@ -187,10 +188,6 @@ public class ItemTags {
      * Added with 1.20.5
      */
     public static final ItemTags COW_FOOD = bind("cow_food");
-    /**
-     * Added with 1.20.5
-     */
-    public static final ItemTags DYEABLE = bind("dyeable");
     /**
      * Added with 1.20.5
      */
@@ -581,6 +578,52 @@ public class ItemTags {
      * @versions 1.21.11+
      */
     public static final ItemTags ENCHANTABLE_LUNGE = bind("enchantable/lunge");
+    /**
+     * @versions 26.1+
+     */
+    public static final ItemTags MUD = bind("mud");
+    /**
+     * @versions 26.1+
+     */
+    public static final ItemTags GRASS_BLOCKS = bind("grass_blocks");
+    /**
+     * @versions 26.1+
+     */
+    public static final ItemTags MOSS_BLOCKS = bind("moss_blocks");
+    /**
+     * @versions 26.1+
+     */
+    public static final ItemTags DYES = bind("dyes");
+    /**
+     * @versions 26.1+
+     */
+    public static final ItemTags LOOM_PATTERNS = bind("loom_patterns");
+    /**
+     * @versions 26.1+
+     */
+    public static final ItemTags CAULDRON_CAN_REMOVE_DYE = bind("cauldron_can_remove_dye");
+    /**
+     * @versions 26.1+
+     */
+    public static final ItemTags METAL_NUGGETS = bind("metal_nuggets");
+    /**
+     * @versions 26.1+
+     */
+    public static final ItemTags LOOM_DYES = bind("loom_dyes");
+    /**
+     * @versions 26.1+
+     */
+    public static final ItemTags CAT_COLLAR_DYES = bind("cat_collar_dyes");
+    /**
+     * @versions 26.1+
+     */
+    public static final ItemTags WOLF_COLLAR_DYES = bind("wolf_collar_dyes");
+
+    /**
+     * @versions 1.20.5-1.21.11
+     */
+    @Deprecated
+    public static final ItemTags DYEABLE = DYES;
 
     static {
         // auto-generated, do not edit manually!
@@ -631,6 +674,9 @@ public class ItemTags {
         copy(BlockTags.EMERALD_ORES, ItemTags.EMERALD_ORES);
         copy(BlockTags.COPPER_ORES, ItemTags.COPPER_ORES);
         copy(BlockTags.DIRT, ItemTags.DIRT);
+        copy(BlockTags.MUD, ItemTags.MUD);
+        copy(BlockTags.MOSS_BLOCKS, ItemTags.MOSS_BLOCKS);
+        copy(BlockTags.GRASS_BLOCKS, ItemTags.GRASS_BLOCKS);
         copy(BlockTags.TERRACOTTA, ItemTags.TERRACOTTA);
         copy(BlockTags.SHULKER_BOXES, ItemTags.SHULKER_BOXES);
         copy(BlockTags.COPPER_CHESTS, ItemTags.COPPER_CHESTS);
@@ -726,16 +772,19 @@ public class ItemTags {
         ItemTags.SHOVELS.add(ItemTypes.DIAMOND_SHOVEL, ItemTypes.STONE_SHOVEL, ItemTypes.GOLDEN_SHOVEL, ItemTypes.NETHERITE_SHOVEL, ItemTypes.WOODEN_SHOVEL, ItemTypes.IRON_SHOVEL, ItemTypes.COPPER_SHOVEL);
         ItemTags.SPEARS.add(ItemTypes.DIAMOND_SPEAR, ItemTypes.STONE_SPEAR, ItemTypes.GOLDEN_SPEAR, ItemTypes.NETHERITE_SPEAR, ItemTypes.WOODEN_SPEAR, ItemTypes.IRON_SPEAR, ItemTypes.COPPER_SPEAR);
         ItemTags.VILLAGER_PLANTABLE_SEEDS.add(ItemTypes.WHEAT_SEEDS, ItemTypes.POTATO, ItemTypes.CARROT, ItemTypes.BEETROOT_SEEDS, ItemTypes.TORCHFLOWER_SEEDS, ItemTypes.PITCHER_POD);
-        ItemTags.DYEABLE.add(ItemTypes.LEATHER_HELMET, ItemTypes.LEATHER_CHESTPLATE, ItemTypes.LEATHER_LEGGINGS, ItemTypes.LEATHER_BOOTS, ItemTypes.LEATHER_HORSE_ARMOR, ItemTypes.WOLF_ARMOR);
         copy(ItemTags.COALS, ItemTags.FURNACE_MINECART_FUEL);
         ItemTags.BUNDLES.add(ItemTypes.BUNDLE, ItemTypes.BLACK_BUNDLE, ItemTypes.BLUE_BUNDLE, ItemTypes.BROWN_BUNDLE, ItemTypes.CYAN_BUNDLE, ItemTypes.GRAY_BUNDLE, ItemTypes.GREEN_BUNDLE, ItemTypes.LIGHT_BLUE_BUNDLE, ItemTypes.LIGHT_GRAY_BUNDLE, ItemTypes.LIME_BUNDLE, ItemTypes.MAGENTA_BUNDLE, ItemTypes.ORANGE_BUNDLE, ItemTypes.PINK_BUNDLE, ItemTypes.PURPLE_BUNDLE, ItemTypes.RED_BUNDLE, ItemTypes.YELLOW_BUNDLE, ItemTypes.WHITE_BUNDLE);
         ItemTags.BOOK_CLONING_TARGET.add(ItemTypes.WRITABLE_BOOK);
+        ItemTags.DYES.add(ItemTypes.WHITE_DYE, ItemTypes.ORANGE_DYE, ItemTypes.MAGENTA_DYE, ItemTypes.LIGHT_BLUE_DYE, ItemTypes.YELLOW_DYE, ItemTypes.LIME_DYE, ItemTypes.PINK_DYE, ItemTypes.GRAY_DYE, ItemTypes.LIGHT_GRAY_DYE, ItemTypes.CYAN_DYE, ItemTypes.PURPLE_DYE, ItemTypes.BLUE_DYE, ItemTypes.BROWN_DYE, ItemTypes.GREEN_DYE, ItemTypes.RED_DYE, ItemTypes.BLACK_DYE);
+        ItemTags.LOOM_PATTERNS.add(ItemTypes.FLOWER_BANNER_PATTERN, ItemTypes.CREEPER_BANNER_PATTERN, ItemTypes.SKULL_BANNER_PATTERN, ItemTypes.MOJANG_BANNER_PATTERN, ItemTypes.GLOBE_BANNER_PATTERN, ItemTypes.PIGLIN_BANNER_PATTERN, ItemTypes.FLOW_BANNER_PATTERN, ItemTypes.GUSTER_BANNER_PATTERN, ItemTypes.FIELD_MASONED_BANNER_PATTERN, ItemTypes.BORDURE_INDENTED_BANNER_PATTERN);
+        ItemTags.CAULDRON_CAN_REMOVE_DYE.add(ItemTypes.LEATHER_HELMET, ItemTypes.LEATHER_CHESTPLATE, ItemTypes.LEATHER_LEGGINGS, ItemTypes.LEATHER_BOOTS, ItemTypes.LEATHER_HORSE_ARMOR, ItemTypes.WOLF_ARMOR);
         ItemTags.SKELETON_PREFERRED_WEAPONS.add(ItemTypes.BOW);
         ItemTags.DROWNED_PREFERRED_WEAPONS.add(ItemTypes.TRIDENT);
         ItemTags.PIGLIN_PREFERRED_WEAPONS.add(ItemTypes.CROSSBOW, ItemTypes.GOLDEN_SPEAR);
         ItemTags.PILLAGER_PREFERRED_WEAPONS.add(ItemTypes.CROSSBOW);
         ItemTags.WITHER_SKELETON_DISLIKED_WEAPONS.add(ItemTypes.BOW, ItemTypes.CROSSBOW);
         ItemTags.SHEARABLE_FROM_COPPER_GOLEM.add(ItemTypes.POPPY);
+        ItemTags.METAL_NUGGETS.add(ItemTypes.COPPER_NUGGET, ItemTypes.IRON_NUGGET, ItemTypes.GOLD_NUGGET);
         ItemTags.ENCHANTABLE_FISHING.add(ItemTypes.FISHING_ROD);
         copy(ItemTags.DROWNED_PREFERRED_WEAPONS, ItemTags.ENCHANTABLE_TRIDENT);
         copy(ItemTags.SKELETON_PREFERRED_WEAPONS, ItemTags.ENCHANTABLE_BOW);
@@ -752,7 +801,7 @@ public class ItemTags {
         copy(BlockTags.FLOWERS, ItemTags.FLOWERS);
         copy(BlockTags.FENCES, ItemTags.FENCES);
         copy(BlockTags.DAMPENS_VIBRATIONS, ItemTags.DAMPENS_VIBRATIONS);
-        ItemTags.PIGLIN_LOVED.addTag(ItemTags.GOLD_ORES).add(ItemTypes.GOLD_BLOCK, ItemTypes.GILDED_BLACKSTONE, ItemTypes.LIGHT_WEIGHTED_PRESSURE_PLATE, ItemTypes.GOLD_INGOT, ItemTypes.BELL, ItemTypes.CLOCK, ItemTypes.GOLDEN_CARROT, ItemTypes.GLISTERING_MELON_SLICE, ItemTypes.GOLDEN_APPLE, ItemTypes.ENCHANTED_GOLDEN_APPLE, ItemTypes.GOLDEN_HELMET, ItemTypes.GOLDEN_CHESTPLATE, ItemTypes.GOLDEN_LEGGINGS, ItemTypes.GOLDEN_BOOTS, ItemTypes.GOLDEN_HORSE_ARMOR, ItemTypes.GOLDEN_NAUTILUS_ARMOR, ItemTypes.GOLDEN_SWORD, ItemTypes.GOLDEN_SPEAR, ItemTypes.GOLDEN_PICKAXE, ItemTypes.GOLDEN_SHOVEL, ItemTypes.GOLDEN_AXE, ItemTypes.GOLDEN_HOE, ItemTypes.RAW_GOLD, ItemTypes.RAW_GOLD_BLOCK);
+        ItemTags.PIGLIN_LOVED.addTag(ItemTags.GOLD_ORES).add(ItemTypes.GOLD_BLOCK, ItemTypes.GILDED_BLACKSTONE, ItemTypes.LIGHT_WEIGHTED_PRESSURE_PLATE, ItemTypes.GOLD_INGOT, ItemTypes.BELL, ItemTypes.CLOCK, ItemTypes.GOLDEN_CARROT, ItemTypes.GLISTERING_MELON_SLICE, ItemTypes.GOLDEN_APPLE, ItemTypes.ENCHANTED_GOLDEN_APPLE, ItemTypes.GOLDEN_HELMET, ItemTypes.GOLDEN_CHESTPLATE, ItemTypes.GOLDEN_LEGGINGS, ItemTypes.GOLDEN_BOOTS, ItemTypes.GOLDEN_HORSE_ARMOR, ItemTypes.GOLDEN_NAUTILUS_ARMOR, ItemTypes.GOLDEN_SWORD, ItemTypes.GOLDEN_SPEAR, ItemTypes.GOLDEN_PICKAXE, ItemTypes.GOLDEN_SHOVEL, ItemTypes.GOLDEN_AXE, ItemTypes.GOLDEN_HOE, ItemTypes.RAW_GOLD, ItemTypes.RAW_GOLD_BLOCK, ItemTypes.GOLDEN_DANDELION);
         ItemTags.WOLF_FOOD.addTag(ItemTags.MEAT).add(ItemTypes.COD, ItemTypes.COOKED_COD, ItemTypes.SALMON, ItemTypes.COOKED_SALMON, ItemTypes.TROPICAL_FISH, ItemTypes.PUFFERFISH, ItemTypes.RABBIT_STEW);
         ItemTags.HAPPY_GHAST_TEMPT_ITEMS.addTag(ItemTags.HAPPY_GHAST_FOOD).addTag(ItemTags.HARNESSES);
         ItemTags.PANDA_EATS_FROM_GROUND.addTag(ItemTags.PANDA_FOOD).add(ItemTypes.CAKE);
@@ -764,6 +813,9 @@ public class ItemTags {
         ItemTags.DECORATED_POT_INGREDIENTS.addTag(ItemTags.DECORATED_POT_SHERDS).add(ItemTypes.BRICK);
         ItemTags.BREAKS_DECORATED_POTS.addTag(ItemTags.SWORDS).addTag(ItemTags.AXES).addTag(ItemTags.PICKAXES).addTag(ItemTags.SHOVELS).addTag(ItemTags.HOES).add(ItemTypes.TRIDENT, ItemTypes.MACE);
         ItemTags.VILLAGER_PICKS_UP.addTag(ItemTags.VILLAGER_PLANTABLE_SEEDS).add(ItemTypes.BREAD, ItemTypes.WHEAT, ItemTypes.BEETROOT);
+        ItemTags.LOOM_DYES.addTag(ItemTags.DYES);
+        copy(ItemTags.LOOM_DYES, ItemTags.CAT_COLLAR_DYES);
+        copy(ItemTags.LOOM_DYES, ItemTags.WOLF_COLLAR_DYES);
         ItemTags.ENCHANTABLE_FOOT_ARMOR.addTag(ItemTags.FOOT_ARMOR);
         ItemTags.ENCHANTABLE_LEG_ARMOR.addTag(ItemTags.LEG_ARMOR);
         ItemTags.ENCHANTABLE_CHEST_ARMOR.addTag(ItemTags.CHEST_ARMOR);

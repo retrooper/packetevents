@@ -62,11 +62,14 @@ public abstract class AbstractMappedEntity implements MappedEntity {
 
     @Override
     public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
         if (this == obj) return true;
-        if (!(obj instanceof AbstractMappedEntity)) return false;
+
         AbstractMappedEntity that = (AbstractMappedEntity) obj;
         if (this.data != null && that.data != null) {
             return this.data.getName().equals(that.data.getName());
+        } else if (this instanceof DeepComparableEntity) {
+            return ((DeepComparableEntity) this).deepEquals(obj);
         }
         return false;
     }
@@ -74,9 +77,11 @@ public abstract class AbstractMappedEntity implements MappedEntity {
     @Override
     public int hashCode() {
         if (this.data != null) {
-            return Objects.hashCode(this.data.getName());
+            return Objects.hash(this.getClass(), this.data.getName());
+        } else if (this instanceof DeepComparableEntity) {
+            return ((DeepComparableEntity) this).deepHashCode();
         }
-        return super.hashCode();
+        return System.identityHashCode(this);
     }
 
     @Override

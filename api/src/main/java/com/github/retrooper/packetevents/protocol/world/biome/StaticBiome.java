@@ -22,8 +22,8 @@ import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
 import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributeMap;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -153,10 +153,9 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof StaticBiome)) return false;
-        if (!super.equals(obj)) return false;
         StaticBiome that = (StaticBiome) obj;
         if (this.precipitation != that.precipitation) return false;
         if (Float.compare(that.temperature, this.temperature) != 0) return false;
@@ -171,7 +170,7 @@ public class StaticBiome extends AbstractMappedEntity implements Biome {
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.precipitation, this.temperature, this.temperatureModifier,
+        return Objects.hash(this.precipitation, this.temperature, this.temperatureModifier,
                 this.downfall, this.category, this.depth, this.scale, this.effects, this.attributes);
     }
 

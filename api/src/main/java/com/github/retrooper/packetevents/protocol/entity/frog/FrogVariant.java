@@ -29,7 +29,9 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public interface FrogVariant extends MappedEntity, CopyableEntity<FrogVariant>, DeepComparableEntity {
 
     ResourceLocation getAssetId();

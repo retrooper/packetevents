@@ -37,8 +37,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.util.Index;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public interface Biome extends MappedEntity, CopyableEntity<Biome>, DeepComparableEntity {

@@ -4,9 +4,11 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
 
+@NullMarked
 public class LegacyParticleData extends ParticleData implements LegacyConvertible {
 
     private final int[] legacyData;
@@ -78,7 +80,18 @@ public class LegacyParticleData extends ParticleData implements LegacyConvertibl
 
     @Override
     public LegacyParticleData toLegacy(ClientVersion version) {
-        return new LegacyParticleData(legacyData);
+        return this;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        LegacyParticleData that = (LegacyParticleData) obj;
+        return Arrays.equals(this.legacyData, that.legacyData);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(this.legacyData);
+    }
 }

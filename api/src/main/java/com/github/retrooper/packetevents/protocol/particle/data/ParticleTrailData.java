@@ -25,7 +25,11 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
+@NullMarked
 public class ParticleTrailData extends ParticleData {
 
     private static final int FALLBACK_DURATION = 50 / 2; // use average duration as default
@@ -33,7 +37,7 @@ public class ParticleTrailData extends ParticleData {
     private Vector3d target;
     private Color color;
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     private int duration;
 
@@ -103,16 +107,30 @@ public class ParticleTrailData extends ParticleData {
     }
 
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public int getDuration() {
         return this.duration;
     }
 
     /**
-     * Added with 1.21.4
+     * @versions 1.21.4+
      */
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        ParticleTrailData that = (ParticleTrailData) obj;
+        if (this.duration != that.duration) return false;
+        if (!this.target.equals(that.target)) return false;
+        return this.color.equals(that.color);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.target, this.color, this.duration);
     }
 }

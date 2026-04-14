@@ -1,4 +1,17 @@
 {
+  "V_26_1": [
+    "empty",
+    "any_fuel",
+    "with_any_potion",
+    "only_with_component",
+    "item",
+    "item_stack",
+    "tag",
+    "dyed",
+    "smithing_trim",
+    "with_remainder",
+    "composite"
+  ],
   "V_1_21_2": [
     "empty",
     "any_fuel",

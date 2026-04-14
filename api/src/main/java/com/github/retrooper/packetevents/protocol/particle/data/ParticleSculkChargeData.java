@@ -4,7 +4,11 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
+@NullMarked
 public class ParticleSculkChargeData extends ParticleData {
 
     private float roll;
@@ -43,4 +47,15 @@ public class ParticleSculkChargeData extends ParticleData {
         return false;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        ParticleSculkChargeData that = (ParticleSculkChargeData) obj;
+        return Float.compare(that.roll, this.roll) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.roll);
+    }
 }

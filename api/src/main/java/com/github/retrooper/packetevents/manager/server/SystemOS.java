@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.manager.server;
 
+import java.util.Locale;
+
 /**
  * System Operating system.
  *
@@ -36,9 +38,9 @@ public enum SystemOS {
      * @return Operating System.
      */
     public static SystemOS getOSNoCache() {
-        final String os = System.getProperty("os.name").toLowerCase();
+        final String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
         for (SystemOS sysos : values()) {
-            if (os.contains(sysos.name().toLowerCase())) {
+            if (os.contains(sysos.name().toLowerCase(Locale.ROOT))) {
                 return sysos;
             }
         }

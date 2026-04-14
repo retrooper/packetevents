@@ -31,7 +31,9 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public interface IJukeboxSong extends MappedEntity, CopyableEntity<IJukeboxSong>, DeepComparableEntity {
 
     Sound getSound();

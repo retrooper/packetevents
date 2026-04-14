@@ -31,13 +31,15 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.util.Index;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
 import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
 
+@NullMarked
 public interface ChatType extends MappedEntity, CopyableEntity<ChatType>, DeepComparableEntity {
 
     @UnknownNullability("only nullable for 1.19")

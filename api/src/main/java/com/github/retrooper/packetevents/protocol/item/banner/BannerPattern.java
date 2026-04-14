@@ -28,13 +28,23 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public interface BannerPattern extends MappedEntity, CopyableEntity<BannerPattern>, DeepComparableEntity {
 
     ResourceLocation getAssetId();
 
     String getTranslationKey();
+
+    static BannerPattern read(PacketWrapper<?> wrapper) {
+        return wrapper.readMappedEntityOrDirect(BannerPatterns.getRegistry(), BannerPattern::readDirect);
+    }
+
+    static void write(PacketWrapper<?> wrapper, BannerPattern pattern) {
+        wrapper.writeMappedEntityOrDirect(pattern, BannerPattern::writeDirect);
+    }
 
     static BannerPattern readDirect(PacketWrapper<?> wrapper) {
         ResourceLocation assetId = wrapper.readIdentifier();

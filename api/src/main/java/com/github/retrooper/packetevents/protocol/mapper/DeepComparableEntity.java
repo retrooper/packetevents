@@ -18,9 +18,13 @@
 
 package com.github.retrooper.packetevents.protocol.mapper;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public interface DeepComparableEntity {
 
-    boolean deepEquals(Object obj);
+    boolean deepEquals(@Nullable Object obj);
 
     int deepHashCode();
 }

@@ -26,8 +26,8 @@ import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -85,9 +85,8 @@ public class NoticeDialog extends AbstractMappedEntity implements Dialog {
     }
 
     @Override
-    public boolean deepEquals(Object obj) {
+    public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof NoticeDialog)) return false;
-        if (!super.equals(obj)) return false;
         NoticeDialog that = (NoticeDialog) obj;
         if (!this.common.equals(that.common)) return false;
         return this.action.equals(that.action);
@@ -95,6 +94,6 @@ public class NoticeDialog extends AbstractMappedEntity implements Dialog {
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.common, this.action);
+        return Objects.hash(this.common, this.action);
     }
 }

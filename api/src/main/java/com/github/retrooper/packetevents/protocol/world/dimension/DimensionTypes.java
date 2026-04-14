@@ -30,6 +30,7 @@ import com.github.retrooper.packetevents.protocol.world.attributes.BackgroundMus
 import com.github.retrooper.packetevents.protocol.world.attributes.EnvironmentAttributes;
 import com.github.retrooper.packetevents.protocol.world.biome.BiomeEffects.MoodSettings;
 import com.github.retrooper.packetevents.protocol.world.biome.BiomeEffects.MusicSettings;
+import com.github.retrooper.packetevents.protocol.world.clock.WorldClocks;
 import com.github.retrooper.packetevents.protocol.world.states.defaulttags.BlockTags;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.VersionRange;
@@ -141,6 +142,9 @@ public final class DimensionTypes {
                     .setNatural(true).setRespawnAnchorWorks(false).setBedWorks(true)
                     .setEffects(new ResourceLocation("overworld"))
                     .setAttribute(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, true)
+                    // 26.1+
+                    .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, new Color(0x0A0A0A))
+                    .setDefaultClock(WorldClocks.OVERWORLD)
     );
 
     /**
@@ -214,9 +218,12 @@ public final class DimensionTypes {
                     .setNatural(true).setRespawnAnchorWorks(false).setBedWorks(true)
                     .setEffects(new ResourceLocation("overworld"))
                     .setAttribute(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, true)
+                    // 26.1+
+                    .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, new Color(0x0A0A0A))
+                    .setDefaultClock(WorldClocks.OVERWORLD)
     );
 
-    public static final DimensionType THE_END = define("the_end",
+    private static final Consumer<DimensionTypeBuilder> THE_END_COMMON =
             builder -> builder
                     // .setTimelines(new MappedEntityRef.Named<>()) TODO how?
                     .setHasFixedTime(true)
@@ -250,13 +257,30 @@ public final class DimensionTypes {
                     ))
                     .setAttribute(EnvironmentAttributes.VISUAL_FOG_COLOR, new Color(0x181318))
                     .setAttribute(EnvironmentAttributes.VISUAL_SKY_COLOR, new Color(0x000000))
-                    .setAttribute(EnvironmentAttributes.VISUAL_SKY_LIGHT_COLOR, new Color(0xE580FF))
+                    .setAttribute(EnvironmentAttributes.VISUAL_SKY_LIGHT_COLOR, new Color(0xAC60CD))
                     .setAttribute(EnvironmentAttributes.VISUAL_SKY_LIGHT_FACTOR, 0f)
                     // pre 1.21.11 properties
                     .setNatural(false).setRespawnAnchorWorks(false).setBedWorks(false)
                     .setEffects(new ResourceLocation("the_end")).setFixedTime(5L * 60L * Ticks.TICKS_PER_SECOND)
                     .setAttribute(EnvironmentAttributes.GAMEPLAY_CAN_START_RAID, true)
-    );
+                    // 26.1+
+                    .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, new Color(0x3F473F))
+                    .setDefaultClock(WorldClocks.THE_END)
+                    .setHasEnderDragonFight(true);
+
+    /**
+     * @versions -1.21.8
+     */
+    @ApiStatus.Obsolete
+    public static final DimensionType THE_END_PRE_1_21_9 = define("the_end",
+            new VersionRange(null, ClientVersion.V_1_21_7),
+            THE_END_COMMON.andThen(builder -> builder.setHasSkylight(false)));
+
+    /**
+     * @versions 1.21.9+
+     */
+    public static final DimensionType THE_END = define("the_end",
+            new VersionRange(ClientVersion.V_1_21_9, null), THE_END_COMMON);
 
     public static final DimensionType THE_NETHER = define("the_nether",
             builder -> builder
@@ -284,6 +308,8 @@ public final class DimensionTypes {
                     .setNatural(false).setRespawnAnchorWorks(true).setBedWorks(false)
                     .setEffects(new ResourceLocation("the_nether"))
                     .setFixedTime(15L * 60L * Ticks.TICKS_PER_SECOND)
+                    // 26.1+
+                    .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, new Color(0x302821))
     );
 
     static {
