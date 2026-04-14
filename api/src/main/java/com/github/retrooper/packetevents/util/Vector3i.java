@@ -35,6 +35,9 @@ import java.util.Objects;
  * @since 1.7
  */
 public class Vector3i {
+
+    private static final Vector3i ZERO = new Vector3i(0, 0, 0);
+
     /**
      * X (coordinate/angle/whatever you wish)
      */
@@ -281,6 +284,6 @@ public class Vector3i {
     }
 
     public static Vector3i zero() {
-        return new Vector3i();
+        return ZERO;
     }
 }
