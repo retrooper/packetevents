@@ -9,18 +9,18 @@ plugins {
 
 repositories {
     mavenCentral()
-   // maven("https://papermc.io/repo/repository/maven-public/")
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
+    api(project(":api"))
+    api(project(":netty-common"))
+
     compileOnly(libs.netty)
+    implementation(libs.bstats.velocity)
+
     compileOnly(libs.velocity)
     annotationProcessor(libs.velocity)
-    shadow(project(":api", "shadow"))
-    shadow(project(":netty-common"))
-    compileShadowOnly(libs.bstats.velocity)
-    // Velocity already bundles with adventure
 }
 
 tasks {

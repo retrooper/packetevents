@@ -46,7 +46,7 @@ parchment-mappings = { module = "org.parchmentmc.data:parchment-1.21.11", versio
 
 [bundles]
 adventure = ["adventure-api", "adventure-nbt", "adventure-key", "adventure-examination-api", "adventure-examination-string"]
-adventure-serializers = ["adventure-text-serializer-gson", "adventure-text-serializer-json-legacy", "adventure-text-serializer-legacy"]
+adventure-serializers = ["adventure-text-serializer-gson", "adventure-text-serializer-json-legacy", "adventure-text-serializer-legacy", "adventure-text-serializer-commons"]
 
 [plugins]
 spongeGradle = { id = "org.spongepowered.gradle.plugin", version.ref = "spongeGradle" }

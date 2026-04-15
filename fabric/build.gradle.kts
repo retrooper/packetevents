@@ -27,7 +27,7 @@ plugins {
 
 dependencies {
     // include dependencies
-    include(project(":api", "shadow"))
+    include(project(":api"))
     include(project(":netty-common"))
 
     // include fabric-specific modules

@@ -85,13 +85,11 @@ tasks {
 
 
 dependencies {
+    api(project(":api"))
+    api(project(":netty-common"))
+
     compileOnly(libs.netty)
-    shadow(libs.adventure.nbt) {
-        isTransitive = false
-    }
-    shadow(project(":api", "shadow"))
-    shadow(project(":netty-common"))
-    compileShadowOnly(libs.bstats.sponge)
+    implementation(libs.bstats.sponge)
 
     compileOnly(libs.via.version)
 }
