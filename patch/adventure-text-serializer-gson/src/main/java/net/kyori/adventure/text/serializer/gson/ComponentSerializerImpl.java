@@ -105,7 +105,7 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
     }
 
     @Override
-    public BuildableComponent<?, ?> read(final JsonReader in) throws IOException {
+    public Component read(final JsonReader in) throws IOException { // packetevents patch
         final JsonToken token = in.peek();
         if (token == JsonToken.STRING || token == JsonToken.NUMBER || token == JsonToken.BOOLEAN) {
             return Component.text(GsonHacks.readString(in));
@@ -113,9 +113,11 @@ final class ComponentSerializerImpl extends TypeAdapter<Component> {
             ComponentBuilder<?, ?> parent = null;
             in.beginArray();
             while (in.hasNext()) {
-                final BuildableComponent<?, ?> child = this.read(in);
+                // packetevents patch start
+                final Component child = this.read(in);
                 if (parent == null) {
-                    parent = child.toBuilder();
+                    parent = BackwardCompatUtil.toBuilder(child);
+                    // packetevents patch end
                 } else {
                     parent.append(child);
                 }

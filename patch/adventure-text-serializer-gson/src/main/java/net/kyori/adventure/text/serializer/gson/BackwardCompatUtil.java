@@ -19,7 +19,9 @@ package net.kyori.adventure.text.serializer.gson;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
+import net.kyori.adventure.text.BuildableComponent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.Style;
@@ -40,7 +42,9 @@ public final class BackwardCompatUtil {
     public static final boolean IS_4_17_0_OR_NEWER;
     public static final boolean IS_4_18_0_OR_NEWER;
     public static final boolean IS_4_22_0_OR_NEWER;
+    public static final boolean IS_4_23_0_OR_NEWER;
     public static final boolean IS_4_25_0_OR_NEWER;
+    public static final boolean IS_4_26_0_OR_NEWER;
 
     static {
         boolean is4_10_0OrNewer = false;
@@ -87,7 +91,15 @@ public final class BackwardCompatUtil {
         }
         IS_4_18_0_OR_NEWER = is4_18_0OrNewer;
 
-        boolean is4_22_0OrNewer = false;
+        boolean is4_23_0OrNewer = false;
+        try {
+            ClickEvent.custom(Key.key("test"), BinaryTagHolder.binaryTagHolder("{test:true}"));
+            is4_23_0OrNewer = true;
+        } catch (Throwable ignored) {
+        }
+        IS_4_23_0_OR_NEWER = is4_23_0OrNewer;
+
+        boolean is4_22_0OrNewer = is4_23_0OrNewer;
         try {
             // support for 1.21.6+ clickevent payloads was added in 4.22.0
             ClickEvent.custom(Key.key("test"), "{test:true}");
@@ -104,6 +116,15 @@ public final class BackwardCompatUtil {
         } catch (Throwable ignored) {
         }
         IS_4_25_0_OR_NEWER = is4_25_0OrNewer;
+
+        boolean is4_26_0OrNewer = false;
+        try {
+            Component component = Component.text(42);
+            component.toBuilder();
+            is4_26_0OrNewer = true;
+        } catch (Throwable ignored) {
+        }
+        IS_4_26_0_OR_NEWER = is4_26_0OrNewer;
     }
 
     private BackwardCompatUtil() {
@@ -140,4 +161,11 @@ public final class BackwardCompatUtil {
         }
     }
 
+    public static ComponentBuilder<?, ?> toBuilder(Component component) {
+        if (IS_4_26_0_OR_NEWER) {
+            return component.toBuilder();
+        }
+        // safe to cast, every Component impl also implements BuildableComponent
+        return ((BuildableComponent<?, ?>) component).toBuilder();
+    }
 }

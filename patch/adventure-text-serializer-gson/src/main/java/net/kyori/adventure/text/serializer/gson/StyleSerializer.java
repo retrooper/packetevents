@@ -38,6 +38,7 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -213,30 +214,33 @@ final class StyleSerializer extends TypeAdapter<Style> {
                     }
                 }
                 if (action != null && action.readable()) {
-                    switch (action) {
-                        case OPEN_URL:
-                            if (value != null) style.clickEvent(ClickEvent.openUrl(value));
-                            break;
-                        case RUN_COMMAND:
-                            if (value != null) style.clickEvent(ClickEvent.runCommand(value));
-                            break;
-                        case SUGGEST_COMMAND:
-                            if (value != null) style.clickEvent(ClickEvent.suggestCommand(value));
-                            break;
-                        case CHANGE_PAGE:
-                            if (page != null) style.clickEvent(ClickEvent.changePage(page));
-                            break;
-                        case COPY_TO_CLIPBOARD:
-                            if (value != null) style.clickEvent(ClickEvent.copyToClipboard(value));
-                            break;
-                        case CUSTOM:
-                            if (key != null && value != null) style.clickEvent(ClickEvent.custom(key, value));
-                            break;
-                        // Not readable.
-                        case SHOW_DIALOG:
-                        case OPEN_FILE:
-                            break;
+                    // packetevents patch start
+                    if (value != null) {
+                        if (action == ClickEvent.Action.OPEN_URL) {
+                            style.clickEvent(ClickEvent.openUrl(value));
+                        } else if (action == ClickEvent.Action.RUN_COMMAND) {
+                            style.clickEvent(ClickEvent.runCommand(value));
+                        } else if (action == ClickEvent.Action.SUGGEST_COMMAND) {
+                            style.clickEvent(ClickEvent.suggestCommand(value));
+                        } else if (action == ClickEvent.Action.COPY_TO_CLIPBOARD) {
+                            style.clickEvent(ClickEvent.copyToClipboard(value));
+                        } else if (action == ClickEvent.Action.CHANGE_PAGE) {
+                            style.clickEvent(ClickEvent.changePage(Integer.parseInt(value)));
+                        }
+                    } else if (action == ClickEvent.Action.CHANGE_PAGE) {
+                        if (page != null) {
+                            style.clickEvent(ClickEvent.changePage(page));
+                        }
+                    } else if (action == ClickEvent.Action.CUSTOM) {
+                        if (key != null) {
+                            if (BackwardCompatUtil.IS_4_23_0_OR_NEWER) {
+                                style.clickEvent(ClickEvent.custom(key, BinaryTagHolder.binaryTagHolder(value)));
+                            } else {
+                                style.clickEvent(ClickEvent.custom(key, value));
+                            }
+                        }
                     }
+                    // packetevents patch end
                 }
                 in.endObject();
             } else if (fieldName.equals(HOVER_EVENT_SNAKE) || fieldName.equals(HOVER_EVENT_CAMEL)) {
@@ -406,18 +410,15 @@ final class StyleSerializer extends TypeAdapter<Style> {
                     final Object payload = BackwardCompatUtil.IS_4_22_0_OR_NEWER ? clickEvent.payload() : clickEvent.value(); // packetevents patch
 
                     if (payload instanceof String || payload instanceof ClickEvent.Payload.Text) { // packetevents patch
-                        switch (action) {
-                            case OPEN_URL:
-                                out.name(CLICK_EVENT_URL);
-                                break;
-                            case RUN_COMMAND:
-                            case SUGGEST_COMMAND:
-                                out.name(CLICK_EVENT_COMMAND);
-                                break;
-                            case COPY_TO_CLIPBOARD:
-                                out.name(CLICK_EVENT_VALUE);
-                                break;
+                        // packetevents patch start
+                        if (action == ClickEvent.Action.OPEN_URL) {
+                            out.name(CLICK_EVENT_URL);
+                        } else if (action == ClickEvent.Action.RUN_COMMAND || action == ClickEvent.Action.SUGGEST_COMMAND) {
+                            out.name(CLICK_EVENT_COMMAND);
+                        } else {
+                            out.name(CLICK_EVENT_VALUE);
                         }
+                        // packetevents patch end
                         String payloadValue = payload instanceof String ? (String) payload : ((ClickEvent.Payload.Text) payload).value(); // packetevents patch
                         if (action == ClickEvent.Action.OPEN_URL && this.emitClickUrlHttps && !StyleSerializer.isValidUrlScheme(payloadValue)) {
                             payloadValue = StyleSerializer.FALLBACK_URL_PROTOCOL + payloadValue;
@@ -427,8 +428,18 @@ final class StyleSerializer extends TypeAdapter<Style> {
                         final ClickEvent.Payload.Custom customPayload = (ClickEvent.Payload.Custom) payload;
                         out.name(CLICK_EVENT_ID);
                         this.gson.toJson(customPayload.key(), SerializerFactory.KEY_TYPE, out);
-                        out.name(CLICK_EVENT_PAYLOAD);
-                        out.value(customPayload.data());
+                        // packetevents patch start
+                        if (BackwardCompatUtil.IS_4_23_0_OR_NEWER) {
+                            BinaryTagHolder tag = customPayload.nbt();
+                            if (tag != null) {
+                                out.name(CLICK_EVENT_PAYLOAD);
+                                out.value(tag.string());
+                            }
+                        } else {
+                            out.name(CLICK_EVENT_PAYLOAD);
+                            out.value(customPayload.data());
+                        }
+                        // packetevents patch end
                     } else if (payload instanceof ClickEvent.Payload.Int) {
                         final ClickEvent.Payload.Int intPayload = (ClickEvent.Payload.Int) payload;
                         out.name(CLICK_EVENT_PAGE);
@@ -449,7 +460,14 @@ final class StyleSerializer extends TypeAdapter<Style> {
                 out.name(CLICK_EVENT_ACTION);
                 this.gson.toJson(action, SerializerFactory.CLICK_ACTION_TYPE, out);
                 out.name(CLICK_EVENT_VALUE);
-                String payloadValue = clickEvent.value();
+                // packetevents patch start
+                String payloadValue;
+                if (BackwardCompatUtil.IS_4_22_0_OR_NEWER) {
+                    payloadValue = ((ClickEvent.Payload.Text) clickEvent.payload()).value();
+                } else {
+                    payloadValue = clickEvent.value();
+                }
+                // packetevents patch end
                 if (action == ClickEvent.Action.OPEN_URL && this.emitClickUrlHttps && !StyleSerializer.isValidUrlScheme(payloadValue)) {
                     payloadValue = StyleSerializer.FALLBACK_URL_PROTOCOL + payloadValue;
                 }

@@ -40,7 +40,19 @@ import org.jetbrains.annotations.Nullable;
 
 final class NBTLegacyHoverEventSerializerImpl implements LegacyHoverEventSerializer {
     static final NBTLegacyHoverEventSerializerImpl INSTANCE = new NBTLegacyHoverEventSerializerImpl();
-    private static final TagStringIO SNBT_IO = TagStringIO.get();
+    // packetevents patch start
+    private static final TagStringIO SNBT_IO;
+    static {
+        TagStringIO io;
+        try {
+            // added in 4.22.0
+            io = TagStringIO.tagStringIO();
+        } catch (Throwable ignored) {
+            io = TagStringIO.get();
+        }
+        SNBT_IO = io;
+    }
+    // packetevents patch end
     private static final Codec<CompoundBinaryTag, String, IOException, IOException> SNBT_CODEC = BackwardCompatUtil.createCodec(SNBT_IO::asCompound, SNBT_IO::asString); // packetevents patch
 
     static final String ITEM_TYPE = "id";
