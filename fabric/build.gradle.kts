@@ -27,7 +27,6 @@ plugins {
 
 dependencies {
     // include dependencies
-    include(libs.bundles.adventure)
     include(project(":api", "shadow"))
     include(project(":netty-common"))
 
