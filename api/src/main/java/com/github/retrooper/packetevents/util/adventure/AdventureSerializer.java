@@ -221,9 +221,10 @@ public final class AdventureSerializer implements NbtEncoder<Component>, NbtDeco
         return this.nbt().serializeOrNull(component, wrapper);
     }
 
-    public GsonComponentSerializer gson() {
-        if (this.gson == null) {
-            this.gson = GsonComponentSerializer.builder()
+    private GsonComponentSerializer buildGsonSerializer() {
+        GsonComponentSerializer.Builder gsonBuilder = GsonComponentSerializer.builder();
+        if (AdventureSupportUtil.HAS_JSON_SERIALIZER_OPTS) {
+            gsonBuilder
                     .editOptions(builder -> {
                         builder.values(JSONOptions.byDataVersion().at(0));
                         if (this.version.isNewerThanOrEquals(ClientVersion.V_1_16)) {
@@ -253,9 +254,16 @@ public final class AdventureSerializer implements NbtEncoder<Component>, NbtDeco
                         if (this.version.isNewerThanOrEquals(ClientVersion.V_1_21_6)) {
                             builder.value(JSONOptions.EMIT_CHANGE_PAGE_CLICK_EVENT_PAGE_AS_STRING, false);
                         }
-                    })
-                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
-                    .build();
+                    });
+        }
+        return gsonBuilder
+                .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
+                .build();
+    }
+
+    public GsonComponentSerializer gson() {
+        if (this.gson == null) {
+            this.gson = this.buildGsonSerializer();
         }
         return this.gson;
     }

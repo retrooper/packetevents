@@ -10,14 +10,20 @@ plugins {
     `pe-version`
 }
 
+val include: Configuration by configurations.creating {
+    configurations.compileOnlyApi.get().extendsFrom(this)
+}
+
 // papermc repo + disableAutoTargetJvm needed for mockbukkit
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
-    compileOnlyApi(libs.bundles.adventure)
-    compileOnlyApi(libs.bundles.adventure.serializers)
+    include(libs.bundles.adventure)
+    include(libs.bundles.adventure.serializers) {
+        exclude(module = "gson")
+    }
 
     compileOnly(libs.gson)
     compileOnly(libs.checkerqual)
@@ -68,6 +74,14 @@ tasks {
 
     withType<JavaCompile> {
         dependsOn(generateVersionsFile)
+    }
+
+    // TODO only include where needed (spigot/paper + bungee?)
+    // TODO do we even want to include this? maybe just download at runtime because of version conflicts anyway?
+    named<Jar>("jar") {
+        from(include.resolve()) {
+            rename { it.replace(Regex("^([\\w\\-]+)-(?:\\d+\\.){2,3}jar$"), "assets/libs/$1.jar") }
+        }
     }
 
     processResources {

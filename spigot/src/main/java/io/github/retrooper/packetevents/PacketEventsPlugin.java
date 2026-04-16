@@ -19,20 +19,25 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.*;
-import com.github.retrooper.packetevents.event.simple.*;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.util.TimeStampMode;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
+import com.github.retrooper.packetevents.util.adventure.AdventureLoader;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
-import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.util.Set;
+
 public class PacketEventsPlugin extends JavaPlugin {
+
+    private final URLClassLoader injectionLoader;
+    private final Set<Path> injectedJars;
+
+    public PacketEventsPlugin() {
+        this.injectionLoader = (URLClassLoader) PacketEventsPlugin.class.getClassLoader().getParent();
+        this.injectedJars = AdventureLoader.injectAll(this.injectionLoader);
+    }
+
     @Override
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
@@ -41,68 +46,13 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        //Register your listeners
         PacketEvents.getAPI().getSettings().debug(false).checkForUpdates(true).timeStampMode(TimeStampMode.MILLIS).reEncodeByDefault(true);
         PacketEvents.getAPI().init();
-
-        SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
-            @Override
-            public void onPacketLoginSend(PacketLoginSendEvent event) {
-            }
-
-            @Override
-            public void onPacketConfigReceive(PacketConfigReceiveEvent event) {
-            }
-
-            @Override
-            public void onPacketConfigSend(PacketConfigSendEvent event) {
-            }
-
-            @Override
-            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-                if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
-                    WrapperPlayClientInteractEntity interaction = new WrapperPlayClientInteractEntity(event);
-                    if (interaction.getAction() == WrapperPlayClientInteractEntity.InteractAction.ATTACK) {
-                        Player player = event.getPlayer();
-                        WrapperPlayServerBlockChange blockChange = new WrapperPlayServerBlockChange(SpigotConversionUtil
-                                .fromBukkitLocation(player.getLocation()).getPosition().toVector3i().subtract(0, 1, 0),
-                                StateTypes.COAL_BLOCK.createBlockState().getGlobalId());
-
-                        event.getUser().sendPacket(blockChange);
-                    }
-                }
-            }
-
-            @Override
-            public void onPacketPlaySend(PacketPlaySendEvent event) {
-                if (event.getPacketType() == PacketType.Play.Server.BLOCK_CHANGE) {
-                    WrapperPlayServerBlockChange bc = new WrapperPlayServerBlockChange(event);
-                    ((Player) event.getPlayer()).sendMessage("Type: " + bc.getBlockState().getType().getName());
-                } else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
-                    WrapperPlayServerSystemChatMessage packet = new WrapperPlayServerSystemChatMessage(event);
-                }
-            }
-
-            @Override
-            public void onUserConnect(UserConnectEvent event) {
-                PacketEvents.getAPI().getLogManager().debug("User: (host-name) " + event.getUser().getAddress().getHostString() + " connected...");
-            }
-
-            @Override
-            public void onUserLogin(UserLoginEvent event) {
-                PacketEvents.getAPI().getLogManager().debug("You logged in! User name: " + event.getUser().getProfile().getName());
-            }
-
-            @Override
-            public void onUserDisconnect(UserDisconnectEvent event) {
-                PacketEvents.getAPI().getLogManager().debug("User: (host-name) " + event.getUser().getAddress().getHostString() + " disconnected...");
-            }
-        };
-        // PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
     public void onDisable() {
         PacketEvents.getAPI().terminate();
+        AdventureLoader.uninjectAll(this.injectionLoader, this.injectedJars);
     }
 }
