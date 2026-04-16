@@ -18,11 +18,13 @@
 
 package com.github.retrooper.packetevents.util.adventure;
 
+import com.github.retrooper.packetevents.util.PEVersion;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
@@ -39,7 +41,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.CodeSource;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +50,22 @@ import java.util.Set;
 @NullMarked
 @ApiStatus.Internal
 public final class AdventureLoader {
+
+    // TODO don't use maven central here
+    private static final URI REPO_URI = URI.create("https://repo1.maven.org/maven2/");
+    private static final String ADVENTURE_VERSION;
+
+    static {
+        // try to detect existing adventure version
+        String adventureVersion = AdventureVersionDetector.detectAdventureVersion();
+        if (adventureVersion != null) {
+            ADVENTURE_VERSION = adventureVersion;
+        } else {
+            // adventure most likely doesn't exist on the classpath
+            // yet, we just use a default adventure version in this case
+            ADVENTURE_VERSION = "4.26.1";
+        }
+    }
 
     /**
      * A list of all adventure dependencies which may be jar-in-jar'ed, depending on the platform.<br/>
@@ -57,29 +76,34 @@ public final class AdventureLoader {
      * The thing which does cause lots of issues is version conflicts - we include a pretty new version of adventure,
      * while some users may run 1.16.5 servers, which causes incompatibilities between the two adventure libs.
      */
-    private static final List<Dependency> DEPENDENCIES = Arrays.asList(
-            new Dependency("examination-api", "net.kyori.examination.Examinable"),
-            new Dependency("examination-string", "net.kyori.examination.string.StringExaminer"),
-            new Dependency("option", "net.kyori.option.Option"),
-            new Dependency("adventure-key", "net.kyori.adventure.key.Key"),
-            new Dependency("adventure-api", "net.kyori.adventure.text.ObjectComponent"),
-            new Dependency("adventure-nbt", "net.kyori.adventure.nbt.BinaryTag"),
-            new Dependency("adventure-text-serializer-json", "net.kyori.adventure.text.serializer.json.JSONComponentSerializer"),
-            new Dependency("adventure-text-serializer-gson", "net.kyori.adventure.text.serializer.gson.GsonComponentSerializer"),
-            new Dependency("adventure-text-serializer-json-legacy-impl", "net.kyori.adventure.text.serializer.json.legacyimpl.NBTLegacyHoverEventSerializer"),
-            new Dependency("adventure-text-serializer-legacy", "net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer")
-    );
+    private static final List<Dependency> DEPENDENCIES;
+
+    static {
+        List<Dependency> dependencies = new ArrayList<>();
+        dependencies.add(new Dependency("net.kyori", "examination-api", "1.3.0", "net.kyori.examination.Examinable"));
+        dependencies.add(new Dependency("net.kyori", "examination-string", "1.3.0", "net.kyori.examination.string.StringExaminer"));
+        dependencies.add(new Dependency("net.kyori", "option", "1.1.0", "net.kyori.option.Option"));
+        dependencies.add(new Dependency("net.kyori", "adventure-key", ADVENTURE_VERSION, "net.kyori.adventure.key.Key"));
+        dependencies.add(new Dependency("net.kyori", "adventure-api", "4.26.1", "net.kyori.adventure.text.ObjectComponent"));
+        dependencies.add(new Dependency("net.kyori", "adventure-nbt", ADVENTURE_VERSION, "net.kyori.adventure.nbt.BinaryTag"));
+        if (!PEVersion.fromString(ADVENTURE_VERSION).isOlderThan(new PEVersion(4, 14, 0))) {
+            dependencies.add(new Dependency("net.kyori", "adventure-text-serializer-json", ADVENTURE_VERSION, "net.kyori.adventure.text.serializer.json.JSONComponentSerializer"));
+            dependencies.add(new Dependency("net.kyori", "adventure-text-serializer-json-legacy-impl", ADVENTURE_VERSION, "net.kyori.adventure.text.serializer.json.legacyimpl.NBTLegacyHoverEventSerializer"));
+        }
+        dependencies.add(new Dependency("net.kyori", "adventure-text-serializer-gson", ADVENTURE_VERSION, "net.kyori.adventure.text.serializer.gson.GsonComponentSerializer"));
+        dependencies.add(new Dependency("net.kyori", "adventure-text-serializer-legacy", ADVENTURE_VERSION, "net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer"));
+        DEPENDENCIES = Collections.unmodifiableList(dependencies);
+    }
 
     private AdventureLoader() {
     }
 
     public static Set<Path> injectAll(URLClassLoader classLoader) {
-        String adventureVersion = AdventureVersionDetector.detectAdventureVersion();
-        System.out.println("ADV VER: " + adventureVersion);
+        // check each adventure dependency
         Set<Path> injectedJars = new HashSet<>();
         for (Dependency dependency : DEPENDENCIES) {
             if (!dependency.isAvailable()) {
-                injectedJars.add(dependency.inject(classLoader));
+                injectedJars.add(dependency.inject(REPO_URI, classLoader));
             }
         }
         return injectedJars;
@@ -109,7 +133,7 @@ public final class AdventureLoader {
 
     private static final class Dependency {
 
-        private static final MethodHandle GET_UCP, ADD_URL;
+        private static final MethodHandle GET_UCP, ADD_URL, GET_URLS;
 
         static {
             MethodHandles.Lookup trustedLookup;
@@ -138,21 +162,23 @@ public final class AdventureLoader {
                 Class<?> urlClassPathClass = URLClassLoader.class.getDeclaredField("ucp").getType();
                 GET_UCP = trustedLookup.findGetter(URLClassLoader.class, "ucp", urlClassPathClass);
                 ADD_URL = trustedLookup.findVirtual(urlClassPathClass, "addURL", MethodType.methodType(void.class, URL.class));
+                GET_URLS = trustedLookup.findVirtual(urlClassPathClass, "getURLs", MethodType.methodType(URL[].class));
             } catch (ReflectiveOperationException exception) {
                 throw new RuntimeException("Error while looking up URLClassLoader injection methods", exception);
             }
         }
 
-        private final String name;
+        private final String groupId;
+        private final String artifactId;
+        private final String version;
+
         private final String className;
 
-        public Dependency(String name, String className) {
-            this.name = name;
+        public Dependency(String groupId, String artifactId, String version, String className) {
+            this.groupId = groupId;
+            this.artifactId = artifactId;
+            this.version = version;
             this.className = className;
-        }
-
-        public String getJarName() {
-            return "/assets/libs/" + this.name + ".jar";
         }
 
         public @Nullable CodeSource getCodeSource() {
@@ -164,14 +190,31 @@ public final class AdventureLoader {
             return Reflection.getClassByNameWithoutException(this.className) != null;
         }
 
-        public Path inject(URLClassLoader classLoader) {
-            try (InputStream resource = Dependency.class.getResourceAsStream(this.getJarName())) {
-                if (resource == null) {
-                    throw new IllegalStateException("Can't find " + this.getJarName() + " in classpath of " + Dependency.class.getProtectionDomain().getCodeSource().getLocation());
-                }
-                return this.inject(resource, classLoader);
+        public Path inject(URI repoUri, URLClassLoader classLoader) {
+            // resolve maven-based artifact url at {repo}{groupId}/{artifactId}/{version}/{artifactId}-{version}.jar
+            URI artifactUri = repoUri.resolve(this.groupId.replace('.', '/') + "/" + this.artifactId
+                    + "/" + this.version + "/" + this.artifactId + "-" + this.version + ".jar");
+            System.out.println("LOADING FROM " + artifactUri);
+            // can't use java 11's http client because we still support java 8
+            HttpsURLConnection connection;
+            try {
+                connection = (HttpsURLConnection) artifactUri.toURL().openConnection();
             } catch (IOException exception) {
-                throw new RuntimeException("Failed to read " + this.name + " from classpath", exception);
+                throw new RuntimeException("Failed to open connection to " + artifactUri, exception);
+            }
+            try {
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(10000);
+                connection.connect();
+
+                // inject jar directly from url into classpath
+                try (InputStream resource = connection.getInputStream()) {
+                    return this.inject(resource, classLoader);
+                }
+            } catch (IOException exception) {
+                throw new RuntimeException("Failed to read from " + artifactUri, exception);
+            } finally {
+                connection.disconnect();
             }
         }
 
@@ -179,7 +222,7 @@ public final class AdventureLoader {
             Path tempFile;
             try {
                 // copy to external temp file
-                tempFile = Files.createTempFile("packetevents_" + this.name + "_", ".jar");
+                tempFile = Files.createTempFile("packetevents_" + this.artifactId + "_", ".jar");
                 tempFile.toFile().deleteOnExit();
                 Files.copy(resource, tempFile, StandardCopyOption.REPLACE_EXISTING);
                 URL tempUrl = tempFile.toUri().toURL();
@@ -194,9 +237,9 @@ public final class AdventureLoader {
             try {
                 classLoader.loadClass(this.className);
             } catch (Throwable ignored) {
-                throw new IllegalStateException("Failed to load dependency '" + this.name + "' into classloader " + classLoader);
+                throw new IllegalStateException("Failed to load dependency '" + this.artifactId + "' into classloader " + classLoader);
             }
-            System.out.println("LOADED " + this.name);
+            System.out.println("LOADED " + this.artifactId);
             return tempFile;
         }
 
