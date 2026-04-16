@@ -63,7 +63,7 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
         } else {
             uuid = UUID.fromString(readString(36));
         }
-        String username = readString(16);
+        String username = readString();
         this.userProfile = new UserProfile(uuid, username);
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
@@ -90,7 +90,7 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
         } else {
             writeString(userProfile.getUUID().toString(), 36);
         }
-        writeString(userProfile.getName(), 16);
+        writeString(userProfile.getName());
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeVarInt(userProfile.getTextureProperties().size());
