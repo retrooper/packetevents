@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -167,5 +168,24 @@ public final class BackwardCompatUtil {
         }
         // safe to cast, every Component impl also implements BuildableComponent
         return ((BuildableComponent<?, ?>) component).toBuilder();
+    }
+
+    private static final Method COMPONENT_BUILDER_BUILD;
+
+    static {
+        try {
+            COMPONENT_BUILDER_BUILD = ComponentBuilder.class.getMethod("build");
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    public static Component build(ComponentBuilder<?, ?> builder) {
+        // signature changed with v5
+        try {
+            return (Component) COMPONENT_BUILDER_BUILD.invoke(builder);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 }

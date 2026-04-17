@@ -310,7 +310,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             builder.append(extra);
         }
 
-        return builder.build();
+        return BackwardCompatUtil.build(builder);
     }
 
     @Deprecated
