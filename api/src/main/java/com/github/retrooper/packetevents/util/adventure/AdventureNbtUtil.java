@@ -40,6 +40,7 @@ import static net.kyori.adventure.nbt.TagStringIO.tagStringIO;
 @NullMarked
 public final class AdventureNbtUtil {
 
+    private static final int END_TAG_ID = 0;
     private static final BinaryTagType<?>[] NBT_TAG_TYPES = buildNbtTagTypes();
 
     private AdventureNbtUtil() {
@@ -47,7 +48,12 @@ public final class AdventureNbtUtil {
 
     @SuppressWarnings("unchecked")
     private static BinaryTagType<?>[] buildNbtTagTypes() {
-        BinaryTagTypes.BYTE.id(); // initialize types
+        // initialize class
+        try {
+            BinaryTagTypes.class.getField("BYTE").get(null);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException("Error while initializing adventure binary tag types");
+        }
 
         // there is no way to get all registered types...
         List<BinaryTagType<? extends BinaryTag>> types;
@@ -73,7 +79,7 @@ public final class AdventureNbtUtil {
 
     public static BinaryTag readAdventureTag(Object buf) {
         byte tagTypeId = ByteBufHelper.readByte(buf);
-        if (tagTypeId == BinaryTagTypes.END.id()) {
+        if (tagTypeId == END_TAG_ID) {
             return EndBinaryTag.endBinaryTag();
         }
         BinaryTagType<?> tagType = NBT_TAG_TYPES[tagTypeId];
@@ -88,7 +94,7 @@ public final class AdventureNbtUtil {
         @SuppressWarnings("unchecked")
         BinaryTagType<? super BinaryTag> tagType = (BinaryTagType<? super BinaryTag>) tag.type();
         ByteBufHelper.writeByte(buf, tagType.id());
-        if (tagType.id() != BinaryTagTypes.END.id()) {
+        if (tagType.id() != END_TAG_ID) {
             try {
                 tagType.write(tag, new ByteBufOutputStream(buf));
             } catch (IOException exception) {
