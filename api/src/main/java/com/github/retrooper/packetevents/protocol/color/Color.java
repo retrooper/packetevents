@@ -18,23 +18,45 @@
 
 package com.github.retrooper.packetevents.protocol.color;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTFloat;
-import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
-import com.github.retrooper.packetevents.protocol.nbt.NBTList;
-import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
-import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.util.RGBLike;
 import org.jetbrains.annotations.Range;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 @NullMarked
 public class Color implements RGBLike {
+
+    private static final NbtCodec<Color> INT_CODEC = NbtCodecs.INT.apply(Color::new, Color::asRGB);
+    private static final NbtCodec<Color> FLOATS_CODEC = NbtCodecs.FLOAT.applyFixedList(3)
+            .apply(floats -> new Color(floats.get(0), floats.get(1), floats.get(2)),
+                    color -> Arrays.asList(color.red / 255f, color.green / 255f, color.blue / 255f));
+
+    public static final NbtCodec<Color> CODEC = new NbtCodec<Color>() {
+        private final NbtCodec<Color> decodeCodec = INT_CODEC.withAlternative(FLOATS_CODEC);
+
+        @Override
+        public Color decode(NBT tag, PacketWrapper<?> wrapper) throws NbtCodecException {
+            return this.decodeCodec.decode(tag, wrapper);
+        }
+
+        @Override
+        public NBT encode(PacketWrapper<?> wrapper, Color value) throws NbtCodecException {
+            if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
+                return INT_CODEC.encode(wrapper, value);
+            }
+            return FLOATS_CODEC.encode(wrapper, value);
+        }
+    };
 
     public static final Color WHITE = new Color(0xFFFFFFFF);
     public static final Color BLACK = new Color(0xFF000000);
@@ -85,36 +107,24 @@ public class Color implements RGBLike {
         wrapper.writeByte(color.blue);
     }
 
+    @Deprecated
     public static Color decode(NBT nbt, PacketWrapper<?> wrapper) {
-        return decode(nbt, wrapper.getServerVersion().toClientVersion());
+        return CODEC.decode(nbt, wrapper);
     }
 
     @Deprecated
     public static Color decode(NBT nbt, ClientVersion version) {
-        if (nbt instanceof NBTNumber) {
-            return new Color(((NBTNumber) nbt).getAsInt());
-        }
-        NBTList<?> list = (NBTList<?>) nbt;
-        float red = ((NBTNumber) list.getTag(0)).getAsFloat();
-        float green = ((NBTNumber) list.getTag(1)).getAsFloat();
-        float blue = ((NBTNumber) list.getTag(2)).getAsFloat();
-        return new Color(red, green, blue);
+        return decode(nbt, PacketWrapper.createDummyWrapper(version));
     }
 
+    @Deprecated
     public static NBT encode(PacketWrapper<?> wrapper, Color color) {
-        return encode(color, wrapper.getServerVersion().toClientVersion());
+        return CODEC.encode(wrapper, color);
     }
 
     @Deprecated
     public static NBT encode(Color color, ClientVersion version) {
-        if (version.isNewerThanOrEquals(ClientVersion.V_1_21_2)) {
-            return new NBTInt(color.asRGB());
-        }
-        NBTList<NBTFloat> list = new NBTList<>(NBTType.FLOAT, 3);
-        list.addTag(new NBTFloat(color.red));
-        list.addTag(new NBTFloat(color.green));
-        list.addTag(new NBTFloat(color.blue));
-        return list;
+        return encode(PacketWrapper.createDummyWrapper(version), color);
     }
 
     public AlphaColor withAlpha() {
