@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.advancements;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.ItemStackSerialization;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -56,7 +57,7 @@ public final class AdvancementDisplay {
     public static AdvancementDisplay read(PacketWrapper<?> wrapper) {
         Component title = wrapper.readComponent();
         Component description = wrapper.readComponent();
-        ItemStack icon = wrapper.readItemStack();
+        ItemStack icon = ItemStackSerialization.readTemplate(wrapper);
         AdvancementType type = wrapper.readEnum(AdvancementType.class);
         int flags = wrapper.readInt();
         ResourceLocation background = (flags & FLAG_HAS_BACKGROUND) != 0 ? ResourceLocation.read(wrapper) : null;
@@ -70,7 +71,7 @@ public final class AdvancementDisplay {
     public static void write(PacketWrapper<?> wrapper, AdvancementDisplay display) {
         wrapper.writeComponent(display.title);
         wrapper.writeComponent(display.description);
-        wrapper.writeItemStack(display.icon);
+        ItemStackSerialization.writeTemplate(wrapper, display.icon);
         wrapper.writeEnum(display.type);
         wrapper.writeInt(display.packFlags());
         if (display.background != null) {

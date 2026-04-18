@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.particle.data;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.ItemStackSerialization;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -47,7 +48,7 @@ public class ParticleItemStackData extends ParticleData implements LegacyConvert
 
     public static ParticleItemStackData read(PacketWrapper<?> wrapper) {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
-            return new ParticleItemStackData(wrapper.readItemStack());
+            return new ParticleItemStackData(ItemStackSerialization.readTemplate(wrapper));
         } else {
             return new ParticleItemStackData(ItemStack.builder()
                     .type(ItemTypes.getRegistry().getByIdOrThrow(wrapper.getClientVersion(), wrapper.readVarInt()))
@@ -56,7 +57,7 @@ public class ParticleItemStackData extends ParticleData implements LegacyConvert
     }
 
     public static void write(PacketWrapper<?> wrapper, ParticleItemStackData data) {
-        wrapper.writeItemStack(data.getItemStack());
+        ItemStackSerialization.writeTemplate(wrapper, data.getItemStack());
     }
 
     public static ParticleItemStackData decode(NBTCompound compound, ClientVersion version) {

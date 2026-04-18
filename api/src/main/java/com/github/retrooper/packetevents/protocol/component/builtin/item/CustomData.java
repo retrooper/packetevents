@@ -38,7 +38,7 @@ public class CustomData {
             String nbtString = ((NBTString) nbt).getValue();
             return (NBTCompound) AdventureNbtUtil.fromString(nbtString);
         }
-        throw new UnsupportedOperationException("Unsupported custom data nbt type: " + nbt.getType());
+        throw new UnsupportedOperationException("Unsupported custom data tag: " + nbt);
     }
 
     public static void write(PacketWrapper<?> wrapper, NBTCompound compound) {

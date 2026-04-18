@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.ItemStackSerialization;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Objects;
@@ -32,12 +33,12 @@ public class ItemUseRemainder {
     }
 
     public static ItemUseRemainder read(PacketWrapper<?> wrapper) {
-        ItemStack target = wrapper.readItemStack();
+        ItemStack target = ItemStackSerialization.readTemplate(wrapper);
         return new ItemUseRemainder(target);
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemUseRemainder remainder) {
-        wrapper.writeItemStack(remainder.target);
+        ItemStackSerialization.writeTemplate(wrapper, remainder.target);
     }
 
     public ItemStack getTarget() {
