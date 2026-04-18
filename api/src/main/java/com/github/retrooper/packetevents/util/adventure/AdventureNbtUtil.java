@@ -44,7 +44,6 @@ import java.util.List;
 public final class AdventureNbtUtil {
 
     private static final byte END_TAG_ID = 0;
-    private static final BinaryTagType<?>[] NBT_TAG_TYPES = buildNbtTagTypes();
 
     private static final TagStringIO TAG_STRING_IO;
 
@@ -63,6 +62,8 @@ public final class AdventureNbtUtil {
     private static final Method TAG_TYPE_GET_ID = Reflection.getMethodExact(BinaryTagType.class, "id", byte.class);
     private static final Method TAG_TYPE_READ = Reflection.getMethodExact(BinaryTagType.class, "read", BinaryTag.class, DataInput.class);
     private static final Method TAG_TYPE_WRITE = Reflection.getMethodExact(BinaryTagType.class, "write", void.class, BinaryTag.class, DataOutput.class);
+
+    private static final BinaryTagType<?>[] NBT_TAG_TYPES = buildNbtTagTypes();
 
     private AdventureNbtUtil() {
     }
@@ -95,8 +96,9 @@ public final class AdventureNbtUtil {
         BinaryTagType<?>[] nbtTagTypes = new BinaryTagType[types.size()];
         for (int i = 0; i < nbtTagTypes.length; i++) {
             BinaryTagType<? extends BinaryTag> type = types.get(i);
-            if (type.id() != i) {
-                throw new IllegalStateException("Registered nbt tag types are wrong: " + type.id() + " != " + i);
+            byte tagId = getTagId(type);
+            if (tagId != i) {
+                throw new IllegalStateException("Registered nbt tag types are wrong: " + tagId + " != " + i);
             }
             nbtTagTypes[i] = type;
         }
