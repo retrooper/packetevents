@@ -33,6 +33,8 @@ dependencies {
     compileOnly(libs.gson)
     compileOnly(libs.checkerqual)
 
+    testRuntimeOnly(testlibs.bundles.adventure)
+    testRuntimeOnly(testlibs.bundles.adventure.serializers)
     testImplementation(libs.bundles.adventure)
     testImplementation(project(":patch:adventure-text-serializer-gson"))
     testImplementation(libs.adventure.text.serializer.legacy)

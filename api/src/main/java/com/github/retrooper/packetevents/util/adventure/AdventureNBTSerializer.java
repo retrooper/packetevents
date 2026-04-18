@@ -489,7 +489,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         if (clickEvent != null) {
             ClickEvent.Action action = clickEvent.readUTF("action", ClickEvent.Action.NAMES::value);
             ClickEvent value;
-            switch (action.name().toLowerCase(Locale.ROOT)) {
+            switch (action.toString()) {
                 case "open_url":
                     value = ClickEvent.openUrl(clickEvent.readUTF(modernEvents ? "url" : "value", Function.identity()));
                     break;
