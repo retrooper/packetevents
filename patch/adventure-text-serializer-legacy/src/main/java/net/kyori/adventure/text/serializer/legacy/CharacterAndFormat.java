@@ -32,6 +32,7 @@ import net.kyori.examination.Examinable;
 import net.kyori.examination.ExaminableProperty;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 /**
@@ -174,7 +175,7 @@ public interface CharacterAndFormat extends Examinable {
      *
      * @since 4.14.0
      */
-    CharacterAndFormat RESET = characterAndFormat('r', Reset.INSTANCE, true);
+    CharacterAndFormat RESET = characterAndFormat('r', true); // packetevents patch
 
     /**
      * Creates a new combination of a case-sensitive {@code character} and a {@link TextFormat}.
@@ -201,6 +202,20 @@ public interface CharacterAndFormat extends Examinable {
         return new CharacterAndFormatImpl(character, format, caseInsensitive);
     }
 
+    // packetevents patch start
+    /**
+     * Creates a new combination of a {@code character} and a reset.
+     *
+     * @param character the character
+     * @param caseInsensitive if the character is case-insensitive
+     * @return a new character and format instance.
+     * @since 4.17.0
+     */
+    static @NotNull CharacterAndFormat characterAndFormat(final char character, final boolean caseInsensitive) {
+        return new CharacterAndFormatImpl(character, null, caseInsensitive);
+    }
+    // packetevents patch end
+
     /**
      * Gets an unmodifiable list of character and format instances containing all default vanilla formats.
      *
@@ -226,7 +241,7 @@ public interface CharacterAndFormat extends Examinable {
      * @return the format
      * @since 4.14.0
      */
-    @NotNull TextFormat format();
+    @Nullable TextFormat format(); // packetevents patch
 
     /**
      * If the {@link #character()} is case-insensitive.

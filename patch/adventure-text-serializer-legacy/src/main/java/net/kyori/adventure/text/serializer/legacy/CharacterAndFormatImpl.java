@@ -31,16 +31,14 @@ import net.kyori.adventure.text.format.TextFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static java.util.Objects.requireNonNull;
-
 final class CharacterAndFormatImpl implements CharacterAndFormat {
   private final char character;
-  private final TextFormat format;
+  private final @Nullable TextFormat format; // packetevents patch
   private final boolean caseInsensitive;
 
-  CharacterAndFormatImpl(final char character, final @NotNull TextFormat format, final boolean caseInsensitive) {
+  CharacterAndFormatImpl(final char character, final @Nullable TextFormat format, final boolean caseInsensitive) { // packetevents patch
     this.character = character;
-    this.format = requireNonNull(format, "format");
+    this.format = format; // packetevents patch
     this.caseInsensitive = caseInsensitive;
   }
 
@@ -50,7 +48,7 @@ final class CharacterAndFormatImpl implements CharacterAndFormat {
   }
 
   @Override
-  public @NotNull TextFormat format() {
+  public @Nullable TextFormat format() { // packetevents patch
     return this.format;
   }
 

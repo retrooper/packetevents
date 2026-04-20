@@ -340,7 +340,7 @@ final class LegacyComponentSerializerImpl implements LegacyComponentSerializer {
       }
     }
 
-    void append(final @NotNull TextFormat format) {
+    void append(final @Nullable TextFormat format) { // packetevents patch
       if (this.lastWritten != format) {
         final String legacyCode = LegacyComponentSerializerImpl.this.toLegacyCode(format);
         if (legacyCode == null) {
@@ -402,14 +402,14 @@ final class LegacyComponentSerializerImpl implements LegacyComponentSerializer {
         final boolean colorChanged = this.color != Cereal.this.style.color;
         if (this.needsReset) {
           if (!colorChanged) {
-            Cereal.this.append(Reset.INSTANCE);
+            Cereal.this.append(null); // packetevents patch
           }
           this.needsReset = false;
         }
 
         // If color changes, we need to do a full reset.
         // Additionally, if the last thing to be appended was a reset then we need to re-apply everything.
-        if (colorChanged || Cereal.this.lastWritten == Reset.INSTANCE) {
+        if (colorChanged || Cereal.this.lastWritten == null) { // packetevents patch
           this.applyFullFormat();
           return;
         }
@@ -433,7 +433,7 @@ final class LegacyComponentSerializerImpl implements LegacyComponentSerializer {
         if (this.color != null) {
           Cereal.this.append(this.color);
         } else {
-          Cereal.this.append(Reset.INSTANCE);
+          Cereal.this.append(null); // packetevents patch
         }
         Cereal.this.style.color = this.color;
 
