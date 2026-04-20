@@ -39,3 +39,4 @@ include("fabric-official")
 include("fabric-intermediary")
 // Patch modules
 include(":patch:adventure-text-serializer-gson")
+include(":patch:adventure-text-serializer-legacy")
