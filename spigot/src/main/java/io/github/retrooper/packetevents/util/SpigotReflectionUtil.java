@@ -118,7 +118,7 @@ public final class SpigotReflectionUtil {
     //Fields
     public static Field ENTITY_PLAYER_PING_FIELD, ENTITY_BOUNDING_BOX_FIELD, BYTE_BUF_IN_PACKET_DATA_SERIALIZER, DIMENSION_CODEC_FIELD,
             DYNAMIC_OPS_NBT_INSTANCE_FIELD, CHUNK_PROVIDER_SERVER_FIELD, CRAFT_PARTICLE_PARTICLES_FIELD, NMS_MK_KEY_FIELD, LEGACY_NMS_PARTICLE_KEY_FIELD, LEGACY_NMS_KEY_TO_NMS_PARTICLE,
-            REMOTE_CHAT_SESSION_FIELD, REGISTRY_KEY_LOCATION_FIELD, DATA_WATCHER_FIELD, PAPER_CONNECTION_HANDLE_FIELD, PACKETLISTENER_CONNECTION_FIELD, CONNECTION_CHANNEL_FIELD;
+            REMOTE_CHAT_SESSION_FIELD, REGISTRY_KEY_LOCATION_FIELD, DATA_WATCHER_FIELD, PAPER_CONNECTION_HANDLE_FIELD, PACKETLISTENER_CONNECTION_FIELD, CONNECTION_CHANNEL_FIELD, ENTITY_ID_COUNTER;
 
     //Methods
     public static Method IS_DEBUGGING, GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
@@ -325,6 +325,11 @@ public final class SpigotReflectionUtil {
         PAPER_CONNECTION_HANDLE_FIELD = Reflection.getField(PAPER_COMMON_CONNECTION_CLASS, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, 0);
         PACKETLISTENER_CONNECTION_FIELD = Reflection.getField(SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, NETWORK_MANAGER_CLASS, 0);
         CONNECTION_CHANNEL_FIELD = Reflection.getField(NETWORK_MANAGER_CLASS, CHANNEL_CLASS, 0);
+
+        ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, "entityCount");
+        if (ENTITY_ID_COUNTER == null) {
+            ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, AtomicInteger.class, 0);
+        }
     }
 
     private static void initClasses() {
@@ -797,18 +802,14 @@ public final class SpigotReflectionUtil {
     }
 
     public static int generateEntityId() {
-        Field field = Reflection.getField(NMS_ENTITY_CLASS, "entityCount");
-        if (field == null) {
-            field = Reflection.getField(NMS_ENTITY_CLASS, AtomicInteger.class, 0);
-        }
         try {
-            if (field.getType().equals(AtomicInteger.class)) {
+            if (ENTITY_ID_COUNTER.getType() == AtomicInteger.class) {
                 //Newer versions
-                AtomicInteger atomicInteger = (AtomicInteger) field.get(null);
+                AtomicInteger atomicInteger = (AtomicInteger) ENTITY_ID_COUNTER.get(null);
                 return atomicInteger.incrementAndGet();
             } else {
-                int id = field.getInt(null);
-                field.set(null, id + 1);
+                int id = ENTITY_ID_COUNTER.getInt(null);
+                ENTITY_ID_COUNTER.set(null, id + 1);
                 return id;
             }
         } catch (IllegalAccessException ex) {
