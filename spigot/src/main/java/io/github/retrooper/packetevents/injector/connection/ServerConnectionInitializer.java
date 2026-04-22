@@ -46,10 +46,11 @@ public class ServerConnectionInitializer {
         if (!PreViaPipelineSupport.shouldInjectPreViaPipelineOnListenerRegistration(listener)) return;
 
         SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-        if (!injector.hasPreViaPipelineInjected()) {
-            injector.setPreViaPipelineInjected(true);
-            injector.injectNetworkManagers();
+        if (!injector.isPreViaRequested()) {
+            injector.setPreViaRequested(true);
         }
+
+        injector.catchUpPreViaOnExistingChannelsIfNeeded();
     };
 
     public static void initChannel(Object ch, ConnectionState connectionState) {
@@ -87,7 +88,7 @@ public class ServerConnectionInitializer {
 
             relocateHandlers(channel, user, false);
             SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-            if (injector.hasPreViaPipelineInjected()) relocateHandlers(channel, user, true);
+            if (injector.isPreViaRequested()) relocateHandlers(channel, user, true);
 
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
             PacketEvents.getAPI().getProtocolManager().setUser(channel, user);

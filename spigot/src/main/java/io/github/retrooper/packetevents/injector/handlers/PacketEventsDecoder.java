@@ -145,7 +145,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
             ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, false);
 
             SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-            if (injector.hasPreViaPipelineInjected())
+            if (injector.isPreViaRequested())
                 ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, true);
         }
         super.userEventTriggered(ctx, event);

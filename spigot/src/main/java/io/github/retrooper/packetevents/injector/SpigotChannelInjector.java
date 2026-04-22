@@ -47,7 +47,10 @@ public class SpigotChannelInjector implements ChannelInjector {
     public final Set<Channel> injectedConnectionChannels = new HashSet<>();
     public List<Object> networkManagers;
     private int connectionChannelsListIndex = -1;
-    private boolean preViaPipelineInjected = false;
+    // True once a pre-Via listener asks us to place handlers before Via in the pipeline.
+    private boolean preViaRequested = false;
+    // True once existing channels have been caught up with the requested pre-Via relocation after bind.
+    private boolean preViaExistingChannelsCatchupDone = false;
 
     public void updatePlayer(User user, Object player) {
         Object channel = user.getChannel();
@@ -132,13 +135,17 @@ public class SpigotChannelInjector implements ChannelInjector {
 
                     if (user == null) {
                         ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
-                    } else if (hasPreViaPipelineInjected()) {
+                    } else if (isPreViaRequested()) {
                         ServerConnectionInitializer.relocateHandlers(channel, user, true);
                     }
                 } catch (Exception e) {
                     PacketEvents.getAPI().getLogManager().severe("PacketEvents Spigot injector failed to inject into an existing channel. If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc");
                     e.printStackTrace();
                 }
+            }
+
+            if (isPreViaRequested()) {
+                preViaExistingChannelsCatchupDone = true;
             }
         }
     }
@@ -259,11 +266,19 @@ public class SpigotChannelInjector implements ChannelInjector {
         return false;
     }
 
-    public boolean hasPreViaPipelineInjected() {
-        return preViaPipelineInjected;
+    public boolean isPreViaRequested() {
+        return preViaRequested;
     }
 
-    public void setPreViaPipelineInjected(boolean preViaPipelineInjected) {
-        this.preViaPipelineInjected = preViaPipelineInjected;
+    public void setPreViaRequested(boolean preViaRequested) {
+        this.preViaRequested = preViaRequested;
+    }
+
+    public void catchUpPreViaOnExistingChannelsIfNeeded() {
+        if (!isPreViaRequested() || preViaExistingChannelsCatchupDone || !isServerBound()) {
+            return;
+        }
+
+        injectNetworkManagers();
     }
 }
