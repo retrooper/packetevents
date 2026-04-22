@@ -1577,6 +1577,12 @@ public class WrappedBlockState {
         return data;
     }
 
+    public boolean isFluid() {
+        StateType block = this.getType();
+        return block == StateTypes.WATER || block == StateTypes.LAVA
+                || this.hasProperty(StateValue.WATERLOGGED) && this.isWaterlogged();
+    }
+
     public boolean hasProperty(StateValue property) {
         return data.containsKey(property);
     }

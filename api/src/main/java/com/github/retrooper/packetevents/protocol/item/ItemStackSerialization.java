@@ -19,9 +19,6 @@
 package com.github.retrooper.packetevents.protocol.item;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
-import com.github.retrooper.packetevents.protocol.component.ComponentType;
-import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
@@ -30,13 +27,67 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 public final class ItemStackSerialization {
 
     private ItemStackSerialization() {
+    }
+
+    public static ItemStack readOptionalTemplate(PacketWrapper<?> wrapper) {
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_1)) {
+            return read(wrapper);
+        }
+        if (wrapper.readBoolean()) {
+            return readTemplate0(wrapper);
+        }
+        return ItemStack.EMPTY;
+    }
+
+    public static ItemStack readTemplate(PacketWrapper<?> wrapper) {
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_1)) {
+            return read(wrapper);
+        }
+        return readTemplate0(wrapper);
+    }
+
+    public static ItemStack readTemplate0(PacketWrapper<?> wrapper) {
+        ItemType item = wrapper.readMappedEntity(ItemTypes.getRegistry());
+        int count = wrapper.readVarInt();
+        PatchableComponentMap components = PatchableComponentMap.read(wrapper, item, false);
+        ItemStack ret = ItemStack.builder().type(item).amount(count).components(components).build();
+        if (ret.isEmpty()) {
+            throw new IllegalStateException("Can't read empty item stack template: " + ret);
+        }
+        return ret;
+    }
+
+    public static void writeOptionalTemplate(PacketWrapper<?> wrapper, ItemStack stack) {
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_1)) {
+            write(wrapper, stack);
+            return;
+        }
+        if (!stack.isEmpty()) {
+            wrapper.writeBoolean(true);
+            writeTemplate0(wrapper, stack);
+        } else {
+            wrapper.writeBoolean(false);
+        }
+    }
+
+    public static void writeTemplate(PacketWrapper<?> wrapper, ItemStack stack) {
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_1)) {
+            write(wrapper, stack);
+        } else {
+            writeTemplate0(wrapper, stack);
+        }
+    }
+
+    private static void writeTemplate0(PacketWrapper<?> wrapper, ItemStack stack) {
+        if (stack.isEmpty()) {
+            throw new IllegalStateException("Can't write empty item stack template: " + stack);
+        }
+        wrapper.writeMappedEntity(stack.getType());
+        wrapper.writeVarInt(stack.getAmount());
+        PatchableComponentMap.write(wrapper, stack, false);
     }
 
     public static ItemStack read(PacketWrapper<?> wrapper) {
@@ -114,58 +165,14 @@ public final class ItemStackSerialization {
         return readModern(wrapper, true);
     }
 
-    @SuppressWarnings("unchecked")
     private static ItemStack readModern(PacketWrapper<?> wrapper, boolean lengthPrefixed) {
         int count = wrapper.readVarInt();
         if (count <= 0) {
             return ItemStack.EMPTY;
         }
-        ItemType itemType = wrapper.readMappedEntity(ItemTypes.getRegistry());
-
-        // read component patch counts
-        int presentCount = wrapper.readVarInt();
-        int absentCount = wrapper.readVarInt();
-        if (presentCount == 0 && absentCount == 0) {
-            return ItemStack.builder().type(itemType).amount(count).wrapper(wrapper).build();
-        }
-
-        PatchableComponentMap components = new PatchableComponentMap(
-                itemType.getComponents(wrapper.getServerVersion().toClientVersion()),
-                new HashMap<>(presentCount + absentCount),
-                wrapper.getRegistryHolder());
-        for (int i = 0; i < presentCount; i++) {
-            ComponentType<?> type = wrapper.readMappedEntity(ComponentTypes.getRegistry());
-            // this is not 1:1 how vanilla decodes the length prefix, vanilla slices the buffer and
-            // restricts reading to only the slice; packetevents just verifies the length isn't too large
-            // and throws an error if we actually read more/less than expected
-            int expectedReaderIndex;
-            if (lengthPrefixed) {
-                int size = wrapper.readVarInt();
-                if (size > ByteBufHelper.readableBytes(wrapper.buffer)) {
-                    throw new RuntimeException("Component size " + size + " for " + type.getName() + " out of bounds");
-                }
-                expectedReaderIndex = ByteBufHelper.readerIndex(wrapper.buffer) + size;
-            } else {
-                expectedReaderIndex = -1;
-            }
-            // read component value
-            Object value = type.read(wrapper);
-            // if this component is length-prefixed, verify the reader index changed to the expected value
-            if (expectedReaderIndex != -1) {
-                int readerIndex = ByteBufHelper.readerIndex(wrapper.buffer);
-                if (readerIndex != expectedReaderIndex) {
-                    throw new RuntimeException("Invalid component read for " + type.getName() + "; expected reader index "
-                            + expectedReaderIndex + ", got reader index " + readerIndex);
-                }
-            }
-            // set component value in component patch-map
-            components.set((ComponentType<Object>) type, value);
-        }
-        for (int i = 0; i < absentCount; i++) {
-            components.unset(wrapper.readMappedEntity(ComponentTypes.getRegistry()));
-        }
-
-        return ItemStack.builder().type(itemType).amount(count).components(components).wrapper(wrapper).build();
+        ItemType item = wrapper.readMappedEntity(ItemTypes.getRegistry());
+        PatchableComponentMap components = PatchableComponentMap.read(wrapper, item, lengthPrefixed);
+        return ItemStack.builder().type(item).amount(count).components(components).wrapper(wrapper).build();
     }
 
     /**
@@ -182,7 +189,6 @@ public final class ItemStackSerialization {
         writeModern(wrapper, stack, true);
     }
 
-    @SuppressWarnings("unchecked")
     private static void writeModern(PacketWrapper<?> wrapper, ItemStack stack, boolean lengthPrefixed) {
         if (stack.isEmpty()) {
             wrapper.writeByte(0);
@@ -190,54 +196,6 @@ public final class ItemStackSerialization {
         }
         wrapper.writeVarInt(stack.getAmount());
         wrapper.writeMappedEntity(stack.getType());
-
-        if (!stack.hasComponentPatches()) {
-            wrapper.writeShort(0);
-            return; // early return
-        }
-
-        // write component patch counts
-        Map<ComponentType<?>, Optional<?>> allPatches = stack.getComponents().getPatches();
-        int presentCount = 0, absentCount = 0;
-        for (Map.Entry<ComponentType<?>, Optional<?>> patch : allPatches.entrySet()) {
-            if (patch.getValue().isPresent()) {
-                presentCount++;
-            } else {
-                absentCount++;
-            }
-        }
-        wrapper.writeVarInt(presentCount);
-        wrapper.writeVarInt(absentCount);
-
-        // write present patches
-        for (Map.Entry<ComponentType<?>, Optional<?>> patch : allPatches.entrySet()) {
-            if (patch.getValue().isPresent()) {
-                wrapper.writeVarInt(patch.getKey().getId(wrapper.getServerVersion().toClientVersion()));
-                Runnable writer = () -> ((ComponentType<Object>) patch.getKey()).write(wrapper, patch.getValue().get());
-                if (lengthPrefixed) {
-                    // easiest solution is to just temporarily replace the buffer
-                    Object originalBuffer = wrapper.buffer;
-                    wrapper.buffer = ByteBufHelper.allocateNewBuffer(originalBuffer);
-                    writer.run();
-                    Object componentBuffer = wrapper.buffer;
-                    wrapper.buffer = originalBuffer;
-                    // after writing to new buffer, write length of newly written buffer to original buffer
-                    wrapper.writeVarInt(ByteBufHelper.readableBytes(componentBuffer));
-                    // copy component buffer bytes to original buffer
-                    ByteBufHelper.writeBytes(wrapper.buffer, componentBuffer);
-                    // release component buffer
-                    ByteBufHelper.release(componentBuffer);
-                } else {
-                    writer.run();
-                }
-            }
-        }
-
-        // write absent patches
-        for (Map.Entry<ComponentType<?>, Optional<?>> patch : allPatches.entrySet()) {
-            if (!patch.getValue().isPresent()) {
-                wrapper.writeVarInt(patch.getKey().getId(wrapper.getServerVersion().toClientVersion()));
-            }
-        }
+        PatchableComponentMap.write(wrapper, stack, lengthPrefixed);
     }
 }

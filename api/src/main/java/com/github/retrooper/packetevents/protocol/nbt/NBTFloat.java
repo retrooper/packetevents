@@ -18,6 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.nbt;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class NBTFloat extends NBTNumber {
 
     protected final float value;
@@ -67,7 +71,7 @@ public class NBTFloat extends NBTNumber {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }
