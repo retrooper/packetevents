@@ -23,8 +23,9 @@ import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 /**
@@ -43,12 +44,43 @@ import java.util.logging.Level;
 
 public class EventManager {
 
-    //Using a ConcurrentHashMap is faster and more secure here, compared to Collections.synchronizedMap(new EnumMap<>(PacketListenerPriority.class))
-    //This is mainly due to:
-    //1. On each modification Collections.synchronizedMap synchronizes the whole Map object, while ConcurrentHashMap only it's internal, currently modified Node
-    //2. ConcurrentHashMap won't fail in a multi-thread environment, while Collections.synchronizedMap is said to have a lot of potential problems,
-    //being a generalized method for synchronization
-    private final Map<PacketListenerPriority, Set<PacketListenerCommon>> listenersMap = new ConcurrentHashMap<>();
+    // specifically optimized for the use case of storing listeners by their priority concurrently
+    // we can use a small array since priorities are very limited and known ahead of time
+    // uses cas operations to uphold a safe lock free architecture
+    private static class ConcurrentListenerMap {
+
+        private final AtomicReferenceArray<Set<PacketListenerCommon>> array = new AtomicReferenceArray(PacketListenerPriority.values().length);
+
+        public void clear() {
+            for (int i = 0; i < this.array.length(); i++) {
+                do {
+                    Set<PacketListenerCommon> current = this.array.get(i);
+                    if (current == null || this.array.compareAndSet(i, current, null))
+                        break;
+                } while (true);
+            }
+        }
+
+        public Set<PacketListenerCommon> get(PacketListenerPriority priority) {
+            return this.array.get(priority.ordinal());
+        }
+
+        public Set<PacketListenerCommon> computeIfAbsent(PacketListenerPriority priority, Function<PacketListenerPriority, Set<PacketListenerCommon>> supplier) {
+            int index = priority.ordinal();
+            Set<PacketListenerCommon> supplied = null;
+            do {
+                Set<PacketListenerCommon> current = this.array.get(index);
+                if (current != null)
+                    return current;
+                if (supplied == null)
+                    supplied = supplier.apply(priority);
+                if (this.array.compareAndSet(index, null, supplied))
+                    return supplied;
+            } while (true);
+        }
+    }
+
+    private final ConcurrentListenerMap listenersMap = new ConcurrentListenerMap();
     //Since reads greatly outnumber writes, create an array for the best possible iteration time
     //Updated as a whole on writes, no index modifications are allowed
     private volatile PacketListenerCommon[] listeners = new PacketListenerCommon[0];
