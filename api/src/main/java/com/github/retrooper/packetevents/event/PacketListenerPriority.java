@@ -27,7 +27,10 @@ package com.github.retrooper.packetevents.event;
  *
  * @author retrooper
  * @since 1.8
+ *
+ * @deprecated Legacy priority type. Use {@link ListenerPriority} instead.
  */
+@Deprecated
 public enum PacketListenerPriority {
     /**
      * This listener will be run first and has little say in the outcome of events.
@@ -64,10 +67,18 @@ public enum PacketListenerPriority {
      */
     MONITOR;
 
+    /**
+     * @deprecated Legacy priority type. Use {@link ListenerPriority} instead.
+     */
+    @Deprecated
     public static PacketListenerPriority getById(byte id) {
         return values()[id];
     }
 
+    /**
+     * @deprecated Legacy priority type. Use {@link ListenerPriority} instead.
+     */
+    @Deprecated
     public byte getId() {
         return (byte) ordinal();
     }

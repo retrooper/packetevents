@@ -18,10 +18,6 @@
 
 package com.github.retrooper.packetevents.event;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Abstract packet listener.
  *
@@ -29,18 +25,44 @@ import java.util.Map;
  * @since 1.8
  */
 public abstract class PacketListenerCommon {
-    private final PacketListenerPriority priority;
+    private final ListenerPriority priority;
 
-    public PacketListenerCommon(PacketListenerPriority priority) {
+    /**
+     * @param priority the priority of this packet listener.
+     */
+    public PacketListenerCommon(ListenerPriority priority) {
         this.priority = priority;
     }
 
+    /**
+     * Default priority is {@link ListenerPriority#NORMAL}.
+     */
     public PacketListenerCommon() {
-        this.priority = PacketListenerPriority.NORMAL;
+        this(ListenerPriority.NORMAL);
     }
 
+    /**
+     * @deprecated Legacy priority type. Use constructor {@link PacketListenerCommon(ListenerPriority)} instead.
+     */
+    @Deprecated
+    public PacketListenerCommon(PacketListenerPriority priority) {
+        this(ListenerPriority.fromLegacy(priority));
+    }
+
+    /**
+     * @deprecated Legacy priority type, returns {@link PacketListenerPriority#MONITOR} for custom priorities. Use {@link #priority()} instead.
+     * @return the priority of this packet listener.
+     */
+    @Deprecated
     public PacketListenerPriority getPriority() {
-        return priority;
+        return priority.legacyType();
+    }
+
+    /**
+     * @return the priority of this packet listener.
+     */
+    public ListenerPriority priority() {
+        return this.priority;
     }
 
     public void onUserConnect(UserConnectEvent event) {
