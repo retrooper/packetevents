@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.util.adventure;
 
 import com.github.retrooper.packetevents.util.reflection.Reflection;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentBuilder;
@@ -38,6 +39,7 @@ import java.util.Map;
 @ApiStatus.Internal
 public final class AdventureSupportUtil {
 
+    public static final boolean HAS_BOSSBAR_VIEWERS = Reflection.getMethod(BossBar.class, "viewers", 0) != null;
     public static final boolean HAS_TRANSLATION_FALLBACK = Reflection.getMethodExact(TranslatableComponent.class, "fallback", String.class) != null;
     public static final boolean HAS_TRANSLATION_ARGUMENTS = Reflection.getMethodExact(TranslatableComponent.class, "arguments", List.class) != null;
     public static final boolean HAS_JSON_SERIALIZER_OPTS = Reflection.getMethod(GsonComponentSerializer.Builder.class, "editOptions", 0) != null;

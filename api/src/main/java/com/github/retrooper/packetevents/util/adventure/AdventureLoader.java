@@ -46,6 +46,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 @NullMarked
 @ApiStatus.Internal
@@ -98,11 +99,12 @@ public final class AdventureLoader {
     private AdventureLoader() {
     }
 
-    public static Set<Path> injectAll(URLClassLoader classLoader) {
+    public static Set<Path> injectAll(URLClassLoader classLoader, Logger logger) {
         // check each adventure dependency
         Set<Path> injectedJars = new HashSet<>();
         for (Dependency dependency : DEPENDENCIES) {
             if (!dependency.isAvailable()) {
+                logger.info("Loading dependency " + dependency + "...");
                 injectedJars.add(dependency.inject(REPO_URI, classLoader));
             }
         }
@@ -245,6 +247,11 @@ public final class AdventureLoader {
 
         public void uninject(URLClassLoader classLoader, URL url) {
             // TODO though not a priority
+        }
+
+        @Override
+        public String toString() {
+            return this.groupId + ":" + this.artifactId + ":" + this.version;
         }
     }
 }

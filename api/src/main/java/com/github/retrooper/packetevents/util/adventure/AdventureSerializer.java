@@ -177,20 +177,21 @@ public final class AdventureSerializer implements NbtEncoder<Component>, NbtDeco
         return serializer().asNbtTag(component);
     }
 
-    public Component fromLegacy(String legacy) {
-        return this.legacy().deserializeOrNull(legacy);
+    public @Nullable Component fromLegacy(@Nullable String legacy) {
+        return legacy != null ? this.legacy().deserialize(legacy) : null;
     }
 
-    public String asLegacy(Component component) {
-        return this.legacy().serializeOrNull(component);
+    public @Nullable String asLegacy(@Nullable Component component) {
+        return component != null ? this.legacy().serialize(component) : null;
     }
 
-    public Component fromJson(String json) {
-        return this.gson().deserializeOrNull(json);
+    public @Nullable Component fromJson(@Nullable String json) {
+        return json != null ? this.gson().deserialize(json) : null;
     }
 
-    public String asJson(Component component) {
-        return this.gson().serializeOrNull(component);
+    @Contract("null -> null; !null -> !null")
+    public @Nullable String asJson(@Nullable Component component) {
+        return component != null ? this.gson().serialize(component) : null;
     }
 
     @Contract("!null -> !null")
@@ -256,9 +257,10 @@ public final class AdventureSerializer implements NbtEncoder<Component>, NbtDeco
                         }
                     });
         }
-        return gsonBuilder
-                .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
-                .build();
+        if (AdventureSupportUtil.HAS_BOSSBAR_VIEWERS) {
+            gsonBuilder.legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get());
+        }
+        return gsonBuilder.build();
     }
 
     public GsonComponentSerializer gson() {
