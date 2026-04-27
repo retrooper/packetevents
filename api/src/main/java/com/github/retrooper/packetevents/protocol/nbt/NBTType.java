@@ -18,8 +18,12 @@
 
 package com.github.retrooper.packetevents.protocol.nbt;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Objects;
 
+@NullMarked
 public class NBTType<T extends NBT> {
 
     public static final NBTType<NBTEnd> END = new NBTType<>(NBTEnd.class);
@@ -54,7 +58,7 @@ public class NBTType<T extends NBT> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }

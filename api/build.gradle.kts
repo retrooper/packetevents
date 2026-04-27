@@ -22,6 +22,8 @@ dependencies {
     compileOnly(libs.gson)
     compileOnly(libs.checkerqual)
 
+    testRuntimeOnly(testlibs.bundles.adventure)
+    testRuntimeOnly(testlibs.bundles.adventure.serializers)
     testImplementation(libs.bundles.adventure)
     testImplementation(libs.bundles.adventure.serializers)
 

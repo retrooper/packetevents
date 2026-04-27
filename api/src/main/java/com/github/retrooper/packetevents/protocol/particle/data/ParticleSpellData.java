@@ -61,7 +61,7 @@ public class ParticleSpellData extends ParticleData {
 
     @ApiStatus.Internal
     public static ParticleSpellData decode(NBTCompound compound, ClientVersion version) {
-        Color color = compound.getOr("color", Color::decode, Color.WHITE, null);
+        Color color = compound.getOr("color", Color.CODEC, Color.WHITE, PacketWrapper.createDummyWrapper(version));
         float power = compound.getNumberTagValueOrDefault("power", 1f).floatValue();
         return new ParticleSpellData(color, power);
     }
@@ -70,7 +70,7 @@ public class ParticleSpellData extends ParticleData {
     public static void encode(ParticleSpellData data, ClientVersion version, NBTCompound compound) {
         if (version.isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
             if (!Color.WHITE.equals(data.color)) {
-                compound.setTag("color", Color.encode(data.color, version));
+                compound.set("color", data.color, Color.CODEC, PacketWrapper.createDummyWrapper(version));
             }
             if (data.power != 1f) {
                 compound.setTag("power", new NBTFloat(data.power));

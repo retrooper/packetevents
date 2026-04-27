@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.util.adventure;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -46,6 +47,7 @@ public final class AdventureSupportUtil {
     public static final boolean HAS_OBJECT_COMPONENT = Reflection.getMethod(Component.class, "object", 0) != null;
 
     private static final Method CLICK_EVENT_VALUE = Reflection.getMethodExact(ClickEvent.class, "value", String.class);
+    private static final Method COMPONENT_BUILDER_BUILD = Reflection.getMethod(ComponentBuilder.class, "build");
 
     private AdventureSupportUtil() {
     }
@@ -67,6 +69,15 @@ public final class AdventureSupportUtil {
         }
         try {
             return Integer.parseInt((String) CLICK_EVENT_VALUE.invoke(event));
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    public static Component build(ComponentBuilder<?, ?> builder) {
+        // signature changed with v5
+        try {
+            return (Component) COMPONENT_BUILDER_BUILD.invoke(builder);
         } catch (ReflectiveOperationException exception) {
             throw new RuntimeException(exception);
         }
