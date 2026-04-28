@@ -35,7 +35,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     public PacketEventsPlugin() {
         this.injectionLoader = (URLClassLoader) PacketEventsPlugin.class.getClassLoader().getParent();
-        this.injectedJars = AdventureLoader.injectAll(this.injectionLoader);
+        this.injectedJars = AdventureLoader.injectAll(this.injectionLoader, this.getLogger());
     }
 
     @Override
