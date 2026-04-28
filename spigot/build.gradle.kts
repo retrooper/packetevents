@@ -44,8 +44,8 @@ tasks {
     // 1.18 - 1.20.4    = Java 17
     // 1.20.5 - 1.21.11 = Java 21
     // 26.1+            = Java 25
-    val version = "1.16.5"
-    val javaVersion = JavaLanguageVersion.of(8)
+    val version = "26.1.2"
+    val javaVersion = JavaLanguageVersion.of(25)
 
     val jvmArgsExternal = listOf(
         "-Dcom.mojang.eula.agree=true"
