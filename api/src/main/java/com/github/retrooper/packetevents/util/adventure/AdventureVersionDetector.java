@@ -83,9 +83,9 @@ final class AdventureVersionDetector {
             return "4.15.0";
         } else if (Reflection.getMethodExact(HoverEvent.class, "showItem", HoverEvent.class, Keyed.class, int.class, Map.class) == null) {
             return "4.16.0";
-        } else if (Reflection.getMethod(Style.class, "shadowColor", 0) == null) {
+        } else if (Reflection.getMethod(Component.class, "virtual", 0) == null) {
             return "4.17.0";
-        } else if (Reflection.getMethod(TextReplacementConfig.class, "replaceInsideHoverEvents", 0) == null) {
+        } else if (Reflection.getMethod(TextReplacementConfig.Builder.class, "replaceInsideHoverEvents", 0) == null) {
             return "4.18.0";
         } else if (Reflection.getMethod(Translator.class, "canTranslate", 0) == null) {
             return "4.19.0";
