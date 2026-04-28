@@ -133,6 +133,9 @@ public final class ListenerPriority implements Comparable<ListenerPriority> {
         return Integer.compare(this.priority, o.priority);
     }
 
+    /**
+     * @return the ordinal of this priority. The higher the ordinal, the higher the priority.
+     */
     public int getPriority() {
         return this.priority;
     }

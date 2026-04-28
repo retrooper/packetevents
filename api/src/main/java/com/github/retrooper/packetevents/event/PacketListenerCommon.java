@@ -62,8 +62,9 @@ public abstract class PacketListenerCommon {
      * @return the priority of this packet listener.
      */
     public ListenerPriority priority() {
-        // backwards compat, developers may have overrides
-        return ListenerPriority.fromLegacy(this.getPriority());
+        // no point in providing a backwards compat if method returns the modern type
+        // + the new type has to be exposed in one way or another (the event manager needs it), cant get around this one :(
+        return this.priority;
     }
 
     public void onUserConnect(UserConnectEvent event) {
