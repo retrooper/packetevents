@@ -229,7 +229,11 @@ public final class AdventureSerializer implements NbtEncoder<Component>, NbtDeco
                     .editOptions(builder -> {
                         builder.values(JSONOptions.byDataVersion().at(0));
                         if (this.version.isNewerThanOrEquals(ClientVersion.V_1_16)) {
-                            builder.value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.CAMEL_CASE);
+                            try {
+                                builder.value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.CAMEL_CASE);
+                            } catch (NoSuchFieldError ignored) {
+                                builder.value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.MODERN_ONLY); // legacy
+                            }
                             if (!PacketEvents.getAPI().getSettings().shouldDownsampleColors()) {
                                 builder.value(JSONOptions.EMIT_RGB, true);
                             }
@@ -250,7 +254,10 @@ public final class AdventureSerializer implements NbtEncoder<Component>, NbtDeco
                             builder.value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.SNAKE_CASE);
                             builder.value(JSONOptions.EMIT_CLICK_EVENT_TYPE, JSONOptions.ClickEventValueMode.SNAKE_CASE);
                             builder.value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_KEY_AS_TYPE_AND_UUID_AS_ID, false);
-                            builder.value(JSONOptions.EMIT_CLICK_URL_HTTPS, true);
+                            try {
+                                builder.value(JSONOptions.EMIT_CLICK_URL_HTTPS, true);
+                            } catch (NoSuchFieldError ignored) {
+                            }
                         }
                         if (this.version.isNewerThanOrEquals(ClientVersion.V_1_21_6)) {
                             builder.value(JSONOptions.EMIT_CHANGE_PAGE_CLICK_EVENT_PAGE_AS_STRING, false);

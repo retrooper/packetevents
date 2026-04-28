@@ -37,6 +37,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -53,6 +54,8 @@ public final class AdventureNbtUtil {
     private static final Method TAG_TYPE_WRITE = Reflection.getMethodExact(BinaryTagType.class, "write", void.class, BinaryTag.class, DataOutput.class);
 
     private static final Constructor<?> CHAR_BUFFER_CTOR;
+    private static final Method CHAR_BUFFER_SKIP_WHITESPACE;
+    private static final Method CHAR_BUFFER_HAS_MORE;
     private static final Constructor<?> TAG_STRING_READER_CTOR;
     private static final @Nullable Method TAG_STRING_READER_HETEROGENEOUS_LISTS;
     private static final Method TAG_STRING_READER_TAG;
@@ -68,6 +71,8 @@ public final class AdventureNbtUtil {
             Class<?> tagStringWriter = Class.forName("net.kyori.adventure.nbt.TagStringWriter");
 
             CHAR_BUFFER_CTOR = Reflection.getConstructor(charBuffer, CharSequence.class);
+            CHAR_BUFFER_SKIP_WHITESPACE = Reflection.getMethodExact(charBuffer, "skipWhitespace", charBuffer);
+            CHAR_BUFFER_HAS_MORE = Reflection.getMethodExact(charBuffer, "hasMore", boolean.class);
             TAG_STRING_READER_CTOR = Reflection.getConstructor(tagStringReader, charBuffer);
             TAG_STRING_READER_HETEROGENEOUS_LISTS = Reflection.getMethodExact(tagStringReader, "heterogeneousLists", tagStringReader, boolean.class);
             TAG_STRING_READER_TAG = Reflection.getMethodExact(tagStringReader, "tag", BinaryTag.class);
@@ -191,7 +196,10 @@ public final class AdventureNbtUtil {
                 TAG_STRING_READER_HETEROGENEOUS_LISTS.invoke(reader, version.isNewerThanOrEquals(ClientVersion.V_1_21_5));
             }
             advTag = (BinaryTag) TAG_STRING_READER_TAG.invoke(reader);
-            // TODO check trailing data
+            CHAR_BUFFER_SKIP_WHITESPACE.invoke(buffer);
+            if ((boolean) CHAR_BUFFER_HAS_MORE.invoke(buffer)) {
+                throw new IOException("Document had trailing content after first Tag");
+            }
         } catch (Exception exception) {
             throw new RuntimeException("Error while decoding nbt from string: " + string, exception);
         }
