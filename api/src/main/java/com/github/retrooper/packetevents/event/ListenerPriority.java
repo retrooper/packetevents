@@ -18,84 +18,62 @@
 
 package com.github.retrooper.packetevents.event;
 
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
- * Class for defining listener priorities.
  * The priority of packet listeners affect the order they will be invoked in.
  * The lowest priority listeners are invoked first, the highest are invoked last.
- * The highest priority listener has the final decider on an event being cancelled.
- * <p>
- * Users can define custom priorities by using the {@link #custom(int)} method.
+ * The highest priority listener has the final decider on an event being canceled.
  * <p>
  * Predefined priorities are: {@link #LOWEST}, {@link #LOW}, {@link #NORMAL}, {@link #HIGH}, {@link #HIGHEST} and {@link #MONITOR}.
- *
- * @author ieatglu3
+ * <p>
+ * Custom integer priorities can be defined using {@link #custom(int)}.
  */
 @NullMarked
 public final class ListenerPriority implements Comparable<ListenerPriority> {
 
-    private final int ordinal;
-
-    private ListenerPriority(int ordinal) {
-        this.ordinal = ordinal;
-    }
+    private static final int LOWEST_PRIORITY = -5000;
+    private static final int LOW_PRIORITY = -2500;
+    private static final int NORMAL_PRIORITY = 0;
+    private static final int HIGH_PRIORITY = 2500;
+    private static final int HIGHEST_PRIORITY = 5000;
+    private static final int MONITOR_PRIORITY = Integer.MAX_VALUE;
 
     /**
      * This listener will be run first and has little say in the outcome of events.
      */
-    public static final ListenerPriority LOWEST = new ListenerPriority(0);
+    public static final ListenerPriority LOWEST = new ListenerPriority(LOWEST_PRIORITY);
 
     /**
      * Listener is of low importance.
      */
-    public static final ListenerPriority LOW = new ListenerPriority(1);
+    public static final ListenerPriority LOW = new ListenerPriority(LOW_PRIORITY);
 
     /**
      * The normal listener priority.
      */
-    public static final ListenerPriority NORMAL = new ListenerPriority(2);
+    public static final ListenerPriority NORMAL = new ListenerPriority(NORMAL_PRIORITY);
 
     /**
      * Listener is of high importance.
      */
-    public static final ListenerPriority HIGH = new ListenerPriority(3);
+    public static final ListenerPriority HIGH = new ListenerPriority(HIGH_PRIORITY);
 
     /**
      * Listener is of critical importance. Use this to decide the final state of packets.
      */
-    public static final ListenerPriority HIGHEST = new ListenerPriority(4);
+    public static final ListenerPriority HIGHEST = new ListenerPriority(HIGHEST_PRIORITY);
 
     /**
      * Highest priority. Use this to perform logic based on the outcome of an event.
      */
-    public static final ListenerPriority MONITOR = new ListenerPriority(5);
+    public static final ListenerPriority MONITOR = new ListenerPriority(MONITOR_PRIORITY);
 
-    private static final ListenerPriority[] VALUES = {LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR};
+    private final int priority;
 
-    /**
-     * @return the ordinal of this priority. The higher the ordinal, the higher the priority.
-     */
-    public int getOrdinal() {
-        return this.ordinal;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || o.getClass() != ListenerPriority.class) return false;
-        return this.ordinal == ((ListenerPriority) o).ordinal;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.ordinal;
-    }
-
-    @Override
-    public int compareTo(@NotNull ListenerPriority o) {
-        return Integer.compare(this.ordinal, o.ordinal);
+    private ListenerPriority(int priority) {
+        this.priority = priority;
     }
 
     /**
@@ -108,13 +86,6 @@ public final class ListenerPriority implements Comparable<ListenerPriority> {
      */
     public static ListenerPriority custom(int ordinal) {
         return new ListenerPriority(ordinal);
-    }
-
-    /**
-     * @return a copy of all the predefined priorities in order of their ordinals.
-     */
-    public static ListenerPriority[] predefined() {
-        return VALUES.clone();
     }
 
     @Deprecated
@@ -133,25 +104,48 @@ public final class ListenerPriority implements Comparable<ListenerPriority> {
             case MONITOR:
                 return MONITOR;
             default:
-                throw new IllegalArgumentException("unknown legacy priority: " + priority);
+                throw new AssertionError();
         }
     }
 
     @Deprecated
     public PacketListenerPriority legacyType() {
-        switch (this.ordinal) {
-            case 0:
+        switch (this.priority) {
+            case LOWEST_PRIORITY:
                 return PacketListenerPriority.LOWEST;
-            case 1:
+            case LOW_PRIORITY:
                 return PacketListenerPriority.LOW;
-            case 2:
+            case NORMAL_PRIORITY:
                 return PacketListenerPriority.NORMAL;
-            case 3:
+            case HIGH_PRIORITY:
                 return PacketListenerPriority.HIGH;
-            case 4:
+            case HIGHEST_PRIORITY:
                 return PacketListenerPriority.HIGHEST;
-            default:
+            case MONITOR_PRIORITY:
                 return PacketListenerPriority.MONITOR;
+            default:
+                throw new IllegalStateException("Can't convert " + this + " to legacy listener priority");
         }
+    }
+
+    @Override
+    public int compareTo(ListenerPriority o) {
+        return Integer.compare(this.priority, o.priority);
+    }
+
+    public int getPriority() {
+        return this.priority;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) return true;
+        if (o == null || o.getClass() != ListenerPriority.class) return false;
+        return this.priority == ((ListenerPriority) o).priority;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.priority;
     }
 }

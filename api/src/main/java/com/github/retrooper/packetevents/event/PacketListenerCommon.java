@@ -42,7 +42,7 @@ public abstract class PacketListenerCommon {
     }
 
     /**
-     * @deprecated Legacy priority type. Use constructor {@link PacketListenerCommon(ListenerPriority)} instead.
+     * @deprecated use {@link PacketListenerCommon(ListenerPriority)} instead
      */
     @Deprecated
     public PacketListenerCommon(PacketListenerPriority priority) {
@@ -50,19 +50,20 @@ public abstract class PacketListenerCommon {
     }
 
     /**
-     * @deprecated Legacy priority type, returns {@link PacketListenerPriority#MONITOR} for custom priorities. Use {@link #priority()} instead.
      * @return the priority of this packet listener.
+     * @deprecated use {@link #priority()} instead
      */
     @Deprecated
     public PacketListenerPriority getPriority() {
-        return priority.legacyType();
+        return this.priority.legacyType();
     }
 
     /**
      * @return the priority of this packet listener.
      */
     public ListenerPriority priority() {
-        return this.priority;
+        // backwards compat, developers may have overrides
+        return ListenerPriority.fromLegacy(this.getPriority());
     }
 
     public void onUserConnect(UserConnectEvent event) {
