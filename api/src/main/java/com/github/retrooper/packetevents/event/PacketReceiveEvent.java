@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.event;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -36,6 +37,14 @@ public class PacketReceiveEvent extends ProtocolPacketEvent {
             boolean autoProtocolTranslation
     ) throws PacketProcessException {
         super(PacketSide.CLIENT, channel, user, player, rawByteBuf, autoProtocolTranslation);
+    }
+
+    protected PacketReceiveEvent(
+            Object channel, User user,
+            @UnknownNullability Object player, Object rawByteBuf,
+            boolean autoProtocolTranslation, ConnectionState connectionState
+    ) throws PacketProcessException {
+        super(PacketSide.CLIENT, channel, user, player, rawByteBuf, autoProtocolTranslation, connectionState);
     }
 
     protected PacketReceiveEvent(

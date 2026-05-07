@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.injector.connection;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
+import com.github.retrooper.packetevents.manager.PreViaSupport;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -30,6 +31,7 @@ import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
@@ -43,7 +45,10 @@ public class ServerConnectionInitializer {
 
     // This is called each time a new listener is registered
     public static final Consumer<PacketListenerCommon> PRE_VIA_LISTENER_REGISTERED = listener -> {
-        if (!PreViaPipelineSupport.shouldInjectPreViaPipelineOnListenerRegistration(listener)) return;
+        if (!PreViaSupport.isExternalPreViaListener(listener)) return;
+        PreViaSupport.ensurePreViaInternalListenerRegistered();
+
+        if (!ViaVersionUtil.isAvailable()) return;
 
         SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
         if (!injector.isPreViaRequested()) {

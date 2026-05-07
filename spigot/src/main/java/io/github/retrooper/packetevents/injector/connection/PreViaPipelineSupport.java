@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.injector.connection;
 
-import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import com.github.retrooper.packetevents.manager.PreViaSupport;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import org.jetbrains.annotations.ApiStatus;
@@ -23,10 +22,6 @@ public final class PreViaPipelineSupport {
         }
 
         return ViaVersionUtil.isAvailable() ? DispatchMode.PIPELINE : DispatchMode.FALLBACK;
-    }
-
-    public static boolean shouldInjectPreViaPipelineOnListenerRegistration(PacketListenerCommon listener) {
-        return listener.isPreVia() && ViaVersionUtil.isAvailable();
     }
 
     public static boolean shouldDispatchFallbackPreViaEvents(boolean pipelinePreVia) {

@@ -101,12 +101,19 @@ public final class PacketEventsImplHelper {
             Object channel, User user, Object player, Object buffer,
             boolean autoProtocolTranslation
     ) throws Exception {
+        return handleServerBoundPacket(channel, user, player, buffer, autoProtocolTranslation, user.getDecoderState());
+    }
+
+    public static @Nullable PacketReceiveEvent handleServerBoundPacket(
+            Object channel, User user, Object player, Object buffer,
+            boolean autoProtocolTranslation, ConnectionState connectionState
+    ) throws Exception {
         if (!ByteBufHelper.isReadable(buffer)) {
             return null;
         }
 
         int preProcessIndex = ByteBufHelper.readerIndex(buffer);
-        PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
+        PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(channel, user, player, buffer, autoProtocolTranslation, connectionState);
         int processIndex = ByteBufHelper.readerIndex(buffer);
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
             ByteBufHelper.readerIndex(buffer, processIndex);

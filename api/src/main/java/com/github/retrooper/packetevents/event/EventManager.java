@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
-import com.github.retrooper.packetevents.manager.PreViaInternalListener;
+import com.github.retrooper.packetevents.manager.PreViaSupport;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -193,7 +193,7 @@ public class EventManager {
                     list.addAll(set);
                     for (PacketListenerCommon listener : set) {
                         if (listener.isPreVia()) {
-                            if (listener instanceof PreViaInternalListener) {
+                            if (PreViaSupport.isPreViaInternalListener(listener)) {
                                 hasPreViaInternalListener = true;
                             } else {
                                 hasPreViaListeners = true;

@@ -141,9 +141,9 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
         if (msg instanceof ByteBuf) {
             boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
-            ConnectionState encoderState = this.user.getEncoderState();
+            ConnectionState connectionState = preVia ? this.user.getPreViaEncoderState() : this.user.getEncoderState();
             this.handleClientBoundPacket(
-                    ctx.channel(), this.user, this.player, (ByteBuf) msg, !preVia, null, this.promise);
+                    ctx.channel(), this.user, this.player, (ByteBuf) msg, !preVia, connectionState, this.promise);
 
             // check if the packet got cancelled
             if (!((ByteBuf) msg).isReadable()) {
@@ -152,9 +152,10 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
                 return; // abort handling
             }
 
-            // We still call preVia listeners if ViaVersion is not available
+            // Without ViaVersion we still need to call previa listeners from the normal handler
             if (PreViaPipelineSupport.shouldDispatchFallbackPreViaEvents(preVia)) {
-                this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, false, encoderState, this.promise);
+                this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg,
+                        false, this.user.getPreViaEncoderState(), this.promise);
             }
 
             if (needsRecompression) {

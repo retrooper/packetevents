@@ -1,9 +1,7 @@
 package com.github.retrooper.packetevents.manager;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
@@ -20,14 +18,17 @@ public final class PreViaSupport {
         return PacketEvents.getAPI().getEventManager().hasPreViaInternalListener();
     }
 
-    public static boolean shouldRegisterPreViaInternalListener() {
-        return PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_20_2);
+    public static void ensurePreViaInternalListenerRegistered() {
+        if (!hasPreViaInternalListener()) {
+            PacketEvents.getAPI().getEventManager().registerListener(new PreViaInternalListener());
+        }
     }
 
-    public static boolean shouldUseLegacyLoginTracking(User user) {
-        return shouldRegisterPreViaInternalListener()
-                && hasPreViaInternalListener()
-                && user.getClientVersion() != null
-                && user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_20_2);
+    public static boolean isPreViaInternalListener(PacketListenerCommon listener) {
+        return listener instanceof PreViaInternalListener;
+    }
+
+    public static boolean isExternalPreViaListener(PacketListenerCommon listener) {
+        return listener.isPreVia() && !isPreViaInternalListener(listener);
     }
 }

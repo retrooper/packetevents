@@ -61,12 +61,15 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
         try {
-            // We still call preVia listeners if ViaVersion is not available
+            // Without ViaVersion we still need to call previa listeners from the normal handler
             if (PreViaPipelineSupport.shouldDispatchFallbackPreViaEvents(preVia)) {
-                PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, false);
+                PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input,
+                        false, user.getPreViaDecoderState());
             }
 
-            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input, !preVia);
+            ConnectionState connectionState = preVia ? user.getPreViaDecoderState() : user.getDecoderState();
+            PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input,
+                    !preVia, connectionState);
             out.add(ByteBufHelper.retain(input));
         } catch (Throwable e) {
             // We must be sure all the exceptions caused by our handlers are PacketProcessExceptions
