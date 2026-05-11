@@ -164,8 +164,16 @@ public class DataPalette {
         }
     }
 
+    public int getAndSet(int x, int y, int z, int state) {
+        return this.palette.idToState(this.set(x, y, z, state));
+    }
+
     /**
+     * It's recommended to use {@link #getAndSet(int, int, int, int)} instead if you want to use the return value.
+     *
      * @return the old value present in the storage.
+     * <strong>WARNING</strong>: For legacy reasons, the return value is NOT remapped
+     * by the palette and thus pretty much unusable.
      */
     public int set(int x, int y, int z, int state) {
         int id = this.palette.stateToId(state);

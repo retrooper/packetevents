@@ -186,7 +186,7 @@ public class Chunk_v1_18 implements BaseChunk {
 
     @Override
     public void set(int x, int y, int z, WrappedBlockState state) {
-        int curr = this.chunkData.set(x, y, z, state.getGlobalId());
+        int curr = this.chunkData.getAndSet(x, y, z, state.getGlobalId());
         WrappedBlockState currState = WrappedBlockState.getByGlobalId(this.version, curr);
 
         // track block count
