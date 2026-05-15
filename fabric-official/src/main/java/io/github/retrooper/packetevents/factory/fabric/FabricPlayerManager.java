@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.factory.fabric;
 
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -34,7 +35,7 @@ public class FabricPlayerManager extends PlayerManagerAbstract {
     }
 
     @Override
-    public Object getChannel(Object player) {
+    public @Nullable Object getChannel(Object player) {
         if (player instanceof ServerPlayer) {
             return ((ServerPlayer) player).connection.connection.channel;
         }

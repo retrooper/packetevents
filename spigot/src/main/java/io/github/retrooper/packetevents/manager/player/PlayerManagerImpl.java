@@ -30,7 +30,7 @@ import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.NotNull;import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
@@ -88,7 +88,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public Object getChannel(@NotNull Object player) {
+    public @Nullable Object getChannel(@NotNull Object player) {
         UUID uuid = ((Player) player).getUniqueId();
         ProtocolManager protocolManager = PacketEvents.getAPI().getProtocolManager();
         Object channel = protocolManager.getChannel(uuid);
@@ -108,7 +108,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public User getUser(@NotNull Object player) {
+    public @Nullable User getUser(@NotNull Object player) {
         Player p = (Player) player;
         Object channel = getChannel(p);
 

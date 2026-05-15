@@ -26,15 +26,22 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface PlayerManager {
     int getPing(@NotNull Object player);
 
     @NotNull ClientVersion getClientVersion(@NotNull Object player);
 
-    Object getChannel(@NotNull Object player);
+    /**
+     * Gets the channel of a platform specific player object. This returns null if no channel for the player has been established.
+     */
+    @Nullable Object getChannel(@NotNull Object player);
 
-    User getUser(@NotNull Object player);
+    /**
+     * Get the user from the platform specific player object. This returns null if the player's channel is null.
+     */
+    @Nullable User getUser(@NotNull Object player);
 
     /**
      * <strong>WARNING</strong>: Usage of this method should be avoided. Please use either

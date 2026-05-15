@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -167,7 +168,7 @@ public interface ProtocolManager {
         PacketEvents.getAPI().getInjector().updateUser(channel, user);
     }
 
-    default Object getChannel(UUID uuid) {
+    default @Nullable Object getChannel(UUID uuid) {
         return CHANNELS.get(uuid);
     }
 

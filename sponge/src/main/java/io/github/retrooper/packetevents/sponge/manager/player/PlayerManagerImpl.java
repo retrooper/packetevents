@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.sponge.util.SpongeReflectionUtil;
 import io.github.retrooper.packetevents.sponge.util.viaversion.ViaVersionUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.network.ServerConnectionState;
 import org.spongepowered.api.network.ServerSideConnection;
@@ -67,7 +68,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public Object getChannel(@NotNull Object player) {
+    public @Nullable Object getChannel(@NotNull Object player) {
         UUID uuid = ((ServerPlayer) player).uniqueId();
         ProtocolManager protocolManager = PacketEvents.getAPI().getProtocolManager();
         Object channel = protocolManager.getChannel(uuid);
@@ -87,7 +88,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public User getUser(@NotNull Object player) {
+    public @Nullable User getUser(@NotNull Object player) {
         ServerPlayer p = (ServerPlayer) player;
         Object channel = getChannel(p);
 

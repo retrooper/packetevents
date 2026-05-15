@@ -23,13 +23,14 @@ import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class PlayerManagerAbstract implements PlayerManager {
     @Override
     public abstract int getPing(@NotNull Object player);
 
     @Override
-    public abstract Object getChannel(@NotNull Object player);
+    public abstract @Nullable Object getChannel(@NotNull Object player);
 
     @Override
     public @NotNull ClientVersion getClientVersion(@NotNull Object player) {
@@ -37,7 +38,7 @@ public abstract class PlayerManagerAbstract implements PlayerManager {
     }
 
     @Override
-    public User getUser(@NotNull Object player) {
+    public @Nullable User getUser(@NotNull Object player) {
         Object channel = getChannel(player);
         return PacketEvents.getAPI().getProtocolManager().getUser(channel);
     }

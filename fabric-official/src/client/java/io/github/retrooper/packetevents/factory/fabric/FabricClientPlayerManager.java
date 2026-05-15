@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.factory.fabric;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
+import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -42,7 +43,7 @@ public class FabricClientPlayerManager extends FabricPlayerManager {
     }
 
     @Override
-    public Object getChannel(Object player) {
+    public @Nullable Object getChannel(Object player) {
         if (player instanceof LocalPlayer) {
             return ((LocalPlayer) player).connection.getConnection().channel;
         }

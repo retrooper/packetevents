@@ -134,12 +134,12 @@ public class BungeePacketEventsBuilder {
                 }
 
                 @Override
-                public Object getChannel(@NotNull Object player) {
+                public @Nullable Object getChannel(@NotNull Object player) {
                     return PacketEvents.getAPI().getProtocolManager().getChannel(((ProxiedPlayer) player).getUniqueId());
                 }
 
                 @Override
-                public User getUser(@NotNull Object player) {
+                public @Nullable User getUser(@NotNull Object player) {
                     ProxiedPlayer p = (ProxiedPlayer) player;
                     Object channel = getChannel(p);
                     User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);

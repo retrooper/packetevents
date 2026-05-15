@@ -26,6 +26,7 @@ import com.velocitypowered.api.proxy.Player;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.netty.channel.Channel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerManagerImpl extends PlayerManagerAbstract {
     private static Class<?> CONNECTED_PLAYER, MINECRAFT_CONNECTION_CLASS;
@@ -35,7 +36,7 @@ public class PlayerManagerImpl extends PlayerManagerAbstract {
     }
 
     @Override
-    public Object getChannel(@NotNull Object player) {
+    public @Nullable Object getChannel(@NotNull Object player) {
         ProtocolManager protocolManager = PacketEvents.getAPI().getProtocolManager();
         Object channel = protocolManager.getChannel(((Player) player).getUniqueId());
         if (channel == null) {
