@@ -30,7 +30,8 @@ import io.github.retrooper.packetevents.util.protocolsupport.ProtocolSupportUtil
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
