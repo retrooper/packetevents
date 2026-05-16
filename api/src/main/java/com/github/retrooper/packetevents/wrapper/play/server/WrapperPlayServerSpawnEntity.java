@@ -115,14 +115,9 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             this.velocity = Optional.of(LpVector3d.read(this));
         }
 
-        if (v1_15) {
-            pitch = readByte() / ROTATION_FACTOR;
-            yaw = readByte() / ROTATION_FACTOR;
-        } else {
-            yaw = readByte() / ROTATION_FACTOR;
-            pitch = readByte() / ROTATION_FACTOR;
-        }
 
+        pitch = readByte() / ROTATION_FACTOR;
+        yaw = readByte() / ROTATION_FACTOR;
         if (v1_19) {
             headYaw = readByte() / ROTATION_FACTOR;
             data = readVarInt();
@@ -175,13 +170,8 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             LpVector3d.write(this, this.velocity.orElse(Vector3d.zero()));
         }
 
-        if (v1_15) {
-            writeByte(MathUtil.floor(pitch * ROTATION_FACTOR));
-            writeByte(MathUtil.floor(yaw * ROTATION_FACTOR));
-        } else {
-            writeByte(MathUtil.floor(yaw * ROTATION_FACTOR));
-            writeByte(MathUtil.floor(pitch * ROTATION_FACTOR));
-        }
+        writeByte(MathUtil.floor(pitch * ROTATION_FACTOR));
+        writeByte(MathUtil.floor(yaw * ROTATION_FACTOR));
 
         if (v1_19) {
             writeByte(MathUtil.floor(headYaw * ROTATION_FACTOR));
