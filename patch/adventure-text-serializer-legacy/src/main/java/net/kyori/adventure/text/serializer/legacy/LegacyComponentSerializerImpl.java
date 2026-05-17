@@ -325,12 +325,12 @@ final class LegacyComponentSerializerImpl implements LegacyComponentSerializer {
 
     @Override
     public void component(final @NotNull String text) {
-      if (!text.isEmpty()) {
+//      if (!text.isEmpty()) { // packetevents comment out - scoreboard team prefix/suffix may have empty text but have color and formatting, which should be retained
         if (this.head < 0) throw new IllegalStateException("No style has been pushed!");
 
         this.styles[this.head].applyFormat();
         this.sb.append(text);
-      }
+//      } // packetevents comment out - scoreboard team prefix/suffix may have empty text but have color and formatting, which should be retained
     }
 
     @Override
