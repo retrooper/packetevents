@@ -153,9 +153,9 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             this.writeVarInt(this.soundCategory.ordinal());
         }
-        writeInt((int) (position.x * POSITION_MULTIPLIER));
-        writeInt((int) (position.y * POSITION_MULTIPLIER));
-        writeInt((int) (position.z * POSITION_MULTIPLIER));
+        writeInt((int) (position.x * (double) POSITION_MULTIPLIER));
+        writeInt((int) (position.y * (double) POSITION_MULTIPLIER));
+        writeInt((int) (position.z * (double) POSITION_MULTIPLIER));
         writeFloat(volume);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
             writeFloat(pitch);
@@ -215,9 +215,9 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     @Deprecated
     public Vector3i getEffectPosition() {
         return new Vector3i(
-                (int) (position.x * POSITION_MULTIPLIER),
-                (int) (position.y * POSITION_MULTIPLIER),
-                (int) (position.z * POSITION_MULTIPLIER)
+                (int) (position.x * (double) POSITION_MULTIPLIER),
+                (int) (position.y * (double) POSITION_MULTIPLIER),
+                (int) (position.z * (double) POSITION_MULTIPLIER)
         );
     }
 
