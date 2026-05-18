@@ -93,7 +93,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
             pitch = readFloat();
         } else {
-            pitch = readUnsignedByte() / 63.5F;
+            pitch = readUnsignedByte() / 63.0F;
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             this.seed = readLong();
@@ -119,7 +119,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
             writeFloat(pitch);
         } else {
-            writeByte((int) (pitch * 63.5F));
+            writeByte((int) (pitch * 63.0F));
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19)) {
             writeLong(seed);
