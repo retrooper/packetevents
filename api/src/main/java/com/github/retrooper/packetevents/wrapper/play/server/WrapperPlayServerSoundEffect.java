@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.protocol.sound.StaticSound;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -35,9 +36,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServerSoundEffect> {
 
+    private static final float POSITION_MULTIPLIER = 8.0F;
+
     private Sound sound;
     private SoundCategory soundCategory;
-    private Vector3i effectPosition;
+    private Vector3d position;
     private float volume;
     private float pitch;
     private long seed;
@@ -46,28 +49,63 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
+    @Deprecated
     public WrapperPlayServerSoundEffect(int soundId, SoundCategory soundCategory,
                                         Vector3i effectPosition, float volume, float pitch) {
         this(soundId, soundCategory, effectPosition, volume, pitch, ThreadLocalRandom.current().nextLong());
     }
 
+    @Deprecated
     public WrapperPlayServerSoundEffect(int soundId, SoundCategory soundCategory,
                                         Vector3i effectPosition, float volume, float pitch, long seed) {
         this(Sounds.getById(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), soundId),
                 soundCategory, effectPosition, volume, pitch, seed);
     }
 
+    @Deprecated
     public WrapperPlayServerSoundEffect(Sound sound, SoundCategory soundCategory,
                                         Vector3i effectPosition, float volume, float pitch) {
         this(sound, soundCategory, effectPosition, volume, pitch, ThreadLocalRandom.current().nextLong());
     }
 
+    @Deprecated
     public WrapperPlayServerSoundEffect(Sound sound, SoundCategory soundCategory,
                                         Vector3i effectPosition, float volume, float pitch, long seed) {
         super(PacketType.Play.Server.SOUND_EFFECT);
         this.sound = sound;
         this.soundCategory = soundCategory;
-        this.effectPosition = effectPosition;
+        this.position = new Vector3d(
+                (float) effectPosition.x / POSITION_MULTIPLIER,
+                (float) effectPosition.y / POSITION_MULTIPLIER,
+                (float) effectPosition.z / POSITION_MULTIPLIER
+        );
+        this.volume = volume;
+        this.pitch = pitch;
+        this.seed = seed;
+    }
+
+    public WrapperPlayServerSoundEffect(int soundId, SoundCategory soundCategory,
+                                        Vector3d position, float volume, float pitch) {
+        this(soundId, soundCategory, position, volume, pitch, ThreadLocalRandom.current().nextLong());
+    }
+
+    public WrapperPlayServerSoundEffect(int soundId, SoundCategory soundCategory,
+                                        Vector3d position, float volume, float pitch, long seed) {
+        this(Sounds.getById(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion(), soundId),
+                soundCategory, position, volume, pitch, seed);
+    }
+
+    public WrapperPlayServerSoundEffect(Sound sound, SoundCategory soundCategory,
+                                        Vector3d position, float volume, float pitch) {
+        this(sound, soundCategory, position, volume, pitch, ThreadLocalRandom.current().nextLong());
+    }
+
+    public WrapperPlayServerSoundEffect(Sound sound, SoundCategory soundCategory,
+                                        Vector3d position, float volume, float pitch, long seed) {
+        super(PacketType.Play.Server.SOUND_EFFECT);
+        this.sound = sound;
+        this.soundCategory = soundCategory;
+        this.position = position;
         this.volume = volume;
         this.pitch = pitch;
         this.seed = seed;
@@ -88,7 +126,11 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             soundCategory = SoundCategory.fromId(readVarInt());
         }
-        effectPosition = new Vector3i(readInt(), readInt(), readInt());
+        position = new Vector3d(
+                (float) readInt() / POSITION_MULTIPLIER,
+                (float) readInt() / POSITION_MULTIPLIER,
+                (float) readInt() / POSITION_MULTIPLIER
+        );
         volume = readFloat();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
             pitch = readFloat();
@@ -112,9 +154,9 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             this.writeVarInt(this.soundCategory.ordinal());
         }
-        writeInt(effectPosition.x);
-        writeInt(effectPosition.y);
-        writeInt(effectPosition.z);
+        writeInt((int) (position.x * (double) POSITION_MULTIPLIER));
+        writeInt((int) (position.y * (double) POSITION_MULTIPLIER));
+        writeInt((int) (position.z * (double) POSITION_MULTIPLIER));
         writeFloat(volume);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
             writeFloat(pitch);
@@ -130,7 +172,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
     public void copy(WrapperPlayServerSoundEffect wrapper) {
         sound = wrapper.sound;
         soundCategory = wrapper.soundCategory;
-        effectPosition = wrapper.effectPosition;
+        position = wrapper.position;
         volume = wrapper.volume;
         pitch = wrapper.pitch;
         seed = wrapper.seed;
@@ -163,12 +205,30 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         this.soundCategory = soundCategory;
     }
 
-    public Vector3i getEffectPosition() {
-        return effectPosition;
+    public Vector3d getPosition() {
+        return position;
     }
 
+    public void setPosition(Vector3d position) {
+        this.position = position;
+    }
+
+    @Deprecated
+    public Vector3i getEffectPosition() {
+        return new Vector3i(
+                (int) (position.x * (double) POSITION_MULTIPLIER),
+                (int) (position.y * (double) POSITION_MULTIPLIER),
+                (int) (position.z * (double) POSITION_MULTIPLIER)
+        );
+    }
+
+    @Deprecated
     public void setEffectPosition(Vector3i effectPosition) {
-        this.effectPosition = effectPosition;
+        this.position = new Vector3d(
+                (float) effectPosition.x / POSITION_MULTIPLIER,
+                (float) effectPosition.y / POSITION_MULTIPLIER,
+                (float) effectPosition.z / POSITION_MULTIPLIER
+        );
     }
 
     public float getVolume() {
