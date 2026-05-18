@@ -35,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServerSoundEffect> {
+
     private static final float POSITION_MULTIPLIER = 8.0F;
 
     private Sound sound;
