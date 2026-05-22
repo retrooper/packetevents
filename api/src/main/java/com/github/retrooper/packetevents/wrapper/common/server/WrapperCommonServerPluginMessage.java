@@ -10,19 +10,19 @@ public abstract class WrapperCommonServerPluginMessage<T extends WrapperCommonSe
     protected String channelName;
     protected byte[] data;
 
-    public WrapperCommonServerPluginMessage(PacketSendEvent event) {
+    protected WrapperCommonServerPluginMessage(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperCommonServerPluginMessage(PacketTypeCommon packetType) {
+    protected WrapperCommonServerPluginMessage(PacketTypeCommon packetType) {
         super(packetType);
     }
 
-    public WrapperCommonServerPluginMessage(PacketTypeCommon packetType, ResourceLocation channelName, byte[] data) {
+    protected WrapperCommonServerPluginMessage(PacketTypeCommon packetType, ResourceLocation channelName, byte[] data) {
         this(packetType, channelName.toString(), data);
     }
 
-    public WrapperCommonServerPluginMessage(PacketTypeCommon packetType, String channelName, byte[] data) {
+    protected WrapperCommonServerPluginMessage(PacketTypeCommon packetType, String channelName, byte[] data) {
         super(packetType);
         this.channelName = channelName;
         this.data = data;
