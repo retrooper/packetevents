@@ -81,7 +81,7 @@ public enum PaletteType {
         }
         boolean allowSingletonPalette = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean lengthPrefix = wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5);
-        return DataPalette.read(new NetStreamInputWrapper(wrapper), this, allowSingletonPalette, lengthPrefix);
+        return DataPalette.read(wrapper, this, allowSingletonPalette, lengthPrefix);
     }
 
     public DataPalette create() {
