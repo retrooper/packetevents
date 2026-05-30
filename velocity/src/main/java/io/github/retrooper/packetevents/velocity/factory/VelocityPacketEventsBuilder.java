@@ -22,7 +22,6 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
@@ -31,10 +30,8 @@ import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
-import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.plugin.PluginContainer;
@@ -179,15 +176,8 @@ public class VelocityPacketEventsBuilder {
                     PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
                     PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
-                    WrappedBlockState.ensureLoad();
-                    SynchronizedRegistriesHandler.init();
-                    injector.inject();
-
+                    super.load();
                     loaded = true;
-
-                    // Register internal packet listener (should be the first listener)
-                    // This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListener(new InternalPacketListener());
                 }
             }
 
@@ -236,13 +226,7 @@ public class VelocityPacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    // try to uninject the injector
-                    try {
-                        this.injector.uninject();
-                    } catch (Exception exception) {
-                        this.logManager.warn("Failed to uninject from initializer");
-                        exception.printStackTrace();
-                    }
+                    super.terminate();
                     // Remove handlers for players
                     for (User user : this.protocolManager.getUsers()) {
                         Channel channel = (Channel) user.getChannel();
@@ -253,8 +237,6 @@ public class VelocityPacketEventsBuilder {
                             channel.pipeline().remove(PacketEvents.DECODER_NAME);
                         }
                     }
-                    // Unregister all our listeners
-                    getEventManager().unregisterAllListeners();
                     initialized = false;
                     terminated = true;
                 }

@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.impl.netty.factory;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
@@ -95,13 +94,10 @@ public class NettyPacketEventsBuilder {
                     PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
                     PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
-                    injector.inject();
+
+                    super.load();
 
                     loaded = true;
-
-                    //Register internal packet listener (should be the first listener)
-                    //This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListener(new InternalPacketListener());
                 }
             }
 
@@ -135,10 +131,7 @@ public class NettyPacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    //Uninject the injector if needed(depends on the injector implementation)
-                    injector.uninject();
-                    //Unregister all our listeners
-                    getEventManager().unregisterAllListeners();
+                    super.terminate();
                     initialized = false;
                     terminated = true;
                 }

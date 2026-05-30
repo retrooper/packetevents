@@ -21,16 +21,13 @@ package io.github.retrooper.packetevents.factory.fabric;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
-import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import net.fabricmc.api.EnvType;
@@ -93,12 +90,7 @@ public abstract class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader
         PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
         PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
 
-        WrappedBlockState.ensureLoad();
-        SynchronizedRegistriesHandler.init();
-
-        // register internal packet listener (should be the first listener)
-        // this listener doesn't do any modifications to the packets, just reads data
-        this.getEventManager().registerListener(new InternalPacketListener());
+        super.load();
         this.loaded = true;
     }
 
@@ -135,7 +127,7 @@ public abstract class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader
         if (!this.initialized) {
             return;
         }
-        this.getEventManager().unregisterAllListeners();
+        super.terminate();
         this.initialized = false;
         this.terminated = true;
     }

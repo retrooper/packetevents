@@ -20,15 +20,18 @@ package com.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
+import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
-//Note: The PEVersions class is generated. Refer to PEVersionTask.kt
 import com.github.retrooper.packetevents.util.PEVersions;
+import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 
 import java.util.logging.Logger;
@@ -65,7 +68,15 @@ public abstract class PacketEventsAPI<T> {
         return logManager;
     }
 
-    public abstract void load();
+    public void load() {
+        WrappedBlockState.ensureLoad();
+        SynchronizedRegistriesHandler.init();
+        PacketType.prepare();
+
+        // Register internal packet listener (should be the first listener)
+        // This listener doesn't do any modifications to the packets, just reads data
+        this.getEventManager().registerListener(new InternalPacketListener());
+    }
 
     public abstract boolean isLoaded();
 
@@ -73,7 +84,10 @@ public abstract class PacketEventsAPI<T> {
 
     public abstract boolean isInitialized();
 
-    public abstract void terminate();
+    public void terminate() {
+        this.getInjector().uninject();
+        this.getEventManager().unregisterAllListeners();
+    }
 
     public abstract boolean isTerminated();
 

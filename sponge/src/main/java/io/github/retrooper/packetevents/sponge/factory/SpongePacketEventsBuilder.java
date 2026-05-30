@@ -25,23 +25,19 @@ import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
-import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
+import io.github.retrooper.packetevents.sponge.InternalSpongeListener;
 import io.github.retrooper.packetevents.sponge.injector.SpongeChannelInjector;
 import io.github.retrooper.packetevents.sponge.injector.connection.ServerConnectionInitializer;
-import io.github.retrooper.packetevents.sponge.manager.protocol.ProtocolManagerImpl;
-import io.github.retrooper.packetevents.sponge.util.viaversion.CustomPipelineUtil;
-import io.github.retrooper.packetevents.sponge.manager.InternalSpongePacketListener;
 import io.github.retrooper.packetevents.sponge.manager.player.PlayerManagerImpl;
+import io.github.retrooper.packetevents.sponge.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.sponge.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.sponge.netty.NettyManagerImpl;
-import io.github.retrooper.packetevents.sponge.InternalSpongeListener;
 import io.github.retrooper.packetevents.sponge.util.SpongeLogManager;
 import io.github.retrooper.packetevents.sponge.util.SpongeReflectionUtil;
+import io.github.retrooper.packetevents.sponge.util.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.sponge.util.viaversion.ViaVersionUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
@@ -104,13 +100,10 @@ public class SpongePacketEventsBuilder {
                 try {
                     SpongeReflectionUtil.init();
                     CustomPipelineUtil.init();
-                    WrappedBlockState.ensureLoad();
-                    SynchronizedRegistriesHandler.init();
                 } catch (Exception ex) {
                     throw new IllegalStateException(ex);
                 }
-
-                PacketType.prepare();
+                super.load();
 
                 // Server hasn't bound to the port yet.
                 lateBind = !injector.isServerBound();
@@ -120,10 +113,6 @@ public class SpongePacketEventsBuilder {
                 }
 
                 loaded = true;
-
-                // Register internal packet listener (should be the first listener)
-                // This listener doesn't do any modifications to the packets, just reads data
-                getEventManager().registerListener(new InternalSpongePacketListener());
             }
 
             @Override
@@ -168,14 +157,10 @@ public class SpongePacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    // Uninject the injector if needed(depends on the injector implementation)
-                    injector.uninject();
+                    super.terminate();
                     for (User user : this.protocolManager.getUsers()) {
                         ServerConnectionInitializer.destroyHandlers(user.getChannel());
                     }
-
-                    // Unregister all listeners. Because if we attempt to reload, we will end up with duplicate listeners.
-                    getEventManager().unregisterAllListeners();
                     initialized = false;
                     terminated = true;
                 }

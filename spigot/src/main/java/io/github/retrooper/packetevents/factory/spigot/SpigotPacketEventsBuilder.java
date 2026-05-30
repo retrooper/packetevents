@@ -26,13 +26,10 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
-import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
 import io.github.retrooper.packetevents.bukkit.InternalBukkitLoginListener;
@@ -41,7 +38,6 @@ import io.github.retrooper.packetevents.bukkit.InternalPaperJoinListener;
 import io.github.retrooper.packetevents.bukkit.InternalPaperListener;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
-import io.github.retrooper.packetevents.manager.InternalBukkitPacketListener;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
@@ -115,13 +111,10 @@ public class SpigotPacketEventsBuilder {
                     try {
                         SpigotReflectionUtil.init();
                         CustomPipelineUtil.init();
-                        WrappedBlockState.ensureLoad();
-                        SynchronizedRegistriesHandler.init();
                     } catch (Exception ex) {
                         throw new IllegalStateException(ex);
                     }
-
-                    PacketType.prepare();
+                    super.load();
 
                     //Server hasn't bound to the port yet.
                     lateBind = !injector.isServerBound();
@@ -131,10 +124,6 @@ public class SpigotPacketEventsBuilder {
                     }
 
                     loaded = true;
-
-                    //Register internal packet listener (should be the first listener)
-                    //This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListener(new InternalBukkitPacketListener());
                 }
             }
 
@@ -307,13 +296,10 @@ public class SpigotPacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    //Uninject the injector if needed(depends on the injector implementation)
-                    injector.uninject();
+                    super.terminate();
                     for (User user : this.protocolManager.getUsers()) {
                         ServerConnectionInitializer.destroyHandlers(user.getChannel());
                     }
-                    //Unregister all listeners. Because if we attempt to reload, we will end up with duplicate listeners.
-                    getEventManager().unregisterAllListeners();
                     initialized = false;
                     terminated = true;
                 }
