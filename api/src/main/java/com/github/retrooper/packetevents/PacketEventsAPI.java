@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
 import com.github.retrooper.packetevents.util.PEVersions;
+import com.github.retrooper.packetevents.util.adventure.AdventureConversionInjector;
 import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 
@@ -72,6 +73,7 @@ public abstract class PacketEventsAPI<T> {
         WrappedBlockState.ensureLoad();
         SynchronizedRegistriesHandler.init();
         PacketType.prepare();
+        AdventureConversionInjector.inject();
 
         // Register internal packet listener (should be the first listener)
         // This listener doesn't do any modifications to the packets, just reads data
@@ -87,6 +89,7 @@ public abstract class PacketEventsAPI<T> {
     public void terminate() {
         this.getInjector().uninject();
         this.getEventManager().unregisterAllListeners();
+        AdventureConversionInjector.uninject();
     }
 
     public abstract boolean isTerminated();
