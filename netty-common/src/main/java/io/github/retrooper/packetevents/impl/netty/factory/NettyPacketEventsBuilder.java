@@ -96,7 +96,7 @@ public class NettyPacketEventsBuilder {
                     PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
 
                     super.load();
-
+                    injector.inject();
                     loaded = true;
                 }
             }
