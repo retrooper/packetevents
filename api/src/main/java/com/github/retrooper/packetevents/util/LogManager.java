@@ -16,7 +16,6 @@ import java.util.logging.Level;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 import static net.kyori.adventure.text.format.NamedTextColor.RED;
-import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
 import static net.kyori.adventure.text.format.NamedTextColor.YELLOW;
 
 @NullMarked
@@ -80,7 +79,7 @@ public abstract class LogManager {
     public abstract void log(Level level, ComponentLike component, @Nullable Throwable error);
 
     public void info(String message) {
-        this.log(Level.INFO, WHITE, message);
+        this.log(Level.INFO, null, message);
     }
 
     public void warn(String message) {
