@@ -110,7 +110,7 @@ public final class SpigotReflectionUtil {
             RESOURCE_KEY, REGISTRY, WRITABLE_REGISTRY, NBT_ACCOUNTER, CHUNK_PROVIDER_SERVER_CLASS, ICHUNKPROVIDER_CLASS, CHUNK_STATUS_CLASS,
             BLOCK_POSITION_CLASS, PLAYER_CHUNK_MAP_CLASS, PLAYER_CHUNK_CLASS, CHUNK_CLASS, IBLOCKACCESS_CLASS, ICHUNKACCESS_CLASS, REMOTE_CHAT_SESSION_CLASS,
             DATA_WATCHER_CLASS, CLIENTBOUND_SET_ENTITY_DATA_PACKET_CLASS, DATA_WATCHER_ITEM_CLASS, DATA_WATCHER_VALUE_CLASS,
-            PAPER_COMMON_CONNECTION_CLASS;
+            PAPER_COMMON_CONNECTION_CLASS, REGISTRY_OPS;
 
     //Netty classes
     public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS, BYTE_TO_MESSAGE_DECODER, MESSAGE_TO_BYTE_ENCODER;
@@ -118,7 +118,7 @@ public final class SpigotReflectionUtil {
     //Fields
     public static Field ENTITY_PLAYER_PING_FIELD, ENTITY_BOUNDING_BOX_FIELD, BYTE_BUF_IN_PACKET_DATA_SERIALIZER, DIMENSION_CODEC_FIELD,
             DYNAMIC_OPS_NBT_INSTANCE_FIELD, CHUNK_PROVIDER_SERVER_FIELD, CRAFT_PARTICLE_PARTICLES_FIELD, NMS_MK_KEY_FIELD, LEGACY_NMS_PARTICLE_KEY_FIELD, LEGACY_NMS_KEY_TO_NMS_PARTICLE,
-            REMOTE_CHAT_SESSION_FIELD, REGISTRY_KEY_LOCATION_FIELD, DATA_WATCHER_FIELD, PAPER_CONNECTION_HANDLE_FIELD, PACKETLISTENER_CONNECTION_FIELD, CONNECTION_CHANNEL_FIELD;
+            REMOTE_CHAT_SESSION_FIELD, REGISTRY_KEY_LOCATION_FIELD, DATA_WATCHER_FIELD, PAPER_CONNECTION_HANDLE_FIELD, PACKETLISTENER_CONNECTION_FIELD, CONNECTION_CHANNEL_FIELD, ENTITY_ID_COUNTER;
 
     //Methods
     public static Method IS_DEBUGGING, GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
@@ -134,7 +134,7 @@ public final class SpigotReflectionUtil {
             NBT_ACCOUNTER_UNLIMITED_HEAP, CHUNK_CACHE_GET_IBLOCKACCESS, CHUNK_CACHE_GET_ICHUNKACCESS,
             IBLOCKACCESS_GET_BLOCK_DATA, CHUNK_GET_BLOCK_DATA, PLAYER_CHUNK_MAP_GET_PLAYER_CHUNK, PLAYER_CHUNK_GET_CHUNK,
             LEGACY_DATA_WATCHER_WRITE_METHOD, CLIENTBOUND_SET_ENTITY_DATA_PACKET_WRITE_DATA_WATCHER_METHOD, GET_DATA_VALUE_FROM_DATA_ITEM_METHOD,
-            GET_TPS;
+            GET_TPS, REGISTRY_OPS_CREATE;
 
     //Constructors
     private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR,
@@ -213,7 +213,11 @@ public final class SpigotReflectionUtil {
             }
         }
 
-        CRAFT_ITEM_STACK_AS_BUKKIT_COPY = Reflection.getMethod(CRAFT_ITEM_STACK_CLASS, "asBukkitCopy", 0);
+        CRAFT_ITEM_STACK_AS_BUKKIT_COPY = Reflection.getMethodExact(CRAFT_ITEM_STACK_CLASS, "asBukkitCopy", null, NMS_ITEM_STACK_CLASS);
+        if (CRAFT_ITEM_STACK_AS_BUKKIT_COPY == null) {
+            // Fallback for older servers where there's only one overload
+            CRAFT_ITEM_STACK_AS_BUKKIT_COPY = Reflection.getMethod(CRAFT_ITEM_STACK_CLASS, "asBukkitCopy", 0);
+        }
         CRAFT_ITEM_STACK_AS_NMS_COPY = Reflection.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
 
         // Had to hardcode the 1.12 vanilla names because some jar was screwing with it, fall back to normal mappings if not found
@@ -289,6 +293,7 @@ public final class SpigotReflectionUtil {
         CLIENTBOUND_SET_ENTITY_DATA_PACKET_WRITE_DATA_WATCHER_METHOD = Reflection.getMethod(CLIENTBOUND_SET_ENTITY_DATA_PACKET_CLASS, 0, List.class, REGISTRY_FRIENDLY_BYTE_BUF);
         GET_DATA_VALUE_FROM_DATA_ITEM_METHOD = Reflection.getMethod(DATA_WATCHER_ITEM_CLASS, DATA_WATCHER_VALUE_CLASS, 0);
         GET_TPS = Reflection.getMethod(Server.class, "getTPS");
+        REGISTRY_OPS_CREATE = Reflection.getMethod(REGISTRY_OPS, REGISTRY_OPS, 0);
     }
 
     private static void initFields() {
@@ -321,6 +326,11 @@ public final class SpigotReflectionUtil {
         PAPER_CONNECTION_HANDLE_FIELD = Reflection.getField(PAPER_COMMON_CONNECTION_CLASS, SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, 0);
         PACKETLISTENER_CONNECTION_FIELD = Reflection.getField(SERVER_COMMON_PACKETLISTENER_IMPL_CLASS, NETWORK_MANAGER_CLASS, 0);
         CONNECTION_CHANNEL_FIELD = Reflection.getField(NETWORK_MANAGER_CLASS, CHANNEL_CLASS, 0);
+
+        ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, "entityCount");
+        if (ENTITY_ID_COUNTER == null) {
+            ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, AtomicInteger.class, 0);
+        }
     }
 
     private static void initClasses() {
@@ -432,6 +442,7 @@ public final class SpigotReflectionUtil {
         CLIENTBOUND_SET_ENTITY_DATA_PACKET_CLASS = SpigotReflectionUtil.getServerClass("network.protocol.game.ClientboundSetEntityDataPacket", "PacketPlayOutEntityMetadata");
         DATA_WATCHER_ITEM_CLASS = NestedClassUtil.getNestedClass(DATA_WATCHER_CLASS, 0);
         DATA_WATCHER_VALUE_CLASS = NestedClassUtil.getNestedClass(DATA_WATCHER_CLASS, 1);
+        REGISTRY_OPS = getServerClass("resources.RegistryOps", "RegistryOps");
     }
 
     private static void initObjects() {
@@ -742,6 +753,9 @@ public final class SpigotReflectionUtil {
                 Object finalDimensionType = dimensionType;
                 dimensionType = (Supplier<Object>) () -> finalDimensionType;
             }
+            if (REGISTRY_OPS_CREATE != null) {
+                nbtOps = REGISTRY_OPS_CREATE.invoke(null, nbtOps, getFrozenRegistryAccess());
+            }
             Object encodedDimType = CODEC_ENCODE_METHOD.invoke(dimensionTypeCodec, nbtOps, dimensionType);
             Optional<?> optionalDimType = (Optional<?>) DATA_RESULT_GET_METHOD.invoke(encodedDimType);
             return optionalDimType.orElse(null);
@@ -793,18 +807,14 @@ public final class SpigotReflectionUtil {
     }
 
     public static int generateEntityId() {
-        Field field = Reflection.getField(NMS_ENTITY_CLASS, "entityCount");
-        if (field == null) {
-            field = Reflection.getField(NMS_ENTITY_CLASS, AtomicInteger.class, 0);
-        }
         try {
-            if (field.getType().equals(AtomicInteger.class)) {
+            if (ENTITY_ID_COUNTER.getType() == AtomicInteger.class) {
                 //Newer versions
-                AtomicInteger atomicInteger = (AtomicInteger) field.get(null);
+                AtomicInteger atomicInteger = (AtomicInteger) ENTITY_ID_COUNTER.get(null);
                 return atomicInteger.incrementAndGet();
             } else {
-                int id = field.getInt(null);
-                field.set(null, id + 1);
+                int id = ENTITY_ID_COUNTER.getInt(null);
+                ENTITY_ID_COUNTER.set(null, id + 1);
                 return id;
             }
         } catch (IllegalAccessException ex) {

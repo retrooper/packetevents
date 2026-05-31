@@ -17,51 +17,43 @@
  */
 package com.github.retrooper.compression
 
-data class EntryVersion(val major: Int, val minor: Int) : Comparable<EntryVersion> {
+data class EntryVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<EntryVersion> {
 
     companion object {
         /**
-         * Format: V_1_M_m
-         * M = Major
-         * m = Minor
-         * Example: V_1_9_4
+         * Format: V_Major_Minor(_Patch) (e.g. V_1_9_4, V_26_1, V_26_1_3)
          *
          * @param version The version string
          * @return EntryVersion object
          */
         fun fromString(version: String): EntryVersion {
-            val split = version.substring(4).split("_".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val split = version.substring(2).split('_').dropLastWhile { it.isEmpty() }.toTypedArray()
 
             val major = split[0].toInt()
-            val minor = if (split.size == 2) {
-                split[1].toInt()
-            } else {
-                0
-            }
+            val minor = split[1].toInt()
+            val patch = if (split.size > 2) split[2].toInt() else 0
 
-            return EntryVersion(major, minor)
+            return EntryVersion(major, minor, patch)
         }
     }
 
     fun isNewerThan(other: EntryVersion): Boolean {
-        return major > other.major || (major == other.major && minor > other.minor)
+        return compareTo(other) > 0
     }
 
     fun isOlderThan(other: EntryVersion): Boolean {
-        return major < other.major || (major == other.major && minor < other.minor)
+        return compareTo(other) < 0
     }
 
     override fun compareTo(other: EntryVersion): Int {
-        return if (major > other.major) {
-            1
-        } else if (major < other.major) {
-            -1
-        } else {
-            minor.compareTo(other.minor)
-        }
+        val cmajor = major.compareTo(other.major)
+        if (cmajor != 0) return cmajor
+        val cminor = minor.compareTo(other.minor)
+        if (cminor != 0) return cminor
+        return patch.compareTo(other.patch)
     }
 
     override fun toString(): String {
-        return "V_1_" + major + (if (minor == 0) "" else "_$minor")
+        return "V_${major}_$minor" + (if (patch == 0) "" else "_$patch")
     }
 }

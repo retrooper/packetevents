@@ -18,6 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.nbt;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public abstract class NBTNumber extends NBT {
 
     //PacketEvents start - We added this to make the nbt -> json conversion easier.

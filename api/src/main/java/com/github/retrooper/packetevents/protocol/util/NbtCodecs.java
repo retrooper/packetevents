@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @NullMarked
 @ApiStatus.Experimental
@@ -359,14 +360,14 @@ public final class NbtCodecs {
         return new NbtCodec<T>() {
             @Override
             public T decode(NBT nbt, PacketWrapper<?> wrapper) {
+                ClientVersion version = wrapper.getServerVersion().toClientVersion();
                 IRegistry<T> replacedRegistry = wrapper.replaceRegistry(registry);
                 T entry = null;
                 if (nbt instanceof NBTNumber) {
-                    ClientVersion version = wrapper.getServerVersion().toClientVersion();
                     int id = ((NBTNumber) nbt).getAsInt();
                     entry = replacedRegistry.getById(version, id);
                 } else if (nbt instanceof NBTString) {
-                    entry = replacedRegistry.getByName(((NBTString) nbt).getValue());
+                    entry = replacedRegistry.getByName(version, ((NBTString) nbt).getValue());
                 }
                 if (entry == null) {
                     throw new NbtCodecException("Can't decode registry " + registry.getRegistryKey());
@@ -406,6 +407,20 @@ public final class NbtCodecs {
                         v -> left.encode(wrapper, v),
                         v -> right.encode(wrapper, v)
                 );
+            }
+        };
+    }
+
+    public static <T> NbtMapCodec<T> forUnit(Supplier<T> supplier) {
+        return new NbtMapCodec<T>() {
+            @Override
+            public T decode(NBTCompound tag, PacketWrapper<?> wrapper) throws NbtCodecException {
+                return supplier.get();
+            }
+
+            @Override
+            public void encode(NBTCompound tag, PacketWrapper<?> wrapper, T value) throws NbtCodecException {
+                // NO-OP
             }
         };
     }

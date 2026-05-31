@@ -35,9 +35,10 @@ public final class CowVariants {
 
     @ApiStatus.Internal
     public static CowVariant define(String name, ModelType modelType, String texture) {
-        ResourceLocation assetId = new ResourceLocation("entity/cow/" + texture);
+        ResourceLocation assetId = new ResourceLocation("entity/cow/cow_" + texture);
+        ResourceLocation babyAssetId = new ResourceLocation("entity/cow/cow_" + texture + "_baby");
         return REGISTRY.define(name, data ->
-                new StaticCowVariant(data, modelType, assetId));
+                new StaticCowVariant(data, modelType, assetId, babyAssetId));
     }
 
     public static VersionedRegistry<CowVariant> getRegistry() {

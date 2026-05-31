@@ -24,8 +24,10 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufOutputStream;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.google.gson.*;
 import com.google.gson.internal.LazilyParsedNumber;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -39,7 +41,7 @@ import java.util.zip.GZIPOutputStream;
 public class NBTCodec {
 
     //PacketEvents start: JSON -> NBT conversion method
-    @Deprecated
+    @ApiStatus.Internal
     public static NBT jsonToNBT(JsonElement element) {
         //Deal with the primitives first
         if (element instanceof JsonPrimitive) {
@@ -80,11 +82,8 @@ public class NBTCodec {
             if (list.isEmpty()) {
                 return new NBTList<>(NBTType.COMPOUND);
             }
-            NBTList<? extends NBT> l = new NBTList<>(list.get(0).getType());
-            for (NBT nbt : list) {
-                l.addTagUnsafe(nbt);
-            }
-            return l;
+            // noinspection DataFlowIssue
+            return NbtCodecs.GENERIC_LIST.encode(null, list);
         }
         //Handle json objects
         else if (element instanceof JsonObject) {
@@ -98,14 +97,13 @@ public class NBTCodec {
         else if (element instanceof JsonNull || element == null) {
             return new NBTCompound();
         }
-        throw new IllegalStateException("Failed to convert JSON to NBT " + element.toString());
+        throw new IllegalStateException("Failed to convert JSON to NBT " + element);
     }
     //PacketEvents end
 
     //PacketEvents start - NBT to JSON conversion
-    @Deprecated
+    @ApiStatus.Internal
     public static JsonElement nbtToJson(NBT nbt, boolean parseByteAsBool) {
-        //TODO once I make my own nbt implementation, make a toJSON method that each nbt class implements to make this  a one liner
         if (nbt instanceof NBTNumber) {
             if (nbt instanceof NBTByte && parseByteAsBool) {
                 byte val = ((NBTByte)nbt).getAsByte();
@@ -123,15 +121,14 @@ public class NBTCodec {
         }
         else if (nbt instanceof NBTList) {
             NBTList<? extends NBT> list = (NBTList<? extends NBT>) nbt;
-            JsonArray jsonArray = new JsonArray();
-
-            list.getTags().forEach(tag -> {
+            JsonArray jsonArray = new JsonArray(list.size());
+            for (NBT tag : list.unwrapTags()) {
                 jsonArray.add(nbtToJson(tag, parseByteAsBool));
-            });
+            }
             return jsonArray;
         }
         else if (nbt instanceof NBTEnd) {
-            throw new IllegalStateException("Encountered the NBTEnd tag during the NBT to JSON conversion: " + nbt.toString());
+            return JsonNull.INSTANCE;
         }
         else if (nbt instanceof NBTCompound) {
             JsonObject jsonObject = new JsonObject();
@@ -141,9 +138,30 @@ public class NBTCodec {
                 jsonObject.add(entry.getKey(), jsonValue);
             }
             return jsonObject;
+        } else if (nbt instanceof NBTByteArray) {
+            byte[] tag = ((NBTByteArray) nbt).getValue();
+            JsonArray json = new JsonArray(tag.length);
+            for (byte b : tag) {
+                json.add(b);
+            }
+            return json;
+        } else if (nbt instanceof NBTIntArray) {
+            int[] tag = ((NBTIntArray) nbt).getValue();
+            JsonArray json = new JsonArray(tag.length);
+            for (int i : tag) {
+                json.add(i);
+            }
+            return json;
+        } else if (nbt instanceof NBTLongArray) {
+            long[] tag = ((NBTLongArray) nbt).getValue();
+            JsonArray json = new JsonArray(tag.length);
+            for (long l : tag) {
+                json.add(l);
+            }
+            return json;
         }
         else {
-            throw new IllegalStateException("Failed to convert NBT to JSON.");
+            throw new IllegalStateException("Failed to convert NBT to JSON: " + nbt);
         }
     }
     //PacketEvents end

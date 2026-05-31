@@ -1,6 +1,27 @@
 {
   "minecraft:day": {
+    "time_markers": {
+      "minecraft:midnight": {
+        "ticks": 18000,
+        "show_in_commands": 1
+      },
+      "minecraft:day": {
+        "ticks": 1000,
+        "show_in_commands": 1
+      },
+      "minecraft:night": {
+        "ticks": 13000,
+        "show_in_commands": 1
+      },
+      "minecraft:wake_up_from_sleep": 0,
+      "minecraft:noon": {
+        "ticks": 6000,
+        "show_in_commands": 1
+      },
+      "minecraft:roll_village_siege": 18000
+    },
     "period_ticks": 24000,
+    "clock": "minecraft:overworld",
     "tracks": {
       "minecraft:gameplay/sky_light_level": {
         "keyframes": [
@@ -44,26 +65,18 @@
         ],
         "modifier": "multiply"
       },
-      "minecraft:visual/sky_color": {
+      "minecraft:audio/firefly_bush_sounds": {
         "keyframes": [
           {
-            "ticks": 133,
-            "value": "#ffffff"
+            "ticks": 12600,
+            "value": 1
           },
           {
-            "ticks": 11867,
-            "value": "#ffffff"
-          },
-          {
-            "ticks": 13670,
-            "value": "#000000"
-          },
-          {
-            "ticks": 22330,
-            "value": "#000000"
+            "ticks": 23401,
+            "value": 0
           }
         ],
-        "modifier": "multiply"
+        "modifier": "or"
       },
       "minecraft:visual/sun_angle": {
         "keyframes": [
@@ -85,18 +98,26 @@
           ]
         }
       },
-      "minecraft:audio/firefly_bush_sounds": {
+      "minecraft:visual/sky_color": {
         "keyframes": [
           {
-            "ticks": 12600,
-            "value": 1
+            "ticks": 133,
+            "value": "#ffffff"
           },
           {
-            "ticks": 23401,
-            "value": 0
+            "ticks": 11867,
+            "value": "#ffffff"
+          },
+          {
+            "ticks": 13670,
+            "value": "#000000"
+          },
+          {
+            "ticks": 22330,
+            "value": "#000000"
           }
         ],
-        "modifier": "or"
+        "modifier": "multiply"
       },
       "minecraft:visual/moon_angle": {
         "keyframes": [
@@ -118,26 +139,18 @@
           ]
         }
       },
-      "minecraft:visual/sky_light_factor": {
+      "minecraft:gameplay/creaking_active": {
         "keyframes": [
           {
-            "ticks": 730,
+            "ticks": 12600,
             "value": 1
           },
           {
-            "ticks": 11270,
-            "value": 1
-          },
-          {
-            "ticks": 13140,
-            "value": 0.24
-          },
-          {
-            "ticks": 22860,
-            "value": 0.24
+            "ticks": 23401,
+            "value": 0
           }
         ],
-        "modifier": "multiply"
+        "modifier": "or"
       },
       "minecraft:visual/sky_light_color": {
         "keyframes": [
@@ -160,18 +173,26 @@
         ],
         "modifier": "multiply"
       },
-      "minecraft:gameplay/creaking_active": {
+      "minecraft:visual/sky_light_factor": {
         "keyframes": [
           {
-            "ticks": 12600,
+            "ticks": 730,
             "value": 1
           },
           {
-            "ticks": 23401,
-            "value": 0
+            "ticks": 11270,
+            "value": 1
+          },
+          {
+            "ticks": 13140,
+            "value": 0.24
+          },
+          {
+            "ticks": 22860,
+            "value": 0.24
           }
         ],
-        "modifier": "or"
+        "modifier": "multiply"
       },
       "minecraft:visual/star_brightness": {
         "keyframes": [
@@ -401,9 +422,12 @@
       }
     }
   },
-  "minecraft:early_game": {},
+  "minecraft:early_game": {
+    "clock": "minecraft:overworld"
+  },
   "minecraft:moon": {
     "period_ticks": 192000,
+    "clock": "minecraft:overworld",
     "tracks": {
       "minecraft:visual/moon_phase": {
         "keyframes": [
@@ -444,6 +468,7 @@
     }
   },
   "minecraft:villager_schedule": {
-    "period_ticks": 24000
+    "period_ticks": 24000,
+    "clock": "minecraft:overworld"
   }
 }

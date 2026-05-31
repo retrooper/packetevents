@@ -1,3 +1,71 @@
+!!!!! v2.12.1
+
+# PacketEvents 2.12.1 is finally out! 🎉
+
+This patch release includes mainly bugfixes related to Minecraft 26.1, but also includes a few smaller features.
+
+Recent donors: **PebbleHost, JustUsBuilds, matsu1213**\
+If you intend on donating and do not wish to be mentioned, please add such a note on your donation.
+
+# Announcement 📢
+
+Visit our website: https://packetevents.com/ \
+Documentation: https://docs.packetevents.com/ \
+Javadoc: https://javadocs.packetevents.com/
+
+Thanks to all contributors which helped make this release possible:
+- @Beaness
+- @booky10
+- @ieatglu3
+- @ManInMyVan
+- @rafi67000
+- @retrooper
+- @roggy666
+- @vadim-soude
+- @Vrganj
+- @ytnoos
+
+## What's Changed
+
+* Fix minor issues related to 26.1 ([#1483](https://github.com/retrooper/packetevents/pull/1483), [`f2974ec`](https://github.com/retrooper/packetevents/commit/f2974eca7c919ca60266016339991ea0e28a17bb))
+* Add WrapperPlayServerChunkBiomes ([#1383](https://github.com/retrooper/packetevents/pull/1383))
+* Mark 26.1.2 as fully supported ([`4d1938b`](https://github.com/retrooper/packetevents/commit/4d1938b97564633900d3a73061ad137b680e8fa1))
+* Track chunk section fluid count ([#1477](https://github.com/retrooper/packetevents/pull/1477))
+* Add support for adventure v5 ([`bbeec89...c1163ee`](https://github.com/retrooper/packetevents/compare/bbeec896384e22844a51ab28b9bc4c91f8f1daf0...c1163ee7232c9084ae25b3e2e2a6f44d602ec737))
+
+**View Full Changelog**: [`v2.12.0...v2.12.1`](https://github.com/retrooper/packetevents/compare/v2.12.0...v2.12.1)
+
+!!!!! v2.12.0
+
+# PacketEvents 2.12.0 is finally out! 🎉
+
+This update primarily adds support for Minecraft 26.1.
+Again, huge thanks to all users who have donated their hard-earned money to PacketEvents since the previous release. It's been received & it's very much appreciated.
+
+Recent donors: PebbleHost, Dylan\
+If you intend on donating and do not wish to be mentioned, please add such a note on your donation.
+
+Also, thanks to the contributors that made this update possible, especially @booky10. Open-source software thrives when it receives contributions from the community.
+
+# Announcement 📢
+
+Visit our website: https://packetevents.com\
+Documentation: https://docs.packetevents.com\
+JavaDocs: https://javadocs.packetevents.com
+
+## What's Changed (Summary)
+* Added support for Minecraft 26.1 (and 26.1.1)
+* Added support for changes to Fabric, leading to the addition of new internal modules.
+
+**View Full Changelog**: https://github.com/retrooper/packetevents/compare/v2.11.2...v2.12.0
+
+### If you want to support PacketEvents, consider donating to us on [PayPal](https://paypal.me/packetevents), [Streamlabs](https://streamlabs.com/retrooper), or [GitHub Sponsors](https://github.com/sponsors/retrooper).
+
+## Maven/Gradle Dependency Setup Guide
+
+**Check it out**: https://docs.packetevents.com/introduction/development-setup/
+
+
 !!!!! v2.11.2
 
 # PacketEvents 2.11.2 is finally out! 🎉
@@ -5,7 +73,7 @@
 This update fixes various bugs. It's encouraged that users update.
 Again, huge thanks to all users who have donated their hard-earned money to PacketEvents since the previous release. It's been received & it's very much appreciated.
 
-Recent donors: PebbleHost, SSomar1607, ipavdev, Suleyman Abulkhasan, frap
+Recent donors: PebbleHost, SSomar1607, ipavdev, Meed, frap
 
 Also, thanks to the contributors that made this update possible.
 
@@ -32,7 +100,7 @@ I've released a new YouTube [video](https://youtu.be/G7qYRHpZVIo).
 
 **View Full Changelog**: https://github.com/retrooper/packetevents/compare/v2.11.1...v2.11.2
 
-## If you want to support PacketEvents, consider donating to us on [PayPal](https://paypal.me/retrooperdev) or sponsoring us on [GitHub Sponsors](https://github.com/sponsors/retrooper).
+## If you want to support PacketEvents, consider donating to us on [PayPal](https://paypal.me/packetevents) or sponsoring us on [GitHub Sponsors](https://github.com/sponsors/retrooper).
 
 ## Maven/Gradle Dependency Setup Guide
 
@@ -67,7 +135,7 @@ If you intend on donating and do not wish to be mentioned, please add such a not
 
 **View Full Changelog**: https://github.com/retrooper/packetevents/compare/v2.11.0...v2.11.1
 
-## If you want to support PacketEvents, consider donating to us on [PayPal](https://paypal.me/retrooperdev) or sponsoring us on [GitHub Sponsors](https://github.com/sponsors/retrooper)
+## If you want to support PacketEvents, consider donating to us on [PayPal](https://paypal.me/packetevents) or sponsoring us on [GitHub Sponsors](https://github.com/sponsors/retrooper)
 
 ## Maven/Gradle Dependency
 
@@ -93,7 +161,7 @@ This update adds support for Minecraft 1.21.11.
 
 **View Full Changelog**: https://github.com/retrooper/packetevents/compare/v2.10.1...v2.11.0
 
-## If you want to support PacketEvents, consider donating to us on [PayPal](https://paypal.me/retrooperdev) or sponsoring us on [GitHub Sponsors](https://github.com/sponsors/retrooper)
+## If you want to support PacketEvents, consider donating to us on [PayPal](https://paypal.me/packetevents) or sponsoring us on [GitHub Sponsors](https://github.com/sponsors/retrooper)
 
 ## Maven/Gradle Dependency
 

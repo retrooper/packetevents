@@ -37,11 +37,13 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.protocol.util.NbtDecoder;
 import com.github.retrooper.packetevents.util.UniqueIdUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.google.gson.JsonElement;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.BlockNBTComponent;
@@ -71,6 +73,7 @@ import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.object.SpriteObjectContents;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
 import net.kyori.adventure.text.serializer.gson.BackwardCompatUtil;
+import net.kyori.adventure.text.serializer.gson.GsonDataComponentValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -310,7 +313,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             builder.append(extra);
         }
 
-        return builder.build();
+        return BackwardCompatUtil.build(builder);
     }
 
     @Deprecated
@@ -347,12 +350,14 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             }
 
             // translation arguments
-            List<Component> args = ((TranslatableComponent) component).args();
-            if (!args.isEmpty()) {
-                if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
-                    writer.writeList("with", NBTType.COMPOUND, this.serializeTranslationArgumentList(
-                            ((TranslatableComponent) component).arguments(), wrapper));
-                } else {
+            if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
+                List<TranslationArgument> args = ((TranslatableComponent) component).arguments();
+                if (!args.isEmpty()) {
+                    writer.writeList("with", NBTType.COMPOUND, this.serializeTranslationArgumentList(args, wrapper));
+                }
+            } else {
+                List<Component> args = ((TranslatableComponent) component).args();
+                if (!args.isEmpty()) {
                     writer.writeList("with", NBTType.COMPOUND, this.serializeComponentList(args, wrapper));
                 }
             }
@@ -487,40 +492,38 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         if (clickEvent != null) {
             ClickEvent.Action action = clickEvent.readUTF("action", ClickEvent.Action.NAMES::value);
             ClickEvent value;
-            if (!modernEvents) {
-                value = ClickEvent.clickEvent(action, clickEvent.readUTF("value", Function.identity()));
-            } else {
-                switch (action) {
-                    case OPEN_URL:
-                        value = ClickEvent.openUrl(clickEvent.readUTF("url", Function.identity()));
-                        break;
-                    case OPEN_FILE:
-                        value = ClickEvent.openFile(clickEvent.readUTF("path", Function.identity()));
-                        break;
-                    case RUN_COMMAND:
-                        value = ClickEvent.runCommand(clickEvent.readUTF("command", Function.identity()));
-                        break;
-                    case SUGGEST_COMMAND:
-                        value = ClickEvent.suggestCommand(clickEvent.readUTF("command", Function.identity()));
-                        break;
-                    case CHANGE_PAGE:
-                        value = ClickEvent.changePage(clickEvent.readNumber("page", Number::intValue));
-                        break;
-                    case COPY_TO_CLIPBOARD:
-                        value = ClickEvent.copyToClipboard(clickEvent.readUTF("value", Function.identity()));
-                        break;
-                    case SHOW_DIALOG:
-                        NBT dialogTag = clickEvent.read("dialog", Function.identity());
-                        value = ClickEvent.showDialog(Dialog.decode(dialogTag, wrapper));
-                        break;
-                    case CUSTOM:
-                        Key key = clickEvent.readUTF("id", Key::key);
-                        NBT payload = clickEvent.read("payload", Function.identity());
-                        value = ClickEvent.custom(key, new NbtTagHolder(payload != null ? payload : NBTEnd.INSTANCE));
-                        break;
-                    default:
-                        throw new UnsupportedOperationException("Unsupported clickevent: " + action);
-                }
+            switch (action.toString()) {
+                case "open_url":
+                    value = ClickEvent.openUrl(clickEvent.readUTF(modernEvents ? "url" : "value", Function.identity()));
+                    break;
+                case "open_file":
+                    value = ClickEvent.openFile(clickEvent.readUTF(modernEvents ? "path" : "value", Function.identity()));
+                    break;
+                case "run_command":
+                    value = ClickEvent.runCommand(clickEvent.readUTF(modernEvents ? "command" : "value", Function.identity()));
+                    break;
+                case "suggest_command":
+                    value = ClickEvent.suggestCommand(clickEvent.readUTF(modernEvents ? "command" : "value", Function.identity()));
+                    break;
+                case "change_page":
+                    value = ClickEvent.changePage(modernEvents
+                            ? clickEvent.readNumber("page", Number::intValue)
+                            : clickEvent.readUTF("value", Integer::parseInt));
+                    break;
+                case "copy_to_clipboard":
+                    value = ClickEvent.copyToClipboard(clickEvent.readUTF("value", Function.identity()));
+                    break;
+                case "show_dialog":
+                    NBT dialogTag = clickEvent.read("dialog", Function.identity());
+                    value = ClickEvent.showDialog(Dialog.decode(dialogTag, wrapper));
+                    break;
+                case "custom":
+                    Key key = clickEvent.readUTF("id", Key::key);
+                    NBT payload = clickEvent.read("payload", Function.identity());
+                    value = ClickEvent.custom(key, new NbtTagHolder(payload != null ? payload : NBTEnd.INSTANCE));
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unsupported clickevent: " + action);
             }
             style.clickEvent(value);
         }
@@ -618,34 +621,34 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             NBTWriter child = writer.child(modern ? "click_event" : "clickEvent");
             child.writeUTF("action", clickEvent.action().toString());
             if (!modern) {
-                child.writeUTF("value", clickEvent.value());
+                if (clickEvent.action() != ClickEvent.Action.CHANGE_PAGE) {
+                    child.writeUTF("value", AdventureSupportUtil.getStringValue(clickEvent));
+                } else {
+                    child.writeUTF("value", Integer.toString(AdventureSupportUtil.getIntValue(clickEvent)));
+                }
             } else {
-                switch (clickEvent.action()) {
-                    case OPEN_URL:
-                        child.writeUTF("url", clickEvent.value());
+                switch (clickEvent.action().name().toLowerCase(Locale.ROOT)) {
+                    case "open_url":
+                        child.writeUTF("url", AdventureSupportUtil.getStringValue(clickEvent));
                         break;
-                    case OPEN_FILE:
-                        child.writeUTF("path", clickEvent.value());
+                    case "open_file":
+                        child.writeUTF("path", AdventureSupportUtil.getStringValue(clickEvent));
                         break;
-                    case RUN_COMMAND:
-                    case SUGGEST_COMMAND:
-                        child.writeUTF("command", clickEvent.value());
+                    case "run_command":
+                    case "suggest_command":
+                        child.writeUTF("command", AdventureSupportUtil.getStringValue(clickEvent));
                         break;
-                    case CHANGE_PAGE:
-                        if (BackwardCompatUtil.IS_4_22_0_OR_NEWER) {
-                            child.writeInt("page", ((ClickEvent.Payload.Int) clickEvent.payload()).integer());
-                        } else {
-                            child.writeInt("page", Integer.parseInt(clickEvent.value()));
-                        }
+                    case "change_page":
+                        child.writeInt("page", AdventureSupportUtil.getIntValue(clickEvent));
                         break;
-                    case COPY_TO_CLIPBOARD:
-                        child.writeUTF("value", clickEvent.value());
+                    case "copy_to_clipboard":
+                        child.writeUTF("value", AdventureSupportUtil.getStringValue(clickEvent));
                         break;
-                    case SHOW_DIALOG:
+                    case "show_dialog":
                         Dialog dialog = (Dialog) ((ClickEvent.Payload.Dialog) clickEvent.payload()).dialog();
                         child.write("dialog", Dialog.encode(wrapper, dialog));
                         break;
-                    case CUSTOM:
+                    case "custom":
                         ClickEvent.Payload.Custom customPayload = (ClickEvent.Payload.Custom) clickEvent.payload();
                         child.writeUTF("id", customPayload.key().asString());
                         BinaryTagHolder nbtHolder = customPayload.nbt();
@@ -655,7 +658,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                             if (!(payloadTag instanceof NBTEnd)) {
                                 child.write("payload", payloadTag);
                             }
-                        } else {
+                        } else if (nbtHolder != null) {
                             String nbtString = nbtHolder.string();
                             // as adventure doesn't want to make the nbt payload nullable (though it actually is),
                             // we use an empty nbt string to mark a null payload
@@ -709,8 +712,18 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                                 if (entry.getValue() instanceof NbtTagHolder) {
                                     NBT compNbt = ((NbtTagHolder) entry.getValue()).getTag();
                                     compsNbt.write(entry.getKey().toString(), compNbt);
+                                } else if (entry.getValue() instanceof DataComponentValue.TagSerializable) {
+                                    DataComponentValue.TagSerializable tagSerializable = (DataComponentValue.TagSerializable) entry.getValue();
+                                    NBT tag = AdventureNbtUtil.fromString(tagSerializable.asBinaryTag().string());
+                                    compsNbt.write(entry.getKey().toString(), tag);
+                                } else if (entry.getValue() instanceof GsonDataComponentValue) {
+                                    // there is no way to recover 100% of the actual information
+                                    // without implementing JSON data serialization for every
+                                    // available component
+                                    JsonElement element = ((GsonDataComponentValue) entry.getValue()).element();
+                                    compsNbt.write(entry.getKey().toString(), NBTCodec.jsonToNBT(element));
                                 }
-                                // unsupported entry component value, skip for now
+                                // else: unsupported entry component value, skip
                             }
                         }
                     }

@@ -1,3 +1,4 @@
+import com.github.retrooper.excludeAdventure
 import org.spongepowered.gradle.plugin.config.PluginLoaders
 import org.spongepowered.plugin.metadata.model.PluginDependency
 
@@ -44,7 +45,13 @@ val adventureVersion: String = libs.versions.adventure.get()
 val generateAdventureVersionClass by tasks.registering {
     val outputDir = layout.buildDirectory.dir("generated/sources/adventureVersion").get().asFile
     val pkg = "io.github.retrooper.packetevents.sponge.internal"
-    val file = File(outputDir, "$pkg/AdventureInfo.java")
+    val file = File(outputDir, "${pkg.replace(".", "/")}/AdventureInfo.java")
+
+    inputs.properties(
+        "adventureVersion" to adventureVersion,
+        "spongeVersion" to spongeVersion,
+    )
+    outputs.dir(outputDir)
 
     doLast {
         file.parentFile.mkdirs()
@@ -59,13 +66,16 @@ val generateAdventureVersionClass by tasks.registering {
             """.trimIndent()
         )
     }
+}
 
-    // Expose generated dir to source sets
-    sourceSets["main"].java.srcDir(outputDir)
+sourceSets {
+    main {
+        java.srcDir(generateAdventureVersionClass)
+    }
 }
 
 tasks {
-    compileJava {
+    withType<Jar> {
         dependsOn(generateAdventureVersionClass)
     }
 
@@ -80,8 +90,14 @@ dependencies {
     shadow(libs.adventure.nbt) {
         isTransitive = false
     }
-    shadow(project(":api", "shadow"))
-    shadow(project(":netty-common"))
+    shadow(project(":api", "shadow")) {
+        excludeAdventure()
+        exclude(group = "net.kyori", module = "adventure-key")
+    }
+    shadow(project(":netty-common")) {
+        excludeAdventure()
+        exclude(group = "net.kyori", module = "adventure-key")
+    }
     compileShadowOnly(libs.bstats.sponge)
 
     compileOnly(libs.via.version)

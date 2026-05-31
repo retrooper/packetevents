@@ -89,6 +89,12 @@ public final class ComponentPredicateTypes {
     @ApiStatus.Experimental
     public static final ComponentPredicateType<NbtComponentPredicate> JUKEBOX_PLAYABLE =
             define("jukebox_playable", NbtComponentPredicate::read, NbtComponentPredicate::write);
+    /**
+     * @versions 26.1+
+     */
+    @ApiStatus.Experimental
+    public static final ComponentPredicateType<NbtComponentPredicate> VILLAGER_VARIANT =
+            define("villager/variant", NbtComponentPredicate::read, NbtComponentPredicate::write);
 
     static {
         REGISTRY.unloadMappings();

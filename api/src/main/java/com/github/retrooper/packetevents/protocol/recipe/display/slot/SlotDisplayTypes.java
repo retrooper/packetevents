@@ -21,6 +21,9 @@ package com.github.retrooper.packetevents.protocol.recipe.display.slot;
 import com.github.retrooper.packetevents.util.mappings.VersionedRegistry;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * @versions 1.21.2+
+ */
 public final class SlotDisplayTypes {
 
     private static final VersionedRegistry<SlotDisplayType<?>> REGISTRY = new VersionedRegistry<>("slot_display");
@@ -54,6 +57,22 @@ public final class SlotDisplayTypes {
             "with_remainder", WithRemainderSlotDisplay::read, WithRemainderSlotDisplay::write);
     public static final SlotDisplayType<CompositeSlotDisplay> COMPOSITE = register(
             "composite", CompositeSlotDisplay::read, CompositeSlotDisplay::write);
+
+    /**
+     * @versions 26.1+
+     */
+    public static final SlotDisplayType<WithAnyPotionSlotDisplay> WITH_ANY_POTION = register(
+            "with_any_potion", WithAnyPotionSlotDisplay::read, WithAnyPotionSlotDisplay::write);
+    /**
+     * @versions 26.1+
+     */
+    public static final SlotDisplayType<OnlyWithComponentSlotDisplay> ONLY_WITH_COMPONENT = register(
+            "only_with_component", OnlyWithComponentSlotDisplay::read, OnlyWithComponentSlotDisplay::write);
+    /**
+     * @versions 26.1+
+     */
+    public static final SlotDisplayType<DyedSlotDisplay> DYED = register(
+            "dyed", DyedSlotDisplay::read, DyedSlotDisplay::write);
 
     static {
         REGISTRY.unloadMappings();

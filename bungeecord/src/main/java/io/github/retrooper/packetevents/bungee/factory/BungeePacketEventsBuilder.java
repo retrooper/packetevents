@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.bungee.factory;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
@@ -34,10 +33,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.PEVersions;
-import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
@@ -187,15 +184,10 @@ public class BungeePacketEventsBuilder {
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
                     PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
 
-                    WrappedBlockState.ensureLoad();
-                    SynchronizedRegistriesHandler.init();
+                    super.load();
 
                     injector.inject();
                     loaded = true;
-
-                    // Register internal packet listener (should be the first listener)
-                    // This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListener(new InternalPacketListener());
 
                     this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW + ("packetevents".equals(id) ? "" : " for " + id));
                 }
@@ -234,10 +226,7 @@ public class BungeePacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    // Uninject the injector if needed(depends on the injector implementation)
-                    injector.uninject();
-                    // Unregister all our listeners
-                    getEventManager().unregisterAllListeners();
+                    super.terminate();
                     initialized = false;
                     terminated = true;
                 }

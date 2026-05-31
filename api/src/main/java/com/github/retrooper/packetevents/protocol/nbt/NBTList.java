@@ -18,12 +18,16 @@
 
 package com.github.retrooper.packetevents.protocol.nbt;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@NullMarked
 public class NBTList<T extends NBT> extends NBT {
 
     protected final NBTType<T> type;
@@ -167,7 +171,7 @@ public class NBTList<T extends NBT> extends NBT {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }
