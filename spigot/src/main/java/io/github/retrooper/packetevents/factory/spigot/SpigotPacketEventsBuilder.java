@@ -38,6 +38,7 @@ import io.github.retrooper.packetevents.bukkit.InternalPaperJoinListener;
 import io.github.retrooper.packetevents.bukkit.InternalPaperListener;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
+import io.github.retrooper.packetevents.manager.InternalBukkitPacketListener;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
@@ -125,6 +126,11 @@ public class SpigotPacketEventsBuilder {
 
                     loaded = true;
                 }
+            }
+
+            @Override
+            protected void registerInternalListener() {
+                this.getEventManager().registerListener(new InternalBukkitPacketListener());
             }
 
             @Override

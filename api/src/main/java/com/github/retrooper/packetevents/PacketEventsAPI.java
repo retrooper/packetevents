@@ -77,6 +77,10 @@ public abstract class PacketEventsAPI<T> {
 
         // Register internal packet listener (should be the first listener)
         // This listener doesn't do any modifications to the packets, just reads data
+        this.registerInternalListener();
+    }
+
+    protected void registerInternalListener() {
         this.getEventManager().registerListener(new InternalPacketListener());
     }
 
