@@ -87,7 +87,12 @@ public abstract class PacketEventsAPI<T> {
     public abstract boolean isInitialized();
 
     public void terminate() {
-        this.getInjector().uninject();
+        try {
+            this.getInjector().uninject();
+        } catch (Throwable throwable) {
+            this.getLogManager().warn("Failed to uninject during termination");
+            throwable.printStackTrace();
+        }
         this.getEventManager().unregisterAllListeners();
         AdventureConversionInjector.uninject();
     }
