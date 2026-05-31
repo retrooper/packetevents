@@ -72,6 +72,8 @@ public abstract class PacketEventsAPI<T> {
     }
 
     public void load() {
+        this.getLogManager().info("Loading packetevents...");
+
         WrappedBlockState.ensureLoad();
         SynchronizedRegistriesHandler.init();
         PacketType.prepare();
