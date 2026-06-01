@@ -34,6 +34,7 @@ import java.util.Optional;
  * This packet is used to send a chat message to the server.
  */
 public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClientChatMessage> {
+
     private static final int LEGACY_MAX_LENGTH = Integer.getInteger("packetevents.legacy-chat-max-length", 100);
 
     private String message;
