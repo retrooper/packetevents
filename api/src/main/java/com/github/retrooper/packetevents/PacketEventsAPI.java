@@ -94,7 +94,7 @@ public abstract class PacketEventsAPI<T> {
         try {
             this.getInjector().uninject();
         } catch (Throwable throwable) {
-            this.getLogManager().warn("Failed to uninject during termination");
+            this.getLogManager().warn("Failed to uninject during termination, this error can be ignored on shutdown");
             throwable.printStackTrace();
         }
         this.getEventManager().unregisterAllListeners();
