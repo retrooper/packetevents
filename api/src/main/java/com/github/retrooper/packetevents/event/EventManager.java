@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 
 /**
@@ -43,12 +42,8 @@ import java.util.logging.Level;
 
 public class EventManager {
 
-    //Using a ConcurrentHashMap is faster and more secure here, compared to Collections.synchronizedMap(new EnumMap<>(PacketListenerPriority.class))
-    //This is mainly due to:
-    //1. On each modification Collections.synchronizedMap synchronizes the whole Map object, while ConcurrentHashMap only it's internal, currently modified Node
-    //2. ConcurrentHashMap won't fail in a multi-thread environment, while Collections.synchronizedMap is said to have a lot of potential problems,
-    //being a generalized method for synchronization
-    private final Map<PacketListenerPriority, Set<PacketListenerCommon>> listenersMap = new ConcurrentHashMap<>();
+
+    private final Set<PacketListenerCommon> listenerSet = ConcurrentHashMap.newKeySet();
     //Since reads greatly outnumber writes, create an array for the best possible iteration time
     //Updated as a whole on writes, no index modifications are allowed
     private volatile PacketListenerCommon[] listeners = new PacketListenerCommon[0];
@@ -150,7 +145,7 @@ public class EventManager {
      * Unregister all dynamic packet event listeners.
      */
     public void unregisterAllListeners() {
-        this.listenersMap.clear();
+        this.listenerSet.clear();
         synchronized (this) {//like booky10 said, the synchronization is necessary here
             this.listeners = new PacketListenerCommon[0];
         }
@@ -160,12 +155,8 @@ public class EventManager {
     //is overridden by its non-up-to-date value, simply because it finished a bit later than the most recent update)
     private void recalculateListeners() {
         synchronized (this) {
-            List<PacketListenerCommon> list = new ArrayList<>();
-            //adds from LOWEST to MONITOR, so in the correct order
-            for (PacketListenerPriority priority : PacketListenerPriority.values()) {
-                Set<PacketListenerCommon> set = this.listenersMap.get(priority);
-                if (set != null) list.addAll(set);
-            }
+            List<PacketListenerCommon> list = new ArrayList<>(this.listenerSet);
+            list.sort(Comparator.comparing(PacketListenerCommon::priority));
             this.listeners = list.toArray(new PacketListenerCommon[0]);
         }
     }
@@ -173,13 +164,11 @@ public class EventManager {
     //Internal registration methods, specifically separated for lesser overhead when registering an array of Listeners
 
     private void registerListenerNoRecalculation(PacketListenerCommon listener) {
-        Set<PacketListenerCommon> listenerSet = this.listenersMap.computeIfAbsent(listener.getPriority(), p -> new CopyOnWriteArraySet<>());
-        listenerSet.add(listener);
+        this.listenerSet.add(listener);
     }
 
     //Returns true if the listener was removed, so a modification occurred
     private boolean unregisterListenerNoRecalculation(PacketListenerCommon listener) {
-        Set<PacketListenerCommon> listenerSet = this.listenersMap.get(listener.getPriority());
-        return listenerSet != null && listenerSet.remove(listener);
+        return this.listenerSet.remove(listener);
     }
 }

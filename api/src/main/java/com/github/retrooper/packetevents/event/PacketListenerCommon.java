@@ -18,10 +18,6 @@
 
 package com.github.retrooper.packetevents.event;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Abstract packet listener.
  *
@@ -29,18 +25,46 @@ import java.util.Map;
  * @since 1.8
  */
 public abstract class PacketListenerCommon {
-    private final PacketListenerPriority priority;
+    private final ListenerPriority priority;
 
-    public PacketListenerCommon(PacketListenerPriority priority) {
+    /**
+     * @param priority the priority of this packet listener.
+     */
+    public PacketListenerCommon(ListenerPriority priority) {
         this.priority = priority;
     }
 
+    /**
+     * Default priority is {@link ListenerPriority#NORMAL}.
+     */
     public PacketListenerCommon() {
-        this.priority = PacketListenerPriority.NORMAL;
+        this(ListenerPriority.NORMAL);
     }
 
+    /**
+     * @deprecated use {@link PacketListenerCommon(ListenerPriority)} instead
+     */
+    @Deprecated
+    public PacketListenerCommon(PacketListenerPriority priority) {
+        this(ListenerPriority.fromLegacy(priority));
+    }
+
+    /**
+     * @return the priority of this packet listener.
+     * @deprecated use {@link #priority()} instead
+     */
+    @Deprecated
     public PacketListenerPriority getPriority() {
-        return priority;
+        return this.priority.legacyType();
+    }
+
+    /**
+     * @return the priority of this packet listener.
+     */
+    public ListenerPriority priority() {
+        // no point in providing a backwards compat if method returns the modern type
+        // + the new type has to be exposed in one way or another (the event manager needs it), cant get around this one :(
+        return this.priority;
     }
 
     public void onUserConnect(UserConnectEvent event) {
