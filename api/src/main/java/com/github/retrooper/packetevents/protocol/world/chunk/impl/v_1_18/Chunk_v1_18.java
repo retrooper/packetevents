@@ -100,14 +100,10 @@ public class Chunk_v1_18 implements BaseChunk {
 
     public static Chunk_v1_18 read(PacketWrapper<?> wrapper) {
         ClientVersion version = wrapper.getServerVersion().toClientVersion();
-        boolean paletteLengthPrefix = version.isOlderThan(ClientVersion.V_1_21_5);
-        boolean hasFluidCount = version.isNewerThanOrEquals(ClientVersion.V_26_1);
         int blockCount = wrapper.readShort();
-        int fluidCount = hasFluidCount ? wrapper.readShort() : 0;
-        DataPalette chunkPalette = DataPalette.read(wrapper, PaletteType.CHUNK,
-                true, paletteLengthPrefix);
-        DataPalette biomePalette = DataPalette.read(wrapper, PaletteType.BIOME,
-                true, paletteLengthPrefix);
+        int fluidCount = version.isNewerThanOrEquals(ClientVersion.V_26_1) ? wrapper.readShort() : 0;
+        DataPalette chunkPalette = DataPalette.read(wrapper, PaletteType.CHUNK);
+        DataPalette biomePalette = DataPalette.read(wrapper, PaletteType.BIOME);
         return new Chunk_v1_18(version, blockCount, fluidCount, chunkPalette, biomePalette);
     }
 

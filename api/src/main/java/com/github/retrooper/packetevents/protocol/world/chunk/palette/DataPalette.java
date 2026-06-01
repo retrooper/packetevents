@@ -18,12 +18,13 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.storage.BaseStorage;
 import com.github.retrooper.packetevents.protocol.world.chunk.storage.BitStorage;
 import com.github.retrooper.packetevents.protocol.world.chunk.storage.LegacyFlexibleStorage;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class DataPalette {
@@ -78,24 +79,21 @@ public class DataPalette {
         return read(in, paletteType, allowSingletonPalette, true);
     }
 
-    public static DataPalette read(
-            PacketWrapper<?> wrapper, PaletteType paletteType,
-            boolean allowSingletonPalette, boolean lengthPrefix
-    ) {
+    public static DataPalette read(PacketWrapper<?> wrapper, PaletteType paletteType) {
         int bitsPerEntry = wrapper.readByte();
-        Palette palette = readPalette(paletteType, bitsPerEntry, wrapper, allowSingletonPalette);
+        Palette palette = readPalette(paletteType, bitsPerEntry, wrapper);
         BitStorage storage;
         if (!(palette instanceof SingletonPalette)) {
-            if (lengthPrefix) {
-                long[] data = readLongs(wrapper, wrapper.readVarInt());
+            if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
+                long[] data = wrapper.readLongArray();
                 storage = new BitStorage(bitsPerEntry, paletteType.getStorageSize(), data);
             } else {
                 storage = new BitStorage(bitsPerEntry, paletteType.getStorageSize());
-                readLongsInto(wrapper, storage.getData());
+                wrapper.readLongArray(storage.getData());
             }
         } else {
-            if (lengthPrefix) {
-                skipLongs(wrapper, wrapper.readVarInt());
+            if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
+                ByteBufHelper.skipBytes(wrapper.buffer, wrapper.readVarInt() * Long.BYTES);
             }
             storage = null;
         }
@@ -240,13 +238,8 @@ public class DataPalette {
         }
     }
 
-    private static Palette readPalette(
-            PaletteType paletteType,
-            int bitsPerEntry,
-            PacketWrapper<?> wrapper,
-            boolean allowSingletonPalette
-    ) {
-        if (bitsPerEntry == 0 && allowSingletonPalette) {
+    private static Palette readPalette(PaletteType paletteType, int bitsPerEntry, PacketWrapper<?> wrapper) {
+        if (bitsPerEntry == 0 && wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
             return new SingletonPalette(wrapper);
         } else if (bitsPerEntry <= paletteType.getMaxBitsPerEntryForList()) {
             // vanilla forces a blockstate-list-palette to always be the maximum size
@@ -256,33 +249,6 @@ public class DataPalette {
             return new MapPalette(bitsPerEntry, wrapper);
         } else {
             return GlobalPalette.INSTANCE;
-        }
-    }
-
-    private static long[] readLongs(PacketWrapper<?> wrapper, int length) {
-        validateLongArrayLength(length);
-        long[] values = new long[length];
-        readLongsInto(wrapper, values);
-        return values;
-    }
-
-    private static void readLongsInto(PacketWrapper<?> wrapper, long[] target) {
-        for (int i = 0; i < target.length; i++) {
-            target[i] = wrapper.readLong();
-        }
-    }
-
-    private static void skipLongs(PacketWrapper<?> wrapper, int length) {
-        validateLongArrayLength(length);
-        ByteBufHelper.skipBytes(wrapper.buffer, length * Long.BYTES);
-    }
-
-    private static void validateLongArrayLength(int length) {
-        if (length < 0) {
-            throw new IllegalArgumentException("Array cannot have length less than 0.");
-        }
-        if (length > Integer.MAX_VALUE / Long.BYTES) {
-            throw new IllegalArgumentException("Long array byte length is too large: " + length);
         }
     }
 
