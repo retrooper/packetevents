@@ -27,7 +27,7 @@ import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
-import com.github.retrooper.packetevents.util.LogManager;
+import com.github.retrooper.packetevents.util.PEVersions;
 import io.github.retrooper.packetevents.sponge.InternalSpongeListener;
 import io.github.retrooper.packetevents.sponge.injector.SpongeChannelInjector;
 import io.github.retrooper.packetevents.sponge.injector.connection.ServerConnectionInitializer;
@@ -36,7 +36,6 @@ import io.github.retrooper.packetevents.sponge.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.sponge.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.sponge.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.sponge.netty.NettyManagerImpl;
-import io.github.retrooper.packetevents.sponge.util.SpongeLogManager;
 import io.github.retrooper.packetevents.sponge.util.SpongeReflectionUtil;
 import io.github.retrooper.packetevents.sponge.util.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.sponge.util.viaversion.ViaVersionUtil;
@@ -80,7 +79,6 @@ public class SpongePacketEventsBuilder {
             private final PlayerManager playerManager = new PlayerManagerImpl();
             private final NettyManager nettyManager = new NettyManagerImpl();
             private final SpongeChannelInjector injector = new SpongeChannelInjector();
-            private final LogManager logManager = new SpongeLogManager(plugin);
             private boolean loaded;
             private boolean initialized;
             private boolean terminated;
@@ -114,6 +112,8 @@ public class SpongePacketEventsBuilder {
                 }
 
                 loaded = true;
+
+                this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW + ("packetevents".equals(id) ? "" : " for " + plugin.metadata().id()));
             }
 
             @Override
@@ -210,11 +210,6 @@ public class SpongePacketEventsBuilder {
             @Override
             public ChannelInjector getInjector() {
                 return injector;
-            }
-
-            @Override
-            public LogManager getLogManager() {
-                return logManager;
             }
         };
     }

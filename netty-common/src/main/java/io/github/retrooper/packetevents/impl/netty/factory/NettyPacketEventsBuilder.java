@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import com.github.retrooper.packetevents.util.PEVersions;
 import io.github.retrooper.packetevents.impl.netty.BuildData;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
@@ -98,6 +99,8 @@ public class NettyPacketEventsBuilder {
                     super.load();
                     injector.inject();
                     loaded = true;
+
+                    this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW + ("packetevents".equals(id) ? "" : " for " + data.getName()));
                 }
             }
 

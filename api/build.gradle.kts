@@ -31,6 +31,7 @@ dependencies {
         excludeAdventure()
     }
     compileOnly(libs.gson)
+    compileOnly(libs.adventure.text.logger.slf4j)
     compileOnly(libs.checkerqual)
 
     testRuntimeOnly(testlibs.bundles.adventure)
@@ -38,6 +39,8 @@ dependencies {
     testImplementation(libs.bundles.adventure)
     testImplementation(project(":patch:adventure-text-serializer-gson"))
     testImplementation(project(":patch:adventure-text-serializer-legacy"))
+    testImplementation(libs.adventure.text.serializer.legacy)
+    testImplementation(libs.adventure.text.logger.slf4j)
     testImplementation(project(":netty-common"))
     testImplementation(testlibs.mockbukkit)
     testImplementation(testlibs.paper.api)

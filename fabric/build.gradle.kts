@@ -28,6 +28,8 @@ plugins {
 dependencies {
     // include dependencies
     include(libs.bundles.adventure)
+    api(libs.adventure.text.logger.slf4j)
+    include(libs.adventure.text.logger.slf4j)
     include(project(":api", "shadow"))
     include(project(":netty-common"))
 

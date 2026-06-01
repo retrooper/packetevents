@@ -323,7 +323,7 @@ public final class SynchronizedRegistriesHandler {
 
             // can't find this element anywhere
             // TODO dummy values to make at least simple stuff work?
-            PacketEvents.getAPI().getLogger().warning("Unknown registry entry "
+            PacketEvents.getAPI().getLogManager().warn("Unknown registry entry "
                     + elementName + " for " + this.getRegistryKey());
         }
 

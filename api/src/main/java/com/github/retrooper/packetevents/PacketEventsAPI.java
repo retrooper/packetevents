@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import com.github.retrooper.packetevents.util.logger.JulLegacyLogManager;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
 import com.github.retrooper.packetevents.util.PEVersions;
@@ -38,11 +39,11 @@ import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 import java.util.logging.Logger;
 
 public abstract class PacketEventsAPI<T> {
+
     private final EventManager eventManager = new EventManager();
     private final PacketEventsSettings settings = new PacketEventsSettings();
     private final UpdateChecker updateChecker = new UpdateChecker();
-    private final LogManager logManager = new LogManager();
-    private static final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
+    private final LogManager logManager = LogManager.construct(this);
 
     public EventManager getEventManager() {
         return eventManager;
@@ -61,15 +62,18 @@ public abstract class PacketEventsAPI<T> {
         return PEVersions.CURRENT;
     }
 
+    @Deprecated
     public Logger getLogger() {
-        return LOGGER;
+        return JulLegacyLogManager.getLogger();
     }
 
     public LogManager getLogManager() {
-        return logManager;
+        return this.logManager;
     }
 
     public void load() {
+        this.getLogManager().info("Loading packetevents...");
+
         WrappedBlockState.ensureLoad();
         SynchronizedRegistriesHandler.init();
         PacketType.prepare();
@@ -94,8 +98,7 @@ public abstract class PacketEventsAPI<T> {
         try {
             this.getInjector().uninject();
         } catch (Throwable throwable) {
-            this.getLogManager().warn("Failed to uninject during termination, this error can be ignored on shutdown");
-            throwable.printStackTrace();
+            this.getLogManager().warn("Failed to uninject during termination, this error can be ignored on shutdown", throwable);
         }
         this.getEventManager().unregisterAllListeners();
         AdventureConversionInjector.uninject();
