@@ -77,6 +77,10 @@ public class WrapperPlayServerSpawnWeatherEntity extends PacketWrapper<WrapperPl
     @Override
     public void copy(WrapperPlayServerSpawnWeatherEntity wrapper) {
         this.entityId = wrapper.entityId;
+        this.type = wrapper.type;
+        this.x = wrapper.x;
+        this.y = wrapper.y;
+        this.z = wrapper.z;
     }
 
     public int getEntityId() {

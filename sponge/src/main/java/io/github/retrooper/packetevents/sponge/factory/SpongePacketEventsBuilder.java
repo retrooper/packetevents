@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.util.PEVersions;
 import io.github.retrooper.packetevents.sponge.InternalSpongeListener;
 import io.github.retrooper.packetevents.sponge.injector.SpongeChannelInjector;
 import io.github.retrooper.packetevents.sponge.injector.connection.ServerConnectionInitializer;
+import io.github.retrooper.packetevents.sponge.manager.InternalSpongePacketListener;
 import io.github.retrooper.packetevents.sponge.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.sponge.manager.protocol.ProtocolManagerImpl;
 import io.github.retrooper.packetevents.sponge.manager.server.ServerManagerImpl;
@@ -113,6 +114,11 @@ public class SpongePacketEventsBuilder {
                 loaded = true;
 
                 this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW + ("packetevents".equals(id) ? "" : " for " + plugin.metadata().id()));
+            }
+
+            @Override
+            protected void registerInternalListener() {
+                this.getEventManager().registerListener(new InternalSpongePacketListener());
             }
 
             @Override

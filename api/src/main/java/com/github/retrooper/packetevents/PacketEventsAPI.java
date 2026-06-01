@@ -81,6 +81,10 @@ public abstract class PacketEventsAPI<T> {
 
         // Register internal packet listener (should be the first listener)
         // This listener doesn't do any modifications to the packets, just reads data
+        this.registerInternalListener();
+    }
+
+    protected void registerInternalListener() {
         this.getEventManager().registerListener(new InternalPacketListener());
     }
 
@@ -94,7 +98,7 @@ public abstract class PacketEventsAPI<T> {
         try {
             this.getInjector().uninject();
         } catch (Throwable throwable) {
-            this.getLogManager().warn("Failed to uninject during termination", throwable);
+            this.getLogManager().warn("Failed to uninject during termination, this error can be ignored on shutdown", throwable);
         }
         this.getEventManager().unregisterAllListeners();
         AdventureConversionInjector.uninject();

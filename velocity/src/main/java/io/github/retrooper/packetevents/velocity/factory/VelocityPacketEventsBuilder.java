@@ -151,7 +151,7 @@ public class VelocityPacketEventsBuilder {
 
             private final PlayerManagerAbstract playerManager = new PlayerManagerImpl();
 
-            private final ChannelInjector injector = new VelocityPipelineInjector(server);
+            private final ChannelInjector injector = new VelocityPipelineInjector(this, server);
             private final NettyManager nettyManager = new NettyManagerImpl();
             private boolean loaded;
             private boolean initialized;
