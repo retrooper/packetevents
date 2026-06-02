@@ -18,10 +18,13 @@
 
 package io.github.retrooper.packetevents.factory.spigot;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.EventContainer;
 import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
-import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
+import com.github.retrooper.packetevents.manager.ClientVersionInternalListener;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -29,6 +32,17 @@ public class BukkitEventManager extends EventManager {
 
     @Override
     protected void handleNewListener(EventContainer container, PacketListenerCommon listener) {
-        ServerConnectionInitializer.PRE_VIA_LISTENER_REGISTERED.accept(listener);
+        if (container != this.clientListeners || !container.isEmpty()) {
+            return; // useless
+        } else if (listener instanceof ClientVersionInternalListener) {
+            return; // prevent recursive loop
+        }
+        // register internal listener first
+        container.registerListener(new ClientVersionInternalListener());
+
+        if (ViaVersionUtil.isAvailable()) {
+            SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
+            injector.activatePreViaVersion();
+        }
     }
 }

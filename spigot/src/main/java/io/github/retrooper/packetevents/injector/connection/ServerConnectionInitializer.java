@@ -19,9 +19,8 @@
 package io.github.retrooper.packetevents.injector.connection;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListenerCommon;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.UserConnectEvent;
-import com.github.retrooper.packetevents.manager.PreViaSupport;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -31,44 +30,48 @@ import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
-import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelPipeline;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.function.Consumer;
 
+@NullMarked
+@ApiStatus.Internal
+public final class ServerConnectionInitializer {
 
-public class ServerConnectionInitializer {
+    private static final String VIAVERSION_ENCODER_NAME = "via-encoder";
+    private static final String VIAVERSION_DECODER_NAME = "via-decoder";
+    private static final String MINECRAFT_DECOMPRESS_NAME = "decompress";
+    private static final String MINECRAFT_COMPRESS_NAME = "compress";
+    private static final String MINECRAFT_DECODER_NAME = "decoder";
+    private static final String MINECRAFT_ENCODER_NAME = "encoder";
+    private static final String MINECRAFT_INBOUND_CONFIG_NAME = "inbound_config";
+    private static final String MINECRAFT_OUTBOUND_CONFIG_NAME = "outbound_config";
+    private static final String MINECRAFT_SPLITTER_NAME = "splitter";
 
-    // This is called each time a new listener is registered
-    public static final Consumer<PacketListenerCommon> PRE_VIA_LISTENER_REGISTERED = listener -> {
-        if (!PreViaSupport.isExternalPreViaListener(listener)) return;
-        PreViaSupport.ensurePreViaInternalListenerRegistered();
+    private ServerConnectionInitializer() {
+    }
 
-        if (!ViaVersionUtil.isAvailable()) return;
+    @Deprecated
+    public static void initChannel(Object ch, ConnectionState state) {
+        initChannel((Channel) ch, state);
+    }
 
-        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-        if (!injector.isPreViaRequested()) {
-            injector.setPreViaRequested(true);
-        }
-
-        injector.catchUpPreViaOnExistingChannelsIfNeeded();
-    };
-
-    public static void initChannel(Object ch, ConnectionState connectionState) {
-        Channel channel = (Channel) ch;
+    public static void initChannel(Channel channel, ConnectionState state) {
         if (FakeChannelUtil.isFakeChannel(channel)) {
             return;
         }
-        User user = new User(channel, connectionState, null, new UserProfile(null, null));
+        User user = new User(channel, state, null, new UserProfile(null, null));
 
-        if (connectionState == ConnectionState.PLAY) {
+        PacketEventsAPI<?> packetevents = PacketEvents.getAPI();
+        if (state == ConnectionState.PLAY) {
             // Player connected before ViaVersion init, therefore the player is server version (mostly true except 1.7 servers)
-            user.setClientVersion(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion());
-            PacketEvents.getAPI().getLogManager().warn("Late injection detected, we missed packets so some functionality may break!");
+            user.setClientVersion(packetevents.getServerManager().getVersion().toClientVersion());
+            packetevents.getLogManager().warn("Late injection detected for " + user.getUUID() + ", we missed packets so some functionality may break!");
         }
 
         synchronized (channel) {
@@ -79,24 +82,26 @@ public class ServerConnectionInitializer {
              * We can, of course, wait for them to be handled, but this complexes the algorithm.
              * Taken the above into account, here we just drop all unhandled connections.
              */
-            if (channel.pipeline().get("splitter") == null) {
+            if (channel.pipeline().get(MINECRAFT_SPLITTER_NAME) == null) {
                 channel.close();
                 return;
             }
 
             UserConnectEvent connectEvent = new UserConnectEvent(user);
-            PacketEvents.getAPI().getEventManager().callEvent(connectEvent);
+            packetevents.getEventManager().callEvent(connectEvent);
             if (connectEvent.isCancelled()) {
                 channel.unsafe().closeForcibly();
                 return;
             }
 
             relocateHandlers(channel, user, false);
-            SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-            if (injector.isPreViaRequested()) relocateHandlers(channel, user, true);
+            SpigotChannelInjector injector = (SpigotChannelInjector) packetevents.getInjector();
+            if (injector.isPreViaVersionActivated()) {
+                relocateHandlers(channel, user, true);
+            }
 
             channel.closeFuture().addListener((ChannelFutureListener) future -> PacketEventsImplHelper.handleDisconnection(user.getChannel(), user.getUUID()));
-            PacketEvents.getAPI().getProtocolManager().setUser(channel, user);
+            packetevents.getProtocolManager().setUser(channel, user);
         }
     }
 
@@ -117,8 +122,11 @@ public class ServerConnectionInitializer {
 
     public static void relocateHandlers(Channel ctx, User user, boolean preVia) {
         try {
-            if (PacketEvents.getAPI().getSettings().isDebugEnabled())
-                PacketEvents.getAPI().getLogManager().debug("Pre relocate, preVia: " + preVia + ", " + ChannelHelper.pipelineHandlerNamesAsString(ctx));
+            PacketEventsAPI<?> packetevents = PacketEvents.getAPI();
+
+            if (packetevents.getSettings().isDebugEnabled()) {
+                packetevents.getLogManager().debug("Pre relocate, preVia: " + preVia + ", " + ctx.pipeline().names());
+            }
 
             String encoderName = preVia ? "pre-" + PacketEvents.ENCODER_NAME : PacketEvents.ENCODER_NAME;
             String decoderName = preVia ? "pre-" + PacketEvents.DECODER_NAME : PacketEvents.DECODER_NAME;
@@ -126,48 +134,42 @@ public class ServerConnectionInitializer {
             // Determine where we WANT to be.
             String targetDecoderName;
             String targetEncoderName;
-
             if (preVia) {
-                targetEncoderName = "via-encoder";
-                targetDecoderName = "via-decoder";
+                targetEncoderName = VIAVERSION_ENCODER_NAME;
+                targetDecoderName = VIAVERSION_DECODER_NAME;
             } else {
-                targetDecoderName = ctx.pipeline().names().contains("inbound_config") ? "inbound_config" : "decoder";
-                targetEncoderName = ctx.pipeline().names().contains("outbound_config") ? "outbound_config" : "encoder";
+                List<String> handlers = ctx.pipeline().names();
+                targetDecoderName = handlers.contains(MINECRAFT_INBOUND_CONFIG_NAME) ? MINECRAFT_INBOUND_CONFIG_NAME : MINECRAFT_DECODER_NAME;
+                targetEncoderName = handlers.contains(MINECRAFT_OUTBOUND_CONFIG_NAME) ? MINECRAFT_OUTBOUND_CONFIG_NAME : MINECRAFT_ENCODER_NAME;
             }
 
-            PacketEventsDecoder existingDecoder = (PacketEventsDecoder) ctx.pipeline().get(decoderName);
-            ChannelHandler encoder;
-            PacketEventsDecoder decoder;
+            PacketEventsDecoder decoder = (PacketEventsDecoder) ctx.pipeline().get(decoderName);
+            PacketEventsEncoder encoder;
 
-            if (existingDecoder != null) {
-                if (existingDecoder.hasBeenRelocated
-                        && handlersAlreadyRelocated(ctx, preVia, decoderName, targetDecoderName, encoderName, targetEncoderName)) {
+            if (decoder != null) {
+                // check whether we actually need to relocate
+                if (handlersAlreadyRelocated(ctx.pipeline(), preVia, decoderName, targetDecoderName, encoderName, targetEncoderName)) {
                     return;
                 }
-                existingDecoder.hasBeenRelocated = true;
-
-                decoder = new PacketEventsDecoder((PacketEventsDecoder) ctx.pipeline().remove(decoderName));
                 encoder = new PacketEventsEncoder(ctx.pipeline().remove(encoderName));
-            } else { // Decoder == null means we haven't made handlers for the user yet
+                ctx.pipeline().remove(decoderName);
+            } else {
+                // no decoder means we haven't made handlers for the user yet
                 encoder = new PacketEventsEncoder(user, preVia);
                 decoder = new PacketEventsDecoder(user, preVia);
             }
 
-            if (PacketEvents.getAPI().getSettings().isDebugEnabled())
-                PacketEvents.getAPI().getLogManager().debug("After remove, preVia: " + preVia + ", " + ChannelHelper.pipelineHandlerNamesAsString(ctx));
-
-            if (preVia) {
-                ctx.pipeline()
-                        .addBefore("via-encoder", encoderName, encoder)
-                        .addBefore("via-decoder", decoderName, decoder);
-            } else {
-                ctx.pipeline()
-                        .addBefore(targetDecoderName, decoderName, decoder)
-                        .addBefore(targetEncoderName, encoderName, encoder);
+            if (packetevents.getSettings().isDebugEnabled()) {
+                packetevents.getLogManager().debug("After remove, preVia: " + preVia + ", " + ctx.pipeline().names());
             }
 
-            if (PacketEvents.getAPI().getSettings().isDebugEnabled())
-                PacketEvents.getAPI().getLogManager().debug("After add, preVia: " + preVia + ", " + ChannelHelper.pipelineHandlerNamesAsString(ctx));
+            ctx.pipeline()
+                    .addBefore(targetDecoderName, decoderName, decoder)
+                    .addBefore(targetEncoderName, encoderName, encoder);
+
+            if (packetevents.getSettings().isDebugEnabled()) {
+                packetevents.getLogManager().debug("After add, preVia: " + preVia + ", " + ctx.pipeline().names());
+            }
         } catch (NoSuchElementException ex) {
             String handlers = ChannelHelper.pipelineHandlerNamesAsString(ctx);
             throw new IllegalStateException("PacketEvents failed to add a decoder to the netty pipeline. Pipeline handlers: " + handlers, ex);
@@ -177,37 +179,37 @@ public class ServerConnectionInitializer {
     /**
      * Checks if 'myHandler' exists and is currently at a lower index (upstream) than 'targetHandler'.
      */
-    private static boolean isAlreadyBefore(Channel ctx, String myHandler, String targetHandler) {
-        List<String> names = ctx.pipeline().names();
-        int myIndex = names.indexOf(myHandler);
-        int targetIndex = names.indexOf(targetHandler);
-
-        // If we aren't in the pipeline, we aren't before anything. We need to be added.
-        if (myIndex == -1) return false;
-
-        // If the target (e.g., Via) isn't in the pipeline, we can't compare.
-        // Usually implies we should just stay put or let the standard logic run.
-        // Returning true here is safe because if Via isn't there, we don't need to fight it.
-        if (targetIndex == -1) return true;
-
-        // We are good if we are earlier in the list than the target.
-        return myIndex < targetIndex;
+    private static boolean isBefore(List<String> handlers, String myHandler, String targetHandler) {
+        // just do one iteration and check which handler we encounter first,
+        // but account for target handler just not existing
+        boolean foundMe = false;
+        for (String handler : handlers) {
+            if (handler.equals(myHandler)) {
+                foundMe = true;
+            } else if (handler.equals(targetHandler)) {
+                return foundMe;
+            }
+        }
+        // can't find either, return same as if final handler is our target
+        return foundMe;
     }
 
-    private static boolean handlersAlreadyRelocated(Channel ctx, boolean preVia, String decoderName, String targetDecoderName,
-                                                    String encoderName, String targetEncoderName) {
-        if (!isAlreadyBefore(ctx, decoderName, targetDecoderName)
-                || !isAlreadyBefore(ctx, encoderName, targetEncoderName)) {
+    private static boolean handlersAlreadyRelocated(
+            ChannelPipeline pipeline, boolean preVia,
+            String decoderName, String targetDecoderName,
+            String encoderName, String targetEncoderName
+    ) {
+        // ensure we're still before our target
+        List<String> handlers = pipeline.names();
+        if (!isBefore(handlers, decoderName, targetDecoderName)
+                || !isBefore(handlers, encoderName, targetEncoderName)) {
             return false;
         }
 
         if (!preVia) {
-            if (ctx.pipeline().get("decompress") != null && !isAlreadyBefore(ctx, "decompress", decoderName)) {
-                return false;
-            }
-            if (ctx.pipeline().get("compress") != null && !isAlreadyBefore(ctx, "compress", encoderName)) {
-                return false;
-            }
+            // ensure we're not too far before our target (i.e. after compress/decompress) as otherwise we would only catch compressed packets
+            return (!handlers.contains(MINECRAFT_DECOMPRESS_NAME) || isBefore(handlers, MINECRAFT_DECOMPRESS_NAME, decoderName))
+                    && (!handlers.contains(MINECRAFT_COMPRESS_NAME) || isBefore(handlers, MINECRAFT_COMPRESS_NAME, encoderName));
         }
 
         return true;

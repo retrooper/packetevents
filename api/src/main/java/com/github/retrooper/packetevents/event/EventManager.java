@@ -26,30 +26,30 @@ import org.jspecify.annotations.NullMarked;
 @ApiStatus.NonExtendable
 public class EventManager {
 
-    private final EventContainer serverListeners = new Container();
-    private final EventContainer clientListeners = new Container();
+    protected final EventContainer serverListeners = new Container();
+    protected final EventContainer clientListeners = new Container();
 
     /**
      * @see EventContainer#callEvent(PacketEvent)
      */
     @ApiStatus.Internal
-    public void callEvent(PacketEvent event) {
-        this.callEvent(event, null);
+    public final void callEvent(PacketEvent event) {
+        this.serverListeners.callEvent(event, null);
     }
 
     /**
      * @see EventContainer#callEvent(PacketEvent, Runnable)
      */
     @ApiStatus.Internal
-    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
-        this.callEvent(event, postCallListenerAction, false);
+    public final void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
+        this.serverListeners.callEvent(event, postCallListenerAction);
     }
 
     /**
      * @see EventContainer#callEvent(PacketEvent, Runnable)
      */
     @ApiStatus.Internal
-    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction, boolean clientListeners) {
+    public final void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction, boolean clientListeners) {
         EventContainer container = clientListeners ? this.clientListeners : this.serverListeners;
         container.callEvent(event, postCallListenerAction);
     }

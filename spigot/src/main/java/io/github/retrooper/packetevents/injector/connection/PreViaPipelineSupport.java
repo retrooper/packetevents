@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.injector.connection;
 
-import com.github.retrooper.packetevents.manager.PreViaSupport;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -17,7 +16,7 @@ public final class PreViaPipelineSupport {
     }
 
     public static DispatchMode getDispatchMode() {
-        if (!PreViaSupport.hasPreViaListeners()) {
+        if (false/*!PreViaSupport.hasPreViaListeners()*/) { // TODO
             return DispatchMode.DISABLED;
         }
 

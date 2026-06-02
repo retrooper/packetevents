@@ -157,6 +157,10 @@ public class EventContainer {
         }
     }
 
+    public boolean isEmpty() {
+        return this.listenersMap.isEmpty();
+    }
+
     @ApiStatus.Internal
     void recalculateListeners() {
         synchronized (this) {
@@ -174,9 +178,9 @@ public class EventContainer {
 
     @ApiStatus.Internal
     void registerListenerNoRecalculation(PacketListenerCommon listener) {
+        this.handleNewListener(listener);
         Set<PacketListenerCommon> listenerSet = this.listenersMap.computeIfAbsent(listener.getPriority(), p -> new CopyOnWriteArraySet<>());
         listenerSet.add(listener);
-        this.handleNewListener(listener);
     }
 
     /**

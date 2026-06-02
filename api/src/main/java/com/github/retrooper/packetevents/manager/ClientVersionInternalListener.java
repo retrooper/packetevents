@@ -1,6 +1,5 @@
 package com.github.retrooper.packetevents.manager;
 
-
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
@@ -8,7 +7,6 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import org.jetbrains.annotations.ApiStatus;
@@ -17,9 +15,9 @@ import org.jetbrains.annotations.ApiStatus;
  * Keeps the raw client-side state used by previa handlers separate from the normal server state.
  */
 @ApiStatus.Internal
-public class PreViaInternalListener extends PacketListenerAbstract {
+public class ClientVersionInternalListener extends PacketListenerAbstract {
 
-    public PreViaInternalListener() {
+    public ClientVersionInternalListener() {
         super(PacketListenerPriority.LOWEST);
     }
 
@@ -33,11 +31,10 @@ public class PreViaInternalListener extends PacketListenerAbstract {
         User user = event.getUser();
         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
             WrapperHandshakingClientHandshake packet = new WrapperHandshakingClientHandshake(event);
-            ClientVersion clientVersion = packet.getClientVersion();
-
-            user.setClientVersion(clientVersion);
-            user.setPreViaDecoderState(packet.getNextConnectionState());
-            user.setPreViaEncoderState(packet.getNextConnectionState());
+            user.setClientVersion(packet.getClientVersion());
+            ConnectionState state = packet.getNextConnectionState();
+            user.setPreViaDecoderState(state);
+            user.setPreViaEncoderState(state);
         } else if (event.getPacketType() == PacketType.Login.Client.LOGIN_SUCCESS_ACK) {
             user.setPreViaDecoderState(ConnectionState.CONFIGURATION);
         } else if (event.getPacketType() == PacketType.Play.Client.CONFIGURATION_ACK) {
@@ -55,6 +52,7 @@ public class PreViaInternalListener extends PacketListenerAbstract {
                 user.setPreViaEncoderState(ConnectionState.CONFIGURATION);
             } else {
                 user.setPreViaEncoderState(ConnectionState.PLAY);
+                user.setPreViaDecoderState(ConnectionState.PLAY);
             }
         } else if (event.getPacketType() == PacketType.Play.Server.CONFIGURATION_START) {
             user.setPreViaEncoderState(ConnectionState.CONFIGURATION);
