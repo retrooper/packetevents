@@ -42,6 +42,7 @@ public class ClientVersionInternalListener extends PacketListenerAbstract {
         } else if (event.getPacketType() == PacketType.Configuration.Client.CONFIGURATION_END_ACK) {
             user.setPreViaDecoderState(ConnectionState.PLAY);
         }
+        System.out.println("PRE VIA " + event.getPacketType() + " " + event.getServerVersion());
     }
 
     @Override

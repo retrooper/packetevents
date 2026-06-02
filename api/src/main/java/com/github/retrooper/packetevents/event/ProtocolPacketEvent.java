@@ -108,7 +108,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
             if (PacketType.getById(packetSide, ConnectionState.PLAY, version, packetID) == PacketType.Play.Server.DISCONNECT) {
                 throw new InvalidDisconnectPacketSend();
             }
-            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Bound: " + packetSide.getOpposite() + ", Connection state: " + user.getDecoderState() + ", Server version: " + serverVersion.getReleaseName());
+            throw new PacketProcessException("Failed to map the Packet ID " + packetID + " to a PacketType constant. Bound: " + packetSide.getOpposite() + ", Connection state: " + user.getDecoderState() + ", Server version: " + serverVersion.getReleaseName() + ", PreVia: " + !autoProtocolTranslation);
         }
         this.packetType = packetType;
     }

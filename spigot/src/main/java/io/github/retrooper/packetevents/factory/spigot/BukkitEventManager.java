@@ -30,15 +30,18 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class BukkitEventManager extends EventManager {
 
+    public BukkitEventManager() {
+        // register internal listener first
+        this.registerListener(new ClientVersionInternalListener());
+    }
+
     @Override
     protected void handleNewListener(EventContainer container, PacketListenerCommon listener) {
         if (container != this.clientListeners || !container.isEmpty()) {
             return; // useless
         } else if (listener instanceof ClientVersionInternalListener) {
-            return; // prevent recursive loop
+            return; // don't inject pre-via if this is only our internal listener
         }
-        // register internal listener first
-        container.registerListener(new ClientVersionInternalListener());
 
         if (ViaVersionUtil.isAvailable()) {
             SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
