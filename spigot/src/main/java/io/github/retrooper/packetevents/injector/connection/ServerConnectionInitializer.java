@@ -30,6 +30,7 @@ import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
+import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
@@ -148,7 +149,7 @@ public final class ServerConnectionInitializer {
             PacketEventsEncoder encoder;
 
             SpigotChannelInjector injector = (SpigotChannelInjector) packetevents.getInjector();
-            TriState preViaState = injector.isPreViaVersionActivated() ? TriState.byBoolean(preVia) : TriState.NOT_SET;
+            TriState preViaState = injector.isPreViaVersionActivated() || ViaVersionUtil.isAvailable() ? TriState.byBoolean(preVia) : TriState.NOT_SET;
 
             if (decoder != null) {
                 // check whether we actually need to relocate
