@@ -19,13 +19,13 @@
 package io.github.retrooper.packetevents.factory.spigot;
 
 import com.github.retrooper.packetevents.event.EventContainer;
-import com.github.retrooper.packetevents.event.EventHandler;
+import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class BukkitEventManager extends EventHandler {
+public class BukkitEventManager extends EventManager {
 
     @Override
     protected void handleNewListener(EventContainer container, PacketListenerCommon listener) {

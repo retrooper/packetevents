@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents;
 
-import com.github.retrooper.packetevents.event.EventHandler;
+import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
@@ -40,20 +40,20 @@ import java.util.logging.Logger;
 
 public abstract class PacketEventsAPI<T> {
 
-    private final EventHandler eventManager;
+    private final EventManager eventManager;
     private final PacketEventsSettings settings = new PacketEventsSettings();
     private final UpdateChecker updateChecker = new UpdateChecker();
     private final LogManager logManager = LogManager.construct(this);
 
-    public PacketEventsAPI(EventHandler eventManager) {
+    public PacketEventsAPI(EventManager eventManager) {
         this.eventManager = eventManager;
     }
 
     public PacketEventsAPI() {
-        this(new EventHandler());
+        this(new EventManager());
     }
 
-    public EventHandler getEventManager() {
+    public EventManager getEventManager() {
         return eventManager;
     }
 

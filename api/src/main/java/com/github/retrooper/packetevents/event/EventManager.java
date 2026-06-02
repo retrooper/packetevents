@@ -24,7 +24,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 @ApiStatus.NonExtendable
-public class EventHandler {
+public class EventManager {
 
     private final EventContainer serverListeners = new Container();
     private final EventContainer clientListeners = new Container();
@@ -138,7 +138,7 @@ public class EventHandler {
 
         @Override
         protected void handleNewListener(PacketListenerCommon listener) {
-            EventHandler.this.handleNewListener(this, listener);
+            EventManager.this.handleNewListener(this, listener);
         }
     }
 }
