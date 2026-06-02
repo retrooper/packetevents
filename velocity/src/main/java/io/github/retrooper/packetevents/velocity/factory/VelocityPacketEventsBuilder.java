@@ -22,7 +22,6 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
@@ -31,10 +30,8 @@ import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
-import com.github.retrooper.packetevents.util.LogManager;
-import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
+import com.github.retrooper.packetevents.util.PEVersions;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.plugin.PluginContainer;
@@ -48,14 +45,12 @@ import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerA
 import io.github.retrooper.packetevents.injector.VelocityPipelineInjector;
 import io.github.retrooper.packetevents.manager.PlayerManagerImpl;
 import io.netty.channel.Channel;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.logging.Level;
 
 public class VelocityPacketEventsBuilder {
     private static PacketEventsAPI<PluginContainer> INSTANCE;
@@ -156,14 +151,8 @@ public class VelocityPacketEventsBuilder {
 
             private final PlayerManagerAbstract playerManager = new PlayerManagerImpl();
 
-            private final ChannelInjector injector = new VelocityPipelineInjector(server);
+            private final ChannelInjector injector = new VelocityPipelineInjector(this, server);
             private final NettyManager nettyManager = new NettyManagerImpl();
-            private final LogManager logManager = new LogManager() {
-                @Override
-                protected void log(Level level, @Nullable NamedTextColor color, String message) {
-                    System.out.println(message);
-                }
-            };
             private boolean loaded;
             private boolean initialized;
             private boolean terminated;
@@ -179,15 +168,12 @@ public class VelocityPacketEventsBuilder {
                     PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
                     PacketEvents.TIMEOUT_HANDLER_NAME = "pe-timeout-handler-" + id;
-                    WrappedBlockState.ensureLoad();
-                    SynchronizedRegistriesHandler.init();
-                    injector.inject();
 
+                    super.load();
+                    injector.inject();
                     loaded = true;
 
-                    // Register internal packet listener (should be the first listener)
-                    // This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListener(new InternalPacketListener());
+                    this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW + ("packetevents".equals(id) ? "" : " for " + id));
                 }
             }
 
@@ -236,13 +222,7 @@ public class VelocityPacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    // try to uninject the injector
-                    try {
-                        this.injector.uninject();
-                    } catch (Exception exception) {
-                        this.logManager.warn("Failed to uninject from initializer");
-                        exception.printStackTrace();
-                    }
+                    super.terminate();
                     // Remove handlers for players
                     for (User user : this.protocolManager.getUsers()) {
                         Channel channel = (Channel) user.getChannel();
@@ -253,8 +233,6 @@ public class VelocityPacketEventsBuilder {
                             channel.pipeline().remove(PacketEvents.DECODER_NAME);
                         }
                     }
-                    // Unregister all our listeners
-                    getEventManager().unregisterAllListeners();
                     initialized = false;
                     terminated = true;
                 }
@@ -263,11 +241,6 @@ public class VelocityPacketEventsBuilder {
             @Override
             public boolean isTerminated() {
                 return terminated;
-            }
-
-            @Override
-            public LogManager getLogManager() {
-                return logManager;
             }
 
             @Override

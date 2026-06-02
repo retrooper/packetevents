@@ -138,9 +138,8 @@ public class SpigotChannelInjector implements ChannelInjector {
                     } else if (isPreViaRequested()) {
                         ServerConnectionInitializer.relocateHandlers(channel, user, true);
                     }
-                } catch (Exception e) {
-                    PacketEvents.getAPI().getLogManager().severe("PacketEvents Spigot injector failed to inject into an existing channel. If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc");
-                    e.printStackTrace();
+                } catch (Exception exception) {
+                    PacketEvents.getAPI().getLogManager().severe("PacketEvents Spigot injector failed to inject into an existing channel. If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc", exception);
                 }
             }
 
@@ -258,7 +257,7 @@ public class SpigotChannelInjector implements ChannelInjector {
      * @return may return null if the channel is closed already or not initialized yet
      */
     public @Nullable PacketEventsDecoder getDecoder(Channel channel) {
-         return (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+        return (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
     }
 
     @Override

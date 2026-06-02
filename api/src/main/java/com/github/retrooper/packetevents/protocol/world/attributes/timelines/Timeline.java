@@ -47,7 +47,7 @@ import java.util.Map;
 public interface Timeline extends MappedEntity, CopyableEntity<Timeline>, DeepComparableEntity {
 
     NbtCodec<Map<EnvironmentAttribute<?>, TimelineTrack<?, ?>>> TRACK_CODEC = NbtMapCodec.<EnvironmentAttribute<?>, TimelineTrack<?, ?>>codecOfMap(
-            NbtCodecs.forRegistry(EnvironmentAttributes.getRegistry()), TimelineTrack::codec).codec();
+            NbtCodecs.forRegistry(EnvironmentAttributes.getRegistry()), EnvironmentAttribute::isSynced, TimelineTrack::codec).codec();
     NbtCodec<Map<ResourceLocation, TimeMarkerInfo>> TIME_MARKER_CODEC = NbtMapCodec.codecOfMap(ResourceLocation.CODEC, TimeMarkerInfo.CODEC).codec();
 
     NbtCodec<Timeline> CODEC = new NbtMapCodec<Timeline>() {

@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.storage.BaseStorage;
@@ -75,6 +77,28 @@ public class DataPalette {
     @Deprecated
     public static DataPalette read(NetStreamInput in, PaletteType paletteType, boolean allowSingletonPalette) {
         return read(in, paletteType, allowSingletonPalette, true);
+    }
+
+    public static DataPalette read(PacketWrapper<?> wrapper, PaletteType paletteType) {
+        int bitsPerEntry = wrapper.readByte();
+        Palette palette = readPalette(paletteType, bitsPerEntry, wrapper);
+        BitStorage storage;
+        if (!(palette instanceof SingletonPalette)) {
+            if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
+                long[] data = wrapper.readLongArray();
+                storage = new BitStorage(bitsPerEntry, paletteType.getStorageSize(), data);
+            } else {
+                storage = new BitStorage(bitsPerEntry, paletteType.getStorageSize());
+                wrapper.readLongArray(storage.getData());
+            }
+        } else {
+            if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
+                ByteBufHelper.skipBytes(wrapper.buffer, wrapper.readVarInt() * Long.BYTES);
+            }
+            storage = null;
+        }
+
+        return new DataPalette(palette, storage, paletteType);
     }
 
     /**
@@ -164,8 +188,16 @@ public class DataPalette {
         }
     }
 
+    public int getAndSet(int x, int y, int z, int state) {
+        return this.palette.idToState(this.set(x, y, z, state));
+    }
+
     /**
+     * It's recommended to use {@link #getAndSet(int, int, int, int)} instead if you want to use the return value.
+     *
      * @return the old value present in the storage.
+     * <strong>WARNING</strong>: For legacy reasons, the return value is NOT remapped
+     * by the palette and thus pretty much unusable.
      */
     public int set(int x, int y, int z, int state) {
         int id = this.palette.stateToId(state);
@@ -201,6 +233,20 @@ public class DataPalette {
             return new ListPalette(bits, in);
         } else if (bitsPerEntry <= paletteType.getMaxBitsPerEntryForMap()) {
             return new MapPalette(bitsPerEntry, in);
+        } else {
+            return GlobalPalette.INSTANCE;
+        }
+    }
+
+    private static Palette readPalette(PaletteType paletteType, int bitsPerEntry, PacketWrapper<?> wrapper) {
+        if (bitsPerEntry == 0 && wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            return new SingletonPalette(wrapper);
+        } else if (bitsPerEntry <= paletteType.getMaxBitsPerEntryForList()) {
+            // vanilla forces a blockstate-list-palette to always be the maximum size
+            int bits = paletteType.isForceMaxListPaletteSize() ? paletteType.getMaxBitsPerEntryForList() : bitsPerEntry;
+            return new ListPalette(bits, wrapper);
+        } else if (bitsPerEntry <= paletteType.getMaxBitsPerEntryForMap()) {
+            return new MapPalette(bitsPerEntry, wrapper);
         } else {
             return GlobalPalette.INSTANCE;
         }

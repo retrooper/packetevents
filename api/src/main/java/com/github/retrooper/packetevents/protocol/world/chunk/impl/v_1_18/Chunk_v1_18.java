@@ -22,7 +22,6 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
-import com.github.retrooper.packetevents.protocol.stream.NetStreamInputWrapper;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutputWrapper;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
@@ -101,9 +100,11 @@ public class Chunk_v1_18 implements BaseChunk {
 
     public static Chunk_v1_18 read(PacketWrapper<?> wrapper) {
         ClientVersion version = wrapper.getServerVersion().toClientVersion();
-        boolean paletteLengthPrefix = version.isOlderThan(ClientVersion.V_1_21_5);
-        boolean hasFluidCount = version.isNewerThanOrEquals(ClientVersion.V_26_1);
-        return read(version, new NetStreamInputWrapper(wrapper), paletteLengthPrefix, hasFluidCount);
+        int blockCount = wrapper.readShort();
+        int fluidCount = version.isNewerThanOrEquals(ClientVersion.V_26_1) ? wrapper.readShort() : 0;
+        DataPalette chunkPalette = DataPalette.read(wrapper, PaletteType.CHUNK);
+        DataPalette biomePalette = DataPalette.read(wrapper, PaletteType.BIOME);
+        return new Chunk_v1_18(version, blockCount, fluidCount, chunkPalette, biomePalette);
     }
 
     /**
@@ -186,7 +187,7 @@ public class Chunk_v1_18 implements BaseChunk {
 
     @Override
     public void set(int x, int y, int z, WrappedBlockState state) {
-        int curr = this.chunkData.set(x, y, z, state.getGlobalId());
+        int curr = this.chunkData.getAndSet(x, y, z, state.getGlobalId());
         WrappedBlockState currState = WrappedBlockState.getByGlobalId(this.version, curr);
 
         // track block count

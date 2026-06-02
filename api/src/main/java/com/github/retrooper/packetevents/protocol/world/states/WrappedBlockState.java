@@ -36,6 +36,7 @@ import com.github.retrooper.packetevents.protocol.world.states.enums.West;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateValue;
+import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +50,6 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
 
@@ -177,7 +177,7 @@ public class WrappedBlockState {
         if (!BY_ID[mappingsIndex].isEmpty()) {
             return; // already loaded
         }
-        PacketEvents.getAPI().getLogger().info("Loading block mappings for " + version + "/" + mappingsIndex + "...");
+        PacketEvents.getAPI().getLogManager().info("Loading block mappings for " + version + "/" + mappingsIndex + "...");
         long start = System.nanoTime();
 
         if (mappingsIndex == LEGACY_MAPPING_INDEX) {
@@ -187,7 +187,7 @@ public class WrappedBlockState {
         }
 
         double timeDiff = (System.nanoTime() - start) / 1_000_000d;
-        PacketEvents.getAPI().getLogger().info("Finished loading block mappings for "
+        PacketEvents.getAPI().getLogManager().info("Finished loading block mappings for "
                 + version + "/" + mappingsIndex + " in " + timeDiff + "ms");
     }
 
@@ -337,7 +337,7 @@ public class WrappedBlockState {
         byte mappingsIndex = loadMappings(version);
         WrappedBlockState state = DEFAULT_STATES[mappingsIndex].get(type);
         if (state == null) {
-            PacketEvents.getAPI().getLogger().config("Default state for " + type.getName() + " is null. Returning AIR");
+            PacketEvents.getAPI().getLogManager().debug("Default state for " + type.getName() + " is null. Returning AIR");
             return AIR;
         }
         return clone ? state.clone() : state;
@@ -366,7 +366,7 @@ public class WrappedBlockState {
 
                 StateType type = StateTypes.getByName(entry.getKey());
                 if (type == null) {
-                    PacketEvents.getAPI().getLogger().warning("Could not find type for " + entry.getKey());
+                    PacketEvents.getAPI().getLogManager().warn("Could not find type for " + entry.getKey());
                     inner.skip();
                     continue;
                 }
@@ -385,7 +385,7 @@ public class WrappedBlockState {
                         for (Map.Entry<String, NBT> props : dataContent) {
                             StateValue state = StateValue.byName(props.getKey());
                             if (state == null) {
-                                PacketEvents.getAPI().getLogger().warning("Could not find value for " + props.getKey());
+                                PacketEvents.getAPI().getLogManager().warn("Could not find value for " + props.getKey());
                                 continue;
                             }
 
@@ -398,7 +398,7 @@ public class WrappedBlockState {
                             } else if (value instanceof NBTString) {
                                 v = ((NBTString) value).getValue();
                             } else {
-                                PacketEvents.getAPI().getLogger().warning("Unknown NBT type in legacy mapping: " + value.getClass().getSimpleName());
+                                PacketEvents.getAPI().getLogManager().warn("Unknown NBT type in legacy mapping: " + value.getClass().getSimpleName());
                                 continue;
                             }
                             dataMap.put(state, state.getParser().apply(v.toString().toUpperCase(Locale.ROOT)));
@@ -462,7 +462,7 @@ public class WrappedBlockState {
                     type = StateTypes.getByName(typeString);
 
                     if (type == null) {
-                        PacketEvents.getAPI().getLogger().warning("Unknown block type: " + typeString);
+                        PacketEvents.getAPI().getLogManager().warn("Unknown block type: " + typeString);
                         element.skip();
                         continue;
                     }
@@ -472,7 +472,7 @@ public class WrappedBlockState {
 
                 int defaultIdx = 0;
                 if (!next.getKey().equals("def")) {
-                    PacketEvents.getAPI().getLogger().warning("No default state for " + type + " using 0");
+                    PacketEvents.getAPI().getLogManager().warn("No default state for " + type + " using 0");
                 } else {
                     defaultIdx = ((NBTNumber) next.getValue()).getAsInt();
                     next = element.next(); // entries
@@ -487,7 +487,7 @@ public class WrappedBlockState {
                         for (Map.Entry<String, NBT> props : dataContent) {
                             StateValue state = StateValue.byName(props.getKey());
                             if (state == null) {
-                                PacketEvents.getAPI().getLogger().warning("Could not find value for " + props.getKey());
+                                PacketEvents.getAPI().getLogManager().warn("Could not find value for " + props.getKey());
                                 continue;
                             }
 
@@ -500,7 +500,7 @@ public class WrappedBlockState {
                             } else if (value instanceof NBTString) {
                                 v = ((NBTString) value).getValue();
                             } else {
-                                PacketEvents.getAPI().getLogger().warning("Unknown NBT typeString in modern mapping: " + value.getClass().getSimpleName());
+                                PacketEvents.getAPI().getLogManager().warn("Unknown NBT typeString in modern mapping: " + value.getClass().getSimpleName());
                                 continue;
                             }
                             dataMap.put(state, state.getParser().apply(v.toString().toUpperCase(Locale.ROOT)));
@@ -1615,7 +1615,7 @@ public class WrappedBlockState {
         if (!PRELOAD_BLOCK_STATE_MAPPINGS) {
             return;
         }
-        Logger logger = PacketEvents.getAPI().getLogger();
+        LogManager logger = PacketEvents.getAPI().getLogManager();
         logger.info("Preloading block mappings...");
         long start = System.nanoTime();
 

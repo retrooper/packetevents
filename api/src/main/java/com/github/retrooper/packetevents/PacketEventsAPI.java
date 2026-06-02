@@ -20,25 +20,30 @@ package com.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
+import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
-//Note: The PEVersions class is generated. Refer to PEVersionTask.kt
 import com.github.retrooper.packetevents.util.PEVersions;
+import com.github.retrooper.packetevents.util.adventure.AdventureConversionInjector;
+import com.github.retrooper.packetevents.util.logger.JulLegacyLogManager;
+import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 
 import java.util.logging.Logger;
 
 public abstract class PacketEventsAPI<T> {
+
     private final EventManager eventManager;
     private final PacketEventsSettings settings = new PacketEventsSettings();
     private final UpdateChecker updateChecker = new UpdateChecker();
-    private final LogManager logManager = new LogManager();
-    private static final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
+    private final LogManager logManager = LogManager.construct(this);
 
     public PacketEventsAPI(EventManager eventManager) {
         this.eventManager = eventManager;
@@ -65,15 +70,31 @@ public abstract class PacketEventsAPI<T> {
         return PEVersions.CURRENT;
     }
 
+    @Deprecated
     public Logger getLogger() {
-        return LOGGER;
+        return JulLegacyLogManager.getLogger();
     }
 
     public LogManager getLogManager() {
-        return logManager;
+        return this.logManager;
     }
 
-    public abstract void load();
+    public void load() {
+        this.getLogManager().info("Loading packetevents...");
+
+        WrappedBlockState.ensureLoad();
+        SynchronizedRegistriesHandler.init();
+        PacketType.prepare();
+        AdventureConversionInjector.inject();
+
+        // Register internal packet listener (should be the first listener)
+        // This listener doesn't do any modifications to the packets, just reads data
+        this.registerInternalListener();
+    }
+
+    protected void registerInternalListener() {
+        this.getEventManager().registerListener(new InternalPacketListener());
+    }
 
     public abstract boolean isLoaded();
 
@@ -81,7 +102,15 @@ public abstract class PacketEventsAPI<T> {
 
     public abstract boolean isInitialized();
 
-    public abstract void terminate();
+    public void terminate() {
+        try {
+            this.getInjector().uninject();
+        } catch (Throwable throwable) {
+            this.getLogManager().warn("Failed to uninject during termination, this error can be ignored on shutdown", throwable);
+        }
+        this.getEventManager().unregisterAllListeners();
+        AdventureConversionInjector.uninject();
+    }
 
     public abstract boolean isTerminated();
 

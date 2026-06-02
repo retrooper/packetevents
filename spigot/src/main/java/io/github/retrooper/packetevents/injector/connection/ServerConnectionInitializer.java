@@ -105,13 +105,13 @@ public class ServerConnectionInitializer {
         if (channel.pipeline().get(PacketEvents.DECODER_NAME) != null) {
             channel.pipeline().remove(PacketEvents.DECODER_NAME);
         } else {
-            PacketEvents.getAPI().getLogger().warning("Could not find decoder handler in channel pipeline!");
+            PacketEvents.getAPI().getLogManager().warn("Could not find decoder handler in channel pipeline!");
         }
 
         if (channel.pipeline().get(PacketEvents.ENCODER_NAME) != null) {
             channel.pipeline().remove(PacketEvents.ENCODER_NAME);
         } else {
-            PacketEvents.getAPI().getLogger().warning("Could not find encoder handler in channel pipeline!");
+            PacketEvents.getAPI().getLogManager().warn("Could not find encoder handler in channel pipeline!");
         }
     }
 

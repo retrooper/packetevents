@@ -110,6 +110,7 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
     @Override
     public void copy(WrapperLoginServerLoginSuccess wrapper) {
         this.userProfile = wrapper.userProfile;
+        this.strictErrorHandling = wrapper.strictErrorHandling;
     }
 
     public UserProfile getUserProfile() {

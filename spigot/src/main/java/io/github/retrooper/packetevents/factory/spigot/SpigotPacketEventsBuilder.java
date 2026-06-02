@@ -27,13 +27,11 @@ import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
-import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
+import com.github.retrooper.packetevents.util.PEVersions;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.bukkit.InternalBukkitListener;
 import io.github.retrooper.packetevents.bukkit.InternalBukkitLoginListener;
@@ -96,7 +94,7 @@ public class SpigotPacketEventsBuilder {
             private final PlayerManager playerManager = new PlayerManagerImpl();
             private final NettyManager nettyManager = new NettyManagerImpl();
             private final SpigotChannelInjector injector = new SpigotChannelInjector();
-            private final LogManager logManager = new BukkitLogManager();
+            private final LogManager logManager = new BukkitLogManager(this);
             private boolean loaded;
             private boolean initialized;
             private boolean lateBind = false;
@@ -116,13 +114,10 @@ public class SpigotPacketEventsBuilder {
                     try {
                         SpigotReflectionUtil.init();
                         CustomPipelineUtil.init();
-                        WrappedBlockState.ensureLoad();
-                        SynchronizedRegistriesHandler.init();
                     } catch (Exception ex) {
                         throw new IllegalStateException(ex);
                     }
-
-                    PacketType.prepare();
+                    super.load();
 
                     //Server hasn't bound to the port yet.
                     lateBind = !injector.isServerBound();
@@ -133,10 +128,13 @@ public class SpigotPacketEventsBuilder {
 
                     loaded = true;
 
-                    //Register internal packet listener (should be the first listener)
-                    //This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListeners(new InternalBukkitPacketListener());
+                    this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW + ("packetevents".equals(id) ? "" : " for " + plugin.getName()));
                 }
+            }
+
+            @Override
+            protected void registerInternalListener() {
+                this.getEventManager().registerListener(new InternalBukkitPacketListener());
             }
 
             @Override
@@ -174,7 +172,7 @@ public class SpigotPacketEventsBuilder {
                         if (minecraftVersion.contains("Unknown")) {
                             ServerVersion fallbackVersion = ServerVersion.V_1_8_8;
                             String failureToDetectVersionMsg = "Your server software is preventing us from checking the Minecraft Server version. This is what we found: " + minecraftVersion + ". We will assume the Server version is " + fallbackVersion.name() + "... If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc";
-                            plugin.getLogger().warning(failureToDetectVersionMsg);
+                            getLogManager().warn(failureToDetectVersionMsg);
                         } else {
                             // Our PEVersion class can parse this version and detect if it is a newer version than what is currently supported
                             PEVersion bukkitServerVersion = PEVersion.fromString(minecraftVersion);
@@ -195,7 +193,7 @@ public class SpigotPacketEventsBuilder {
                                 String newBuildsMsg = (status == UpdateChecker.UpdateCheckerStatus.OUTDATED
                                         || status == UpdateChecker.UpdateCheckerStatus.FAILED || status == null) ? releaseBuildsMsg : developmentBuildsMsg;
 
-                                plugin.getLogger().warning("Your build of PacketEvents does not support the Minecraft version "
+                                getLogManager().warn("Your build of PacketEvents does not support the Minecraft version "
                                         + bukkitServerVersion + "! The latest Minecraft version supported by your build of PacketEvents is " + latestSupportedVersion + ". "
                                         + newBuildsMsg +
                                         " If you're in need of any help, join our Discord server: https://discord.gg/DVHxPPxHZc");
@@ -308,13 +306,10 @@ public class SpigotPacketEventsBuilder {
             @Override
             public void terminate() {
                 if (initialized) {
-                    //Uninject the injector if needed(depends on the injector implementation)
-                    injector.uninject();
+                    super.terminate();
                     for (User user : this.protocolManager.getUsers()) {
                         ServerConnectionInitializer.destroyHandlers(user.getChannel());
                     }
-                    //Unregister all listeners. Because if we attempt to reload, we will end up with duplicate listeners.
-                    getEventManager().unregisterAllListeners();
                     initialized = false;
                     terminated = true;
                 }
