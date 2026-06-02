@@ -33,6 +33,7 @@ import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
+import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -146,17 +147,23 @@ public final class ServerConnectionInitializer {
             PacketEventsDecoder decoder = (PacketEventsDecoder) ctx.pipeline().get(decoderName);
             PacketEventsEncoder encoder;
 
+            SpigotChannelInjector injector = (SpigotChannelInjector) packetevents.getInjector();
+            TriState preViaState = injector.isPreViaVersionActivated() ? TriState.byBoolean(preVia) : TriState.NOT_SET;
+
             if (decoder != null) {
                 // check whether we actually need to relocate
                 if (handlersAlreadyRelocated(ctx.pipeline(), preVia, decoderName, targetDecoderName, encoderName, targetEncoderName)) {
                     return;
                 }
-                encoder = new PacketEventsEncoder(ctx.pipeline().remove(encoderName));
-                ctx.pipeline().remove(decoderName);
+                encoder = new PacketEventsEncoder((PacketEventsEncoder) ctx.pipeline().remove(encoderName));
+                decoder = new PacketEventsDecoder((PacketEventsDecoder) ctx.pipeline().remove(decoderName));
+                // ensure pre-via state is up-to-date
+                encoder.preVia = preViaState;
+                decoder.preVia = preViaState;
             } else {
                 // no decoder means we haven't made handlers for the user yet
-                encoder = new PacketEventsEncoder(user, preVia);
-                decoder = new PacketEventsDecoder(user, preVia);
+                encoder = new PacketEventsEncoder(user, preViaState);
+                decoder = new PacketEventsDecoder(user, preViaState);
             }
 
             if (packetevents.getSettings().isDebugEnabled()) {

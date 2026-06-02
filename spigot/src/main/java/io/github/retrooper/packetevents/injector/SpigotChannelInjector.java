@@ -33,6 +33,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
@@ -138,8 +139,12 @@ public class SpigotChannelInjector implements ChannelInjector {
                         if (user == null) {
                             ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
                         } else if (this.preViaVersionActivated) {
-                            // user already exists and viaversion is activated/has been just activated, try to relocate handlers
+                            // user already exists and viaversion is activated/has been just activated,
+                            // try to initialize pre-via handlers
                             ServerConnectionInitializer.relocateHandlers(channel, user, true);
+                            // ensure normal encoder/decoders know about pre-via state, otherwise packets may be duplicated
+                            ((PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME)).preVia = TriState.FALSE;
+                            ((PacketEventsEncoder) channel.pipeline().get(PacketEvents.DECODER_NAME)).preVia = TriState.FALSE;
                         }
                     } catch (Exception exception) {
                         PacketEvents.getAPI().getLogManager().severe("PacketEvents injector failed to inject channel " + channel, exception);

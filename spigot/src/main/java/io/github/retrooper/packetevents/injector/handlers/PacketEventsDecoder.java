@@ -26,8 +26,6 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
-import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
-import io.github.retrooper.packetevents.injector.connection.PreViaPipelineSupport;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
@@ -35,41 +33,49 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 
+@ApiStatus.Internal
 public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
+
     public User user;
     public Player player;
     public boolean hasBeenRelocated;
-    public boolean preVia;
+    public TriState preVia;
 
-    public PacketEventsDecoder(User user, boolean preVia) {
+    public PacketEventsDecoder(User user, TriState preVia) {
         this.user = user;
         this.preVia = preVia;
     }
 
     public PacketEventsDecoder(PacketEventsDecoder decoder) {
-        user = decoder.user;
-        player = decoder.player;
-        hasBeenRelocated = decoder.hasBeenRelocated;
-        preVia = decoder.preVia;
+        this.user = decoder.user;
+        this.player = decoder.player;
+        this.hasBeenRelocated = decoder.hasBeenRelocated;
+        this.preVia = decoder.preVia;
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
         try {
             // Without ViaVersion we still need to call previa listeners from the normal handler
-            if (PreViaPipelineSupport.shouldDispatchFallbackPreViaEvents(preVia)) {
+            if (this.preVia == TriState.NOT_SET) {
                 PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input,
                         false, user.getPreViaDecoderState());
             }
 
-            ConnectionState connectionState = preVia ? user.getPreViaDecoderState() : user.getDecoderState();
+            ConnectionState connectionState = this.preVia == TriState.TRUE ? user.getPreViaDecoderState() : user.getDecoderState();
             PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input,
-                    !preVia, connectionState);
-            out.add(ByteBufHelper.retain(input));
+                    this.preVia != TriState.TRUE, connectionState);
+
+            // don't forward canceled packets
+            if (input.isReadable()) {
+                out.add(ByteBufHelper.retain(input));
+            }
         } catch (Throwable e) {
             // We must be sure all the exceptions caused by our handlers are PacketProcessExceptions
             // In the case we have thrown an exception that is not a PacketProcessException, let's wrap it in order to
@@ -140,14 +146,12 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
             return;
         }
 
-        // Via changes the order of handlers in this event, so we must respond to Via changing their stuff
-        if (!preVia) {
-            // 1.20.4 has a bug where userEventTriggered is called twice, so Via relocates twice uselessly and we must do so
+        // relocate handlers on compression change
+        if (this.preVia != TriState.TRUE) {
             ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, false);
-
-            SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-            if (injector.isPreViaRequested())
+            if (this.preVia != TriState.NOT_SET) {
                 ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, true);
+            }
         }
         super.userEventTriggered(ctx, event);
     }
