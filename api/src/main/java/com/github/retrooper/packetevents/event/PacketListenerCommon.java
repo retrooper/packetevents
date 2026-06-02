@@ -18,10 +18,6 @@
 
 package com.github.retrooper.packetevents.event;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Abstract packet listener.
  *
@@ -61,6 +57,17 @@ public abstract class PacketListenerCommon {
     public void onPacketEventExternal(PacketEvent event) {
     }
 
+    /**
+     * Returning true here will cause additional pipeline handlers to be injected to receive packets
+     * before version-translation plugins (e.g. ViaVersion). Only use this if you know what you are doing.
+     *
+     * @return whether the client's version should be used instead of the server's version
+     */
+    public boolean useClientVersion() {
+        return false;
+    }
+
+    @Deprecated
     public boolean isPreVia() {
         return false;
     }

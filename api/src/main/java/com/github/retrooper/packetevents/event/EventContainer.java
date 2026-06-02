@@ -20,8 +20,9 @@ package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.exception.InvalidHandshakeException;
-import com.github.retrooper.packetevents.manager.PreViaSupport;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +41,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * its event listeners during any modifications. In other words, it assumes that reads (events fired)
  * greatly outnumber writes (listeners modifications). If your case requires frequent listener modifications,
  * open a pull request on GitHub and describe your case.
- *
  */
-public class EventManager {
+@NullMarked
+public class EventContainer {
 
     //Using a ConcurrentHashMap is faster and more secure here, compared to Collections.synchronizedMap(new EnumMap<>(PacketListenerPriority.class))
     //This is mainly due to:
@@ -53,9 +54,6 @@ public class EventManager {
     //Since reads greatly outnumber writes, create an array for the best possible iteration time
     //Updated as a whole on writes, no index modifications are allowed
     private volatile PacketListenerCommon[] listeners = new PacketListenerCommon[0];
-
-    private volatile boolean hasPreViaListeners = false;
-    private volatile boolean hasPreViaInternalListener = false;
 
     /**
      * Call the PacketEvent.
@@ -81,11 +79,10 @@ public class EventManager {
      * @param event                  {@link PacketEvent}
      * @param postCallListenerAction The action to be run after all the listeners have finished processing
      */
-    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction, boolean preVia) {
+    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
         for (PacketListenerCommon listener : listeners) {
             try {
-                if (listener.isPreVia() == preVia)
-                    event.call(listener);
+                event.call(listener);
             } catch (Exception t) {
                 // ignore handshake exceptions
                 if (t.getClass() != InvalidHandshakeException.class && (t.getCause() == null || t.getCause().getClass() != InvalidHandshakeException.class)) {
@@ -100,10 +97,6 @@ public class EventManager {
         if (event instanceof ProtocolPacketEvent && !((ProtocolPacketEvent) event).needsReEncode()) {
             ((ProtocolPacketEvent) event).setLastUsedWrapper(null);
         }
-    }
-
-    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
-        callEvent(event, postCallListenerAction, false);
     }
 
     /**
@@ -161,62 +154,41 @@ public class EventManager {
         this.listenersMap.clear();
         synchronized (this) {//like booky10 said, the synchronization is necessary here
             this.listeners = new PacketListenerCommon[0];
-            this.hasPreViaListeners = false;
-            this.hasPreViaInternalListener = false;
         }
     }
 
-    //Needs to be synchronized in order to avoid race conditions (for example where the 'listeners' variable
-    //is overridden by its non-up-to-date value, simply because it finished a bit later than the most recent update)
-    private void recalculateListeners() {
+    @ApiStatus.Internal
+    void recalculateListeners() {
         synchronized (this) {
             List<PacketListenerCommon> list = new ArrayList<>();
-            boolean hasPreViaListeners = false;
-            boolean hasPreViaInternalListener = false;
             //adds from LOWEST to MONITOR, so in the correct order
             for (PacketListenerPriority priority : PacketListenerPriority.values()) {
                 Set<PacketListenerCommon> set = this.listenersMap.get(priority);
                 if (set != null) {
                     list.addAll(set);
-                    for (PacketListenerCommon listener : set) {
-                        if (listener.isPreVia()) {
-                            if (PreViaSupport.isPreViaInternalListener(listener)) {
-                                hasPreViaInternalListener = true;
-                            } else {
-                                hasPreViaListeners = true;
-                            }
-                        }
-                    }
                 }
             }
             this.listeners = list.toArray(new PacketListenerCommon[0]);
-            this.hasPreViaListeners = hasPreViaListeners;
-            this.hasPreViaInternalListener = hasPreViaInternalListener;
         }
     }
 
-    public boolean hasPreViaListeners() {
-        return this.hasPreViaListeners;
-    }
-
-    public boolean hasPreViaInternalListener() {
-        return this.hasPreViaInternalListener;
-    }
-
-    //Internal registration methods, specifically separated for lesser overhead when registering an array of Listeners
-
-    private void registerListenerNoRecalculation(PacketListenerCommon listener) {
+    @ApiStatus.Internal
+    void registerListenerNoRecalculation(PacketListenerCommon listener) {
         Set<PacketListenerCommon> listenerSet = this.listenersMap.computeIfAbsent(listener.getPriority(), p -> new CopyOnWriteArraySet<>());
         listenerSet.add(listener);
         this.handleNewListener(listener);
     }
 
-    //Returns true if the listener was removed, so a modification occurred
-    private boolean unregisterListenerNoRecalculation(PacketListenerCommon listener) {
+    /**
+     * @return whether listener was removed
+     */
+    @ApiStatus.Internal
+    boolean unregisterListenerNoRecalculation(PacketListenerCommon listener) {
         Set<PacketListenerCommon> listenerSet = this.listenersMap.get(listener.getPriority());
         return listenerSet != null && listenerSet.remove(listener);
     }
 
+    @ApiStatus.OverrideOnly
     protected void handleNewListener(PacketListenerCommon listener) {
     }
 }

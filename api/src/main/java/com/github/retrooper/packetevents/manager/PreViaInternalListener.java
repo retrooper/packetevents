@@ -24,7 +24,7 @@ public class PreViaInternalListener extends PacketListenerAbstract {
     }
 
     @Override
-    public boolean isPreVia() {
+    public boolean useClientVersion() {
         return true;
     }
 
