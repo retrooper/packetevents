@@ -87,7 +87,7 @@ public class SpigotPacketEventsBuilder {
     }
 
     public static PacketEventsAPI<Plugin> buildNoCache(Plugin plugin, PacketEventsSettings inSettings) {
-        return new PacketEventsAPI<Plugin>(new EventManager(ServerConnectionInitializer.PRE_VIA_LISTENER_REGISTERED)) {
+        return new PacketEventsAPI<Plugin>(new BukkitEventManager()) {
             private final PacketEventsSettings settings = inSettings;
             private final ProtocolManager protocolManager = new ProtocolManagerImpl();
             private final ServerManager serverManager = new ServerManagerImpl();
