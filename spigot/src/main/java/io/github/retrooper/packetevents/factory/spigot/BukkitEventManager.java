@@ -31,8 +31,6 @@ import org.jspecify.annotations.NullMarked;
 public class BukkitEventManager extends EventManager {
 
     public BukkitEventManager() {
-        // register internal listener first
-        this.registerListener(new ClientVersionInternalListener());
     }
 
     @Override
@@ -43,9 +41,14 @@ public class BukkitEventManager extends EventManager {
             return; // don't inject pre-via if this is only our internal listener
         }
 
+        // register internal listener first
+        this.clientListeners.registerListener(new ClientVersionInternalListener());
+
+        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
         if (ViaVersionUtil.isAvailable()) {
-            SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
             injector.activatePreViaVersion();
+        } else {
+            injector.setPreViaFallback();
         }
     }
 }

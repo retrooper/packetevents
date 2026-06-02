@@ -125,6 +125,11 @@ public class EventManager {
     }
 
     @ApiStatus.Internal
+    public boolean hasClientVersionedListeners() {
+        return !this.clientListeners.isEmpty();
+    }
+
+    @ApiStatus.Internal
     public void unregisterAllListeners() {
         this.serverListeners.unregisterAllListeners();
         this.clientListeners.unregisterAllListeners();

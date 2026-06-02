@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjector.PreViaState;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
@@ -40,7 +41,6 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.util.TriState;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.ApiStatus;
@@ -70,7 +70,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
     public User user;
     public Player player;
-    public TriState preVia;
+    public PreViaState preVia;
 
     private boolean handledCompression = COMPRESSION_ENABLED_EVENT != null;
     private ChannelPromise promise;
@@ -78,7 +78,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
     private final Queue<QueuedMessage> queuedMessages = new ArrayDeque<>();
     private boolean hold = false;
 
-    public PacketEventsEncoder(User user, TriState preVia) {
+    public PacketEventsEncoder(User user, PreViaState preVia) {
         this.user = user;
         this.preVia = preVia;
     }
@@ -145,9 +145,9 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
         if (msg instanceof ByteBuf) {
             boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
-            ConnectionState connectionState = this.preVia == TriState.TRUE ? this.user.getPreViaEncoderState() : this.user.getEncoderState();
+            ConnectionState connectionState = this.preVia == PreViaState.PRE_VIA ? this.user.getPreViaEncoderState() : this.user.getEncoderState();
             this.handleClientBoundPacket(
-                    ctx.channel(), this.user, this.player, (ByteBuf) msg, this.preVia != TriState.TRUE, connectionState, this.promise);
+                    ctx.channel(), this.user, this.player, (ByteBuf) msg, this.preVia != PreViaState.PRE_VIA, connectionState, this.promise);
 
             // check if the packet got canceled
             if (!((ByteBuf) msg).isReadable()) {
@@ -157,7 +157,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
             }
 
             // Without ViaVersion we still need to call previa listeners from the normal handler
-            if (this.preVia == TriState.NOT_SET) {
+            if (this.preVia == PreViaState.FALLBACK) {
                 this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg,
                         false, this.user.getPreViaEncoderState(), this.promise);
             }
@@ -262,7 +262,7 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         int compressIndex = ctx.pipeline().names().indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = ctx.pipeline().names().indexOf((preVia == TriState.TRUE ? "pre-" : "") + PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = ctx.pipeline().names().indexOf((preVia == PreViaState.PRE_VIA ? "pre-" : "") + PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
 
         if (compressIndex <= peEncoderIndex) return false;
@@ -270,13 +270,13 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
         //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
         boolean decompress = false;
-        if (preVia != TriState.TRUE || !user.getClientVersion().isOlderThanOrEquals(ClientVersion.V_1_7_10)) {
+        if (preVia != PreViaState.PRE_VIA || !user.getClientVersion().isOlderThanOrEquals(ClientVersion.V_1_7_10)) {
             decompress(ctx, buffer, buffer);
             decompress = true;
         }
 
         //Let us relocate and no longer deal with compression.
-        ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, preVia == TriState.TRUE);
+        ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, preVia == PreViaState.PRE_VIA);
         return decompress;
     }
 

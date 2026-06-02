@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjector.PreViaState;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
@@ -33,7 +34,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.util.TriState;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.ApiStatus;
@@ -46,9 +46,9 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public User user;
     public Player player;
     public boolean hasBeenRelocated;
-    public TriState preVia;
+    public PreViaState preVia;
 
-    public PacketEventsDecoder(User user, TriState preVia) {
+    public PacketEventsDecoder(User user, PreViaState preVia) {
         this.user = user;
         this.preVia = preVia;
     }
@@ -63,14 +63,14 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> out) throws Exception {
         try {
             // Without ViaVersion we still need to call previa listeners from the normal handler
-            if (this.preVia == TriState.NOT_SET) {
+            if (this.preVia == PreViaState.FALLBACK) {
                 PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input,
                         false, user.getPreViaDecoderState());
             }
 
-            ConnectionState connectionState = this.preVia == TriState.TRUE ? user.getPreViaDecoderState() : user.getDecoderState();
+            ConnectionState connectionState = this.preVia == PreViaState.PRE_VIA ? user.getPreViaDecoderState() : user.getDecoderState();
             PacketEventsImplHelper.handleServerBoundPacket(ctx.channel(), user, player, input,
-                    this.preVia != TriState.TRUE, connectionState);
+                    this.preVia != PreViaState.PRE_VIA, connectionState);
 
             // don't forward canceled packets
             if (input.isReadable()) {
@@ -147,12 +147,7 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         }
 
         // relocate handlers on compression change
-        if (this.preVia != TriState.TRUE) {
-            ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, false);
-            if (this.preVia != TriState.NOT_SET) {
-                ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, true);
-            }
-        }
+        ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, this.preVia == PreViaState.PRE_VIA);
         super.userEventTriggered(ctx, event);
     }
 

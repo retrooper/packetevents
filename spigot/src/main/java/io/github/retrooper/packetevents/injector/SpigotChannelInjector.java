@@ -33,7 +33,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import net.kyori.adventure.util.TriState;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
@@ -41,6 +40,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 @ApiStatus.Internal
 public class SpigotChannelInjector implements ChannelInjector {
@@ -109,17 +109,26 @@ public class SpigotChannelInjector implements ChannelInjector {
             reflectServerConnection.writeList(connectionChannelsListIndex, wrappedList);
 
             //Player channels might have been registered already. Let us add our handlers. We are a little late though.
-            injectNetworkManagers();
+            this.injectNetworkManagers(channel -> {
+                // initialize users for channels which don't exist yet
+                User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+                if (user == null) {
+                    ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
+                }
+            });
         }
     }
 
-    public void injectNetworkManagers() {
+    public void injectNetworkManagers(Consumer<Channel> consumer) {
+        if (!this.isServerBound()) {
+            return;
+        }
         if (networkManagers == null) {
             networkManagers = SpigotReflectionUtil.getNetworkManagers();
         }
         synchronized (networkManagers) {
             if (!networkManagers.isEmpty()) {
-                PacketEvents.getAPI().getLogManager().debug("Late bind not enabled, injecting into existing channel");
+                PacketEvents.getAPI().getLogManager().debug("Late bind not enabled, injecting into existing channels");
             }
 
             for (Object networkManager : networkManagers) {
@@ -134,18 +143,7 @@ public class SpigotChannelInjector implements ChannelInjector {
                         return; // closed connection
                     }
                     try {
-                        // initialize users for channels which don't exist yet
-                        User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
-                        if (user == null) {
-                            ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
-                        } else if (this.preViaVersionActivated) {
-                            // user already exists and viaversion is activated/has been just activated,
-                            // try to initialize pre-via handlers
-                            ServerConnectionInitializer.relocateHandlers(channel, user, true);
-                            // ensure normal encoder/decoders know about pre-via state, otherwise packets may be duplicated
-                            ((PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME)).preVia = TriState.FALSE;
-                            ((PacketEventsEncoder) channel.pipeline().get(PacketEvents.DECODER_NAME)).preVia = TriState.FALSE;
-                        }
+                        consumer.accept(channel);
                     } catch (Exception exception) {
                         PacketEvents.getAPI().getLogManager().severe("PacketEvents injector failed to inject channel " + channel, exception);
                     }
@@ -277,9 +275,33 @@ public class SpigotChannelInjector implements ChannelInjector {
     public void activatePreViaVersion() {
         if (!this.preViaVersionActivated) {
             this.preViaVersionActivated = true;
-            if (this.isServerBound()) {
-                this.injectNetworkManagers();
-            }
+            this.injectNetworkManagers(channel -> {
+                User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+                if (user != null) {
+                    // pre-viaversion has just been activated, try to initialize pre-via handlers
+                    ServerConnectionInitializer.relocateHandlers(channel, user, true);
+                    // ensure normal encoder/decoders know about pre-via state, otherwise packets may be duplicated
+                    ((PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME)).preVia = PreViaState.NORMAL;
+                    ((PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME)).preVia = PreViaState.NORMAL;
+                }
+            });
         }
+    }
+
+    public void setPreViaFallback() {
+        this.injectNetworkManagers(channel -> {
+            User user = PacketEvents.getAPI().getProtocolManager().getUser(channel);
+            if (user != null) {
+                // ensure normal encoder/decoders know about pre-via state, otherwise packets may be duplicated
+                ((PacketEventsEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME)).preVia = PreViaState.FALLBACK;
+                ((PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME)).preVia = PreViaState.FALLBACK;
+            }
+        });
+    }
+
+    public enum PreViaState {
+        PRE_VIA,
+        NORMAL,
+        FALLBACK,
     }
 }

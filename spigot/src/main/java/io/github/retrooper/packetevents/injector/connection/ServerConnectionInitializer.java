@@ -28,13 +28,13 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.github.retrooper.packetevents.injector.SpigotChannelInjector;
+import io.github.retrooper.packetevents.injector.SpigotChannelInjector.PreViaState;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.injector.handlers.PacketEventsEncoder;
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
-import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -148,8 +148,10 @@ public final class ServerConnectionInitializer {
             PacketEventsDecoder decoder = (PacketEventsDecoder) ctx.pipeline().get(decoderName);
             PacketEventsEncoder encoder;
 
-            SpigotChannelInjector injector = (SpigotChannelInjector) packetevents.getInjector();
-            TriState preViaState = injector.isPreViaVersionActivated() || ViaVersionUtil.isAvailable() ? TriState.byBoolean(preVia) : TriState.NOT_SET;
+            // if anyone registered pre-via listeners and no viaversion is available, we need to tell our normal handlers
+            // to call events twice as otherwise the pre-via listener would never be called
+            PreViaState preViaState = packetevents.getEventManager().hasClientVersionedListeners() && !ViaVersionUtil.isAvailable()
+                    ? PreViaState.FALLBACK : (preVia ? PreViaState.PRE_VIA : PreViaState.NORMAL);
 
             if (decoder != null) {
                 // check whether we actually need to relocate
