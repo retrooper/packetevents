@@ -306,6 +306,42 @@ public final class ParticleTypes {
      * @versions 26.1+
      */
     public static final ParticleType<ParticleData> RESET_MOB_GROWTH = define("reset_mob_growth");
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleData> SULFUR_BUBBLES = define("sulfur_bubbles");
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleData> NOXIOUS_GAS = define("noxious_gas");
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleData> NOXIOUS_GAS_CLOUD = define("noxious_gas_cloud");
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleGeyserData> GEYSER = define("geyser",
+            ParticleGeyserData::read, ParticleGeyserData::write, ParticleGeyserData.MAP_CODEC);
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleGeyserBaseData> GEYSER_BASE = define("geyser_base",
+            ParticleGeyserBaseData::read, ParticleGeyserBaseData::write, ParticleGeyserBaseData.MAP_CODEC);
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleGeyserBaseData> GEYSER_POOF = define("geyser_poof",
+            ParticleGeyserBaseData::read, ParticleGeyserBaseData::write, ParticleGeyserBaseData.MAP_CODEC);
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleGeyserData> GEYSER_PLUME = define("geyser_plume",
+            ParticleGeyserData::read, ParticleGeyserData::write, ParticleGeyserData.MAP_CODEC);
+    /**
+     * @versions 26.2+
+     */
+    public static final ParticleType<ParticleData> SULFUR_CUBE_GOO = define("sulfur_cube_goo");
 
     /**
      * Returns an immutable view of the particle types.

@@ -73,6 +73,7 @@ public class WrappedBlockState {
             ClientVersion.V_1_19_3, ClientVersion.V_1_19_4, ClientVersion.V_1_20, ClientVersion.V_1_20_2,
             ClientVersion.V_1_20_3, ClientVersion.V_1_20_5, ClientVersion.V_1_21_2, ClientVersion.V_1_21_4,
             ClientVersion.V_1_21_5, ClientVersion.V_1_21_6, ClientVersion.V_1_21_9, ClientVersion.V_26_1,
+            ClientVersion.V_26_2,
     };
     private static final byte[] MAPPING_INDEXES;
     private static final ClientVersion[] MAPPING_VERSIONS;

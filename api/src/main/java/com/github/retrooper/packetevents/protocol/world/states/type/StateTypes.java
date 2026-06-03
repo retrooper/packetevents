@@ -421,7 +421,8 @@ public final class StateTypes {
     /**
      * @versions 1.21.6-1.21.8
      */
-    @ApiStatus.Obsolete @RuntimeObsolete(since = "2.11.1", reason = "Removed and replaced with different chain types in 1.21.9")
+    @ApiStatus.Obsolete
+    @RuntimeObsolete(since = "2.11.1", reason = "Removed and replaced with different chain types in 1.21.9")
     public static StateType CHAIN = StateTypes.builder().name("CHAIN").blastResistance(6.0f).hardness(5.0f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.METAL).build();
     public static StateType GLASS_PANE = StateTypes.builder().name("GLASS_PANE").blastResistance(0.3f).hardness(0.3f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.GLASS).build();
     public static StateType MELON = StateTypes.builder().name("MELON").blastResistance(1.0f).hardness(1.0f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.VEGETABLE).build();
@@ -531,7 +532,8 @@ public final class StateTypes {
     public static StateType TERRACOTTA = StateTypes.builder().name("TERRACOTTA").blastResistance(4.2f).hardness(1.25f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.STONE).build();
     public static StateType PACKED_ICE = StateTypes.builder().name("PACKED_ICE").blastResistance(0.5f).hardness(0.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.ICE_SOLID).build();
     public static StateType DIRT_PATH = StateTypes.builder().name("DIRT_PATH").blastResistance(0.65f).hardness(0.65f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DIRT).build();
-    @ApiStatus.Obsolete @RuntimeObsolete(since = "2.9.0", reason = "Renamed to DIRT_PATH in 1.17")
+    @ApiStatus.Obsolete
+    @RuntimeObsolete(since = "2.9.0", reason = "Renamed to DIRT_PATH in 1.17")
     public static StateType GRASS_PATH = StateTypes.builder().name("GRASS_PATH").blastResistance(0.65f).hardness(0.65f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DIRT).build();
     public static StateType SUNFLOWER = StateTypes.builder().name("SUNFLOWER").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
     public static StateType LILAC = StateTypes.builder().name("LILAC").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(false).setMaterial(MaterialType.REPLACEABLE_PLANT).build();
@@ -1477,6 +1479,118 @@ public final class StateTypes {
      * @versions 26.1+
      */
     public static StateType POTTED_GOLDEN_DANDELION = StateTypes.builder().name("POTTED_GOLDEN_DANDELION").blastResistance(0.0f).hardness(0.0f).isBlocking(false).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.DECORATION).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR = StateTypes.builder().name("SULFUR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POTENT_SULFUR = StateTypes.builder().name("POTENT_SULFUR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_SLAB = StateTypes.builder().name("SULFUR_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_STAIRS = StateTypes.builder().name("SULFUR_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_WALL = StateTypes.builder().name("SULFUR_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_SULFUR = StateTypes.builder().name("POLISHED_SULFUR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_SULFUR_SLAB = StateTypes.builder().name("POLISHED_SULFUR_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_SULFUR_STAIRS = StateTypes.builder().name("POLISHED_SULFUR_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_SULFUR_WALL = StateTypes.builder().name("POLISHED_SULFUR_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_BRICKS = StateTypes.builder().name("SULFUR_BRICKS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_BRICK_SLAB = StateTypes.builder().name("SULFUR_BRICK_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_BRICK_STAIRS = StateTypes.builder().name("SULFUR_BRICK_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_BRICK_WALL = StateTypes.builder().name("SULFUR_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CHISELED_SULFUR = StateTypes.builder().name("CHISELED_SULFUR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR = StateTypes.builder().name("CINNABAR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_SLAB = StateTypes.builder().name("CINNABAR_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_STAIRS = StateTypes.builder().name("CINNABAR_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_WALL = StateTypes.builder().name("CINNABAR_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_CINNABAR = StateTypes.builder().name("POLISHED_CINNABAR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_CINNABAR_SLAB = StateTypes.builder().name("POLISHED_CINNABAR_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_CINNABAR_STAIRS = StateTypes.builder().name("POLISHED_CINNABAR_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType POLISHED_CINNABAR_WALL = StateTypes.builder().name("POLISHED_CINNABAR_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_BRICKS = StateTypes.builder().name("CINNABAR_BRICKS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_BRICK_SLAB = StateTypes.builder().name("CINNABAR_BRICK_SLAB").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_BRICK_STAIRS = StateTypes.builder().name("CINNABAR_BRICK_STAIRS").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CINNABAR_BRICK_WALL = StateTypes.builder().name("CINNABAR_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).isShapeExceedsCube(true).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType CHISELED_CINNABAR = StateTypes.builder().name("CHISELED_CINNABAR").blastResistance(6.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(true).isSolid(true).setMaterial(MaterialType.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static StateType SULFUR_SPIKE = StateTypes.builder().name("SULFUR_SPIKE").blastResistance(3.0f).hardness(1.5f).isBlocking(true).requiresCorrectTool(false).isSolid(true).setMaterial(MaterialType.SULFUR).build();
     // </editor-fold>
 
     static {
