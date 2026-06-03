@@ -83,7 +83,7 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
     }
 
     @ApiStatus.Internal
-    public <Z extends T> Z define(String name, MappedEntityBuilder<Z> builder) {
+    public <Z extends T> Z defineWithBuilder(String name, MappedEntityBuilder<Z> builder) {
         return this.define(name, VersionRange.ALL_VERSIONS, builder::build);
     }
 
