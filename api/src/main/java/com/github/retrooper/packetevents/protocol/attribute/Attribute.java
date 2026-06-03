@@ -21,10 +21,14 @@ package com.github.retrooper.packetevents.protocol.attribute;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MathUtil;
 
 public interface Attribute extends MappedEntity {
+
+    NbtCodec<Attribute> CODEC = NbtCodecs.forRegistry(Attributes.getRegistry());
 
     @Override
     default ResourceLocation getName() {
