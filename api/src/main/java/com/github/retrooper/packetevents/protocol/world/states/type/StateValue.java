@@ -33,6 +33,7 @@ import com.github.retrooper.packetevents.protocol.world.states.enums.Mode;
 import com.github.retrooper.packetevents.protocol.world.states.enums.North;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Orientation;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Part;
+import com.github.retrooper.packetevents.protocol.world.states.enums.PotentSulfurState;
 import com.github.retrooper.packetevents.protocol.world.states.enums.SculkSensorPhase;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Shape;
 import com.github.retrooper.packetevents.protocol.world.states.enums.SideChainPart;
@@ -176,6 +177,10 @@ public enum StateValue {
      * @versions 1.21.9+
      */
     COPPER_GOLEM_POSE("copper_golem_pose", CopperGolemPose.class, CopperGolemPose::valueOf),
+    /**
+     * @versions 26.2+
+     */
+    POTENT_SULFUR_STATE("potent_sulfur_state", PotentSulfurState.class, PotentSulfurState::valueOf)
     ;
 
     public static final Index<String, StateValue> NAME_INDEX = Index.create(
