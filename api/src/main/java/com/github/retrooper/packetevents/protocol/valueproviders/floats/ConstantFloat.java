@@ -11,6 +11,9 @@ import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 import java.util.Random;
 
+/**
+ * @versions 1.17+
+ */
 @NullMarked
 public final class ConstantFloat implements FloatProvider {
 

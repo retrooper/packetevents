@@ -7,6 +7,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * @versions 1.17+
+ */
 @NullMarked
 @ApiStatus.Internal
 final class StaticFloatProviderType<T extends FloatProvider> extends AbstractMappedEntity implements FloatProviderType<T> {

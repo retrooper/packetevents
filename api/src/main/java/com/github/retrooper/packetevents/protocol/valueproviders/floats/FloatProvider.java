@@ -12,6 +12,9 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.Random;
 
+/**
+ * @versions 1.17+
+ */
 @NullMarked
 public interface FloatProvider {
 
