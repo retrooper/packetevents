@@ -40,6 +40,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.RabbitVarian
 import com.github.retrooper.packetevents.protocol.component.builtin.SalmonSizeComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.SheepColorComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.ShulkerColorComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.SulfurCubeContentComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.TropicalFishBaseColorComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.TropicalFishPatternColorComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.TropicalFishPatternComponent;
