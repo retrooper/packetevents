@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.protocol.attribute.AttributeModifier;
 import com.github.retrooper.packetevents.protocol.attribute.AttributeOperation;
 import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
+import com.github.retrooper.packetevents.protocol.valueproviders.floats.ConstantFloat;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageTypes;
 import com.github.retrooper.packetevents.protocol.world.states.defaulttags.ItemTags;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
