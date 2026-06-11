@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.mapper.CopyableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.DeepComparableEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRef;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRefSet;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
@@ -56,6 +57,8 @@ import java.util.OptionalLong;
 public interface DimensionType extends MappedEntity, CopyableEntity<DimensionType>, DeepComparableEntity {
 
     NbtCodec<DimensionType> CODEC = new NbtMapCodec<DimensionType>() {
+        private final NbtCodec<MappedEntityRef<WorldClock>> clockCodec = MappedEntityRef.codec(WorldClock.CODEC);
+
         @Override
         public DimensionType decode(NBTCompound compound, PacketWrapper<?> wrapper) throws NbtCodecException {
             DimensionTypeBuilder builder = DimensionTypeBuilder.dimensionTypeBuilder();
@@ -70,7 +73,7 @@ public interface DimensionType extends MappedEntity, CopyableEntity<DimensionTyp
                         .setTimelines(compound.getOr("timelines", MappedEntitySet::decodeRefSet, MappedEntitySet.createEmpty(), wrapper));
 
                 if (version.isNewerThanOrEquals(ServerVersion.V_26_1)) {
-                    builder.setDefaultClock(compound.getOrNull("default_clock", WorldClock.CODEC, wrapper));
+                    builder.setDefaultClock(compound.getOrNull("default_clock", this.clockCodec, wrapper));
                     builder.setHasEnderDragonFight(compound.getBooleanOrThrow("has_ender_dragon_fight"));
                 }
             } else {
@@ -145,9 +148,9 @@ public interface DimensionType extends MappedEntity, CopyableEntity<DimensionTyp
                     compound.set("timelines", timelines, MappedEntitySet::encodeRefSet, wrapper);
                 }
                 if (version.isNewerThanOrEquals(ServerVersion.V_26_1)) {
-                    WorldClock defaultClock = value.getDefaultClock();
+                    MappedEntityRef<WorldClock> defaultClock = value.getDefaultClockRef();
                     if (defaultClock != null) {
-                        compound.set("default_clock", defaultClock, WorldClock.CODEC, wrapper);
+                        compound.set("default_clock", defaultClock, this.clockCodec, wrapper);
                     }
                     compound.setTag("has_ender_dragon_fight", new NBTByte(value.isHasEnderDragonFight()));
                 }
@@ -306,6 +309,11 @@ public interface DimensionType extends MappedEntity, CopyableEntity<DimensionTyp
      * @versions 26.1+
      */
     @Nullable WorldClock getDefaultClock();
+
+    /**
+     * @versions 26.1+
+     */
+    @Nullable MappedEntityRef<WorldClock> getDefaultClockRef();
 
     /**
      * @versions 26.1+

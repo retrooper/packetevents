@@ -366,8 +366,15 @@ public final class NbtCodecs {
                 if (nbt instanceof NBTNumber) {
                     int id = ((NBTNumber) nbt).getAsInt();
                     entry = replacedRegistry.getById(version, id);
+                    if (entry == null) {
+                        throw new NbtCodecException("Can't find #" + id + " in " + registry.getRegistryKey());
+                    }
                 } else if (nbt instanceof NBTString) {
-                    entry = replacedRegistry.getByName(version, ((NBTString) nbt).getValue());
+                    String name = ((NBTString) nbt).getValue();
+                    entry = replacedRegistry.getByName(version, name);
+                    if (entry == null) {
+                        throw new NbtCodecException("Can't find " + name + " in " + registry.getRegistryKey());
+                    }
                 }
                 if (entry == null) {
                     throw new NbtCodecException("Can't decode registry " + registry.getRegistryKey());
