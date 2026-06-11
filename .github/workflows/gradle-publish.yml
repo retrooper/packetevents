@@ -10,7 +10,7 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Validate gradle wrapper
         uses: gradle/actions/wrapper-validation@v5
@@ -28,43 +28,43 @@ jobs:
         run: chmod +x gradlew && ./gradlew build
 
       - name: Upload build artifacts api
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: api-build
           path: build/libs/packetevents-api-*.jar
 
       - name: Upload build artifacts spigot
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: spigot-build
           path: build/libs/packetevents-spigot-*.jar
 
       - name: Upload build artifacts netty-common
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: netty-common-build
           path: build/libs/packetevents-netty-common-*.jar
 
       - name: Upload build artifacts bungeecord
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bungeecord-build
           path: build/libs/packetevents-bungeecord-*.jar
 
       - name: Upload build artifacts velocity
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: velocity-build
           path: build/libs/packetevents-velocity-*.jar
 
       - name: Upload build artifacts fabric
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fabric-build
           path: build/libs/packetevents-fabric-*.jar
 
       - name: Upload build artifacts sponge
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sponge-build
           path: build/libs/packetevents-sponge-*.jar
