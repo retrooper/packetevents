@@ -1,13 +1,13 @@
 [versions]
-shadow = "8.3.10"
 jetbrains-annotations = "26.1.0"
-via-nbt = "5.2.0"
+via-nbt = "5.2.1"
 fast-util = "8.5.18"
-gson = "2.13.2"
+gson = "2.14.0"
 java-diff-utils = "4.15"
-mod-publish = "1.1.0"
+shadow = "8.3.11"
+mod-publish = "2.0.0"
 runtask = "3.0.2"
-fabric-loom = "1.15.5"
+fabric-loom = "1.17.8"
 
 [libraries]
 shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version.ref = "shadow" }
