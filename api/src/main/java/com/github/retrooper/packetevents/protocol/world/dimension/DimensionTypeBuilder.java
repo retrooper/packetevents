@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.world.dimension;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntityBuilder;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRef;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRefSet;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
@@ -113,7 +114,7 @@ public final class DimensionTypeBuilder implements MappedEntityBuilder<Dimension
     /**
      * @versions 26.1+
      */
-    private @Nullable WorldClock defaultClock;
+    private @Nullable MappedEntityRef<WorldClock> defaultClock;
     /**
      * @versions 26.1+
      */
@@ -331,10 +332,18 @@ public final class DimensionTypeBuilder implements MappedEntityBuilder<Dimension
     }
 
     public @Nullable WorldClock getDefaultClock() {
+        return this.defaultClock != null ? this.defaultClock.get() : null;
+    }
+
+    public @Nullable MappedEntityRef<WorldClock> getDefaultClockRef() {
         return this.defaultClock;
     }
 
     public DimensionTypeBuilder setDefaultClock(@Nullable WorldClock defaultClock) {
+        return this.setDefaultClock(defaultClock != null ? new MappedEntityRef.Static<>(defaultClock) : null);
+    }
+
+    public DimensionTypeBuilder setDefaultClock(@Nullable MappedEntityRef<WorldClock> defaultClock) {
         this.defaultClock = defaultClock;
         return this;
     }
