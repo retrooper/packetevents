@@ -30,11 +30,23 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.UUID;
 
 /**
+ * Mojang name: ClientboundLoginFinishedPacket
+ * <p>
  * This packet switches the connection state to {@link ConnectionState#PLAY}.
  */
 public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginServerLoginSuccess> {
 
+    private static final UUID FALLBACK_SESSION_ID = new UUID(0L, 0L);
+
     private UserProfile userProfile;
+    /**
+     * @versions 26.2+
+     */
+    private UUID sessionId;
+    /**
+     * @versions 1.20.5-1.21.1
+     */
+    @ApiStatus.Obsolete
     private boolean strictErrorHandling;
 
     public WrapperLoginServerLoginSuccess(PacketSendEvent event) {
@@ -50,8 +62,17 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
     }
 
     public WrapperLoginServerLoginSuccess(UserProfile userProfile, boolean strictErrorHandling) {
+        this(userProfile, FALLBACK_SESSION_ID, strictErrorHandling);
+    }
+
+    public WrapperLoginServerLoginSuccess(UserProfile userProfile, UUID sessionId) {
+        this(userProfile, sessionId, true);
+    }
+
+    public WrapperLoginServerLoginSuccess(UserProfile userProfile, UUID sessionId, boolean strictErrorHandling) {
         super(PacketType.Login.Server.LOGIN_SUCCESS);
         this.userProfile = userProfile;
+        this.sessionId = sessionId;
         this.strictErrorHandling = strictErrorHandling;
     }
 
@@ -75,6 +96,10 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
                 TextureProperty textureProperty = new TextureProperty(propertyName, propertyValue, propertySignature);
                 userProfile.getTextureProperties().add(textureProperty);
             }
+        }
+
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_2)) {
+            this.sessionId = this.readUUID();
         }
 
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)
@@ -101,6 +126,10 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
             }
         }
 
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_2)) {
+            this.writeUUID(this.sessionId);
+        }
+
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)
                 && this.serverVersion.isOlderThan(ServerVersion.V_1_21_2)) {
             this.writeBoolean(this.strictErrorHandling);
@@ -110,11 +139,12 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
     @Override
     public void copy(WrapperLoginServerLoginSuccess wrapper) {
         this.userProfile = wrapper.userProfile;
+        this.sessionId = wrapper.sessionId;
         this.strictErrorHandling = wrapper.strictErrorHandling;
     }
 
     public UserProfile getUserProfile() {
-        return userProfile;
+        return this.userProfile;
     }
 
     public void setUserProfile(UserProfile userProfile) {
@@ -122,7 +152,23 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
     }
 
     /**
-     * This is always enabled with 1.21.2
+     * @versions 26.2+
+     */
+    public UUID getSessionId() {
+        return this.sessionId;
+    }
+
+    /**
+     * @versions 26.2+
+     */
+    public void setSessionId(UUID sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    /**
+     * Always-on starting with 1.21.2.
+     *
+     * @versions 1.20.5-1.21.1
      */
     @ApiStatus.Obsolete
     public boolean isStrictErrorHandling() {
@@ -130,7 +176,9 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
     }
 
     /**
-     * This is always enabled with 1.21.2
+     * Always-on starting with 1.21.2.
+     *
+     * @versions 1.20.5-1.21.1
      */
     @ApiStatus.Obsolete
     public void setStrictErrorHandling(boolean strictErrorHandling) {

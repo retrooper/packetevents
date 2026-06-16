@@ -13,6 +13,7 @@ import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Attachment;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Axis;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Bloom;
+import com.github.retrooper.packetevents.protocol.world.states.enums.CopperGolemPose;
 import com.github.retrooper.packetevents.protocol.world.states.enums.CreakingHeartState;
 import com.github.retrooper.packetevents.protocol.world.states.enums.East;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Face;
@@ -24,8 +25,10 @@ import com.github.retrooper.packetevents.protocol.world.states.enums.Mode;
 import com.github.retrooper.packetevents.protocol.world.states.enums.North;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Orientation;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Part;
+import com.github.retrooper.packetevents.protocol.world.states.enums.PotentSulfurState;
 import com.github.retrooper.packetevents.protocol.world.states.enums.SculkSensorPhase;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Shape;
+import com.github.retrooper.packetevents.protocol.world.states.enums.SideChainPart;
 import com.github.retrooper.packetevents.protocol.world.states.enums.South;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Thickness;
 import com.github.retrooper.packetevents.protocol.world.states.enums.Tilt;
@@ -73,6 +76,7 @@ public class WrappedBlockState {
             ClientVersion.V_1_19_3, ClientVersion.V_1_19_4, ClientVersion.V_1_20, ClientVersion.V_1_20_2,
             ClientVersion.V_1_20_3, ClientVersion.V_1_20_5, ClientVersion.V_1_21_2, ClientVersion.V_1_21_4,
             ClientVersion.V_1_21_5, ClientVersion.V_1_21_6, ClientVersion.V_1_21_9, ClientVersion.V_26_1,
+            ClientVersion.V_26_2,
     };
     private static final byte[] MAPPING_INDEXES;
     private static final ClientVersion[] MAPPING_VERSIONS;
@@ -1525,6 +1529,54 @@ public class WrappedBlockState {
     public void setHydration(int hydration) {
         this.checkIfCloneNeeded();
         this.data.put(StateValue.HYDRATION, hydration);
+        this.checkIsStillValid();
+    }
+
+    /**
+     * @versions 1.21.9+
+     */
+    public SideChainPart getSideChain() {
+        return (SideChainPart) this.data.get(StateValue.SIDE_CHAIN);
+    }
+
+    /**
+     * @versions 1.21.9+
+     */
+    public void setSideChain(SideChainPart part) {
+        this.checkIfCloneNeeded();
+        this.data.put(StateValue.SIDE_CHAIN, part);
+        this.checkIsStillValid();
+    }
+
+    /**
+     * @versions 1.21.9+
+     */
+    public CopperGolemPose getCopperGolemPose() {
+        return (CopperGolemPose) this.data.get(StateValue.COPPER_GOLEM_POSE);
+    }
+
+    /**
+     * @versions 1.21.9+
+     */
+    public void setCopperGolemPose(CopperGolemPose pose) {
+        this.checkIfCloneNeeded();
+        this.data.put(StateValue.COPPER_GOLEM_POSE, pose);
+        this.checkIsStillValid();
+    }
+
+    /**
+     * @versions 26.2+
+     */
+    public PotentSulfurState getPotentSulfurState() {
+        return (PotentSulfurState) this.data.get(StateValue.POTENT_SULFUR_STATE);
+    }
+
+    /**
+     * @versions 26.2+
+     */
+    public void setPotentSulfurState(PotentSulfurState state) {
+        this.checkIfCloneNeeded();
+        this.data.put(StateValue.POTENT_SULFUR_STATE, state);
         this.checkIsStillValid();
     }
 

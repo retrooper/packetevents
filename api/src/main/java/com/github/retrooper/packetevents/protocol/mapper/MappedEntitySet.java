@@ -22,6 +22,8 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.mappings.IRegistry;
 import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
@@ -66,6 +68,20 @@ public class MappedEntitySet<T extends MappedEntity> implements MappedEntityRefS
 
     public static <Z extends MappedEntity> MappedEntitySet<Z> createEmpty() {
         return new MappedEntitySet<>(new ArrayList<>(0));
+    }
+
+    public static <Z extends MappedEntity> NbtCodec<MappedEntitySet<Z>> codec(IRegistry<Z> registry) {
+        return new NbtCodec<MappedEntitySet<Z>>() {
+            @Override
+            public MappedEntitySet<Z> decode(NBT tag, PacketWrapper<?> wrapper) throws NbtCodecException {
+                return MappedEntitySet.decode(tag, wrapper, registry);
+            }
+
+            @Override
+            public NBT encode(PacketWrapper<?> wrapper, MappedEntitySet<Z> value) throws NbtCodecException {
+                return MappedEntitySet.encode(wrapper, value);
+            }
+        };
     }
 
     public static <Z extends MappedEntity> MappedEntityRefSet<Z> readRefSet(PacketWrapper<?> wrapper) {

@@ -19,37 +19,53 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
- * Mojang name: ServerboundSpectateEntityPacket
+ * Mojang name: ServerboundSpectatorActionPacket
+ * <p>
+ * Named ServerboundSpectateEntityPacket before 26.2
  *
  * @versions 26.1+
  */
 @NullMarked
 public class WrapperPlayClientSpectateEntity extends PacketWrapper<WrapperPlayClientSpectateEntity> {
 
-    private int entityId;
+    private @Nullable Integer entityId;
 
     public WrapperPlayClientSpectateEntity(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperPlayClientSpectateEntity(int entityId) {
+        this(Integer.valueOf(entityId));
+    }
+
+    public WrapperPlayClientSpectateEntity(@Nullable Integer entityId) {
         super(PacketType.Play.Client.SPECTATE_ENTITY);
         this.entityId = entityId;
     }
 
     @Override
     public void read() {
-        this.entityId = this.readVarInt();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_2)) {
+            this.entityId = this.readNullableVarInt();
+        } else {
+            this.entityId = this.readVarInt();
+        }
     }
 
     @Override
     public void write() {
-        this.writeVarInt(this.entityId);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_2)) {
+            this.writeNullableVarInt(this.entityId);
+        } else {
+            this.writeVarInt(this.entityId != null ? this.entityId : 0);
+        }
     }
 
     @Override
@@ -57,11 +73,24 @@ public class WrapperPlayClientSpectateEntity extends PacketWrapper<WrapperPlayCl
         this.entityId = wrapper.entityId;
     }
 
+    public boolean hasEntityId() {
+        return this.entityId != null;
+    }
+
+    /**
+     * Only handles null for backwards compat,
+     * DO NOT compare return value against 0 for checking
+     * whether this entity id is set or not.
+     */
     public int getEntityId() {
-        return this.entityId;
+        return this.entityId != null ? this.entityId : 0;
     }
 
     public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
+
+    public void setEntityId(@Nullable Integer entityId) {
         this.entityId = entityId;
     }
 }

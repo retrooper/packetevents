@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.util.mappings;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntityBuilder;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MapUtil;
@@ -79,6 +80,11 @@ public final class VersionedRegistry<T extends MappedEntity> implements IRegistr
         int versions = this.typesBuilder.getVersionMapper().size();
         this.typeNames = new Map[versions];
         this.typeIds = new Map[versions];
+    }
+
+    @ApiStatus.Internal
+    public <Z extends T> Z defineWithBuilder(String name, MappedEntityBuilder<Z> builder) {
+        return this.define(name, VersionRange.ALL_VERSIONS, builder::build);
     }
 
     @ApiStatus.Internal

@@ -355,25 +355,34 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
                 }
             } else {
                 wrapper.writeComponent(info.displayName.getComponent());
-                wrapper.writeEnum(info.optionData);
-                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_2)) {
+                    wrapper.writeComponent(info.prefix.getComponent());
+                    wrapper.writeComponent(info.suffix.getComponent());
                     wrapper.writeEnum(info.tagVisibility);
                     wrapper.writeEnum(info.collisionRule);
+                    wrapper.writeOptional(info.color, (ew, c) ->
+                            ew.writeVarInt(ColorUtil.getId(c)));
                 } else {
-                    wrapper.writeString(info.tagVisibility.getId());
-                    wrapper.writeString(info.collisionRule.getId());
-                }
-                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
-                    int colorId = ColorUtil.getId(info.color);
-                    if (colorId < 0) {
-                        colorId = 21; // since 1.17, minecraft decides to use writeEnum rather than writing it value, while 21 equals RESET
+                    wrapper.writeEnum(info.optionData);
+                    if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+                        wrapper.writeEnum(info.tagVisibility);
+                        wrapper.writeEnum(info.collisionRule);
+                    } else {
+                        wrapper.writeString(info.tagVisibility.getId());
+                        wrapper.writeString(info.collisionRule.getId());
                     }
-                    wrapper.writeVarInt(colorId);
-                } else {
-                    wrapper.writeByte(ColorUtil.getId(info.color));
+                    if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
+                        int colorId = ColorUtil.getId(info.color);
+                        if (colorId < 0) {
+                            colorId = 21; // since 1.17, minecraft decides to use writeEnum rather than writing it value, while 21 equals RESET
+                        }
+                        wrapper.writeVarInt(colorId);
+                    } else {
+                        wrapper.writeByte(ColorUtil.getId(info.color));
+                    }
+                    wrapper.writeComponent(info.prefix.getComponent());
+                    wrapper.writeComponent(info.suffix.getComponent());
                 }
-                wrapper.writeComponent(info.prefix.getComponent());
-                wrapper.writeComponent(info.suffix.getComponent());
             }
         }
 

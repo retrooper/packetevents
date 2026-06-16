@@ -65,6 +65,10 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     private WorldBlockPosition lastDeathPosition;
     private Integer portalCooldown;
     private int seaLevel;
+    /**
+     * @versions 26.2+
+     */
+    private boolean onlineMode;
     private boolean enforcesSecureChat;
 
     public WrapperPlayServerJoinGame(PacketSendEvent event) {
@@ -244,6 +248,24 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
             @Nullable Integer portalCooldown, int seaLevel, boolean enforcesSecureChat
     ) {
+        this(entityID, hardcore, gameMode, previousGameMode, worldNames, dimensionCodec, dimensionTypeRef,
+                difficulty, worldName, hashedSeed, maxPlayers, viewDistance, simulationDistance, reducedDebugInfo, enableRespawnScreen,
+                limitedCrafting, isDebug, isFlat, lastDeathPosition, portalCooldown, seaLevel, true, enforcesSecureChat);
+    }
+
+    /**
+     * @versions 26.2+
+     */
+    public WrapperPlayServerJoinGame(
+            int entityID, boolean hardcore, GameMode gameMode,
+            @Nullable GameMode previousGameMode, List<String> worldNames,
+            NBTCompound dimensionCodec, DimensionTypeRef dimensionTypeRef,
+            Difficulty difficulty, String worldName, long hashedSeed,
+            int maxPlayers, int viewDistance, int simulationDistance,
+            boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
+            boolean isDebug, boolean isFlat, WorldBlockPosition lastDeathPosition,
+            @Nullable Integer portalCooldown, int seaLevel, boolean onlineMode, boolean enforcesSecureChat
+    ) {
         super(PacketType.Play.Server.JOIN_GAME);
         this.entityID = entityID;
         this.hardcore = hardcore;
@@ -266,6 +288,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         this.lastDeathPosition = lastDeathPosition;
         this.portalCooldown = portalCooldown;
         this.seaLevel = seaLevel;
+        this.onlineMode = onlineMode;
         this.enforcesSecureChat = enforcesSecureChat;
     }
 
@@ -353,6 +376,9 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
                 if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
                     this.seaLevel = this.readVarInt();
+                }
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_2)) {
+                    this.onlineMode = this.readBoolean();
                 }
                 this.enforcesSecureChat = this.readBoolean();
             }
@@ -459,6 +485,9 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)) {
             this.writeVarInt(this.seaLevel);
         }
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_2)) {
+            this.writeBoolean(this.onlineMode);
+        }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             writeBoolean(enforcesSecureChat);
         }
@@ -487,6 +516,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         lastDeathPosition = wrapper.lastDeathPosition;
         portalCooldown = wrapper.portalCooldown;
         seaLevel = wrapper.seaLevel;
+        onlineMode = wrapper.onlineMode;
         enforcesSecureChat = wrapper.enforcesSecureChat;
     }
 
@@ -676,6 +706,14 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
 
     public void setSeaLevel(int seaLevel) {
         this.seaLevel = seaLevel;
+    }
+
+    public boolean isOnlineMode() {
+        return this.onlineMode;
+    }
+
+    public void setOnlineMode(boolean onlineMode) {
+        this.onlineMode = onlineMode;
     }
 
     public boolean isEnforcesSecureChat() {

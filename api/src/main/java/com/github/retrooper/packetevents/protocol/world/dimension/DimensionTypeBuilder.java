@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.world.dimension;
 
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntityBuilder;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRef;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntityRefSet;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntitySet;
@@ -37,7 +38,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public final class DimensionTypeBuilder {
+public final class DimensionTypeBuilder implements MappedEntityBuilder<DimensionType> {
 
     /**
      * @versions 1.21.11+
@@ -126,10 +127,8 @@ public final class DimensionTypeBuilder {
         return new DimensionTypeBuilder();
     }
 
-    public DimensionType build() {
-        return this.build(null);
-    }
-
+    @ApiStatus.Internal
+    @Override
     public DimensionType build(@Nullable TypesBuilderData data) {
         return new StaticDimensionType(
                 data, this.hasFixedTime, this.skybox, this.cardinalLight, this.attributes.copyImmutable(), this.timelines,

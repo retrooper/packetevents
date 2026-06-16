@@ -1926,6 +1926,130 @@ public final class ItemTypes {
      * @versions 26.1+
      */
     public static final ItemType GOLDEN_DANDELION = builder("golden_dandelion").setMaxAmount(64).setPlacedType(StateTypes.GOLDEN_DANDELION).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType SULFUR = builder("sulfur").setMaxAmount(64).setPlacedType(StateTypes.SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType POTENT_SULFUR = builder("potent_sulfur").setMaxAmount(64).setPlacedType(StateTypes.POTENT_SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType SULFUR_SLAB = builder("sulfur_slab").setMaxAmount(64).setPlacedType(StateTypes.SULFUR_SLAB).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType SULFUR_STAIRS = builder("sulfur_stairs").setMaxAmount(64).setPlacedType(StateTypes.SULFUR_STAIRS).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType SULFUR_WALL = builder("sulfur_wall").setMaxAmount(64).setPlacedType(StateTypes.SULFUR_WALL).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType POLISHED_SULFUR = builder("polished_sulfur").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType POLISHED_SULFUR_SLAB = builder("polished_sulfur_slab").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_SULFUR_SLAB).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType POLISHED_SULFUR_STAIRS = builder("polished_sulfur_stairs").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_SULFUR_STAIRS).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType POLISHED_SULFUR_WALL = builder("polished_sulfur_wall").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_SULFUR_WALL).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType SULFUR_BRICKS = builder("sulfur_bricks").setMaxAmount(64).setPlacedType(StateTypes.SULFUR_BRICKS).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType SULFUR_BRICK_SLAB = builder("sulfur_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.SULFUR_BRICK_SLAB).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType SULFUR_BRICK_STAIRS = builder("sulfur_brick_stairs").setMaxAmount(64).setPlacedType(StateTypes.SULFUR_BRICK_STAIRS).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType SULFUR_BRICK_WALL = builder("sulfur_brick_wall").setMaxAmount(64).setPlacedType(StateTypes.SULFUR_BRICK_WALL).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType CHISELED_SULFUR = builder("chiseled_sulfur").setMaxAmount(64).setPlacedType(StateTypes.CHISELED_SULFUR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType CINNABAR = builder("cinnabar").setMaxAmount(64).setPlacedType(StateTypes.CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType CINNABAR_SLAB = builder("cinnabar_slab").setMaxAmount(64).setPlacedType(StateTypes.CINNABAR_SLAB).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType CINNABAR_STAIRS = builder("cinnabar_stairs").setMaxAmount(64).setPlacedType(StateTypes.CINNABAR_STAIRS).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType CINNABAR_WALL = builder("cinnabar_wall").setMaxAmount(64).setPlacedType(StateTypes.CINNABAR_WALL).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType POLISHED_CINNABAR = builder("polished_cinnabar").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType POLISHED_CINNABAR_SLAB = builder("polished_cinnabar_slab").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_CINNABAR_SLAB).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType POLISHED_CINNABAR_STAIRS = builder("polished_cinnabar_stairs").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_CINNABAR_STAIRS).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType POLISHED_CINNABAR_WALL = builder("polished_cinnabar_wall").setMaxAmount(64).setPlacedType(StateTypes.POLISHED_CINNABAR_WALL).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType CINNABAR_BRICKS = builder("cinnabar_bricks").setMaxAmount(64).setPlacedType(StateTypes.CINNABAR_BRICKS).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType CINNABAR_BRICK_SLAB = builder("cinnabar_brick_slab").setMaxAmount(64).setPlacedType(StateTypes.CINNABAR_BRICK_SLAB).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType CINNABAR_BRICK_STAIRS = builder("cinnabar_brick_stairs").setMaxAmount(64).setPlacedType(StateTypes.CINNABAR_BRICK_STAIRS).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType CINNABAR_BRICK_WALL = builder("cinnabar_brick_wall").setMaxAmount(64).setPlacedType(StateTypes.CINNABAR_BRICK_WALL).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType CHISELED_CINNABAR = builder("chiseled_cinnabar").setMaxAmount(64).setPlacedType(StateTypes.CHISELED_CINNABAR).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType SULFUR_CUBE_BUCKET = builder("sulfur_cube_bucket").setMaxAmount(1).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType SULFUR_CUBE_SPAWN_EGG = builder("sulfur_cube_spawn_egg").setMaxAmount(64).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType MUSIC_DISC_BOUNCE = builder("music_disc_bounce").setMaxAmount(1).setAttributes(ItemAttribute.MUSIC_DISC).build();
+    /**
+     * @versions 26.2+
+     */
+    public static final ItemType SULFUR_SPIKE = builder("sulfur_spike").setMaxAmount(64).setPlacedType(StateTypes.SULFUR_SPIKE).build();
 
     /**
      * @deprecated Burning furnace shows up as a missing texture, removed in 1.9
@@ -2077,7 +2201,7 @@ public final class ItemTypes {
                 ClientVersion.V_1_20_5, ClientVersion.V_1_21, ClientVersion.V_1_21_2,
                 ClientVersion.V_1_21_4, ClientVersion.V_1_21_5, ClientVersion.V_1_21_6,
                 ClientVersion.V_1_21_7, ClientVersion.V_1_21_9, ClientVersion.V_1_21_11,
-                ClientVersion.V_26_1,
+                ClientVersion.V_26_1, ClientVersion.V_26_2,
         };
         for (ClientVersion version : versions) {
             parseAllComponents(version);

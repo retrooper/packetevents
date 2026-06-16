@@ -300,7 +300,7 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         this.clientVersion = clientVersion;
     }
 
-    public ServerVersion getServerVersion() {
+    public final ServerVersion getServerVersion() {
         return serverVersion;
     }
 
