@@ -20,14 +20,21 @@ package io.github.retrooper.packetevents.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.EventCreationUtil;
+import com.github.retrooper.packetevents.util.ExceptionUtil;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.velocitypowered.api.proxy.Player;
+import io.github.retrooper.packetevents.impl.netty.util.WrapperUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import net.kyori.adventure.text.Component;
 
 @ChannelHandler.Sharable
 public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
@@ -76,7 +83,30 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+        boolean didWeCauseThis = ExceptionUtil.isException(cause, PacketProcessException.class);
+        User user = this.user;
+        if (didWeCauseThis
+            && (user == null || user.getEncoderState() != ConnectionState.HANDSHAKING)) {
+            if (PacketEvents.getAPI().getSettings().isFullStackTraceEnabled()) {
+                cause.printStackTrace();
+            } else {
+                PacketEvents.getAPI().getLogManager().warn(cause.getMessage());
+            }
+
+            if (PacketEvents.getAPI().getSettings().isKickOnPacketExceptionEnabled()) {
+                Channel channel = ctx.channel();
+                if (user != null) {
+                    PacketWrapper<?> wrapper = WrapperUtil.disconnectWrapper(user.getEncoderState(), Component.text("Invalid packet"));
+
+                    channel.eventLoop().execute(() -> {
+                        if (wrapper != null) user.sendPacket(wrapper);
+
+                        channel.close();
+                    });
+                } else channel.close();
+
+                super.exceptionCaught(ctx, cause);
+            }
+        }
     }
 }
-
