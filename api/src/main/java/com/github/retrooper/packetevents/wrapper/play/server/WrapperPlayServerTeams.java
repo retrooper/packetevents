@@ -319,20 +319,31 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
             }
 
             LegacyComponent displayName = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
-            OptionData optionData = wrapper.readEnum(OptionData.values());
+            if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_2)) {
+                OptionData optionData = wrapper.readEnum(OptionData.values());
 
-            NameTagVisibility nameTagVisibility;
-            CollisionRule collisionRule;
-            if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
-                nameTagVisibility = wrapper.readEnum(NameTagVisibility.class);
-                collisionRule = wrapper.readEnum(CollisionRule.class);
-            } else {
-                nameTagVisibility = NameTagVisibility.fromID(wrapper.readString(40));
-                collisionRule = CollisionRule.fromID(wrapper.readString(40));
+                NameTagVisibility nameTagVisibility;
+                CollisionRule collisionRule;
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+                    nameTagVisibility = wrapper.readEnum(NameTagVisibility.class);
+                    collisionRule = wrapper.readEnum(CollisionRule.class);
+                } else {
+                    nameTagVisibility = NameTagVisibility.fromID(wrapper.readString(40));
+                    collisionRule = CollisionRule.fromID(wrapper.readString(40));
+                }
+                NamedTextColor color = ColorUtil.fromId(wrapper.readByte());
+                LegacyComponent prefix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
+                LegacyComponent suffix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
+
+                return new ScoreBoardTeamInfo(displayName, prefix, suffix, nameTagVisibility, collisionRule, color, optionData);
             }
-            NamedTextColor color = ColorUtil.fromId(wrapper.readByte());
+
             LegacyComponent prefix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
             LegacyComponent suffix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
+            NameTagVisibility nameTagVisibility = wrapper.readEnum(NameTagVisibility.class);
+            CollisionRule collisionRule = wrapper.readEnum(CollisionRule.class);
+            NamedTextColor color = wrapper.readOptional(ew -> ColorUtil.fromId(ew.readVarInt()));
+            OptionData optionData = wrapper.readEnum(OptionData.values());
 
             return new ScoreBoardTeamInfo(displayName, prefix, suffix, nameTagVisibility, collisionRule, color, optionData);
         }
@@ -362,6 +373,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
                     wrapper.writeEnum(info.collisionRule);
                     wrapper.writeOptional(info.color, (ew, c) ->
                             ew.writeVarInt(ColorUtil.getId(c)));
+                    wrapper.writeEnum(info.optionData);
                 } else {
                     wrapper.writeEnum(info.optionData);
                     if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
