@@ -8,6 +8,7 @@ shadow = "8.3.11"
 mod-publish = "2.0.0"
 runtask = "3.0.2"
 fabric-loom = "1.17.8"
+neoforge-moddev = "2.0.141"
 
 [libraries]
 shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version.ref = "shadow" }
@@ -19,3 +20,4 @@ java-diff-utils = { group = "io.github.java-diff-utils", name = "java-diff-utils
 mod-publish = { group = "me.modmuss50", name = "mod-publish-plugin", version.ref = "mod-publish" }
 runtask = { group = "xyz.jpenilla", name = "run-task", version.ref = "runtask" }
 fabric-loom = { module = "net.fabricmc:fabric-loom", version.ref = "fabric-loom" }
+neoforge-moddev = { module = "net.neoforged:moddev-gradle", version.ref = "neoforge-moddev" }
