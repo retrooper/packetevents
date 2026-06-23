@@ -19,11 +19,9 @@
 package com.github.retrooper.packetevents.util.updatechecker;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.util.ColorUtil;
 import com.github.retrooper.packetevents.util.PEVersion;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.gson.JsonObject;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,31 +70,23 @@ public class UpdateChecker {
                 latestVersionHolder.accept(newVersion);
             }
         } catch (Exception ex) {
-            PacketEvents.getAPI().getLogManager().warn("Failed to check for updates. "
-                    + (ex.getCause() != null ? ex.getCause().getClass().getName() + ": " + ex.getCause().getMessage() : ex.getMessage()));
+            PacketEvents.getAPI().getLogManager().warn("Failed to check for updates", ex);
             return UpdateCheckerStatus.FAILED;
         }
 
         if (localVersion.isOlderThan(newVersion)) {
-            PacketEvents.getAPI().getLogManager().warn("There is an update available for PacketEvents! Your build: ("
-                    + ColorUtil.toString(NamedTextColor.YELLOW) + localVersion
-                    + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest release: ("
-                    + ColorUtil.toString(NamedTextColor.GREEN) + newVersion
-                    + ColorUtil.toString(NamedTextColor.WHITE) + ")");
+            PacketEvents.getAPI().getLogManager().warn("There is an update available! "
+                    + "Your version: " + localVersion + " | Latest release: " + newVersion);
             return UpdateCheckerStatus.OUTDATED;
         } else if (localVersion.isNewerThan(newVersion)) {
-            PacketEvents.getAPI().getLogManager().info("You are running a development build of PacketEvents. Your build: ("
-                    + ColorUtil.toString(NamedTextColor.AQUA) + localVersion
-                    + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest release: ("
-                    + ColorUtil.toString(NamedTextColor.DARK_AQUA) + newVersion
-                    + ColorUtil.toString(NamedTextColor.WHITE) + ")");
+            PacketEvents.getAPI().getLogManager().info("You are running a development build. "
+                    + "Your version: " + localVersion + " | Latest release: " + newVersion);
             return UpdateCheckerStatus.PRE_RELEASE;
         } else if (localVersion.equals(newVersion)) {
-            PacketEvents.getAPI().getLogManager().info("You are running the latest release of PacketEvents. Your build: ("
-                    + ColorUtil.toString(NamedTextColor.GREEN) + newVersion + ColorUtil.toString(NamedTextColor.WHITE) + ")");
+            PacketEvents.getAPI().getLogManager().info("You are running the latest release: " + localVersion);
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {
-            PacketEvents.getAPI().getLogManager().warn("Failed to check for updates. Your build: (" + localVersion + ")");
+            PacketEvents.getAPI().getLogManager().warn("Failed to check for updates for version " + localVersion);
             return UpdateCheckerStatus.FAILED;
         }
     }
@@ -106,7 +96,8 @@ public class UpdateChecker {
         return checkForUpdate(null);
     }
 
-    @Deprecated @ApiStatus.Internal
+    @Deprecated
+    @ApiStatus.Internal
     public void handleUpdateCheck(@Nullable Runnable updateCheckCallback) {
         Thread thread = new Thread(() -> {
             PacketEvents.getAPI().getLogManager().info("Checking for updates, please wait...");
@@ -132,7 +123,7 @@ public class UpdateChecker {
 
     @ApiStatus.Internal
     public void handleUpdateCheck() {
-       handleUpdateCheck((Runnable) null);
+        handleUpdateCheck((Runnable) null);
     }
 
     /**

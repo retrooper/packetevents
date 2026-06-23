@@ -37,11 +37,13 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
 import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.protocol.util.NbtDecoder;
 import com.github.retrooper.packetevents.util.UniqueIdUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.google.gson.JsonElement;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.BlockNBTComponent;
@@ -70,6 +72,7 @@ import net.kyori.adventure.text.object.ObjectContents;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.object.SpriteObjectContents;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
+import net.kyori.adventure.text.serializer.gson.GsonDataComponentValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -708,8 +711,18 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                                 if (entry.getValue() instanceof NbtTagHolder) {
                                     NBT compNbt = ((NbtTagHolder) entry.getValue()).getTag();
                                     compsNbt.write(entry.getKey().toString(), compNbt);
+                                } else if (entry.getValue() instanceof DataComponentValue.TagSerializable) {
+                                    DataComponentValue.TagSerializable tagSerializable = (DataComponentValue.TagSerializable) entry.getValue();
+                                    NBT tag = AdventureNbtUtil.fromString(tagSerializable.asBinaryTag().string());
+                                    compsNbt.write(entry.getKey().toString(), tag);
+                                } else if (entry.getValue() instanceof GsonDataComponentValue) {
+                                    // there is no way to recover 100% of the actual information
+                                    // without implementing JSON data serialization for every
+                                    // available component
+                                    JsonElement element = ((GsonDataComponentValue) entry.getValue()).element();
+                                    compsNbt.write(entry.getKey().toString(), NBTCodec.jsonToNBT(element));
                                 }
-                                // unsupported entry component value, skip for now
+                                // else: unsupported entry component value, skip
                             }
                         }
                     }

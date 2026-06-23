@@ -26,6 +26,8 @@ import com.github.retrooper.packetevents.protocol.util.NbtEncoder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.gson.JsonElement;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.flattener.ComponentFlattener;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.json.JSONOptions;
 import net.kyori.adventure.text.serializer.json.legacyimpl.NBTLegacyHoverEventSerializer;
@@ -49,6 +51,12 @@ public final class AdventureSerializer implements NbtEncoder<Component>, NbtDeco
 
     private AdventureSerializer(ClientVersion version) {
         this.version = version;
+    }
+
+    public static String stringify(ComponentLike component) {
+        StringBuilder bob = new StringBuilder();
+        ComponentFlattener.basic().flatten(component.asComponent(), bob::append);
+        return bob.toString();
     }
 
     public static AdventureSerializer serializer(PacketWrapper<?> wrapper) {

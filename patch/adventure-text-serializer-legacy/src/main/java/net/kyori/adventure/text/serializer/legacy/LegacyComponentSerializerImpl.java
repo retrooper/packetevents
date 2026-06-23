@@ -274,14 +274,14 @@ final class LegacyComponentSerializerImpl implements LegacyComponentSerializer {
     return state.toString();
   }
 
-  private static boolean applyFormat(final TextComponent.@NotNull Builder builder, final @NotNull TextFormat format) {
+  private static boolean applyFormat(final TextComponent.@NotNull Builder builder, final @Nullable TextFormat format) { // packetevents patch
     if (format instanceof TextColor) {
       builder.colorIfAbsent((TextColor) format);
       return true;
     } else if (format instanceof TextDecoration) {
       builder.decoration((TextDecoration) format, TextDecoration.State.TRUE);
       return false;
-    } else if (format instanceof Reset) {
+    } else if (format == null || format instanceof Reset) { // packetevents patch
       return true;
     }
     throw new IllegalArgumentException(String.format("unknown format '%s'", format.getClass()));
@@ -558,12 +558,9 @@ final class LegacyComponentSerializerImpl implements LegacyComponentSerializer {
 
   static final class DecodedFormat {
     final FormatCodeType encodedFormat;
-    final TextFormat format;
+    final @Nullable TextFormat format; // packetevents patch
 
-    private DecodedFormat(final FormatCodeType encodedFormat, final TextFormat format) {
-      if (format == null) {
-        throw new IllegalStateException("No format found");
-      }
+    private DecodedFormat(final FormatCodeType encodedFormat, final @Nullable TextFormat format) { // packetevents patch
       this.encodedFormat = encodedFormat;
       this.format = format;
     }

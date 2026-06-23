@@ -102,7 +102,7 @@ public class PatchableComponentMap implements IComponentMap {
         int presentCount = wrapper.readVarInt();
         int absentCount = wrapper.readVarInt();
         if (presentCount == 0 && absentCount == 0) {
-            return PatchableComponentMap.EMPTY;
+            return new PatchableComponentMap(base);
         }
 
         PatchableComponentMap components = new PatchableComponentMap(base,

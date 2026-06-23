@@ -22,12 +22,9 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.common.server.WrapperCommonServerPluginMessage;
 
-public class WrapperConfigServerPluginMessage extends PacketWrapper<WrapperConfigServerPluginMessage> {
-
-    private String channelName;
-    private byte[] data;
+public class WrapperConfigServerPluginMessage extends WrapperCommonServerPluginMessage<WrapperConfigServerPluginMessage> {
 
     public WrapperConfigServerPluginMessage(PacketSendEvent event) {
         super(event);
@@ -38,9 +35,7 @@ public class WrapperConfigServerPluginMessage extends PacketWrapper<WrapperConfi
     }
 
     public WrapperConfigServerPluginMessage(String channelName, byte[] data) {
-        super(PacketType.Configuration.Server.PLUGIN_MESSAGE);
-        this.channelName = channelName;
-        this.data = data;
+        super(PacketType.Configuration.Server.PLUGIN_MESSAGE, channelName, data);
     }
 
     @Override
@@ -58,25 +53,4 @@ public class WrapperConfigServerPluginMessage extends PacketWrapper<WrapperConfi
         this.writeBytes(this.data);
     }
 
-    @Override
-    public void copy(WrapperConfigServerPluginMessage wrapper) {
-        this.channelName = wrapper.channelName;
-        this.data = wrapper.data;
-    }
-
-    public String getChannelName() {
-        return this.channelName;
-    }
-
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
-    }
-
-    public byte[] getData() {
-        return this.data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
-    }
 }

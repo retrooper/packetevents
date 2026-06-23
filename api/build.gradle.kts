@@ -20,12 +20,14 @@ dependencies {
     compileOnlyApi(libs.bundles.adventure.serializers)
 
     compileOnly(libs.gson)
+    compileOnly(libs.adventure.text.logger.slf4j)
     compileOnly(libs.checkerqual)
 
     testRuntimeOnly(testlibs.bundles.adventure)
     testRuntimeOnly(testlibs.bundles.adventure.serializers)
     testImplementation(libs.bundles.adventure)
     testImplementation(libs.bundles.adventure.serializers)
+    testImplementation(libs.adventure.text.logger.slf4j)
 
     testImplementation(project(":netty-common"))
     testImplementation(testlibs.slf4j)

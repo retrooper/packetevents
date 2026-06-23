@@ -21,30 +21,23 @@ package io.github.retrooper.packetevents.factory.fabric;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
-import com.github.retrooper.packetevents.util.LogManager;
-import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
+import com.github.retrooper.packetevents.util.PEVersions;
 import io.github.retrooper.packetevents.impl.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jspecify.annotations.NullMarked;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 
 @NullMarked
 public abstract class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger("PacketEvents");
 
     private final String modId;
     private final EnvType environment;
@@ -55,7 +48,6 @@ public abstract class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader
     private final PlayerManagerAbstract playerManager;
     private final ChannelInjector injector;
     private final NettyManager nettyManager = new NettyManagerImpl();
-    private final LogManager logManager = new FabricLogger(LOGGER);
 
     private boolean loaded;
     private boolean initialized;
@@ -93,13 +85,10 @@ public abstract class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader
         PacketEvents.CONNECTION_HANDLER_NAME = "pe-connection-handler-" + id;
         PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + id;
 
-        WrappedBlockState.ensureLoad();
-        SynchronizedRegistriesHandler.init();
-
-        // register internal packet listener (should be the first listener)
-        // this listener doesn't do any modifications to the packets, just reads data
-        this.getEventManager().registerListener(new InternalPacketListener());
+        super.load();
         this.loaded = true;
+
+        this.getLogManager().info("Loaded packetevents v" + PEVersions.RAW);
     }
 
     @Override
@@ -135,7 +124,7 @@ public abstract class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader
         if (!this.initialized) {
             return;
         }
-        this.getEventManager().unregisterAllListeners();
+        super.terminate();
         this.initialized = false;
         this.terminated = true;
     }
@@ -158,11 +147,6 @@ public abstract class FabricPacketEventsAPI extends PacketEventsAPI<FabricLoader
     @Override
     public ServerManager getServerManager() {
         return this.serverManager;
-    }
-
-    @Override
-    public LogManager getLogManager() {
-        return this.logManager;
     }
 
     @Override

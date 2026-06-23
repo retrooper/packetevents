@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -125,8 +124,7 @@ public class SpigotChannelInjector implements ChannelInjector {
                     try {
                         ServerConnectionInitializer.initChannel(channel, ConnectionState.PLAY);
                     } catch (Exception e) {
-                        PacketEvents.getAPI().getLogManager().severe("PacketEvents Spigot injector failed to inject into an existing channel. If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc");
-                        e.printStackTrace();
+                        PacketEvents.getAPI().getLogManager().severe("PacketEvents Spigot injector failed to inject into an existing channel. If you need assistance, join our Discord server: https://discord.gg/DVHxPPxHZc", e);
                     }
                 }
             }
@@ -241,7 +239,7 @@ public class SpigotChannelInjector implements ChannelInjector {
      * @return may return null if the channel is closed already or not initialized yet
      */
     public @Nullable PacketEventsDecoder getDecoder(Channel channel) {
-         return (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
+        return (PacketEventsDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
     }
 
     @Override

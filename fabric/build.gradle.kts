@@ -48,7 +48,7 @@ tasks {
         // always run this task if asked to
         outputs.upToDateWhen { false }
 
-        minecraftVersion = "1.21.11"
+        minecraftVersion = "26.2-rc-2"
         loaderVersion = libs.versions.fabric.loader
         runDir = project.layout.projectDirectory.dir("run").dir(minecraftVersion.get())
 

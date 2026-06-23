@@ -101,7 +101,7 @@ public class ClassStructureTest extends BaseDummyAPITest {
             }
             for (MethodInfo dataCtor : dataCtors) {
                 // ensure constructor is marked as internal
-                if (!dataCtor.hasAnnotation(ApiStatus.Internal.class)) {
+                if (!dataCtor.hasAnnotation(ApiStatus.Internal.class) && mappedEntity.isPublic()) {
                     issues.add(classPrefix + " Constructor accepting TypesBuilderData isn't marked as @ApiStatus.Internal: " + dataCtor.toStringWithSimpleNames());
                 }
                 // ensure TypesBuilderData type is annotated as Nullable

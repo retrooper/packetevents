@@ -21,12 +21,11 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.util.LegacyComponent;
 import com.github.retrooper.packetevents.util.ColorUtil;
-import com.github.retrooper.packetevents.util.LegacyFormat;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -168,50 +167,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         teamMode = TeamMode.values()[readByte()];
         ScoreBoardTeamInfo info = null;
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
-            Component displayName, prefix, suffix;
-            OptionData optionData;
-            NameTagVisibility nameTagVisibility;
-            CollisionRule collisionRule = null;
-            NamedTextColor color;
-            if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-                LegacyComponentSerializer serializer = this.getSerializers().legacy();
-                displayName = serializer.deserialize(this.readString(32));
-                prefix = serializer.deserialize(this.readString(16));
-                suffix = serializer.deserialize(this.readString(16));
-                optionData = OptionData.values()[readByte()];
-                if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
-                    nameTagVisibility = NameTagVisibility.ALWAYS;
-                    color = NamedTextColor.WHITE;
-                } else {
-                    nameTagVisibility = NameTagVisibility.fromID(readString(32));
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                        collisionRule = CollisionRule.fromID(readString(32));
-                    }
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-                        // starting from 1.17, the color is sent with ColorFormatting enum ordinal
-                        int colorId = readVarInt();
-                        if (colorId == 21)
-                            colorId = -1;
-                        color = ColorUtil.fromId(colorId);
-                    } else {
-                        color = ColorUtil.fromId(readByte());
-                    }
-                }
-            } else {
-                displayName = readComponent();
-                optionData = OptionData.fromValue(readByte());
-                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
-                    nameTagVisibility = this.readEnum(NameTagVisibility.class);
-                    collisionRule = this.readEnum(CollisionRule.class);
-                } else {
-                    nameTagVisibility = NameTagVisibility.fromID(this.readString(40));
-                    collisionRule = CollisionRule.fromID(this.readString(40));
-                }
-                color = ColorUtil.fromId(readByte());
-                prefix = readComponent();
-                suffix = readComponent();
-            }
-            info = new ScoreBoardTeamInfo(displayName, prefix, suffix, nameTagVisibility, collisionRule == null ? CollisionRule.ALWAYS : collisionRule, color, optionData);
+            info = ScoreBoardTeamInfo.read(this);
         }
         teamInfo = Optional.ofNullable(info);
         players = new ArrayList<>();
@@ -234,43 +190,8 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         writeString(teamName, teamNameLimit);
         writeByte(teamMode.ordinal());
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
-            ScoreBoardTeamInfo info = teamInfo.orElse(new ScoreBoardTeamInfo(Component.empty(), Component.empty(), Component.empty(), NameTagVisibility.ALWAYS, CollisionRule.ALWAYS, NamedTextColor.WHITE, OptionData.NONE));
-            if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-                LegacyComponentSerializer serializer = this.getSerializers().legacy();
-                writeString(LegacyFormat.trimLegacyFormat(serializer.serialize(info.displayName), 32));
-                writeString(LegacyFormat.trimLegacyFormat(serializer.serialize(info.prefix), 16));
-                writeString(LegacyFormat.trimLegacyFormat(serializer.serialize(info.suffix), 16));
-                writeByte(info.optionData.ordinal());
-                if (this.serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
-                    writeString(NameTagVisibility.ALWAYS.getId(), 32);
-                    writeByte(15);
-                } else {
-                    writeString(info.tagVisibility.id, 32);
-                    if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9))
-                        writeString(info.collisionRule.getId(), 32);
-                    writeByte(ColorUtil.getId(info.color));
-                }
-            } else {
-                writeComponent(info.displayName);
-                writeByte(info.optionData.getByteValue());
-                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
-                    writeEnum(info.tagVisibility);
-                    writeEnum(info.collisionRule);
-                } else {
-                    writeString(info.tagVisibility.id);
-                    writeString(info.collisionRule.getId());
-                }
-                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-                    int colorId = ColorUtil.getId(info.color);
-                    if (colorId < 0)
-                        colorId = 21; // since 1.17, minecraft decides to use writeEnum rather than writing it value, while 21 equals RESET
-                    writeVarInt(colorId);
-                } else {
-                    writeByte(ColorUtil.getId(info.color));
-                }
-                writeComponent(info.prefix);
-                writeComponent(info.suffix);
-            }
+            ScoreBoardTeamInfo info = this.teamInfo.orElse(ScoreBoardTeamInfo.EMPTY);
+            ScoreBoardTeamInfo.write(this, info);
         }
 
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.ADD_ENTITIES || teamMode == TeamMode.REMOVE_ENTITIES) {
@@ -327,22 +248,39 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
 
     public static class ScoreBoardTeamInfo {
 
-        private Component displayName;
-        private Component prefix;
-        private Component suffix;
+        private static final ScoreBoardTeamInfo EMPTY = new ScoreBoardTeamInfo(
+                LegacyComponent.empty(), LegacyComponent.empty(), LegacyComponent.empty(),
+                NameTagVisibility.ALWAYS, CollisionRule.ALWAYS,
+                NamedTextColor.WHITE, OptionData.NONE
+        );
+
+        private LegacyComponent displayName;
+        private LegacyComponent prefix;
+        private LegacyComponent suffix;
         private NameTagVisibility tagVisibility;
         private CollisionRule collisionRule;
         private NamedTextColor color;
         private OptionData optionData;
 
-        public ScoreBoardTeamInfo(Component displayName, @Nullable Component prefix, @Nullable Component suffix, NameTagVisibility tagVisibility, CollisionRule collisionRule, NamedTextColor color, OptionData optionData) {
+        public ScoreBoardTeamInfo(
+                Component displayName, @Nullable Component prefix, @Nullable Component suffix,
+                NameTagVisibility tagVisibility, CollisionRule collisionRule,
+                NamedTextColor color, OptionData optionData
+        ) {
+            this(
+                    LegacyComponent.wrapOrEmpty(displayName),
+                    LegacyComponent.wrapOrEmpty(prefix),
+                    LegacyComponent.wrapOrEmpty(suffix),
+                    tagVisibility, collisionRule, color, optionData
+            );
+        }
+
+        public ScoreBoardTeamInfo(
+                LegacyComponent displayName, LegacyComponent prefix, LegacyComponent suffix,
+                NameTagVisibility tagVisibility, CollisionRule collisionRule,
+                NamedTextColor color, OptionData optionData
+        ) {
             this.displayName = displayName;
-            if (prefix == null) {
-                prefix = Component.empty();
-            }
-            if (suffix == null) {
-                suffix = Component.empty();
-            }
             this.prefix = prefix;
             this.suffix = suffix;
             this.tagVisibility = tagVisibility;
@@ -351,28 +289,161 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
             this.optionData = optionData;
         }
 
+        public static ScoreBoardTeamInfo read(PacketWrapper<?> wrapper) {
+            if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_13)) {
+                LegacyComponent displayName = new LegacyComponent(wrapper.readString(32));
+                LegacyComponent prefix = new LegacyComponent(wrapper.readString(32));
+                LegacyComponent suffix = new LegacyComponent(wrapper.readString(32));
+                OptionData optionData = wrapper.readEnum(OptionData.values());
+
+                NameTagVisibility tagVisibility = NameTagVisibility.ALWAYS;
+                CollisionRule collisionRule = CollisionRule.ALWAYS;
+                NamedTextColor color = NamedTextColor.WHITE;
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_8)) {
+                    tagVisibility = NameTagVisibility.fromID(wrapper.readString(32));
+                    if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                        collisionRule = CollisionRule.fromID(wrapper.readString(32));
+                    }
+                    if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
+                        // starting from 1.17, the color is sent with ColorFormatting enum ordinal
+                        int colorId = wrapper.readVarInt();
+                        if (colorId == 21) {
+                            colorId = -1;
+                        }
+                        color = ColorUtil.fromId(colorId);
+                    } else {
+                        color = ColorUtil.fromId(wrapper.readByte());
+                    }
+                }
+                return new ScoreBoardTeamInfo(displayName, prefix, suffix, tagVisibility, collisionRule, color, optionData);
+            }
+
+            LegacyComponent displayName = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
+            if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_2)) {
+                OptionData optionData = wrapper.readEnum(OptionData.values());
+
+                NameTagVisibility nameTagVisibility;
+                CollisionRule collisionRule;
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+                    nameTagVisibility = wrapper.readEnum(NameTagVisibility.class);
+                    collisionRule = wrapper.readEnum(CollisionRule.class);
+                } else {
+                    nameTagVisibility = NameTagVisibility.fromID(wrapper.readString(40));
+                    collisionRule = CollisionRule.fromID(wrapper.readString(40));
+                }
+                NamedTextColor color = ColorUtil.fromId(wrapper.readByte());
+                LegacyComponent prefix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
+                LegacyComponent suffix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
+
+                return new ScoreBoardTeamInfo(displayName, prefix, suffix, nameTagVisibility, collisionRule, color, optionData);
+            }
+
+            LegacyComponent prefix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
+            LegacyComponent suffix = LegacyComponent.wrapOrEmpty(wrapper.readComponent());
+            NameTagVisibility nameTagVisibility = wrapper.readEnum(NameTagVisibility.class);
+            CollisionRule collisionRule = wrapper.readEnum(CollisionRule.class);
+            NamedTextColor color = wrapper.readOptional(ew -> ColorUtil.fromId(ew.readVarInt()));
+            OptionData optionData = wrapper.readEnum(OptionData.values());
+
+            return new ScoreBoardTeamInfo(displayName, prefix, suffix, nameTagVisibility, collisionRule, color, optionData);
+        }
+
+        public static void write(PacketWrapper<?> wrapper, ScoreBoardTeamInfo info) {
+            if (wrapper.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
+                wrapper.writeString(info.displayName.getLegacy());
+                wrapper.writeString(info.prefix.getLegacy());
+                wrapper.writeString(info.suffix.getLegacy());
+                wrapper.writeEnum(info.optionData);
+                if (wrapper.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
+                    wrapper.writeString(NameTagVisibility.ALWAYS.getId(), 32);
+                    wrapper.writeByte(0xF);
+                } else {
+                    wrapper.writeString(info.tagVisibility.getId(), 32);
+                    if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                        wrapper.writeString(info.collisionRule.getId(), 32);
+                    }
+                    wrapper.writeByte(ColorUtil.getId(info.color));
+                }
+            } else {
+                wrapper.writeComponent(info.displayName.getComponent());
+                if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_2)) {
+                    wrapper.writeComponent(info.prefix.getComponent());
+                    wrapper.writeComponent(info.suffix.getComponent());
+                    wrapper.writeEnum(info.tagVisibility);
+                    wrapper.writeEnum(info.collisionRule);
+                    wrapper.writeOptional(info.color, (ew, c) ->
+                            ew.writeVarInt(ColorUtil.getId(c)));
+                    wrapper.writeEnum(info.optionData);
+                } else {
+                    wrapper.writeEnum(info.optionData);
+                    if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)) {
+                        wrapper.writeEnum(info.tagVisibility);
+                        wrapper.writeEnum(info.collisionRule);
+                    } else {
+                        wrapper.writeString(info.tagVisibility.getId());
+                        wrapper.writeString(info.collisionRule.getId());
+                    }
+                    if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
+                        int colorId = ColorUtil.getId(info.color);
+                        if (colorId < 0) {
+                            colorId = 21; // since 1.17, minecraft decides to use writeEnum rather than writing it value, while 21 equals RESET
+                        }
+                        wrapper.writeVarInt(colorId);
+                    } else {
+                        wrapper.writeByte(ColorUtil.getId(info.color));
+                    }
+                    wrapper.writeComponent(info.prefix.getComponent());
+                    wrapper.writeComponent(info.suffix.getComponent());
+                }
+            }
+        }
+
+        public LegacyComponent getLegacyDisplayName() {
+            return this.displayName;
+        }
+
+        public void setLegacyDisplayName(LegacyComponent component) {
+            this.displayName = component;
+        }
+
         public Component getDisplayName() {
-            return displayName;
+            return this.displayName.getComponent();
         }
 
         public void setDisplayName(Component displayName) {
-            this.displayName = displayName;
+            this.displayName = new LegacyComponent(displayName);
+        }
+
+        public LegacyComponent getLegacyPrefix() {
+            return this.prefix;
+        }
+
+        public void setLegacyPrefix(LegacyComponent component) {
+            this.prefix = component;
         }
 
         public Component getPrefix() {
-            return prefix;
+            return this.prefix.getComponent();
         }
 
         public void setPrefix(Component prefix) {
-            this.prefix = prefix;
+            this.prefix = new LegacyComponent(prefix);
+        }
+
+        public LegacyComponent getLegacySuffix() {
+            return this.suffix;
+        }
+
+        public void setLegacySuffix(LegacyComponent component) {
+            this.suffix = component;
         }
 
         public Component getSuffix() {
-            return suffix;
+            return this.suffix.getComponent();
         }
 
         public void setSuffix(Component suffix) {
-            this.suffix = suffix;
+            this.suffix = new LegacyComponent(suffix);
         }
 
         public NameTagVisibility getTagVisibility() {

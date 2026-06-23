@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
@@ -29,17 +30,25 @@ import io.github.retrooper.packetevents.handlers.PacketEventsDecoder;
 import io.github.retrooper.packetevents.handlers.PacketEventsEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import org.jetbrains.annotations.ApiStatus;
+import org.spongepowered.configurate.util.CheckedConsumer;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
+@ApiStatus.Internal
 public class VelocityPipelineInjector implements ChannelInjector {
+
     private static Class<?> CONNECTION_MANAGER_CLASS, SERVER_INITIALIZER_HOLDER_CLASS, BACKEND_INITIALIZER_HOLDER_CLASS;
     private static Method SET_SERVER_INTIIALIZER, SET_BACKEND_INITIALIZER;
+
+    private final PacketEventsAPI<?> packetevents;
     private final ProxyServer server;
 
-    public VelocityPipelineInjector(ProxyServer server) {
+    public VelocityPipelineInjector(PacketEventsAPI<?> packetevents, ProxyServer server) {
+        this.packetevents = packetevents;
         this.server = server;
     }
 
@@ -76,17 +85,38 @@ public class VelocityPipelineInjector implements ChannelInjector {
 
     @Override
     public void uninject() {
-        Supplier<ChannelInitializer<Channel>> initializerHolder = getServerChannelInitializerHolder();
-        ChannelInitializer<Channel> wrapper = initializerHolder.get();
-        // Check if it's our initializer, could be wrapped by other plugins
-        if (wrapper instanceof VelocityChannelInitializer) {
-            try {
-                SET_SERVER_INTIIALIZER.invoke(initializerHolder, ((VelocityChannelInitializer) wrapper).getWrappedInitializer());
-            } catch (IllegalAccessException | InvocationTargetException exception) {
-                throw new RuntimeException("Failed to uninject from frontend pipeline", exception);
+        Supplier<ChannelInitializer<Channel>> holder = this.getServerChannelInitializerHolder();
+        ChannelInitializer<?> wrapper = holder.get();
+        CheckedConsumer<ChannelInitializer<Channel>, ReflectiveOperationException> uninjector = (initializer) -> {
+            this.packetevents.getLogManager().info("Uninjecting from Velocity channel initializer...");
+            SET_SERVER_INTIIALIZER.invoke(holder, initializer);
+        };
+
+        try {
+            while (true) {
+                // Check if it's our initializer, could be wrapped by other plugins
+                if (wrapper instanceof VelocityChannelInitializer) {
+                    uninjector.accept(((VelocityChannelInitializer) wrapper).getWrappedInitializer());
+                    break;
+                } else {
+                    // walk up wrapper tree, if possible to find a single matching field
+                    // this accounts for other plugins (e.g. ViaVersion) also replacing the injector, which may
+                    // wrap our already wrapped injector
+                    Field field = Reflection.getField(wrapper.getClass(), ChannelInitializer.class, 0);
+                    if (field == null) {
+                        throw new IllegalStateException("Can't unwrap foreign channel initializer: " + wrapper);
+                    }
+                    field.setAccessible(true);
+                    ChannelInitializer<?> thisWrapper = wrapper;
+                    wrapper = (ChannelInitializer<?>) field.get(thisWrapper);
+                    uninjector = initializer -> {
+                        field.set(thisWrapper, initializer);
+                        this.packetevents.getLogManager().info("Uninjected from plugin channel initializer " + thisWrapper);
+                    };
+                }
             }
-        } else {
-            throw new IllegalStateException("Failed to uninject from frontend pipeline: can't unwrap foreign channel initializer");
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException("Failed to uninject from frontend pipeline", exception);
         }
     }
 

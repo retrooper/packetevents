@@ -64,6 +64,8 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (!(msg instanceof Channel)) return;
+
         Channel channel = (Channel) msg;
         //Resolve netty version only once.
         if (NETTY_VERSION == null && !CHECKED_NETTY_VERSION) {

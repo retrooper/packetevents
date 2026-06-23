@@ -21,33 +21,26 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.common.server.WrapperCommonServerPluginMessage;
 
 /**
  * Mods and plugins can use this to send their data.
  * Minecraft itself uses some plugin channels.
  * These internal channels are in the minecraft namespace.
  */
-public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlayServerPluginMessage> {
-    private String channelName;
-    private byte[] data;
+public class WrapperPlayServerPluginMessage extends WrapperCommonServerPluginMessage<WrapperPlayServerPluginMessage> {
 
     public WrapperPlayServerPluginMessage(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerPluginMessage(String channelName, byte[] data) {
-        super(PacketType.Play.Server.PLUGIN_MESSAGE);
-        this.channelName = channelName;
-        this.data = data;
+    public WrapperPlayServerPluginMessage(ResourceLocation channelName, byte[] data) {
+        this(channelName.toString(), data);
     }
 
-    public WrapperPlayServerPluginMessage(ResourceLocation channelName, byte[] data) {
-        super(PacketType.Play.Server.PLUGIN_MESSAGE);
-        this.channelName = channelName.toString();
-        this.data = data;
+    public WrapperPlayServerPluginMessage(String channelName, byte[] data) {
+        super(PacketType.Play.Server.PLUGIN_MESSAGE, channelName, data);
     }
 
     @Override
@@ -79,43 +72,4 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
         writeBytes(data);
     }
 
-    @Override
-    public void copy(WrapperPlayServerPluginMessage wrapper) {
-        this.channelName = wrapper.channelName;
-        this.data = wrapper.data;
-    }
-
-    /**
-     * The channel name of the plugin message.
-     * @return The channel name.
-     */
-    public String getChannelName() {
-        return channelName;
-    }
-
-    /**
-     * Sets the channel name of the plugin message.
-     * @param channelName The channel name.
-     */
-    public void setChannelName(String channelName) {
-       this.channelName = channelName;
-    }
-
-    /**
-     * The data of the plugin message.
-     *
-     * @return The data.
-     */
-    public byte[] getData() {
-        return data;
-    }
-
-    /**
-     * Sets the data of the plugin message.
-     *
-     * @param data The data.
-     */
-    public void setData(byte[] data) {
-        this.data = data;
-    }
 }
