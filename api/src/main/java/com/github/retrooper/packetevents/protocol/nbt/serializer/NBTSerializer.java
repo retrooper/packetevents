@@ -26,6 +26,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 @ApiStatus.NonExtendable
@@ -36,9 +37,9 @@ public class NBTSerializer<IN, OUT> implements NBTReader<NBT, IN>, NBTWriter<NBT
     protected final NameReader<IN> nameReader;
     protected final NameWriter<OUT> nameWriter;
     protected final Map<Integer, NBTType<? extends NBT>> idToType = new HashMap<>();
-    protected final Map<NBTType<? extends NBT>, Integer> typeToId = new HashMap<>();
-    protected final Map<NBTType<? extends NBT>, TagReader<IN, ? extends NBT>> typeReaders = new HashMap<>();
-    protected final Map<NBTType<? extends NBT>, TagWriter<OUT, ? extends NBT>> typeWriters = new HashMap<>();
+    protected final Map<NBTType<? extends NBT>, Integer> typeToId = new IdentityHashMap<>();
+    protected final Map<NBTType<? extends NBT>, TagReader<IN, ? extends NBT>> typeReaders = new IdentityHashMap<>();
+    protected final Map<NBTType<? extends NBT>, TagWriter<OUT, ? extends NBT>> typeWriters = new IdentityHashMap<>();
 
     public NBTSerializer(
             IdReader<IN> idReader, IdWriter<OUT> idWriter,
