@@ -592,7 +592,10 @@ public class WrappedBlockState {
     @Override
     public int hashCode() {
         // Don't hash the global ID, it is determined by the other data types
-        return Objects.hash(type, data);
+        int result = 1;
+        result = 31 * result + this.type.hashCode();
+        result = 31 * result + this.data.hashCode();
+        return result;
     }
 
     public StateType getType() {
