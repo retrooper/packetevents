@@ -49,6 +49,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -360,7 +361,7 @@ public class WrappedBlockState {
         Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
         Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
         Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
-        Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
+        Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new IdentityHashMap<>();
 
         try (final SequentialNBTReader.Compound compound = MappingHelper.decompress(MAPPINGS_ASSETS_LEGACY)) {
             compound.skipOne(); // Skip version
@@ -450,7 +451,7 @@ public class WrappedBlockState {
             Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
             Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
             Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
-            Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
+            Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new IdentityHashMap<>();
 
             int id = 0;
             for (NBT e : list) {
