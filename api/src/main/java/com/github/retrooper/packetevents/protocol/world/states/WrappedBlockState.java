@@ -113,7 +113,7 @@ public class WrappedBlockState {
     private static final Map<String, WrappedBlockState>[] BY_STRING = new Map[HIGHEST_MAPPING_INDEX + 1];
     private static final Map<Integer, WrappedBlockState>[] BY_ID = new Map[HIGHEST_MAPPING_INDEX + 1];
     private static final Map<WrappedBlockState, String>[] INTO_STRING = new Map[HIGHEST_MAPPING_INDEX + 1];
-    private static final Map<WrappedBlockState, Integer>[] INTO_ID = new Map[HIGHEST_MAPPING_INDEX + 1];
+    private static final Map<WrappedBlockState, WrappedBlockState>[] INTO_ID = new Map[HIGHEST_MAPPING_INDEX + 1];
     private static final Map<StateType, WrappedBlockState>[] DEFAULT_STATES = new Map[HIGHEST_MAPPING_INDEX + 1];
 
     private static final Map<String, String> STRING_UPDATER = new HashMap<>();
@@ -132,7 +132,7 @@ public class WrappedBlockState {
         BY_STRING[AIR_MAPPING_INDEX] = Collections.singletonMap(airName, AIR);
         BY_ID[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR.getGlobalId(), AIR);
         INTO_STRING[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR, airName);
-        INTO_ID[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR, AIR.getGlobalId());
+        INTO_ID[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR, AIR);
         DEFAULT_STATES[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR.getType(), AIR);
     }
 
@@ -358,7 +358,7 @@ public class WrappedBlockState {
 
     private static void loadLegacy(Map<Map<StateValue, Object>, StateCacheValue> cache) {
         Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
-        Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
+        Map<WrappedBlockState, WrappedBlockState> stateToIdMap = new HashMap<>();
         Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
         Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
         Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new IdentityHashMap<>();
@@ -418,7 +418,7 @@ public class WrappedBlockState {
 
                     stateByIdMap.put(combinedID, state);
                     stateToStringMap.put(state, fullString);
-                    stateToIdMap.put(state, combinedID);
+                    stateToIdMap.put(state, state);
 
                     // We want the first with this ID, to prevent invalid blocks that work with vanilla, but may
                     // cause other things handling data to have issues, such as air with a byte value of 1
@@ -448,7 +448,7 @@ public class WrappedBlockState {
             SequentialNBTReader.List list = (SequentialNBTReader.List) compound.next().getValue();
 
             Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
-            Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
+            Map<WrappedBlockState, WrappedBlockState> stateToIdMap = new HashMap<>();
             Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
             Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
             Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new IdentityHashMap<>();
@@ -525,7 +525,7 @@ public class WrappedBlockState {
                     stateByStringMap.put(fullString, state);
                     stateByIdMap.put(id, state);
                     stateToStringMap.put(state, fullString);
-                    stateToIdMap.put(state, id);
+                    stateToIdMap.put(state, state);
 
                     id++;
                     index++;
@@ -1655,7 +1655,8 @@ public class WrappedBlockState {
      * Internal method for determining if the block state is still valid
      */
     private int getGlobalIdNoCache() {
-        return INTO_ID[this.mappingsIndex].getOrDefault(this, -1);
+        WrappedBlockState state = INTO_ID[this.mappingsIndex].get(this);
+        return state != null ? state.getGlobalId() : -1;
     }
 
     @Override
