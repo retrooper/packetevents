@@ -556,6 +556,8 @@ public class WrappedBlockState {
                                 PacketEvents.getAPI().getLogManager().warn("Unknown NBT typeString in modern mapping: " + value.getClass().getSimpleName());
                                 continue;
                             }
+                            // TODO remove toUpperCase, every parser needs to be adjusted; this would
+                            //   eliminate 10% of all allocations if loading all modern state mappings
                             dataMap.put(state, state.getParser().apply(v.toString().toUpperCase(Locale.ROOT)));
                         }
                         stateCache = cache.computeIfAbsent(dataMap, StateCacheValue::new);
@@ -1734,18 +1736,24 @@ public class WrappedBlockState {
 
         public String getString() {
             if (this.string == null) {
-                StringBuilder builder = new StringBuilder();
+                StringBuilder builder = new StringBuilder("[");
                 for (Map.Entry<StateValue, Object> entry : this.map.entrySet()) {
+                    if (builder.length() != 1) {
+                        builder.append(',');
+                    }
                     builder
                             .append(entry.getKey().getName())
                             .append('=')
                             // this is technically incorrect as block property values are case-sensitive, but it
                             // doesn't matter for this use case as we do String#toUpperCase while reading anyway;
                             // the current block state property system is already enough of a mess
-                            .append(String.valueOf(entry.getValue()).toLowerCase(Locale.ROOT))
-                            .append(',');
+                            .append(String.valueOf(entry.getValue()).toLowerCase(Locale.ROOT));
                 }
-                this.string = builder.length() == 0 ? "" : '[' + builder.substring(0, builder.length() - 1) + ']';
+                if (builder.length() != 1) {
+                    this.string = builder.append(']').toString();
+                } else {
+                    this.string = "";
+                }
             }
             return this.string;
         }
