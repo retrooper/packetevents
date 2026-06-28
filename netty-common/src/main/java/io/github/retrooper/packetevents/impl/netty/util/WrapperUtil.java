@@ -11,7 +11,7 @@ import net.kyori.adventure.text.Component;
 @ApiStatus.Internal
 public final class WrapperUtil {
 
-    public static PacketWrapper<?> disconnectWrapper(ConnectionState state, Component component) {
+    public static @Nullable PacketWrapper<?> createDisconnectWrapper(ConnectionState state, Component component) {
         switch (state) {
             case HANDSHAKING:
             case STATUS:
