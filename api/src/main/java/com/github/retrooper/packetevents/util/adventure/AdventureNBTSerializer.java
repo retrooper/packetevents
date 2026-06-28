@@ -169,7 +169,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         }
 
         if (input instanceof NBTNumber) { // Serialized as number
-            return Component.text(((NBTNumber) input).getAsInt());
+            return Component.text(((NBTNumber) input).getAsNumber().toString());
         }
 
         // Serialized as tree
@@ -182,7 +182,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             } else if (nbt.getType() == NBTType.BYTE && ((NBTByte) nbt).getAsByte() < 2) {
                 return String.valueOf(((NBTByte) nbt).getAsByte() == 1);
             } else if (nbt instanceof NBTNumber) {
-                return String.valueOf(((NBTNumber) nbt).getAsInt());
+                return ((NBTNumber) nbt).getAsNumber().toString();
             } else {
                 throw new IllegalStateException("Don't know how to deserialize " + nbt.getType() + " to text");
             }
@@ -802,7 +802,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             if (nbt instanceof NBTByte) {
                 arguments.add(TranslationArgument.bool(((NBTByte) nbt).getAsByte() != (byte) 0));
             } else if (nbt instanceof NBTNumber) {
-                arguments.add(TranslationArgument.numeric(((NBTNumber) nbt).getAsInt()));
+                arguments.add(TranslationArgument.numeric(((NBTNumber) nbt).getAsNumber()));
             } else if (nbt instanceof NBTString) {
                 arguments.add(TranslationArgument.component(Component.text(((NBTString) nbt).getValue())));
             } else {
