@@ -109,6 +109,8 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
 
                 super.exceptionCaught(ctx, cause);
             }
+        } else {
+            super.exceptionCaught(ctx, cause);
         }
     }
 }
