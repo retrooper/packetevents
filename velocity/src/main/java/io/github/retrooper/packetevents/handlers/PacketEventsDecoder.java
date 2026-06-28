@@ -105,4 +105,9 @@ public class PacketEventsDecoder extends MessageToMessageDecoder<ByteBuf> {
         ServerConnectionInitializer.destroyChannel(ctx.channel());
         super.channelInactive(ctx);
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+    }
 }

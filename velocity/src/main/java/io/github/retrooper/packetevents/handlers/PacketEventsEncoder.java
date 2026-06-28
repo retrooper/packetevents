@@ -36,6 +36,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.kyori.adventure.text.Component;
 
+import java.net.InetSocketAddress;
+
 @ChannelHandler.Sharable
 public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
     public Player player;
@@ -81,35 +83,41 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
         }
     }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    //true if handled, false if not our exception
+    static boolean onExceptionCaught(Channel channel, User user, Throwable cause) {
         boolean didWeCauseThis = ExceptionUtil.isException(cause, PacketProcessException.class);
-        User user = this.user;
-        if (didWeCauseThis
-            && (user == null || user.getEncoderState() != ConnectionState.HANDSHAKING)) {
-            if (PacketEvents.getAPI().getSettings().isFullStackTraceEnabled()) {
-                cause.printStackTrace();
-            } else {
-                PacketEvents.getAPI().getLogManager().warn(cause.getMessage());
+        if (didWeCauseThis) {
+            boolean loggable = (user != null && user.getDecoderState() != ConnectionState.HANDSHAKING);
+
+            if (loggable) {
+                if (PacketEvents.getAPI().getSettings().isFullStackTraceEnabled()) {
+                    String name = user.getName();
+
+                    String id = name != null ? name : ((InetSocketAddress) channel.remoteAddress()).getAddress().getHostAddress();
+                    PacketEvents.getAPI().getLogManager().severe("Disconnecting " + id + " due to an invalid packet!", cause);
+                } else {
+                    PacketEvents.getAPI().getLogManager().warn(cause.getMessage());
+                }
             }
 
             if (PacketEvents.getAPI().getSettings().isKickOnPacketExceptionEnabled()) {
-                Channel channel = ctx.channel();
                 if (user != null) {
-                    PacketWrapper<?> wrapper = WrapperUtil.disconnectWrapper(user.getEncoderState(), Component.text("Invalid packet"));
+                    PacketWrapper<?> wrapper = WrapperUtil.createDisconnectWrapper(user.getEncoderState(), Component.text("Invalid packet"));
 
                     if (wrapper != null) {
                         user.sendPacket(wrapper);
                     }
-                    channel.close();
-                } else {
-                    channel.close();
                 }
-
-                super.exceptionCaught(ctx, cause);
+                channel.close();
             }
-        } else {
-            super.exceptionCaught(ctx, cause);
+            return true;
         }
+        return false;
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (!onExceptionCaught(ctx.channel(), this.user, cause))
+            super.exceptionCaught(ctx, cause);
     }
 }
