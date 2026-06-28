@@ -103,7 +103,9 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
 
                         channel.close();
                     });
-                } else channel.close();
+                } else {
+                    channel.close();
+                }
 
                 super.exceptionCaught(ctx, cause);
             }
