@@ -7,6 +7,8 @@ import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServer
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import net.kyori.adventure.text.Component;
 
+@NullMarked
+@ApiStatus.Internal
 public final class WrapperUtil {
 
     public static PacketWrapper<?> disconnectWrapper(ConnectionState state, Component component) {
