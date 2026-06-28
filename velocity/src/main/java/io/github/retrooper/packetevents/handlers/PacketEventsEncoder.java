@@ -98,11 +98,10 @@ public class PacketEventsEncoder extends MessageToByteEncoder<ByteBuf> {
                 if (user != null) {
                     PacketWrapper<?> wrapper = WrapperUtil.disconnectWrapper(user.getEncoderState(), Component.text("Invalid packet"));
 
-                    channel.eventLoop().execute(() -> {
-                        if (wrapper != null) user.sendPacket(wrapper);
-
-                        channel.close();
-                    });
+                    if (wrapper != null) {
+                        user.sendPacket(wrapper);
+                    }
+                    channel.close();
                 } else {
                     channel.close();
                 }
