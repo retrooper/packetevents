@@ -88,9 +88,16 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.github.retrooper.packetevents.util.adventure.AdventureIndexUtil.indexValueOrThrow;
-
 public class AdventureNBTSerializer implements ComponentSerializer<Component, Component, NBT> {
+
+    private static final TextDecoration[] DECORATION_VALUES = TextDecoration.values();
+    private static final String[] DECORATION_KEYS = new String[DECORATION_VALUES.length];
+
+    static {
+        for (int i = 0; i < DECORATION_VALUES.length; i++) {
+            DECORATION_KEYS[i] = DECORATION_VALUES[i].toString();
+        }
+    }
 
     private final ClientVersion version;
     private final boolean downsampleColor;
@@ -470,22 +477,27 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         Style.Builder style = Style.style();
         NBTReader reader = new NBTReader(wrapper, input);
 
-        reader.useUTF("font", value -> style.font(Key.key(value)));
-        reader.useUTF("color", value -> {
-            TextColor color = this.deserializeColor(value);
+        String font = reader.getUTF("font");
+        if (font != null) style.font(Key.key(font));
+
+        String colorName = reader.getUTF("color");
+        if (colorName != null) {
+            TextColor color = this.deserializeColor(colorName);
             if (color != null) style.color(color);
-        });
-        if (BackwardCompatUtil.IS_4_18_0_OR_NEWER) {
-            reader.useNumber("shadow_color", num ->
-                    style.shadowColor(ShadowColor.shadowColor(num.intValue())));
         }
 
-        for (String decorationKey : TextDecoration.NAMES.keys()) {
-            reader.useBoolean(decorationKey, value -> style.decoration(
-                    indexValueOrThrow(TextDecoration.NAMES, decorationKey),
-                    TextDecoration.State.byBoolean(value)));
+        if (BackwardCompatUtil.IS_4_18_0_OR_NEWER) {
+            Number shadowColor = reader.getNumber("shadow_color");
+            if (shadowColor != null) style.shadowColor(ShadowColor.shadowColor(shadowColor.intValue()));
         }
-        reader.useUTF("insertion", style::insertion);
+
+        for (int i = 0; i < DECORATION_KEYS.length; i++) {
+            Number value = reader.getNumber(DECORATION_KEYS[i]);
+            if (value != null) style.decoration(DECORATION_VALUES[i], TextDecoration.State.byBoolean(value.byteValue() != 0));
+        }
+
+        String insertion = reader.getUTF("insertion");
+        if (insertion != null) style.insertion(insertion);
 
         boolean modernEvents = this.version.isNewerThanOrEquals(ClientVersion.V_1_21_5);
         NBTReader clickEvent = reader.child(modernEvents ? "click_event" : "clickEvent");
@@ -605,7 +617,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             if (shadowColor != null) writer.writeInt("shadow_color", shadowColor.value());
         }
 
-        for (TextDecoration decoration : TextDecoration.NAMES.values()) {
+        for (TextDecoration decoration : DECORATION_VALUES) {
             TextDecoration.State state = style.decoration(decoration);
             if (state != TextDecoration.State.NOT_SET) {
                 writer.writeBoolean(decoration.toString(), state == TextDecoration.State.TRUE);
@@ -866,6 +878,18 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
 
         public <R> R readUTF(String key, Function<String, R> function) {
             return withTag(key, tag -> function.apply(requireType(tag, NBTType.STRING).getValue()));
+        }
+
+        public String getUTF(String key) {
+            NBT tag = compound.getTagOrNull(key);
+            return tag == null ? null : requireType(tag, NBTType.STRING).getValue();
+        }
+
+        public Number getNumber(String key) {
+            NBT tag = compound.getTagOrNull(key);
+            if (tag == null) return null;
+            if (tag instanceof NBTNumber) return ((NBTNumber) tag).getAsNumber();
+            throw new IllegalArgumentException("Expected number but got " + tag.getType());
         }
 
         public void useByteArray(String key, Consumer<byte[]> consumer) {
