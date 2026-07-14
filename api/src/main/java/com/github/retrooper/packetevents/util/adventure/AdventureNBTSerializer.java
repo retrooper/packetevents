@@ -90,14 +90,7 @@ import java.util.function.Function;
 
 public class AdventureNBTSerializer implements ComponentSerializer<Component, Component, NBT> {
 
-    private static final TextDecoration[] DECORATION_VALUES = TextDecoration.values();
-    private static final String[] DECORATION_KEYS = new String[DECORATION_VALUES.length];
-
-    static {
-        for (int i = 0; i < DECORATION_VALUES.length; i++) {
-            DECORATION_KEYS[i] = DECORATION_VALUES[i].toString();
-        }
-    }
+    private static final Map<String, TextDecoration> DECORATION_MAP = new HashMap<>(TextDecoration.NAMES.keyToValue());
 
     private final ClientVersion version;
     private final boolean downsampleColor;
@@ -491,9 +484,9 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             if (shadowColor != null) style.shadowColor(ShadowColor.shadowColor(shadowColor.intValue()));
         }
 
-        for (int i = 0; i < DECORATION_KEYS.length; i++) {
-            Number value = reader.getNumber(DECORATION_KEYS[i]);
-            if (value != null) style.decoration(DECORATION_VALUES[i], TextDecoration.State.byBoolean(value.byteValue() != 0));
+        for (Map.Entry<String, TextDecoration> entry : DECORATION_MAP.entrySet()) {
+            Number value = reader.getNumber(entry.getKey());
+            if (value != null) style.decoration(entry.getValue(), TextDecoration.State.byBoolean(value.byteValue() != 0));
         }
 
         String insertion = reader.getUTF("insertion");
@@ -617,10 +610,10 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             if (shadowColor != null) writer.writeInt("shadow_color", shadowColor.value());
         }
 
-        for (TextDecoration decoration : DECORATION_VALUES) {
-            TextDecoration.State state = style.decoration(decoration);
+        for (Map.Entry<String, TextDecoration> entry : DECORATION_MAP.entrySet()) {
+            TextDecoration.State state = style.decoration(entry.getValue());
             if (state != TextDecoration.State.NOT_SET) {
-                writer.writeBoolean(decoration.toString(), state == TextDecoration.State.TRUE);
+                writer.writeBoolean(entry.getKey(), state == TextDecoration.State.TRUE);
             }
         }
 
