@@ -85,12 +85,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class AdventureNBTSerializer implements ComponentSerializer<Component, Component, NBT> {
 
-    private static final Map<String, TextDecoration> DECORATION_MAP = new HashMap<>(TextDecoration.NAMES.keyToValue());
+    private static final Set<TextDecoration> DECORATIONS = TextDecoration.NAMES.values();
 
     private final ClientVersion version;
     private final boolean downsampleColor;
@@ -484,9 +485,9 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             if (shadowColor != null) style.shadowColor(ShadowColor.shadowColor(shadowColor.intValue()));
         }
 
-        for (Map.Entry<String, TextDecoration> entry : DECORATION_MAP.entrySet()) {
-            Number value = reader.getNumber(entry.getKey());
-            if (value != null) style.decoration(entry.getValue(), TextDecoration.State.byBoolean(value.byteValue() != 0));
+        for (TextDecoration decoration : DECORATIONS) {
+            Boolean value = reader.getBoolean(decoration.toString());
+            if (value != null) style.decoration(decoration, TextDecoration.State.byBoolean(value));
         }
 
         String insertion = reader.getUTF("insertion");
@@ -610,10 +611,10 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             if (shadowColor != null) writer.writeInt("shadow_color", shadowColor.value());
         }
 
-        for (Map.Entry<String, TextDecoration> entry : DECORATION_MAP.entrySet()) {
-            TextDecoration.State state = style.decoration(entry.getValue());
+        for (TextDecoration decoration : DECORATIONS) {
+            TextDecoration.State state = style.decoration(decoration);
             if (state != TextDecoration.State.NOT_SET) {
-                writer.writeBoolean(entry.getKey(), state == TextDecoration.State.TRUE);
+                writer.writeBoolean(decoration.toString(), state == TextDecoration.State.TRUE);
             }
         }
 
@@ -878,11 +879,16 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             return tag == null ? null : requireType(tag, NBTType.STRING).getValue();
         }
 
-        public Number getNumber(String key) {
+        public @Nullable Number getNumber(String key) {
             NBT tag = compound.getTagOrNull(key);
             if (tag == null) return null;
             if (tag instanceof NBTNumber) return ((NBTNumber) tag).getAsNumber();
             throw new IllegalArgumentException("Expected number but got " + tag.getType());
+        }
+
+        public @Nullable Boolean getBoolean(String key) {
+            Number number = getNumber(key);
+            return number == null ? null : number.byteValue() != 0;
         }
 
         public void useByteArray(String key, Consumer<byte[]> consumer) {
