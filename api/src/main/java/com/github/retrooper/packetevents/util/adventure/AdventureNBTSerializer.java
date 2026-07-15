@@ -873,7 +873,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             return withTag(key, tag -> function.apply(requireType(tag, NBTType.STRING).getValue()));
         }
 
-        public String getUTF(String key) {
+        public @Nullable String getUTF(String key) {
             NBT tag = compound.getTagOrNull(key);
             return tag == null ? null : requireType(tag, NBTType.STRING).getValue();
         }
