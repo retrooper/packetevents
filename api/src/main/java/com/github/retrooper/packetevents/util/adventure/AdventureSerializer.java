@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.util.adventure;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.stats.Statistics;
 import com.github.retrooper.packetevents.protocol.util.NbtDecoder;
 import com.github.retrooper.packetevents.protocol.util.NbtEncoder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -186,20 +185,21 @@ public final class AdventureSerializer implements NbtEncoder<Component>, NbtDeco
         return serializer().asNbtTag(component);
     }
 
-    public Component fromLegacy(String legacy) {
-        return this.legacy().deserializeOrNull(legacy);
+    public @Nullable Component fromLegacy(@Nullable String legacy) {
+        return legacy != null ? this.legacy().deserialize(legacy) : null;
     }
 
-    public String asLegacy(Component component) {
-        return this.legacy().serializeOrNull(component);
+    public @Nullable String asLegacy(@Nullable Component component) {
+        return component != null ? this.legacy().serialize(component) : null;
     }
 
-    public Component fromJson(String json) {
-        return this.gson().deserializeOrNull(json);
+    public @Nullable Component fromJson(@Nullable String json) {
+        return json != null ? this.gson().deserialize(json) : null;
     }
 
-    public String asJson(Component component) {
-        return this.gson().serializeOrNull(component);
+    @Contract("null -> null; !null -> !null")
+    public @Nullable String asJson(@Nullable Component component) {
+        return component != null ? this.gson().serialize(component) : null;
     }
 
     @Contract("!null -> !null")
@@ -230,13 +230,18 @@ public final class AdventureSerializer implements NbtEncoder<Component>, NbtDeco
         return this.nbt().serializeOrNull(component, wrapper);
     }
 
-    public GsonComponentSerializer gson() {
-        if (this.gson == null) {
-            this.gson = GsonComponentSerializer.builder()
+    private GsonComponentSerializer buildGsonSerializer() {
+        GsonComponentSerializer.Builder gsonBuilder = GsonComponentSerializer.builder();
+        if (AdventureSupportUtil.HAS_JSON_SERIALIZER_OPTS) {
+            gsonBuilder
                     .editOptions(builder -> {
                         builder.values(JSONOptions.byDataVersion().at(0));
                         if (this.version.isNewerThanOrEquals(ClientVersion.V_1_16)) {
-                            builder.value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.CAMEL_CASE);
+                            try {
+                                builder.value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.CAMEL_CASE);
+                            } catch (NoSuchFieldError ignored) {
+                                builder.value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.MODERN_ONLY); // legacy
+                            }
                             if (!PacketEvents.getAPI().getSettings().shouldDownsampleColors()) {
                                 builder.value(JSONOptions.EMIT_RGB, true);
                             }
@@ -257,15 +262,25 @@ public final class AdventureSerializer implements NbtEncoder<Component>, NbtDeco
                             builder.value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.SNAKE_CASE);
                             builder.value(JSONOptions.EMIT_CLICK_EVENT_TYPE, JSONOptions.ClickEventValueMode.SNAKE_CASE);
                             builder.value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_KEY_AS_TYPE_AND_UUID_AS_ID, false);
-                            builder.value(JSONOptions.EMIT_CLICK_URL_HTTPS, true);
+                            try {
+                                builder.value(JSONOptions.EMIT_CLICK_URL_HTTPS, true);
+                            } catch (NoSuchFieldError ignored) {
+                            }
                         }
                         if (this.version.isNewerThanOrEquals(ClientVersion.V_1_21_6)) {
                             builder.value(JSONOptions.EMIT_CHANGE_PAGE_CLICK_EVENT_PAGE_AS_STRING, false);
                         }
-                    })
-                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
-                    .showAchievementToComponent(input -> Statistics.getById(input).display())
-                    .build();
+                    });
+        }
+        if (AdventureSupportUtil.HAS_BOSSBAR_VIEWERS) {
+            gsonBuilder.legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get());
+        }
+        return gsonBuilder.build();
+    }
+
+    public GsonComponentSerializer gson() {
+        if (this.gson == null) {
+            this.gson = this.buildGsonSerializer();
         }
         return this.gson;
     }

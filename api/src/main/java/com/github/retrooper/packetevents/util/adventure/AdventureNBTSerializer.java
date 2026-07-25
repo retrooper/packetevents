@@ -72,7 +72,6 @@ import net.kyori.adventure.text.object.ObjectContents;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.object.SpriteObjectContents;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
-import net.kyori.adventure.text.serializer.gson.BackwardCompatUtil;
 import net.kyori.adventure.text.serializer.gson.GsonDataComponentValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -194,7 +193,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         String translate = reader.readUTF("translate", Function.identity());
         String translateFallback = reader.readUTF("fallback", Function.identity());
         List<? extends ComponentLike> translateWith;
-        if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
+        if (AdventureSupportUtil.HAS_TRANSLATION_ARGUMENTS) {
             NBTType<?> type = reader.type("with");
             if (type == NBTType.INT_ARRAY) {
                 translateWith = reader.readIntArray("with", params -> {
@@ -248,13 +247,13 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             TranslatableComponent.Builder i18nBuilder;
             builder = i18nBuilder = Component.translatable().key(translate);
             if (translateWith != null) {
-                if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
+                if (AdventureSupportUtil.HAS_TRANSLATION_ARGUMENTS) {
                     i18nBuilder.arguments(translateWith);
                 } else {
                     i18nBuilder.args(translateWith);
                 }
             }
-            if (BackwardCompatUtil.IS_4_13_0_OR_NEWER) {
+            if (AdventureSupportUtil.HAS_TRANSLATION_FALLBACK) {
                 i18nBuilder.fallback(translateFallback);
             }
         } else if (score != null) {
@@ -282,7 +281,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                 throw new IllegalStateException("Illegal nbt component, block/entity/storage is missing");
             }
         } else if (player != null) {
-            if (BackwardCompatUtil.IS_4_25_0_OR_NEWER) {
+            if (AdventureSupportUtil.HAS_OBJECT_COMPONENT) {
                 ItemProfile profile = ItemProfile.decode(player, wrapper);
                 PlayerHeadObjectContents playerHead = ObjectContents.playerHead()
                         .id(profile.getId()).name(profile.getName())
@@ -294,7 +293,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                 builder = Component.text();
             }
         } else if (sprite != null) {
-            if (BackwardCompatUtil.IS_4_25_0_OR_NEWER) {
+            if (AdventureSupportUtil.HAS_OBJECT_COMPONENT) {
                 Key spriteKey = Key.key(sprite);
                 Key atlasKey = reader.readUTF("atlas", atlas -> Key.key(atlas));
                 builder = Component.object().contents(atlasKey != null
@@ -313,7 +312,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             builder.append(extra);
         }
 
-        return BackwardCompatUtil.build(builder);
+        return builder.asComponent();
     }
 
     @Deprecated
@@ -342,7 +341,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             writer.writeUTF("translate", ((TranslatableComponent) component).key());
 
             // translation fallback
-            if (BackwardCompatUtil.IS_4_13_0_OR_NEWER) {
+            if (AdventureSupportUtil.HAS_TRANSLATION_FALLBACK) {
                 String fallback = ((TranslatableComponent) component).fallback();
                 if (fallback != null) {
                     writer.writeUTF("fallback", fallback);
@@ -350,7 +349,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             }
 
             // translation arguments
-            if (BackwardCompatUtil.IS_4_15_0_OR_NEWER) {
+            if (AdventureSupportUtil.HAS_TRANSLATION_ARGUMENTS) {
                 List<TranslationArgument> args = ((TranslatableComponent) component).arguments();
                 if (!args.isEmpty()) {
                     writer.writeList("with", NBTType.COMPOUND, this.serializeTranslationArgumentList(args, wrapper));
@@ -411,7 +410,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                 writer.writeUTF("storage", storage.asString());
             }
         } else if (component instanceof ObjectComponent) {
-            if (BackwardCompatUtil.IS_4_25_0_OR_NEWER && this.version.isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
+            if (AdventureSupportUtil.HAS_OBJECT_COMPONENT && this.version.isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
                 // object contents
                 ObjectContents objectContents = ((ObjectComponent) component).contents();
                 if (objectContents instanceof PlayerHeadObjectContents) {
@@ -475,7 +474,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
             TextColor color = this.deserializeColor(value);
             if (color != null) style.color(color);
         });
-        if (BackwardCompatUtil.IS_4_18_0_OR_NEWER) {
+        if (AdventureSupportUtil.HAS_SHADOW_COLOR) {
             reader.useNumber("shadow_color", num ->
                     style.shadowColor(ShadowColor.shadowColor(num.intValue())));
         }
@@ -549,7 +548,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                     int nonNullCount = count == null ? 1 : count;
 
                     BinaryTagHolder tag = item.readUTF("tag", BinaryTagHolder::binaryTagHolder);
-                    if (tag != null || !BackwardCompatUtil.IS_4_17_0_OR_NEWER) {
+                    if (tag != null || !AdventureSupportUtil.HAS_DATA_COMPONENTS) {
                         style.hoverEvent(HoverEvent.showItem(itemId, nonNullCount, tag));
                     } else {
                         Map<Key, DataComponentValue> components = item.readCompound("components", nbt -> {
@@ -600,7 +599,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
         TextColor color = style.color();
         if (color != null) writer.writeUTF("color", this.serializeColor(color));
 
-        if (BackwardCompatUtil.IS_4_18_0_OR_NEWER) {
+        if (AdventureSupportUtil.HAS_SHADOW_COLOR) {
             ShadowColor shadowColor = style.shadowColor();
             if (shadowColor != null) writer.writeInt("shadow_color", shadowColor.value());
         }
@@ -687,7 +686,7 @@ public class AdventureNBTSerializer implements ComponentSerializer<Component, Co
                     Key itemId = item.item();
                     int count = item.count();
                     BinaryTagHolder nbt = item.nbt();
-                    boolean emptyComps = !BackwardCompatUtil.IS_4_17_0_OR_NEWER || item.dataComponents().isEmpty();
+                    boolean emptyComps = !AdventureSupportUtil.HAS_DATA_COMPONENTS || item.dataComponents().isEmpty();
 
                     // "modern" item stacks are no longer allowed to be inlined
                     if (!modern && count == 1 && nbt == null && emptyComps) {

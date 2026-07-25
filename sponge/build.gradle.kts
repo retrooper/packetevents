@@ -1,4 +1,3 @@
-import com.github.retrooper.excludeAdventure
 import org.spongepowered.gradle.plugin.config.PluginLoaders
 import org.spongepowered.plugin.metadata.model.PluginDependency
 
@@ -86,19 +85,11 @@ tasks {
 
 
 dependencies {
+    api(project(":api"))
+    api(project(":netty-common"))
+
     compileOnly(libs.netty)
-    shadow(libs.adventure.nbt) {
-        isTransitive = false
-    }
-    shadow(project(":api", "shadow")) {
-        excludeAdventure()
-        exclude(group = "net.kyori", module = "adventure-key")
-    }
-    shadow(project(":netty-common")) {
-        excludeAdventure()
-        exclude(group = "net.kyori", module = "adventure-key")
-    }
-    compileShadowOnly(libs.bstats.sponge)
+    implementation(libs.bstats.sponge)
 
     compileOnly(libs.via.version)
 }
