@@ -136,9 +136,13 @@ public class ItemConsumable {
         TOOT_HORN,
         BRUSH,
         /**
-         * Added with 1.21.4
+         * @versions 1.21.4+
          */
         BUNDLE,
+        /**
+         * @versions 1.21.11+
+         */
+        SPEAR,
         ;
     }
 }
