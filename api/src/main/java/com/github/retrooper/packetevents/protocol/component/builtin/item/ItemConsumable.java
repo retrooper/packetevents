@@ -130,7 +130,7 @@ public class ItemConsumable {
         DRINK,
         BLOCK,
         BOW,
-        SPEAR,
+        TRIDENT,
         CROSSBOW,
         SPYGLASS,
         TOOT_HORN,
