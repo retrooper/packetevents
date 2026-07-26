@@ -55,12 +55,18 @@ public class MinestomProtocolManager extends ProtocolManagerAbstract {
     }
 
     /**
-     * Maps a client's wire protocol id (from Minestom's
-     * {@code PlayerConnection#getProtocolVersion()}, which already reflects ViaVersion
-     * translation when a Via layer is present) to the PacketEvents {@link ClientVersion}.
+     * Maps a client's wire protocol id to the PacketEvents {@link ClientVersion}.
      * {@link ClientVersion#getById(int)} clamps out-of-range ids to the latest/oldest
      * known version; this additionally maps the in-range {@code UNKNOWN} case to the
      * latest known version so callers never receive {@code UNKNOWN}.
+     * <p>
+     * <b>Deployment note (ViaVersion runs on the Velocity proxy, not this backend):</b>
+     * Minestom's {@code PlayerConnection#getProtocolVersion()} reports the <i>native</i>
+     * server protocol (26.2) for every player, because ViaVersion already translated
+     * older clients at the proxy — the backend never sees their real version. To flag a
+     * player's true client version, the proxy must forward it (e.g. a login plugin
+     * message from a Velocity+Via plugin) and the caller passes <i>that</i> id here.
+     * This method is the pure id→ClientVersion mapping and is agnostic to the source.
      */
     public static ClientVersion resolveClientVersion(int protocolId) {
         ClientVersion byId = ClientVersion.getById(protocolId);

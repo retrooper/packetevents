@@ -56,6 +56,9 @@ public final class MinestomUserTracker {
             return; // non-socket (test/fake) connection: nothing to track
         }
         SocketChannel channel = conn.getChannel();
+        // NOTE: behind Velocity+ViaVersion this is always the native protocol (Via translates
+        // at the proxy). For a player's real client version, forward it from the proxy and
+        // resolve that instead — see MinestomProtocolManager#resolveClientVersion.
         var clientVersion = MinestomProtocolManager.resolveClientVersion(conn.getProtocolVersion());
         User user = new User(channel, ConnectionState.CONFIGURATION, clientVersion,
                 new UserProfile(player.getUuid(), player.getUsername()));
