@@ -83,6 +83,9 @@ public final class MinestomPacketFeeder {
         }
 
         ConnectionState state = player.getPlayerConnection().getClientState();
+        // Keep PE's decoder state in lockstep with Minestom so EventCreationUtil builds
+        // the right event subtype (CONFIGURATION vs PLAY) for this connection phase.
+        user.setDecoderState(toPeState(state));
         byte[] payload = reserializeClientPacket(state, event.getPacket());
 
         // PacketSide.SERVER is "this platform's" side (see MinestomChannelInjector);
@@ -104,6 +107,7 @@ public final class MinestomPacketFeeder {
         }
 
         ConnectionState state = player.getPlayerConnection().getServerState();
+        user.setEncoderState(toPeState(state));
         byte[] payload = reserializeServerPacket(state, event.getPacket());
 
         // Outbound packets are fed with this platform's own side unchanged, mirroring
@@ -129,6 +133,17 @@ public final class MinestomPacketFeeder {
             return socketConnection.getChannel();
         }
         return null;
+    }
+
+    /** Translates Minestom's connection state to the PacketEvents equivalent. */
+    private static com.github.retrooper.packetevents.protocol.ConnectionState toPeState(ConnectionState minestom) {
+        return switch (minestom) {
+            case HANDSHAKE -> com.github.retrooper.packetevents.protocol.ConnectionState.HANDSHAKING;
+            case STATUS -> com.github.retrooper.packetevents.protocol.ConnectionState.STATUS;
+            case LOGIN -> com.github.retrooper.packetevents.protocol.ConnectionState.LOGIN;
+            case CONFIGURATION -> com.github.retrooper.packetevents.protocol.ConnectionState.CONFIGURATION;
+            case PLAY -> com.github.retrooper.packetevents.protocol.ConnectionState.PLAY;
+        };
     }
 
     /**
