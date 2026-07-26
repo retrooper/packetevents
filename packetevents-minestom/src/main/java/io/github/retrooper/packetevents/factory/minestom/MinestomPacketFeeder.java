@@ -145,7 +145,7 @@ public final class MinestomPacketFeeder {
      * registry view that produced the original packet.
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private static byte[] reserializeClientPacket(ConnectionState state, ClientPacket packet) {
+    static byte[] reserializeClientPacket(ConnectionState state, ClientPacket packet) {
         PacketRegistry registry = PacketVanilla.CLIENT_PACKET_PARSER.stateRegistry(state);
         PacketRegistry.PacketInfo info = registry.packetInfo(packet.getClass());
         NetworkBuffer.Type type = info.serializer();
@@ -162,7 +162,7 @@ public final class MinestomPacketFeeder {
      * own equivalent write path).
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private static byte[] reserializeServerPacket(ConnectionState state, ServerPacket packet) {
+    static byte[] reserializeServerPacket(ConnectionState state, ServerPacket packet) {
         PacketRegistry registry = PacketVanilla.SERVER_PACKET_PARSER.stateRegistry(state);
         PacketRegistry.PacketInfo info = registry.packetInfo(packet.getClass());
         NetworkBuffer.Type type = info.serializer();

@@ -29,6 +29,21 @@ dependencies {
     // compileOnlyApi(adventure) already covers our compile classpath.
     compileOnly(libs.minestom)
     compileOnly(libs.slf4j.api)
+
+    // Wire-byte fidelity test (Phase 0 gate): Minestom is needed on the *runtime* test
+    // classpath (it is only compileOnly for main), plus JUnit 5. The loopback test boots
+    // Minestom's registries and round-trips a movement packet through the real
+    // reserialize -> PacketEventsImplHelper.handlePacket -> PE-wrapper path.
+    testImplementation(libs.minestom)
+    // Netty is compileOnlyApi in :netty-common (platforms provide it at runtime); Minestom
+    // is pure NIO and bundles no Netty, so the test classpath must supply it explicitly.
+    testImplementation(libs.netty)
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 tasks.withType<JavaCompile> {
