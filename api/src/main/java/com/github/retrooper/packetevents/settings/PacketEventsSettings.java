@@ -40,6 +40,7 @@ public class PacketEventsSettings {
     private boolean fullStackTraceEnabled = false;
     private boolean kickOnPacketExceptionEnabled = true;
     private boolean kickIfTerminated = true;
+    private boolean preViaInjection = true;
     private Function<String, InputStream> resourceProvider = path -> PacketEventsSettings.class
             .getClassLoader()
             .getResourceAsStream(path);
@@ -153,6 +154,20 @@ public class PacketEventsSettings {
     }
 
     /**
+     * Whether PacketEvents should inject itself before ViaVersion in the netty pipeline.
+     * On platforms without a backend ViaVersion (e.g. Minestom, where Via runs on the proxy)
+     * this has no effect, but the setter must exist because consumers like Grim call it
+     * unconditionally.
+     *
+     * @param preViaInjection Value
+     * @return Settings instance.
+     */
+    public PacketEventsSettings preViaInjection(boolean preViaInjection) {
+        this.preViaInjection = preViaInjection;
+        return this;
+    }
+
+    /**
      * Some projects may want to implement a CDN with resources like asset mappings
      * By default, all resources are retrieved from the ClassLoader
      *
@@ -239,6 +254,15 @@ public class PacketEventsSettings {
      */
     public boolean isKickIfTerminated() {
         return kickIfTerminated;
+    }
+
+    /**
+     * Should packetevents inject before ViaVersion in the netty pipeline?
+     *
+     * @return Getter for {@link #preViaInjection}
+     */
+    public boolean isPreViaInjection() {
+        return preViaInjection;
     }
 
     /**
