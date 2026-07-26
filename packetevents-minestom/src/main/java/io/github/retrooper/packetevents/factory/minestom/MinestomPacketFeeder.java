@@ -46,11 +46,12 @@ import java.nio.channels.SocketChannel;
  * {@link PacketEventsImplHelper#handlePacket}, the same entry point every other
  * platform's Netty encoder/decoder uses.
  * <p>
- * This is a Phase 0 scaffold: {@link #register()} wires the listeners, and the
- * packet-side/reserialization logic below is a real, compiling best-effort
- * implementation, but it has <strong>not</strong> been exercised against a live client.
- * See the {@code PHASE-0-GATE} javadoc on {@link #reserializeClientPacket} and
- * {@link #reserializeServerPacket} for exactly what still needs live verification.
+ * Inbound movement decode is proven: {@code WireByteFidelityTest} round-trips
+ * PositionAndRotation / Position / Rotation / onGround-only packets through
+ * {@link #reserializeClientPacket} into PacketEvents wrappers with bit-exact fields.
+ * Still unverified against a live client: {@link #register()}'s end-to-end wiring, the
+ * outbound path ({@link #reserializeServerPacket}), and any packet whose serializer
+ * depends on dynamic registries — see the {@code PHASE-0-GATE} javadocs below.
  */
 public final class MinestomPacketFeeder {
 
@@ -136,10 +137,9 @@ public final class MinestomPacketFeeder {
      * outer length-prefix frame, matching what a Netty decoder would hand to the next
      * pipeline stage on other platforms) using Minestom's own
      * {@link NetworkBuffer}/{@link PacketVanilla} registries - the exact types Minestom
-     * itself uses internally (see {@code PlayerSocketConnection#read}). This compiles
-     * against Minestom 26.2 and mirrors Minestom's internal parse path, but round-trip
-     * byte fidelity against a real client has NOT been verified live and must be
-     * checked in the live-wire phase - in particular for packets whose
+     * itself uses internally (see {@code PlayerSocketConnection#read}). Round-trip byte
+     * fidelity is proven for movement packets by {@code WireByteFidelityTest} (loopback,
+     * bit-exact). Still to check in the live-wire phase: packets whose
      * {@code NetworkBuffer.Type} depends on dynamic registries (e.g. synced registry
      * ids), where {@link MinecraftServer#getRegistries()} may not be the exact
      * registry view that produced the original packet.
