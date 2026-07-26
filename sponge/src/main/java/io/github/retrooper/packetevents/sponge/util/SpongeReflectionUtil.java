@@ -109,10 +109,7 @@ public final class SpongeReflectionUtil {
         BYTE_BUF_IN_PACKET_DATA_SERIALIZER = Reflection.getField(NMS_PACKET_DATA_SERIALIZER_CLASS, ByteBuf.class, 0, true);
         NMS_MK_KEY_FIELD = Reflection.getField(NMS_MINECRAFT_KEY_CLASS, "key");
 
-        ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, "entityCount");
-        if (ENTITY_ID_COUNTER == null) {
-            ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, AtomicInteger.class, 0);
-        }
+        ENTITY_ID_COUNTER = Reflection.getField(NMS_ENTITY_CLASS, AtomicInteger.class, 0);
         if (ENTITY_ID_COUNTER == null) {
             ENTITY_ID_COUNTER = Reflection.getField(SERVER_LEVEL_CLASS, "ENTITY_COUNTER");
         }
