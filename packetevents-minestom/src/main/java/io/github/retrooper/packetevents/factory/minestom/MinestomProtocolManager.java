@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.factory.minestom;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
 import org.jetbrains.annotations.Nullable;
@@ -46,8 +47,24 @@ public class MinestomProtocolManager extends ProtocolManagerAbstract {
 
     @Override
     public ProtocolVersion getPlatformVersion() {
-        // TODO implement platform version, same as FabricProtocolManager
+        // PacketEvents' ProtocolVersion enum is an upstream //TODO stub (only UNKNOWN);
+        // FabricProtocolManager returns UNKNOWN for the same reason. Touching that enum
+        // would be a non-additive change to :api, so we mirror Fabric here. The
+        // meaningful per-player version lives in resolveClientVersion below.
         return ProtocolVersion.UNKNOWN;
+    }
+
+    /**
+     * Maps a client's wire protocol id (from Minestom's
+     * {@code PlayerConnection#getProtocolVersion()}, which already reflects ViaVersion
+     * translation when a Via layer is present) to the PacketEvents {@link ClientVersion}.
+     * {@link ClientVersion#getById(int)} clamps out-of-range ids to the latest/oldest
+     * known version; this additionally maps the in-range {@code UNKNOWN} case to the
+     * latest known version so callers never receive {@code UNKNOWN}.
+     */
+    public static ClientVersion resolveClientVersion(int protocolId) {
+        ClientVersion byId = ClientVersion.getById(protocolId);
+        return byId == ClientVersion.UNKNOWN ? ClientVersion.getLatest() : byId;
     }
 
     @Override
