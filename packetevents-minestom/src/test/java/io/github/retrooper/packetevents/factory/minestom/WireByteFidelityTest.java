@@ -28,7 +28,6 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerPosition;
@@ -36,7 +35,6 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPl
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerRotation;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.network.packet.client.ClientPacket;
 import net.minestom.server.network.packet.client.play.ClientPlayerPositionAndRotationPacket;
@@ -75,17 +73,7 @@ class WireByteFidelityTest {
 
     @BeforeAll
     static void boot() {
-        // Load Minestom's registries + packet parsers (needed by reserializeClientPacket);
-        // init() does not bind a socket, so it is safe in a unit test.
-        MinecraftServer.init();
-
-        PacketEventsSettings settings = new PacketEventsSettings()
-                .checkForUpdates(false) // no network call in tests
-                .reEncodeByDefault(false);
-        MinestomPacketEventsAPI api = new MinestomPacketEventsAPI("26.2", settings);
-        PacketEvents.setAPI(api);
-        api.load();
-        api.init();
+        PeMinestomTestBootstrap.ensureBooted();
 
         PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override

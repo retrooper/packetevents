@@ -92,7 +92,11 @@ public final class MinestomPacketFeeder {
         // inbound packets are fed with the opposite side, mirroring how
         // fabric-common's PacketDecoder passes side.getOpposite() into handlePacket.
         PacketSide side = PacketEvents.getAPI().getInjector().getPacketSide().getOpposite();
-        feed(channel, user, player, payload, side);
+        if (feed(channel, user, player, payload, side)) {
+            // Enforcement seam: PacketEvents (e.g. Grim) cancelled the re-serialized copy;
+            // cancel the original Minestom packet so it never reaches the game.
+            event.setCancelled(true);
+        }
     }
 
     private static void onOutbound(PlayerPacketOutEvent event) {
@@ -113,17 +117,47 @@ public final class MinestomPacketFeeder {
         // Outbound packets are fed with this platform's own side unchanged, mirroring
         // fabric-common's PacketEncoder, which passes its side through as-is.
         PacketSide side = PacketEvents.getAPI().getInjector().getPacketSide();
-        feed(channel, user, player, payload, side);
+        if (feed(channel, user, player, payload, side)) {
+            event.setCancelled(true);
+        }
     }
 
-    private static void feed(SocketChannel channel, User user, Player player, byte[] payload, PacketSide side) {
+    /**
+     * Feeds one re-serialized packet into PacketEvents.
+     *
+     * @return {@code true} if PacketEvents cancelled the packet (the caller must then
+     * cancel the original Minestom event), {@code false} otherwise.
+     */
+    private static boolean feed(SocketChannel channel, User user, Player player, byte[] payload, PacketSide side) {
         ByteBuf buf = Unpooled.wrappedBuffer(payload);
         try {
-            PacketEventsImplHelper.handlePacket(channel, user, player, buf, false, side);
+            var event = PacketEventsImplHelper.handlePacket(channel, user, player, buf, false, side);
+            return event != null && event.isCancelled();
         } catch (Exception e) {
             PacketEvents.getAPI().getLogManager().warn("Failed to process a Minestom packet through PacketEvents", e);
+            return false;
         } finally {
             buf.release();
+        }
+    }
+
+    /**
+     * Test hook: re-serialized inbound bytes are fed through the exact {@link #feed} path
+     * used in production, returning whether PacketEvents cancelled the packet. Uses a
+     * throwaway PLAY-state {@link User} keyed on a real (unconnected) {@link SocketChannel}.
+     */
+    static boolean feedInboundForTest(byte[] payload) throws java.io.IOException {
+        SocketChannel channel = SocketChannel.open();
+        try {
+            User user = new User(channel,
+                    com.github.retrooper.packetevents.protocol.ConnectionState.PLAY,
+                    com.github.retrooper.packetevents.protocol.player.ClientVersion.V_26_2,
+                    new com.github.retrooper.packetevents.protocol.player.UserProfile(
+                            java.util.UUID.randomUUID(), "CancelTestPlayer"));
+            PacketSide side = PacketEvents.getAPI().getInjector().getPacketSide().getOpposite();
+            return feed(channel, user, null, payload, side);
+        } finally {
+            channel.close();
         }
     }
 
