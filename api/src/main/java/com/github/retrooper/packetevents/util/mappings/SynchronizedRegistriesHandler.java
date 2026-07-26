@@ -43,6 +43,8 @@ import com.github.retrooper.packetevents.protocol.entity.pig.PigSoundVariant;
 import com.github.retrooper.packetevents.protocol.entity.pig.PigSoundVariants;
 import com.github.retrooper.packetevents.protocol.entity.pig.PigVariant;
 import com.github.retrooper.packetevents.protocol.entity.pig.PigVariants;
+import com.github.retrooper.packetevents.protocol.entity.sulfurcube.SulfurCubeArchtype;
+import com.github.retrooper.packetevents.protocol.entity.sulfurcube.SulfurCubeArchtypes;
 import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfSoundVariant;
 import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfSoundVariants;
 import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfVariant;
@@ -109,7 +111,7 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
                 new RegistryEntry<>(TrimPatterns.getRegistry(), (NbtEntryDecoder<TrimPattern>) TrimPattern::decode),
                 new RegistryEntry<>(TrimMaterials.getRegistry(), (NbtEntryDecoder<TrimMaterial>) TrimMaterial::decode),
-                new RegistryEntry<>(WolfVariants.getRegistry(), (NbtEntryDecoder<WolfVariant>) WolfVariant::decode),
+                new RegistryEntry<>(WolfVariants.getRegistry(), WolfVariant.CODEC),
                 new RegistryEntry<>(WolfSoundVariants.getRegistry(), WolfSoundVariant.CODEC),
                 new RegistryEntry<>(PigVariants.getRegistry(), PigVariant::decode),
                 new RegistryEntry<>(FrogVariants.getRegistry(), FrogVariant::decode),
@@ -119,7 +121,7 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(ZombieNautilusVariants.getRegistry(), ZombieNautilusVariant::decode),
                 new RegistryEntry<>(PaintingVariants.getRegistry(), PaintingVariant.CODEC),
                 new RegistryEntry<>(DimensionTypes.getRegistry(), DimensionType.CODEC),
-                new RegistryEntry<>(DamageTypes.getRegistry(), DamageType::decode),
+                new RegistryEntry<>(DamageTypes.getRegistry(), DamageType.DIRECT_CODEC),
                 new RegistryEntry<>(BannerPatterns.getRegistry(), BannerPattern::decode),
                 new RegistryEntry<>(EnchantmentTypes.getRegistry(), (NbtEntryDecoder<EnchantmentType>) EnchantmentType::decode),
                 new RegistryEntry<>(JukeboxSongs.getRegistry(), (NbtEntryDecoder<IJukeboxSong>) IJukeboxSong::decode),
@@ -130,7 +132,8 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(CatSoundVariants.getRegistry(), CatSoundVariant.CODEC),
                 new RegistryEntry<>(CowSoundVariants.getRegistry(), CowSoundVariant.CODEC),
                 new RegistryEntry<>(ChickenSoundVariants.getRegistry(), ChickenSoundVariant.CODEC),
-                new RegistryEntry<>(WorldClocks.getRegistry(), WorldClock.DIRECT_CODEC)
+                new RegistryEntry<>(WorldClocks.getRegistry(), WorldClock.DIRECT_CODEC),
+                new RegistryEntry<>(SulfurCubeArchtypes.getRegistry(), SulfurCubeArchtype.DIRECT_CODEC)
         ).forEach(entry -> REGISTRY_KEYS.put(entry.getRegistryKey(), entry));
     }
 

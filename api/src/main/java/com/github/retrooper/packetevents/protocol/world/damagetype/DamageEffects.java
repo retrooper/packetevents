@@ -18,9 +18,15 @@
 
 package com.github.retrooper.packetevents.protocol.world.damagetype;
 
+import com.github.retrooper.packetevents.protocol.util.CodecNameable;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import net.kyori.adventure.util.Index;
+import org.jspecify.annotations.NullMarked;
 
-public enum DamageEffects {
+@NullMarked
+public enum DamageEffects implements CodecNameable {
+
     HURT("hurt"),
     THORNS("thorns"),
     DROWNING("drowning"),
@@ -29,6 +35,7 @@ public enum DamageEffects {
     FREEZING("freezing");
 
     public static final Index<String, DamageEffects> ID_INDEX = Index.create(DamageEffects.class, DamageEffects::getId);
+    public static final NbtCodec<DamageEffects> CODEC = NbtCodecs.forEnum(values());
 
     private final String id;
 
@@ -37,6 +44,11 @@ public enum DamageEffects {
     }
 
     public String getId() {
-        return id;
+        return this.id;
+    }
+
+    @Override
+    public String getCodecName() {
+        return this.id;
     }
 }

@@ -70,4 +70,6 @@ public enum MaterialType {
     FROGLIGHT,
     DECORATED_POT,
     RESIN,
+    SULFUR,
+    CINNABAR,
 }
