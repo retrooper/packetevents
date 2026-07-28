@@ -18,14 +18,41 @@
 
 package com.github.retrooper.packetevents.protocol.entity.type;
 
+import java.util.Optional;
+
 import com.github.retrooper.packetevents.protocol.mapper.LegacyMappedEntity;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 
-import java.util.Optional;
-
 public interface EntityType extends MappedEntity, LegacyMappedEntity {
 
-    boolean isInstanceOf(EntityType parent);
+	/**
+	 * Returns the hierarchy class this entity type belongs to.
+	 * For example, {@code ZOMBIE → ABSTRACT_MONSTER}.
+	 */
+	EntityClass getEntityClass();
 
-    Optional<EntityType> getParent();
+	/**
+	 * Checks if this entity type is an instance of the given hierarchy class
+	 * (or one of its ancestors). Uses the {@link EntityClass} tree.
+	 * <p>
+	 * This is the replacement for the deprecated {@link #isInstanceOf(EntityType)}.
+	 */
+	default boolean isInstanceOf(EntityClass clazz) {
+		EntityClass self = getEntityClass();
+		return clazz != null && self != null && clazz.isAssignableFrom(self);
+	}
+
+	/**
+	 * @deprecated Use {@link #isInstanceOf(EntityClass)} with constants from
+	 *             {@link EntityHierarchy}.
+	 */
+	@Deprecated
+	boolean isInstanceOf(EntityType parent);
+
+	/**
+	 * @deprecated Use {@link #getEntityClass()} and
+	 *             {@link EntityClass#getParent()}.
+	 */
+	@Deprecated
+	Optional<EntityType> getParent();
 }

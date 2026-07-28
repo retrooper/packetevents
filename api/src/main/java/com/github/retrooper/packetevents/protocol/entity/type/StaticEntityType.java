@@ -18,59 +18,104 @@
 
 package com.github.retrooper.packetevents.protocol.entity.type;
 
-import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
+import com.github.retrooper.packetevents.protocol.mapper.AbstractMappedEntity;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.mappings.TypesBuilderData;
+
 public class StaticEntityType extends AbstractMappedEntity implements EntityType {
 
-    private final Optional<EntityType> parent;
-    private final Map<EntityType, Boolean> parents;
+	private final EntityClass entityClass;
+	private final Map<EntityClass, Boolean> classChain;
+	private final @Nullable EntityType concreteParent;
 
-    private @Nullable TypesBuilderData legacyData;
+	private @Nullable TypesBuilderData legacyData;
 
-    @ApiStatus.Internal
-    public StaticEntityType(@Nullable TypesBuilderData data, @Nullable EntityType parent) {
-        super(data);
-        this.parent = Optional.ofNullable(parent);
+	@ApiStatus.Internal
+	public StaticEntityType(@Nullable TypesBuilderData data, EntityClass entityClass) {
+		this(data, entityClass, null);
+	}
 
-        // iterate through all parents and save them for faster access
-        this.parents = new IdentityHashMap<>();
-        this.parents.put(this, true);
-        while (parent != null) {
-            this.parents.put(parent, true);
-            parent = parent.getParent().orElse(null);
-        }
-    }
+	@ApiStatus.Internal
+	public StaticEntityType(@Nullable TypesBuilderData data, EntityClass entityClass,
+			@Nullable EntityType concreteParent) {
+		super(data);
+		this.entityClass = entityClass;
+		this.concreteParent = concreteParent;
 
-    StaticEntityType setLegacyData(@Nullable TypesBuilderData legacyData) {
-        this.legacyData = legacyData;
-        return this;
-    }
+		// build the class chain by walking the EntityClass hierarchy
+		this.classChain = new IdentityHashMap<>();
+		EntityClass cur = entityClass;
+		while (cur != null) {
+			this.classChain.put(cur, true);
+			cur = cur.getParent();
+		}
+	}
 
-    @Override
-    public boolean isInstanceOf(EntityType parent) {
-        return parent != null && this.parents.containsKey(parent);
-    }
+	StaticEntityType setLegacyData(@Nullable TypesBuilderData legacyData) {
+		this.legacyData = legacyData;
+		return this;
+	}
 
-    @Override
-    public Optional<EntityType> getParent() {
-        return this.parent;
-    }
+	@Override
+	public EntityClass getEntityClass() {
+		return this.entityClass;
+	}
 
-    @Override
-    public int getLegacyId(ClientVersion version) {
-        if (version.isNewerThanOrEquals(ClientVersion.V_1_14)) {
-            return -1;
-        } else if (this.legacyData != null) {
-            return this.legacyData.getId(version);
-        }
-        throw new UnsupportedOperationException();
-    }
+	@Override
+	public boolean isInstanceOf(EntityClass clazz) {
+		return clazz != null && this.classChain.containsKey(clazz);
+	}
+
+	@Override
+	@Deprecated
+	public boolean isInstanceOf(EntityType parent) {
+		if (parent == null)
+			return false;
+
+		EntityClass parentClass = parent.getEntityClass();
+		if (parentClass != null && this.classChain.containsKey(parentClass)) {
+			return true;
+		}
+
+		// walk the concrete parent chain (DROWNED → ZOMBIE etc.)
+		// the walk is needed when the concrete parent reference matters
+		// (e.g. two types sharing the same EntityClass but unrelated)
+		EntityType cur = this.concreteParent;
+		while (cur != null) {
+			if (cur == parent)
+				return true;
+			// note: instanceof guard is necessary because the EntityType interface
+			// is public and could theoretically have non-StaticEntityType implementations
+			if (cur instanceof StaticEntityType) {
+				cur = ((StaticEntityType) cur).concreteParent;
+			} else {
+				cur = null;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	@Deprecated
+	public Optional<EntityType> getParent() {
+		return Optional.ofNullable(this.concreteParent);
+	}
+
+	@Override
+	public int getLegacyId(ClientVersion version) {
+		if (version.isNewerThanOrEquals(ClientVersion.V_1_14)) {
+			return -1;
+		} else if (this.legacyData != null) {
+			return this.legacyData.getId(version);
+		}
+		throw new UnsupportedOperationException();
+	}
 }
