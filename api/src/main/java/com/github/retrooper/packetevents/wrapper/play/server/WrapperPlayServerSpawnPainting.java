@@ -88,9 +88,8 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             this.variant = readMappedEntity(PaintingVariants.getRegistry());
         } else {
-            String title = readString(13);
-            this.variant = PaintingVariants.getByName(
-                    title.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase());
+            PaintingType oldType = PaintingType.getByTitle(readString(13));
+            this.variant = oldType != null ? paintingTypeToVariant(oldType) : null;
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             this.position = readBlockPosition();
@@ -116,7 +115,8 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             writeMappedEntity(Objects.requireNonNull(this.variant, "variant must be set"));
         } else {
-            writeString(pascalCaseTitle(Objects.requireNonNull(this.variant, "variant must be set").getName().getKey()), 13);
+            PaintingVariant v = Objects.requireNonNull(this.variant, "variant must be set");
+            writeString(variantToPaintingType(v).getTitle(), 13);
         }
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             long positionVector = this.position.getSerializedPosition(this.serverVersion);
@@ -202,16 +202,6 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
             map.put(enumNameToRegistryKey(type), type);
         }
         REGISTRY_KEY_TO_TYPE = Collections.unmodifiableMap(map);
-    }
-
-    private static String pascalCaseTitle(String registryName) {
-        StringBuilder sb = new StringBuilder();
-        for (String part : registryName.split("_")) {
-            if (part.isEmpty()) continue;
-            sb.append(Character.toUpperCase(part.charAt(0)));
-            sb.append(part.substring(1));
-        }
-        return sb.toString();
     }
 
     @Nullable
