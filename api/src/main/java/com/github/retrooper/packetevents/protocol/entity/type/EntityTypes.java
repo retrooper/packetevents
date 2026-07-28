@@ -71,8 +71,13 @@ public final class EntityTypes {
 
     // Credit to ViaVersion for these categories
     public static final EntityType ENTITY = define("entity", null);
-    public static final EntityType LIVINGENTITY = define("livingentity", ENTITY);
-    public static final EntityType ABSTRACT_INSENTIENT = define("abstract_insentient", LIVINGENTITY);
+    public static final EntityType LIVING_ENTITY = define("livingentity", ENTITY);
+    /**
+     * @deprecated Use {@link #LIVING_ENTITY}
+     */
+    @Deprecated
+    public static final EntityType LIVINGENTITY = LIVING_ENTITY;
+    public static final EntityType ABSTRACT_INSENTIENT = define("abstract_insentient", LIVING_ENTITY);
     public static final EntityType ABSTRACT_CREATURE = define("abstract_creature", ABSTRACT_INSENTIENT);
     public static final EntityType ABSTRACT_AGEABLE = define("abstract_ageable", ABSTRACT_CREATURE);
     public static final EntityType ABSTRACT_ANIMAL = define("abstract_animal", ABSTRACT_AGEABLE);
@@ -94,17 +99,40 @@ public final class EntityTypes {
     public static final EntityType ABSTRACT_LIGHTNING = define("abstract_lightning", ENTITY);
     public static final EntityType ABSTRACT_ARROW = define("abstract_arrow", ENTITY);
     public static final EntityType ABSTRACT_FIREBALL = define("abstract_fireball", ENTITY);
-    public static final EntityType PROJECTILE_ABSTRACT = define("projectile_abstract", ENTITY);
-    public static final EntityType MINECART_ABSTRACT = define("minecart_abstract", ENTITY);
-    public static final EntityType CHESTED_MINECART_ABSTRACT = define("chested_minecart_abstract", MINECART_ABSTRACT);
+    public static final EntityType ABSTRACT_PROJECTILE = define("projectile_abstract", ENTITY);
+    /**
+     * @deprecated Use {@link #ABSTRACT_PROJECTILE}
+     */
+    @Deprecated
+    public static final EntityType PROJECTILE_ABSTRACT = ABSTRACT_PROJECTILE;
+    public static final EntityType ABSTRACT_MINECART = define("minecart_abstract", ENTITY);
+    /**
+     * @deprecated Use {@link #ABSTRACT_MINECART}
+     */
+    @Deprecated
+    public static final EntityType MINECART_ABSTRACT = ABSTRACT_MINECART;
+    public static final EntityType ABSTRACT_CHESTED_MINECART = define("chested_minecart_abstract", ABSTRACT_MINECART);
+    /**
+     * @deprecated Use {@link #ABSTRACT_CHESTED_MINECART}
+     */
+    @Deprecated
+    public static final EntityType CHESTED_MINECART_ABSTRACT = ABSTRACT_CHESTED_MINECART;
+    /**
+     * Virtual parent type for all boat entities.
+     */
+    public static final EntityType ABSTRACT_BOAT = define("abstract_boat", ENTITY);
+    /**
+     * Virtual parent type for all chest boat entities.
+     */
+    public static final EntityType ABSTRACT_CHEST_BOAT = define("abstract_chest_boat", ABSTRACT_BOAT);
     /**
      * Not spawnable
      *
      * @versions 1.21.9+
      */
-    public static final EntityType AVATAR = define("avatar", LIVINGENTITY);
+    public static final EntityType AVATAR = define("avatar", LIVING_ENTITY);
     public static final EntityType AREA_EFFECT_CLOUD = define("area_effect_cloud", ENTITY);
-    public static final EntityType ARMOR_STAND = define("armor_stand", LIVINGENTITY);
+    public static final EntityType ARMOR_STAND = define("armor_stand", LIVING_ENTITY);
     public static final EntityType ALLAY = define("allay", ABSTRACT_CREATURE);
     public static final EntityType ARROW = define("arrow", ABSTRACT_ARROW);
     public static final EntityType AXOLOTL = define("axolotl", ABSTRACT_ANIMAL);
@@ -114,11 +142,11 @@ public final class EntityTypes {
     /**
      * <strong>WARNING:</strong> Does not exist itself anymore since 1.21.2
      */
-    public static final EntityType BOAT = define("boat", ENTITY);
+    public static final EntityType BOAT = define("boat", ABSTRACT_BOAT);
     /**
      * <strong>WARNING:</strong> Does not exist itself anymore since 1.21.2
      */
-    public static final EntityType CHEST_BOAT = define("chest_boat", BOAT);
+    public static final EntityType CHEST_BOAT = define("chest_boat", ABSTRACT_CHEST_BOAT);
     public static final EntityType CAT = define("cat", ABSTRACT_TAMEABLE_ANIMAL);
     public static final EntityType CAMEL = define("camel", ABSTRACT_HORSE);
     public static final EntityType SPIDER = define("spider", ABSTRACT_MONSTER);
@@ -167,13 +195,13 @@ public final class EntityTypes {
     public static final EntityType SLIME = define("slime", ABSTRACT_INSENTIENT);
     public static final EntityType MAGMA_CUBE = define("magma_cube", SLIME);
     public static final EntityType MARKER = define("marker", ENTITY);
-    public static final EntityType MINECART = define("minecart", MINECART_ABSTRACT);
-    public static final EntityType CHEST_MINECART = define("chest_minecart", CHESTED_MINECART_ABSTRACT);
-    public static final EntityType COMMAND_BLOCK_MINECART = define("command_block_minecart", MINECART_ABSTRACT);
-    public static final EntityType FURNACE_MINECART = define("furnace_minecart", MINECART_ABSTRACT);
-    public static final EntityType HOPPER_MINECART = define("hopper_minecart", CHESTED_MINECART_ABSTRACT);
-    public static final EntityType SPAWNER_MINECART = define("spawner_minecart", MINECART_ABSTRACT);
-    public static final EntityType TNT_MINECART = define("tnt_minecart", MINECART_ABSTRACT);
+    public static final EntityType MINECART = define("minecart", ABSTRACT_MINECART);
+    public static final EntityType CHEST_MINECART = define("chest_minecart", ABSTRACT_CHESTED_MINECART);
+    public static final EntityType COMMAND_BLOCK_MINECART = define("command_block_minecart", ABSTRACT_MINECART);
+    public static final EntityType FURNACE_MINECART = define("furnace_minecart", ABSTRACT_MINECART);
+    public static final EntityType HOPPER_MINECART = define("hopper_minecart", ABSTRACT_CHESTED_MINECART);
+    public static final EntityType SPAWNER_MINECART = define("spawner_minecart", ABSTRACT_MINECART);
+    public static final EntityType TNT_MINECART = define("tnt_minecart", ABSTRACT_MINECART);
     public static final EntityType MULE = define("mule", CHESTED_HORSE);
     public static final EntityType MOOSHROOM = define("mooshroom", COW);
     public static final EntityType OCELOT = define("ocelot", ABSTRACT_TAMEABLE_ANIMAL);
@@ -199,18 +227,18 @@ public final class EntityTypes {
     public static final EntityType SKELETON_HORSE = define("skeleton_horse", ABSTRACT_HORSE);
     public static final EntityType SMALL_FIREBALL = define("small_fireball", ABSTRACT_FIREBALL);
     public static final EntityType SNOW_GOLEM = define("snow_golem", ABSTRACT_GOLEM);
-    public static final EntityType SNOWBALL = define("snowball", PROJECTILE_ABSTRACT);
+    public static final EntityType SNOWBALL = define("snowball", ABSTRACT_PROJECTILE);
     public static final EntityType SPECTRAL_ARROW = define("spectral_arrow", ABSTRACT_ARROW);
     public static final EntityType STRAY = define("stray", ABSTRACT_SKELETON);
     public static final EntityType STRIDER = define("strider", ABSTRACT_ANIMAL);
-    public static final EntityType EGG = define("egg", PROJECTILE_ABSTRACT);
-    public static final EntityType ENDER_PEARL = define("ender_pearl", PROJECTILE_ABSTRACT);
-    public static final EntityType EXPERIENCE_BOTTLE = define("experience_bottle", PROJECTILE_ABSTRACT);
+    public static final EntityType EGG = define("egg", ABSTRACT_PROJECTILE);
+    public static final EntityType ENDER_PEARL = define("ender_pearl", ABSTRACT_PROJECTILE);
+    public static final EntityType EXPERIENCE_BOTTLE = define("experience_bottle", ABSTRACT_PROJECTILE);
     /**
      * <strong>WARNING:</strong> Does not exist itself anymore since 1.21.5, this has
      * been split into {@link #SPLASH_POTION} and {@link #LINGERING_POTION}
      */
-    public static final EntityType POTION = define("potion", PROJECTILE_ABSTRACT);
+    public static final EntityType POTION = define("potion", ABSTRACT_PROJECTILE);
     public static final EntityType TADPOLE = define("tadpole", ABSTRACT_FISHES);
     @Deprecated // Exists only in 1.9 and 1.10
     public static final EntityType TIPPED_ARROW = define("tipped_arrow", ARROW);
@@ -235,16 +263,16 @@ public final class EntityTypes {
     public static final EntityType PLAYER = define("player", AVATAR);
     public static final EntityType FISHING_BOBBER = define("fishing_bobber", ENTITY);
     public static final EntityType ENDER_SIGNAL = define("ender_signal", ENTITY);
-    public static final EntityType THROWN_EXP_BOTTLE = define("thrown_exp_bottle", PROJECTILE_ABSTRACT);
+    public static final EntityType THROWN_EXP_BOTTLE = define("thrown_exp_bottle", ABSTRACT_PROJECTILE);
     public static final EntityType PRIMED_TNT = define("primed_tnt", ENTITY);
     public static final EntityType FIREWORK = define("firework", ENTITY);
-    public static final EntityType MINECART_COMMAND = define("minecart_command", MINECART_ABSTRACT);
-    public static final EntityType MINECART_RIDEABLE = define("minecart_rideable", MINECART_ABSTRACT);
-    public static final EntityType MINECART_CHEST = define("minecart_chest", MINECART_ABSTRACT);
-    public static final EntityType MINECART_FURNACE = define("minecart_furnace", MINECART_ABSTRACT);
-    public static final EntityType MINECART_TNT = define("minecart_tnt", MINECART_ABSTRACT);
-    public static final EntityType MINECART_HOPPER = define("minecart_hopper", MINECART_ABSTRACT);
-    public static final EntityType MINECART_MOB_SPAWNER = define("minecart_mob_spawner", MINECART_ABSTRACT);
+    public static final EntityType MINECART_COMMAND = define("minecart_command", ABSTRACT_MINECART);
+    public static final EntityType MINECART_RIDEABLE = define("minecart_rideable", ABSTRACT_MINECART);
+    public static final EntityType MINECART_CHEST = define("minecart_chest", ABSTRACT_MINECART);
+    public static final EntityType MINECART_FURNACE = define("minecart_furnace", ABSTRACT_MINECART);
+    public static final EntityType MINECART_TNT = define("minecart_tnt", ABSTRACT_MINECART);
+    public static final EntityType MINECART_HOPPER = define("minecart_hopper", ABSTRACT_MINECART);
+    public static final EntityType MINECART_MOB_SPAWNER = define("minecart_mob_spawner", ABSTRACT_MINECART);
     /**
      * @versions 1.19.4+
      */
@@ -276,7 +304,7 @@ public final class EntityTypes {
     /**
      * @versions 1.20.3+
      */
-    public static final EntityType ABSTRACT_WIND_CHARGE = define("abstract_wind_charge", PROJECTILE_ABSTRACT);
+    public static final EntityType ABSTRACT_WIND_CHARGE = define("abstract_wind_charge", ABSTRACT_PROJECTILE);
     /**
      * @versions 1.20.3+
      */
