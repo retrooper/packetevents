@@ -23,16 +23,15 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToMessageEncoder;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.util.List;
-
 @NullMarked
 @ApiStatus.Internal
-public class PacketEncoder extends MessageToMessageEncoder<ByteBuf> {
+public class PacketEncoder extends ChannelOutboundHandlerAdapter {
 
     private final PacketSide side;
     public User user;
@@ -44,14 +43,28 @@ public class PacketEncoder extends MessageToMessageEncoder<ByteBuf> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        if (!msg.isReadable()) {
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        if (!(msg instanceof ByteBuf)) {
+            ctx.write(msg, promise);
             return;
         }
-        PacketEventsImplHelper.handlePacket(ctx.channel(), this.user, this.player,
-                msg, true, this.side);
-        if (msg.isReadable()) {
-            out.add(msg.retain());
+
+        ByteBuf buf = (ByteBuf) msg;
+        if (!buf.isReadable()) {
+            ctx.write(msg, promise);
+            return;
+        }
+
+        PacketEventsImplHelper.handlePacket(ctx.channel(), this.user, this.player, buf, true, this.side);
+
+        if (buf.isReadable()) {
+            ctx.write(buf, promise);
+        } else {
+            // packet was cancelled - release the buffer and silently drop it,
+            // completing the promise as successful instead of forwarding
+            // an empty/unreadable buffer down the pipeline
+            buf.release();
+            promise.setSuccess();
         }
     }
 }
