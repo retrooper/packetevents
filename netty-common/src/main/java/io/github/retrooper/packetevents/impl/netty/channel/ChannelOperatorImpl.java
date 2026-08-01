@@ -27,22 +27,65 @@ import java.util.List;
 public class ChannelOperatorImpl implements ChannelOperator {
     @Override
     public SocketAddress remoteAddress(Object channel) {
-        return ((Channel) channel).remoteAddress();
+        if (channel instanceof Channel) {
+            return ((Channel) channel).remoteAddress();
+        }
+        // OnThePixel (Minestom): raw NIO SocketChannel, not a Netty Channel.
+        if (channel instanceof java.nio.channels.SocketChannel) {
+            try {
+                return ((java.nio.channels.SocketChannel) channel).getRemoteAddress();
+            } catch (java.io.IOException ignored) {
+                return null;
+            }
+        }
+        return null;
     }
 
     @Override
     public SocketAddress localAddress(Object channel) {
-        return ((Channel) channel).localAddress();
+        if (channel instanceof Channel) {
+            return ((Channel) channel).localAddress();
+        }
+        // OnThePixel (Minestom): raw NIO SocketChannel, not a Netty Channel.
+        if (channel instanceof java.nio.channels.SocketChannel) {
+            try {
+                return ((java.nio.channels.SocketChannel) channel).getLocalAddress();
+            } catch (java.io.IOException ignored) {
+                return null;
+            }
+        }
+        return null;
     }
 
     @Override
     public boolean isOpen(Object channel) {
-        return ((Channel) channel).isOpen();
+        if (channel instanceof Channel) {
+            return ((Channel) channel).isOpen();
+        }
+        // OnThePixel (Minestom): the "channel" is a raw NIO java.nio.channels.SocketChannel, not a
+        // Netty Channel. Grim's shouldCheck() calls ChannelHelper.isOpen() on the tick thread; the
+        // blind Netty cast threw ClassCastException and stopped every player from being checked.
+        if (channel instanceof java.nio.channels.Channel) {
+            return ((java.nio.channels.Channel) channel).isOpen();
+        }
+        return false;
     }
 
     @Override
     public Object close(Object channel) {
-        return ((Channel) channel).close();
+        if (channel instanceof Channel) {
+            return ((Channel) channel).close();
+        }
+        // OnThePixel (Minestom): the "channel" is a raw NIO java.nio.channels.SocketChannel, not a Netty
+        // Channel. Closing it via the Netty cast threw ClassCastException on the tick thread. Close it
+        // directly so no closeConnection() path can ever take down the server tick.
+        if (channel instanceof java.nio.channels.Channel) {
+            try {
+                ((java.nio.channels.Channel) channel).close();
+            } catch (java.io.IOException ignored) {
+            }
+        }
+        return null;
     }
 
     @Override
@@ -107,7 +150,14 @@ public class ChannelOperatorImpl implements ChannelOperator {
 
     @Override
     public void runInEventLoop(Object channel, Runnable runnable) {
-        ((Channel) channel).eventLoop().execute(runnable);
+        if (channel instanceof Channel) {
+            ((Channel) channel).eventLoop().execute(runnable);
+            return;
+        }
+        // OnThePixel (Minestom): a raw NIO SocketChannel has no Netty event loop. Grim uses this via
+        // runSafely() to get channel-thread affinity; with no event loop to hand off to, run inline on
+        // the calling thread (the Minestom packet/tick thread that already drives this player's flow).
+        runnable.run();
     }
 
     @Override

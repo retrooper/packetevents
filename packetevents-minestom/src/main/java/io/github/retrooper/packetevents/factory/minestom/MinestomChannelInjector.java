@@ -66,6 +66,11 @@ public class MinestomChannelInjector implements ChannelInjector {
         return this.players.containsKey((SocketChannel) channel);
     }
 
+    /** The Minestom {@code Player} bound to this channel, or {@code null} if none is set. */
+    public Object getPlayer(Object channel) {
+        return this.players.get((SocketChannel) channel);
+    }
+
     @Override
     public boolean isProxy() {
         return false;

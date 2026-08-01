@@ -22,7 +22,9 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.ProtocolVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolManagerAbstract;
+import net.minestom.server.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -89,5 +91,41 @@ public class MinestomProtocolManager extends ProtocolManagerAbstract {
     @Override
     public @Nullable User removeUser(Object channel) {
         return USERS.remove(channel);
+    }
+
+    // ------------------------------------------------------------------------------------------
+    // Wrapper-Sends: der geerbte ProtocolManagerAbstract-Pfad kodiert Wrapper in Netty-ByteBufs und
+    // schreibt sie über ChannelHelper auf den Netty-Channel. Minestom hat aber einen NIO-SocketChannel
+    // (kein Netty). Grim sendet u.a. Transactions per user.writePacket(...) — ohne diese Umleitung
+    // crasht das (ClassCastException) und Grims Transaction-/Setback-System läuft nie an.
+    // Wir umgehen transformWrappers/ChannelHelper komplett und senden über Minestoms eigenen Pfad
+    // (MinestomPacketSender -> player.sendPacket). Minestom flusht selbst, daher ist write == send.
+    // ------------------------------------------------------------------------------------------
+
+    @Override
+    public void sendPacket(Object channel, PacketWrapper<?> wrapper) {
+        sendViaMinestom(channel, wrapper);
+    }
+
+    @Override
+    public void sendPacketSilently(Object channel, PacketWrapper<?> wrapper) {
+        sendViaMinestom(channel, wrapper);
+    }
+
+    @Override
+    public void writePacket(Object channel, PacketWrapper<?> wrapper) {
+        sendViaMinestom(channel, wrapper);
+    }
+
+    @Override
+    public void writePacketSilently(Object channel, PacketWrapper<?> wrapper) {
+        sendViaMinestom(channel, wrapper);
+    }
+
+    private void sendViaMinestom(Object channel, PacketWrapper<?> wrapper) {
+        Object player = ((MinestomChannelInjector) PacketEvents.getAPI().getInjector()).getPlayer(channel);
+        if (player instanceof Player p) {
+            MinestomPacketSender.send(p, wrapper);
+        }
     }
 }
