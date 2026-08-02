@@ -20,9 +20,10 @@ package com.github.retrooper.packetevents.protocol.world;
 
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
-import org.jetbrains.annotations.NotNull;
 
-public class Location {
+import java.util.Objects;
+
+public class Location implements Cloneable {
     private Vector3d position;
     private float yaw;
     private float pitch;
@@ -97,6 +98,16 @@ public class Location {
             double xz = Math.sqrt(x2 + z2);
             this.pitch = (float)Math.toDegrees(Math.atan(-vector.getY() / xz));
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Location)) return false;
+        Location other = (Location) obj;
+        return Objects.equals(this.position, other.position)
+                && this.yaw == other.yaw
+                && this.pitch == other.pitch;
     }
 
     @Override
