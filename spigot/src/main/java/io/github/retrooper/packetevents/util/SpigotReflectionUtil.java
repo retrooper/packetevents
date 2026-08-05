@@ -34,7 +34,7 @@ import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.MapMaker;
-import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -886,7 +886,7 @@ public final class SpigotReflectionUtil {
     }
 
     public static com.github.retrooper.packetevents.protocol.item.ItemStack decodeBukkitItemStack(ItemStack in) {
-        Object buffer = PooledByteBufAllocator.DEFAULT.buffer();
+        Object buffer = Unpooled.buffer();
         try {
             // 3 reflection calls
             Object packetDataSerializer = createPacketDataSerializer(buffer);
@@ -902,7 +902,7 @@ public final class SpigotReflectionUtil {
     }
 
     public static ItemStack encodeBukkitItemStack(com.github.retrooper.packetevents.protocol.item.ItemStack in) {
-        Object buffer = PooledByteBufAllocator.DEFAULT.buffer();
+        Object buffer = Unpooled.buffer();
         try {
             PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
             wrapper.writeItemStack(in);
