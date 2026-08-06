@@ -19,6 +19,8 @@
 package io.github.retrooper.packetevents.factory.minestom;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
@@ -117,8 +119,43 @@ public final class MinestomPacketFeeder {
         // Outbound packets are fed with this platform's own side unchanged, mirroring
         // fabric-common's PacketEncoder, which passes its side through as-is.
         PacketSide side = PacketEvents.getAPI().getInjector().getPacketSide();
-        if (feed(channel, user, player, payload, side)) {
+
+        ByteBuf buf = Unpooled.wrappedBuffer(payload);
+        ProtocolPacketEvent peEvent = null;
+        try {
+            peEvent = PacketEventsImplHelper.handlePacket(channel, user, player, buf, false, side);
+        } catch (Exception e) {
+            PacketEvents.getAPI().getLogManager().warn("Failed to process a Minestom packet through PacketEvents", e);
+        } finally {
+            buf.release();
+        }
+
+        if (peEvent != null && peEvent.isCancelled()) {
             event.setCancelled(true);
+            return;
+        }
+
+        // Run PacketEvents' after-send tasks. Spigot/Sponge run these from their encoder's write
+        // promise (AFTER the packet hits the socket); Minestom has no such hook, so without this they
+        // are silently dropped. Grim relies on them — e.g. the transaction it brackets every server
+        // teleport with (PacketServerTeleport) and its player registration on LOGIN_SUCCESS.
+        //
+        // Crucially these must run AFTER the current packet is written, not before: Minestom fires
+        // PlayerPacketOutEvent from writePacketSync *before* the packet reaches the buffer, so running
+        // a task that itself sends a packet (like the post-teleport transaction) synchronously here
+        // would put that packet AHEAD of the teleport on the wire — the exact ordering that makes Grim
+        // think the teleport was skipped. Defer to the next tick so ordering is preserved.
+        if (peEvent instanceof PacketSendEvent sendEvent && sendEvent.hasTasksAfterSend()) {
+            final java.util.List<Runnable> afterSend = new java.util.ArrayList<>(sendEvent.getTasksAfterSend());
+            MinecraftServer.getSchedulerManager().scheduleNextTick(() -> {
+                for (Runnable task : afterSend) {
+                    try {
+                        task.run();
+                    } catch (Throwable t) {
+                        PacketEvents.getAPI().getLogManager().warn("A packet after-send task failed", t);
+                    }
+                }
+            });
         }
     }
 
