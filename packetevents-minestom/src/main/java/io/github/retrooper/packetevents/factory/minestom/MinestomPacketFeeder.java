@@ -57,7 +57,34 @@ import java.nio.channels.SocketChannel;
  */
 public final class MinestomPacketFeeder {
 
+    /** Drossel fürs Fehler-Logging: je Fehler-Signatur zuletzt geloggter Zeitpunkt (ms). */
+    private static final java.util.concurrent.ConcurrentHashMap<String, Long> LAST_ERROR_LOG =
+            new java.util.concurrent.ConcurrentHashMap<>();
+    private static final long ERROR_LOG_THROTTLE_MS = 30_000L;
+
     private MinestomPacketFeeder() {
+    }
+
+    /**
+     * Loggt einen Fehler bei der Paketverarbeitung GEDROSSELT (je Signatur höchstens alle
+     * {@link #ERROR_LOG_THROTTLE_MS}). Fängt bewusst {@link Throwable} — u.a. {@code NoClassDefFoundError}
+     * (fehlende geshadete Klasse), das sonst durch {@code catch (Exception)} rutscht, den Tick-Handler
+     * mitreißt und das Log flutet (so geschehen mit CollisionData). Die Signatur (Ort + Fehlerklasse +
+     * erste Stack-Zeile) macht verbleibende Port-Lücken im Log sichtbar, ohne es zu überschwemmen.
+     */
+    private static void logPacketError(String where, Throwable t) {
+        StackTraceElement top = t.getStackTrace().length > 0 ? t.getStackTrace()[0] : null;
+        String sig = where + '|' + t.getClass().getName() + '|' + (top == null ? "?" : top.toString());
+        long now = System.currentTimeMillis();
+        Long last = LAST_ERROR_LOG.get(sig);
+        if (last != null && now - last < ERROR_LOG_THROTTLE_MS) {
+            return;
+        }
+        LAST_ERROR_LOG.put(sig, now);
+        PacketEvents.getAPI().getLogManager().warn(
+                "[packetevents/minestom] Paketverarbeitung (" + where + ") fehlgeschlagen — verbleibende "
+                        + "Port-Lücke? " + t.getClass().getName() + ": " + t.getMessage()
+                        + (top == null ? "" : " @ " + top), t);
     }
 
     /**
@@ -124,8 +151,8 @@ public final class MinestomPacketFeeder {
         ProtocolPacketEvent peEvent = null;
         try {
             peEvent = PacketEventsImplHelper.handlePacket(channel, user, player, buf, false, side);
-        } catch (Exception e) {
-            PacketEvents.getAPI().getLogManager().warn("Failed to process a Minestom packet through PacketEvents", e);
+        } catch (Throwable e) {
+            logPacketError("outbound", e);
         } finally {
             buf.release();
         }
@@ -170,8 +197,8 @@ public final class MinestomPacketFeeder {
         try {
             var event = PacketEventsImplHelper.handlePacket(channel, user, player, buf, false, side);
             return event != null && event.isCancelled();
-        } catch (Exception e) {
-            PacketEvents.getAPI().getLogManager().warn("Failed to process a Minestom packet through PacketEvents", e);
+        } catch (Throwable e) {
+            logPacketError("inbound", e);
             return false;
         } finally {
             buf.release();

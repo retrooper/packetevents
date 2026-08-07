@@ -19,12 +19,35 @@
 package io.github.retrooper.packetevents.impl.netty.channel;
 
 import com.github.retrooper.packetevents.netty.channel.ChannelOperator;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 
 import java.net.SocketAddress;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 public class ChannelOperatorImpl implements ChannelOperator {
+
+    private static final Logger LOGGER = Logger.getLogger(ChannelOperatorImpl.class.getName());
+    /** Bereits gemeldete NIO-Fallback-Methoden — jede wird nur EINMAL geloggt (keine Flut). */
+    private static final Set<String> LOGGED_NIO_FALLBACKS = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Meldet EINMALIG, dass eine Netty-Pipeline-/Write-Methode auf einem NIO-Channel (Minestom) landete.
+     * Diese Methoden gehören NICHT zum Port-Pfad (Sends laufen über MinestomPacketSender, Inbound über
+     * MinestomPacketFeeder). Ein Treffer heißt: hier nutzt Code noch den Netty-Pfad → Port-Lücke, die
+     * gefixt werden sollte. Wird bewusst nur einmal je Methode geloggt, um Log-Fluten zu vermeiden.
+     */
+    private static void warnNioFallbackOnce(String method) {
+        if (LOGGED_NIO_FALLBACKS.add(method)) {
+            LOGGER.warning("[packetevents/minestom] NIO-Fallback in ChannelOperator." + method
+                    + "() — dieser Netty-Pipeline-Pfad ist auf dem Minestom-Port nicht implementiert "
+                    + "(No-Op). Wenn hier Funktionalität fehlt, muss der Pfad portiert werden.");
+        }
+    }
     @Override
     public SocketAddress remoteAddress(Object channel) {
         if (channel instanceof Channel) {
@@ -88,64 +111,118 @@ public class ChannelOperatorImpl implements ChannelOperator {
         return null;
     }
 
+    // OnThePixel (Minestom): der "channel" ist ein roher NIO-SocketChannel ohne Netty-Pipeline/EventLoop.
+    // Auf dem Port laufen Sends über MinestomProtocolManager→MinestomPacketSender und Inbound über
+    // MinestomPacketFeeder — die folgenden Netty-Pipeline/Write-Methoden gehören NICHT zum Port-Pfad.
+    // Statt blind auf Netty zu casten (ClassCastException → riss z.B. die Paket-/Tick-Verarbeitung mit),
+    // greifen sie nur noch bei echten Netty-Channels und degradieren auf NIO gefahrlos (No-Op/leer).
+
     @Override
     public Object write(Object channel, Object buffer) {
-        return ((Channel) channel).write(buffer);
+        if (channel instanceof Channel) {
+            return ((Channel) channel).write(buffer);
+        }
+        warnNioFallbackOnce("write");
+        return null;
     }
 
     @Override
     public Object flush(Object channel) {
-        return ((Channel) channel).flush();
+        if (channel instanceof Channel) {
+            return ((Channel) channel).flush();
+        }
+        warnNioFallbackOnce("flush");
+        return null;
     }
 
     @Override
     public Object writeAndFlush(Object channel, Object buffer) {
-        return ((Channel) channel).writeAndFlush(buffer);
+        if (channel instanceof Channel) {
+            return ((Channel) channel).writeAndFlush(buffer);
+        }
+        warnNioFallbackOnce("writeAndFlush");
+        return null;
     }
 
     @Override
     public Object fireChannelRead(Object channel, Object buffer) {
-        return ((Channel) channel).pipeline().fireChannelRead(buffer);
+        if (channel instanceof Channel) {
+            return ((Channel) channel).pipeline().fireChannelRead(buffer);
+        }
+        warnNioFallbackOnce("fireChannelRead");
+        return null;
     }
 
     @Override
     public Object writeInContext(Object channel, String ctx, Object buffer) {
-        return ((Channel) channel).pipeline().context(ctx).write(buffer);
+        if (channel instanceof Channel) {
+            return ((Channel) channel).pipeline().context(ctx).write(buffer);
+        }
+        warnNioFallbackOnce("writeInContext");
+        return null;
     }
 
     @Override
     public Object flushInContext(Object channel, String ctx) {
-        return ((Channel) channel).pipeline().context(ctx).flush();
+        if (channel instanceof Channel) {
+            return ((Channel) channel).pipeline().context(ctx).flush();
+        }
+        warnNioFallbackOnce("flushInContext");
+        return null;
     }
 
     @Override
     public Object writeAndFlushInContext(Object channel, String ctx, Object buffer) {
-        return ((Channel) channel).pipeline().context(ctx).writeAndFlush(buffer);
+        if (channel instanceof Channel) {
+            return ((Channel) channel).pipeline().context(ctx).writeAndFlush(buffer);
+        }
+        warnNioFallbackOnce("writeAndFlushInContext");
+        return null;
     }
 
     @Override
     public Object fireChannelReadInContext(Object channel, String ctx, Object buffer) {
-        return ((Channel) channel).pipeline().context(ctx).fireChannelRead(buffer);
+        if (channel instanceof Channel) {
+            return ((Channel) channel).pipeline().context(ctx).fireChannelRead(buffer);
+        }
+        warnNioFallbackOnce("fireChannelReadInContext");
+        return null;
     }
 
     @Override
     public List<String> pipelineHandlerNames(Object channel) {
-        return ((Channel) channel).pipeline().names();
+        if (channel instanceof Channel) {
+            return ((Channel) channel).pipeline().names();
+        }
+        warnNioFallbackOnce("pipelineHandlerNames");
+        return Collections.emptyList();
     }
 
     @Override
     public Object getPipelineHandler(Object channel, String name) {
-        return ((Channel) channel).pipeline().get(name);
+        if (channel instanceof Channel) {
+            return ((Channel) channel).pipeline().get(name);
+        }
+        warnNioFallbackOnce("getPipelineHandler");
+        return null;
     }
 
     @Override
     public Object getPipelineContext(Object channel, String name) {
-        return ((Channel) channel).pipeline().context(name);
+        if (channel instanceof Channel) {
+            return ((Channel) channel).pipeline().context(name);
+        }
+        warnNioFallbackOnce("getPipelineContext");
+        return null;
     }
 
     @Override
     public Object getPipeline(Object channel) {
-        return ((Channel) channel).pipeline();
+        if (channel instanceof Channel) {
+            return ((Channel) channel).pipeline();
+        }
+        warnNioFallbackOnce("getPipeline");
+        return null;
     }
 
     @Override
@@ -162,6 +239,11 @@ public class ChannelOperatorImpl implements ChannelOperator {
 
     @Override
     public Object pooledByteBuf(Object channel) {
-        return ((Channel) channel).alloc().buffer();
+        if (channel instanceof Channel) {
+            return ((Channel) channel).alloc().buffer();
+        }
+        // OnThePixel (Minestom): kein Netty-Allocator am NIO-Channel. Unpooled-Heap-Buffer liefern,
+        // damit Aufrufer einen nutzbaren ByteBuf bekommen statt NPE/ClassCastException.
+        return Unpooled.buffer();
     }
 }
