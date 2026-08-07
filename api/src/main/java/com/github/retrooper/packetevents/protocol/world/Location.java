@@ -20,10 +20,13 @@ package com.github.retrooper.packetevents.protocol.world;
 
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 
+@NullMarked
 public class Location implements Cloneable {
+
     private Vector3d position;
     private float yaw;
     private float pitch;
@@ -108,6 +111,11 @@ public class Location implements Cloneable {
         return Objects.equals(this.position, other.position)
                 && this.yaw == other.yaw
                 && this.pitch == other.pitch;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.position, this.yaw, this.pitch);
     }
 
     @Override
