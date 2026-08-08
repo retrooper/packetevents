@@ -44,7 +44,7 @@ public class ChunkReader_v1_8 implements ChunkReader {
     @Override
     public BaseChunk[] read(
             DimensionType dimensionType, BitSet chunkMask, BitSet secondaryChunkMask, boolean fullChunk,
-            boolean hasBlockLight, boolean hasSkyLight, int chunkSize, int arrayLength, PacketWrapper<?> wrapper
+            boolean forceSkyLight, boolean checkForSkyLight, int chunkSize, int arrayLength, PacketWrapper<?> wrapper
     ) {
         int populatedSections = 0;
         for (int index = 0; index < SECTION_COUNT; index++) {
@@ -56,7 +56,7 @@ public class ChunkReader_v1_8 implements ChunkReader {
         int sectionDataLength = populatedSections * (BLOCK_DATA_LENGTH + LIGHT_DATA_LENGTH);
         int expectedWithoutSkyLight = sectionDataLength + (fullChunk ? BIOME_DATA_LENGTH : 0);
         // Bulk packets specify skylight; regular packets infer it from the payload length.
-        boolean skyLight = hasBlockLight || arrayLength > expectedWithoutSkyLight && hasSkyLight;
+        boolean skyLight = forceSkyLight || arrayLength > expectedWithoutSkyLight && checkForSkyLight;
         int requiredSectionDataLength = sectionDataLength
                 + (skyLight ? populatedSections * LIGHT_DATA_LENGTH : 0);
         if (arrayLength < requiredSectionDataLength) {
