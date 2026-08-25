@@ -61,6 +61,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     private @Nullable List<Runnable> postTasks = null;
 
     private boolean cloned;
+    private boolean autoProtocolTranslation;
     private boolean needsReEncode = PacketEvents.getAPI().getSettings().reEncodeByDefault();
 
     public ProtocolPacketEvent(
@@ -68,14 +69,24 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
             @UnknownNullability Object player, Object byteBuf,
             boolean autoProtocolTranslation
     ) throws PacketProcessException {
+        this(packetSide, channel, user, player, byteBuf, autoProtocolTranslation,
+                packetSide == PacketSide.CLIENT ? user.getDecoderState() : user.getEncoderState());
+    }
+
+    protected ProtocolPacketEvent(
+            PacketSide packetSide, Object channel, User user,
+            @UnknownNullability Object player, Object byteBuf,
+            boolean autoProtocolTranslation, ConnectionState connectionState
+    ) throws PacketProcessException {
         this.channel = channel;
         this.user = user;
         this.player = player;
+        this.autoProtocolTranslation = autoProtocolTranslation;
 
         if (autoProtocolTranslation || user.getClientVersion() == null) {
             this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
         } else {
-            this.serverVersion = user.getPacketVersion().toServerVersion();
+            this.serverVersion = user.getClientVersion().toServerVersion();
         }
 
         this.byteBuf = byteBuf;
@@ -90,7 +101,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         }
 
         ClientVersion version = serverVersion.toClientVersion();
-        this.connectionState = packetSide == PacketSide.CLIENT ? user.getDecoderState() : user.getEncoderState();
+        this.connectionState = connectionState;
         PacketTypeCommon packetType = PacketType.getById(packetSide, this.connectionState, version, this.packetID);
         if (packetType == null) {
             // mojang messed up and keeps sending disconnect packets in the wrong protocol state
@@ -204,6 +215,10 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
 
     public PacketTypeCommon getPacketType() {
         return packetType;
+    }
+
+    public boolean isAutoProtocolTranslation() {
+        return autoProtocolTranslation;
     }
 
     @Deprecated

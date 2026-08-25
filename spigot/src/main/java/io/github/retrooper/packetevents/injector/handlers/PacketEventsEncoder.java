@@ -23,10 +23,12 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.exception.InvalidDisconnectPacketSend;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
+import io.github.retrooper.packetevents.injector.connection.PreViaPipelineSupport;
 import io.github.retrooper.packetevents.injector.connection.ServerConnectionInitializer;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
@@ -71,15 +73,18 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
     private final Queue<QueuedMessage> queuedMessages = new ArrayDeque<>();
     private boolean hold = false;
+    private boolean preVia;
 
-    public PacketEventsEncoder(User user) {
+    public PacketEventsEncoder(User user, boolean preVia) {
         this.user = user;
+        this.preVia = preVia;
     }
 
     public PacketEventsEncoder(ChannelHandler encoder) {
         user = ((PacketEventsEncoder) encoder).user;
         player = ((PacketEventsEncoder) encoder).player;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
+        preVia = ((PacketEventsEncoder) encoder).preVia;
         promise = ((PacketEventsEncoder) encoder).promise;
     }
 
@@ -98,8 +103,13 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         }
     }
 
-    private @Nullable PacketSendEvent handleClientBoundPacket(Channel channel, User user, Object player, ByteBuf buffer, ChannelPromise promise) throws Exception {
-        PacketSendEvent packetSendEvent = PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, true);
+    private @Nullable PacketSendEvent handleClientBoundPacket(
+            Channel channel, User user, Object player, ByteBuf buffer, boolean autoProtocolTranslation,
+            @Nullable ConnectionState connectionState, ChannelPromise promise
+    ) throws Exception {
+        PacketSendEvent packetSendEvent = connectionState == null
+                ? PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, autoProtocolTranslation)
+                : PacketEventsImplHelper.handleClientBoundPacket(channel, user, player, buffer, autoProtocolTranslation, connectionState);
         if (packetSendEvent != null && packetSendEvent.hasTasksAfterSend()) {
             promise.addListener((p) -> {
                 for (Runnable task : packetSendEvent.getTasksAfterSend()) {
@@ -131,13 +141,21 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
         if (msg instanceof ByteBuf) {
             boolean needsRecompression = !this.handledCompression && this.handleCompression(ctx, (ByteBuf) msg);
-            this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg, this.promise);
+            ConnectionState connectionState = preVia ? this.user.getPreViaEncoderState() : this.user.getEncoderState();
+            this.handleClientBoundPacket(
+                    ctx.channel(), this.user, this.player, (ByteBuf) msg, !preVia, connectionState, this.promise);
 
             // check if the packet got cancelled
             if (!((ByteBuf) msg).isReadable()) {
                 ReferenceCountUtil.release(msg);
                 promise.trySuccess(); // TODO how to properly handle this?
                 return; // abort handling
+            }
+
+            // Without ViaVersion we still need to call previa listeners from the normal handler
+            if (PreViaPipelineSupport.shouldDispatchFallbackPreViaEvents(preVia)) {
+                this.handleClientBoundPacket(ctx.channel(), this.user, this.player, (ByteBuf) msg,
+                        false, this.user.getPreViaEncoderState(), this.promise);
             }
 
             if (needsRecompression) {
@@ -240,18 +258,22 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
         int compressIndex = ctx.pipeline().names().indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = ctx.pipeline().names().indexOf((preVia ? "pre-" : "") + PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
-        if (compressIndex > peEncoderIndex) {
-            //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
-            //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
+
+        if (compressIndex <= peEncoderIndex) return false;
+
+        //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
+        //But first we need to compress the data and re-compress it after we do all our processing to avoid issues.
+        boolean decompress = false;
+        if (!preVia || !user.getClientVersion().isOlderThanOrEquals(ClientVersion.V_1_7_10)) {
             decompress(ctx, buffer, buffer);
-            //Let us relocate and no longer deal with compression.
-            PacketEventsDecoder decoder = (PacketEventsDecoder) ctx.pipeline().get(PacketEvents.DECODER_NAME);
-            ServerConnectionInitializer.relocateHandlers(ctx.channel(), decoder, user);
-            return true;
+            decompress = true;
         }
-        return false;
+
+        //Let us relocate and no longer deal with compression.
+        ServerConnectionInitializer.relocateHandlers(ctx.channel(), user, preVia);
+        return decompress;
     }
 
     private static final class QueuedMessage {

@@ -62,7 +62,9 @@ public class User implements IRegistryHolder {
 
     private final Object channel;
     private ConnectionState decoderState;
+    private ConnectionState preViaDecoderState;
     private ConnectionState encoderState;
+    private ConnectionState preViaEncoderState;
     private ClientVersion clientVersion;
     private final UserProfile profile;
     private int entityId = -1;
@@ -75,7 +77,9 @@ public class User implements IRegistryHolder {
                 UserProfile profile) {
         this.channel = channel;
         this.decoderState = connectionState;
+        this.preViaDecoderState = connectionState;
         this.encoderState = connectionState;
+        this.preViaEncoderState = connectionState;
         this.clientVersion = clientVersion;
         this.profile = profile;
     }
@@ -135,10 +139,23 @@ public class User implements IRegistryHolder {
     public void setConnectionState(ConnectionState connectionState) {
         this.setDecoderState(connectionState);
         this.setEncoderState(connectionState);
+        this.setPreViaDecoderState(connectionState);
+        this.setPreViaEncoderState(connectionState);
     }
 
     public ConnectionState getDecoderState() {
         return this.decoderState;
+    }
+
+    public ConnectionState getPreViaDecoderState() {
+        return this.preViaDecoderState;
+    }
+
+    @ApiStatus.Internal
+    public void setPreViaDecoderState(ConnectionState preViaDecoderState) {
+        this.preViaDecoderState = preViaDecoderState;
+        PacketEvents.getAPI().getLogManager().debug(
+                "Transitioned " + this.getName() + "'s previa decoder into " + preViaDecoderState + " state!");
     }
 
     @ApiStatus.Internal
@@ -150,6 +167,17 @@ public class User implements IRegistryHolder {
 
     public ConnectionState getEncoderState() {
         return this.encoderState;
+    }
+
+    public ConnectionState getPreViaEncoderState() {
+        return this.preViaEncoderState;
+    }
+
+    @ApiStatus.Internal
+    public void setPreViaEncoderState(ConnectionState preViaEncoderState) {
+        this.preViaEncoderState = preViaEncoderState;
+        PacketEvents.getAPI().getLogManager().debug(
+                "Transitioned " + this.getName() + "'s previa encoder into " + preViaEncoderState + " state!");
     }
 
     @ApiStatus.Internal
