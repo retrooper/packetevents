@@ -137,7 +137,16 @@ public class ItemStack {
     }
 
     public static NBT encode(PacketWrapper<?> wrapper, ItemStack itemStack) {
-        return encodeForParticle(itemStack, wrapper.getServerVersion().toClientVersion());
+        ClientVersion version = wrapper.getServerVersion().toClientVersion();
+        NBT nbt = encodeForParticle(itemStack, version);
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_20_5)
+                && version.isOlderThan(ClientVersion.V_26_1)
+                && nbt instanceof NBTString) {
+            NBTCompound compound = new NBTCompound();
+            compound.setTag("id", nbt);
+            return compound;
+        }
+        return nbt;
     }
 
     @Deprecated
