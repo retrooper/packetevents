@@ -114,7 +114,7 @@ public class ItemEquippable {
     }
 
     public static ItemEquippable read(PacketWrapper<?> wrapper) {
-        EquipmentSlot slot = wrapper.readEnum(EquipmentSlot.values());
+        EquipmentSlot slot = EquipmentSlot.getByComponentId(wrapper.readVarInt());
         Sound equipSound = Sound.read(wrapper);
         ResourceLocation assetId = wrapper.readOptional(PacketWrapper::readIdentifier);
         ResourceLocation cameraOverlay = wrapper.readOptional(PacketWrapper::readIdentifier);
@@ -139,7 +139,7 @@ public class ItemEquippable {
     }
 
     public static void write(PacketWrapper<?> wrapper, ItemEquippable equippable) {
-        wrapper.writeEnum(equippable.slot);
+        wrapper.writeVarInt(equippable.slot.getComponentId());
         Sound.write(wrapper, equippable.equipSound);
         wrapper.writeOptional(equippable.assetId, PacketWrapper::writeIdentifier);
         wrapper.writeOptional(equippable.cameraOverlay, PacketWrapper::writeIdentifier);

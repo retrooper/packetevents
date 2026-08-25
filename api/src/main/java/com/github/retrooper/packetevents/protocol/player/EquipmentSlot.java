@@ -22,21 +22,34 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import org.jetbrains.annotations.Nullable;
 
 public enum EquipmentSlot {
-    MAIN_HAND(0),
-    OFF_HAND(0),
-    BOOTS(1),
-    LEGGINGS(2),
-    CHEST_PLATE(3),
-    HELMET(4),
-    BODY(0),
-    SADDLE(0);
+    MAIN_HAND(0, 0),
+    OFF_HAND(0, 5),
+    BOOTS(1, 1),
+    LEGGINGS(2, 2),
+    CHEST_PLATE(3, 3),
+    HELMET(4, 4),
+    BODY(0, 6),
+    SADDLE(0, 7);
 
     private static final EquipmentSlot[] VALUES = values();
+    private static final EquipmentSlot[] BY_COMPONENT_ID = new EquipmentSlot[VALUES.length];
+
+    static {
+        for (EquipmentSlot slot : VALUES) {
+            BY_COMPONENT_ID[slot.componentId] = slot;
+        }
+    }
 
     private final byte legacyId;
+    private final byte componentId;
 
-    EquipmentSlot(int legacyId) {
+    EquipmentSlot(int legacyId, int componentId) {
         this.legacyId = (byte) legacyId;
+        this.componentId = (byte) componentId;
+    }
+
+    public int getComponentId() {
+        return this.componentId;
     }
 
     public int getId(ServerVersion version) {
@@ -68,5 +81,9 @@ public enum EquipmentSlot {
     @Nullable
     public static EquipmentSlot getById(ServerVersion version, int id) {
         return getById(version.toClientVersion(), id);
+    }
+
+    public static EquipmentSlot getByComponentId(int id) {
+        return BY_COMPONENT_ID[id];
     }
 }
