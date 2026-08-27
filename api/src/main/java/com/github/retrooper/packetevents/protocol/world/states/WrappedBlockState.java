@@ -43,12 +43,14 @@ import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.mappings.MappingHelper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -110,9 +112,9 @@ public class WrappedBlockState {
     private static final WrappedBlockState AIR = new WrappedBlockState(StateTypes.AIR,
             new EnumMap<>(StateValue.class), 0, AIR_MAPPING_INDEX);
     private static final Map<String, WrappedBlockState>[] BY_STRING = new Map[HIGHEST_MAPPING_INDEX + 1];
-    private static final Map<Integer, WrappedBlockState>[] BY_ID = new Map[HIGHEST_MAPPING_INDEX + 1];
+    private static final @Nullable WrappedBlockState[][] BY_ID = new WrappedBlockState[HIGHEST_MAPPING_INDEX + 1][];
     private static final Map<WrappedBlockState, String>[] INTO_STRING = new Map[HIGHEST_MAPPING_INDEX + 1];
-    private static final Map<WrappedBlockState, Integer>[] INTO_ID = new Map[HIGHEST_MAPPING_INDEX + 1];
+    private static final Map<WrappedBlockState, WrappedBlockState>[] INTO_ID = new Map[HIGHEST_MAPPING_INDEX + 1];
     private static final Map<StateType, WrappedBlockState>[] DEFAULT_STATES = new Map[HIGHEST_MAPPING_INDEX + 1];
 
     private static final Map<String, String> STRING_UPDATER = new HashMap<>();
@@ -121,7 +123,7 @@ public class WrappedBlockState {
         STRING_UPDATER.put("grass_path", "dirt_path"); // 1.16 -> 1.17
 
         Arrays.fill(BY_STRING, Collections.emptyMap());
-        Arrays.fill(BY_ID, Collections.emptyMap());
+        Arrays.fill(BY_ID, new WrappedBlockState[0]);
         Arrays.fill(INTO_STRING, Collections.emptyMap());
         Arrays.fill(INTO_ID, Collections.emptyMap());
         Arrays.fill(DEFAULT_STATES, Collections.emptyMap());
@@ -129,9 +131,9 @@ public class WrappedBlockState {
         // because AIR is a constant, preload all data for this into a separate mapping index
         String airName = AIR.getType().getMapped().getName().getKey();
         BY_STRING[AIR_MAPPING_INDEX] = Collections.singletonMap(airName, AIR);
-        BY_ID[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR.getGlobalId(), AIR);
+        BY_ID[AIR_MAPPING_INDEX] = new WrappedBlockState[]{AIR};
         INTO_STRING[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR, airName);
-        INTO_ID[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR, AIR.getGlobalId());
+        INTO_ID[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR, AIR);
         DEFAULT_STATES[AIR_MAPPING_INDEX] = Collections.singletonMap(AIR.getType(), AIR);
     }
 
@@ -171,14 +173,14 @@ public class WrappedBlockState {
 
     private static byte loadMappings(ClientVersion version) {
         byte mappingsIndex = getMappingsIndex(version);
-        if (!PRELOAD_BLOCK_STATE_MAPPINGS && BY_ID[mappingsIndex].isEmpty()) {
+        if (!PRELOAD_BLOCK_STATE_MAPPINGS && BY_ID[mappingsIndex].length == 0) {
             loadMappings0(getMappingsVersion(version), mappingsIndex); // try to load mappings
         }
         return mappingsIndex;
     }
 
     private static synchronized void loadMappings0(ClientVersion version, byte mappingsIndex) {
-        if (!BY_ID[mappingsIndex].isEmpty()) {
+        if (BY_ID[mappingsIndex].length != 0) {
             return; // already loaded
         }
         PacketEvents.getAPI().getLogManager().info("Loading block mappings for " + version + "/" + mappingsIndex + "...");
@@ -209,11 +211,10 @@ public class WrappedBlockState {
 
         Map<Map<StateValue, Object>, StateCacheValue> cache = new HashMap<>();
         for (byte i = 0; i < HIGHEST_MAPPING_INDEX; i++) {
-            Map<Integer, WrappedBlockState> map = BY_ID[i];
-            if (map == null) {
-                continue; // not loaded yet
-            }
-            for (WrappedBlockState state : map.values()) {
+            for (WrappedBlockState state : BY_ID[i]) {
+                if (state == null) {
+                    continue;
+                }
                 cache.computeIfAbsent(state.data, StateCacheValue::new);
             }
         }
@@ -302,10 +303,16 @@ public class WrappedBlockState {
 
     @NotNull
     public static WrappedBlockState getByGlobalId(ClientVersion version, int globalID, boolean clone) {
-        if (globalID == 0) return AIR; // Hardcode for performance
+        if (globalID <= 0) return AIR; // Hardcode for performance
         byte mappingsIndex = loadMappings(version);
-        final WrappedBlockState state = BY_ID[mappingsIndex].getOrDefault(globalID, AIR);
+        final WrappedBlockState state = getByGlobalId0(mappingsIndex, globalID);
         return clone ? state.clone() : state;
+    }
+
+    private static WrappedBlockState getByGlobalId0(byte mappingsIndex, int globalId) {
+        @Nullable WrappedBlockState[] map = BY_ID[mappingsIndex];
+        final WrappedBlockState state = globalId < map.length ? map[globalId] : null;
+        return state != null ? state : AIR;
     }
 
     @NotNull
@@ -355,12 +362,71 @@ public class WrappedBlockState {
         return MAPPING_VERSIONS[version.ordinal()];
     }
 
+    private static final class StateLoaderBuilder {
+
+        private final byte mappingsIndex;
+
+        private WrappedBlockState[] stateById;
+        private int maximumId = -1;
+
+        private final Map<WrappedBlockState, WrappedBlockState> stateToId = new HashMap<>();
+        private final Map<String, WrappedBlockState> stateByString = new HashMap<>();
+        private final Map<WrappedBlockState, String> stateToString = new HashMap<>();
+        private final Map<StateType, WrappedBlockState> defaultStates = new IdentityHashMap<>();
+
+        public StateLoaderBuilder(byte mappingsIndex) {
+            this.mappingsIndex = mappingsIndex;
+            if (mappingsIndex == LEGACY_MAPPING_INDEX) {
+                // we "guess" how many states there after loading
+                this.stateById = new WrappedBlockState[(256 << 4) - 1];
+            } else {
+                // varies by version, this is an actual guess
+                this.stateById = new WrappedBlockState[1 << 15];
+            }
+        }
+
+        public void add(WrappedBlockState state, String string, boolean def) {
+            int globalId = state.getGlobalId();
+            if (globalId > this.maximumId) {
+                this.maximumId = globalId;
+            }
+            if (this.stateById.length <= globalId) {
+                // resize array, double in length
+                this.stateById = Arrays.copyOf(this.stateById, this.stateById.length << 1);
+            }
+            this.stateById[globalId] = state;
+
+            this.stateToString.put(state, string);
+            this.stateToId.put(state, state);
+
+            // legacy handling bullshit (otherwise we could just do #put):
+            //   We want the first with this ID, to prevent invalid blocks that work with vanilla, but may
+            //   cause other things handling data to have issues, such as air with a byte value of 1
+            //   (this matters as doors read bytes if they are a half without caring what type the other block is)
+            this.stateByString.putIfAbsent(string, state);
+
+            if (def) {
+                // use #putIfAbsent for legacy block states
+                this.defaultStates.putIfAbsent(state.getType(), state);
+            }
+        }
+
+        public void register() {
+            // reduce length if we created a too large array
+            if (this.maximumId + 1 != this.stateById.length) {
+                this.stateById = Arrays.copyOf(this.stateById, this.maximumId + 1);
+            }
+
+            BY_ID[this.mappingsIndex] = this.stateById;
+            INTO_ID[this.mappingsIndex] = this.stateToId;
+            BY_STRING[this.mappingsIndex] = this.stateByString;
+            INTO_STRING[this.mappingsIndex] = this.stateToString;
+            DEFAULT_STATES[this.mappingsIndex] = this.defaultStates;
+        }
+    }
+
     private static void loadLegacy(Map<Map<StateValue, Object>, StateCacheValue> cache) {
-        Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
-        Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
-        Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
-        Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
-        Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
+        StateLoaderBuilder builder = new StateLoaderBuilder(LEGACY_MAPPING_INDEX);
 
         try (final SequentialNBTReader.Compound compound = MappingHelper.decompress(MAPPINGS_ASSETS_LEGACY)) {
             compound.skipOne(); // Skip version
@@ -415,25 +481,13 @@ public class WrappedBlockState {
                     String fullString = entry.getKey() + stateCache.getString();
                     WrappedBlockState state = new WrappedBlockState(type, stateCache.map, combinedID, LEGACY_MAPPING_INDEX);
 
-                    stateByIdMap.put(combinedID, state);
-                    stateToStringMap.put(state, fullString);
-                    stateToIdMap.put(state, combinedID);
-
-                    // We want the first with this ID, to prevent invalid blocks that work with vanilla, but may
-                    // cause other things handling data to have issues, such as air with a byte value of 1
-                    // (this matters as doors read bytes if they are a half without caring what type the other block is)
-                    stateByStringMap.putIfAbsent(fullString, state);
-
-                    // This works because the first of a type is always the default block, by chance
-                    stateTypeToBlockStateMap.putIfAbsent(type, state);
+                    // always mark as default, builder will only mark first default state as actual default -
+                    // and this is correct for every legacy state
+                    builder.add(state, fullString, true);
                 }
             }
 
-            BY_ID[LEGACY_MAPPING_INDEX] = stateByIdMap;
-            INTO_ID[LEGACY_MAPPING_INDEX] = stateToIdMap;
-            BY_STRING[LEGACY_MAPPING_INDEX] = stateByStringMap;
-            INTO_STRING[LEGACY_MAPPING_INDEX] = stateToStringMap;
-            DEFAULT_STATES[LEGACY_MAPPING_INDEX] = stateTypeToBlockStateMap;
+            builder.register();
         } catch (IOException e) {
             throw new RuntimeException("Failed to load legacy block mappings", e);
         }
@@ -444,14 +498,9 @@ public class WrappedBlockState {
             compound.skipOne(); // Skip version
 
             byte mappingIndex = getMappingsIndex(version);
+            StateLoaderBuilder builder = new StateLoaderBuilder(mappingIndex);
+
             SequentialNBTReader.List list = (SequentialNBTReader.List) compound.next().getValue();
-
-            Map<Integer, WrappedBlockState> stateByIdMap = new HashMap<>();
-            Map<WrappedBlockState, Integer> stateToIdMap = new HashMap<>();
-            Map<String, WrappedBlockState> stateByStringMap = new HashMap<>();
-            Map<WrappedBlockState, String> stateToStringMap = new HashMap<>();
-            Map<StateType, WrappedBlockState> stateTypeToBlockStateMap = new HashMap<>();
-
             int id = 0;
             for (NBT e : list) {
                 SequentialNBTReader.Compound element = (SequentialNBTReader.Compound) e;
@@ -507,6 +556,8 @@ public class WrappedBlockState {
                                 PacketEvents.getAPI().getLogManager().warn("Unknown NBT typeString in modern mapping: " + value.getClass().getSimpleName());
                                 continue;
                             }
+                            // TODO remove toUpperCase, every parser needs to be adjusted; this would
+                            //   eliminate 10% of all allocations if loading all modern state mappings
                             dataMap.put(state, state.getParser().apply(v.toString().toUpperCase(Locale.ROOT)));
                         }
                         stateCache = cache.computeIfAbsent(dataMap, StateCacheValue::new);
@@ -515,27 +566,12 @@ public class WrappedBlockState {
                     }
 
                     String fullString = typeString + stateCache.getString();
-                    WrappedBlockState state = new WrappedBlockState(type, stateCache.map, id, mappingIndex);
-
-                    if (defaultIdx == index) {
-                        stateTypeToBlockStateMap.put(type, state);
-                    }
-
-                    stateByStringMap.put(fullString, state);
-                    stateByIdMap.put(id, state);
-                    stateToStringMap.put(state, fullString);
-                    stateToIdMap.put(state, id);
-
-                    id++;
-                    index++;
+                    WrappedBlockState state = new WrappedBlockState(type, stateCache.map, id++, mappingIndex);
+                    builder.add(state, fullString, defaultIdx == index++);
                 }
             }
 
-            BY_ID[mappingIndex] = stateByIdMap;
-            INTO_ID[mappingIndex] = stateToIdMap;
-            BY_STRING[mappingIndex] = stateByStringMap;
-            INTO_STRING[mappingIndex] = stateToStringMap;
-            DEFAULT_STATES[mappingIndex] = stateTypeToBlockStateMap;
+            builder.register();
         } catch (IOException e) {
             throw new RuntimeException("Failed to load modern block mappings", e);
         }
@@ -558,7 +594,10 @@ public class WrappedBlockState {
     @Override
     public int hashCode() {
         // Don't hash the global ID, it is determined by the other data types
-        return Objects.hash(type, data);
+        int result = 1;
+        result = 31 * result + this.type.hashCode();
+        result = 31 * result + this.data.hashCode();
+        return result;
     }
 
     public StateType getType() {
@@ -1603,7 +1642,7 @@ public class WrappedBlockState {
         int oldGlobalID = globalID;
         globalID = getGlobalIdNoCache();
         if (globalID == -1) { // -1 maps to no block as negative ID are impossible
-            WrappedBlockState blockState = BY_ID[this.mappingsIndex].getOrDefault(oldGlobalID, AIR).clone();
+            WrappedBlockState blockState = getByGlobalId0(this.mappingsIndex, oldGlobalID).clone();
             this.type = blockState.type;
             this.globalID = blockState.globalID;
             this.data = new HashMap<>(blockState.data);
@@ -1654,7 +1693,8 @@ public class WrappedBlockState {
      * Internal method for determining if the block state is still valid
      */
     private int getGlobalIdNoCache() {
-        return INTO_ID[this.mappingsIndex].getOrDefault(this, -1);
+        WrappedBlockState state = INTO_ID[this.mappingsIndex].get(this);
+        return state != null ? state.getGlobalId() : -1;
     }
 
     @Override
@@ -1696,18 +1736,24 @@ public class WrappedBlockState {
 
         public String getString() {
             if (this.string == null) {
-                StringBuilder builder = new StringBuilder();
+                StringBuilder builder = new StringBuilder("[");
                 for (Map.Entry<StateValue, Object> entry : this.map.entrySet()) {
+                    if (builder.length() != 1) {
+                        builder.append(',');
+                    }
                     builder
                             .append(entry.getKey().getName())
                             .append('=')
                             // this is technically incorrect as block property values are case-sensitive, but it
                             // doesn't matter for this use case as we do String#toUpperCase while reading anyway;
                             // the current block state property system is already enough of a mess
-                            .append(String.valueOf(entry.getValue()).toLowerCase(Locale.ROOT))
-                            .append(',');
+                            .append(String.valueOf(entry.getValue()).toLowerCase(Locale.ROOT));
                 }
-                this.string = builder.length() == 0 ? "" : '[' + builder.substring(0, builder.length() - 1) + ']';
+                if (builder.length() != 1) {
+                    this.string = builder.append(']').toString();
+                } else {
+                    this.string = "";
+                }
             }
             return this.string;
         }
