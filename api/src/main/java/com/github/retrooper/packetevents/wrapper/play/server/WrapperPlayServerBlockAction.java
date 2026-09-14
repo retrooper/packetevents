@@ -21,12 +21,15 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * Mojang name: ClientboundBlockEventPacket
+ */
 public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServerBlockAction> {
     private Vector3i blockPosition;
     private int actionID;
@@ -114,12 +117,21 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         this.blockTypeID = blockTypeID;
     }
 
-    public WrappedBlockState getBlockType() {
-        ClientVersion version = serverVersion.toClientVersion();
-        return StateTypes.getById(version, blockTypeID).createBlockState(version);
+    public StateType getStateType() {
+        return StateTypes.getById(this.serverVersion.toClientVersion(), this.blockTypeID);
     }
 
+    public void setStateType(StateType stateType) {
+        this.blockTypeID = stateType.getMapped().getId(this.serverVersion.toClientVersion());
+    }
+
+    @Deprecated
+    public WrappedBlockState getBlockType() {
+        return this.getStateType().createBlockState(this.serverVersion.toClientVersion());
+    }
+
+    @Deprecated
     public void setBlockType(WrappedBlockState blockType) {
-        this.blockTypeID = blockType.getType().getMapped().getId(serverVersion.toClientVersion());
+        this.setStateType(blockType.getType());
     }
 }
