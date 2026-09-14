@@ -22,40 +22,53 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.simple.*;
 import com.github.retrooper.packetevents.exception.PacketProcessException;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 public class EventCreationUtil {
     public static PacketReceiveEvent createReceiveEvent(Object channel, User user, Object player, Object buffer,
                                                         boolean autoProtocolTranslation) throws PacketProcessException {
-        switch (user.getDecoderState()) {
+        return createReceiveEvent(channel, user, player, buffer, autoProtocolTranslation, user.getDecoderState());
+    }
+
+    public static PacketReceiveEvent createReceiveEvent(Object channel, User user, Object player, Object buffer,
+                                                        boolean autoProtocolTranslation, ConnectionState connectionState)
+            throws PacketProcessException {
+        switch (connectionState) {
             case HANDSHAKING:
-                return new PacketHandshakeReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
+                return new PacketHandshakeReceiveEvent(channel, user, player, buffer, autoProtocolTranslation, connectionState);
             case STATUS:
-                return new PacketStatusReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
+                return new PacketStatusReceiveEvent(channel, user, player, buffer, autoProtocolTranslation, connectionState);
             case LOGIN:
-                return new PacketLoginReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
+                return new PacketLoginReceiveEvent(channel, user, player, buffer, autoProtocolTranslation, connectionState);
             case PLAY:
-                return new PacketPlayReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
+                return new PacketPlayReceiveEvent(channel, user, player, buffer, autoProtocolTranslation, connectionState);
             case CONFIGURATION:
-                return new PacketConfigReceiveEvent(channel, user, player, buffer, autoProtocolTranslation);
+                return new PacketConfigReceiveEvent(channel, user, player, buffer, autoProtocolTranslation, connectionState);
         }
-        throw new RuntimeException("Unknown connection state " + user.getDecoderState() + "!");
+        throw new RuntimeException("Unknown connection state " + connectionState + "!");
     }
 
     public static PacketSendEvent createSendEvent(Object channel, User user, Object player, Object buffer,
-                                                  boolean autoProtocolTranslation) throws PacketProcessException{
-        switch (user.getEncoderState()) {
+                                                  boolean autoProtocolTranslation) throws PacketProcessException {
+        return createSendEvent(channel, user, player, buffer, autoProtocolTranslation, user.getEncoderState());
+    }
+
+    public static PacketSendEvent createSendEvent(Object channel, User user, Object player, Object buffer,
+                                                  boolean autoProtocolTranslation, ConnectionState connectionState)
+            throws PacketProcessException {
+        switch (connectionState) {
             case HANDSHAKING:
-                return new PacketHandshakeSendEvent(channel, user, player, buffer, autoProtocolTranslation);
+                return new PacketHandshakeSendEvent(channel, user, player, buffer, autoProtocolTranslation, connectionState);
             case STATUS:
-                return new PacketStatusSendEvent(channel, user, player, buffer, autoProtocolTranslation);
+                return new PacketStatusSendEvent(channel, user, player, buffer, autoProtocolTranslation, connectionState);
             case LOGIN:
-                return new PacketLoginSendEvent(channel, user, player, buffer, autoProtocolTranslation);
+                return new PacketLoginSendEvent(channel, user, player, buffer, autoProtocolTranslation, connectionState);
             case PLAY:
-                return new PacketPlaySendEvent(channel, user, player, buffer, autoProtocolTranslation);
+                return new PacketPlaySendEvent(channel, user, player, buffer, autoProtocolTranslation, connectionState);
             case CONFIGURATION:
-                return new PacketConfigSendEvent(channel, user, player, buffer, autoProtocolTranslation);
+                return new PacketConfigSendEvent(channel, user, player, buffer, autoProtocolTranslation, connectionState);
         }
-        throw new RuntimeException("Unknown connection state " + user.getEncoderState() + "!");
+        throw new RuntimeException("Unknown connection state " + connectionState + "!");
     }
 }

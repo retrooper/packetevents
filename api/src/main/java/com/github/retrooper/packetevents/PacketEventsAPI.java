@@ -28,11 +28,11 @@ import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
-import com.github.retrooper.packetevents.util.logger.JulLegacyLogManager;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
 import com.github.retrooper.packetevents.util.PEVersions;
 import com.github.retrooper.packetevents.util.adventure.AdventureConversionInjector;
+import com.github.retrooper.packetevents.util.logger.JulLegacyLogManager;
 import com.github.retrooper.packetevents.util.mappings.SynchronizedRegistriesHandler;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 
@@ -40,10 +40,18 @@ import java.util.logging.Logger;
 
 public abstract class PacketEventsAPI<T> {
 
-    private final EventManager eventManager = new EventManager();
+    private final EventManager eventManager;
     private final PacketEventsSettings settings = new PacketEventsSettings();
     private final UpdateChecker updateChecker = new UpdateChecker();
     private final LogManager logManager = LogManager.construct(this);
+
+    public PacketEventsAPI(EventManager eventManager) {
+        this.eventManager = eventManager;
+    }
+
+    public PacketEventsAPI() {
+        this(new EventManager());
+    }
 
     public EventManager getEventManager() {
         return eventManager;
