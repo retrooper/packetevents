@@ -27,6 +27,8 @@ import org.jspecify.annotations.NullMarked;
 import java.util.List;
 
 /**
+ * Mojang name: ClientboundPostEffectsPacket
+ *
  * @versions 26.3+
  */
 @NullMarked

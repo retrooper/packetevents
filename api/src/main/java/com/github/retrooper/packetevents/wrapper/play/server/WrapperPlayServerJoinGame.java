@@ -40,13 +40,16 @@ import java.util.Optional;
 
 import static com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn.FALLBACK_SEA_LEVEL;
 
+/**
+ * Mojang name: ClientboundLoginPacket
+ */
 public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJoinGame> {
+
     private int entityID;
     private boolean hardcore;
     private GameMode gameMode;
 
-    @Nullable
-    private GameMode previousGameMode;
+    private @Nullable GameMode previousGameMode;
 
     private List<String> worldNames;
     private NBTCompound dimensionCodec;

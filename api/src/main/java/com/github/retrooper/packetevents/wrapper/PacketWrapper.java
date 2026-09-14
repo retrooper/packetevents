@@ -1166,6 +1166,10 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
         FilterMaskType type = FilterMaskType.getById(readVarInt());
         switch (type) {
             case PARTIALLY_FILTERED:
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+                    BitSet bitSet = BitSet.valueOf(this.readByteArray());
+                    return new FilterMask(bitSet);
+                }
                 return new FilterMask(readBitSet());
             case PASS_THROUGH:
                 return FilterMask.PASS_THROUGH;
@@ -1179,7 +1183,11 @@ public class PacketWrapper<T extends PacketWrapper<T>> {
     public void writeFilterMask(FilterMask filterMask) {
         writeVarInt(filterMask.getType().getId());
         if (filterMask.getType() == FilterMaskType.PARTIALLY_FILTERED) {
-            writeBitSet(filterMask.getMask());
+            if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+                this.writeByteArray(filterMask.getMask().toByteArray());
+            } else {
+                this.writeBitSet(filterMask.getMask());
+            }
         }
     }
 
