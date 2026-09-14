@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTType;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
@@ -30,7 +31,6 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -87,6 +87,9 @@ public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream
         private NBT lastRead;
         private boolean hasReadType;
 
+        // allocate only once to reduce memory allocations
+        private final NbtEntry entry = new NbtEntry();
+
         private Compound(DataInputStream stream, NBTLimiter limiter, Runnable onComplete) {
             this.stream = stream;
             this.limiter = limiter;
@@ -139,7 +142,7 @@ public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream
             try {
                 hasReadType = false;
 
-                String name = DefaultNBTSerializer.readString(limiter, stream);
+                this.entry.name = DefaultNBTSerializer.readString(limiter, stream);
 
                 if (nextType == NBTType.COMPOUND) {
                     lastRead = new Compound(stream, limiter, this::runCompleted);
@@ -151,7 +154,8 @@ public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream
                 }
                 limiter.increment(36);
 
-                return new AbstractMap.SimpleEntry<>(name, lastRead);
+                this.entry.tag = this.lastRead;
+                return this.entry;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -282,6 +286,30 @@ public final class SequentialNBTReader implements NBTReader<NBT, DataInputStream
         @Override
         public void close() throws IOException {
             stream.close();
+        }
+
+        private static final class NbtEntry implements Map.Entry<String, NBT> {
+
+            private @MonotonicNonNull String name;
+            private @MonotonicNonNull NBT tag;
+
+            private NbtEntry() {
+            }
+
+            @Override
+            public String getKey() {
+                return this.name;
+            }
+
+            @Override
+            public NBT getValue() {
+                return this.tag;
+            }
+
+            @Override
+            public NBT setValue(NBT value) {
+                throw new UnsupportedOperationException();
+            }
         }
     }
 
