@@ -10,6 +10,7 @@ velocity = "3.4.0-SNAPSHOT"
 fabric-loader = "0.18.4"
 fabric-minecraft-intermediary = "1.21.11"
 fabric-minecraft-official = "26.2-rc-2"
+neoforge = "26.2.0.6-beta"
 parchment-mappings = "2025.12.20"
 spongeGradle = "2.3.0"
 classgraph = "4.8.184"
@@ -40,6 +41,7 @@ velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref =
 classgraph = { group = "io.github.classgraph", name = "classgraph", version.ref = "classgraph" }
 checkerqual = { module = "org.checkerframework:checker-qual", version.ref = "checkerqual" }
 fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
+neoforge = { module = "net.neoforged:neoforge", version.ref = "neoforge" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 fabric-minecraft-intermediary = { module = "com.mojang:minecraft", version.ref = "fabric-minecraft-intermediary" }
 fabric-minecraft-official = { module = "com.mojang:minecraft", version.ref = "fabric-minecraft-official" }
