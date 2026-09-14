@@ -48,7 +48,7 @@ public enum EquipmentSlot {
         this.componentId = (byte) componentId;
     }
 
-    public int getComponentId() {
+    public int getComponentId(ServerVersion version) {
         return this.componentId;
     }
 
@@ -83,7 +83,7 @@ public enum EquipmentSlot {
         return getById(version.toClientVersion(), id);
     }
 
-    public static EquipmentSlot getByComponentId(int id) {
+    public static EquipmentSlot getByComponentId(ServerVersion version, int id) {
         return BY_COMPONENT_ID[id];
     }
 }
