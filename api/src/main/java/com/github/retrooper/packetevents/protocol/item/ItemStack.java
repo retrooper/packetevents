@@ -98,7 +98,7 @@ public class ItemStack {
             ClientVersion version,
             IRegistryHolder registryHolder
     ) {
-        this.type = type;
+        this.type = type == null ? ItemTypes.AIR : type;
         this.amount = amount;
         this.nbt = nbt;
         this.components = components;
