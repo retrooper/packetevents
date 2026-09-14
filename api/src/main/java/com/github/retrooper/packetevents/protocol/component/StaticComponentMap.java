@@ -60,9 +60,13 @@ public final class StaticComponentMap implements IComponentMap {
     }
 
     public StaticComponentMap(Map<ComponentType<?>, ?> delegate, IRegistryHolder registries) {
+        this(delegate, registries, false);
+    }
+
+    private StaticComponentMap(Map<ComponentType<?>, ?> delegate, IRegistryHolder registries, boolean owned) {
         this.empty = delegate.isEmpty();
         this.delegate = this.empty ? Collections.emptyMap()
-                : Collections.unmodifiableMap(new HashMap<>(delegate));
+                : Collections.unmodifiableMap(owned ? delegate : new HashMap<>(delegate));
         this.registries = registries;
     }
 
@@ -135,14 +139,24 @@ public final class StaticComponentMap implements IComponentMap {
 
     public static class Builder {
 
-        private final Map<ComponentType<?>, Object> map = new HashMap<>();
+        private Map<ComponentType<?>, Object> map = new HashMap<>();
         private IRegistryHolder registries = GlobalRegistryHolder.INSTANCE;
+        private boolean handedOver;
 
         public Builder() {
         }
 
         public StaticComponentMap build() {
-            return new StaticComponentMap(this.map, this.registries);
+            this.handedOver = true;
+            return new StaticComponentMap(this.map, this.registries, true);
+        }
+
+        private Map<ComponentType<?>, Object> mutableMap() {
+            if (this.handedOver) {
+                this.map = new HashMap<>(this.map);
+                this.handedOver = false;
+            }
+            return this.map;
         }
 
         public Builder setRegistries(IRegistryHolder registries) {
@@ -171,20 +185,22 @@ public final class StaticComponentMap implements IComponentMap {
         }
 
         public <T> Builder set(ComponentType<T> type, @Nullable T value) {
+            Map<ComponentType<?>, Object> map = this.mutableMap();
             if (value == null) {
-                this.map.remove(type);
+                map.remove(type);
             } else {
-                this.map.put(type, value);
+                map.put(type, value);
             }
             return this;
         }
 
         public <T> Builder set(ComponentType<T> type, @Nullable ComponentValueRef<T> ref) {
+            Map<ComponentType<?>, Object> map = this.mutableMap();
             if (ref == null) {
-                this.map.remove(type);
+                map.remove(type);
             } else {
                 // needs special handling on get
-                this.map.put(type, ref);
+                map.put(type, ref);
             }
             return this;
         }

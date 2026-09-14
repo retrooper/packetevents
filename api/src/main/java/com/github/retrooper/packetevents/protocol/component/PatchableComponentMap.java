@@ -44,7 +44,7 @@ public class PatchableComponentMap implements IComponentMap {
     private final IRegistryHolder registries;
 
     public PatchableComponentMap(StaticComponentMap base) {
-        this(base.delegate, new HashMap<>(), base.registries);
+        this(base.delegate, new HashMap<>(), base.registries, true);
     }
 
     @Deprecated
@@ -56,7 +56,7 @@ public class PatchableComponentMap implements IComponentMap {
             StaticComponentMap base,
             Map<ComponentType<?>, Optional<?>> patches
     ) {
-        this(base.delegate, patches, base.registries);
+        this(base.delegate, patches, base.registries, true);
     }
 
     @Deprecated
@@ -68,7 +68,7 @@ public class PatchableComponentMap implements IComponentMap {
     }
 
     public PatchableComponentMap(StaticComponentMap base, IRegistryHolder registries) {
-        this(base.delegate, new HashMap<>(), registries);
+        this(base.delegate, new HashMap<>(), registries, true);
     }
 
     public PatchableComponentMap(Map<ComponentType<?>, ?> base, IRegistryHolder registries) {
@@ -80,7 +80,7 @@ public class PatchableComponentMap implements IComponentMap {
             Map<ComponentType<?>, Optional<?>> patches,
             IRegistryHolder registries
     ) {
-        this(base.delegate, patches, registries);
+        this(base.delegate, patches, registries, true);
     }
 
     public PatchableComponentMap(
@@ -88,7 +88,22 @@ public class PatchableComponentMap implements IComponentMap {
             Map<ComponentType<?>, Optional<?>> patches,
             IRegistryHolder registries
     ) {
-        this.base = Collections.unmodifiableMap(new HashMap<>(base));
+        this(base, patches, registries, false);
+    }
+
+    /**
+     * @param trustedBase whether {@code base} is already immutable and may be referenced directly.
+     *                    Only ever true for maps sourced from a {@link StaticComponentMap}, which
+     *                    already wraps its own defensive copy. Copying again here would allocate a
+     *                    fresh map for every item stack read off the wire.
+     */
+    private PatchableComponentMap(
+            Map<ComponentType<?>, ?> base,
+            Map<ComponentType<?>, Optional<?>> patches,
+            IRegistryHolder registries,
+            boolean trustedBase
+    ) {
+        this.base = trustedBase ? base : Collections.unmodifiableMap(new HashMap<>(base));
         this.patches = patches;
         this.registries = registries;
     }
@@ -233,13 +248,13 @@ public class PatchableComponentMap implements IComponentMap {
     @Override
     public PatchableComponentMap withRegistries(IRegistryHolder registries) {
         if (this.registries != registries) {
-            return new PatchableComponentMap(this.base, this.patches, this.registries);
+            return new PatchableComponentMap(this.base, this.patches, registries, true);
         }
         return this;
     }
 
     public PatchableComponentMap copy() {
-        return new PatchableComponentMap(this.base, new HashMap<>(this.patches), this.registries);
+        return new PatchableComponentMap(this.base, new HashMap<>(this.patches), this.registries, true);
     }
 
     @Deprecated
