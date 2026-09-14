@@ -28,6 +28,8 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTByteArray;
 import com.github.retrooper.packetevents.protocol.nbt.serializer.SequentialNBTReader;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.util.NbtCodec;
+import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -53,6 +55,7 @@ public final class ItemTypes {
 
     private static final VersionedRegistry<ItemType> REGISTRY = new VersionedRegistry<>("item");
     private static final Map<StateType, ItemType> HELD_TO_PLACED_MAP = new HashMap<>();
+    private static final NbtCodec<ItemType> CODEC = NbtCodecs.forRegistry(REGISTRY);
 
     // <editor-fold desc="item type definitions" defaultstate="collapsed">
     public static final ItemType GILDED_BLACKSTONE = builder("gilded_blackstone").setMaxAmount(64).setPlacedType(StateTypes.GILDED_BLACKSTONE).build();
@@ -2215,6 +2218,10 @@ public final class ItemTypes {
 
     public static VersionedRegistry<ItemType> getRegistry() {
         return REGISTRY;
+    }
+
+    public static NbtCodec<ItemType> getCodec() {
+        return CODEC;
     }
 
     public static Collection<ItemType> values() {

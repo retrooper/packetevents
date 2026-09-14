@@ -22,6 +22,25 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * Mojang name: ClientboundBundleDelimiterPacket
+ * <p>
+ * A delimiter for a bundle of packets, carrying no data. The first delimiter opens a bundle, the next one
+ * closes it. While a bundle is open the client buffers every packet it receives, and processes all of them
+ * on a single tick once the bundle closes. A bundle holds at most 4096 packets, the client disconnects when
+ * that is exceeded.
+ * <p>
+ * Delimiters carry no owner. Sending one while a bundle is already open closes that bundle, and the
+ * delimiter meant to close it opens a new one. Every delimiter after that is inverted, so the client keeps
+ * buffering packets and stops acting on them. The vanilla server opens a bundle for the packets which spawn
+ * an entity, and plugins open bundles as well, so an already open bundle is normal.
+ * <p>
+ * Track the state per user with a boolean, flipped every time this packet is seen in a
+ * {@link PacketSendEvent}. With no bundle open, send a delimiter, your packets, and a delimiter. With a
+ * bundle open, send your packets and let whoever opened it close it.
+ *
+ * @version 1.19.4+
+ */
 public class WrapperPlayServerBundle extends PacketWrapper<WrapperPlayServerBundle> {
     public WrapperPlayServerBundle(PacketSendEvent event) {
         super(event);
