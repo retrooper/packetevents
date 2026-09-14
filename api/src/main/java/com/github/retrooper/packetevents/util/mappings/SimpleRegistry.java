@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.util.mappings;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.IdTable;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -35,8 +36,9 @@ public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T
 
     private final ResourceLocation registryKey;
     private final Map<String, T> typeMap = new HashMap<>();
-    private final Map<Integer, T> typeIdMap = new HashMap<>();
     private final Map<String, Integer> reverseTypeIdMap = new HashMap<>();
+    private final IdTable<T> typeIdTable = new IdTable<>(1);
+    private @Nullable Map<Integer, T> typeIdOverflow;
 
     public SimpleRegistry(String registryKey) {
         this(new ResourceLocation(registryKey));
@@ -55,8 +57,15 @@ public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T
     public <Z extends T> Z define(ResourceLocation name, int id, Z instance) {
         String nameStr = name.toString();
         this.typeMap.put(nameStr, instance);
-        this.typeIdMap.put(id, instance);
         this.reverseTypeIdMap.put(nameStr, id);
+        if (id >= 0 && id < IdTable.MAX_ID) {
+            this.typeIdTable.put(0, id, instance);
+        } else {
+            if (this.typeIdOverflow == null) {
+                this.typeIdOverflow = new HashMap<>(4);
+            }
+            this.typeIdOverflow.put(id, instance);
+        }
         return instance;
     }
 
@@ -68,7 +77,11 @@ public final class SimpleRegistry<T extends MappedEntity> implements IRegistry<T
 
     @Override
     public @Nullable T getById(ClientVersion version, int id) {
-        return this.typeIdMap.get(id);
+        T byId = this.typeIdTable.lookup(0, id);
+        if (byId != null) {
+            return byId;
+        }
+        return this.typeIdOverflow != null ? this.typeIdOverflow.get(id) : null;
     }
 
     @Override
