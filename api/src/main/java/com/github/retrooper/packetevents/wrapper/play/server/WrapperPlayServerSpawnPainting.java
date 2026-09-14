@@ -30,6 +30,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.Locale;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -224,6 +225,6 @@ public class WrapperPlayServerSpawnPainting extends PacketWrapper<WrapperPlaySer
         if (type == PaintingType.PIG_SCENE) {
             return "pigscene";
         }
-        return type.name().toLowerCase();
+        return type.name().toLowerCase(Locale.ROOT);
     }
 }
