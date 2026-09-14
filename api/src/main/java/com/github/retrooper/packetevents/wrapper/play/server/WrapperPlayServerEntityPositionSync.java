@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.protocol.entity.EntityPositionData;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.vector.positionpath.LinearPositionPath;
 import com.github.retrooper.packetevents.protocol.vector.positionpath.PositionPath;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -92,7 +93,7 @@ public class WrapperPlayServerEntityPositionSync extends PacketWrapper<WrapperPl
             this.yRot = this.readFloat();
             this.xRot = this.readFloat();
         } else {
-            this.values = EntityPositionData.read(this);
+            this.setValues(EntityPositionData.read(this));
         }
         this.onGround = this.readBoolean();
     }
@@ -101,11 +102,11 @@ public class WrapperPlayServerEntityPositionSync extends PacketWrapper<WrapperPl
     public void write() {
         this.writeVarInt(this.id);
         if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
-            PositionPath.write(this, this.position);
+            PositionPath.write(this, this.getPosition());
             this.writeFloat(this.yRot);
             this.writeFloat(this.xRot);
         } else {
-            EntityPositionData.write(this, this.values);
+            EntityPositionData.write(this, this.getValues());
         }
         this.writeBoolean(this.onGround);
     }
@@ -132,6 +133,13 @@ public class WrapperPlayServerEntityPositionSync extends PacketWrapper<WrapperPl
      * @versions 1.21.2-26.2
      */
     public EntityPositionData getValues() {
+        if (this.values == null) {
+            this.values = new EntityPositionData(
+                    this.getPosition().getEndPosition(),
+                    Vector3d.zero(),
+                    this.getYRot(), this.getXRot()
+            );
+        }
         return this.values;
     }
 
@@ -140,12 +148,17 @@ public class WrapperPlayServerEntityPositionSync extends PacketWrapper<WrapperPl
      */
     public void setValues(EntityPositionData values) {
         this.values = values;
+        this.yRot = values.getYaw();
+        this.xRot = values.getPitch();
     }
 
     /**
      * @versions 26.3+
      */
     public PositionPath getPosition() {
+        if (this.position == null) {
+            this.position = new LinearPositionPath(this.getValues().getPosition());
+        }
         return this.position;
     }
 
