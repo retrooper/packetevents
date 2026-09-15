@@ -70,12 +70,18 @@ public enum DiggingAction {
         if (version.isNewerThanOrEquals(ServerVersion.V_26_3) || this == START_DIGGING) {
             return this.ordinal();
         }
+        if (this == CHANGE_DESTROY_DIRECTION) {
+            throw new IllegalStateException("CHANGE_DESTROY_DIRECTION has no id before 26.3");
+        }
         return this.ordinal() - 1;
     }
 
+    /**
+     * Pre-26.3 wire id. Prefer {@link #getId(ServerVersion)}.
+     */
     @Deprecated
     public int getId() {
-        return this.ordinal();
+        return getId(ServerVersion.V_26_2);
     }
 
     public static DiggingAction getById(ServerVersion version, int id) {
@@ -85,8 +91,11 @@ public enum DiggingAction {
         return VALUES[id + 1];
     }
 
+    /**
+     * Pre-26.3 wire id. Prefer {@link #getById(ServerVersion, int)}.
+     */
     @Deprecated
     public static DiggingAction getById(int id) {
-        return VALUES[id];
+        return getById(ServerVersion.V_26_2, id);
     }
 }

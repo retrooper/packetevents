@@ -56,8 +56,11 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
             int z = readInt();
             this.blockPosition = new Vector3i(x, y, z);
         }
-        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
-            this.isFrontText = !this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20) || this.readBoolean();
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_20)
+                && this.serverVersion.isOlderThan(ServerVersion.V_26_3)) {
+            this.isFrontText = this.readBoolean();
+        } else if (this.serverVersion.isOlderThan(ServerVersion.V_1_20)) {
+            this.isFrontText = true;
         }
         textLines = new String[4];
         for (int i = 0; i < 4; i++) {
