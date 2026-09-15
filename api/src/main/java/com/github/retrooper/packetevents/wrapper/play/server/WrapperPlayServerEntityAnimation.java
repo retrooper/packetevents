@@ -127,7 +127,11 @@ public class WrapperPlayServerEntityAnimation extends PacketWrapper<WrapperPlayS
         }
 
         public int getId(ServerVersion version) {
-            return version.isNewerThanOrEquals(ServerVersion.V_26_3) ? this.id : this.legacyId;
+            int id = version.isNewerThanOrEquals(ServerVersion.V_26_3) ? this.id : this.legacyId;
+            if (id < 0) {
+                throw new IllegalStateException(this + " has no id on " + version);
+            }
+            return id;
         }
     }
 }
