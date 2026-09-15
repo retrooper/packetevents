@@ -93,7 +93,7 @@ public final class SteppedVecDelta implements VecDelta {
 
     @Override
     public int getStepCount() {
-        return 0;
+        return this.steps.size();
     }
 
     @Override
