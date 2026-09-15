@@ -22,7 +22,10 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
+import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
@@ -66,6 +69,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -97,6 +101,8 @@ public final class SpigotReflectionUtil {
     public static boolean V_1_19_OR_HIGHER;
     public static boolean V_1_17_OR_HIGHER;
     public static boolean V_1_12_OR_HIGHER;
+    private static boolean V_1_13_OR_HIGHER;
+    private static boolean V_1_20_5_OR_HIGHER;
     //Minecraft classes
     public static Class<?> MINECRAFT_SERVER_CLASS, NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS,
             NMS_IMATERIAL_CLASS, NMS_ENTITY_CLASS, ENTITY_PLAYER_CLASS, BOUNDING_BOX_CLASS, NMS_MINECRAFT_KEY_CLASS,
@@ -153,6 +159,14 @@ public final class SpigotReflectionUtil {
 
     //Cache entities right after we request/find them for faster search.
     public static Map<Integer, Entity> ENTITY_ID_CACHE = new MapMaker().weakValues().makeMap();
+
+    //Item stack conversion caches, see #decodeBukkitItemStack and #encodeBukkitItemStack
+    private static final Map<Material, ItemType> MATERIAL_TO_ITEM_TYPE = new ConcurrentHashMap<>();
+    private static final Map<ItemType, Material> ITEM_TYPE_TO_MATERIAL = new ConcurrentHashMap<>();
+    private static final Field BUKKIT_ITEM_STACK_META_FIELD = Reflection.getField(ItemStack.class, "meta");
+    private static final ThreadLocal<ItemStackCodec> ITEM_STACK_CODEC = new ThreadLocal<>();
+    private static final int MAX_RETAINED_ITEM_BUFFER_CAPACITY = 32 * 1024;
+    private static final int MAX_FAST_PATH_ITEM_AMOUNT = Byte.MAX_VALUE;
 
     private static void initConstructors() {
         Class<?> itemClass = NMS_IMATERIAL_CLASS != null ? NMS_IMATERIAL_CLASS : NMS_ITEM_CLASS;
@@ -464,6 +478,8 @@ public final class SpigotReflectionUtil {
         V_1_19_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_19);
         V_1_17_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_17);
         V_1_12_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_12);
+        V_1_13_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_13);
+        V_1_20_5_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_20_5);
 
         initClasses();
         initFields();
@@ -886,33 +902,183 @@ public final class SpigotReflectionUtil {
     }
 
     public static com.github.retrooper.packetevents.protocol.item.ItemStack decodeBukkitItemStack(ItemStack in) {
-        Object buffer = PooledByteBufAllocator.DEFAULT.buffer();
+        if (in == null || in.getType() == Material.AIR) {
+            return com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY;
+        }
+
+        if (in.getClass() == ItemStack.class && isFastPathItemAmount(in.getAmount())
+                && (V_1_20_5_OR_HIGHER || in.getType().getMaxDurability() <= 0)
+                && !hasBukkitItemMeta(in)) {
+            ItemType type = getItemTypeByMaterial(in.getType());
+            if (type != ItemTypes.AIR) {
+                com.github.retrooper.packetevents.protocol.item.ItemStack.Builder builder =
+                        com.github.retrooper.packetevents.protocol.item.ItemStack.builder()
+                                .type(type).amount(in.getAmount());
+                if (V_1_20_5_OR_HIGHER) {
+                    builder.components(new PatchableComponentMap(type.getComponents(VERSION.toClientVersion())));
+                } else if (!V_1_13_OR_HIGHER) {
+                    builder.legacyData(Math.max(0, in.getDurability()));
+                }
+                return builder.build();
+            }
+            return com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY;
+        }
+        return decodeBukkitItemStackSlow(in);
+    }
+
+    private static com.github.retrooper.packetevents.protocol.item.ItemStack decodeBukkitItemStackSlow(ItemStack in) {
+        ItemStackCodec codec = acquireItemStackCodec();
+        if (codec == null) {
+            Object buffer = PooledByteBufAllocator.DEFAULT.buffer();
+            try {
+                return decodeBukkitItemStack0(in, createPacketDataSerializer(buffer),
+                        PacketWrapper.createUniversalPacketWrapper(buffer));
+            } finally {
+                ByteBufHelper.release(buffer);
+            }
+        }
         try {
-            // 3 reflection calls
-            Object packetDataSerializer = createPacketDataSerializer(buffer);
-            Object nmsItemStack = toNMSItemStack(in);
-            writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
-            // No more reflection from here on.
-            PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
-            com.github.retrooper.packetevents.protocol.item.ItemStack stack = wrapper.readItemStack();
-            return stack;
+            return decodeBukkitItemStack0(in, codec.serializer, codec.wrapper);
         } finally {
-            ByteBufHelper.release(buffer);
+            releaseItemStackCodec(codec);
         }
     }
 
+    private static com.github.retrooper.packetevents.protocol.item.ItemStack decodeBukkitItemStack0(
+            ItemStack in, Object packetDataSerializer, PacketWrapper<?> wrapper) {
+        Object nmsItemStack = toNMSItemStack(in);
+        writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
+        return wrapper.readItemStack();
+    }
+
     public static ItemStack encodeBukkitItemStack(com.github.retrooper.packetevents.protocol.item.ItemStack in) {
-        Object buffer = PooledByteBufAllocator.DEFAULT.buffer();
+        if (in == null || in.isEmpty()) {
+            return new ItemStack(Material.AIR);
+        }
+
+        NBTCompound nbt = in.getNBT();
+        if (isFastPathItemAmount(in.getAmount()) && !in.hasComponentPatches()
+                && (nbt == null || nbt.isEmpty())) {
+            Material material = getMaterialByItemType(in.getType());
+            if (material == Material.AIR) {
+                return new ItemStack(Material.AIR);
+            }
+            int legacyData = V_1_13_OR_HIGHER ? 0 : in.getLegacyData();
+            if (legacyData >= Short.MIN_VALUE && legacyData <= Short.MAX_VALUE) {
+                ItemStack stack = new ItemStack(material, in.getAmount());
+                if (!V_1_13_OR_HIGHER) {
+                    stack.setDurability((short) Math.max(0, legacyData));
+                }
+                return stack;
+            }
+        }
+        return encodeBukkitItemStackSlow(in);
+    }
+
+    private static ItemStack encodeBukkitItemStackSlow(com.github.retrooper.packetevents.protocol.item.ItemStack in) {
+        ItemStackCodec codec = acquireItemStackCodec();
+        if (codec == null) {
+            Object buffer = PooledByteBufAllocator.DEFAULT.buffer();
+            try {
+                return encodeBukkitItemStack0(in, createPacketDataSerializer(buffer),
+                        PacketWrapper.createUniversalPacketWrapper(buffer));
+            } finally {
+                ByteBufHelper.release(buffer);
+            }
+        }
         try {
-            PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(buffer);
-            wrapper.writeItemStack(in);
-            // 3 reflection calls
-            Object packetDataSerializer = createPacketDataSerializer(wrapper.getBuffer());
-            Object nmsItemStack = readNMSItemStackPacketDataSerializer(packetDataSerializer);
-            ItemStack stack = toBukkitItemStack(nmsItemStack);
-            return stack;
+            return encodeBukkitItemStack0(in, codec.serializer, codec.wrapper);
         } finally {
-            ByteBufHelper.release(buffer);
+            releaseItemStackCodec(codec);
+        }
+    }
+
+    private static ItemStack encodeBukkitItemStack0(
+            com.github.retrooper.packetevents.protocol.item.ItemStack in,
+            Object packetDataSerializer, PacketWrapper<?> wrapper) {
+        wrapper.writeItemStack(in);
+        Object nmsItemStack = readNMSItemStackPacketDataSerializer(packetDataSerializer);
+        return toBukkitItemStack(nmsItemStack);
+    }
+
+    public static ItemType getItemTypeByMaterial(Material material) {
+        ItemType type = MATERIAL_TO_ITEM_TYPE.get(material);
+        if (type == null) {
+            type = decodeBukkitItemStackSlow(new ItemStack(material)).getType();
+            MATERIAL_TO_ITEM_TYPE.put(material, type);
+        }
+        return type;
+    }
+
+    public static Material getMaterialByItemType(ItemType itemType) {
+        Material material = ITEM_TYPE_TO_MATERIAL.get(itemType);
+        if (material == null) {
+            material = encodeBukkitItemStackSlow(com.github.retrooper.packetevents.protocol.item.ItemStack
+                    .builder().type(itemType).build()).getType();
+            ITEM_TYPE_TO_MATERIAL.put(itemType, material);
+        }
+        return material;
+    }
+
+    private static boolean isFastPathItemAmount(int amount) {
+        return amount > 0 && amount <= MAX_FAST_PATH_ITEM_AMOUNT;
+    }
+
+    private static boolean hasBukkitItemMeta(ItemStack stack) {
+        if (BUKKIT_ITEM_STACK_META_FIELD != null) {
+            try {
+                return BUKKIT_ITEM_STACK_META_FIELD.get(stack) != null;
+            } catch (IllegalAccessException ignored) {
+            }
+        }
+        return stack.hasItemMeta();
+    }
+
+    private static @Nullable ItemStackCodec acquireItemStackCodec() {
+        ItemStackCodec codec = ITEM_STACK_CODEC.get();
+        if (codec == null) {
+            codec = ItemStackCodec.create();
+            if (codec == null) {
+                return null;
+            }
+            ITEM_STACK_CODEC.set(codec);
+        } else if (codec.inUse) {
+            return null;
+        }
+        codec.inUse = true;
+        ByteBufHelper.clear(codec.buffer);
+        return codec;
+    }
+
+    private static void releaseItemStackCodec(ItemStackCodec codec) {
+        codec.inUse = false;
+        if (ByteBufHelper.capacity(codec.buffer) > MAX_RETAINED_ITEM_BUFFER_CAPACITY) {
+            ITEM_STACK_CODEC.remove();
+            ByteBufHelper.release(codec.buffer);
+        }
+    }
+
+    private static final class ItemStackCodec {
+
+        private final Object buffer;
+        private final Object serializer;
+        private final PacketWrapper<?> wrapper;
+        private boolean inUse;
+
+        private ItemStackCodec(Object buffer, Object serializer, PacketWrapper<?> wrapper) {
+            this.buffer = buffer;
+            this.serializer = serializer;
+            this.wrapper = wrapper;
+        }
+
+        private static @Nullable ItemStackCodec create() {
+            Object buffer = UnpooledByteBufAllocationHelper.buffer(256);
+            Object serializer = createPacketDataSerializer(buffer);
+            if (serializer == null) {
+                ByteBufHelper.release(buffer);
+                return null;
+            }
+            return new ItemStackCodec(buffer, serializer, PacketWrapper.createUniversalPacketWrapper(buffer));
         }
     }
 
