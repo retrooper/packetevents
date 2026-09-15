@@ -79,8 +79,8 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
     public WrapperPlayServerEntityRelativeMove(int entityID, VecDelta delta, boolean onGround) {
         super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE);
         this.entityID = entityID;
-        this.delta = delta;
         this.onGround = onGround;
+        setDelta(delta);
     }
 
     @Override
@@ -159,6 +159,10 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
      */
     public void setDelta(VecDelta delta) {
         this.delta = delta;
+        Vector3d total = delta.apply(Vector3d.zero());
+        this.deltaX = total.x;
+        this.deltaY = total.y;
+        this.deltaZ = total.z;
     }
 
     /**
@@ -173,6 +177,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
      */
     public void setDeltaX(double deltaX) {
         this.deltaX = deltaX;
+        this.delta = new LinearVecDelta(this.deltaX, this.deltaY, this.deltaZ);
     }
 
     /**
@@ -187,6 +192,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
      */
     public void setDeltaY(double deltaY) {
         this.deltaY = deltaY;
+        this.delta = new LinearVecDelta(this.deltaX, this.deltaY, this.deltaZ);
     }
 
     /**
@@ -201,6 +207,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
      */
     public void setDeltaZ(double deltaZ) {
         this.deltaZ = deltaZ;
+        this.delta = new LinearVecDelta(this.deltaX, this.deltaY, this.deltaZ);
     }
 
     public boolean isOnGround() {
