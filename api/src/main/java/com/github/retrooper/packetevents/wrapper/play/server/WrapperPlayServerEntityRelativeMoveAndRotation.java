@@ -85,10 +85,10 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
     public WrapperPlayServerEntityRelativeMoveAndRotation(int entityID, VecDelta delta, float yaw, float pitch, boolean onGround) {
         super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION);
         this.entityID = entityID;
-        this.delta = delta;
         this.yaw = yaw;
         this.pitch = pitch;
         this.onGround = onGround;
+        setDelta(delta);
     }
 
     @Override
@@ -177,6 +177,10 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
      */
     public void setDelta(VecDelta delta) {
         this.delta = delta;
+        Vector3d total = delta.apply(Vector3d.zero());
+        this.deltaX = total.x;
+        this.deltaY = total.y;
+        this.deltaZ = total.z;
     }
 
     /**
@@ -191,6 +195,7 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
      */
     public void setDeltaX(double deltaX) {
         this.deltaX = deltaX;
+        this.delta = new LinearVecDelta(this.deltaX, this.deltaY, this.deltaZ);
     }
 
     /**
@@ -205,6 +210,7 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
      */
     public void setDeltaY(double deltaY) {
         this.deltaY = deltaY;
+        this.delta = new LinearVecDelta(this.deltaX, this.deltaY, this.deltaZ);
     }
 
     /**
@@ -219,6 +225,7 @@ public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrappe
      */
     public void setDeltaZ(double deltaZ) {
         this.deltaZ = deltaZ;
+        this.delta = new LinearVecDelta(this.deltaX, this.deltaY, this.deltaZ);
     }
 
     public float getYaw() {
