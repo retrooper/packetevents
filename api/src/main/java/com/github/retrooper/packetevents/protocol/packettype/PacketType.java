@@ -173,6 +173,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPl
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerRotation;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPong;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPunch;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientQueryBlockNBT;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientQueryEntityNBT;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientResourcePackStatus;
@@ -1067,7 +1068,7 @@ public final class PacketType {
             VEHICLE_MOVE(WrapperPlayClientVehicleMove.class),
             STEER_BOAT(WrapperPlayClientSteerBoat.class),
             /**
-             * Removed with 1.21.4
+             * @versions -1.21.3
              */
             @ApiStatus.Obsolete
             PICK_ITEM(WrapperPlayClientPickItem.class),
@@ -1076,7 +1077,7 @@ public final class PacketType {
             PLAYER_DIGGING(WrapperPlayClientPlayerDigging.class),
             ENTITY_ACTION(WrapperPlayClientEntityAction.class),
             /**
-             * Removed with 1.21.2
+             * @versions -1.21.1
              */
             @ApiStatus.Obsolete
             STEER_VEHICLE(WrapperPlayClientSteerVehicle.class),
@@ -1096,6 +1097,10 @@ public final class PacketType {
             UPDATE_JIGSAW_BLOCK(WrapperPlayClientUpdateJigsawBlock.class),
             UPDATE_STRUCTURE_BLOCK(WrapperPlayClientSetStructureBlock.class),
             UPDATE_SIGN(WrapperPlayClientUpdateSign.class),
+            /**
+             * @versions -26.2
+             */
+            @ApiStatus.Obsolete
             ANIMATION(WrapperPlayClientAnimation.class),
             SPECTATE(WrapperPlayClientSpectate.class),
             PLAYER_BLOCK_PLACEMENT(WrapperPlayClientPlayerBlockPlacement.class),
@@ -1209,6 +1214,11 @@ public final class PacketType {
              * @versions 26.1+
              */
             SPECTATE_ENTITY(WrapperPlayClientSpectateEntity.class),
+
+            /**
+             * @versions 26.3+
+             */
+            PUNCH(WrapperPlayClientPunch.class),
             ;
 
             private static int INDEX = 0;
