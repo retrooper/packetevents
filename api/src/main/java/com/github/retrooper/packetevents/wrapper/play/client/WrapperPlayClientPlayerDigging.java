@@ -58,9 +58,9 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
     @Override
     public void read() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            action = DiggingAction.getById(readVarInt());
+            action = DiggingAction.getById(serverVersion, readVarInt());
         } else {
-            action = DiggingAction.getById(readByte());
+            action = DiggingAction.getById(serverVersion, readByte());
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
@@ -83,10 +83,10 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
     @Override
     public void write() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            writeVarInt(action.getId());
+            writeVarInt(action.getId(serverVersion));
             writeBlockPosition(blockPosition);
         } else {
-            writeByte(action.getId());
+            writeByte(action.getId(serverVersion));
             writeInt(blockPosition.x);
             writeByte(blockPosition.y);
             writeInt(blockPosition.z);
