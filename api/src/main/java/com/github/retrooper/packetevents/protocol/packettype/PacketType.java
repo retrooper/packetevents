@@ -48,12 +48,14 @@ import com.github.retrooper.packetevents.protocol.packettype.clientbound.Clientb
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_9;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_1_9_3;
 import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_26_1;
+import com.github.retrooper.packetevents.protocol.packettype.clientbound.ClientboundPacketType_26_3;
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_20_2;
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_20_3;
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_20_5;
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_21;
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_21_6;
 import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_1_21_9;
+import com.github.retrooper.packetevents.protocol.packettype.config.clientbound.ClientboundConfigPacketType_26_3;
 import com.github.retrooper.packetevents.protocol.packettype.config.serverbound.ServerboundConfigPacketType_1_20_2;
 import com.github.retrooper.packetevents.protocol.packettype.config.serverbound.ServerboundConfigPacketType_1_20_5;
 import com.github.retrooper.packetevents.protocol.packettype.config.serverbound.ServerboundConfigPacketType_1_21_6;
@@ -82,6 +84,7 @@ import com.github.retrooper.packetevents.protocol.packettype.serverbound.Serverb
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_8;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_1_9;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_26_1;
+import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_26_3;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.VersionMapper;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -218,8 +221,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCh
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatPreview;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkBatchBegin;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkBatchEnd;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkBiomes;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkDataBulk;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerClearDialog;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerClearTitles;
@@ -407,7 +410,8 @@ public final class PacketType {
             ClientVersion.V_1_21_5,
             ClientVersion.V_1_21_6,
             ClientVersion.V_1_21_9,
-            ClientVersion.V_26_1);
+            ClientVersion.V_26_1,
+            ClientVersion.V_26_3);
 
     //TODO UPDATE Update packet type mappings (serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_PLAY_VERSION_MAPPER = new VersionMapper(
@@ -434,7 +438,8 @@ public final class PacketType {
             ClientVersion.V_1_21_5,
             ClientVersion.V_1_21_6,
             ClientVersion.V_1_21_9,
-            ClientVersion.V_26_1);
+            ClientVersion.V_26_1,
+            ClientVersion.V_26_3);
 
     // TODO UPDATE Update packet type mappings (config clientbound pt. 1)
     private static final VersionMapper CLIENTBOUND_CONFIG_VERSION_MAPPER = new VersionMapper(
@@ -443,7 +448,8 @@ public final class PacketType {
             ClientVersion.V_1_20_5,
             ClientVersion.V_1_21,
             ClientVersion.V_1_21_6,
-            ClientVersion.V_1_21_9);
+            ClientVersion.V_1_21_9,
+            ClientVersion.V_26_3);
     // TODO UPDATE Update packet type mappings (config serverbound pt. 1)
     private static final VersionMapper SERVERBOUND_CONFIG_VERSION_MAPPER = new VersionMapper(
             ClientVersion.V_1_20_2,
@@ -989,6 +995,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundConfigPacketType_1_21.values());
                 loadPacketIds(ClientboundConfigPacketType_1_21_6.values());
                 loadPacketIds(ClientboundConfigPacketType_1_21_9.values());
+                loadPacketIds(ClientboundConfigPacketType_26_3.values());
                 // TODO UPDATE Update packet type mappings (config clientbound pt. 2)
             }
 
@@ -1285,6 +1292,7 @@ public final class PacketType {
                 loadPacketIds(ServerboundPacketType_1_21_6.values());
                 loadPacketIds(ServerboundPacketType_1_21_9.values());
                 loadPacketIds(ServerboundPacketType_26_1.values());
+                loadPacketIds(ServerboundPacketType_26_3.values());
                 //TODO UPDATE Update packet type mappings (serverbound pt. 2)
             }
 
@@ -1383,7 +1391,7 @@ public final class PacketType {
             FACE_PLAYER(WrapperPlayServerFacePlayer.class),
             PLAYER_POSITION_AND_LOOK(WrapperPlayServerPlayerPositionAndLook.class),
             /**
-             * Removed with 1.21.2
+             * @versions -1.21.1
              */
             @ApiStatus.Obsolete
             UNLOCK_RECIPES(null),
@@ -1635,6 +1643,14 @@ public final class PacketType {
              * @versions 26.3+
              */
             POST_EFFECTS(WrapperPlayServerPostEffects.class),
+            /**
+             * @versions 26.3+
+             */
+            ADD_TRANSIENT_BLOCK(WrapperPlayServerAddTransientBlock.class),
+            /**
+             * @versions 26.3+
+             */
+            SWING_ANIMATION(WrapperPlayServerSwingAnimation.class),
             ;
 
             private static int INDEX = 0;
@@ -1716,6 +1732,7 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_1_21_6.values());
                 loadPacketIds(ClientboundPacketType_1_21_9.values());
                 loadPacketIds(ClientboundPacketType_26_1.values());
+                loadPacketIds(ClientboundPacketType_26_3.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
             }
         }
