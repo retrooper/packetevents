@@ -154,7 +154,15 @@ public class BlockTags {
     public static final BlockTags STONE_ORE_REPLACEABLES = bind("stone_ore_replaceables");
     public static final BlockTags DEEPSLATE_ORE_REPLACEABLES = bind("deepslate_ore_replaceables");
     public static final BlockTags BASE_STONE_NETHER = bind("base_stone_nether");
+    /**
+     * @versions -26.2
+     */
+    @ApiStatus.Obsolete
     public static final BlockTags OVERWORLD_CARVER_REPLACEABLES = bind("overworld_carver_replaceables");
+    /**
+     * @versions -26.2
+     */
+    @ApiStatus.Obsolete
     public static final BlockTags NETHER_CARVER_REPLACEABLES = bind("nether_carver_replaceables");
     public static final BlockTags CANDLE_CAKES = bind("candle_cakes");
     public static final BlockTags CAULDRONS = bind("cauldrons");
@@ -209,6 +217,10 @@ public class BlockTags {
     public static final BlockTags AZALEA_GROWS_ON = bind("azalea_grows_on");
     @Deprecated
     public static final BlockTags REPLACEABLE_PLANTS = bind("replaceable_plants");
+    /**
+     * @versions -26.2
+     */
+    @ApiStatus.Obsolete
     public static final BlockTags CONVERTABLE_TO_MUD = bind("convertable_to_mud");
     public static final BlockTags MANGROVE_LOGS_CAN_GROW_THROUGH = bind("mangrove_logs_can_grow_through");
     public static final BlockTags MANGROVE_ROOTS_CAN_GROW_THROUGH = bind("mangrove_roots_can_grow_through");
@@ -1225,6 +1237,9 @@ public class BlockTags {
         BlockTags.TALL_FLOWERS.add(StateTypes.SUNFLOWER, StateTypes.LILAC, StateTypes.PEONY, StateTypes.ROSE_BUSH, StateTypes.PITCHER_PLANT);
         BlockTags.AZALEA_GROWS_ON.addTag(BlockTags.DIRT).addTag(BlockTags.SAND).addTag(BlockTags.TERRACOTTA).add(StateTypes.SNOW_BLOCK, StateTypes.POWDER_SNOW);
         BlockTags.REPLACEABLE_PLANTS.add(StateTypes.SHORT_GRASS, StateTypes.FERN, StateTypes.DEAD_BUSH, StateTypes.VINE, StateTypes.GLOW_LICHEN, StateTypes.SUNFLOWER, StateTypes.LILAC, StateTypes.ROSE_BUSH, StateTypes.PEONY, StateTypes.TALL_GRASS, StateTypes.LARGE_FERN, StateTypes.HANGING_ROOTS, StateTypes.PITCHER_PLANT);
+        BlockTags.NETHER_CARVER_REPLACEABLES.addTag(BlockTags.BASE_STONE_OVERWORLD).addTag(BlockTags.BASE_STONE_NETHER).addTag(BlockTags.SUBSTRATE_OVERWORLD).addTag(BlockTags.NYLIUM).addTag(BlockTags.WART_BLOCKS).add(StateTypes.SOUL_SAND, StateTypes.SOUL_SOIL);
+        BlockTags.OVERWORLD_CARVER_REPLACEABLES.addTag(BlockTags.BASE_STONE_OVERWORLD).addTag(BlockTags.SUBSTRATE_OVERWORLD).addTag(BlockTags.SAND).addTag(BlockTags.TERRACOTTA).addTag(BlockTags.IRON_ORES).addTag(BlockTags.COPPER_ORES).addTag(BlockTags.SNOW).add(StateTypes.WATER, StateTypes.GRAVEL, StateTypes.SUSPICIOUS_GRAVEL, StateTypes.SANDSTONE, StateTypes.RED_SANDSTONE, StateTypes.CALCITE, StateTypes.PACKED_ICE, StateTypes.RAW_IRON_BLOCK, StateTypes.RAW_COPPER_BLOCK, StateTypes.CINNABAR, StateTypes.SULFUR, StateTypes.POTENT_SULFUR);
+        BlockTags.CONVERTABLE_TO_MUD.add(StateTypes.DIRT, StateTypes.COARSE_DIRT, StateTypes.ROOTED_DIRT);
         // legacy blocks
         BlockTags.CHAINS.add(StateTypes.CHAIN);
         BlockTags.MINEABLE_PICKAXE.add(StateTypes.CHAIN);
