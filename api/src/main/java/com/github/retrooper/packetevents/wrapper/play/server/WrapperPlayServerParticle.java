@@ -66,6 +66,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this(particle, longDistance, position, offset, maxSpeed, particleCount, false);
     }
 
+    /**
+     * @versions 1.21.4+
+     */
     public WrapperPlayServerParticle(
             Particle<?> particle, boolean longDistance, Vector3d position, Vector3f offset,
             float maxSpeed, int particleCount, boolean alwaysShow
@@ -78,6 +81,24 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this.maxSpeed = new Vector3f(maxSpeed, maxSpeed, maxSpeed);
         this.particleCount = particleCount;
         this.alwaysShow = alwaysShow;
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public WrapperPlayServerParticle(
+            Particle<?> particle, boolean longDistance, Vector3d position, Vector3f offset,
+            Vector3f maxSpeed, int particleCount, boolean alwaysShow, RandomizationType randomizationType
+    ) {
+        super(PacketType.Play.Server.PARTICLE);
+        this.particle = particle;
+        this.longDistance = longDistance;
+        this.position = position;
+        this.offset = offset;
+        this.maxSpeed = maxSpeed;
+        this.particleCount = particleCount;
+        this.alwaysShow = alwaysShow;
+        this.randomizationType = randomizationType;
     }
 
     @SuppressWarnings("unchecked")
