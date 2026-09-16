@@ -139,6 +139,14 @@ public final class AttributeTypes {
     public static final AttributeType<BackgroundMusic> BACKGROUND_MUSIC = define("background_music", BackgroundMusic.CODEC);
     public static final AttributeType<AmbientSounds> AMBIENT_SOUNDS = define("ambient_sounds", AmbientSounds.CODEC);
 
+    /**
+     * Not synced via network, not usable via packetevents.
+     *
+     * @versions 26.3+
+     */
+    @ApiStatus.Obsolete
+    public static final AttributeType<?> MOB_SPAWN_SETTINGS = defineUnsynced("mob_spawn_settings");
+
     static {
         REGISTRY.unloadMappings();
     }

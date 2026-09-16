@@ -238,6 +238,27 @@ public final class Parsers {
      */
     public static final Parser TEAM_COLOR = define("team_color", null, null);
 
+    /**
+     * @versions 26.3+
+     */
+    public static final Parser CONTEXT_FLOAT_PROVIDER = define("context_float_provider", null, null);
+    /**
+     * @versions 26.3+
+     */
+    public static final Parser CONTEXT_INT_PROVIDER = define("context_int_provider", null, null);
+    /**
+     * @versions 26.3+
+     */
+    public static final Parser SLOT_SOURCE = define("slot_source", null, null);
+    /**
+     * @versions 26.3+
+     */
+    public static final Parser FEATURE = define("feature", null, null);
+    /**
+     * @versions 26.3+
+     */
+    public static final Parser SWING_ANIMATION = define("swing_animation", null, null);
+
     static {
         REGISTRY.unloadMappings();
     }
