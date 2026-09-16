@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.ChickenSound
 import com.github.retrooper.packetevents.protocol.component.builtin.ChickenVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.CowSoundVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.CowVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.CushionColorComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.FoxVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.FrogVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.HorseVariantComponent;
@@ -40,6 +41,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.RabbitVarian
 import com.github.retrooper.packetevents.protocol.component.builtin.SalmonSizeComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.SheepColorComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.ShulkerColorComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.SignTextComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.SulfurCubeContentComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.TropicalFishBaseColorComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.TropicalFishPatternColorComponent;
@@ -67,9 +69,12 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBee
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBlockStateProperties;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBlocksAttacks;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBreakSound;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemBrewingFuel;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemCompostable;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemConsumable;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemContainerContents;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemContainerLoot;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemCookingFuel;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemCustomModelData;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDamageResistant;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemDamageType;
@@ -87,6 +92,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLor
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMapDecorations;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMapPostProcessingState;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMinimumAttackCharge;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemMobVisibility;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemModel;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPiercingWeapon;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPotionContents;
@@ -105,6 +111,8 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemUnb
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemUseCooldown;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemUseEffects;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemUseRemainder;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemVillagerFood;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemWaxed;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemWeapon;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.LodestoneTracker;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.PotDecorations;
@@ -129,6 +137,7 @@ import java.util.Collection;
 /**
  * Contains all item data component types.
  *
+ * @versions 1.20.5+
  * @see EnchantEffectComponentTypes
  */
 public final class ComponentTypes {
@@ -236,6 +245,10 @@ public final class ComponentTypes {
             ItemEnchantments::read, ItemEnchantments::write);
     public static final ComponentType<ItemDyeColor> DYED_COLOR = define("dyed_color",
             ItemDyeColor::read, ItemDyeColor::write);
+    /**
+     * @versions 1.20.5-26.2
+     */
+    @ApiStatus.Obsolete
     public static final ComponentType<Integer> MAP_COLOR = define("map_color",
             PacketWrapper::readInt, PacketWrapper::writeInt);
     public static final ComponentType<Integer> MAP_ID = define("map_id",
@@ -567,6 +580,31 @@ public final class ComponentTypes {
      */
     public static final ComponentType<SulfurCubeContentComponent> SULFUR_CUBE_CONTENT = define("sulfur_cube_content",
             SulfurCubeContentComponent::read, SulfurCubeContentComponent::write);
+
+    public static final ComponentType<ItemSwingAnimation> ATTACK_ANIMATION = define("attack_animation",
+            ItemSwingAnimation::read,ItemSwingAnimation::write);
+    public static final ComponentType<ItemSwingAnimation> INTERACT_ANIMATION = define("interact_animation",
+            ItemSwingAnimation::read,ItemSwingAnimation::write);
+    public static final ComponentType<?> BLOCK_TRANSFORMER = define("block_transformer", ); // TODO
+    public static final ComponentType<ItemVillagerFood> VILLAGER_FOOD = define("villager_food",
+            ItemVillagerFood::read,ItemVillagerFood::write);
+    public static final ComponentType<ItemCompostable> COMPOSTABLE = define("compostable",
+            ItemCompostable::read,ItemCompostable::write);
+    public static final ComponentType<ItemCookingFuel> COOKING_FUEL = define("cooking_fuel",
+            ItemCookingFuel::read,ItemCookingFuel::write);
+    public static final ComponentType<ItemBrewingFuel> BREWING_FUEL = define("brewing_fuel",
+            ItemBrewingFuel::read,ItemBrewingFuel::write);
+    public static final ComponentType<ItemMobVisibility> MOB_VISIBILITY = define("mob_visibility",
+            ItemMobVisibility::read,ItemMobVisibility::write);
+    public static final ComponentType<?> PROVIDES_POTTERY_PATTERN = define("provides_pottery_pattern", ); // TODO ??? why new registry
+    public static final ComponentType<SignTextComponent> SIGN_TEXT_FRONT = define("sign_text_front",
+            SignTextComponent::read, SignTextComponent::write);
+    public static final ComponentType<SignTextComponent> SIGN_TEXT_BACK = define("sign_text_back",
+            SignTextComponent::read, SignTextComponent::write);
+    public static final ComponentType<ItemWaxed> WAXED = define("waxed",
+            ItemWaxed::read, ItemWaxed::write);
+    public static final ComponentType<CushionColorComponent> CUSHION_COLOR = define("cushion/color",
+            CushionColorComponent::read, CushionColorComponent::write);
 
     /**
      * Returns an immutable view of the component types.

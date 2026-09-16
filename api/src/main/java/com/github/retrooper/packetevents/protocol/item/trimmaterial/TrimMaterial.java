@@ -61,10 +61,18 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
     @ApiStatus.Obsolete
     float getItemModelIndex();
 
+    /**
+     * @versions -26.2
+     */
+    @ApiStatus.Obsolete
     default @Nullable String getArmorMaterialOverride(ArmorMaterial armorMaterial) {
         return this.getOverrideArmorMaterials().get(armorMaterial);
     }
 
+    /**
+     * @versions -26.2
+     */
+    @ApiStatus.Obsolete
     Map<ArmorMaterial, String> getOverrideArmorMaterials();
 
     Component getDescription();
@@ -79,9 +87,12 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
                 ? null : wrapper.readMappedEntity(ItemTypes::getById);
         float itemModelIndex = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_4)
                 ? FALLBACK_ITEM_MODEL_INDEX : wrapper.readFloat();
-        Map<ArmorMaterial, String> overrideArmorMaterials = wrapper.readMap(
-                ew -> ew.readMappedEntity(ArmorMaterials::getById),
-                PacketWrapper::readString);
+        Map<ArmorMaterial, String> overrideArmorMaterials = Collections.emptyMap();
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_3)) {
+            overrideArmorMaterials = wrapper.readMap(
+                    ew -> ew.readMappedEntity(ArmorMaterials::getById),
+                    PacketWrapper::readString);
+        }
         Component description = wrapper.readComponent();
         return new StaticTrimMaterial(assetName, ingredient, itemModelIndex, overrideArmorMaterials, description);
     }
@@ -98,8 +109,10 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_4)) {
             wrapper.writeFloat(material.getItemModelIndex());
         }
-        wrapper.writeMap(material.getOverrideArmorMaterials(),
-                PacketWrapper::writeMappedEntity, PacketWrapper::writeString);
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_3)) {
+            wrapper.writeMap(material.getOverrideArmorMaterials(),
+                    PacketWrapper::writeMappedEntity, PacketWrapper::writeString);
+        }
         wrapper.writeComponent(material.getDescription());
     }
 
@@ -115,17 +128,17 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
                 ? null : ItemTypes.getByName(compound.getStringTagValueOrThrow("ingredient"));
         float itemModelIndex = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_4)
                 ? FALLBACK_ITEM_MODEL_INDEX : compound.getNumberTagOrThrow("item_model_index").getAsFloat();
-        NBTCompound overrideArmorMaterialsTag = compound.getCompoundTagOrNull("override_armor_materials");
-        Map<ArmorMaterial, String> overrideArmorMaterials;
-        if (overrideArmorMaterialsTag != null) {
-            overrideArmorMaterials = new HashMap<>();
-            for (Map.Entry<String, NBT> entry : overrideArmorMaterialsTag.getTags().entrySet()) {
-                ArmorMaterial material = ArmorMaterials.getByName(entry.getKey());
-                String override = ((NBTString) entry.getValue()).getValue();
-                overrideArmorMaterials.put(material, override);
+        Map<ArmorMaterial, String> overrideArmorMaterials = Collections.emptyMap();
+        if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_3)) {
+            NBTCompound overrideArmorMaterialsTag = compound.getCompoundTagOrNull("override_armor_materials");
+            if (overrideArmorMaterialsTag != null) {
+                overrideArmorMaterials = new HashMap<>();
+                for (Map.Entry<String, NBT> entry : overrideArmorMaterialsTag.getTags().entrySet()) {
+                    ArmorMaterial material = ArmorMaterials.getByName(entry.getKey());
+                    String override = ((NBTString) entry.getValue()).getValue();
+                    overrideArmorMaterials.put(material, override);
+                }
             }
-        } else {
-            overrideArmorMaterials = Collections.emptyMap();
         }
         Component description = ((NBTCompound) nbt).getOrThrow("description", wrapper.getSerializers(), wrapper);
         return new StaticTrimMaterial(data, assetName, ingredient, itemModelIndex, overrideArmorMaterials, description);
@@ -157,7 +170,7 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_4)) {
             compound.setTag("item_model_index", new NBTFloat(material.getItemModelIndex()));
         }
-        if (overrideArmorMaterialsTag != null) {
+        if (overrideArmorMaterialsTag != null && wrapper.getServerVersion().isOlderThan(ServerVersion.V_26_3)) {
             compound.setTag("override_armor_materials", overrideArmorMaterialsTag);
         }
         compound.set("description", material.getDescription(), wrapper.getSerializers(), wrapper);
