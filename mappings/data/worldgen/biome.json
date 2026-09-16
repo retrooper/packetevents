@@ -66,14 +66,17 @@
         },
         "loop": "minecraft:ambient.basalt_deltas.loop"
       },
-      "minecraft:visual/ambient_particles": [
-        {
-          "probability": 0.118093334,
-          "particle": {
-            "type": "minecraft:white_ash"
+      "minecraft:visual/ambient_particles": {
+        "argument": [
+          {
+            "probability": 0.118093334,
+            "particle": {
+              "type": "minecraft:white_ash"
+            }
           }
-        }
-      ]
+        ],
+        "modifier": "append"
+      }
     }
   },
   "minecraft:beach": {
@@ -122,8 +125,8 @@
           "min_delay": 12000
         }
       },
-      "minecraft:visual/sky_color": "#7ba4ff",
-      "minecraft:visual/water_fog_color": "#5db7ef"
+      "minecraft:visual/water_fog_color": "#5db7ef",
+      "minecraft:visual/sky_color": "#7ba4ff"
     }
   },
   "minecraft:cold_ocean": {
@@ -183,14 +186,40 @@
         },
         "loop": "minecraft:ambient.crimson_forest.loop"
       },
-      "minecraft:visual/ambient_particles": [
-        {
-          "probability": 0.025,
-          "particle": {
-            "type": "minecraft:crimson_spore"
+      "minecraft:visual/ambient_particles": {
+        "argument": [
+          {
+            "probability": 0.025,
+            "particle": {
+              "type": "minecraft:crimson_spore"
+            }
           }
+        ],
+        "modifier": "append"
+      }
+    }
+  },
+  "minecraft:dappled_forest": {
+    "effects": {
+      "dry_foliage_color": "#8c3a04",
+      "grass_color": "#df6827",
+      "foliage_color": "#e68e30",
+      "water_color": "#375154"
+    },
+    "has_precipitation": 1,
+    "temperature": 0.6,
+    "downfall": 0.6,
+    "attributes": {
+      "minecraft:audio/background_music": {
+        "default": {
+          "max_delay": 24000,
+          "sound": "minecraft:music.overworld.forest",
+          "min_delay": 12000
         }
-      ]
+      },
+      "minecraft:visual/fog_color": "#ccd8e2",
+      "minecraft:visual/sky_color": "#7ca3ff",
+      "minecraft:visual/water_fog_color": "#375154"
     }
   },
   "minecraft:dark_forest": {
@@ -296,8 +325,8 @@
           "min_delay": 12000
         }
       },
-      "minecraft:visual/sky_color": "#7ba4ff",
-      "minecraft:visual/water_fog_color": "#041633"
+      "minecraft:visual/water_fog_color": "#041633",
+      "minecraft:visual/sky_color": "#7ba4ff"
     }
   },
   "minecraft:deep_ocean": {
@@ -370,7 +399,8 @@
     },
     "has_precipitation": 0,
     "temperature": 0.5,
-    "downfall": 0.5
+    "downfall": 0.5,
+    "attributes": {}
   },
   "minecraft:end_highlands": {
     "effects": {
@@ -378,7 +408,8 @@
     },
     "has_precipitation": 0,
     "temperature": 0.5,
-    "downfall": 0.5
+    "downfall": 0.5,
+    "attributes": {}
   },
   "minecraft:end_midlands": {
     "effects": {
@@ -386,7 +417,8 @@
     },
     "has_precipitation": 0,
     "temperature": 0.5,
-    "downfall": 0.5
+    "downfall": 0.5,
+    "attributes": {}
   },
   "minecraft:eroded_badlands": {
     "effects": {
@@ -592,8 +624,8 @@
           "min_delay": 12000
         }
       },
-      "minecraft:visual/sky_color": "#7ba4ff",
-      "minecraft:visual/water_fog_color": "#041633"
+      "minecraft:visual/water_fog_color": "#041633",
+      "minecraft:visual/sky_color": "#7ba4ff"
     }
   },
   "minecraft:lush_caves": {
@@ -633,8 +665,8 @@
         }
       },
       "minecraft:visual/fog_color": "#c0d8ff",
-      "minecraft:visual/sky_color": "#78a7ff",
       "minecraft:visual/water_fog_color": "#4d7a60",
+      "minecraft:visual/sky_color": "#78a7ff",
       "minecraft:visual/water_fog_end_distance": {
         "argument": 0.85,
         "modifier": "multiply"
@@ -796,8 +828,8 @@
     "attributes": {
       "minecraft:audio/background_music": {},
       "minecraft:visual/fog_color": "#817770",
-      "minecraft:visual/sky_color": "#b9b9b9",
       "minecraft:visual/water_fog_color": "#556980",
+      "minecraft:visual/sky_color": "#b9b9b9",
       "minecraft:audio/music_volume": 0
     }
   },
@@ -868,7 +900,8 @@
     },
     "has_precipitation": 0,
     "temperature": 0.5,
-    "downfall": 0.5
+    "downfall": 0.5,
+    "attributes": {}
   },
   "minecraft:snowy_beach": {
     "effects": {
@@ -950,14 +983,17 @@
         },
         "loop": "minecraft:ambient.soul_sand_valley.loop"
       },
-      "minecraft:visual/ambient_particles": [
-        {
-          "probability": 0.00625,
-          "particle": {
-            "type": "minecraft:ash"
+      "minecraft:visual/ambient_particles": {
+        "argument": [
+          {
+            "probability": 0.00625,
+            "particle": {
+              "type": "minecraft:ash"
+            }
           }
-        }
-      ]
+        ],
+        "modifier": "append"
+      }
     }
   },
   "minecraft:sparse_jungle": {
@@ -1024,8 +1060,8 @@
         }
       },
       "minecraft:visual/fog_color": "#8cb831",
-      "minecraft:visual/water_fog_color": "#17543c",
-      "minecraft:visual/sky_color": "#78a7ff"
+      "minecraft:visual/sky_color": "#78a7ff",
+      "minecraft:visual/water_fog_color": "#17543c"
     }
   },
   "minecraft:sunflower_plains": {
@@ -1082,7 +1118,8 @@
     },
     "has_precipitation": 0,
     "temperature": 0.5,
-    "downfall": 0.5
+    "downfall": 0.5,
+    "attributes": {}
   },
   "minecraft:the_void": {
     "effects": {
@@ -1120,8 +1157,8 @@
           "min_delay": 12000
         }
       },
-      "minecraft:visual/sky_color": "#7ba4ff",
-      "minecraft:visual/water_fog_color": "#041f33"
+      "minecraft:visual/water_fog_color": "#041f33",
+      "minecraft:visual/sky_color": "#7ba4ff"
     }
   },
   "minecraft:warped_forest": {
@@ -1153,14 +1190,17 @@
         },
         "loop": "minecraft:ambient.warped_forest.loop"
       },
-      "minecraft:visual/ambient_particles": [
-        {
-          "probability": 0.01428,
-          "particle": {
-            "type": "minecraft:warped_spore"
+      "minecraft:visual/ambient_particles": {
+        "argument": [
+          {
+            "probability": 0.01428,
+            "particle": {
+              "type": "minecraft:warped_spore"
+            }
           }
-        }
-      ]
+        ],
+        "modifier": "append"
+      }
     }
   },
   "minecraft:windswept_forest": {
