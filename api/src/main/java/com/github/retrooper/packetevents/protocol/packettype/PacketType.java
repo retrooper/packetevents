@@ -208,6 +208,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientWi
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerAcknowledgeBlockChanges;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerAcknowledgePlayerDigging;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerActionBar;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerAddTransientBlock;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerAttachEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockAction;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockBreakAnimation;
@@ -333,6 +334,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnWeatherEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerStatistics;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerStoreCookie;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSwingAnimation;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTabComplete;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTags;

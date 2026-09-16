@@ -41,6 +41,7 @@ import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateValue;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.mappings.MappingHelper;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -167,6 +168,14 @@ public class WrappedBlockState {
         this.type = type;
         this.data = data;
         this.mappingsIndex = mappingsIndex;
+    }
+
+    public static WrappedBlockState read(PacketWrapper<?> wrapper) {
+        return getByGlobalId(wrapper.getServerVersion().toClientVersion(), wrapper.readVarInt());
+    }
+
+    public static void write(PacketWrapper<?> wrapper, WrappedBlockState state) {
+        wrapper.writeVarInt(state.globalID);
     }
 
     private static byte loadMappings(ClientVersion version) {
