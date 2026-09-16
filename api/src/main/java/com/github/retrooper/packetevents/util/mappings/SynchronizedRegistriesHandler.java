@@ -74,6 +74,8 @@ import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Tim
 import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Timelines;
 import com.github.retrooper.packetevents.protocol.world.biome.Biome;
 import com.github.retrooper.packetevents.protocol.world.biome.Biomes;
+import com.github.retrooper.packetevents.protocol.world.blockentity.decopot.DecoratedPotPattern;
+import com.github.retrooper.packetevents.protocol.world.blockentity.decopot.DecoratedPotPatterns;
 import com.github.retrooper.packetevents.protocol.world.clock.WorldClock;
 import com.github.retrooper.packetevents.protocol.world.clock.WorldClocks;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageType;
@@ -106,6 +108,7 @@ public final class SynchronizedRegistriesHandler {
     static {
         // packetevents ignores a few unimportant registries which aren't used anywhere else in the protocol:
         // test_environment, test_instance
+        // TODO DECORATED_POT_PATTERN BLOCK_TRANSFORMER BLOCK_STATE_PROVIDER
         Stream.of(
                 new RegistryEntry<>(Biomes.getRegistry(), Biome.CODEC),
                 new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
@@ -133,7 +136,8 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(CowSoundVariants.getRegistry(), CowSoundVariant.CODEC),
                 new RegistryEntry<>(ChickenSoundVariants.getRegistry(), ChickenSoundVariant.CODEC),
                 new RegistryEntry<>(WorldClocks.getRegistry(), WorldClock.DIRECT_CODEC),
-                new RegistryEntry<>(SulfurCubeArchtypes.getRegistry(), SulfurCubeArchtype.DIRECT_CODEC)
+                new RegistryEntry<>(SulfurCubeArchtypes.getRegistry(), SulfurCubeArchtype.DIRECT_CODEC),
+                new RegistryEntry<>(DecoratedPotPatterns.getRegistry(), DecoratedPotPattern.CODEC)
         ).forEach(entry -> REGISTRY_KEYS.put(entry.getRegistryKey(), entry));
     }
 

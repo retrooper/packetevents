@@ -37,6 +37,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.PaintingVari
 import com.github.retrooper.packetevents.protocol.component.builtin.ParrotVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.PigSoundVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.PigVariantComponent;
+import com.github.retrooper.packetevents.protocol.component.builtin.PotteryPatternComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.RabbitVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.SalmonSizeComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.SheepColorComponent;
@@ -582,21 +583,22 @@ public final class ComponentTypes {
             SulfurCubeContentComponent::read, SulfurCubeContentComponent::write);
 
     public static final ComponentType<ItemSwingAnimation> ATTACK_ANIMATION = define("attack_animation",
-            ItemSwingAnimation::read,ItemSwingAnimation::write);
+            ItemSwingAnimation::read, ItemSwingAnimation::write);
     public static final ComponentType<ItemSwingAnimation> INTERACT_ANIMATION = define("interact_animation",
-            ItemSwingAnimation::read,ItemSwingAnimation::write);
+            ItemSwingAnimation::read, ItemSwingAnimation::write);
     public static final ComponentType<?> BLOCK_TRANSFORMER = define("block_transformer", ); // TODO
     public static final ComponentType<ItemVillagerFood> VILLAGER_FOOD = define("villager_food",
-            ItemVillagerFood::read,ItemVillagerFood::write);
+            ItemVillagerFood::read, ItemVillagerFood::write);
     public static final ComponentType<ItemCompostable> COMPOSTABLE = define("compostable",
-            ItemCompostable::read,ItemCompostable::write);
+            ItemCompostable::read, ItemCompostable::write);
     public static final ComponentType<ItemCookingFuel> COOKING_FUEL = define("cooking_fuel",
-            ItemCookingFuel::read,ItemCookingFuel::write);
+            ItemCookingFuel::read, ItemCookingFuel::write);
     public static final ComponentType<ItemBrewingFuel> BREWING_FUEL = define("brewing_fuel",
-            ItemBrewingFuel::read,ItemBrewingFuel::write);
+            ItemBrewingFuel::read, ItemBrewingFuel::write);
     public static final ComponentType<ItemMobVisibility> MOB_VISIBILITY = define("mob_visibility",
-            ItemMobVisibility::read,ItemMobVisibility::write);
-    public static final ComponentType<?> PROVIDES_POTTERY_PATTERN = define("provides_pottery_pattern", ); // TODO ??? why new registry
+            ItemMobVisibility::read, ItemMobVisibility::write);
+    public static final ComponentType<PotteryPatternComponent> PROVIDES_POTTERY_PATTERN = define("provides_pottery_pattern",
+            PotteryPatternComponent::read, PotteryPatternComponent::write);
     public static final ComponentType<SignTextComponent> SIGN_TEXT_FRONT = define("sign_text_front",
             SignTextComponent::read, SignTextComponent::write);
     public static final ComponentType<SignTextComponent> SIGN_TEXT_BACK = define("sign_text_back",
