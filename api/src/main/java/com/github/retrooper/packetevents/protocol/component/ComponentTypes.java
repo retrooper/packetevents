@@ -56,6 +56,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.WolfVariantC
 import com.github.retrooper.packetevents.protocol.component.builtin.ZombieNautilusVariantComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ArmorTrim;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BannerLayers;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.BlockTransformerComponent;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.BundleContents;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ChargedProjectiles;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.CustomData;
@@ -586,7 +587,8 @@ public final class ComponentTypes {
             ItemSwingAnimation::read, ItemSwingAnimation::write);
     public static final ComponentType<ItemSwingAnimation> INTERACT_ANIMATION = define("interact_animation",
             ItemSwingAnimation::read, ItemSwingAnimation::write);
-    public static final ComponentType<?> BLOCK_TRANSFORMER = define("block_transformer", ); // TODO
+    public static final ComponentType<BlockTransformerComponent> BLOCK_TRANSFORMER = define("block_transformer",
+            BlockTransformerComponent::read, BlockTransformerComponent::write);
     public static final ComponentType<ItemVillagerFood> VILLAGER_FOOD = define("villager_food",
             ItemVillagerFood::read, ItemVillagerFood::write);
     public static final ComponentType<ItemCompostable> COMPOSTABLE = define("compostable",

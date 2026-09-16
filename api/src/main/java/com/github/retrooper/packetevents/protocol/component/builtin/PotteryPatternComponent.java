@@ -24,6 +24,9 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 
+/**
+ * @versions 26.3+
+ */
 @NullMarked
 public class PotteryPatternComponent {
 
