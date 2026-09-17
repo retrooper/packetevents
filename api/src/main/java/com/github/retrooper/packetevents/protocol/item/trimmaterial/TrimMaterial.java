@@ -123,7 +123,8 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
 
     static TrimMaterial decode(NBT nbt, PacketWrapper<?> wrapper, @Nullable TypesBuilderData data) {
         NBTCompound compound = (NBTCompound) nbt;
-        String assetName = compound.getStringTagValueOrThrow("asset_name");
+        String assetNameKey = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3) ? "palette_id" : "asset_name";
+        String assetName = compound.getStringTagValueOrThrow(assetNameKey);
         ItemType ingredient = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_5)
                 ? null : ItemTypes.getByName(compound.getStringTagValueOrThrow("ingredient"));
         float itemModelIndex = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_4)
@@ -162,8 +163,9 @@ public interface TrimMaterial extends MappedEntity, CopyableEntity<TrimMaterial>
             overrideArmorMaterialsTag = null;
         }
 
+        String assetNameKey = wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3) ? "palette_id" : "asset_name";
         NBTCompound compound = new NBTCompound();
-        compound.setTag("asset_name", new NBTString(material.getAssetName()));
+        compound.setTag(assetNameKey, new NBTString(material.getAssetName()));
         if (wrapper.getServerVersion().isOlderThan(ServerVersion.V_1_21_5)) {
             compound.setTag("ingredient", new NBTString(material.getIngredient().getName().toString()));
         }
