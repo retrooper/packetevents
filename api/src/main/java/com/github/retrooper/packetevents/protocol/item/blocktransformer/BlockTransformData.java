@@ -180,7 +180,7 @@ public final class BlockTransformData {
         private boolean updateFromNeighbors = true;
         private TransformType transformType = TransformType.SINGLE_BLOCK;
         private boolean consumeOnUse = true;
-        private int itemDamagePerUse = 0;
+        private int itemDamagePerUse = 1;
 
         private Builder(BlockStateProvider blockStateProvider) {
             this.blockStateProvider = blockStateProvider;

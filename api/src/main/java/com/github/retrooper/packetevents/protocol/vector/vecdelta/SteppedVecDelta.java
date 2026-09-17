@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.vector.vecdelta;
 
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.vector.positionpath.LinearPositionPath;
 import com.github.retrooper.packetevents.protocol.vector.positionpath.PositionPath;
 import com.github.retrooper.packetevents.protocol.vector.positionpath.SteppedPositionPath;
@@ -34,6 +35,8 @@ import java.util.List;
 @NullMarked
 public final class SteppedVecDelta implements VecDelta {
 
+    private static final int MIN_BYTES_PER_STEP = 7;
+
     private final List<DeltaStep> steps;
 
     public SteppedVecDelta(List<DeltaStep> steps) {
@@ -41,6 +44,10 @@ public final class SteppedVecDelta implements VecDelta {
     }
 
     public static SteppedVecDelta read(PacketWrapper<?> wrapper, int stepCount) {
+        int maxSteps = ByteBufHelper.readableBytes(wrapper.buffer) / MIN_BYTES_PER_STEP;
+        if (stepCount > maxSteps) {
+            throw new IllegalStateException("VecDelta with size " + stepCount + " is bigger than allowed " + maxSteps);
+        }
         List<DeltaStep> steps = new ArrayList<>(stepCount);
         for (int i = 0; i < stepCount; i++) {
             steps.add(DeltaStep.read(wrapper));

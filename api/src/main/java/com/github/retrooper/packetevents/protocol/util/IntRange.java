@@ -21,12 +21,14 @@ package com.github.retrooper.packetevents.protocol.util;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
-import com.github.retrooper.packetevents.protocol.nbt.NBTIntArray;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 @NullMarked
@@ -56,7 +58,8 @@ public final class IntRange {
             if (value.minInclusive == value.maxInclusive) {
                 return new NBTInt(value.minInclusive);
             }
-            return new NBTIntArray(new int[]{value.minInclusive, value.maxInclusive});
+            return new NBTList<>(NBTType.INT, Arrays.asList(
+                    new NBTInt(value.minInclusive), new NBTInt(value.maxInclusive)));
         }
     };
 
