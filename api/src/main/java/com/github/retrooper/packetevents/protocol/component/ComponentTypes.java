@@ -538,8 +538,9 @@ public final class ComponentTypes {
     public static final ComponentType<ItemKineticWeapon> KINETIC_WEAPON = define("kinetic_weapon",
             ItemKineticWeapon::read, ItemKineticWeapon::write);
     /**
-     * @versions 1.21.11+
+     * @versions 1.21.11-26.2
      */
+    @ApiStatus.Obsolete
     public static final ComponentType<ItemSwingAnimation> SWING_ANIMATION = define("swing_animation",
             ItemSwingAnimation::read, ItemSwingAnimation::write);
     /**
