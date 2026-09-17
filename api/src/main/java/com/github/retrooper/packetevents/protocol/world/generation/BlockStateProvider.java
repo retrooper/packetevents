@@ -32,6 +32,7 @@ import com.github.retrooper.packetevents.protocol.world.generation.provider.Simp
 import com.github.retrooper.packetevents.protocol.world.states.BlockStateCodec;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -75,12 +76,22 @@ public interface BlockStateProvider extends MappedEntity, CopyableEntity<BlockSt
         }
     };
     NbtCodec<BlockStateProvider> CODEC = new NbtCodec<BlockStateProvider>() {
-        private final NbtCodec<BlockStateProvider> registryCodec = NbtCodecs.forRegistry(BlockStateProviders.getRegistry());
+        private @MonotonicNonNull NbtCodec<BlockStateProvider> registryCodec;
+
+        // resolve lazily to fix class loading order
+        private NbtCodec<BlockStateProvider> registryCodec() {
+            NbtCodec<BlockStateProvider> codec = this.registryCodec;
+            if (codec == null) {
+                codec = NbtCodecs.forRegistry(BlockStateProviders.getRegistry());
+                this.registryCodec = codec;
+            }
+            return codec;
+        }
 
         @Override
         public BlockStateProvider decode(NBT tag, PacketWrapper<?> wrapper) throws NbtCodecException {
             if (tag instanceof NBTString) {
-                return this.registryCodec.decode(tag, wrapper);
+                return this.registryCodec().decode(tag, wrapper);
             }
             return DIRECT_CODEC.decode(tag, wrapper);
         }
@@ -88,7 +99,7 @@ public interface BlockStateProvider extends MappedEntity, CopyableEntity<BlockSt
         @Override
         public NBT encode(PacketWrapper<?> wrapper, BlockStateProvider value) throws NbtCodecException {
             if (value.isRegistered()) {
-                return this.registryCodec.encode(wrapper, value);
+                return this.registryCodec().encode(wrapper, value);
             }
             return DIRECT_CODEC.encode(wrapper, value);
         }
