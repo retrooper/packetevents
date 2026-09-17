@@ -176,7 +176,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             }
             if (this.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
                 int modeId = this.readVarInt();
-                this.previousGameMode = modeId == 0 ? null : GameMode.getById(modeId);
+                this.previousGameMode = modeId == 0 ? null : GameMode.getById(modeId - 1);
             } else {
                 this.previousGameMode = this.readGameMode();
             }
