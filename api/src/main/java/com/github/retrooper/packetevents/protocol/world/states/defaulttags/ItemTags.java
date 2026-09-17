@@ -39,7 +39,7 @@ public class ItemTags {
     public static final ItemTags WOODEN_BUTTONS = bind("wooden_buttons");
     public static final ItemTags STONE_BUTTONS = bind("stone_buttons");
     public static final ItemTags BUTTONS = bind("buttons");
-    public static final ItemTags WOOL_CARPETS = bind("carpets");
+    public static final ItemTags WOOL_CARPETS = bind("wool_carpets");
     public static final ItemTags WOODEN_DOORS = bind("wooden_doors");
     public static final ItemTags WOODEN_STAIRS = bind("wooden_stairs");
     public static final ItemTags WOODEN_SLABS = bind("wooden_slabs");
@@ -546,7 +546,7 @@ public class ItemTags {
     /**
      * @versions 1.21.11+
      */
-    public static final ItemTags ZOMBIE_HORSE_FOOD = bind("shearable_from_copper_golem");
+    public static final ItemTags ZOMBIE_HORSE_FOOD = bind("zombie_horse_food");
     /**
      * @versions 1.21.11+
      */

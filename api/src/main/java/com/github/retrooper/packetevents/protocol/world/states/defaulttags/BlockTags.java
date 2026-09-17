@@ -296,7 +296,7 @@ public class BlockTags {
     /**
      * Added with 1.21.4
      */
-    public static final BlockTags BEE_ATTRACTIVE = bind("bats_spawnable_on");
+    public static final BlockTags BEE_ATTRACTIVE = bind("bee_attractive");
 
     /**
      * Added with 1.21.5
