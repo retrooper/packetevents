@@ -32,13 +32,12 @@ final class StaticBlockTransformer extends AbstractMappedEntity implements Block
     @Override
     public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof StaticBlockTransformer)) return false;
-        if (!super.equals(obj)) return false;
         StaticBlockTransformer that = (StaticBlockTransformer) obj;
         return this.transforms.equals(that.transforms);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.transforms);
+        return Objects.hash(this.transforms);
     }
 }

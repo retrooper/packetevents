@@ -31,13 +31,12 @@ final class StaticDecoratedPotPattern extends AbstractMappedEntity implements De
     @Override
     public boolean deepEquals(@Nullable Object obj) {
         if (!(obj instanceof StaticDecoratedPotPattern)) return false;
-        if (!super.equals(obj)) return false;
         StaticDecoratedPotPattern that = (StaticDecoratedPotPattern) obj;
         return this.assetId.equals(that.assetId);
     }
 
     @Override
     public int deepHashCode() {
-        return Objects.hash(super.hashCode(), this.assetId);
+        return Objects.hash(this.assetId);
     }
 }
