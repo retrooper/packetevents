@@ -82,6 +82,8 @@ import com.github.retrooper.packetevents.protocol.world.clock.WorldClock;
 import com.github.retrooper.packetevents.protocol.world.clock.WorldClocks;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageType;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageTypes;
+import com.github.retrooper.packetevents.protocol.world.generation.BlockStateProvider;
+import com.github.retrooper.packetevents.protocol.world.generation.BlockStateProviders;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
 import com.github.retrooper.packetevents.protocol.world.painting.PaintingVariant;
@@ -110,7 +112,6 @@ public final class SynchronizedRegistriesHandler {
     static {
         // packetevents ignores a few unimportant registries which aren't used anywhere else in the protocol:
         // test_environment, test_instance
-        // TODO BLOCK_STATE_PROVIDER
         Stream.of(
                 new RegistryEntry<>(Biomes.getRegistry(), Biome.CODEC),
                 new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
@@ -140,7 +141,8 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(WorldClocks.getRegistry(), WorldClock.DIRECT_CODEC),
                 new RegistryEntry<>(SulfurCubeArchtypes.getRegistry(), SulfurCubeArchtype.DIRECT_CODEC),
                 new RegistryEntry<>(DecoratedPotPatterns.getRegistry(), DecoratedPotPattern.CODEC),
-                new RegistryEntry<>(BlockTransformers.getRegistry(), BlockTransformer.DIRECT_CODEC)
+                new RegistryEntry<>(BlockTransformers.getRegistry(), BlockTransformer.DIRECT_CODEC),
+                new RegistryEntry<>(BlockStateProviders.getRegistry(), BlockStateProvider.DIRECT_CODEC)
         ).forEach(entry -> REGISTRY_KEYS.put(entry.getRegistryKey(), entry));
     }
 

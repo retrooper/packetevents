@@ -9,6 +9,7 @@ import com.github.retrooper.packetevents.protocol.util.NbtCodecException;
 import com.github.retrooper.packetevents.protocol.util.NbtCodecs;
 import com.github.retrooper.packetevents.protocol.util.NbtMapCodec;
 import com.github.retrooper.packetevents.protocol.world.Direction;
+import com.github.retrooper.packetevents.protocol.world.generation.BlockStateProvider;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
@@ -36,7 +37,7 @@ public final class BlockTransformData {
             boolean updateFromNeighbors = tag.getOr("update_from_neighbors", NbtCodecs.BOOLEAN, true, wrapper);
             TransformType type = tag.getOr("transform_type", TransformType.CODEC, TransformType.SINGLE_BLOCK, wrapper);
             boolean consumeOnUse = tag.getOr("consume_on_use", NbtCodecs.BOOLEAN, true, wrapper);
-            int itemDamagePerUse = tag.getOr("item_damage_on_use", NbtCodecs.INT, 0, wrapper);
+            int itemDamagePerUse = tag.getOr("item_damage_per_use", NbtCodecs.INT, 0, wrapper);
             return new BlockTransformData(blockStateProvider, sound, particle, disallowedFaces, loot,
                     dropStrategy, updateFromNeighbors, type, consumeOnUse, itemDamagePerUse);
         }
@@ -69,12 +70,11 @@ public final class BlockTransformData {
                 tag.set("consume_on_use", false, NbtCodecs.BOOLEAN, wrapper);
             }
             if (value.itemDamagePerUse != 0) {
-                tag.set("item_damage_on_use", value.itemDamagePerUse, NbtCodecs.INT, wrapper);
+                tag.set("item_damage_per_use", value.itemDamagePerUse, NbtCodecs.INT, wrapper);
             }
         }
     }.codec();
 
-    // TODO what the fuck mojang, why did you add worldgen codecs into client-synced registries
     private final BlockStateProvider blockStateProvider;
     private final Sound sound;
     private final Particle particle;
