@@ -106,14 +106,14 @@ public class PotDecorations {
     public static PotDecorations read(PacketWrapper<?> wrapper) {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
             return new PotDecorations(
-                    ItemStackSerialization.readTemplate(wrapper),
-                    ItemStackSerialization.readTemplate(wrapper),
-                    ItemStackSerialization.readTemplate(wrapper),
-                    ItemStackSerialization.readTemplate(wrapper)
+                    wrapper.readOptional(ItemStackSerialization::readTemplate),
+                    wrapper.readOptional(ItemStackSerialization::readTemplate),
+                    wrapper.readOptional(ItemStackSerialization::readTemplate),
+                    wrapper.readOptional(ItemStackSerialization::readTemplate)
             );
-        }//<Optional<ItemType>, Queue<Optional<ItemType>>>
+        }
         Queue<Optional<ItemType>> items = wrapper.readCollection(ArrayDeque::new, ew -> {
-            ItemType type = wrapper.readMappedEntity(ItemTypes.getRegistry()::getByIdOrThrow);
+            ItemType type = wrapper.readMappedEntity(ItemTypes.getRegistry());
             return type == ItemTypes.BRICK ? Optional.empty() : Optional.of(type);
         });
         return new PotDecorations(items);
@@ -121,14 +121,14 @@ public class PotDecorations {
 
     public static void write(PacketWrapper<?> wrapper, PotDecorations decorations) {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
-            ItemStackSerialization.writeTemplate(wrapper, decorations.back);
-            ItemStackSerialization.writeTemplate(wrapper, decorations.left);
-            ItemStackSerialization.writeTemplate(wrapper, decorations.right);
-            ItemStackSerialization.writeTemplate(wrapper, decorations.front);
-            return;
+            wrapper.writeOptional(decorations.back, ItemStackSerialization::writeTemplate);
+            wrapper.writeOptional(decorations.left, ItemStackSerialization::writeTemplate);
+            wrapper.writeOptional(decorations.right, ItemStackSerialization::writeTemplate);
+            wrapper.writeOptional(decorations.front, ItemStackSerialization::writeTemplate);
+        } else {
+            wrapper.writeList(decorations.asList(), (ew, type) ->
+                    ew.writeMappedEntity(type.orElse(ItemTypes.BRICK)));
         }
-        wrapper.writeList(decorations.asList(), (ew, type) ->
-                ew.writeMappedEntity(type.orElse(ItemTypes.BRICK)));
     }
 
     /**

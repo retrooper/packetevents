@@ -2678,8 +2678,8 @@ public final class ItemTypes {
                     ((StaticItemType) type).setComponents(version, defaults);
                 }
             }
-        } catch (IOException exception) {
-            throw new RuntimeException("Error while parsing item base component data", exception);
+        } catch (Exception exception) {
+            throw new RuntimeException("Error while parsing item base component data for " + version, exception);
         }
     }
 
