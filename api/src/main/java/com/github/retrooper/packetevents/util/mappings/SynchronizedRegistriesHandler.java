@@ -116,7 +116,7 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(Biomes.getRegistry(), Biome.CODEC),
                 new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
                 new RegistryEntry<>(TrimPatterns.getRegistry(), (NbtEntryDecoder<TrimPattern>) TrimPattern::decode),
-                new RegistryEntry<>(TrimMaterials.getRegistry(), (NbtEntryDecoder<TrimMaterial>) TrimMaterial::decode),
+                new RegistryEntry<>(TrimMaterials.getRegistry(), TrimMaterial.DIRECT_CODEC),
                 new RegistryEntry<>(WolfVariants.getRegistry(), WolfVariant.CODEC),
                 new RegistryEntry<>(WolfSoundVariants.getRegistry(), WolfSoundVariant.CODEC),
                 new RegistryEntry<>(PigVariants.getRegistry(), PigVariant::decode),
