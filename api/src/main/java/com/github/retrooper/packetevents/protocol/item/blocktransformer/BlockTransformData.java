@@ -15,6 +15,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -86,8 +87,7 @@ public final class BlockTransformData {
     private final boolean consumeOnUse;
     private final int itemDamagePerUse;
 
-    // TODO use builder instead of this
-    public BlockTransformData(
+    private BlockTransformData(
             BlockStateProvider blockStateProvider, Sound sound, Particle particle,
             List<Direction> disallowedFaces, @Nullable ResourceLocation loot, DropStrategy dropStrategy,
             boolean updateFromNeighbors, TransformType transformType, boolean consumeOnUse, int itemDamagePerUse
@@ -102,6 +102,10 @@ public final class BlockTransformData {
         this.transformType = transformType;
         this.consumeOnUse = consumeOnUse;
         this.itemDamagePerUse = itemDamagePerUse;
+    }
+
+    public static Builder builder(BlockStateProvider blockStateProvider) {
+        return new Builder(blockStateProvider);
     }
 
     public BlockStateProvider getBlockStateProvider() {
@@ -163,6 +167,82 @@ public final class BlockTransformData {
     @Override
     public int hashCode() {
         return Objects.hash(this.blockStateProvider, this.sound, this.particle, this.disallowedFaces, this.loot, this.dropStrategy, this.updateFromNeighbors, this.transformType, this.consumeOnUse, this.itemDamagePerUse);
+    }
+
+    public static class Builder {
+
+        private final BlockStateProvider blockStateProvider;
+        private Sound sound = Sounds.INTENTIONALLY_EMPTY;
+        private Particle particle = Particle.NONE;
+        private List<Direction> disallowedFaces = Collections.emptyList();
+        private @Nullable ResourceLocation loot;
+        private DropStrategy dropStrategy = DropStrategy.FROM_MIDDLE;
+        private boolean updateFromNeighbors = true;
+        private TransformType transformType = TransformType.SINGLE_BLOCK;
+        private boolean consumeOnUse = true;
+        private int itemDamagePerUse = 0;
+
+        private Builder(BlockStateProvider blockStateProvider) {
+            this.blockStateProvider = blockStateProvider;
+        }
+
+        public Builder setSound(Sound sound) {
+            this.sound = sound;
+            return this;
+        }
+
+        public Builder setParticle(Particle particle) {
+            this.particle = particle;
+            return this;
+        }
+
+        public Builder setDisallowedFaces(List<Direction> disallowedFaces) {
+            this.disallowedFaces = disallowedFaces;
+            return this;
+        }
+
+        public Builder setDisallowedFaces(Direction... disallowedFaces) {
+            this.disallowedFaces = Arrays.asList(disallowedFaces);
+            return this;
+        }
+
+        public Builder setLoot(@Nullable ResourceLocation loot) {
+            this.loot = loot;
+            return this;
+        }
+
+        public Builder setDropStrategy(DropStrategy dropStrategy) {
+            this.dropStrategy = dropStrategy;
+            return this;
+        }
+
+        public Builder setUpdateFromNeighbors(boolean updateFromNeighbors) {
+            this.updateFromNeighbors = updateFromNeighbors;
+            return this;
+        }
+
+        public Builder setTransformType(TransformType transformType) {
+            this.transformType = transformType;
+            return this;
+        }
+
+        public Builder setConsumeOnUse(boolean consumeOnUse) {
+            this.consumeOnUse = consumeOnUse;
+            return this;
+        }
+
+        public Builder setItemDamagePerUse(int itemDamagePerUse) {
+            this.itemDamagePerUse = itemDamagePerUse;
+            return this;
+        }
+
+        public BlockTransformData build() {
+            return new BlockTransformData(
+                    this.blockStateProvider, this.sound, this.particle,
+                    this.disallowedFaces, this.loot, this.dropStrategy,
+                    this.updateFromNeighbors, this.transformType, this.consumeOnUse, this.itemDamagePerUse
+            );
+        }
     }
 
     /**
