@@ -1,6 +1,6 @@
 !!!!! v2.14.0
 
-# PacketEvents 2.13.0 is finally out! 🎉
+# PacketEvents 2.14.0 is finally out! 🎉
 
 This minor release includes mainly support for Minecraft 26.3, but also includes a few smaller fixes and improvements.
 
