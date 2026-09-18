@@ -8,6 +8,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @versions 26.3+
@@ -61,5 +62,21 @@ public class SignTextComponent {
 
     public boolean isGlowing() {
         return this.glowing;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof SignTextComponent)) return false;
+        SignTextComponent that = (SignTextComponent) obj;
+        if (this.glowing != that.glowing) return false;
+        if (!this.color.equals(that.color)) return false;
+        if (!this.messages.equals(that.messages)) return false;
+        return Objects.equals(this.filteredMessages, that.filteredMessages);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.messages, this.filteredMessages, this.color, this.glowing);
     }
 }
