@@ -30,6 +30,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -65,11 +66,9 @@ public class StaticTrimMaterial extends AbstractMappedEntity implements TrimMate
     /**
      * @versions 26.3+
      */
-    public StaticTrimMaterial(
-            ResourceLocation paletteId, @Nullable ItemType ingredient, float itemModelIndex,
-            Map<ArmorMaterial, String> overrideArmorMaterials, Component description
-    ) {
-        this(null, paletteId.getKey(), paletteId, ingredient, itemModelIndex, overrideArmorMaterials, description);
+    public StaticTrimMaterial(ResourceLocation paletteId, Component description) {
+        this(null, paletteId.getKey(), paletteId, null,
+                FALLBACK_ITEM_MODEL_INDEX, Collections.emptyMap(), description);
     }
 
     @ApiStatus.Internal
