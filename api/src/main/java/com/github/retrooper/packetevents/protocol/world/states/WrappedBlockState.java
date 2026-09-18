@@ -1549,7 +1549,7 @@ public class WrappedBlockState {
      * This is because I believe it's better to revert illegal modification than to simply set to air for doing so
      * As multi-version makes block data still annoying
      */
-    private void checkIsStillValid() {
+    protected void checkIsStillValid() {
         int oldGlobalID = globalID;
         globalID = getGlobalIdNoCache();
         if (globalID == -1) { // -1 maps to no block as negative ID are impossible
