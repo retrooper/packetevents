@@ -23,6 +23,12 @@ dependencies {
     // Velocity already bundles with adventure
 }
 
+configure<JavaPluginExtension> {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
 tasks {
     named<RunVelocity>("runVelocity") {
         velocityVersion("4.1.1")
