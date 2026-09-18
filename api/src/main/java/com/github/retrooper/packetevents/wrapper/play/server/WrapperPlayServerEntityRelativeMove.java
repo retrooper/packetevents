@@ -180,6 +180,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
      * @versions -26.2
      */
     public void setDeltaX(double deltaX) {
+        this.delta = null;
         this.deltaX = deltaX;
     }
 
@@ -194,6 +195,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
      * @versions -26.2
      */
     public void setDeltaY(double deltaY) {
+        this.delta = null;
         this.deltaY = deltaY;
     }
 
@@ -208,6 +210,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
      * @versions -26.2
      */
     public void setDeltaZ(double deltaZ) {
+        this.delta = null;
         this.deltaZ = deltaZ;
     }
 
