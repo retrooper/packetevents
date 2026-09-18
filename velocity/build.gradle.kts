@@ -29,7 +29,7 @@ tasks {
         runDirectory = rootDir.resolve("run/velocity/")
 
         javaLauncher = project.javaToolchains.launcherFor {
-            languageVersion = JavaLanguageVersion.of(21)
+            languageVersion = JavaLanguageVersion.of(25)
         }
     }
 }
