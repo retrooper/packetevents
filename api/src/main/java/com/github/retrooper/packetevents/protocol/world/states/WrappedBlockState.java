@@ -1536,7 +1536,7 @@ public class WrappedBlockState {
      * We can't modify all blocks of a type when modifying a single block.
      * Cloning on every wrapped block state is too expensive.
      */
-    private void checkIfCloneNeeded() {
+    protected void checkIfCloneNeeded() {
         if (!hasClonedData) {
             data = new HashMap<>(data);
             hasClonedData = true;

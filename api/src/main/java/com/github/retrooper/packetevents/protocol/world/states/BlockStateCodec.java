@@ -101,8 +101,11 @@ public final class BlockStateCodec {
                 NBTString stringTag = entry.getValue().castOrThrow(NBTString.class);
                 value = stateValue.parse(stringTag.getValue().toUpperCase(Locale.ROOT));
             }
+            if (!modified) {
+                state.checkIfCloneNeeded();
+                modified = true;
+            }
             state.data.put(stateValue, value);
-            modified = true;
         }
         if (modified) {
             state.checkIsStillValid();
