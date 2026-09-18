@@ -217,6 +217,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         this.maxSpeed = wrapper.maxSpeed;
         this.particleCount = wrapper.particleCount;
         this.alwaysShow = wrapper.alwaysShow;
+        this.randomizationType = wrapper.randomizationType;
     }
 
     public Particle<?> getParticle() {
