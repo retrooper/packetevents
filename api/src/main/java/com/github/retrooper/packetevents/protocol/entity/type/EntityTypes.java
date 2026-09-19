@@ -430,6 +430,18 @@ public final class EntityTypes {
      * @versions 26.2+
      */
     public static final EntityType SULFUR_CUBE = define("sulfur_cube", ABSTRACT_AGEABLE);
+    /**
+     * @versions 26.3+
+     */
+    public static final EntityType CUSHION = define("cushion", ABSTRACT_HANGING);
+    /**
+     * @versions 26.3+
+     */
+    public static final EntityType POPLAR_BOAT = define("poplar_boat", BOAT);
+    /**
+     * @versions 26.3+
+     */
+    public static final EntityType POPLAR_CHEST_BOAT = define("poplar_chest_boat", CHEST_BOAT);
 
     /**
      * Returns an immutable view of the entity types.

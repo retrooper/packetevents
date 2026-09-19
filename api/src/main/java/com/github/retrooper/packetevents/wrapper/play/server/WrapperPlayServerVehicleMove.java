@@ -23,6 +23,9 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * Mojang name: ClientboundMoveVehiclePacket
+ */
 public class WrapperPlayServerVehicleMove extends PacketWrapper<WrapperPlayServerVehicleMove> {
     private Vector3d position;
     private float yaw;

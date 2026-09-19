@@ -1,3 +1,47 @@
+!!!!! v2.14.0
+
+# PacketEvents 2.14.0 is finally out! 🎉
+
+This minor release includes mainly support for Minecraft 26.3, but also includes a few smaller fixes and improvements.
+
+Recent donors: ???\
+If you intend on donating and do not wish to be mentioned, please add such a note on your donation.
+
+# Announcement 📢
+
+Visit our website: https://packetevents.com/ \
+Documentation: https://docs.packetevents.com/ \
+Javadoc: https://javadocs.packetevents.com/
+
+Thanks to all contributors who helped make this release possible:
+- @booky10
+- @Bram1903
+- @carragrive
+- @ChengZhiMeow
+- @Jan1k1
+- @ManInMyVan
+- @R00tB33rMan
+- @ThatApplePieGuy
+- @TheFaser
+
+## What's Changed
+
+* Add support for 26.3 ([#1582](https://github.com/retrooper/packetevents/pull/1582))
+* Fix state type in wrapper for `block_event` packet ([#1571](https://github.com/retrooper/packetevents/pull/1571))
+* Fix dialog body encoding for versions prior to 26.1 ([`2e49ec0`](https://github.com/retrooper/packetevents/commit/2e49ec0965d949de69f54f6f2eea5be75ca25ac0))
+* Fix equippable item component ([#1573](https://github.com/retrooper/packetevents/pull/1573))
+* Prevent null types in ItemStack ([#1574](https://github.com/retrooper/packetevents/pull/1574))
+* Fix errors in WrapperPlayServerUseBed copying ([#1580](https://github.com/retrooper/packetevents/pull/1580))
+* Add short Javadoc to bundle packet wrapper ([#1570](https://github.com/retrooper/packetevents/pull/1570))
+* Minor NBT component serializer performance improvements ([#1549](https://github.com/retrooper/packetevents/pull/1549))
+* Fix limits for clientbound `custom_payload` packets ([#1566](https://github.com/retrooper/packetevents/pull/1566))
+* Implement `Location#equals` ([#1561](https://github.com/retrooper/packetevents/pull/1561))
+* Fix Vector3i decode for versions prior to 1.14 ([`f52b3b9`](https://github.com/retrooper/packetevents/commit/f52b3b92323b380f2ffb061ebd8e22ef1836d75c)
+* Fix interact action in 1.7 ([#1562](https://github.com/retrooper/packetevents/pull/1562))
+* Fix NBT Component serialization bug with numbers ([#1543](https://github.com/retrooper/packetevents/pull/1543))
+
+**View Full Changelog**: [`v2.13.0...v2.14.0`](https://github.com/retrooper/packetevents/compare/v2.13.0...v2.14.0)
+
 !!!!! v2.13.0
 
 # PacketEvents 2.13.0 is finally out! 🎉
