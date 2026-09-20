@@ -40,13 +40,16 @@ import java.util.Optional;
 
 import static com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn.FALLBACK_SEA_LEVEL;
 
+/**
+ * Mojang name: ClientboundLoginPacket
+ */
 public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJoinGame> {
+
     private int entityID;
     private boolean hardcore;
     private GameMode gameMode;
 
-    @Nullable
-    private GameMode previousGameMode;
+    private @Nullable GameMode previousGameMode;
 
     private List<String> worldNames;
     private NBTCompound dimensionCodec;
@@ -349,7 +352,12 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 worldName = readString();
                 hashedSeed = readLong();
                 gameMode = readGameMode();
-                previousGameMode = readGameMode();
+                if (this.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
+                    int modeId = this.readVarInt();
+                    this.previousGameMode = modeId == 0 ? null : GameMode.getById(modeId - 1);
+                } else {
+                    this.previousGameMode = this.readGameMode();
+                }
             }
             isDebug = readBoolean();
             isFlat = readBoolean();
@@ -449,7 +457,11 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
                 writeString(worldName);
                 writeLong(hashedSeed);
                 writeGameMode(gameMode);
-                writeGameMode(previousGameMode);
+                if (this.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
+                    this.writeVarInt(this.previousGameMode != null ? this.previousGameMode.getId() + 1 : 0);
+                } else {
+                    this.writeGameMode(this.previousGameMode);
+                }
             }
             writeBoolean(isDebug);
             writeBoolean(isFlat);

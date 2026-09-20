@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.item.mapdecoration;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 
 public interface MapDecorationType extends MappedEntity {
 
@@ -27,8 +28,16 @@ public interface MapDecorationType extends MappedEntity {
 
     boolean isShowOnItemFrame();
 
+    /**
+     * @versions 1.20.2-26.2
+     */
+    @ApiStatus.Obsolete
     int getMapColor();
 
+    /**
+     * @versions 1.20.2-26.2
+     */
+    @ApiStatus.Obsolete
     boolean isExplorationMapElement();
 
     boolean isTrackCount();

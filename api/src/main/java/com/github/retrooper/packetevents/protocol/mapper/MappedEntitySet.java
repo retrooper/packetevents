@@ -145,6 +145,7 @@ public class MappedEntitySet<T extends MappedEntity> implements MappedEntityRefS
 
     public static <Z extends MappedEntity> MappedEntitySet<Z> decode(
             NBT nbt, PacketWrapper<?> wrapper, IRegistry<Z> registry) {
+        IRegistry<Z> replacedRegistry = wrapper.replaceRegistry(registry);
         ClientVersion version = wrapper.getServerVersion().toClientVersion();
         List<Z> list;
         if (nbt instanceof NBTString) {
@@ -158,14 +159,14 @@ public class MappedEntitySet<T extends MappedEntity> implements MappedEntityRefS
             // single entry list
             list = new ArrayList<>(1);
             ResourceLocation key = new ResourceLocation(singleEntry);
-            list.add(registry.getByNameOrThrow(version, key));
+            list.add(replacedRegistry.getByNameOrThrow(version, key));
         } else {
             // assume it's a list
             NBTList<?> listTag = (NBTList<?>) nbt;
             list = new ArrayList<>(listTag.size());
             for (NBT tag : listTag.getTags()) {
                 ResourceLocation key = new ResourceLocation(((NBTString) tag).getValue());
-                list.add(registry.getByNameOrThrow(version, key));
+                list.add(replacedRegistry.getByNameOrThrow(version, key));
             }
         }
         return new MappedEntitySet<>(list);
