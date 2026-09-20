@@ -174,7 +174,12 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             } else {
                 gameMode = GameMode.getById(readUnsignedByte());
             }
-            previousGameMode = readGameMode();
+            if (this.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
+                int modeId = this.readVarInt();
+                this.previousGameMode = modeId == 0 ? null : GameMode.getById(modeId - 1);
+            } else {
+                this.previousGameMode = this.readGameMode();
+            }
             worldDebug = readBoolean();
             worldFlat = readBoolean();
             if (v1_19_3) {
@@ -227,7 +232,11 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             writeString(worldName.orElse(""));
             writeLong(hashedSeed);
             writeGameMode(gameMode);
-            writeGameMode(previousGameMode);
+            if (this.getServerVersion().isNewerThanOrEquals(ServerVersion.V_26_3)) {
+                this.writeVarInt(this.previousGameMode != null ? this.previousGameMode.getId() + 1 : 0);
+            } else {
+                this.writeGameMode(this.previousGameMode);
+            }
             writeBoolean(worldDebug);
             writeBoolean(worldFlat);
             if (v1_19_3) {

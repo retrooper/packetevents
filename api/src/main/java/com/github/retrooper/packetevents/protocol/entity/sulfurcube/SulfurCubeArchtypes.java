@@ -25,7 +25,7 @@ import static com.github.retrooper.packetevents.protocol.entity.sulfurcube.Sulfu
 @NullMarked
 public final class SulfurCubeArchtypes {
 
-    private static final VersionedRegistry<SulfurCubeArchtype> REGISTRY = new VersionedRegistry<>("sulfur_cube_archtype");
+    private static final VersionedRegistry<SulfurCubeArchtype> REGISTRY = new VersionedRegistry<>("sulfur_cube_archetype");
 
     private SulfurCubeArchtypes() {
     }

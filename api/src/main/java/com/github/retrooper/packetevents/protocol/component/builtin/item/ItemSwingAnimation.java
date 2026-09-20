@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.component.builtin.item;
 
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -67,7 +68,7 @@ public class ItemSwingAnimation {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj == null || getClass() != obj.getClass()) return false;
         ItemSwingAnimation that = (ItemSwingAnimation) obj;
         if (this.duration != that.duration) return false;

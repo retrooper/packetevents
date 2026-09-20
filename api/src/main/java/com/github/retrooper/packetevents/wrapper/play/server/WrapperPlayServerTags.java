@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Mojang name: ClientboundUpdateTagsPacket
+ */
 public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> {
 
     private Map<ResourceLocation, List<Tag>> tags;
