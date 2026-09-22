@@ -19,8 +19,10 @@
 package com.github.retrooper.packetevents.protocol.component;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
+import com.github.retrooper.packetevents.netty.buffer.UnpooledByteBufAllocationHelper;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.mappings.GlobalRegistryHolder;
 import com.github.retrooper.packetevents.util.mappings.IRegistryHolder;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -148,11 +150,11 @@ public class PatchableComponentMap implements IComponentMap {
                             + expectedReaderIndex + ", got reader index " + readerIndex);
                 }
             }
-            // set component value in component patch-map
-            components.set((ComponentType<Object>) type, value);
+            // store the patch in the patch-map exactly as it arrived
+            components.patches.put(type, Optional.ofNullable(value));
         }
         for (int i = 0; i < absentCount; i++) {
-            components.unset(wrapper.readMappedEntity(ComponentTypes.getRegistry()));
+            components.patches.put(wrapper.readMappedEntity(ComponentTypes.getRegistry()), Optional.empty());
         }
 
         return components;
@@ -248,13 +250,46 @@ public class PatchableComponentMap implements IComponentMap {
     @Override
     public PatchableComponentMap withRegistries(IRegistryHolder registries) {
         if (this.registries != registries) {
-            return new PatchableComponentMap(this.base, this.patches, registries, true);
+            return new PatchableComponentMap(this.base, new HashMap<>(this.patches), registries, true);
         }
         return this;
     }
 
     public PatchableComponentMap copy() {
         return new PatchableComponentMap(this.base, new HashMap<>(this.patches), this.registries, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PatchableComponentMap deepCopy(ClientVersion version) {
+        if (this.patches.isEmpty()) {
+            return new PatchableComponentMap(this.base, new HashMap<>(), this.registries, true);
+        }
+
+        Map<ComponentType<?>, Optional<?>> copiedPatches = new HashMap<>(this.patches.size());
+        Object buffer = UnpooledByteBufAllocationHelper.buffer();
+        try {
+            PacketWrapper<?> wrapper = PacketWrapper.createDummyWrapper(version);
+            wrapper.buffer = buffer;
+            wrapper.setRegistryHolder(this.registries);
+
+            for (Map.Entry<ComponentType<?>, Optional<?>> patch : this.patches.entrySet()) {
+                Optional<?> value = patch.getValue();
+                if (!value.isPresent()) {
+                    copiedPatches.put(patch.getKey(), value); // empty optionals are immutable
+                    continue;
+                }
+
+                ComponentType<Object> type = (ComponentType<Object>) patch.getKey();
+                ByteBufHelper.clear(buffer);
+                type.write(wrapper, value.get());
+                Object copiedValue = type.read(wrapper);
+                // a null result means this type has no wire codec; keep sharing the value
+                copiedPatches.put(type, copiedValue != null ? Optional.of(copiedValue) : value);
+            }
+        } finally {
+            ByteBufHelper.release(buffer);
+        }
+        return new PatchableComponentMap(this.base, copiedPatches, this.registries, true);
     }
 
     @Deprecated

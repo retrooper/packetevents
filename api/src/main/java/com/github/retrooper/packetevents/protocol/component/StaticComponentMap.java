@@ -70,6 +70,12 @@ public final class StaticComponentMap implements IComponentMap {
         this.registries = registries;
     }
 
+    private StaticComponentMap(StaticComponentMap other, IRegistryHolder registries) {
+        this.empty = other.empty;
+        this.delegate = other.delegate;
+        this.registries = registries;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -97,7 +103,7 @@ public final class StaticComponentMap implements IComponentMap {
     @Override
     public StaticComponentMap withRegistries(IRegistryHolder registries) {
         if (this.registries != registries) {
-            return new StaticComponentMap(this.delegate, registries);
+            return new StaticComponentMap(this, registries);
         }
         return this;
     }
