@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.protocol.player.User;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.NullUnmarked;
 
 @NullMarked
 public class UserLoginEvent extends PacketEvent implements CallableEvent, UserEvent, PlayerEvent {
@@ -38,6 +39,7 @@ public class UserLoginEvent extends PacketEvent implements CallableEvent, UserEv
     }
 
     @Override
+    @NullUnmarked
     public <T> T getPlayer() {
         return (T) player;
     }
