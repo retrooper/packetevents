@@ -41,6 +41,7 @@ import io.github.retrooper.packetevents.impl.netty.manager.protocol.ProtocolMana
 import io.github.retrooper.packetevents.impl.netty.manager.server.ServerManagerAbstract;
 import io.github.retrooper.packetevents.injector.BungeePipelineInjector;
 import io.github.retrooper.packetevents.processor.InternalBungeeProcessor;
+import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -85,6 +86,16 @@ public class BungeePacketEventsBuilder {
                 @Override
                 public ProtocolVersion getPlatformVersion() {
                     return ProtocolVersion.UNKNOWN;
+                }
+
+                @Override
+                public void receivePacketSilently(Object channel, Object byteBuf) {
+                    if (ChannelHelper.isOpen(channel)) {
+                        // Only invoke handlers after ours; keep Bungee packet-decoder in path (#1465)
+                        ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
+                    } else {
+                        ((ByteBuf) byteBuf).release();
+                    }
                 }
             };
             private final ServerManager serverManager = new ServerManagerAbstract() {
