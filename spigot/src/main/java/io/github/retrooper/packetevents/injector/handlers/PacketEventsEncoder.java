@@ -45,6 +45,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
+import java.util.List;
 import java.util.Queue;
 
 public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
@@ -237,10 +238,12 @@ public class PacketEventsEncoder extends ChannelOutboundHandlerAdapter {
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
         if (handledCompression) return false;
-        int compressIndex = ctx.pipeline().names().indexOf("compress");
+        if (ctx.pipeline().get("compress") == null) return false;
+        List<String> names = ctx.pipeline().names(); // Readonly copy of encoder names
+        int compressIndex = names.indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = names.indexOf(PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
         if (compressIndex > peEncoderIndex) {
             //We are ahead of the decompression handler (they are added dynamically) so let us relocate.

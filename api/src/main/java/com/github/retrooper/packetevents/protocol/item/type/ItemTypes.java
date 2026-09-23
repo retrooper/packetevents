@@ -2591,15 +2591,15 @@ public final class ItemTypes {
     private static StaticComponentMap.Builder parseComponents(
             ClientVersion version,
             @Nullable StaticComponentMap base,
-            SequentialNBTReader.Compound nbt
+            SequentialNBTReader.Compound nbt,
+            PacketWrapper<?> wrapper
     ) {
         StaticComponentMap.Builder components = StaticComponentMap.builder();
         if (base != null) {
             components.setAll(base);
         }
-        // allocate a buffer once and use it for parsing everything
-        Object byteBuf = UnpooledByteBufAllocationHelper.buffer();
-        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(byteBuf, version.toServerVersion());
+
+        Object byteBuf = wrapper.getBuffer();
 
         for (Map.Entry<String, NBT> entry : nbt) {
             String compName = entry.getKey();
@@ -2651,35 +2651,47 @@ public final class ItemTypes {
             }
         }
 
-        ByteBufHelper.release(byteBuf);
         return components;
     }
 
-    private static void parseAllComponents(ClientVersion version) {
+    private static void parseAllComponents(ClientVersion version,
+                                           Map<StaticComponentMap, StaticComponentMap> canonical) {
         String path = "mappings/item_base_components/" + version.name();
-        try (SequentialNBTReader.Compound compound = MappingHelper.decompress(path)) {
-            compound.skipOne(); // skip version
-            SequentialNBTReader.Compound items = (SequentialNBTReader.Compound) compound.next().getValue();
-            StaticComponentMap defaults = parseComponents(
-                    version, null, (SequentialNBTReader.Compound) items.next().getValue()).build();
+        // Shared pool across deserialization
+        Object byteBuf = UnpooledByteBufAllocationHelper.buffer();
+        try {
+            PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(
+                    byteBuf, version.toServerVersion());
+            try (SequentialNBTReader.Compound compound = MappingHelper.decompress(path)) {
+                compound.skipOne(); // skip version
+                SequentialNBTReader.Compound items = (SequentialNBTReader.Compound) compound.next().getValue();
+                StaticComponentMap defaults = parseComponents(
+                        version, null, (SequentialNBTReader.Compound) items.next().getValue(), wrapper).build();
 
-            for (Map.Entry<String, NBT> item : items) {
-                ItemType itemType = REGISTRY.getByName(new ResourceLocation(item.getKey()));
-                if (!(itemType instanceof StaticItemType)) {
-                    ((SequentialNBTReader.Compound) item.getValue()).skip();
-                    continue; // somehow unknown item
+                for (Map.Entry<String, NBT> item : items) {
+                    ItemType itemType = REGISTRY.getByName(new ResourceLocation(item.getKey()));
+                    if (!(itemType instanceof StaticItemType)) {
+                        ((SequentialNBTReader.Compound) item.getValue()).skip();
+                        continue; // somehow unknown item
+                    }
+                    StaticComponentMap components = parseComponents(version, defaults,
+                            (SequentialNBTReader.Compound) item.getValue(), wrapper).build();
+                    // items overlap heavily - most differ from the defaults in only a couple of
+                    // components - so identical maps are shared instead of kept per item per version
+                    StaticComponentMap shared = canonical.putIfAbsent(components, components);
+                    ((StaticItemType) itemType).setComponents(version,
+                            shared != null ? shared : components);
                 }
-                StaticComponentMap.Builder components = parseComponents(version, defaults,
-                        (SequentialNBTReader.Compound) item.getValue());
-                ((StaticItemType) itemType).setComponents(version, components.build());
-            }
-            for (ItemType type : REGISTRY.getEntries()) {
-                if (type instanceof StaticItemType && !((StaticItemType) type).hasComponents(version)) {
-                    ((StaticItemType) type).setComponents(version, defaults);
+                for (ItemType type : REGISTRY.getEntries()) {
+                    if (type instanceof StaticItemType && !((StaticItemType) type).hasComponents(version)) {
+                        ((StaticItemType) type).setComponents(version, defaults);
+                    }
                 }
             }
         } catch (Exception exception) {
             throw new RuntimeException("Error while parsing item base component data for " + version, exception);
+        } finally {
+            ByteBufHelper.release(byteBuf);
         }
     }
 
@@ -2691,9 +2703,11 @@ public final class ItemTypes {
                 ClientVersion.V_1_21_7, ClientVersion.V_1_21_9, ClientVersion.V_1_21_11,
                 ClientVersion.V_26_1, ClientVersion.V_26_2, ClientVersion.V_26_3,
         };
+        Map<StaticComponentMap, StaticComponentMap> canonical = new HashMap<>();
         for (ClientVersion version : versions) {
-            parseAllComponents(version);
+            parseAllComponents(version, canonical);
         }
+        canonical.clear();
         for (ItemType type : REGISTRY.getEntries()) {
             if (type instanceof StaticItemType) {
                 ((StaticItemType) type).fillComponents();
