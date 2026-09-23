@@ -15,14 +15,14 @@ description=""
 [[dependencies.packetevents]]
 modId="neoforge"
 type="required"
-versionRange="[21.9.15-beta,)"
+versionRange="[21,)
 ordering="NONE"
 side="BOTH"
 
 [[dependencies.packetevents]]
 modId="minecraft"
 type="required"
-versionRange="[26.2,26.3)"
+versionRange="[26.3,)"
 ordering="NONE"
 side="BOTH"
 
