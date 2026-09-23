@@ -8,7 +8,7 @@ shadow = "8.3.11"
 mod-publish = "2.0.0"
 runtask = "3.0.2"
 fabric-loom = "1.17.8"
-neoforge-moddev = "2.0.141"
+neoforge-moddev = "2.0.147"
 
 [libraries]
 shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version.ref = "shadow" }
