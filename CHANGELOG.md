@@ -4,7 +4,7 @@
 
 This minor release includes mainly support for Minecraft 26.3, but also includes a few smaller fixes and improvements.
 
-Recent donors: ???\
+Recent donors: **@PebbleHost, Aurel (Advanced GUI), @zer0origin**\
 If you intend on donating and do not wish to be mentioned, please add such a note on your donation.
 
 # Announcement 📢
