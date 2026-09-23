@@ -51,6 +51,8 @@ import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfVariant
 import com.github.retrooper.packetevents.protocol.entity.wolfvariant.WolfVariants;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPattern;
 import com.github.retrooper.packetevents.protocol.item.banner.BannerPatterns;
+import com.github.retrooper.packetevents.protocol.item.blocktransformer.BlockTransformer;
+import com.github.retrooper.packetevents.protocol.item.blocktransformer.BlockTransformers;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.item.instrument.Instrument;
@@ -74,10 +76,14 @@ import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Tim
 import com.github.retrooper.packetevents.protocol.world.attributes.timelines.Timelines;
 import com.github.retrooper.packetevents.protocol.world.biome.Biome;
 import com.github.retrooper.packetevents.protocol.world.biome.Biomes;
+import com.github.retrooper.packetevents.protocol.world.blockentity.decopot.DecoratedPotPattern;
+import com.github.retrooper.packetevents.protocol.world.blockentity.decopot.DecoratedPotPatterns;
 import com.github.retrooper.packetevents.protocol.world.clock.WorldClock;
 import com.github.retrooper.packetevents.protocol.world.clock.WorldClocks;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageType;
 import com.github.retrooper.packetevents.protocol.world.damagetype.DamageTypes;
+import com.github.retrooper.packetevents.protocol.world.generation.BlockStateProvider;
+import com.github.retrooper.packetevents.protocol.world.generation.BlockStateProviders;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionTypes;
 import com.github.retrooper.packetevents.protocol.world.painting.PaintingVariant;
@@ -110,7 +116,7 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(Biomes.getRegistry(), Biome.CODEC),
                 new RegistryEntry<>(ChatTypes.getRegistry(), ChatType::decode),
                 new RegistryEntry<>(TrimPatterns.getRegistry(), (NbtEntryDecoder<TrimPattern>) TrimPattern::decode),
-                new RegistryEntry<>(TrimMaterials.getRegistry(), (NbtEntryDecoder<TrimMaterial>) TrimMaterial::decode),
+                new RegistryEntry<>(TrimMaterials.getRegistry(), TrimMaterial.DIRECT_CODEC),
                 new RegistryEntry<>(WolfVariants.getRegistry(), WolfVariant.CODEC),
                 new RegistryEntry<>(WolfSoundVariants.getRegistry(), WolfSoundVariant.CODEC),
                 new RegistryEntry<>(PigVariants.getRegistry(), PigVariant::decode),
@@ -133,7 +139,10 @@ public final class SynchronizedRegistriesHandler {
                 new RegistryEntry<>(CowSoundVariants.getRegistry(), CowSoundVariant.CODEC),
                 new RegistryEntry<>(ChickenSoundVariants.getRegistry(), ChickenSoundVariant.CODEC),
                 new RegistryEntry<>(WorldClocks.getRegistry(), WorldClock.DIRECT_CODEC),
-                new RegistryEntry<>(SulfurCubeArchtypes.getRegistry(), SulfurCubeArchtype.DIRECT_CODEC)
+                new RegistryEntry<>(SulfurCubeArchtypes.getRegistry(), SulfurCubeArchtype.DIRECT_CODEC),
+                new RegistryEntry<>(DecoratedPotPatterns.getRegistry(), DecoratedPotPattern.CODEC),
+                new RegistryEntry<>(BlockTransformers.getRegistry(), BlockTransformer.DIRECT_CODEC),
+                new RegistryEntry<>(BlockStateProviders.getRegistry(), BlockStateProvider.DIRECT_CODEC)
         ).forEach(entry -> REGISTRY_KEYS.put(entry.getRegistryKey(), entry));
     }
 

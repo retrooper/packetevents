@@ -85,6 +85,10 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
      * @versions 1.21.9+
      */
     private WeightedList<ParticleInfo> blockParticles;
+    /**
+     * @versions 26.3+
+     */
+    private boolean playSound = true;
 
     public WrapperPlayServerExplosion(PacketSendEvent event) {
         super(event);
@@ -189,6 +193,9 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
             this.explosionSound = Sound.read(this);
             if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9)) {
                 this.blockParticles = WeightedList.read(this, ParticleInfo::read);
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+                    this.playSound = this.readBoolean();
+                }
             }
             // legacy fields
             this.blockInteraction = BlockInteraction.DESTROY_BLOCKS;
@@ -251,6 +258,9 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
             Sound.write(this, this.explosionSound);
             if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9)) {
                 WeightedList.write(this, this.blockParticles, ParticleInfo::write);
+                if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_26_3)) {
+                    this.writeBoolean(this.playSound);
+                }
             }
         } else {
             writeFloat(strength);
@@ -300,6 +310,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         blockInteraction = wrapper.blockInteraction;
         explosionSound = wrapper.explosionSound;
         blockParticles = wrapper.blockParticles;
+        playSound = wrapper.playSound;
     }
 
     private Vector3i toFloor(Vector3d position) {
@@ -477,6 +488,20 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
      */
     public void setBlockParticles(WeightedList<ParticleInfo> blockParticles) {
         this.blockParticles = blockParticles;
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public boolean isPlaySound() {
+        return this.playSound;
+    }
+
+    /**
+     * @versions 26.3+
+     */
+    public void setPlaySound(boolean playSound) {
+        this.playSound = playSound;
     }
 
     public enum BlockInteraction {
