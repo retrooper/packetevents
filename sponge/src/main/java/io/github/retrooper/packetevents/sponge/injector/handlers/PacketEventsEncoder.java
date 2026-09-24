@@ -36,6 +36,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageEncoder;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
 
@@ -43,11 +44,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
 
+@ApiStatus.Internal
 public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     public User user;
     public UUID player;
-    private boolean handledCompression;
+    public boolean handleCompression;
+    public boolean handledCompression;
     private ChannelPromise promise;
 
     public PacketEventsEncoder(User user) {
@@ -57,17 +60,18 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     public PacketEventsEncoder(ChannelHandler encoder) {
         user = ((PacketEventsEncoder) encoder).user;
         player = ((PacketEventsEncoder) encoder).player;
+        handleCompression = ((PacketEventsEncoder) encoder).handleCompression;
         handledCompression = ((PacketEventsEncoder) encoder).handledCompression;
         promise = ((PacketEventsEncoder) encoder).promise;
     }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        boolean needsRecompression = !handledCompression && handleCompression(ctx, byteBuf);
-        handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
+        boolean needsRecompression = !this.handledCompression && this.handleCompression && this.handleCompression(ctx, byteBuf);
+        this.handleClientBoundPacket(ctx.channel(), user, player, byteBuf, this.promise);
 
         if (needsRecompression) {
-            compress(ctx, byteBuf);
+            this.compress(ctx, byteBuf);
         }
 
         // So apparently, this is how ViaVersion hacks around bungeecord not supporting sending empty packets
@@ -153,11 +157,11 @@ public class PacketEventsEncoder extends MessageToMessageEncoder<ByteBuf> {
     }
 
     private boolean handleCompression(ChannelHandlerContext ctx, ByteBuf buffer) throws InvocationTargetException {
-        if (handledCompression) return false;
-        int compressIndex = ctx.pipeline().names().indexOf("compress");
+        List<String> handlerNames = ctx.pipeline().names();
+        int compressIndex = handlerNames.indexOf("compress");
         if (compressIndex == -1) return false;
         handledCompression = true;
-        int peEncoderIndex = ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME);
+        int peEncoderIndex = handlerNames.indexOf(PacketEvents.ENCODER_NAME);
         if (peEncoderIndex == -1) return false;
         if (compressIndex > peEncoderIndex) {
             //We are ahead of the decompression handler (they are added dynamically) so let us relocate.
