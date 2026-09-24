@@ -86,6 +86,7 @@ import com.github.retrooper.packetevents.protocol.packettype.serverbound.Serverb
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_26_1;
 import com.github.retrooper.packetevents.protocol.packettype.serverbound.ServerboundPacketType_26_3;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.IdTable;
 import com.github.retrooper.packetevents.util.VersionMapper;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.configuration.client.WrapperConfigClientAcceptCodeOfConduct;
@@ -375,8 +376,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public final class PacketType {
 
@@ -839,7 +838,8 @@ public final class PacketType {
             ;
 
             private static int INDEX = 0;
-            private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
+            private final static IdTable<PacketTypeCommon> PACKET_TYPE_ID_TABLE =
+                    new IdTable<>(SERVERBOUND_CONFIG_VERSION_MAPPER.size());
             private final int[] ids;
             private final Class<? extends PacketWrapper<?>> wrapper;
 
@@ -856,22 +856,25 @@ public final class PacketType {
 
             public static void load() {
                 INDEX = 0;
+                PACKET_TYPE_ID_TABLE.mutable();
                 loadPacketIds(ServerboundConfigPacketType_1_20_2.values());
                 loadPacketIds(ServerboundConfigPacketType_1_20_5.values());
                 loadPacketIds(ServerboundConfigPacketType_1_21_6.values());
                 loadPacketIds(ServerboundConfigPacketType_1_21_9.values());
                 // TODO UPDATE Update packet type mappings (config serverbound pt. 2)
+                PACKET_TYPE_ID_TABLE.immutable();
             }
 
             private static void loadPacketIds(Enum<?>[] enumConstants) {
                 int index = INDEX;
+                PacketTypeCommon[] packetIdTable = new PacketTypeCommon[enumConstants.length];
                 for (Enum<?> constant : enumConstants) {
                     int id = constant.ordinal();
                     Configuration.Client value = Configuration.Client.valueOf(constant.name());
                     value.ids[index] = id;
-                    Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
-                    packetIdMap.put(id, value);
+                    packetIdTable[id] = value;
                 }
+                PACKET_TYPE_ID_TABLE.put(index, packetIdTable);
                 INDEX++;
             }
 
@@ -883,8 +886,7 @@ public final class PacketType {
                 PacketType.prepare();
 
                 int index = SERVERBOUND_CONFIG_VERSION_MAPPER.getIndex(version);
-                Map<Integer, PacketTypeCommon> map = PACKET_TYPE_ID_MAP.get((byte) index);
-                return map.get(packetId);
+                return PACKET_TYPE_ID_TABLE.lookup(index, packetId);
             }
 
             @Deprecated
@@ -974,7 +976,8 @@ public final class PacketType {
             ;
 
             private static int INDEX = 0;
-            private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
+            private static final IdTable<PacketTypeCommon> PACKET_TYPE_ID_TABLE =
+                    new IdTable<>(CLIENTBOUND_CONFIG_VERSION_MAPPER.size());
             private final int[] ids;
             private final Class<? extends PacketWrapper<?>> wrapper;
 
@@ -991,6 +994,7 @@ public final class PacketType {
 
             public static void load() {
                 INDEX = 0;
+                PACKET_TYPE_ID_TABLE.mutable();
                 loadPacketIds(ClientboundConfigPacketType_1_20_2.values());
                 loadPacketIds(ClientboundConfigPacketType_1_20_3.values());
                 loadPacketIds(ClientboundConfigPacketType_1_20_5.values());
@@ -999,17 +1003,19 @@ public final class PacketType {
                 loadPacketIds(ClientboundConfigPacketType_1_21_9.values());
                 loadPacketIds(ClientboundConfigPacketType_26_3.values());
                 // TODO UPDATE Update packet type mappings (config clientbound pt. 2)
+                PACKET_TYPE_ID_TABLE.immutable();
             }
 
             private static void loadPacketIds(Enum<?>[] enumConstants) {
                 int index = INDEX;
+                PacketTypeCommon[] packetIdTable = new PacketTypeCommon[enumConstants.length];
                 for (Enum<?> constant : enumConstants) {
                     int id = constant.ordinal();
                     Configuration.Server value = Configuration.Server.valueOf(constant.name());
                     value.ids[index] = id;
-                    Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
-                    packetIdMap.put(id, value);
+                    packetIdTable[id] = value;
                 }
+                PACKET_TYPE_ID_TABLE.put(index, packetIdTable);
                 INDEX++;
             }
 
@@ -1021,8 +1027,7 @@ public final class PacketType {
                 PacketType.prepare();
 
                 int index = CLIENTBOUND_CONFIG_VERSION_MAPPER.getIndex(version);
-                Map<Integer, PacketTypeCommon> map = PACKET_TYPE_ID_MAP.get((byte) index);
-                return map.get(packetId);
+                return PACKET_TYPE_ID_TABLE.lookup(index, packetId);
             }
 
             @Deprecated
@@ -1231,7 +1236,8 @@ public final class PacketType {
             ;
 
             private static int INDEX = 0;
-            private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
+            private final static IdTable<PacketTypeCommon> PACKET_TYPE_ID_TABLE =
+                    new IdTable<>(SERVERBOUND_PLAY_VERSION_MAPPER.size());
             private final int[] ids;
             private final Class<? extends PacketWrapper<?>> wrapper;
 
@@ -1246,30 +1252,9 @@ public final class PacketType {
                 return wrapper;
             }
 
-            @Nullable
-            public static PacketTypeCommon getById(ClientVersion version, int packetId) {
-                PacketType.prepare();
-
-                int index = SERVERBOUND_PLAY_VERSION_MAPPER.getIndex(version);
-                Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
-                return packetIdMap.get(packetId);
-            }
-
-            private static void loadPacketIds(Enum<?>[] enumConstants) {
-                int index = INDEX;
-                for (Enum<?> constant : enumConstants) {
-                    int id = constant.ordinal();
-                    Client value = Client.valueOf(constant.name());
-                    value.ids[index] = id;
-                    Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte) index,
-                            k -> new HashMap<>());
-                    packetIdMap.put(id, value);
-                }
-                INDEX++;
-            }
-
             public static void load() {
                 INDEX = 0;
+                PACKET_TYPE_ID_TABLE.mutable();
                 loadPacketIds(ServerboundPacketType_1_7_10.values());
                 loadPacketIds(ServerboundPacketType_1_8.values());
                 loadPacketIds(ServerboundPacketType_1_9.values());
@@ -1296,6 +1281,28 @@ public final class PacketType {
                 loadPacketIds(ServerboundPacketType_26_1.values());
                 loadPacketIds(ServerboundPacketType_26_3.values());
                 //TODO UPDATE Update packet type mappings (serverbound pt. 2)
+                PACKET_TYPE_ID_TABLE.immutable();
+            }
+
+            private static void loadPacketIds(Enum<?>[] enumConstants) {
+                int index = INDEX;
+                PacketTypeCommon[] packetIdTable = new PacketTypeCommon[enumConstants.length];
+                for (Enum<?> constant : enumConstants) {
+                    int id = constant.ordinal();
+                    Client value = Client.valueOf(constant.name());
+                    value.ids[index] = id;
+                    packetIdTable[id] = value;
+                }
+                PACKET_TYPE_ID_TABLE.put(index, packetIdTable);
+                INDEX++;
+            }
+
+            @Nullable
+            public static PacketTypeCommon getById(ClientVersion version, int packetId) {
+                PacketType.prepare();
+
+                int index = SERVERBOUND_PLAY_VERSION_MAPPER.getIndex(version);
+                return PACKET_TYPE_ID_TABLE.lookup(index, packetId);
             }
 
             public int getId(ClientVersion version) {
@@ -1656,7 +1663,8 @@ public final class PacketType {
             ;
 
             private static int INDEX = 0;
-            private static final Map<Byte, Map<Integer, PacketTypeCommon>> PACKET_TYPE_ID_MAP = new HashMap<>();
+            private static final IdTable<PacketTypeCommon> PACKET_TYPE_ID_TABLE =
+                    new IdTable<>(CLIENTBOUND_PLAY_VERSION_MAPPER.size());
             private final int[] ids;
             private final Class<? extends PacketWrapper<?>> wrapper;
 
@@ -1671,41 +1679,9 @@ public final class PacketType {
                 return wrapper;
             }
 
-            public int getId(ClientVersion version) {
-                PacketType.prepare();
-
-                int index = CLIENTBOUND_PLAY_VERSION_MAPPER.getIndex(version);
-                return ids[index];
-            }
-
-            @Nullable
-            public static PacketTypeCommon getById(ClientVersion version, int packetId) {
-                PacketType.prepare();
-
-                int index = CLIENTBOUND_PLAY_VERSION_MAPPER.getIndex(version);
-                Map<Integer, PacketTypeCommon> map = PACKET_TYPE_ID_MAP.get((byte) index);
-                return map.get(packetId);
-            }
-
-            @Override
-            public PacketSide getSide() {
-                return PacketSide.SERVER;
-            }
-
-            private static void loadPacketIds(Enum<?>[] enumConstants) {
-                int index = INDEX;
-                for (Enum<?> constant : enumConstants) {
-                    int id = constant.ordinal();
-                    Server value = Server.valueOf(constant.name());
-                    value.ids[index] = id;
-                    Map<Integer, PacketTypeCommon> packetIdMap = PACKET_TYPE_ID_MAP.computeIfAbsent((byte) index, k -> new HashMap<>());
-                    packetIdMap.put(id, value);
-                }
-                INDEX++;
-            }
-
             public static void load() {
                 INDEX = 0;
+                PACKET_TYPE_ID_TABLE.mutable();
                 loadPacketIds(ClientboundPacketType_1_7_10.values());
                 loadPacketIds(ClientboundPacketType_1_8.values());
                 loadPacketIds(ClientboundPacketType_1_9.values());
@@ -1736,6 +1712,40 @@ public final class PacketType {
                 loadPacketIds(ClientboundPacketType_26_1.values());
                 loadPacketIds(ClientboundPacketType_26_3.values());
                 //TODO UPDATE Update packet type mappings (clientbound pt. 2)
+                PACKET_TYPE_ID_TABLE.immutable();
+            }
+
+            private static void loadPacketIds(Enum<?>[] enumConstants) {
+                int index = INDEX;
+                PacketTypeCommon[] packetIdTable = new PacketTypeCommon[enumConstants.length];
+                for (Enum<?> constant : enumConstants) {
+                    int id = constant.ordinal();
+                    Server value = Server.valueOf(constant.name());
+                    value.ids[index] = id;
+                    packetIdTable[id] = value;
+                }
+                PACKET_TYPE_ID_TABLE.put(index, packetIdTable);
+                INDEX++;
+            }
+
+            public int getId(ClientVersion version) {
+                PacketType.prepare();
+
+                int index = CLIENTBOUND_PLAY_VERSION_MAPPER.getIndex(version);
+                return ids[index];
+            }
+
+            @Nullable
+            public static PacketTypeCommon getById(ClientVersion version, int packetId) {
+                PacketType.prepare();
+
+                int index = CLIENTBOUND_PLAY_VERSION_MAPPER.getIndex(version);
+                return PACKET_TYPE_ID_TABLE.lookup(index, packetId);
+            }
+
+            @Override
+            public PacketSide getSide() {
+                return PacketSide.SERVER;
             }
         }
     }
