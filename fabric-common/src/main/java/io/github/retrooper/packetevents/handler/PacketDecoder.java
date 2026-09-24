@@ -18,6 +18,9 @@
 
 package io.github.retrooper.packetevents.handler;
 
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
+import com.github.retrooper.packetevents.exception.PacketProcessException;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
@@ -48,10 +51,20 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         if (!msg.isReadable()) {
             return;
         }
-        PacketEventsImplHelper.handlePacket(ctx.channel(), this.user, this.player,
+        ProtocolPacketEvent event = PacketEventsImplHelper.handlePacket(ctx.channel(), this.user, this.player,
                 msg, false, this.side);
         if (msg.isReadable()) {
             out.add(msg.retain());
+        }
+
+        if (event instanceof PacketSendEvent sendEvent && sendEvent.hasTasksAfterSend()) {
+            for (Runnable task : sendEvent.getTasksAfterSend()) {
+                try {
+                    task.run();
+                } catch (Throwable throwable) {
+                    throw new PacketProcessException("Error while handling post-send-task " + task + " for " + event, throwable);
+                }
+            }
         }
     }
 }
