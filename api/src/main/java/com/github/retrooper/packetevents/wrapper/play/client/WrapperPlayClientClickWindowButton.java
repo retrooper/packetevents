@@ -42,16 +42,19 @@ public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPla
 
     @Override
     public void read() {
-        // TODO this changed from a byte to a var int, which version?
-        this.windowID = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_2)
-                ? this.readContainerId() : this.readVarInt();
-        this.buttonID = readByte();
+        this.windowID = this.readContainerId();
+        this.buttonID = this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)
+                ? this.readVarInt() : this.readByte();
     }
 
     @Override
     public void write() {
         this.writeContainerId(this.windowID);
-        writeByte(this.buttonID);
+        if (this.serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21)) {
+            this.writeVarInt(this.buttonID);
+        } else {
+            this.writeByte(this.buttonID);
+        }
     }
 
     @Override
